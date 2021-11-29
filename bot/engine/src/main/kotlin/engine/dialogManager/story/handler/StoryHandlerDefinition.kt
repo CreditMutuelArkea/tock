@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
 
+import ai.tock.bot.definition.ConnectorStoryHandler
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.message.MessagesList.Companion.toMessageList
 

@@ -23,6 +23,7 @@ import ai.tock.bot.engine.StoryHandlerUnknown
 import ai.tock.bot.engine.StoryHandlerVoiceNotSupported
 import ai.tock.bot.engine.TestStoryDefinition.test
 import ai.tock.bot.engine.TestStoryDefinition.test2
+import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
 import ai.tock.translator.UserInterfaceType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

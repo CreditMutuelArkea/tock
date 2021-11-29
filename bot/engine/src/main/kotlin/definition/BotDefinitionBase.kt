@@ -19,6 +19,9 @@ package ai.tock.bot.definition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialogManager.story.SimpleStoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.deleteKeyword
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.endTestContextKeyword
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.testContextKeyword

@@ -23,8 +23,8 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.StoryDefinition
-import ai.tock.bot.definition.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog

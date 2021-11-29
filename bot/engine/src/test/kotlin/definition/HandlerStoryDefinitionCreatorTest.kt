@@ -17,6 +17,7 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.handler.defaultHandlerStoryDefinitionCreator
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

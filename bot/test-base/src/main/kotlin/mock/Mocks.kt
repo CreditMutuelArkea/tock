@@ -21,10 +21,10 @@ import ai.tock.bot.definition.ConnectorDef
 import ai.tock.bot.definition.ConnectorHandlerProvider
 import ai.tock.bot.definition.ConnectorStoryHandlerBase
 import ai.tock.bot.definition.HandlerDef
-import ai.tock.bot.definition.StoryDefinitionBase
-import ai.tock.bot.definition.StoryHandlerBase
-import ai.tock.bot.definition.StoryHandlerDefinition
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.StoryDefinitionBase
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.shared.injector
 import ai.tock.shared.tockInternalInjector

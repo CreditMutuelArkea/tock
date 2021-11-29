@@ -19,10 +19,10 @@ package ai.tock.bot.engine
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.SimpleStoryDefinition
-import ai.tock.bot.definition.SimpleStoryHandlerBase
-import ai.tock.bot.definition.SimpleStoryStep
-import ai.tock.bot.definition.StoryDefinitionExtended
+import ai.tock.bot.engine.dialogManager.story.SimpleStoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
+import ai.tock.bot.engine.dialogManager.story.StoryDefinitionExtended
 import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.definition.story
 import ai.tock.bot.definition.storyWithSteps

@@ -18,7 +18,7 @@ package ai.tock.bot.connector.googlechat
 import ai.tock.bot.connector.ConnectorHandler
 import ai.tock.bot.connector.googlechat.builder.GOOGLE_CHAT_CONNECTOR_TYPE_ID
 import ai.tock.bot.definition.ConnectorStoryHandler
-import ai.tock.bot.definition.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 import kotlin.reflect.KClass
 
 /**

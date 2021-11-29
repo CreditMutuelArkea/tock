@@ -18,7 +18,7 @@ package ai.tock.bot.engine.message
 
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 
 data class Suggestion(
     val title: CharSequence,

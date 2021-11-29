@@ -46,8 +46,8 @@ import ai.tock.bot.connector.messenger.model.send.SenderAction.typing_on
 import ai.tock.bot.connector.messenger.model.send.UrlPayload
 import ai.tock.bot.connector.messenger.model.webhook.CallbackRequest
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.StoryHandlerDefinition
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository.requestTimer
 import ai.tock.bot.engine.ConnectorController

@@ -18,7 +18,7 @@ package ai.tock.bot.test
 
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.user.PlayerId

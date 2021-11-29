@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story
 
+import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.definition.StoryTag
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**

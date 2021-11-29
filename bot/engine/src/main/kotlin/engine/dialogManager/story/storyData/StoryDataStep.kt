@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.storyData
 
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 
 /**
  * A step that can have specific preconditions and can use input data object in handler.

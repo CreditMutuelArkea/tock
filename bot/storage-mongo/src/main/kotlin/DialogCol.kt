@@ -19,7 +19,7 @@ package ai.tock.bot.mongo
 import ai.tock.bot.admin.dialog.ActionReport
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionMetadata
 import ai.tock.bot.engine.action.SendAttachment

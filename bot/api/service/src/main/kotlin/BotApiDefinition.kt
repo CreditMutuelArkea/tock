@@ -22,11 +22,11 @@ import ai.tock.bot.api.model.configuration.StepConfiguration
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.SimpleStoryDefinition
-import ai.tock.bot.definition.SimpleStoryHandlerBase
-import ai.tock.bot.definition.StoryDefinition
-import ai.tock.bot.definition.StoryHandlerDefinition
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.SimpleStoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.shared.error
 import mu.KotlinLogging

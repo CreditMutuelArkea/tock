@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
 
+import ai.tock.bot.definition.*
 import ai.tock.bot.definition.BotDefinition.Companion.defaultBreath
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.storyData.StoryDataStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.hasCurrentSwitchStoryProcess
 import ai.tock.shared.defaultNamespace
 import ai.tock.translator.I18nKeyProvider

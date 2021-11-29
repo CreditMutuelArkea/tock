@@ -18,7 +18,7 @@ package ai.tock.bot.test.junit
 
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.test.BotBusMock
 import ai.tock.bot.test.BotBusMockContext

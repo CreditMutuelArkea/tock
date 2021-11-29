@@ -31,7 +31,7 @@ import ai.tock.bot.connector.media.MediaAction
 import ai.tock.bot.connector.media.MediaCard
 import ai.tock.bot.connector.media.MediaCarousel
 import ai.tock.bot.connector.media.MediaFile
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment.AttachmentType

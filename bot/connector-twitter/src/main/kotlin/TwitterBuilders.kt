@@ -32,8 +32,8 @@ import ai.tock.bot.connector.twitter.model.outcoming.DirectMessageOutcomingEvent
 import ai.tock.bot.connector.twitter.model.outcoming.OutcomingEvent
 import ai.tock.bot.connector.twitter.model.outcoming.Tweet
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.StoryHandlerDefinition
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator

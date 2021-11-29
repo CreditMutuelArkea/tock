@@ -25,7 +25,7 @@ import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.BotDefinitionTest
 import ai.tock.bot.engine.TestStoryDefinition.test
 import ai.tock.bot.engine.config.BotDefinitionWrapper

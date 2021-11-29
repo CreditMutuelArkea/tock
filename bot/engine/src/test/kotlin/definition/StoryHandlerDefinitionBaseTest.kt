@@ -21,7 +21,7 @@ import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.ConnectorDef
 import ai.tock.bot.definition.ConnectorStoryHandler
 import ai.tock.bot.definition.HandlerDef
-import ai.tock.bot.definition.defaultHandlerStoryDefinitionCreator
+import ai.tock.bot.engine.dialogManager.story.handler.defaultHandlerStoryDefinitionCreator
 import ai.tock.bot.engine.BotBus
 import io.mockk.every
 import io.mockk.mockk

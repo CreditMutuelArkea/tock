@@ -17,9 +17,9 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryDefinition
-import ai.tock.bot.definition.StoryHandler
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS
 import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS_WITH_STORY_INTENT
 import ai.tock.bot.engine.BotBus

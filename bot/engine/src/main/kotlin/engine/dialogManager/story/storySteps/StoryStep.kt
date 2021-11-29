@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.storySteps
 
+import ai.tock.bot.definition.EntityStepSelection
+import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.user.UserTimeline
 import java.util.concurrent.ConcurrentHashMap
 

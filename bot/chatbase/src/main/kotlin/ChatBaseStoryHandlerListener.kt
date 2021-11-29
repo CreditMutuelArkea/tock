@@ -19,7 +19,7 @@ package ai.tock.analytics.chatbase
 import ai.tock.analytics.chatbase.model.Message
 import ai.tock.analytics.chatbase.model.Type
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.definition.StoryHandlerListener
 import ai.tock.bot.engine.BotBus
 

@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
+
+import ai.tock.bot.engine.BotBus
 
 /**
- * [StoryStep] without custom [StoryHandlerDefinition].
+ * For simple stories that do not use custom [StoryHandlerDefinition].
  */
-interface SimpleStoryStep : StoryStep<StoryHandlerDefinition>
+abstract class SimpleStoryHandlerBase(mainIntentName: String? = null) :
+    StoryHandlerBase<StoryHandlerDefinition>(mainIntentName) {
+
+    /**
+     * The method to implement.
+     */
+    abstract fun action(bus: BotBus)
+
+    override fun newHandlerDefinition(bus: BotBus, data: Any?): StoryHandlerDefinition = SimpleStoryHandlerDefinition(bus, this)
+}

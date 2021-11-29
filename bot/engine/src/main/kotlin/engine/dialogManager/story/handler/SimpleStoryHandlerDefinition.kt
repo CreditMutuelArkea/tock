@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
 
 import ai.tock.bot.engine.BotBus
 
 /**
- * Receive a sentence or action, and send the answer.
- *
- * Story handlers should usually not directly extend this class, but instead extend [StoryHandlerBase].
+ * [StoryHandlerDefinition] for [SimpleStoryHandlerBase].
  */
-interface StoryHandler {
+internal class SimpleStoryHandlerDefinition(
+    val bus: BotBus,
+    private val storyHandler: SimpleStoryHandlerBase
+) : BotBus by bus, StoryHandlerDefinition {
 
-    /**
-     * Receive a message from the bus.
-     *
-     * @param bus the bus used to get the message and send the answer
-     */
-    fun handle(bus: BotBus)
-
-    /**
-     * What is the probability of bot support for the current request?
-     *
-     * @return a probability between 0.0 (not supported) and 1.0 (supported!)
-     */
-    fun support(bus: BotBus): Double = 1.0
+    override fun handle() {
+        storyHandler.action(bus)
+    }
 }

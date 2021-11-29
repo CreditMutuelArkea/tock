@@ -18,6 +18,8 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.engine.BotEngineTest
 import ai.tock.bot.engine.TestStoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.nlp.entity.date.DateEntityRange
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

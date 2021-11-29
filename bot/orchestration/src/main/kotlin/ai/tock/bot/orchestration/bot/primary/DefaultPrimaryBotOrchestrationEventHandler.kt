@@ -16,7 +16,7 @@
 
 package ai.tock.bot.orchestration.bot.primary
 
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.orchestration.shared.AvailableOrchestrationResponse
 

@@ -25,6 +25,7 @@ import ai.tock.bot.engine.config.ConfiguredStoryDefinition
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogState
 import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.story.SimpleStoryDefinition
 import ai.tock.translator.I18nLabelValue
 import io.mockk.every
 import io.mockk.mockk

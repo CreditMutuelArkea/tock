@@ -18,6 +18,8 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.UserTimeline
 import io.mockk.every
 import io.mockk.mockk

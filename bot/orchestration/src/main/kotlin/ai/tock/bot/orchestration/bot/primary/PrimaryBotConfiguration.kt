@@ -18,7 +18,7 @@ package ai.tock.bot.orchestration.bot.primary
 
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.orchestration.shared.OrchestrationData
 import ai.tock.bot.orchestration.shared.OrchestrationTargetedBot

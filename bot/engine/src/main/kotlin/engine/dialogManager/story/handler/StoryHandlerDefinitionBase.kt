@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
 
 import ai.tock.bot.connector.ConnectorHandler
 import ai.tock.bot.connector.ConnectorIdHandlers
 import ai.tock.bot.connector.ConnectorType
+import ai.tock.bot.definition.ConnectorHandlerProvider
+import ai.tock.bot.definition.ConnectorStoryHandlerBase
+import ai.tock.bot.definition.DefaultConnectorHandlerProvider
 import ai.tock.bot.engine.BotBus
 import ai.tock.shared.injector
 import ai.tock.shared.provide

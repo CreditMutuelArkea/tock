@@ -19,7 +19,7 @@ package ai.tock.bot.orchestration.bot.primary
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.definition.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.definition.StoryHandlerListener
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action

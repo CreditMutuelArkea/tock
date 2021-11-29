@@ -16,6 +16,9 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+
 data class DialogFlowState(
     val storyDefinition: StoryDefinition,
     val intent: IntentAware = storyDefinition.mainIntent(),

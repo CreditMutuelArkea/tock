@@ -21,9 +21,9 @@ import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryDefinition
-import ai.tock.bot.definition.StoryHandler
-import ai.tock.bot.definition.StoryStep
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.definition.StoryTag
 import ai.tock.translator.UserInterfaceType
 

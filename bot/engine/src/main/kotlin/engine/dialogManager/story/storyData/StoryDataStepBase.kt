@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.storyData
 
-import ai.tock.bot.definition.StoryHandlerBase.Companion.isEndCalled
+import ai.tock.bot.definition.EmptyData
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase.Companion.isEndCalled
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 
 /**
  * Base class for [StoryDataStep] implementations.

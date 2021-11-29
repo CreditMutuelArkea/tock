@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.storySteps
 
-import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 
 /**
- * [StoryHandlerDefinition] for [SimpleStoryHandlerBase].
+ * [StoryStep] without custom [StoryHandlerDefinition].
  */
-internal class SimpleStoryHandlerDefinition(
-    val bus: BotBus,
-    private val storyHandler: SimpleStoryHandlerBase
-) : BotBus by bus, StoryHandlerDefinition {
-
-    override fun handle() {
-        storyHandler.action(bus)
-    }
-}
+interface SimpleStoryStep : StoryStep<StoryHandlerDefinition>

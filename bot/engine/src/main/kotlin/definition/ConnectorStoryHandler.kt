@@ -18,6 +18,7 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 
 /**
  * Handler for specific [ConnectorType].

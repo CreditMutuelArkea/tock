@@ -30,8 +30,8 @@ import ai.tock.bot.connector.ConnectorFeature.CAROUSEL
 import ai.tock.bot.connector.media.MediaCardDescriptor
 import ai.tock.bot.connector.media.MediaCarouselDescriptor
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.StoryDefinition
-import ai.tock.bot.definition.StoryHandler
+import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.SendSentence

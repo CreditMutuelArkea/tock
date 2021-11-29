@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.engine.dialogManager.story.handler
 
 import ai.tock.bot.engine.BotBus
 import kotlin.reflect.full.isSubtypeOf
