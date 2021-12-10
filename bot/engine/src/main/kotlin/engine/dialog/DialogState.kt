@@ -17,6 +17,7 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.user.UserLocation
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
@@ -28,7 +29,7 @@ data class DialogState(
     /**
      * The current [Intent] of the dialog, can be null.
      */
-    var currentIntent: Intent? = null,
+    var currentIntent: IntentAware? = null,
     /**
      * The current entity values (with their history).
      */

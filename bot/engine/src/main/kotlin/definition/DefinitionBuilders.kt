@@ -100,7 +100,7 @@ fun bot(
         intent as? StoryDefinition
             ?: findStoryDefinition(
                 stories,
-                intent?.wrappedIntent()?.name,
+                intent?.name(),
                 unknownStory,
                 keywordStory
             ).let {
@@ -156,7 +156,7 @@ fun story(
     unsupportedUserInterface: UserInterfaceType? = null
 ): StoryDefinitionBase =
     StoryDefinitionBase(
-        handler.wrappedIntent().name,
+        handler.name(),
         handler,
         otherStarterIntents,
         secondaryIntents,
@@ -197,6 +197,7 @@ fun story(
         intentName,
         object : SimpleStoryHandlerBase(intentName) {
             override fun action(bus: BotBus) = handler.invoke(bus)
+            override fun name(): String = intentName
         },
         otherStarterIntents,
         secondaryIntents,
@@ -230,7 +231,7 @@ inline fun <reified T : StoryHandlerDefinition> story(
     unsupportedUserInterface: UserInterfaceType? = null
 ): StoryDefinitionBase =
     StoryDefinitionBase(
-        handler.wrappedIntent().name,
+        handler.name(),
         handler,
         otherStarterIntents,
         secondaryIntents,
@@ -434,7 +435,7 @@ fun story(
     unsupportedUserInterface: UserInterfaceType? = null
 ): StoryDefinitionBase =
     StoryDefinitionBase(
-        intent.wrappedIntent().name,
+        intent.name(),
         storyHandler,
         otherStarterIntents,
         secondaryIntents,

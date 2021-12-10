@@ -100,7 +100,7 @@ internal class BotDefinitionWrapper(val botDefinition: BotDefinition) : BotDefin
     }
 
     override fun findStoryDefinition(intent: IntentAware?, applicationId: String): StoryDefinition {
-        return findStoryDefinition(intent?.wrappedIntent()?.name, applicationId)
+        return findStoryDefinition(intent?.name(), applicationId)
     }
 
     private fun findStory(intent: String?, applicationId: String): StoryDefinition =
@@ -147,7 +147,7 @@ internal class BotDefinitionWrapper(val botDefinition: BotDefinition) : BotDefin
 
                         targetStory
                             ?.let { toStory ->
-                                val storyMainIntent = toStory.mainIntent().name
+                                val storyMainIntent = toStory.mainIntent().name()
                                 if (storyMainIntent == initialIntent) {
                                     toStory.checkApplicationId(applicationId)
                                 } else {

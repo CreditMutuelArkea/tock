@@ -27,9 +27,9 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.BotDefinitionTest
-import ai.tock.bot.engine.TestStoryDefinition.test
 import ai.tock.bot.engine.config.BotDefinitionWrapper
 import ai.tock.bot.engine.config.ConfiguredStoryDefinition
+import ai.tock.bot.engine.test
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -82,7 +82,7 @@ internal class BotDefinitionWrapperTest {
         @Test
         fun `GIVEN no story redirection WHEN find story THEN return story`() {
             val inputStory =
-                botWrapper.findStoryDefinition(test.mainIntent().name, applicationId)
+                botWrapper.findStoryDefinition(test.mainIntent().name(), applicationId)
             assertEquals(test, inputStory)
         }
     }

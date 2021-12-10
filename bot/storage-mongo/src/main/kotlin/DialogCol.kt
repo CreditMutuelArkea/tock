@@ -19,6 +19,7 @@ package ai.tock.bot.mongo
 import ai.tock.bot.admin.dialog.ActionReport
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionMetadata
@@ -147,7 +148,7 @@ internal data class DialogCol(
     }
 
     data class DialogStateMongoWrapper(
-        var currentIntent: Intent?,
+        var currentIntent: IntentAware?,
         @JsonDeserialize(contentAs = EntityStateValueWrapper::class)
         val entityValues: Map<String, EntityStateValueWrapper>,
         @JsonDeserialize(contentAs = AnyValueWrapper::class)
@@ -202,7 +203,7 @@ internal data class DialogCol(
     @JacksonData(internal = true)
     data class StoryMongoWrapper(
         val storyDefinitionId: String,
-        var currentIntent: Intent?,
+        var currentIntent: IntentAware?,
         val currentStep: String?,
         val actions: List<ActionMongoWrapper>
     ) {

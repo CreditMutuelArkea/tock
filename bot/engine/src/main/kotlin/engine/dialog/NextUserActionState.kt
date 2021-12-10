@@ -53,7 +53,7 @@ data class NextUserActionState(
         states: Set<String>? = null
     ) :
         this(
-            intentsQualifiers.map { NlpIntentQualifier(it.key.wrappedIntent().name, it.value) },
+            intentsQualifiers.map { NlpIntentQualifier(it.key.name(), it.value) },
             referenceDate,
             referenceTimezone,
             states

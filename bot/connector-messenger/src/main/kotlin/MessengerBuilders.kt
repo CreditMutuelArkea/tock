@@ -427,7 +427,7 @@ fun <T : Bus<T>> T.quickReply(
     step: StoryStep<out StoryHandlerDefinition>? = null,
     vararg parameters: Pair<String, String>
 ): QuickReply =
-    quickReply(title, targetIntent.wrappedIntent(), imageUrl, step, parameters.toMap())
+    quickReply(title, targetIntent.intent(), imageUrl, step, parameters.toMap())
 
 /**
  * Creates a [quick reply](https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies).

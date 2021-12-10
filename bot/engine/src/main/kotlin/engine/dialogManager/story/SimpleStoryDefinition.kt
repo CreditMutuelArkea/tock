@@ -30,11 +30,11 @@ import ai.tock.translator.UserInterfaceType
 open class SimpleStoryDefinition(
     override val id: String,
     override val storyHandler: StoryHandler,
-    override val starterIntents: Set<Intent>,
+    override val starterIntents: Set<IntentAware>,
     /**
      * starter intents + other intents supported by the story.
      */
-    override val intents: Set<Intent> = starterIntents,
+    override val intents: Set<IntentAware> = starterIntents,
     override val steps: Set<StoryStep<StoryHandlerDefinition>> = emptySet(),
     override val unsupportedUserInterfaces: Set<UserInterfaceType> = emptySet(),
     override val tags: Set<StoryTag> = emptySet()
@@ -52,9 +52,13 @@ open class SimpleStoryDefinition(
         this(
             id = id,
             storyHandler = storyHandler,
-            starterIntents = starterIntents.map { it.wrappedIntent() }.toSet(),
-            intents = intents.map { it.wrappedIntent() }.toSet(),
+            starterIntents = starterIntents.map { it.intent() }.toSet(),
+            intents = intents.map { it.intent() }.toSet(),
             steps = steps.toSet(),
             unsupportedUserInterfaces = unsupportedUserInterfaces
         )
+
+    override fun name(): String {
+        return mainIntent().name()
+    }
 }

@@ -20,6 +20,7 @@ import ai.tock.bot.engine.BotEngineTest
 import ai.tock.bot.engine.TestStoryDefinition
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.testStoryDefinitionList
 import ai.tock.nlp.entity.date.DateEntityRange
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -41,7 +42,7 @@ class DefinitionBuildersTest : BotEngineTest() {
     override val botDefinition: BotDefinition = object : BotDefinitionBase(
         "test",
         "namespace",
-        stories = enumValues<TestStoryDefinition>().toList(),
+        stories = testStoryDefinitionList,
         unknownStory = unknownStory
     ) {}
 
@@ -50,8 +51,8 @@ class DefinitionBuildersTest : BotEngineTest() {
         val yeh = storyWithSteps<Step>("yeh") {
             end("yeh")
         }
-        assertEquals("yeh", yeh.steps.first().baseIntent.wrappedIntent().name)
-        assertEquals("yeh", yeh.steps.last().baseIntent.wrappedIntent().name)
+        assertEquals("yeh", yeh.steps.first().baseIntent.name())
+        assertEquals("yeh", yeh.steps.last().baseIntent.name())
         assertEquals(Step.a, yeh.steps.first())
         assertEquals(Step.b, yeh.steps.last())
     }

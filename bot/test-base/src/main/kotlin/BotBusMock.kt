@@ -245,7 +245,7 @@ open class BotBusMock(
     override var intent: IntentAware?
         get() = dialog.state.currentIntent
         set(value) {
-            dialog.state.currentIntent = value?.wrappedIntent()
+            dialog.state.currentIntent = value?.intent()
         }
 
     override var nextUserActionState: NextUserActionState?
@@ -290,7 +290,7 @@ open class BotBusMock(
         if (a != context.firstAction) {
             context.story.actions.add(a)
             // update action state
-            a.state.intent = context.dialog.state.currentIntent?.name
+            a.state.intent = context.dialog.state.currentIntent?.name()
             a.state.step = context.story.currentStep?.name
         }
         if (a.state.userInterface != null) {

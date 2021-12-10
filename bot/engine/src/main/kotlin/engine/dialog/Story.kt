@@ -17,6 +17,7 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
@@ -37,7 +38,7 @@ import mu.KotlinLogging
  */
 data class Story(
     val definition: StoryDefinition,
-    val starterIntent: Intent,
+    val starterIntent: IntentAware,
     internal var step: String? = null,
     val actions: MutableList<Action> = mutableListOf()
 ) {
@@ -74,7 +75,7 @@ data class Story(
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
-        intent: Intent?
+        intent: IntentAware?
     ): StoryStep<*>? {
         // first level
         findStepInTree(steps, userTimeline, dialog, action, intent)?.also {
@@ -95,7 +96,7 @@ data class Story(
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
-        intent: Intent?
+        intent: IntentAware?
     ): StoryStep<*>? {
         // first level
         steps.forEach { s ->
@@ -162,7 +163,7 @@ data class Story(
     /**
      * Does this story supports the action ?
      */
-    fun supportAction(userTimeline: UserTimeline, dialog: Dialog, action: Action, intent: Intent): Boolean {
+    fun supportAction(userTimeline: UserTimeline, dialog: Dialog, action: Action, intent: IntentAware): Boolean {
         if (supportIntent(intent)) {
             return true
         }
@@ -188,13 +189,13 @@ data class Story(
     /**
      * Does this story supports the intent ?
      */
-    fun supportIntent(intent: Intent): Boolean =
+    fun supportIntent(intent: IntentAware): Boolean =
         definition.supportIntent(intent) || currentStep?.supportIntent(intent) == true
 
     /**
      * Set the current step form the specified action and new intent.
      */
-    fun computeCurrentStep(userTimeline: UserTimeline, dialog: Dialog, action: Action, newIntent: Intent?) {
+    fun computeCurrentStep(userTimeline: UserTimeline, dialog: Dialog, action: Action, newIntent: IntentAware?) {
         // set current step if necessary
         var forced = false
         if (action is SendChoice && !dialog.state.hasCurrentSwitchStoryProcess) {

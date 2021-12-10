@@ -43,12 +43,12 @@ interface StoryDefinition : IntentAware {
      * One or more intents that start the story.
      * Usually, you don't have the same starter intent in two different story definition.
      */
-    val starterIntents: Set<Intent>
+    val starterIntents: Set<IntentAware>
 
     /**
      * The complete list of intents supported by the story.
      */
-    val intents: Set<Intent>
+    val intents: Set<IntentAware>
 
     /**
      * The story definition tags that specify different story types or roles.
@@ -78,22 +78,22 @@ interface StoryDefinition : IntentAware {
     /**
      * Is the specified intent is a starter intent?
      */
-    fun isStarterIntent(intent: Intent) = starterIntents.contains(intent)
+    fun isStarterIntent(intent: IntentAware) = starterIntents.contains(intent)
 
     /**
      * Is the specified intent is supported by this story?
      */
-    fun supportIntent(intent: Intent) = intents.contains(intent)
+    fun supportIntent(intent: IntentAware) = intents.contains(intent)
 
     /**
      * The "referent" intent for this story.
      */
-    fun mainIntent(): Intent = starterIntents.first()
+    fun mainIntent(): IntentAware = starterIntents.first()
 
     /**
      * Implementation for [IntentAware].
      */
-    override fun wrappedIntent(): Intent = mainIntent()
+    override fun intent(): IntentAware = mainIntent()
 
     /**
      * Returns all steps of the story.

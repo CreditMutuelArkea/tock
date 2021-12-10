@@ -18,8 +18,6 @@ package ai.tock.bot.engine
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.StepTest.s4
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.unknown
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog

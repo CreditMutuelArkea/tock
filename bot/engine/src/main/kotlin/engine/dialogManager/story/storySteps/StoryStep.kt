@@ -92,7 +92,7 @@ interface StoryStep<T : StoryHandlerDefinition> {
      * Does this Step has to be automatically selected from the action context?
      * if returns true, the step is selected.
      */
-    fun selectFromAction(userTimeline: UserTimeline, dialog: Dialog, action: Action, intent: Intent?): Boolean =
+    fun selectFromAction(userTimeline: UserTimeline, dialog: Dialog, action: Action, intent: IntentAware?): Boolean =
         intent != null && selectFromActionAndEntityStepSelection(action, intent) ?: supportStarterIntent(intent)
 
     /**
@@ -106,7 +106,7 @@ interface StoryStep<T : StoryHandlerDefinition> {
      * Does this step hast to be selected from its [entityStepSelection]?
      * Returns null if there is no [entityStepSelection].
      */
-    fun selectFromActionAndEntityStepSelection(action: Action, intent: Intent? = null): Boolean? =
+    fun selectFromActionAndEntityStepSelection(action: Action, intent: IntentAware? = null): Boolean? =
         entityStepSelection?.let { e ->
             if (intent != null && this.intent != null && !supportStarterIntent(intent)) false
             else if (e.value == null) action.hasEntity(e.entityRole)
@@ -127,13 +127,13 @@ interface StoryStep<T : StoryHandlerDefinition> {
     /**
      * Does this step support this intent as starter intent?
      */
-    fun supportStarterIntent(i: Intent): Boolean =
+    fun supportStarterIntent(i: IntentAware): Boolean =
         intent?.wrap(i) == true || otherStarterIntents.any { it.wrap(i) }
 
     /**
      * Does this step support this intent?
      */
-    fun supportIntent(i: Intent): Boolean = supportStarterIntent(i) || secondaryIntents.any { it.wrap(i) }
+    fun supportIntent(i: IntentAware): Boolean = supportStarterIntent(i) || secondaryIntents.any { it.wrap(i) }
 
     /**
      * The optional children of the step.

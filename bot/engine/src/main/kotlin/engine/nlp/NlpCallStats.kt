@@ -17,6 +17,7 @@
 package ai.tock.bot.engine.nlp
 
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.nlp.api.client.model.NlpQuery
 import ai.tock.nlp.api.client.model.NlpResult
@@ -27,7 +28,7 @@ import java.util.Locale
  */
 data class NlpCallStats(
     val locale: Locale,
-    val intentResult: Intent = Intent.unknown,
+    val intentResult: IntentAware = Intent.unknown,
     val entityResult: List<EntityValue> = emptyList(),
     val entityResultAfterMerge: List<EntityValue> = emptyList(),
     val nlpQuery: NlpQuery,

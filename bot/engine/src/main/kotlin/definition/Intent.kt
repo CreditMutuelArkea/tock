@@ -36,7 +36,7 @@ data class Intent(
     /**
      * The qualified name of the intent.
      */
-    val name: String
+   val name: String
 ) : IntentAware {
 
     companion object {
@@ -50,5 +50,8 @@ data class Intent(
         val keyword: Intent = Intent("$TOCK_NAMESPACE:keyword")
     }
 
-    override fun wrappedIntent(): Intent = this
+    override fun name(): String {
+        return name
+    }
+
 }

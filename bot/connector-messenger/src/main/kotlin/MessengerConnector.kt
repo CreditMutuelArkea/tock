@@ -596,7 +596,7 @@ class MessengerConnector internal constructor(
                 recipientId,
                 connectorId,
                 PlayerId(pageId, bot),
-                intent.wrappedIntent().name,
+                intent.name(),
                 step,
                 parameters
             ),

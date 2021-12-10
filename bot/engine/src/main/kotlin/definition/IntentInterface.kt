@@ -16,25 +16,5 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.shared.withoutNamespace
-
-/**
- * Convenient interface used to compare [Intent] with [StoryDefinition].
- */
-interface IntentAware {
-
-    fun intentWithoutNamespace(): IntentWithoutNamespace {
-        return  IntentWithoutNamespace(name().withoutNamespace())
-    }
-
-    fun intent(): IntentAware = this
-
-    fun name(): String
-
-    /**
-     * Is it the right intent?
-     */
-    infix fun wrap(intent: IntentAware?): Boolean {
-        return intent().equals(intent)
-    }
+interface IntentInterface {
 }

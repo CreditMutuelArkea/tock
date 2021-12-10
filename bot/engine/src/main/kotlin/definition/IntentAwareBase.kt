@@ -23,5 +23,5 @@ interface IntentAwareBase : IntentAware {
 
     val name: String
 
-    override fun wrappedIntent(): Intent = Intent(name)
+    override fun intent(): IntentAware = Intent(name)
 }

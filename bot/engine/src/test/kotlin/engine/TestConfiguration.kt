@@ -38,8 +38,8 @@ class BotDefinitionTest :
     BotDefinitionBase(
         "test",
         "namespace",
-        stories = enumValues<TestStoryDefinition>().toList() + otherStory + testWithoutStep + builtInStories + disableBotTaggedStory,
-        unknownStory = TestStoryDefinition.unknown,
+        stories = testStoryDefinitionList + otherStory + testWithoutStep + builtInStories + disableBotTaggedStory,
+        unknownStory = unknown,
         botEnabledStory = enableStory,
         botDisabledStory = disableStory
     )
@@ -62,7 +62,8 @@ abstract class AbstractStoryHandler : SimpleStoryHandlerBase() {
     }
 }
 
-enum class TestStoryDefinition(
+class TestStoryDefinition(
+    override val name: String,
     override val storyHandler: AbstractStoryHandler,
     override val otherStarterIntents: Set<IntentAware> = emptySet(),
     override val secondaryIntents: Set<IntentAware> = emptySet(),
@@ -71,15 +72,19 @@ enum class TestStoryDefinition(
     override val tags: Set<StoryTag> = emptySet()
 ) : StoryDefinitionExtended {
 
-    test(StoryHandlerTest, secondaryIntents = setOf(secondaryIntent)),
-    story_with_other_starter(StoryHandlerTest, setOf(secondaryIntent)),
-    test2(StoryHandler2Test),
-    voice_not_supported(StoryHandlerVoiceNotSupported, unsupportedUserInterface = voiceAssistant),
-    withoutStep(StoryHandlerWithoutStep, stepsArray = emptyArray()),
-    unknown(StoryHandlerUnknown);
-
     val registeredBus: BotBus? get() = storyHandler.registeredBus
+
+    override fun name(): String = name
 }
+
+val test = TestStoryDefinition("test", StoryHandlerTest, secondaryIntents = setOf(secondaryIntent))
+val story_with_other_starter = TestStoryDefinition("story_with_other_starter", StoryHandlerTest, setOf(secondaryIntent))
+val test2 = TestStoryDefinition("test2", StoryHandler2Test)
+val voice_not_supported = TestStoryDefinition("voice_not_supported", StoryHandlerVoiceNotSupported, unsupportedUserInterface = voiceAssistant)
+val withoutStep = TestStoryDefinition("withoutStep", StoryHandlerWithoutStep, stepsArray = emptyArray())
+val unknown = TestStoryDefinition("unknown", StoryHandlerUnknown)
+
+val testStoryDefinitionList: List<TestStoryDefinition> = listOf(test, story_with_other_starter, test2, voice_not_supported, withoutStep, unknown)
 
 object StoryHandlerTest : AbstractStoryHandler()
 

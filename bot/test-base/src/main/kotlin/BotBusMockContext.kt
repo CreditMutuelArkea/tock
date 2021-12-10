@@ -180,7 +180,7 @@ data class BotBusMockContext(
         entityValues: List<EntityValue> = emptyList()
     ): SendSentence =
         SendSentence(userId, applicationId, botId, text).apply {
-            state.intent = intent?.wrappedIntent()?.name
+            state.intent = intent?.name()
             state.entityValues.addAll(entityValues)
         }
 
@@ -220,7 +220,7 @@ data class BotBusMockContext(
         entityValues: List<EntityValue> = emptyList()
     ): SendSentence =
         SendSentence(userId, applicationId, botId, null, mutableListOf(message)).apply {
-            state.intent = intent?.wrappedIntent()?.name
+            state.intent = intent?.name()
             state.entityValues.addAll(entityValues)
             state.targetConnectorType = message.connectorType
             state.userInterface = message.connectorType.userInterfaceType
@@ -250,7 +250,7 @@ data class BotBusMockContext(
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>,
         parameters: Parameters
-    ): SendChoice = SendChoice(userId, applicationId, botId, intent.wrappedIntent().name, step, parameters.toMap())
+    ): SendChoice = SendChoice(userId, applicationId, botId, intent.name(), step, parameters.toMap())
 
     /**
      * Create a choice for this context.
@@ -258,7 +258,7 @@ data class BotBusMockContext(
     fun choice(
         intent: IntentAware,
         parameters: Parameters = Parameters()
-    ): SendChoice = SendChoice(userId, applicationId, botId, intent.wrappedIntent().name, parameters.toMap())
+    ): SendChoice = SendChoice(userId, applicationId, botId, intent.name(), parameters.toMap())
 
     /**
      * Create a choice for this context.

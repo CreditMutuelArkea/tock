@@ -21,6 +21,7 @@ import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
@@ -49,12 +50,16 @@ internal class ConfiguredStoryDefinition(
      */
     val name: String = configuration.name
 
+    override fun name(): String {
+        return name;
+    }
+
     fun isDisabled(applicationId: String?): Boolean = configuration.isDisabled(applicationId)
 
     fun findEnabledStorySwitchId(applicationId: String?): String? =
         configuration.findEnabledStorySwitchId(applicationId)
 
-    override val starterIntents: Set<Intent> =
+    override val starterIntents: Set<IntentAware> =
         setOf(configuration.mainIntent) +
             (configuration.storyDefinition(definition, configuration)?.starterIntents ?: emptySet())
 
@@ -64,14 +69,16 @@ internal class ConfiguredStoryDefinition(
         (configuration.storyDefinition(definition, configuration)?.steps ?: emptySet()) +
             configuration.findSteps(botApplicationConfigurationKey).map { it.toStoryStep(configuration) }
 
-    override val intents: Set<Intent> =
+    override val intents: Set<IntentAware> =
         starterIntents +
             (configuration.storyDefinition(definition, configuration)?.intents ?: emptySet()) +
-            configuration.mandatoryEntities.map { it.intent.intent(configuration.namespace) } +
+            configuration.mandatoryEntities.map {
+                it.intent.intent(configuration.namespace)
+            } +
             allSteps()
                 .filterIsInstance<Step>()
                 .filter { it.configuration.findCurrentAnswer() != null || it.configuration.targetIntent != null }
-                .mapNotNull { it.intent?.wrappedIntent() }
+                .mapNotNull { it.intent?.intent() }
 
     override val unsupportedUserInterfaces: Set<UserInterfaceType> =
         configuration.storyDefinition(definition, configuration)?.unsupportedUserInterfaces ?: emptySet()

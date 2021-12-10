@@ -18,8 +18,8 @@ package ai.tock.bot.engine.config
 
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.engine.BotDefinitionTest
-import ai.tock.bot.engine.TestStoryDefinition.story_with_other_starter
 import ai.tock.bot.engine.secondaryIntent
+import ai.tock.bot.engine.story_with_other_starter
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 

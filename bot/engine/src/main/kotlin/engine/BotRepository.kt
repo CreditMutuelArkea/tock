@@ -264,7 +264,7 @@ object BotRepository {
         val starterIntentsMap: MutableMap<String, MutableList<StoryDefinition>> = mutableMapOf()
         botDefinition.stories.map { s ->
             s.starterIntents.forEach {
-                val l = starterIntentsMap.getOrPut(it.name) { mutableListOf() }
+                val l = starterIntentsMap.getOrPut(it.name()) { mutableListOf() }
                 l.add(s)
             }
         }

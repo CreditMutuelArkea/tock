@@ -96,7 +96,7 @@ fun newStory(
     otherStarterIntents: Set<IntentAware> = emptySet(),
     secondaryIntents: Set<IntentAware> = emptySet(),
     steps: List<ClientStep> = emptyList(),
-    storyId: String = mainIntent.wrappedIntent().name,
+    storyId: String = mainIntent.name(),
     /**
      * The handler for the story.
      */

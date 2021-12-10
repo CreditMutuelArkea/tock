@@ -25,7 +25,6 @@ import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.engine.TestStoryDefinition.test
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.Story

@@ -50,5 +50,9 @@ open class ConfigurableStoryHandler<out T : StoryHandlerDefinition>(
 
     override fun newHandlerDefinition(bus: BotBus, data: Any?): T = handlerDefCreator.create(bus, data)
 
+    override fun name(): String {
+        return findMainIntentName() ?: error("unknown intent name")
+    }
+
     override fun checkPreconditions(): BotBus.() -> Any? = preconditionsChecker
 }

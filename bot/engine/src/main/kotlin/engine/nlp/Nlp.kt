@@ -18,6 +18,7 @@ package ai.tock.bot.engine.nlp
 
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.TockConnectorController
@@ -94,7 +95,7 @@ internal class Nlp : NlpController {
                     result?.let { nlpResult ->
 
                         listenNlpSuccessCall(query, nlpResult)
-                        val intent = findIntent(userTimeline, dialog, sentence, nlpResult)
+                        val intent: IntentAware = findIntent(userTimeline, dialog, sentence, nlpResult)
 
                         val customEntityEvaluations: MutableList<EntityValue> = mutableListOf()
                         BotRepository.forEachNlpListener {
@@ -142,12 +143,12 @@ internal class Nlp : NlpController {
             dialog: Dialog,
             sentence: SendSentence,
             nlpResult: NlpResult
-        ): Intent {
-            var i: Intent? = null
+        ): IntentAware {
+            var i: IntentAware? = null
             BotRepository.forEachNlpListener {
                 if (i == null) {
                     i = try {
-                        it.findIntent(userTimeline, dialog, sentence, nlpResult)?.wrappedIntent()
+                        it.findIntent(userTimeline, dialog, sentence, nlpResult)?.intent()
                     } catch (e: Exception) {
                         logger.error(e)
                         null
@@ -257,7 +258,7 @@ internal class Nlp : NlpController {
                 toQueryContext(),
                 NlpQueryState(
                     dialog.state.nextActionState?.states
-                        ?: listOfNotNull(dialog.currentStory?.definition?.mainIntent()?.name).toSet()
+                        ?: listOfNotNull(dialog.currentStory?.definition?.mainIntent()?.name()).toSet()
                 )
             ).run {
                 var query = this

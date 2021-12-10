@@ -22,6 +22,7 @@ import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.action.ActionPriority
@@ -85,7 +86,7 @@ internal class TockBotBus(
     private val context: BusContext = BusContext()
 
     override val entities: Map<String, EntityStateValue> = currentDialog.state.entityValues
-    override val intent: Intent? = currentDialog.state.currentIntent
+    override val intent: IntentAware? = currentDialog.state.currentIntent
 
     override var nextUserActionState: NextUserActionState?
         get() = currentDialog.state.nextActionState

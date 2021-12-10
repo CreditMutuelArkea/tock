@@ -22,6 +22,7 @@ import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment
 import ai.tock.bot.engine.action.SendAttachment.AttachmentType.audio
@@ -242,7 +243,7 @@ internal class TockConnectorController constructor(
         connector.send(TypingOnEvent(action.playerId, action.applicationId), data.callback)
     }
 
-    fun sendIntent(intent: Intent, applicationId: String, data: ConnectorData){
+    fun sendIntent(intent: IntentAware, applicationId: String, data: ConnectorData){
         connector.send(MetadataEvent.intent(intent, applicationId), data.callback)
     }
 

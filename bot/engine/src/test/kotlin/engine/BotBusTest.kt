@@ -20,10 +20,6 @@ import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.engine.BotRepository.registerBotAnswerInterceptor
-import ai.tock.bot.engine.TestStoryDefinition.story_with_other_starter
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.test2
-import ai.tock.bot.engine.TestStoryDefinition.withoutStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionPriority.urgent
 import ai.tock.bot.engine.action.SendChoice

@@ -129,7 +129,7 @@ interface BotDefinition : I18nKeyProvider {
         return if (intent is StoryDefinition) {
             intent
         } else {
-            findStoryDefinition(intent?.wrappedIntent()?.name, applicationId)
+            findStoryDefinition(intent?.name(), applicationId)
         }
     }
 

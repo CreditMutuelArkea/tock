@@ -37,7 +37,7 @@ data class Snapshot(
 
     constructor(dialog: Dialog) : this(
         dialog.currentStory?.definition?.id,
-        dialog.state.currentIntent?.name,
+        dialog.state.currentIntent?.name(),
         dialog.currentStory?.step,
         dialog.state.entityValues.values.mapNotNull { it.value },
         (dialog.currentStory?.definition as? ConfiguredStoryDefinition)?.answerType ?: AnswerConfigurationType.builtin,

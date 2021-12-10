@@ -49,11 +49,15 @@ open class StoryDefinitionBase(
 
     override val unsupportedUserInterfaces: Set<UserInterfaceType> = listOfNotNull(unsupportedUserInterface).toSet()
 
+    override fun name(): String {
+        return name
+    }
+
     override val id: String get() = name
-    override val starterIntents: Set<Intent> =
-        setOf(Intent(name)) + otherStarterIntents.map { it.wrappedIntent() }.toSet()
-    override val intents: Set<Intent> =
-        setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.wrappedIntent() }.toSet()
+    override val starterIntents: Set<IntentAware> =
+        setOf(Intent(name)) + otherStarterIntents.map { it.intent() }.toSet()
+    override val intents: Set<IntentAware> =
+        setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.intent() }.toSet()
 
     open fun handle(bus: BotBus) = storyHandler.handle(bus)
 

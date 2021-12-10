@@ -20,6 +20,7 @@ import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment
 import ai.tock.bot.engine.action.SendChoice
@@ -158,14 +159,14 @@ internal class Bot(
     }
 
     private fun getStory(userTimeline: UserTimeline, dialog: Dialog, action: Action): Story {
-        val newIntent = dialog.state.currentIntent
+        val newIntent: IntentAware? = dialog.state.currentIntent
         val previousStory = dialog.currentStory
 
         val story =
             if (previousStory == null ||
                 (newIntent != null && !previousStory.supportAction(userTimeline, dialog, action, newIntent))
             ) {
-                val storyDefinition = botDefinition.findStoryDefinition(newIntent?.name, action.applicationId)
+                val storyDefinition = botDefinition.findStoryDefinition(newIntent?.name(), action.applicationId)
                 val newStory = Story(
                     storyDefinition,
                     if (newIntent != null && storyDefinition.isStarterIntent(newIntent)) newIntent
@@ -182,7 +183,7 @@ internal class Bot(
         story.actions.add(action)
 
         // update action state
-        action.state.intent = dialog.state.currentIntent?.name
+        action.state.intent = dialog.state.currentIntent?.name()
         action.state.step = story.step
 
         return story

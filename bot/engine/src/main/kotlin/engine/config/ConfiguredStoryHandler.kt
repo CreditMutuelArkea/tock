@@ -91,7 +91,7 @@ internal class ConfiguredStoryHandler(
                     step.send(bus)
                 }
                 val targetIntent = step.targetIntent?.name
-                    ?: (bus.intent.takeIf { !step.hasCurrentAnswer() }?.wrappedIntent()?.name)
+                    ?: (bus.intent.takeIf { !step.hasCurrentAnswer() }?.name())
                 bus.botDefinition
                     .takeIf { targetIntent != null }
                     ?.findStoryDefinition(targetIntent, bus.applicationId)
@@ -138,7 +138,7 @@ internal class ConfiguredStoryHandler(
             configuration.findEnabledEndWithStoryId(bus.applicationId)
                 ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
                 ?.let {
-                    bus.switchConfiguredStory(it, it.mainIntent().name)
+                    bus.switchConfiguredStory(it, it.mainIntent().name())
                 }
         }
     }

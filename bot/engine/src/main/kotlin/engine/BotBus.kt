@@ -152,7 +152,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * To know if the current intent is owned by the [IntentAware].
      */
-    fun isIntent(intentOwner: IntentAware): Boolean = intentOwner.wrap(currentIntent?.wrappedIntent())
+    fun isIntent(intentOwner: IntentAware): Boolean = intentOwner.wrap(currentIntent?.intent())
 
     /**
      * Returns the NLP call stats if an NLP call has occurred, null either.
@@ -425,7 +425,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Switches the context to the specified story definition (start a new [Story]).
      */
-    fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent()) {
+    fun switchStory(storyDefinition: StoryDefinition, starterIntent: IntentAware = storyDefinition.mainIntent()) {
         story = Story(storyDefinition, starterIntent, story.step)
         hasCurrentSwitchStoryProcess = true
         story.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
@@ -435,7 +435,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Handles the action and switches the context to the specified story definition.
      */
-    fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent()) {
+    fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: IntentAware = storyDefinition.mainIntent()) {
         switchStory(storyDefinition, starterIntent)
         hasCurrentSwitchStoryProcess = false
         @Suppress("UNCHECKED_CAST")

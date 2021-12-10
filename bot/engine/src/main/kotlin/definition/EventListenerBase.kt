@@ -89,7 +89,7 @@ open class EventListenerBase : EventListener {
                 event.userId,
                 event.applicationId,
                 event.recipientId,
-                intent.wrappedIntent().name,
+                intent.name(),
                 state = event.state
             ),
             connectorData

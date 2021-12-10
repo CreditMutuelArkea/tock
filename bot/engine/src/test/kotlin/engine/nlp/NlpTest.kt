@@ -19,8 +19,6 @@ package ai.tock.bot.engine.nlp
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotEngineTest
 import ai.tock.bot.engine.BotRepository
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.test2
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
@@ -29,6 +27,8 @@ import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.dialog.NextUserActionState
 import ai.tock.bot.engine.event.Event
+import ai.tock.bot.engine.test
+import ai.tock.bot.engine.test2
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.model.NlpIntentQualifier
 import ai.tock.nlp.api.client.model.NlpQuery
@@ -70,7 +70,7 @@ class NlpTest : BotEngineTest() {
         every { nlpClient.parse(any()) } returns nlpResult
         val sentence = userAction as SendSentence
         Nlp().parseSentence(sentence, userTimeline, dialog, connectorController, botDefinition)
-        assertEquals("test2", sentence.nlpStats?.intentResult?.name)
+        assertEquals("test2", sentence.nlpStats?.intentResult?.name())
     }
 
     @Test
@@ -147,9 +147,9 @@ class NlpTest : BotEngineTest() {
         BotRepository.registerNlpListener(nlpListener)
         Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
 
-        assertEquals(test2.wrappedIntent(), dialog.state.currentIntent)
-        assertEquals(test2.wrappedIntent(), (userAction as SendSentence).nlpStats?.intentResult)
-        assertEquals(test.wrappedIntent().name, (userAction as SendSentence).nlpStats?.nlpResult?.intent)
+        assertEquals(test2.intent(), dialog.state.currentIntent)
+        assertEquals(test2.intent(), (userAction as SendSentence).nlpStats?.intentResult)
+        assertEquals(test.name(), (userAction as SendSentence).nlpStats?.nlpResult?.intent)
     }
 
     @Test

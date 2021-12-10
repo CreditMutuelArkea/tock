@@ -131,7 +131,7 @@ class SendChoice(
                 step?.name,
                 parameters,
                 bus.stepName,
-                bus.currentIntent?.wrappedIntent(),
+                bus.currentIntent?.intent(),
                 sourceAppId = bus.applicationId
             )
         }
@@ -162,7 +162,7 @@ class SendChoice(
                 step,
                 parameters,
                 bus.stepName,
-                bus.currentIntent?.wrappedIntent(),
+                bus.currentIntent?.intent(),
                 sourceAppId = bus.applicationId
             )
         }
@@ -228,7 +228,7 @@ class SendChoice(
             /**
              * The current intent of the bus.
              */
-            currentIntent: Intent?,
+            currentIntent: IntentAware?,
             /**
              * The app id emitter
              */
@@ -236,12 +236,12 @@ class SendChoice(
         ): String {
             val currentStep = step ?: busStep
             return StringBuilder().apply {
-                append(intent.wrappedIntent().name)
+                append(intent.name())
                 val params = parameters +
                     listOfNotNull(
                         if (currentStep != null) STEP_PARAMETER to currentStep else null,
                         if (currentIntent != null && currentIntent != intent)
-                            PREVIOUS_INTENT_PARAMETER to currentIntent.name else null,
+                            PREVIOUS_INTENT_PARAMETER to currentIntent.name() else null,
                         if (sourceAppId != null) SOURCE_APP_ID to sourceAppId else null
                     )
 
