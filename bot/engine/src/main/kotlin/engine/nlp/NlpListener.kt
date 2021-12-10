@@ -16,7 +16,7 @@
 
 package ai.tock.bot.engine.nlp
 
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action

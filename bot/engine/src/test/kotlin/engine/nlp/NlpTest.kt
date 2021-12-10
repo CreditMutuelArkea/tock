@@ -19,8 +19,8 @@ package ai.tock.bot.engine.nlp
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotEngineTest
 import ai.tock.bot.engine.BotRepository
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.test2
+import ai.tock.dialogManager.story.TestStoryDefinition.test
+import ai.tock.dialogManager.story.TestStoryDefinition.test2
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog

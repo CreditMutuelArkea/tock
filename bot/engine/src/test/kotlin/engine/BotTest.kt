@@ -17,9 +17,9 @@
 package ai.tock.bot.engine
 
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.engine.StepTest.s4
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.unknown
+import ai.tock.dialogManager.story.StepTest.s4
+import ai.tock.dialogManager.story.TestStoryDefinition.test
+import ai.tock.dialogManager.story.TestStoryDefinition.unknown
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
@@ -30,6 +30,7 @@ import io.mockk.slot
 import io.mockk.spyk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import ai.tock.dialogManager.story.*
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNull

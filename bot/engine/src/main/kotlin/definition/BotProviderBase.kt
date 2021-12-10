@@ -16,6 +16,8 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.dialogManager.bot.BotDefinition
+
 /**
  * Base implementation of [BotProvider]
  */

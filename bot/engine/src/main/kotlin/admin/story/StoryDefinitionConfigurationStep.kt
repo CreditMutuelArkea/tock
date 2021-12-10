@@ -22,10 +22,10 @@ import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
 import ai.tock.bot.definition.EntityStepSelection
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.dialogManager.story.storySteps.SimpleStoryStep
+import ai.tock.dialogManager.story.storySteps.StoryStep
 import ai.tock.translator.I18nLabelValue
 
 /**

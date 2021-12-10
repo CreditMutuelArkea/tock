@@ -16,14 +16,14 @@
 
 package ai.tock.bot.engine.user
 
-import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.ArchivedEntityValue
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.Snapshot
 import org.litote.kmongo.Id
+import ai.tock.dialogManager.story.StoryDefinition
 import java.time.Instant
 
 /**

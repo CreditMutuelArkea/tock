@@ -20,7 +20,7 @@ import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorData
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment

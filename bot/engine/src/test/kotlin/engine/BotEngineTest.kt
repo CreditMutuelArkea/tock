@@ -24,8 +24,8 @@ import ai.tock.bot.connector.ConnectorCallback
 import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.engine.TestStoryDefinition.test
+import ai.tock.dialogManager.bot.BotDefinition
+import ai.tock.dialogManager.story.TestStoryDefinition.test
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.Story
@@ -58,6 +58,8 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import ai.tock.dialogManager.story.BotDefinitionTest
+import ai.tock.dialogManager.story.TestStoryDefinition
 
 /**
  *

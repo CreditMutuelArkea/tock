@@ -16,13 +16,13 @@
 
 package ai.tock.bot.engine.message
 
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.event.EventType
 import ai.tock.bot.engine.message.parser.MessageParser.mapToString
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.dialogManager.story.storySteps.StoryStep
 
 /**
  * A user choice.

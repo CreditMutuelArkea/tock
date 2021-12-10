@@ -16,6 +16,8 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.dialogManager.bot.BotDefinition
+
 /**
  * Provides a specific type of [BotDefinition].
  * Custom provider should usually not directly extend this class, but instead extend [BotProviderBase].

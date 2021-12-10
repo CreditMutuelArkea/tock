@@ -20,16 +20,16 @@ import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.dialogManager.story.storySteps.StoryStep
 import io.vertx.ext.web.Router
+import ai.tock.dialogManager.story.StoryDefinition
 
 /**
  * Controller to connect [Connector] and [BotDefinition].

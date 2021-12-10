@@ -22,7 +22,7 @@ import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.ConnectorMessageProvider
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action

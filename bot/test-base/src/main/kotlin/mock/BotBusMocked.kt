@@ -23,7 +23,7 @@ import ai.tock.bot.connector.messenger.withMessenger
 import ai.tock.bot.connector.twitter.model.TwitterConnectorMessage
 import ai.tock.bot.connector.twitter.twitterConnectorType
 import ai.tock.bot.connector.twitter.withTwitter
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.StoryDefinitionBase
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase

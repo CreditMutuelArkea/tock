@@ -17,7 +17,7 @@
 package ai.tock.bot.test.junit
 
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition

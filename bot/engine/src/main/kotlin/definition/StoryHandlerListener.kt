@@ -17,7 +17,7 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
+import ai.tock.dialogManager.story.handler.StoryHandler
 
 /**
  * To listen before and after action handling.

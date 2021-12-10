@@ -22,7 +22,7 @@ import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorProvider
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.connector.NotifyBotStateModifier.KEEP_CURRENT_STATE
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.user.PlayerId

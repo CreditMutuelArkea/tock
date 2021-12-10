@@ -19,7 +19,6 @@ package ai.tock.bot.definition
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendChoice
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.event.EndConversationEvent
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.event.NoInputEvent
@@ -30,6 +29,7 @@ import ai.tock.bot.engine.user.UserTimelineDAO
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
+import ai.tock.dialogManager.story.StoryDefinition
 
 /**
  * Base implementation of [EventListener].

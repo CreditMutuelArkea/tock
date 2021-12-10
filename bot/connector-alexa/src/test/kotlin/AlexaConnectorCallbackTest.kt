@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector.alexa
 
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.translator.I18nLabelValue

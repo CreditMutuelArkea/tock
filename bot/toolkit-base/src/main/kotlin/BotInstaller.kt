@@ -16,7 +16,7 @@
 
 package ai.tock.bot
 
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderBase
 import ai.tock.bot.engine.BotRepository

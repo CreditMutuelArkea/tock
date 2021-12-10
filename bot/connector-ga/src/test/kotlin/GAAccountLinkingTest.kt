@@ -23,7 +23,7 @@ import ai.tock.bot.connector.ga.model.request.GAConversation
 import ai.tock.bot.connector.ga.model.request.GARequest
 import ai.tock.bot.connector.ga.model.request.GASurface
 import ai.tock.bot.connector.ga.model.request.GAUser
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.user.PlayerId

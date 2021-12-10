@@ -90,12 +90,12 @@ Slack connector for Tock supports a few slack emojis, more will be added
 
 ```kotlin
 val story = story("story") { bus ->
-    with(bus) {
-        withSlack {
-            emojiMessage(SlackEmoji.SMILE)
-        }
-        end()
-    }
+ with(bus) {
+  withSlack {
+   emojiMessage(SlackEmoji.SMILE)
+  }
+  end()
+ }
 }
 ```
 
@@ -103,12 +103,12 @@ val story = story("story") { bus ->
 
 ```kotlin
 val story = story("story") { bus ->
-    with(bus) {
-        withSlack {
-            textMessage("hello! ${emoji(SlackEmoji.SMILE)}")
-        }
-        end()
-    }
+ with(bus) {
+  withSlack {
+   textMessage("hello! ${emoji(SlackEmoji.SMILE)}")
+  }
+  end()
+ }
 }
 ```
 

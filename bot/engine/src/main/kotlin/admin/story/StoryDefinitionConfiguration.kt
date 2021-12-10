@@ -23,16 +23,16 @@ import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
 import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.shared.defaultNamespace
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
+import ai.tock.dialogManager.story.StoryDefinition
 import java.util.Locale
 
 /**
@@ -213,5 +213,5 @@ data class StoryDefinitionConfiguration(
         findFeatures(applicationId).filter { it.enabled }
 
     @Transient
-    internal val mainIntent: Intent = intent.intent(namespace)
+    val mainIntent: Intent = intent.intent(namespace)
 }

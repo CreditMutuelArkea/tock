@@ -16,6 +16,7 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.dialogManager.behavior.Behavior
 import ai.tock.shared.withoutNamespace
 
 /**

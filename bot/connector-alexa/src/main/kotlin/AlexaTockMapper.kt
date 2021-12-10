@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector.alexa
 
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.EventState
 import ai.tock.bot.engine.event.EndSessionEvent

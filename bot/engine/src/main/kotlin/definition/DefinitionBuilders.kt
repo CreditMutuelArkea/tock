@@ -17,18 +17,19 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.connector.NotifyBotStateModifier
-import ai.tock.bot.definition.BotDefinition.Companion.findStoryDefinition
-import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultKeywordStory
-import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultUnknownStory
+import ai.tock.dialogManager.bot.BotDefinition.Companion.findStoryDefinition
+import ai.tock.dialogManager.bot.BotDefinitionBase.Companion.defaultKeywordStory
+import ai.tock.dialogManager.bot.BotDefinitionBase.Companion.defaultUnknownStory
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.ActionNotificationType
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.StoryDefinitionBase
-import ai.tock.bot.engine.dialogManager.story.handler.*
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.translator.UserInterfaceType
+import ai.tock.dialogManager.story.StoryDefinition
+import ai.tock.dialogManager.story.StoryDefinitionBase
+import ai.tock.dialogManager.story.handler.*
+import ai.tock.dialogManager.*
+import ai.tock.dialogManager.story.storySteps.StoryStep
 
 /**
  * Creates a new bot.

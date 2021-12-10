@@ -18,7 +18,7 @@ package ai.tock.bot.api.service
 
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.api.model.configuration.ClientConfiguration
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
 import ai.tock.bot.definition.Intent

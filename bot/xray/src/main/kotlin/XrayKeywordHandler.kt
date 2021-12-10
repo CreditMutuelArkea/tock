@@ -19,7 +19,7 @@ package ai.tock.bot.xray
 import ai.tock.bot.admin.dialog.ActionReport
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.admin.dialog.DialogReportDAO
-import ai.tock.bot.definition.BotDefinitionBase
+import ai.tock.dialogManager.bot.BotDefinitionBase
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.message.Sentence
 import ai.tock.bot.xray.XrayKeywords.XRAY_KEYWORD

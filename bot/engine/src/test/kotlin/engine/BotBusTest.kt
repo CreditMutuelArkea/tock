@@ -20,10 +20,10 @@ import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.engine.BotRepository.registerBotAnswerInterceptor
-import ai.tock.bot.engine.TestStoryDefinition.story_with_other_starter
-import ai.tock.bot.engine.TestStoryDefinition.test
-import ai.tock.bot.engine.TestStoryDefinition.test2
-import ai.tock.bot.engine.TestStoryDefinition.withoutStep
+import ai.tock.dialogManager.story.TestStoryDefinition.story_with_other_starter
+import ai.tock.dialogManager.story.TestStoryDefinition.test
+import ai.tock.dialogManager.story.TestStoryDefinition.test2
+import ai.tock.dialogManager.story.TestStoryDefinition.withoutStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionPriority.urgent
 import ai.tock.bot.engine.action.SendChoice
@@ -39,6 +39,8 @@ import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import ai.tock.dialogManager.story.StepTest
+import ai.tock.dialogManager.story.secondaryIntent
 import java.util.Locale
 import kotlin.test.BeforeTest
 import kotlin.test.assertEquals

@@ -18,14 +18,14 @@ package ai.tock.bot.engine
 
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.connector.ConnectorData
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendLocation
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.dialogManager.config.BotDefinitionWrapper
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.engine.feature.DefaultFeatureType

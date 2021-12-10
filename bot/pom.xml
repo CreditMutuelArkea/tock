@@ -48,6 +48,7 @@
         <module>connector-google-chat</module>
         <module>orchestration</module>
         <module>xray</module>
+        <module>dialog-manager</module>
 
         <module>dialogflow</module>
 
@@ -141,6 +142,11 @@
             <dependency>
                 <groupId>ai.tock</groupId>
                 <artifactId>tock-bot-connector-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.tock</groupId>
+                <artifactId>tock-bot-dialog-manager</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>

@@ -21,7 +21,7 @@ import ai.tock.bot.admin.dialog.ApplicationDialogFlowData
 import ai.tock.bot.admin.dialog.DialogFlowStateData
 import ai.tock.bot.admin.dialog.DialogFlowStateTransitionData
 import ai.tock.bot.admin.dialog.DialogFlowTransitionStatsData
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.DialogFlowDefinition
 import ai.tock.bot.definition.DialogFlowStateTransitionType
 import ai.tock.bot.definition.DialogFlowStateTransitionType.attachment

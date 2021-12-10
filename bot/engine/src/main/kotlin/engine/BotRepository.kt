@@ -29,15 +29,12 @@ import ai.tock.bot.connector.ConnectorService
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.connector.NotifyBotStateModifier
 import ai.tock.bot.definition.BotAnswerInterceptor
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 import ai.tock.bot.definition.StoryHandlerListener
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.config.StoryConfigurationMonitor
 import ai.tock.bot.engine.monitoring.RequestTimer
@@ -46,6 +43,8 @@ import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.nlp.NlpListener
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.dialogManager.story.storySteps.StoryStep
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.shared.Executor
 import ai.tock.shared.defaultLocale
@@ -59,6 +58,7 @@ import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
 import org.litote.kmongo.Id
+import ai.tock.dialogManager.story.StoryDefinition
 import java.util.ServiceLoader
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList

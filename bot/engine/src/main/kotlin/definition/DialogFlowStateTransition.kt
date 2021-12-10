@@ -16,7 +16,7 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.dialogManager.story.storySteps.StoryStep
 
 data class DialogFlowStateTransition(
     val previousState: DialogFlowState?,

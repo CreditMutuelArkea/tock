@@ -16,7 +16,7 @@
 
 package ai.tock.nlp.dialogflow
 
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.ConnectorController

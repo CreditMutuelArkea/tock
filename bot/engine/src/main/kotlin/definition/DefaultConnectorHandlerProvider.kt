@@ -20,8 +20,8 @@ import ai.tock.bot.connector.ConnectorHandler
 import ai.tock.bot.connector.ConnectorIdHandlers
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
 import ai.tock.shared.mapNotNullValues
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.full.findAnnotation
@@ -30,7 +30,7 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.starProjectedType
 import kotlin.reflect.full.superclasses
 
-internal object DefaultConnectorHandlerProvider : ConnectorHandlerProvider {
+object DefaultConnectorHandlerProvider : ConnectorHandlerProvider {
 
     private val connectorHandlerMap: MutableMap<KClass<*>, Map<String, KClass<*>>> = ConcurrentHashMap()
 

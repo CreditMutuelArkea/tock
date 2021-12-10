@@ -19,14 +19,10 @@ package ai.tock.bot.engine
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.ParameterKey
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.action.ActionPriority
@@ -53,6 +49,10 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
+import ai.tock.dialogManager.story.StoryDefinition
+import ai.tock.dialogManager.story.handler.StoryHandlerBase
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.dialogManager.story.storySteps.StoryStep
 
 /**
  * Bus implementation for Tock integrated mode.
@@ -539,7 +539,7 @@ interface BotBus : Bus<BotBus> {
     override fun end(delay: Long): BotBus = super.end(delay)
 }
 
-internal var BotBus.hasCurrentSwitchStoryProcess: Boolean
+var BotBus.hasCurrentSwitchStoryProcess: Boolean
     get() = dialog.state.hasCurrentSwitchStoryProcess
     set(v) {
         dialog.state.hasCurrentSwitchStoryProcess = v

@@ -87,6 +87,11 @@
             <version>${vertx}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-bot-dialog-manager</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>

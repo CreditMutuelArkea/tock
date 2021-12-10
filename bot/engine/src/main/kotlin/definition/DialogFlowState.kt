@@ -16,8 +16,8 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.dialogManager.story.storySteps.StoryStep
+import ai.tock.dialogManager.story.StoryDefinition
 
 data class DialogFlowState(
     val storyDefinition: StoryDefinition,

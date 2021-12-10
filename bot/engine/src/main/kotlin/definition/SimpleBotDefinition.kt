@@ -16,8 +16,9 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
+import ai.tock.dialogManager.bot.BotDefinitionBase
+import ai.tock.dialogManager.story.handler.StoryHandlerBase
+import ai.tock.dialogManager.story.StoryDefinition
 
 /**
  * A simple [BotDefinition].

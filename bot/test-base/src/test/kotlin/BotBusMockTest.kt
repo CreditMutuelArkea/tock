@@ -17,7 +17,7 @@
 package ai.tock.bot.test
 
 import ai.tock.bot.connector.messenger.model.send.TextMessage
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep

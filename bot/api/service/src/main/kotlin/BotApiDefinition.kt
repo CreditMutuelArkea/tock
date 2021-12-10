@@ -19,7 +19,7 @@ package ai.tock.bot.api.service
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.api.model.configuration.ClientConfiguration
 import ai.tock.bot.api.model.configuration.StepConfiguration
-import ai.tock.bot.definition.BotDefinitionBase
+import ai.tock.dialogManager.bot.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.SimpleStoryDefinition

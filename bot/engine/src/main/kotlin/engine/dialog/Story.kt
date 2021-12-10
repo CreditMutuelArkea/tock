@@ -17,9 +17,6 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS
 import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS_WITH_STORY_INTENT
 import ai.tock.bot.engine.BotBus
@@ -28,8 +25,11 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.dialogManager.story.handler.StoryHandler
+import ai.tock.dialogManager.story.storySteps.StoryStep
 import ai.tock.shared.error
 import mu.KotlinLogging
+import ai.tock.dialogManager.story.StoryDefinition
 
 /**
  * A Story is a small unit of conversation about a specific topic.
@@ -38,7 +38,7 @@ import mu.KotlinLogging
 data class Story(
     val definition: StoryDefinition,
     val starterIntent: Intent,
-    internal var step: String? = null,
+    var step: String? = null,
     val actions: MutableList<Action> = mutableListOf()
 ) {
 

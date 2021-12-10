@@ -16,9 +16,9 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinitionBase
+import ai.tock.dialogManager.story.handler.SimpleStoryHandlerBase
+import ai.tock.dialogManager.story.handler.StoryHandlerBase
+import ai.tock.dialogManager.story.handler.StoryHandlerDefinitionBase
 
 // Definition aliases.
 

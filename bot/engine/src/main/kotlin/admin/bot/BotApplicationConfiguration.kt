@@ -18,7 +18,7 @@ package ai.tock.bot.admin.bot
 
 import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.BotDefinition
+import ai.tock.dialogManager.bot.BotDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.shared.property
 import ai.tock.shared.tryToFindLocalIp
