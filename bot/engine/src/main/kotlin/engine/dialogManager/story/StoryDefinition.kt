@@ -93,7 +93,7 @@ interface StoryDefinition : IntentAware {
     /**
      * Implementation for [IntentAware].
      */
-    override fun intent(): IntentAware = mainIntent()
+    override fun wrappedIntent(): Intent = mainIntent().wrappedIntent()
 
     /**
      * Returns all steps of the story.

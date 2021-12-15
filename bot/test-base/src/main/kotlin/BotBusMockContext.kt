@@ -70,7 +70,7 @@ data class BotBusMockContext(
         this(
             UserTimeline(userId, userPreferences),
             Dialog(setOf(userId, botId)),
-            Story(storyDefinition, storyDefinition.mainIntent()),
+            Story(storyDefinition, storyDefinition.mainIntent().wrappedIntent()),
             action,
             botDefinition,
             storyDefinition.storyHandler as I18nKeyProvider,

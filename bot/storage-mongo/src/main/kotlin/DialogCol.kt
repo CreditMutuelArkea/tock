@@ -148,7 +148,7 @@ internal data class DialogCol(
     }
 
     data class DialogStateMongoWrapper(
-        var currentIntent: IntentAware?,
+        var currentIntent: Intent?,
         @JsonDeserialize(contentAs = EntityStateValueWrapper::class)
         val entityValues: Map<String, EntityStateValueWrapper>,
         @JsonDeserialize(contentAs = AnyValueWrapper::class)
@@ -158,7 +158,7 @@ internal data class DialogCol(
     ) {
 
         constructor(state: DialogState) : this(
-            state.currentIntent,
+            state.currentIntent?.wrappedIntent(),
             state.entityValues.mapValues { EntityStateValueWrapper(it.value) },
             state.context.map { e -> e.key to AnyValueWrapper(e.value) }.toMap(),
             state.userLocation,
@@ -203,7 +203,7 @@ internal data class DialogCol(
     @JacksonData(internal = true)
     data class StoryMongoWrapper(
         val storyDefinitionId: String,
-        var currentIntent: IntentAware?,
+        var currentIntent: Intent?,
         val currentStep: String?,
         val actions: List<ActionMongoWrapper>
     ) {

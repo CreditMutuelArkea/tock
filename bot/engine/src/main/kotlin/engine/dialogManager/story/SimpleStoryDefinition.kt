@@ -16,7 +16,6 @@
 
 package ai.tock.bot.engine.dialogManager.story
 
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
@@ -52,8 +51,8 @@ open class SimpleStoryDefinition(
         this(
             id = id,
             storyHandler = storyHandler,
-            starterIntents = starterIntents.map { it.intent() }.toSet(),
-            intents = intents.map { it.intent() }.toSet(),
+            starterIntents = starterIntents.map { it.wrappedIntent() }.toSet(),
+            intents = intents.map { it.wrappedIntent() }.toSet(),
             steps = steps.toSet(),
             unsupportedUserInterfaces = unsupportedUserInterfaces
         )

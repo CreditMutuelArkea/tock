@@ -55,9 +55,9 @@ open class StoryDefinitionBase(
 
     override val id: String get() = name
     override val starterIntents: Set<IntentAware> =
-        setOf(Intent(name)) + otherStarterIntents.map { it.intent() }.toSet()
+        setOf(Intent(name)) + otherStarterIntents.map { it.wrappedIntent() }.toSet()
     override val intents: Set<IntentAware> =
-        setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.intent() }.toSet()
+        setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.wrappedIntent() }.toSet()
 
     open fun handle(bus: BotBus) = storyHandler.handle(bus)
 

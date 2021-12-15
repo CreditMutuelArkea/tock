@@ -147,8 +147,8 @@ class NlpTest : BotEngineTest() {
         BotRepository.registerNlpListener(nlpListener)
         Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
 
-        assertEquals(test2.intent(), dialog.state.currentIntent)
-        assertEquals(test2.intent(), (userAction as SendSentence).nlpStats?.intentResult)
+        assertEquals(test2.wrappedIntent(), dialog.state.currentIntent)
+        assertEquals(test2.wrappedIntent(), (userAction as SendSentence).nlpStats?.intentResult)
         assertEquals(test.name(), (userAction as SendSentence).nlpStats?.nlpResult?.intent)
     }
 

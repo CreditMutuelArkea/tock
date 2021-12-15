@@ -131,8 +131,8 @@ class TockNlpClient(baseUrl: String = System.getenv("tock_nlp_service_url") ?: "
         )
     }
 
-    override fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition>? {
-        return nlpService.getIntentsByNamespaceAndName(namespace, name).execute().parseAndReturns()
+    override fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition> {
+        return nlpService.getIntentsByNamespaceAndName(namespace, name).execute().parseAndReturns() ?: emptyList()
     }
 
     override fun getApplicationByNamespaceAndName(namespace: String, name: String): ApplicationDefinition? {

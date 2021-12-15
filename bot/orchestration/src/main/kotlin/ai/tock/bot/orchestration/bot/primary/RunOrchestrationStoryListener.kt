@@ -67,7 +67,7 @@ class RunOrchestrationStoryListener(
     }
 
     private fun BotBus.startOrchestration(): Boolean {
-        logger.info { "Try to start an orchestration for intent ${intent?.wrappedIntent()?.name ?: "???"}" }
+        logger.info { "Try to start an orchestration for intent ${intent?.name() ?: "???"}" }
 
         val botAction: SecondaryBotAction? = SecondaryBotAction.from(action, botDefinition.botId)
         if (botAction == null) {
@@ -150,14 +150,14 @@ class RunOrchestrationStoryListener(
 
         if (!orchestration.locked) {
             if (intent.inStopOrchestrationList()) {
-                logger.info { "End of the orchestration caused by the ${intent?.wrappedIntent()?.name ?: "???"} intent" }
+                logger.info { "End of the orchestration caused by the ${intent?.name() ?: "???"} intent" }
                 orchestrationRepository.end(orchestration.playerId)
 
                 return configuration.primaryBotOrchestrationEventHandler.onStopOrchestration(this, orchestration) == ComeBackFromSecondary.EXECUTE_INITIAL_STORY
             }
 
             if (intent.inNoOrchestrationList()) {
-                logger.info { "End of the orchestration caused by the ${intent?.wrappedIntent()?.name ?: "???"} intent" }
+                logger.info { "End of the orchestration caused by the ${intent?.name() ?: "???"} intent" }
                 orchestrationRepository.end(orchestration.playerId)
 
                 return configuration.primaryBotOrchestrationEventHandler.onNoOrchestration(this, orchestration) == ComeBackFromSecondary.EXECUTE_INITIAL_STORY

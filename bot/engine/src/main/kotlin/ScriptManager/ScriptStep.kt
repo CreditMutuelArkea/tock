@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.ScriptManager
 
-/**
- * For [Enum] based [IntentAware] implementations.
- */
-interface IntentAwareBase : IntentAware {
-
-    val name: String
-
-    override fun intent(): IntentAware = Intent(name)
+enum class ScriptStep {
+    START_SCRIPT,
+    END_SCRIPT,
+    DEFAULT
 }

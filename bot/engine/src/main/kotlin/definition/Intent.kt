@@ -50,6 +50,10 @@ data class Intent(
         val keyword: Intent = Intent("$TOCK_NAMESPACE:keyword")
     }
 
+    override fun wrappedIntent(): Intent {
+        return this
+    }
+
     override fun name(): String {
         return name
     }

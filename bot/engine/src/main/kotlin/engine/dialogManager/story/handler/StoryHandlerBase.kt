@@ -219,7 +219,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         return mainIntentName ?: this::class.simpleName?.toLowerCase()?.replace("storyhandler", "")
     }
 
-    override fun intent(): Intent {
+    override fun wrappedIntent(): Intent {
         return findMainIntentName()?.let { Intent(it) } ?: error("unknown main intent name")
     }
 

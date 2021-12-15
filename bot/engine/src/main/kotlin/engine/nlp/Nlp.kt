@@ -148,7 +148,7 @@ internal class Nlp : NlpController {
             BotRepository.forEachNlpListener {
                 if (i == null) {
                     i = try {
-                        it.findIntent(userTimeline, dialog, sentence, nlpResult)?.intent()
+                        it.findIntent(userTimeline, dialog, sentence, nlpResult)?.wrappedIntent()
                     } catch (e: Exception) {
                         logger.error(e)
                         null

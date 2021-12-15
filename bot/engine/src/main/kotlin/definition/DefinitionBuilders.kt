@@ -16,6 +16,8 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManager
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.connector.NotifyBotStateModifier
 import ai.tock.bot.definition.BotDefinition.Companion.findStoryDefinition
 import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultKeywordStory
@@ -96,6 +98,7 @@ fun bot(
      */
     conversation: DialogFlowDefinition? = null
 ): SimpleBotDefinition {
+
     fun findStory(intent: IntentAware?): StoryDefinition? =
         intent as? StoryDefinition
             ?: findStoryDefinition(
@@ -111,11 +114,8 @@ fun bot(
                 }
             }
 
-    return SimpleBotDefinition(
-        botId,
-        namespace,
+    val scriptManager: ScriptManager = ScriptManagerStoryBase(
         stories,
-        nlpModelName,
         unknownStory,
         findStory(hello),
         findStory(goodbye),
@@ -124,8 +124,14 @@ fun bot(
         findStory(botEnabled),
         findStory(userLocation),
         findStory(handleAttachment),
+        keywordStory)
+
+    return SimpleBotDefinition(
+        botId,
+        namespace,
+        scriptManager,
+        nlpModelName,
         eventListener,
-        keywordStory,
         conversation
     )
 }

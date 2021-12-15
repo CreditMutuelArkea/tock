@@ -28,9 +28,7 @@ class ClientStoryDefinition(
     val handler: ClientStoryHandler
 ) : IntentAware {
 
-    override fun intent(): IntentAware = mainIntent.intent()
-
-    override fun name(): String = mainIntent.name()
+    override fun wrappedIntent(): Intent = mainIntent.wrappedIntent()
 
     fun isStarterIntent(intent: Intent): Boolean =
         mainIntent.wrap(intent) || otherStarterIntents.any { it.wrap(intent) }

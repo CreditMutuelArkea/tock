@@ -16,14 +16,9 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinitionBase
 
 // Definition aliases.
 
-typealias IntentDef = IntentAwareBase
-typealias Handler<T> = StoryHandlerBase<T>
 typealias HandlerDef<T> = StoryHandlerDefinitionBase<T>
 typealias ConnectorDef<T> = ConnectorStoryHandlerBase<T>
-typealias SimpleHandler = SimpleStoryHandlerBase

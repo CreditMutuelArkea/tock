@@ -16,10 +16,10 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.ScriptManager.ScriptStep.*
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendChoice
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.event.EndConversationEvent
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.event.NoInputEvent
@@ -45,24 +45,25 @@ open class EventListenerBase : EventListener {
     override fun listenEvent(controller: ConnectorController, connectorData: ConnectorData, event: Event): Boolean {
         logger.debug { "listen event $event" }
 
-        fun StoryDefinition?.sendChoice(event: OneToOneEvent, force: Boolean = false): Boolean =
-            if (this == null && !force) {
-                false
-            } else {
+        fun IntentAware?.sendChoice(event: OneToOneEvent, force: Boolean = false): Boolean {
+            if (this != null || force) {
+                val intent: IntentAware = this ?: controller.botDefinition.scriptManager.findMainIntent(DEFAULT)!!
                 sendChoice(
                     event,
-                    this?.mainIntent()
-                        ?: controller.botDefinition.defaultStory.mainIntent(),
-                    controller, connectorData
+                    intent,
+                    controller,
+                    connectorData
                 )
-                true
+                return true
             }
+            return false
+        }
 
         with(controller.botDefinition) {
             return when (event) {
-                is StartConversationEvent -> helloStory.sendChoice(event, true)
-                is EndConversationEvent -> goodbyeStory.sendChoice(event)
-                is NoInputEvent -> goodbyeStory.sendChoice(event)
+                is StartConversationEvent -> scriptManager.findMainIntent(START_SCRIPT).sendChoice(event, true)
+                is EndConversationEvent -> scriptManager.findMainIntent(END_SCRIPT).sendChoice(event)
+                is NoInputEvent -> scriptManager.findMainIntent(END_SCRIPT).sendChoice(event)
                 is PassThreadControlEvent -> passThreadControlEventListener(controller, connectorData, event)
                 else -> false
             }

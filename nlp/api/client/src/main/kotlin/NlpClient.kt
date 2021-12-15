@@ -63,7 +63,7 @@ interface NlpClient {
      *
      * @return List of IntentDefinition
      */
-    fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition>?
+    fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition>
 
     /**
      * Returns an application for the specified namespace and name.

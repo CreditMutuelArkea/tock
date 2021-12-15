@@ -169,8 +169,8 @@ internal class Bot(
                 val storyDefinition = botDefinition.findStoryDefinition(newIntent?.name(), action.applicationId)
                 val newStory = Story(
                     storyDefinition,
-                    if (newIntent != null && storyDefinition.isStarterIntent(newIntent)) newIntent
-                    else storyDefinition.mainIntent()
+                    if (newIntent != null && storyDefinition.isStarterIntent(newIntent)) newIntent.wrappedIntent()
+                    else storyDefinition.mainIntent().wrappedIntent()
                 )
                 dialog.stories.add(newStory)
                 newStory

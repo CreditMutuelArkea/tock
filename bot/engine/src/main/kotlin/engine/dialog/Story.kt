@@ -38,7 +38,7 @@ import mu.KotlinLogging
  */
 data class Story(
     val definition: StoryDefinition,
-    val starterIntent: IntentAware,
+    val starterIntent: Intent,
     internal var step: String? = null,
     val actions: MutableList<Action> = mutableListOf()
 ) {

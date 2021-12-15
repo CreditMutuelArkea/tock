@@ -57,7 +57,7 @@ internal class TockDialogflowNlpClient : NlpClient {
 
     override fun markAsUnknown(query: MarkAsUnknownQuery) = Unit
 
-    override fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition>? = null
+    override fun getIntentsByNamespaceAndName(namespace: String, name: String): List<IntentDefinition> = emptyList()
 
     override fun getApplicationByNamespaceAndName(namespace: String, name: String): ApplicationDefinition? = null
 

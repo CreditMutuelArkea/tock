@@ -16,6 +16,7 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
@@ -41,20 +42,17 @@ import mu.KotlinLogging
 open class BotDefinitionBase(
     override val botId: String,
     override val namespace: String,
-    override val stories: List<StoryDefinition>,
+    override val scriptManager: ScriptManager,
     override val nlpModelName: String = botId,
-    override val unknownStory: StoryDefinition = defaultUnknownStory,
-    override val helloStory: StoryDefinition? = null,
-    override val goodbyeStory: StoryDefinition? = null,
-    override val noInputStory: StoryDefinition? = null,
-    override val botDisabledStory: StoryDefinition? = null,
-    override val botEnabledStory: StoryDefinition? = null,
-    override val userLocationStory: StoryDefinition? = null,
-    override val handleAttachmentStory: StoryDefinition? = null,
     override val eventListener: EventListener = EventListenerBase(),
-    override val keywordStory: StoryDefinition = defaultKeywordStory,
-    override val flowDefinition: DialogFlowDefinition? = null
+    override val flowDefinition: DialogFlowDefinition? = null,
 ) : BotDefinition {
+
+    /**
+     * Constructor intended to be used by an enum.
+     */
+    constructor(botId: String, scriptManager: ScriptManager) :
+            this(botId, botId, scriptManager)
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -200,11 +198,6 @@ open class BotDefinitionBase(
             return false
         }
     }
-
-    /**
-     * Constructor intended to be used by an enum.
-     */
-    constructor(botId: String, stories: Array<out StoryDefinition>) : this(botId, botId, stories.toList(), botId)
 
     /**
      * The default unknown answer.

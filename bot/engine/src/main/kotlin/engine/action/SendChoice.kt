@@ -131,7 +131,7 @@ class SendChoice(
                 step?.name,
                 parameters,
                 bus.stepName,
-                bus.currentIntent?.intent(),
+                bus.currentIntent?.wrappedIntent(),
                 sourceAppId = bus.applicationId
             )
         }
@@ -162,7 +162,7 @@ class SendChoice(
                 step,
                 parameters,
                 bus.stepName,
-                bus.currentIntent?.intent(),
+                bus.currentIntent?.wrappedIntent(),
                 sourceAppId = bus.applicationId
             )
         }

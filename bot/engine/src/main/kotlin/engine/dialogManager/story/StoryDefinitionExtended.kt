@@ -45,6 +45,6 @@ interface StoryDefinitionExtended : StoryDefinition {
 
     val name: String
     override val id: String get() = name
-    override val starterIntents: Set<IntentAware> get() = setOf(Intent(name)) + otherStarterIntents.map { it.intent() }.toSet()
-    override val intents: Set<IntentAware> get() = setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.intent() }.toSet()
+    override val starterIntents: Set<IntentAware> get() = setOf(Intent(name)) + otherStarterIntents.map { it.wrappedIntent() }.toSet()
+    override val intents: Set<IntentAware> get() = setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.wrappedIntent() }.toSet()
 }

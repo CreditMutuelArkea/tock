@@ -16,6 +16,7 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
 
@@ -25,57 +26,26 @@ import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerBase
 class SimpleBotDefinition(
     botId: String,
     namespace: String,
-    stories: List<StoryDefinition>,
+    scriptManager: ScriptManager,
     nlpModelName: String = botId,
-    unknownStory: StoryDefinition = defaultUnknownStory,
-    helloStory: StoryDefinition? = null,
-    goodbyeStory: StoryDefinition? = null,
-    noInputStory: StoryDefinition? = null,
-    botDisabledStory: StoryDefinition? = null,
-    botEnabledStory: StoryDefinition? = null,
-    userLocationStory: StoryDefinition? = null,
-    handleAttachmentStory: StoryDefinition? = null,
     eventListener: EventListener = EventListenerBase(),
-    keywordStory: StoryDefinition = defaultKeywordStory,
     conversation: DialogFlowDefinition? = null
-) :
-    BotDefinitionBase(
+) : BotDefinitionBase(
         botId,
         namespace,
-        stories,
+        scriptManager,
         nlpModelName,
-        unknownStory,
-        helloStory,
-        goodbyeStory,
-        noInputStory,
-        botDisabledStory,
-        botEnabledStory,
-        userLocationStory,
-        handleAttachmentStory,
         eventListener,
-        keywordStory,
         conversation
     ) {
 
     // set namespace for story handler
     init {
-        (
-            stories +
-                listOfNotNull(
-                    unknownStory,
-                    helloStory,
-                    goodbyeStory,
-                    noInputStory,
-                    botDisabledStory,
-                    botEnabledStory,
-                    userLocationStory,
-                    handleAttachmentStory,
-                    keywordStory
-                )
-            ).forEach {
+        val initLambda: (StoryDefinition) -> Unit = {
             (it.storyHandler as? StoryHandlerBase<*>)?.apply {
                 i18nNamespace = namespace
             }
         }
+        scriptManager.initNameSpace(initLambda)
     }
 }

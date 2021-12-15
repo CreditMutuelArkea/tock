@@ -20,7 +20,6 @@ import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.story.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
@@ -78,7 +77,7 @@ internal class ConfiguredStoryDefinition(
             allSteps()
                 .filterIsInstance<Step>()
                 .filter { it.configuration.findCurrentAnswer() != null || it.configuration.targetIntent != null }
-                .mapNotNull { it.intent?.intent() }
+                .mapNotNull { it.intent?.wrappedIntent() }
 
     override val unsupportedUserInterfaces: Set<UserInterfaceType> =
         configuration.storyDefinition(definition, configuration)?.unsupportedUserInterfaces ?: emptySet()

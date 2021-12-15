@@ -27,14 +27,14 @@ interface IntentAware {
         return  IntentWithoutNamespace(name().withoutNamespace())
     }
 
-    fun intent(): IntentAware = this
+    fun wrappedIntent(): Intent
 
-    fun name(): String
+    fun name(): String = wrappedIntent().name
 
     /**
      * Is it the right intent?
      */
     infix fun wrap(intent: IntentAware?): Boolean {
-        return intent().equals(intent)
+        return wrappedIntent().equals(intent)
     }
 }

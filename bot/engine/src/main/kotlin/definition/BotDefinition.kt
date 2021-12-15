@@ -16,6 +16,7 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.Intent.Companion.keyword
 import ai.tock.bot.definition.Intent.Companion.unknown
@@ -45,6 +46,45 @@ import java.util.Locale
  * New bots should usually not directly extend this class, but instead extend [BotDefinitionBase].
  */
 interface BotDefinition : I18nKeyProvider {
+
+    /**
+     * The main bot id. Must be different for each bot.
+     */
+    val botId: String
+
+    /**
+     * The namespace of the bot. It has to be the same namespace than the NLP models.
+     */
+    val namespace: String
+
+    /**
+     * The name of the main nlp model.
+     */
+    val nlpModelName: String
+
+    /**
+     * Manager of script of dialog. Can be a static story script, or a dynamic state graphe script, or other.
+     */
+    val scriptManager: ScriptManager
+
+    /**
+     * The default unknown answer.
+     */
+    val defaultUnknownAnswer: I18nLabelValue
+
+    /**
+     * To handle custom events.
+     */
+    val eventListener: EventListener
+
+    /**
+     *  Listener invoked when bot is enabled.
+     */
+    val botEnabledListener: (Action) -> Unit
+        get() = {}
+
+    val flowDefinition: DialogFlowDefinition?
+        get() = null
 
     companion object {
 
@@ -96,26 +136,6 @@ interface BotDefinition : I18nKeyProvider {
     }
 
     /**
-     * The main bot id. Must be different for each bot.
-     */
-    val botId: String
-
-    /**
-     * The namespace of the bot. It has to be the same namespace than the NLP models.
-     */
-    val namespace: String
-
-    /**
-     * The name of the main nlp model.
-     */
-    val nlpModelName: String
-
-    /**
-     * The list of each stories.
-     */
-    val stories: List<StoryDefinition>
-
-    /**
      * Finds an [Intent] from an intent name.
      */
     fun findIntent(intent: String, applicationId: String): Intent {
@@ -155,56 +175,6 @@ interface BotDefinition : I18nKeyProvider {
     }
 
     /**
-     * The unknown story. Used where no valid intent is found.
-     */
-    val unknownStory: StoryDefinition
-
-    /**
-     * The default unknown answer.
-     */
-    val defaultUnknownAnswer: I18nLabelValue
-
-    /**
-     * To handle keywords - used to bypass nlp.
-     */
-    val keywordStory: StoryDefinition
-
-    /**
-     * The hello story. Used for first interaction with no other input.
-     */
-    val helloStory: StoryDefinition?
-
-    /**
-     * Provides default Story when no context is known - default to [helloStory] or first [stories].
-     */
-    val defaultStory: StoryDefinition get() = helloStory ?: stories.first()
-
-    /**
-     * The goodbye story. Used when closing the conversation.
-     */
-    val goodbyeStory: StoryDefinition?
-
-    /**
-     * The no input story. When user does nothing!
-     */
-    val noInputStory: StoryDefinition?
-
-    /**
-     * The story that handles [ai.tock.bot.engine.action.SendLocation] action. If it's null, current intent is used.
-     */
-    val userLocationStory: StoryDefinition?
-
-    /**
-     * The story that handles [ai.tock.bot.engine.action.SendAttachment] action. If it's null, current intent is used.
-     */
-    val handleAttachmentStory: StoryDefinition?
-
-    /**
-     * To handle custom events.
-     */
-    val eventListener: EventListener
-
-    /**
      * Called when error occurs. By default send "technical error".
      */
     fun errorAction(playerId: PlayerId, applicationId: String, recipientId: PlayerId): Action {
@@ -217,23 +187,12 @@ interface BotDefinition : I18nKeyProvider {
     }
 
     /**
-     * To manage deactivation.
-     */
-    @Deprecated("use botDisabledStories list")
-    val botDisabledStory: StoryDefinition?
-
-    /**
-     * List of deactivation stories.
-     */
-    val botDisabledStories: List<StoryDefinition> get() = emptyList()
-
-    /**
      * Does this action trigger bot deactivation ?
      */
     fun disableBot(timeline: UserTimeline, dialog: Dialog, action: Action): Boolean =
-        action.state.notification ||
-            dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false ||
-            hasDisableTagIntent(dialog)
+        action.state.notification
+                || dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false
+                || hasDisableTagIntent(dialog)
 
     /**
      * Returns true if the dialog current intent is a disabling intent.
@@ -241,35 +200,19 @@ interface BotDefinition : I18nKeyProvider {
     fun hasDisableTagIntent(dialog: Dialog) =
         dialog.state.currentIntent?.let { botDisabledStories.any { story -> story.isStarterIntent(it) } } ?: false
 
-    /**
-     * To manage reactivation.
-     */
-    @Deprecated("use botEnabledStories list")
-    val botEnabledStory: StoryDefinition?
-
-    /**
-     * List of reactivation stories.
-     */
-    val botEnabledStories: List<StoryDefinition> get() = emptyList()
 
     /**
      * Does this action trigger bot activation ?
      */
     fun enableBot(timeline: UserTimeline, dialog: Dialog, action: Action): Boolean =
-        dialog.state.currentIntent?.let { botEnabledStory?.isStarterIntent(it) } ?: false ||
-            dialog.state.currentIntent?.let { botEnabledStories.any { story -> story.isStarterIntent(it) } } ?: false ||
-            // send choice can reactivate disabled bot (is the intent is not a disabled intent)
-            (
-                sendChoiceActivateBot &&
-                    action is SendChoice &&
-                    !action.state.notification &&
-                    !(dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false)
+        dialog.state.currentIntent?.let { botEnabledStory?.isStarterIntent(it) } ?: false
+                || dialog.state.currentIntent?.let { botEnabledStories.any { story -> story.isStarterIntent(it) } } ?: false
+                || ( // send choice can reactivate disabled bot (is the intent is not a disabled intent)
+                    sendChoiceActivateBot &&
+                        action is SendChoice &&
+                        !action.state.notification &&
+                        !(dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false)
                 )
-
-    /**
-     *  Listener invoked when bot is enabled.
-     */
-    val botEnabledListener: (Action) -> Unit get() = {}
 
     /**
      * If this method returns true, the action will be added in the stored history.
@@ -329,5 +272,4 @@ interface BotDefinition : I18nKeyProvider {
      */
     fun defaultDelay(answerIndex: Int): Long = if (answerIndex == 0) 0 else defaultBreath
 
-    val flowDefinition: DialogFlowDefinition? get() = null
 }

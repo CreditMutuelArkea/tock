@@ -16,6 +16,7 @@
 
 package ai.tock.bot.api.service
 
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.api.model.configuration.ClientConfiguration
 import ai.tock.bot.api.model.configuration.StepConfiguration
@@ -68,28 +69,28 @@ internal class BotApiDefinition(
     configuration: BotConfiguration,
     clientConfiguration: ClientConfiguration?,
     handler: BotApiHandler
-) :
-    BotDefinitionBase(
+) : BotDefinitionBase(
         configuration.botId,
         configuration.namespace,
-        clientConfiguration
-            ?.stories
-            ?.filter { it.mainIntent != Intent.unknown.name }
-            ?.map { s ->
-                SimpleStoryDefinition(
-                    s.name,
-                    FallbackStoryHandler(defaultUnknownStory, handler),
-                    setOf(Intent(s.mainIntent)) + s.otherStarterIntents.map { Intent(it) },
-                    setOf(Intent(s.mainIntent)) + s.otherStarterIntents.map { Intent(it) } + s.secondaryIntents.map {
-                        Intent(
-                            it
-                        )
-                    },
-                    s.steps.map { ApiStep(it) }.toSet()
-                )
-            } ?: emptyList(),
-        configuration.nlpModel,
-        FallbackStoryDefinition(defaultUnknownStory, handler)
+        ScriptManagerStoryBase(
+            clientConfiguration
+                ?.stories
+                ?.filter { it.mainIntent != Intent.unknown.name }
+                ?.map { s ->
+                    SimpleStoryDefinition(
+                        s.name,
+                        FallbackStoryHandler(defaultUnknownStory, handler),
+                        setOf(Intent(s.mainIntent)) + s.otherStarterIntents.map { Intent(it) },
+                        setOf(Intent(s.mainIntent)) + s.otherStarterIntents.map { Intent(it) } + s.secondaryIntents.map {
+                            Intent(
+                                it
+                            )
+                        },
+                        s.steps.map { ApiStep(it) }.toSet()
+                    )
+                } ?: emptyList(),
+                FallbackStoryDefinition(defaultUnknownStory, handler)),
+        configuration.nlpModel
     ) {
 
     override fun findIntent(intent: String, applicationId: String): Intent =

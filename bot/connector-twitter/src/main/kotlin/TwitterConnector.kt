@@ -262,7 +262,7 @@ internal class TwitterConnector internal constructor(
                 recipientId,
                 applicationId,
                 PlayerId(accountId, PlayerType.bot),
-                intent.wrappedIntent().name,
+                intent.name(),
                 step,
                 parameters
             ),

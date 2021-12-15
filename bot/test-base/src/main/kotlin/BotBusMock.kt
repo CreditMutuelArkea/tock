@@ -245,7 +245,7 @@ open class BotBusMock(
     override var intent: IntentAware?
         get() = dialog.state.currentIntent
         set(value) {
-            dialog.state.currentIntent = value?.intent()
+            dialog.state.currentIntent = value?.wrappedIntent()
         }
 
     override var nextUserActionState: NextUserActionState?
@@ -279,7 +279,7 @@ open class BotBusMock(
         ) {
             val storyDefinition =
                 context.botDefinition.findStoryDefinition(context.dialog.state.currentIntent!!, a.applicationId)
-            context.story = Story(storyDefinition, storyDefinition.mainIntent())
+            context.story = Story(storyDefinition, storyDefinition.mainIntent().wrappedIntent())
             context.dialog.stories.add(context.story)
         } else if (context.dialog.stories.isEmpty()) {
             context.dialog.stories.add(context.story)

@@ -21,16 +21,18 @@ import ai.tock.bot.api.model.configuration.ClientConfiguration
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.BotRepository
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.nlp.front.client.FrontClient
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.shared.Executor
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.withoutNamespace
 import mu.KotlinLogging
+import org.litote.kmongo.Id
+import ai.tock.nlp.api.client.model.dump.IntentDefinition as ClientIntentDefinition
 
 internal class BotApiDefinitionProvider(private val configuration: BotConfiguration) : BotProvider {
 
@@ -65,19 +67,22 @@ internal class BotApiDefinitionProvider(private val configuration: BotConfigurat
     private fun registerBuiltinStoryIntents() {
         executor.executeBlocking {
             with(botDefinition()) {
-                val applicationId = FrontClient.getApplicationByNamespaceAndName(namespace, nlpModelName)!!._id
-                val intents = nlpClient.getIntentsByNamespaceAndName(namespace, botId)
-                this.stories.filter { it.mainIntent() != Intent.unknown }.map { it.mainIntent().name.withoutNamespace() }.forEach {
-                    if (intents?.firstOrNull { intent -> intent.name.withoutNamespace() == it } == null) {
+                val applicationId: Id<ApplicationDefinition> = FrontClient.getApplicationByNamespaceAndName(namespace, nlpModelName)!!._id
+                val intents: List<ClientIntentDefinition>  = nlpClient.getIntentsByNamespaceAndName(namespace, botId)
+                scriptManager.getFrontUnkowIntents(intents)
+                    .map { it.name().withoutNamespace() }
+                    .forEach {
                         logger.debug { "Intent $it not found, creating it..." }
                         FrontClient.save(
                             IntentDefinition(
-                                it, namespace, setOf(applicationId),
-                                emptySet(), description = "Intent created automatically for built-in story.", category = "builtin"
+                                it,
+                                namespace, setOf(applicationId),
+                                emptySet(),
+                                description = "Intent created automatically for built-in story.",
+                                category = "builtin"
                             )
                         )
                     }
-                }
             }
         }
     }
