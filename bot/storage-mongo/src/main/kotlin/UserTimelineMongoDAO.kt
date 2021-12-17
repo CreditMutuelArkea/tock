@@ -27,7 +27,7 @@ import ai.tock.bot.admin.user.UserReportQuery
 import ai.tock.bot.admin.user.UserReportQueryResult
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.ArchivedEntityValue

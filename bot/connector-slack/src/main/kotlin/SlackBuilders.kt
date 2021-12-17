@@ -26,7 +26,7 @@ import ai.tock.bot.connector.slack.model.SlackMessageAttachment
 import ai.tock.bot.connector.slack.model.SlackMessageOut
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator

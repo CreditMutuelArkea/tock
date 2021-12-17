@@ -17,7 +17,7 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.engine.*
-import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
+import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.translator.UserInterfaceType
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals

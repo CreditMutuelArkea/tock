@@ -25,7 +25,7 @@ import ai.tock.bot.connector.ga.model.response.GARichResponse
 import ai.tock.bot.connector.ga.model.response.GASuggestion
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator

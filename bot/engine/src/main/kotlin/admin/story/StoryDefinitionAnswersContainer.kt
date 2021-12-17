@@ -21,7 +21,7 @@ import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.AnswerConfigurationType.*
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.bot.BotVersion
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.config.BotDefinitionWrapper
 

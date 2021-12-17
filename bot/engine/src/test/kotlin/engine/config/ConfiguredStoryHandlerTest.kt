@@ -33,6 +33,7 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.story.config.ConfiguredStoryHandler
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.RawString

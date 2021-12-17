@@ -18,7 +18,7 @@ package ai.tock.bot.engine.action
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.dialog.EventState

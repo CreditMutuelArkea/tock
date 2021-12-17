@@ -25,11 +25,13 @@ import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultUnknownStory
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.ActionNotificationType
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.StoryDefinitionBase
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
+import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinitionBase
 import ai.tock.bot.engine.dialogManager.story.handler.*
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.story.dialogManager.handler.*
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -412,7 +414,7 @@ inline fun <reified T : StoryHandlerDefinition, reified S> storyDefWithSteps(
     )
 
 /**
- * Creates a new story from a [StoryHandler].
+ * Creates a new story from a [ScriptHandler].
  */
 fun story(
     /**
@@ -422,7 +424,7 @@ fun story(
     /**
      * The handler of the story.
      */
-    storyHandler: StoryHandler,
+    storyHandler: ScriptHandler,
     /**
      * The optionals other [StoryDefinition.starterIntents].
      */
@@ -481,7 +483,7 @@ inline fun <reified T> storyWithSteps(
     )
 
 /**
- * Creates a new story from a [StoryHandler].
+ * Creates a new story from a [ScriptHandler].
  */
 inline fun <reified T> storyWithSteps(
     /**
@@ -491,7 +493,7 @@ inline fun <reified T> storyWithSteps(
     /**
      * The handler of the story.
      */
-    storyHandler: StoryHandler,
+    storyHandler: ScriptHandler,
     /**
      * The optionals other [StoryDefinition.starterIntents].
      */

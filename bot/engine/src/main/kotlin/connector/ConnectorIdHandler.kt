@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector
 
-import ai.tock.bot.definition.ConnectorStoryHandler
+import ai.tock.bot.story.definition.ConnectorStoryHandler
 import kotlin.reflect.KClass
 
 /**

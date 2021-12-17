@@ -5,7 +5,7 @@ import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.bot.definition.IntentWithoutNamespace_
-import ai.tock.bot.definition.StoryTag
+import ai.tock.bot.story.definition.StoryTag
 import java.util.Locale
 import kotlin.Int
 import kotlin.String

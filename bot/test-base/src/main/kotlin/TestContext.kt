@@ -24,8 +24,8 @@ import ai.tock.bot.admin.user.UserReportDAO
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.definition.StoryHandlerListener
+import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.dialog.DialogFlowDAO
 import ai.tock.bot.engine.feature.FeatureDAO
 import ai.tock.bot.engine.nlp.NlpController

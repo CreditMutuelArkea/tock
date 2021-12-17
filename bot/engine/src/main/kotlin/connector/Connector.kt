@@ -18,7 +18,7 @@ package ai.tock.bot.connector
 
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.ConnectorController

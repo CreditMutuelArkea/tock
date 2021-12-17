@@ -30,7 +30,7 @@ import ai.tock.bot.admin.story.StoryDefinitionConfiguration_.Companion.Name
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration_.Companion.Namespace
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration_.Companion.StoryId
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration_.Companion.Tags
-import ai.tock.bot.definition.StoryTag
+import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.mongo.MongoBotConfiguration.asyncDatabase
 import ai.tock.bot.mongo.MongoBotConfiguration.database
 import ai.tock.bot.mongo.StoryDefinitionConfigurationHistoryCol_.Companion.Date

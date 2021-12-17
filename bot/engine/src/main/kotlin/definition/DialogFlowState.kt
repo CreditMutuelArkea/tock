@@ -16,7 +16,7 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 
 data class DialogFlowState(

@@ -19,10 +19,10 @@ package ai.tock.bot.test
 import ai.tock.bot.connector.messenger.model.send.TextMessage
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.engine.dialogManager.story.handler.SimpleStoryHandlerBase
+import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.definition.StoryHandlerListener
+import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionMetadata
 import ai.tock.bot.engine.dialog.EventState

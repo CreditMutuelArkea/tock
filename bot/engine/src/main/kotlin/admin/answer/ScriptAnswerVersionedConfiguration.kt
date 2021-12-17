@@ -17,7 +17,7 @@
 package ai.tock.bot.admin.answer
 
 import ai.tock.bot.admin.bot.BotVersion
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.shared.error
 import mu.KotlinLogging
 import java.time.Instant

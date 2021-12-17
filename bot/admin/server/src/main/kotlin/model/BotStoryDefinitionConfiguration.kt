@@ -24,7 +24,7 @@ import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.definition.StoryTag
+import ai.tock.bot.story.definition.StoryTag
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.util.Locale

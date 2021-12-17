@@ -17,7 +17,7 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.user.UserTimeline

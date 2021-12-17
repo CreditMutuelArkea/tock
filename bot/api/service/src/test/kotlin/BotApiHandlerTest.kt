@@ -23,7 +23,7 @@ import ai.tock.bot.api.model.websocket.ResponseData
 import ai.tock.bot.api.service.BotApiClientController
 import ai.tock.bot.api.service.BotApiDefinitionProvider
 import ai.tock.bot.api.service.BotApiHandler
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.shared.tockInternalInjector

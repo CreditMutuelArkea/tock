@@ -25,10 +25,10 @@ import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotDefinitionTest
 import ai.tock.bot.engine.config.BotDefinitionWrapper
-import ai.tock.bot.engine.config.ConfiguredStoryDefinition
+import ai.tock.bot.story.config.ConfiguredStoryDefinition
 import ai.tock.bot.engine.test
 import io.mockk.mockk
 import org.junit.jupiter.api.Nested

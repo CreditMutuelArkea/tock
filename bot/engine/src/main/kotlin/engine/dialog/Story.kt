@@ -18,11 +18,11 @@ package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
+import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
-import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS
-import ai.tock.bot.definition.StoryTag.CHECK_ONLY_SUB_STEPS_WITH_STORY_INTENT
+import ai.tock.bot.story.definition.StoryTag.CHECK_ONLY_SUB_STEPS
+import ai.tock.bot.story.definition.StoryTag.CHECK_ONLY_SUB_STEPS_WITH_STORY_INTENT
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.Action
@@ -50,17 +50,20 @@ data class Story(
     /**
      * The last action of the story.
      */
-    val lastAction: Action? get() = actions.lastOrNull()
+    val lastAction: Action?
+        get() = actions.lastOrNull()
 
     /**
      * The last user action of the story.
      */
-    val lastUserAction: Action? get() = actions.findLast { it.playerId.type == PlayerType.user }
+    val lastUserAction: Action?
+        get() = actions.findLast { it.playerId.type == PlayerType.user }
 
     /**
      * The current step of the story.
      */
-    val currentStep: StoryStep<*>? get() = definition.steps.asSequence().mapNotNull { findStep(it) }.firstOrNull()
+    val currentStep: StoryStep<*>?
+        get() = definition.steps.asSequence().mapNotNull { findStep(it) }.firstOrNull()
 
     private fun findStep(step: StoryStep<*>): StoryStep<*>? {
         if (step.name == this.step) {
@@ -118,7 +121,7 @@ data class Story(
         current.takeIf { current.children.any { child.name == it.name } }
             ?: current.children.asSequence().mapNotNull { findParentStep(it, child) }.firstOrNull()
 
-    private fun StoryHandler.sendStartEvent(bus: BotBus): Boolean {
+    private fun ScriptHandler.sendStartEvent(bus: BotBus): Boolean {
         // stops immediately if any startAction returns false
         return BotRepository.storyHandlerListeners.all {
             try {
@@ -130,7 +133,7 @@ data class Story(
         }
     }
 
-    private fun StoryHandler.sendEndEvent(bus: BotBus) {
+    private fun ScriptHandler.sendEndEvent(bus: BotBus) {
         BotRepository.storyHandlerListeners.forEach {
             try {
                 it.endAction(bus, this)

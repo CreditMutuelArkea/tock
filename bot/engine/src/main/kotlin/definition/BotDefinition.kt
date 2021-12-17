@@ -18,15 +18,11 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.connector.ConnectorType
-import ai.tock.bot.definition.Intent.Companion.keyword
-import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.model.Entity
@@ -96,83 +92,15 @@ interface BotDefinition : I18nKeyProvider {
 
         private val sendChoiceActivateBot = booleanProperty("tock_bot_send_choice_activate", true)
 
-        /**
-         * Finds an intent from an intent name and a list of [StoryDefinition].
-         * Is no valid intent found, returns [unknown].
-         */
-        internal fun findIntent(stories: List<StoryDefinition>, intent: String): Intent {
-            val targetIntent = Intent(intent)
-            return if (stories.any { it.supportIntent(targetIntent) } ||
-                stories.any { it.allSteps().any { s -> s.supportIntent(targetIntent) } }
-            ) {
-                targetIntent
-            } else {
-                if (intent == keyword.name) {
-                    keyword
-                } else {
-                    unknown
-                }
-            }
-        }
-
-        /**
-         * Finds a [StoryDefinition] from a list of [StoryDefinition] and an intent name.
-         * Is no valid [StoryDefinition] found, returns the [unknownStory].
-         */
-        internal fun findStoryDefinition(
-            stories: List<StoryDefinition>,
-            intent: String?,
-            unknownStory: StoryDefinition,
-            keywordStory: StoryDefinition
-        ): StoryDefinition {
-            return if (intent == null) {
-                unknownStory
-            } else {
-                val i = findIntent(stories, intent)
-                stories.find { it.isStarterIntent(i) }
-                    ?: if (intent == keyword.name) keywordStory else unknownStory
-            }
-        }
     }
 
     /**
      * Finds an [Intent] from an intent name.
      */
     fun findIntent(intent: String, applicationId: String): Intent {
-        return findIntent(stories, intent)
+        return scriptManager.findIntent(intent, applicationId)
     }
 
-    /**
-     * Finds a [StoryDefinition] from an [Intent].
-     */
-    fun findStoryDefinition(intent: IntentAware?, applicationId: String): StoryDefinition {
-        return if (intent is StoryDefinition) {
-            intent
-        } else {
-            findStoryDefinition(intent?.name(), applicationId)
-        }
-    }
-
-    /**
-     * Search story by storyId.
-     */
-    fun findStoryDefinitionById(storyId: String, applicationId: String): StoryDefinition = stories.find { it.id == storyId } ?: unknownStory
-
-    /**
-     * Search story by storyHandler.
-     */
-    fun findStoryByStoryHandler(storyHandler: StoryHandler, applicationId: String): StoryDefinition? =
-        stories.find { it.storyHandler == storyHandler }
-
-    /**
-     * Finds a [StoryDefinition] from an intent name.
-     *
-     * @param intent the intent name
-     * @param applicationId the optional applicationId
-     */
-    fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition {
-        return findStoryDefinition(stories, intent, unknownStory, keywordStory)
-    }
 
     /**
      * Called when error occurs. By default send "technical error".
@@ -185,7 +113,7 @@ interface BotDefinition : I18nKeyProvider {
             property("tock_technical_error", "Technical error :( sorry!")
         )
     }
-
+/*
     /**
      * Does this action trigger bot deactivation ?
      */
@@ -213,6 +141,8 @@ interface BotDefinition : I18nKeyProvider {
                         !action.state.notification &&
                         !(dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false)
                 )
+
+    */
 
     /**
      * If this method returns true, the action will be added in the stored history.

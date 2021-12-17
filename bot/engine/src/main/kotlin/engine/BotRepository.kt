@@ -34,12 +34,12 @@ import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
-import ai.tock.bot.definition.StoryHandlerListener
+import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
+import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.ActionNotificationType
-import ai.tock.bot.engine.config.StoryConfigurationMonitor
+import ai.tock.bot.story.config.StoryConfigurationMonitor
 import ai.tock.bot.engine.monitoring.RequestTimer
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener
 import ai.tock.bot.engine.nlp.NlpController

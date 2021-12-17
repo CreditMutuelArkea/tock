@@ -4,7 +4,7 @@ import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.definition.IntentWithoutNamespace
-import ai.tock.bot.definition.StoryTag
+import ai.tock.bot.story.definition.StoryTag
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.core.JsonToken
 import com.fasterxml.jackson.core.type.TypeReference

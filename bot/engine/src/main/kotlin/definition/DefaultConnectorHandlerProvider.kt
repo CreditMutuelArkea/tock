@@ -20,7 +20,8 @@ import ai.tock.bot.connector.ConnectorHandler
 import ai.tock.bot.connector.ConnectorIdHandlers
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.definition.ConnectorStoryHandlerBase
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.shared.mapNotNullValues
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass

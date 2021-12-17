@@ -17,7 +17,7 @@
 package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.admin.answer.AnswerConfigurationType
-import ai.tock.bot.engine.config.ConfiguredStoryDefinition
+import ai.tock.bot.story.config.ConfiguredStoryDefinition
 import ai.tock.nlp.api.client.model.Entity
 import java.time.Instant
 import java.time.Instant.now

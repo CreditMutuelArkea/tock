@@ -41,7 +41,7 @@ import ai.tock.bot.connector.ga.model.response.GASimpleSelect
 import ai.tock.bot.connector.ga.model.response.GAStructuredResponse
 import ai.tock.bot.connector.ga.model.response.GAUpdatePermissionValueSpec
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandlerDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator

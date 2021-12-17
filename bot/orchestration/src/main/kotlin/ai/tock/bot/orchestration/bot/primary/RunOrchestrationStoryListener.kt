@@ -19,8 +19,8 @@ package ai.tock.bot.orchestration.bot.primary
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialogManager.story.handler.StoryHandler
-import ai.tock.bot.definition.StoryHandlerListener
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
+import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.orchestration.orchestrator.OrchestratorService
@@ -55,7 +55,7 @@ class RunOrchestrationStoryListener(
     private val orchestrationEnabled: (() -> Boolean) = { true }
 ) : StoryHandlerListener {
 
-    override fun startAction(botBus: BotBus, handler: StoryHandler): Boolean = with(botBus) {
+    override fun startAction(botBus: BotBus, handler: ScriptHandler): Boolean = with(botBus) {
         val currentOrchestration = orchestrationRepository.get(action.playerId)
 
         return when {
