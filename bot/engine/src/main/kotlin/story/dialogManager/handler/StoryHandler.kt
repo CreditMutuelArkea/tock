@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.DialogManager
+package ai.tock.bot.story.dialogManager.handler
 
-import ai.tock.bot.ScriptManager.ScriptStep
-import ai.tock.bot.definition.Intent
-import ai.tock.bot.definition.IntentAware
-import ai.tock.nlp.api.client.model.dump.IntentDefinition
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 
-interface ScriptManager {
-
-    fun findMainIntent(scriptStep: ScriptStep): IntentAware?
-
-    fun getFrontUnkowIntents(frontIntents: List<IntentDefinition>): List<IntentAware>
-
-    fun initNameSpace(namespace: String)
-
-    fun findIntent(intent: String, applicationId: String): Intent
-
-    fun isEnableEndScript(namespace: String, botId: String, applicationId: String): Boolean
+interface StoryHandler : ScriptHandler {
 }

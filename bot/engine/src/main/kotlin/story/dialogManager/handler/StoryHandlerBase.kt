@@ -16,6 +16,7 @@
 
 package ai.tock.bot.story.dialogManager.handler
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
 import ai.tock.bot.definition.*
 import ai.tock.bot.definition.BotDefinition.Companion.defaultBreath
 import ai.tock.bot.engine.BotBus
@@ -49,7 +50,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
      * Convenient value to wait before next answer sentence.
      */
     val breath: Long = defaultBreath
-) : ScriptHandler, I18nKeyProvider, IntentAware {
+) : StoryHandler, I18nKeyProvider, IntentAware {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -111,11 +112,22 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         return null
     }
 
+    //TODO : renommer la méthode
+    private fun getScriptManager(bus: BotBus): ScriptManagerStory {
+        return if(bus.botDefinition.scriptManager !is ScriptManagerStory) {
+            //TODO : mettre la bonne exception
+            throw Exception("script manager incompatible")
+        } else {
+            bus.botDefinition.scriptManager as ScriptManagerStory
+        }
+    }
+
     final override fun handle(bus: BotBus) {
         val storyDefinition = findStoryDefinition(bus)
+        val scriptManager: ScriptManagerStory = getScriptManager(bus)
         // if not supported user interface, use unknown
         if (storyDefinition?.unsupportedUserInterfaces?.contains(bus.userInterfaceType) == true) {
-            bus.botDefinition.unknownStory.storyHandler.handle(bus)
+            scriptManager.unknownStory.storyHandler.handle(bus)
         } else {
             // set current i18n provider
             bus.i18nProvider = this
@@ -160,12 +172,14 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         }
     }
 
-    override fun support(bus: BotBus): Double =
-        if (bus.story.definition == bus.botDefinition.unknownStory) {
+    override fun support(bus: BotBus): Double {
+        val scriptManager: ScriptManagerStory = getScriptManager(bus)
+        return if (bus.story.definition == scriptManager.unknownStory) {
             0.0
         } else {
             (bus.action as? SendSentence)?.nlpStats?.nlpResult?.intentProbability ?: 1.0
         }
+    }
 
     /**
      * Finds the story definition of this handler.

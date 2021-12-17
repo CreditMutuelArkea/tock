@@ -246,6 +246,7 @@ object BotRepository {
      * Register built-in story definitions.
      */
     fun registerBuiltInStoryDefinitions(botProvider: BotProvider) {
+       // botProvider.botDefinition().scriptManager.registerBuiltIn()
         val botDefinition = botProvider.botDefinition()
         checkBuiltInStoryCompliance(botDefinition)
         val configurationName = botProvider.botProviderId.configurationName

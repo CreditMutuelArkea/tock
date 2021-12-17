@@ -18,8 +18,8 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.DialogManager.ScriptManagerStoryBase
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase.Companion.findStoryDefinition
 import ai.tock.bot.connector.NotifyBotStateModifier
-import ai.tock.bot.definition.BotDefinition.Companion.findStoryDefinition
 import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultKeywordStory
 import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultUnknownStory
 import ai.tock.bot.engine.BotBus
@@ -28,14 +28,14 @@ import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
-import ai.tock.bot.engine.dialogManager.story.handler.*
+//import ai.tock.bot.engine.dialogManager.story.handler.*
 import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.story.dialogManager.handler.*
 import ai.tock.translator.UserInterfaceType
 
 /**
- * Creates a new bot.
+ * Creates a new story bot.
  */
 fun bot(
     /**
@@ -101,20 +101,17 @@ fun bot(
     conversation: DialogFlowDefinition? = null
 ): SimpleBotDefinition {
 
-    fun findStory(intent: IntentAware?): StoryDefinition? =
-        intent as? StoryDefinition
-            ?: findStoryDefinition(
+    fun findStory(intent: IntentAware?): StoryDefinition? {
+        return (intent as? StoryDefinition) ?:
+            findStoryDefinition(
                 stories,
                 intent?.name(),
                 unknownStory,
                 keywordStory
-            ).let {
-                if (it == unknownStory || it == keywordStory) {
-                    null
-                } else {
-                    it
-                }
+            ).takeIf {
+                !it.wrap(unknownStory) && !it.wrap(keywordStory)
             }
+    }
 
     val scriptManager: ScriptManager = ScriptManagerStoryBase(
         stories,

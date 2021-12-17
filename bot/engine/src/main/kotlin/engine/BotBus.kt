@@ -96,7 +96,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * The current story.
      */
-    var story: Story
+    //var story: Story
 
     /**
      * The user action.
@@ -144,6 +144,12 @@ interface BotBus : Bus<BotBus> {
 
 
     override val stepName: String? get() = step?.name
+
+    var hasCurrentSwitchStoryProcess: Boolean
+        get() = dialog.state.hasCurrentSwitchStoryProcess
+        set(v) {
+            dialog.state.hasCurrentSwitchStoryProcess = v
+        }
 
     /**
      * The text sent by the user if any.
@@ -539,9 +545,3 @@ interface BotBus : Bus<BotBus> {
 
     override fun end(delay: Long): BotBus = super.end(delay)
 }
-
-internal var BotBus.hasCurrentSwitchStoryProcess: Boolean
-    get() = dialog.state.hasCurrentSwitchStoryProcess
-    set(v) {
-        dialog.state.hasCurrentSwitchStoryProcess = v
-    }

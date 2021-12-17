@@ -60,6 +60,7 @@ internal class TockBotBus(
         set(value) {
             currentDialog.stories.add(value)
         }
+
     override val botDefinition: BotDefinition = bot.botDefinition
     override val applicationId = action.applicationId
     override val botId = action.recipientId

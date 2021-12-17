@@ -18,10 +18,12 @@ package ai.tock.bot.DialogManager
 
 import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.ScriptManager.ScriptStep.*
+import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
@@ -30,6 +32,7 @@ import ai.tock.shared.Executor
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.withoutNamespace
+import com.github.salomonbrys.kodein.instance
 
 class ScriptManagerStoryBase(
     override val stories: List<StoryDefinition>,
@@ -45,6 +48,12 @@ class ScriptManagerStoryBase(
 ) : ScriptManagerStory {
 
     private val executor: Executor get() = injector.provide()
+
+    private val storyDAO: StoryDefinitionConfigurationDAO by injector.instance()
+
+    //TODO : je ne sais pas encore comment initialisé cette story, ça dépend de la userTimeline, et du Dialog
+    @Volatile
+    var currentStory: Story
 
     companion object {
 
@@ -165,4 +174,15 @@ class ScriptManagerStoryBase(
     fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition {
         return findStoryDefinition(stories, intent, unknownStory, keywordStory)
     }
+
+    override fun isEnableEndScript(namespace: String, botId: String, applicationId: String): Boolean {
+        //Check if there is a configuration for Ending story
+        val storySetting = storyDAO.getStoryDefinitionsByNamespaceBotIdStoryId(
+            namespace,
+            botId,
+            currentStory.definition.id
+        )
+        return storySetting?.findEnabledEndWithStoryId(applicationId) == null
+    }
+
 }

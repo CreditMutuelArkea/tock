@@ -53,12 +53,14 @@ internal class BotApiHandler(
     configuration: BotConfiguration,
     private val clientController: BotApiClientController = BotApiClientController(provider, configuration),
 ) {
+    private val BotBus.viewedStories: Set<StoryDefinition>
+        get() {
+           return getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
+        }
 
     companion object {
         private const val VIEWED_STORIES_BUS_KEY = "_viewed_stories_tock_switch"
     }
-
-    private val storyDAO: StoryDefinitionConfigurationDAO by injector.instance()
 
     fun configuration(): ClientConfiguration? = clientController.configuration()
 
@@ -70,13 +72,8 @@ internal class BotApiHandler(
 
     private fun BotBus.handleResponse(request: UserRequest, response: BotResponse?) {
         if (response != null) {
-            //Check if there is a configuration for Ending story
-            val storySetting = storyDAO.getStoryDefinitionsByNamespaceBotIdStoryId(
-                botDefinition.namespace,
-                botDefinition.botId,
-                story.definition.id
-            )
-            val endingStoryId = storySetting?.findEnabledEndWithStoryId(applicationId)
+
+            val isEnd: Boolean = botDefinition.scriptManager.isEnableEndScript(botDefinition.namespace, botDefinition.botId, applicationId)
 
             val messages = response.messages
             if (messages.isEmpty()) {
@@ -87,7 +84,7 @@ internal class BotApiHandler(
                     send(a)
                 }
             messages.last().apply {
-                send(this, endingStoryId == null)
+                send(this, isEnd)
             }
             // handle entity changes
             entities
@@ -119,23 +116,30 @@ internal class BotApiHandler(
                 }
             }
 
-            // switch story if new story
-            if (response.storyId != request.storyId) {
-                botDefinition.findStoryDefinitionById(response.storyId, request.context.applicationId)
-                    .also {
-                        switchStory(it)
-                    }
-            }
-            // set step
-            if (response.step != null) {
-                step = story.definition.allSteps().find { it.name == response.step }
+            try {
+                //TODO : à déplacer dans le scriptManager Story
+
+                // switch story if new story
+                if (response.storyId != request.storyId) {
+                    botDefinition.findStoryDefinitionById(response.storyId, request.context.applicationId)
+                        .also {
+                            switchStory(it)
+                        }
+                }
+                // set step
+                if (response.step != null) {
+                    step = story.definition.allSteps().find { it.name == response.step }
+                }
+
+                //Handle current story and switch to ending story
+                if (endingStoryId != null) {
+                    val targetStory = botDefinition.findStoryDefinitionById(endingStoryId, applicationId)
+                    switchEndingStory(targetStory)
+                }
+            } finally {
+                //TODO : supper le try , c'est juste pour faire jolie
             }
 
-            //Handle current story and switch to ending story
-            if (endingStoryId != null) {
-                val targetStory = botDefinition.findStoryDefinitionById(endingStoryId, applicationId)
-                switchEndingStory(targetStory)
-            }
         }
     }
 
@@ -145,9 +149,6 @@ internal class BotApiHandler(
         handleAndSwitchStory(target)
     }
 
-    private val BotBus.viewedStories: Set<StoryDefinition>
-        get() =
-            getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
 
     private fun BotBus.send(message: BotMessage, end: Boolean = false) {
         val actions =
