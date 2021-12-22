@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.engine.dialogManager.story.storySteps
+package engine.dialogManager.step
 
 import ai.tock.bot.definition.EntityStepSelection
 import ai.tock.bot.definition.Intent
@@ -27,22 +27,10 @@ import ai.tock.bot.engine.user.UserTimeline
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * step -> intent default behaviour.
+ * A step is a part of a [StoryDefinition]. //TODO: Step is now a part of an abstraction of story
+ * Used to manage workflow in a [StoryHandler]. //TODO: workfow in a handler, not only a StoryHandler
  */
-internal val stepToIntentRepository = ConcurrentHashMap<StoryStep<out StoryHandlerDefinition>, IntentAware>()
-
-/**
- * Use this step when you want to set a null [StoryStep].
- */
-val noStep = object : SimpleStoryStep {
-    override val name: String = "_NO_STEP_"
-}
-
-/**
- * A step is a part of a [StoryDefinition].
- * Used to manage workflow in a [StoryHandler].
- */
-interface StoryStep<T : StoryHandlerDefinition> {
+interface Step<T> {
 
     /**
      * The name of the step.
@@ -59,9 +47,9 @@ interface StoryStep<T : StoryHandlerDefinition> {
     fun answer(): T.() -> Any? = { null }
 
     /**
-     * Returns [intent] or the [StoryDefinition.mainIntent] if [intent] is null.
+     * Returns [intent].
      */
-    val baseIntent: IntentAware get() = intent ?: stepToIntentRepository[this] ?: error("no intent for $this")
+    val baseIntent: IntentAware
 
     /**
      * The main intent of the step.
@@ -138,7 +126,7 @@ interface StoryStep<T : StoryHandlerDefinition> {
     /**
      * The optional children of the step.
      */
-    val children: Set<StoryStep<T>> get() = emptySet()
+    val children: Set<Step<T>> get() = emptySet()
 
     /**
      * Flag indicating if it's the step has no children.
@@ -150,3 +138,4 @@ interface StoryStep<T : StoryHandlerDefinition> {
      */
     val entityStepSelection: EntityStepSelection? get() = null
 }
+

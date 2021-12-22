@@ -24,12 +24,12 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.storyData.StoryDataStep
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.hasCurrentSwitchStoryProcess
 import ai.tock.shared.defaultNamespace
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nKeyProvider.Companion.generateKey
 import ai.tock.translator.I18nLabelValue
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 /**
@@ -95,7 +95,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         def: T,
         data: Any?,
         storyDefinition: StoryDefinition?
-    ): StoryStep<*>? {
+    ): Step<*>? {
         storyDefinition?.steps?.also { steps ->
             for (s in steps) {
                 @Suppress("UNCHECKED_CAST") val selected = if (s is StoryDataStep<*, *, *>) {
@@ -154,7 +154,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
                         if (step is StoryDataStep<*, *, *>) {
                             (step as StoryDataStep<T, Any, Any>).handler().invoke(handler, data)
                         } else {
-                            (step as? StoryStep<T>)?.answer()?.invoke(handler)
+                            (step as? Step<T>)?.answer()?.invoke(handler)
                         }
                     }
                 }

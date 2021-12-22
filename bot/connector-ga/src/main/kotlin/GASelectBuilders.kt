@@ -22,10 +22,9 @@ import ai.tock.bot.connector.ga.model.response.GASelectItem
 import ai.tock.bot.connector.ga.model.response.GASimpleSelect
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
+import engine.dialogManager.step.Step
 
 /**
  * Provides a [GAExpectedIntent] with a [GASimpleSelect].
@@ -64,7 +63,7 @@ fun <T : Bus<T>> T.selectItem(
 fun <T : Bus<T>> T.selectItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>,
+    step: Step<*>,
     optionTitle: CharSequence? = null,
     parameters: Parameters
 ): GASelectItem = selectItem(title, targetIntent, step, optionTitle, *parameters.toArray())
@@ -75,7 +74,7 @@ fun <T : Bus<T>> T.selectItem(
 fun <T : Bus<T>> T.selectItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     optionTitle: CharSequence? = null,
     vararg parameters: Pair<String, String>
 ): GASelectItem {

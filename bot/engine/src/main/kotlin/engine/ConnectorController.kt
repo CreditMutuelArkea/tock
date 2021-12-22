@@ -24,11 +24,11 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
+import engine.dialogManager.step.Step
 import io.vertx.ext.web.Router
 
 /**
@@ -65,7 +65,7 @@ interface ConnectorController {
     fun notify(
         recipientId: PlayerId,
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>? = null,
+        step: Step<*>? = null,
         parameters: Map<String, String> = emptyMap(),
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit = {}

@@ -53,6 +53,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
+import engine.dialogManager.step.Step
 
 /**
  * Bus implementation for Tock integrated mode.
@@ -136,12 +137,9 @@ interface BotBus : Bus<BotBus> {
      */
     var nextUserActionState: NextUserActionState?
 
-    var step: StoryStep<out StoryHandlerDefinition>?
-        get() = story.currentStep
-        set(step) {
-            story.step = step?.name
-        }
-
+    var step: Step<*>?
+        get() = botDefinition.scriptManager.getCurrentStep()
+        set(step) = botDefinition.scriptManager.changeCurrentStep(step?.name)
 
     override val stepName: String? get() = step?.name
 

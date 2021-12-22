@@ -18,14 +18,13 @@ package ai.tock.bot.engine.action
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.dialog.EventState
 import ai.tock.bot.engine.message.Choice
 import ai.tock.bot.engine.message.Message
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.shared.mapNotNullValues
+import engine.dialogManager.step.Step
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.net.URLDecoder.decode
@@ -53,7 +52,7 @@ class SendChoice(
         applicationId: String,
         recipientId: PlayerId,
         intentName: String,
-        step: StoryStep<out StoryHandlerDefinition>?,
+        step: Step<*>?,
         parameters: Map<String, String> = emptyMap(),
         id: Id<Action> = newId(),
         date: Instant = Instant.now(),
@@ -120,7 +119,7 @@ class SendChoice(
             /**
              * The target step.
              */
-            step: StoryStep<out StoryHandlerDefinition>? = null,
+            step: Step<*>? = null,
             /**
              * The custom parameters.
              */
@@ -178,7 +177,7 @@ class SendChoice(
             /**
              * The target step.
              */
-            step: StoryStep<out StoryHandlerDefinition>? = null,
+            step: Step<*>? = null,
             /**
              * The custom parameters.
              */
@@ -186,7 +185,7 @@ class SendChoice(
             /**
              * The current step of the bus.
              */
-            busStep: StoryStep<out StoryHandlerDefinition>? = null,
+            busStep: Step<*>? = null,
             /**
              * The current intent of the bus.
              */

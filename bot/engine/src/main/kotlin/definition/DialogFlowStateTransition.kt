@@ -16,12 +16,12 @@
 
 package ai.tock.bot.definition
 
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import engine.dialogManager.step.Step
 
 data class DialogFlowStateTransition(
     val previousState: DialogFlowState?,
     val nextState: DialogFlowState,
     val intent: IntentAware?,
-    val step: StoryStep<*>?,
+    val step: Step<*>?,
     val type: DialogFlowStateTransitionType = DialogFlowStateTransitionType.nlp
 )

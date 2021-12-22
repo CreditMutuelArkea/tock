@@ -19,8 +19,7 @@ package ai.tock.bot.story.dialogManager
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -34,7 +33,7 @@ open class SimpleStoryDefinition(
      * starter intents + other intents supported by the story.
      */
     override val intents: Set<IntentAware> = starterIntents,
-    override val steps: Set<StoryStep<StoryHandlerDefinition>> = emptySet(),
+    override val steps: Set<SimpleStoryStep> = emptySet(),
     override val unsupportedUserInterfaces: Set<UserInterfaceType> = emptySet(),
     override val tags: Set<StoryTag> = emptySet()
 ) :
@@ -43,7 +42,7 @@ open class SimpleStoryDefinition(
     constructor(
         id: String,
         storyHandler: ScriptHandler,
-        steps: Array<out StoryStep<StoryHandlerDefinition>> = emptyArray(),
+        steps: Array<out SimpleStoryStep> = emptyArray(),
         starterIntents: Set<IntentAware>,
         intents: Set<IntentAware> = starterIntents,
         unsupportedUserInterfaces: Set<UserInterfaceType> = emptySet()

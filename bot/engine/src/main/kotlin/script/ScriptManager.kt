@@ -20,6 +20,7 @@ import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
+import engine.dialogManager.step.Step
 
 interface ScriptManager {
 
@@ -32,4 +33,12 @@ interface ScriptManager {
     fun findIntent(intent: String, applicationId: String): Intent
 
     fun isEnableEndScript(namespace: String, botId: String, applicationId: String): Boolean
+
+    fun getHandleAttachmentIntent(): IntentAware?
+
+    fun getUserLocationIntent(): IntentAware?
+
+    fun getCurrentStep(): Step<*>?
+
+    fun changeCurrentStep(stepName: String?)
 }

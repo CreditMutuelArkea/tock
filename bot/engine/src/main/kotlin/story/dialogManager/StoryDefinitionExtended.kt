@@ -18,8 +18,7 @@ package ai.tock.bot.story.dialogManager
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -37,8 +36,8 @@ interface StoryDefinitionExtended : StoryDefinition {
     /**
      * StoryStep implementation could be an enum
      */
-    val stepsArray: Array<out StoryStep<out StoryHandlerDefinition>> get() = emptyArray()
-    override val steps: Set<StoryStep<out StoryHandlerDefinition>> get() = stepsArray.toSet()
+    val stepsArray: Array<out SimpleStoryStep> get() = emptyArray()
+    override val steps: Set<SimpleStoryStep> get() = stepsArray.toSet()
 
     val unsupportedUserInterface: UserInterfaceType? get() = null
     override val unsupportedUserInterfaces: Set<UserInterfaceType> get() = listOfNotNull(unsupportedUserInterface).toSet()

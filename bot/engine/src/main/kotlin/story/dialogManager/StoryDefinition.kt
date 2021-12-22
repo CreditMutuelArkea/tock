@@ -20,7 +20,7 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -68,7 +68,7 @@ interface StoryDefinition : IntentAware {
     /**
      * The root steps of the story.
      */
-    val steps: Set<StoryStep<*>>
+    val steps: Set<SimpleStoryStep>
 
     /**
      * When this story does not support all [UserInterfaceType]s.
@@ -98,10 +98,10 @@ interface StoryDefinition : IntentAware {
     /**
      * Returns all steps of the story.
      */
-    fun allSteps(): Set<StoryStep<*>> =
-        mutableSetOf<StoryStep<*>>().apply { steps.forEach { allStep(this, it) } }
+    fun allSteps(): Set<SimpleStoryStep> =
+        mutableSetOf<SimpleStoryStep>().apply { steps.forEach { allStep(this, it) } }
 
-    private fun allStep(result: MutableSet<StoryStep<*>>, step: StoryStep<*>) {
+    private fun allStep(result: MutableSet<SimpleStoryStep>, step: SimpleStoryStep) {
         result.add(step)
         step.children.forEach { allStep(result, it) }
     }

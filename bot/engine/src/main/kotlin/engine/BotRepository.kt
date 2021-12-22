@@ -37,7 +37,6 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.story.definition.StoryHandlerListener
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.story.config.StoryConfigurationMonitor
 import ai.tock.bot.engine.monitoring.RequestTimer
@@ -55,6 +54,7 @@ import ai.tock.shared.jackson.addConstrainedTypes
 import ai.tock.shared.listProperty
 import ai.tock.shared.provide
 import ai.tock.shared.vertx.vertx
+import engine.dialogManager.step.Step
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
@@ -179,7 +179,7 @@ object BotRepository {
         applicationId: String,
         recipientId: PlayerId,
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>? = null,
+        step: Step<*>? = null,
         parameters: Map<String, String> = emptyMap(),
         stateModifier: NotifyBotStateModifier = NotifyBotStateModifier.KEEP_CURRENT_STATE,
         notificationType: ActionNotificationType? = null,
@@ -201,7 +201,7 @@ object BotRepository {
     private fun ConnectorController.notifyAndCheckState(
         recipientId: PlayerId,
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>?,
+        step: Step<*>?,
         parameters: Map<String, String>,
         stateModifier: NotifyBotStateModifier,
         notificationType: ActionNotificationType?,

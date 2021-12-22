@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.definition
+package ai.tock.bot.script
 
-import ai.tock.bot.story.dialogManager.StoryDefinition
-import engine.dialogManager.step.Step
+import ai.tock.bot.engine.action.Action
 
-data class DialogFlowState(
-    val storyDefinition: StoryDefinition,
-    val intent: IntentAware = storyDefinition.mainIntent(),
-    val step: Step<*>? = null
-)
+interface Script {
+
+    val actions: MutableList<Action>
+
+    val lastAction: Action?
+
+    val lastUserAction: Action?
+}

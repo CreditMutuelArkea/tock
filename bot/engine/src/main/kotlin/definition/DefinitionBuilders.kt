@@ -26,10 +26,10 @@ import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
 //import ai.tock.bot.engine.dialogManager.story.handler.*
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.story.dialogManager.handler.*
 import ai.tock.translator.UserInterfaceType
@@ -154,7 +154,7 @@ fun story(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -188,7 +188,7 @@ fun story(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -229,7 +229,7 @@ inline fun <reified T : StoryHandlerDefinition> story(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -264,7 +264,7 @@ inline fun <reified T : StoryHandlerDefinition, D> storyDef(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -307,7 +307,7 @@ inline fun <reified T : StoryHandlerDefinition> storyDef(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -361,7 +361,7 @@ inline fun <reified T : StoryHandlerDefinition, reified S, D> storyDefWithSteps(
      * [StoryHandlerDefinition.handle] is not called and the handling of bot answer is over.
      */
     noinline preconditionsChecker: BotBus.() -> D
-): StoryDefinitionBase where S : Enum<S>, S : StoryStep<out StoryHandlerDefinition> =
+): StoryDefinitionBase where S : Enum<S>, S : SimpleStoryStep =
     StoryDefinitionBase(
         intentName,
         ConfigurableStoryHandler(intentName, handlerDefCreator, preconditionsChecker),
@@ -400,7 +400,7 @@ inline fun <reified T : StoryHandlerDefinition, reified S> storyDefWithSteps(
      * [StoryHandlerDefinition.handle] is not called and the handling of bot answer is over.
      */
     noinline preconditionsChecker: BotBus.() -> Unit
-): StoryDefinitionBase where S : Enum<S>, S : StoryStep<out StoryHandlerDefinition> =
+): StoryDefinitionBase where S : Enum<S>, S : SimpleStoryStep =
     StoryDefinitionBase(
         intentName,
         ConfigurableStoryHandler(intentName, handlerDefCreator, preconditionsChecker),
@@ -433,7 +433,7 @@ fun story(
     /**
      * The [StoryStep] of the story if any.
      */
-    steps: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    steps: List<SimpleStoryStep> = emptyList(),
     /**
      * Is this story unsupported for a [UserInterfaceType]?
      */
@@ -469,7 +469,7 @@ inline fun <reified T> storyWithSteps(
      */
     unsupportedUserInterface: UserInterfaceType? = null
 ): StoryDefinitionBase
-        where T : Enum<T>, T : StoryStep<out StoryHandlerDefinition> =
+        where T : Enum<T>, T : SimpleStoryStep =
     story(
         handler,
         handler,
@@ -503,7 +503,7 @@ inline fun <reified T> storyWithSteps(
      * Is this story unsupported for a [UserInterfaceType]?
      */
     unsupportedUserInterface: UserInterfaceType? = null
-): StoryDefinitionBase where T : Enum<T>, T : StoryStep<out StoryHandlerDefinition> =
+): StoryDefinitionBase where T : Enum<T>, T : SimpleStoryStep =
     story(
         intent,
         storyHandler,
@@ -537,7 +537,7 @@ inline fun <reified T> storyWithSteps(
      * The handler for the story.
      */
     noinline handler: (BotBus).() -> Unit
-): StoryDefinitionBase where T : Enum<T>, T : StoryStep<out StoryHandlerDefinition> =
+): StoryDefinitionBase where T : Enum<T>, T : SimpleStoryStep =
     story(
         intentName,
         otherStarterIntents,
@@ -569,7 +569,7 @@ fun notify(
     botId: String,
     recipientId: PlayerId,
     intent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: SimpleStoryStep? = null,
     parameters: Parameters = Parameters.EMPTY,
     stateModifier: NotifyBotStateModifier = NotifyBotStateModifier.KEEP_CURRENT_STATE,
     notificationType: ActionNotificationType? = null,

@@ -78,7 +78,11 @@ internal class BotDefinitionWrapper(val botDefinition: BotDefinition) : BotDefin
         val i = super.findIntent(intent, applicationId)
         return if (i == unknown) {
             val i2 = botDefinition.findIntent(intent, applicationId)
-            if (i2 == unknown) BotDefinition.findIntent(intent, applicationId) else i2
+            if (i2 == unknown) {
+                BotDefinition.findIntent(intent, applicationId)
+            } else {
+                i2
+            }
         } else i
     }
 

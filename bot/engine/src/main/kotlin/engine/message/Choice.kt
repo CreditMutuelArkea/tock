@@ -16,13 +16,12 @@
 
 package ai.tock.bot.engine.message
 
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.event.EventType
 import ai.tock.bot.engine.message.parser.MessageParser.mapToString
 import ai.tock.bot.engine.user.PlayerId
+import engine.dialogManager.step.Step
 
 /**
  * A user choice.
@@ -50,7 +49,7 @@ data class Choice(
 
     constructor(
         intentName: String,
-        step: StoryStep<out StoryHandlerDefinition>,
+        step: Step<*>,
         parameters: Map<String, String> = emptyMap(),
         delay: Long = 0
     ) :

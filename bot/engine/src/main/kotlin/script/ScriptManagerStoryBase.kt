@@ -26,6 +26,8 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
+import ai.tock.bot.story.dialogManager.handler.StoryHandler
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
 import ai.tock.shared.Executor
@@ -33,6 +35,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.withoutNamespace
 import com.github.salomonbrys.kodein.instance
+import engine.dialogManager.step.Step
 
 class ScriptManagerStoryBase(
     override val stories: List<StoryDefinition>,
@@ -107,6 +110,10 @@ class ScriptManagerStoryBase(
             DEFAULT -> defaultStory.mainIntent()
         }
     }
+
+    override fun getHandleAttachmentIntent() : IntentAware? = handleAttachmentStory?.mainIntent()
+
+    override fun getUserLocationIntent() : IntentAware? = userLocationStory?.mainIntent()
 
     override fun getFrontUnkowIntents(frontIntents: List<IntentDefinition>): List<IntentAware> {
         return stories
@@ -183,6 +190,14 @@ class ScriptManagerStoryBase(
             currentStory.definition.id
         )
         return storySetting?.findEnabledEndWithStoryId(applicationId) == null
+    }
+
+    override fun getCurrentStep(): SimpleStoryStep? {
+        return currentStory.currentStep
+    }
+
+    override fun changeCurrentStep(stepName: String?) {
+        currentStory.step = stepName
     }
 
 }

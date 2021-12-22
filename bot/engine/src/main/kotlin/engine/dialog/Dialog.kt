@@ -23,7 +23,6 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
-import java.time.Instant
 
 /**
  * A dialog is a conversation between users and bots.
@@ -34,7 +33,7 @@ data class Dialog(
     /**
      * The players of the dialog.
      */
-    val playerIds: Set<PlayerId>,
+    override val playerIds: Set<PlayerId>,
     /**
      * The id of the dialog.
      */
@@ -42,16 +41,16 @@ data class Dialog(
     /**
      * The state of the dialog.
      */
-    val state: DialogState = DialogState(),
+    override val state: DialogState = DialogState(),
     /**
      * The history of stories in the dialog.
      */
-    val stories: MutableList<Story> = mutableListOf(),
+    override val scripts: MutableList<Story> = mutableListOf(),
     /**
      * An optional group identifier.
      */
-    val groupId: String? = null
-) {
+    override val groupId: String? = null,
+) : DialogT<Story> {
 
     companion object {
         /**
@@ -61,8 +60,8 @@ data class Dialog(
             return Dialog(
                 dialog.playerIds,
                 state = DialogState.initFromDialogState(dialog.state),
-                stories = listOfNotNull(
-                    dialog.stories.lastOrNull()?.run {
+                scripts = listOfNotNull(
+                    dialog.scripts.lastOrNull()?.run {
                         val s = copy()
                         s.actions.clear()
                         if (actions.isNotEmpty()) {
@@ -76,37 +75,12 @@ data class Dialog(
     }
 
     /**
-     * The last update date.
-     */
-    val lastDateUpdate: Instant get() = lastAction?.date ?: Instant.now()
-
-    /**
-     * The current story if any.
-     */
-    val currentStory: Story? get() = stories.lastOrNull()
-
-    /**
-     * All old actions.
-     */
-    fun allActions(): List<Action> = stories.flatMap { it.actions }
-
-    /**
-     * Returns last action.
-     */
-    val lastAction: Action? get() = stories.lastOrNull { it.lastAction != null }?.lastAction
-
-    /**
-     * Returns last user action.
-     */
-    val lastUserAction: Action? = stories.lastOrNull { it.lastUserAction != null }?.lastUserAction
-
-    /**
      * The [Snapshots] of the dialog.
      */
-    val snapshots: List<Snapshot> by lazy { injector.provide<UserTimelineDAO>().getSnapshots(id) }
+    override val snapshots: List<Snapshot> by lazy { injector.provide<UserTimelineDAO>().getSnapshots(id) }
 
-    /**
-     * Current number of actions in dialog history.
-     */
-    val actionsSize: Int get() = stories.sumBy { it.actions.size }
+    override fun initFromDialog(dialog: DialogT<Story>): DialogT<Story> {
+        return Dialog.initFromDialog(dialog as Dialog)
+    }
+
 }

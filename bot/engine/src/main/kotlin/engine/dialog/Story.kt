@@ -20,15 +20,16 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.story.definition.StoryTag.CHECK_ONLY_SUB_STEPS
 import ai.tock.bot.story.definition.StoryTag.CHECK_ONLY_SUB_STEPS_WITH_STORY_INTENT
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.script.Script
 import ai.tock.shared.error
 import mu.KotlinLogging
 
@@ -40,8 +41,8 @@ data class Story(
     val definition: StoryDefinition,
     val starterIntent: Intent,
     internal var step: String? = null,
-    val actions: MutableList<Action> = mutableListOf()
-) {
+    override val actions: MutableList<Action> = mutableListOf()
+) : Script {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -50,22 +51,22 @@ data class Story(
     /**
      * The last action of the story.
      */
-    val lastAction: Action?
+    override val lastAction: Action?
         get() = actions.lastOrNull()
 
     /**
      * The last user action of the story.
      */
-    val lastUserAction: Action?
+    override val lastUserAction: Action?
         get() = actions.findLast { it.playerId.type == PlayerType.user }
 
     /**
      * The current step of the story.
      */
-    val currentStep: StoryStep<*>?
+    val currentStep: SimpleStoryStep?
         get() = definition.steps.asSequence().mapNotNull { findStep(it) }.firstOrNull()
 
-    private fun findStep(step: StoryStep<*>): StoryStep<*>? {
+    private fun findStep(step: SimpleStoryStep): SimpleStoryStep? {
         if (step.name == this.step) {
             return step
         } else {
@@ -74,12 +75,12 @@ data class Story(
     }
 
     private fun findStep(
-        steps: Collection<StoryStep<*>>,
+        steps: Collection<SimpleStoryStep>,
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
         intent: IntentAware?
-    ): StoryStep<*>? {
+    ): SimpleStoryStep? {
         // first level
         findStepInTree(steps, userTimeline, dialog, action, intent)?.also {
             return it
@@ -95,12 +96,12 @@ data class Story(
     }
 
     private fun findStepInTree(
-        steps: Collection<StoryStep<*>>,
+        steps: Collection<SimpleStoryStep>,
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
         intent: IntentAware?
-    ): StoryStep<*>? {
+    ): SimpleStoryStep? {
         // first level
         steps.forEach { s ->
             if (s.selectFromAction(userTimeline, dialog, action, intent)) {
@@ -114,10 +115,10 @@ data class Story(
         return null
     }
 
-    private fun findParentStep(child: StoryStep<*>): StoryStep<*>? =
+    private fun findParentStep(child: SimpleStoryStep): SimpleStoryStep? =
         definition.steps.asSequence().mapNotNull { findParentStep(it, child) }.firstOrNull()
 
-    private fun findParentStep(current: StoryStep<*>, child: StoryStep<*>): StoryStep<*>? =
+    private fun findParentStep(current: SimpleStoryStep, child: SimpleStoryStep): SimpleStoryStep? =
         current.takeIf { current.children.any { child.name == it.name } }
             ?: current.children.asSequence().mapNotNull { findParentStep(it, child) }.firstOrNull()
 
@@ -234,7 +235,7 @@ data class Story(
         if (!forced && this.step == null) {
 
             if (s != null) {
-                var parent: StoryStep<*>? = s
+                var parent: SimpleStoryStep? = s
                 do {
                     parent = parent?.let { findParentStep(it) }
                     parent?.children?.let { findStepInTree(it, userTimeline, dialog, action, newIntent) }?.apply {

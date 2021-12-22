@@ -23,9 +23,9 @@ import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -65,7 +65,7 @@ internal class ConfiguredStoryDefinition(
 
     override val storyHandler: ScriptHandler = ConfiguredStoryHandler(definition, configuration)
 
-    override val steps: Set<StoryStep<*>> =
+    override val steps: Set<SimpleStoryStep> =
         (configuration.storyDefinition(definition, configuration)?.steps ?: emptySet()) +
             configuration.findSteps(botApplicationConfigurationKey).map { it.toStoryStep(configuration) }
 

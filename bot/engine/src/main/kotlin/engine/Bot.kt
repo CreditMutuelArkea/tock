@@ -220,18 +220,14 @@ internal class Bot(
     }
 
     private fun parseAttachment(attachment: SendAttachment, dialog: Dialog) {
-        botDefinition.handleAttachmentStory?.let { definition ->
-            definition.mainIntent().let {
-                dialog.state.currentIntent = it
-            }
+         botDefinition.scriptManager.getHandleAttachmentIntent()?.let {
+             dialog.state.currentIntent = it
         }
     }
 
     private fun parseLocation(location: SendLocation, dialog: Dialog) {
-        botDefinition.userLocationStory?.let { definition ->
-            definition.mainIntent().let {
-                dialog.state.currentIntent = it
-            }
+        botDefinition.scriptManager.getUserLocationIntent()?.let {
+            dialog.state.currentIntent = it
         }
     }
 
@@ -240,29 +236,27 @@ internal class Bot(
             // restore state if it's possible (old dialog choice case)
             if (intent != Intent.unknown) {
                 // TODO use story id
-                val previousIntentName = choice.previousIntent()
+                val previousIntentName: String? = choice.previousIntent()
+                val applicationId: String = choice.applicationId
                 if (previousIntentName != null) {
-                    val previousStory = botDefinition.findStoryDefinition(previousIntentName, choice.applicationId)
+
+
+
+                    val previousStory = botDefinition.findStoryDefinition(previousIntentName, applicationId)
                     if (previousStory != botDefinition.unknownStory && previousStory.supportIntent(intent)) {
                         // the previous intent is a primary intent that support the new intent
-                        val storyDefinition = botDefinition.findStoryDefinition(choice.intentName, choice.applicationId)
+                        val storyDefinition = botDefinition.findStoryDefinition(choice.intentName, applicationId)
                         if (storyDefinition == botDefinition.unknownStory) {
                             // the new intent is a secondary intent, may be we need to create a intermediate story
                             val currentStory = dialog.currentStory
-                            if (currentStory == null ||
-                                !currentStory.supportIntent(intent) ||
-                                !currentStory.supportIntent(
-                                        botDefinition.findIntent(
-                                                previousIntentName,
-                                                choice.applicationId
-                                            )
+                            if (currentStory == null
+                                || !currentStory.supportIntent(intent)
+                                || !currentStory.supportIntent(
+                                        botDefinition.findIntent(previousIntentName, applicationId)
                                     )
                             ) {
-                                dialog.stories.add(
-                                    Story(
-                                        previousStory,
-                                        intent
-                                    )
+                                dialog.scripts.add(
+                                    Story(previousStory, intent)
                                 )
                             }
                         }

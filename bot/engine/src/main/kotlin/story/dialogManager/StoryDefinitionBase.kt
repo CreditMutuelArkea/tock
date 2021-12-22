@@ -20,8 +20,7 @@ import ai.tock.bot.definition.*
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.dialogManager.story.storySteps.stepToIntentRepository
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.translator.UserInterfaceType
@@ -34,12 +33,12 @@ open class StoryDefinitionBase(
     override val storyHandler: ScriptHandler = {} as SimpleStoryHandlerBase,
     otherStarterIntents: Set<IntentAware> = emptySet(),
     secondaryIntents: Set<IntentAware> = emptySet(),
-    stepsList: List<StoryStep<out StoryHandlerDefinition>> = emptyList(),
+    stepsList: List<SimpleStoryStep> = emptyList(),
     unsupportedUserInterface: UserInterfaceType? = null,
     override val tags: Set<StoryTag> = emptySet()
 ) : StoryDefinition {
 
-    override val steps: Set<StoryStep<out StoryHandlerDefinition>> =
+    override val steps: Set<SimpleStoryStep> =
         stepsList.apply {
             forEach {
                 if (it.intent == null) {

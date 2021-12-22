@@ -16,9 +16,36 @@
 
 package ai.tock.bot.engine.dialogManager.story.storySteps
 
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
+import engine.dialogManager.step.Step
+import java.util.concurrent.ConcurrentHashMap
 
 /**
- * [StoryStep] without custom [StoryHandlerDefinition].
+ * [Step] without custom [StoryHandlerDefinition].
  */
-interface SimpleStoryStep : StoryStep<StoryHandlerDefinition>
+interface SimpleStoryStep : Step<StoryHandlerDefinition> {
+
+    /**
+     * Returns [intent] or the [StoryDefinition.mainIntent] if [intent] is null.
+     */
+    override val baseIntent: IntentAware get() = intent ?: stepToIntentRepository[this] ?: error("no intent for $this")
+
+    /**
+     * The optional children of the step.
+     */
+    override val children: Set<SimpleStoryStep> get() = emptySet()
+
+}
+
+/**
+ * Use this step when you want to set a null [Step].
+ */
+val noStep = object : SimpleStoryStep {
+    override val name: String = "_NO_STEP_"
+}
+
+/**
+ * step -> intent default behaviour.
+ */
+internal val stepToIntentRepository = ConcurrentHashMap<SimpleStoryStep, IntentAware>()

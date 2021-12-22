@@ -18,14 +18,13 @@ package ai.tock.bot.connector
 
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserPreferences
+import engine.dialogManager.step.Step
 
 /**
  * A connector connects bots to users via a dedicated interface (like Messenger, Google Assistant, Slack... ).
@@ -87,7 +86,7 @@ interface Connector {
         controller: ConnectorController,
         recipientId: PlayerId,
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>? = null,
+        step: Step<*>? = null,
         parameters: Map<String, String> = emptyMap(),
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit = {}

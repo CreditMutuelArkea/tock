@@ -18,7 +18,7 @@ package ai.tock.bot.story.dialogManager.storyData
 
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import engine.dialogManager.step.Step
 
 /**
  * A step that can have specific preconditions and can use input data object in handler.
@@ -27,7 +27,7 @@ import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
  * @param TD the data of the StoryDef
  * @param D the data of the step
  */
-interface StoryDataStep<T : StoryHandlerDefinition, TD, D> : StoryStep<T> {
+interface StoryDataStep<T : StoryHandlerDefinition, TD, D> : Step<T> {
 
     override fun answer(): T.() -> Any? = { handler().invoke(this, null) }
 
