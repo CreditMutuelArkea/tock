@@ -39,8 +39,8 @@ interface TestBehaviour {
      * Setup [UserPreferences] from the bus.
      */
     fun setup(bus: BotBus) {
-        bus.userTimeline.userState.cleanup()
-        bus.userTimeline.userState.profileLoaded = true
+        bus.dialogManager.cleanUserState()
+        bus.dialogManager.setProfileLoaded(true)
         setup(bus.userPreferences, bus.targetConnectorType, bus.userLocale)
     }
 
@@ -55,7 +55,7 @@ interface TestBehaviour {
     }
 
     fun cleanup(bus: BotBus) {
-        bus.userTimeline.userState.cleanup()
+        bus.dialogManager.cleanUserState()
         bus.userPreferences.fillWith(UserPreferences())
     }
 }

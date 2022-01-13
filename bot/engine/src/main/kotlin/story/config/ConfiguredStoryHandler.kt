@@ -35,7 +35,7 @@ import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
 import ai.tock.nlp.api.client.model.Entity
@@ -45,7 +45,7 @@ import mu.KotlinLogging
  *
  */
 internal class ConfiguredStoryHandler(
-    private val definition: BotDefinitionWrapper,
+    private val definition: BotStoryDefinitionWrapper,
     private val configuration: StoryDefinitionConfiguration
 ) : ScriptHandler {
 
@@ -64,7 +64,7 @@ internal class ConfiguredStoryHandler(
                 bus.entityValueDetails(role) == null &&
                 bus.hasActionEntity(entityTypeName)
             ) {
-                bus.dialog.state.changeValue(
+                bus.dialogManager.state.changeValue(
                     role,
                     bus.entityValueDetails(entityTypeName)
                         ?.let { v ->
@@ -161,7 +161,7 @@ internal class ConfiguredStoryHandler(
                 is SimpleAnswerConfiguration -> bus.handleSimpleAnswer(this@send, this)
                 is ScriptAnswerConfiguration -> bus.handleScriptAnswer(this@send)
                 is BuiltInAnswerConfiguration ->
-                    (bus.botDefinition as BotDefinitionWrapper).builtInStory(configuration.storyId)
+                    (bus.botDefinition as BotStoryDefinitionWrapper).builtInStory(configuration.storyId)
                         .storyHandler.handle(bus)
                 else -> error("type not supported for now: $this")
             }

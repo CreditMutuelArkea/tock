@@ -21,8 +21,8 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogState
+import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.UserTimeline
@@ -50,7 +50,7 @@ interface NlpListener {
     fun precompute(
         sentence: SendSentence,
         userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialog: DialogT<*,*>,
         botDefinition: BotDefinition
     ): NlpResult? = null
 
@@ -64,7 +64,7 @@ interface NlpListener {
     fun updateQuery(
         sentence: SendSentence,
         userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialog: DialogT<*,*>,
         botDefinition: BotDefinition,
         nlpQuery: NlpQuery
     ): NlpQuery = nlpQuery
@@ -77,14 +77,14 @@ interface NlpListener {
      *
      * Default returns null.
      */
-    fun findIntent(userTimeline: UserTimeline, dialog: Dialog, event: Event, nlpResult: NlpResult): IntentAware? = null
+    fun findIntent(userTimeline: UserTimeline, dialog: DialogT<*,*>, event: Event, nlpResult: NlpResult): IntentAware? = null
 
     /**
      * Allows custom entity evaluation - default returns empty list.
      */
     fun evaluateEntities(
         userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialog: DialogT<*,*>,
         event: Event,
         nlpResult: NlpResult
     ): List<EntityValue> = emptyList()
@@ -125,5 +125,5 @@ interface NlpListener {
      * }
      * ```
      */
-    fun error(query: NlpQuery, dialog: Dialog, throwable: Throwable?) = Unit
+    fun error(query: NlpQuery, dialog: DialogT<*,*>, throwable: Throwable?) = Unit
 }

@@ -72,7 +72,6 @@ internal class BotApiHandler(
 
     private fun BotBus.handleResponse(request: UserRequest, response: BotResponse?) {
         if (response != null) {
-
             val isEnd: Boolean = botDefinition.scriptManager.isEnableEndScript(botDefinition.namespace, botDefinition.botId, applicationId)
 
             val messages = response.messages
@@ -117,7 +116,7 @@ internal class BotApiHandler(
             }
 
             try {
-                //TODO : à déplacer dans le scriptManager Story
+                //TODO : à déplacer dans le scriptManager Story (ou le dialog manager)
 
                 // switch story if new story
                 if (response.storyId != request.storyId) {

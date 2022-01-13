@@ -116,7 +116,7 @@ class ConfiguredStoryHandlerTest {
         every { configuration.findNextSteps(bus, configuration) } returns nextStepTranslated
 
         // When
-        val handler = ConfiguredStoryHandler(BotDefinitionWrapper(BotDefinitionTest()), configuration)
+        val handler = ConfiguredStoryHandler(BotStoryDefinitionWrapper(BotDefinitionTest()), configuration)
         handler.handle(bus)
 
         // Then
@@ -206,7 +206,7 @@ class ConfiguredStoryHandlerTest {
         every { configuration.findNextSteps(bus, configuration) } returns nextStepTranslated
 
         // When
-        val handler = ConfiguredStoryHandler(BotDefinitionWrapper(BotDefinitionTest()), configuration)
+        val handler = ConfiguredStoryHandler(BotStoryDefinitionWrapper(BotDefinitionTest()), configuration)
         handler.handle(bus)
 
         // Then
@@ -318,7 +318,7 @@ class ConfiguredStoryHandlerTest {
         every { configuration.findNextSteps(bus, configuration) } returns emptyList() // nextStepTranslated
 
         // When
-        val handler = ConfiguredStoryHandler(BotDefinitionWrapper(BotDefinitionTest()), configuration)
+        val handler = ConfiguredStoryHandler(BotStoryDefinitionWrapper(BotDefinitionTest()), configuration)
         handler.handle(bus)
 
         // Then card+text+carousel(card+card+card)+text+text+carousel(card+card)

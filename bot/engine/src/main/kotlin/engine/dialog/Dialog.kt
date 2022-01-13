@@ -37,7 +37,7 @@ data class Dialog(
     /**
      * The id of the dialog.
      */
-    var id: Id<Dialog> = newId(),
+    override val id: Id<Dialog> = newId(),
     /**
      * The state of the dialog.
      */
@@ -50,7 +50,7 @@ data class Dialog(
      * An optional group identifier.
      */
     override val groupId: String? = null,
-) : DialogT<Story> {
+) : DialogT<Story, Dialog> {
 
     companion object {
         /**
@@ -79,7 +79,7 @@ data class Dialog(
      */
     override val snapshots: List<Snapshot> by lazy { injector.provide<UserTimelineDAO>().getSnapshots(id) }
 
-    override fun initFromDialog(dialog: DialogT<Story>): DialogT<Story> {
+    override fun initFromDialog(dialog: DialogT<Story, Dialog>): Dialog {
         return Dialog.initFromDialog(dialog as Dialog)
     }
 

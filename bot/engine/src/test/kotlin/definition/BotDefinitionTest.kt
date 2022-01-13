@@ -20,7 +20,7 @@ import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.BotDefinitionTest
 import ai.tock.bot.engine.StoryHandlerTest
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 import ai.tock.bot.story.config.ConfiguredStoryDefinition
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogState
@@ -77,7 +77,7 @@ class BotDefinitionTest {
     @Test
     fun `GIVEN stories containing configured story with specific id WHEN findStoryDefinitionById THEN story is found`() {
         // Given
-        val wrap = BotDefinitionWrapper(botDef)
+        val wrap = BotStoryDefinitionWrapper(botDef)
 
         wrap.updateStories(
             listOf(
@@ -148,7 +148,7 @@ class BotDefinitionTest {
         )
 
         val configuredStoryConfiguration = ConfiguredStoryDefinition(
-            BotDefinitionWrapper(botDef),
+            BotStoryDefinitionWrapper(botDef),
             StoryDefinitionConfiguration(
                 botDefinition = botDef,
                 storyDefinition = SimpleStoryDefinition(
@@ -191,7 +191,7 @@ class BotDefinitionTest {
             stories = listOf(simpleTaggedStoryDefinition)
         )
 
-        val wrapper = BotDefinitionWrapper(botDef)
+        val wrapper = BotStoryDefinitionWrapper(botDef)
 
         val dialog = Dialog(
             playerIds = emptySet(),
@@ -234,7 +234,7 @@ class BotDefinitionTest {
             stories = listOf(simpleTaggedStoryDefinition)
         )
 
-        val wrapper = BotDefinitionWrapper(botDef)
+        val wrapper = BotStoryDefinitionWrapper(botDef)
 
         val dialog = Dialog(
             playerIds = emptySet(),

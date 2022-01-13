@@ -27,7 +27,7 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotDefinitionTest
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 import ai.tock.bot.story.config.ConfiguredStoryDefinition
 import ai.tock.bot.engine.test
 import io.mockk.mockk
@@ -40,7 +40,7 @@ import kotlin.test.assertEquals
 internal class BotDefinitionWrapperTest {
 
     val botDefinition: BotDefinition = BotDefinitionTest()
-    val botWrapper = BotDefinitionWrapper(botDefinition)
+    val botWrapper = BotStoryDefinitionWrapper(botDefinition)
 
     val applicationId = "test_application"
 

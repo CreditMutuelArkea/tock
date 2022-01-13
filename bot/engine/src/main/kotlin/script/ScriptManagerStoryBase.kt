@@ -19,89 +19,210 @@ package ai.tock.bot.DialogManager
 import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.ScriptManager.ScriptStep.*
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
-import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
-import ai.tock.bot.story.dialogManager.handler.StoryHandler
+import ai.tock.bot.engine.nlp.BuiltInKeywordListener
+import ai.tock.bot.engine.nlp.keywordServices
+import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.bot.script.Script
+import ai.tock.bot.script.ScriptDefinition
+import ai.tock.bot.story.definition.StoryTag
+import ai.tock.bot.story.dialogManager.SimpleStoryDefinition
+import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
-import ai.tock.shared.Executor
-import ai.tock.shared.injector
-import ai.tock.shared.provide
-import ai.tock.shared.withoutNamespace
+import ai.tock.shared.*
+import ai.tock.shared.vertx.vertx
+import ai.tock.translator.I18nKeyProvider
+import ai.tock.translator.I18nLabelValue
 import com.github.salomonbrys.kodein.instance
-import engine.dialogManager.step.Step
+import mu.KotlinLogging
 
 class ScriptManagerStoryBase(
     override val stories: List<StoryDefinition>,
-    override val unknownStory: StoryDefinition = BotDefinitionBase.defaultUnknownStory,
+    override val unknownStory: StoryDefinition = defaultUnknownStory,
     override val helloStory: StoryDefinition? = null,
     override val goodbyeStory: StoryDefinition? = null,
     override val noInputStory: StoryDefinition? = null,
-    override val botDisabledStory: StoryDefinition? = null,
-    override val botEnabledStory: StoryDefinition? = null,
+    override val disabledStory: StoryDefinition? = null,
+    override val enabledStory: StoryDefinition? = null,
     override val userLocationStory: StoryDefinition? = null,
     override val handleAttachmentStory: StoryDefinition? = null,
-    override val keywordStory: StoryDefinition = BotDefinitionBase.defaultKeywordStory,
+    override val keywordStory: StoryDefinition = defaultKeywordStory,
 ) : ScriptManagerStory {
 
     private val executor: Executor get() = injector.provide()
 
     private val storyDAO: StoryDefinitionConfigurationDAO by injector.instance()
 
-    //TODO : je ne sais pas encore comment initialisé cette story, ça dépend de la userTimeline, et du Dialog
-    @Volatile
-    var currentStory: Story
+    /**
+     * List of deactivation stories.
+     */
+    override val disabledStories: List<StoryDefinition>
+        get() = findStoryDefinitionByTag(StoryTag.DISABLE)
+
+    /**
+     * List of reactivation stories.
+     */
+    override val enabledStories: List<StoryDefinition>
+        get() = findStoryDefinitionByTag(StoryTag.ENABLE)
 
     companion object {
+        private val logger = KotlinLogging.logger {}
 
         /**
-         * Finds an intent from an intent name and a list of [StoryDefinition].
-         * Is no valid intent found, returns [unknown].
+         * The default [unknownStory].
          */
-        internal fun findIntent(stories: List<StoryDefinition>, intent: String): Intent {
-            val targetIntent = Intent(intent)
-            return if (stories.any { it.supportIntent(targetIntent) } ||
-                stories.any { it.allSteps().any { s -> s.supportIntent(targetIntent) } }
-            ) {
-                targetIntent
+        val defaultUnknownStory =
+            SimpleStoryDefinition(
+                "tock_unknown_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        bus.markAsUnknown()
+                        bus.end(bus.botDefinition.defaultUnknownAnswer)
+                    }
+                },
+                setOf(unknown)
+            )
+
+        /**
+         * Returns a (potential) keyword from the [BotBus].
+         */
+        fun getKeyword(bus: BotBus): String? {
+            return if (bus.action is SendSentence) {
+                (bus.action as SendSentence).stringText
             } else {
-                if (intent == Intent.keyword.name) {
-                    Intent.keyword
-                } else {
-                    unknown
+                null
+            }
+        }
+
+        /**
+         * The default handler used to handle test context initialization.
+         */
+        fun testContextKeywordHandler(bus: BotBus, sendEnd: Boolean = true) {
+            bus.dialogManager.add(
+                Dialog(
+                    setOf(bus.userId, bus.botId)
+                )
+            )
+            bus.botDefinition.testBehaviour.setup(bus)
+            if (sendEnd) {
+                bus.end(bus.baseI18nValue("test context activated (user state cleaned)"))
+            }
+        }
+
+        /**
+         * The default handler used to cleanup test context.
+         */
+        fun endTestContextKeywordHandler(bus: BotBus, sendEnd: Boolean = true) {
+            bus.dialogManager.add(
+                Dialog(
+                    setOf(bus.userId, bus.botId)
+                )
+            )
+            bus.botDefinition.testBehaviour.cleanup(bus)
+            if (sendEnd) {
+                bus.end(bus.baseI18nValue("test context disabled"))
+            }
+        }
+
+        /**
+         * The default handler used to delete the current user.
+         */
+        fun deleteKeywordHandler(bus: BotBus, sendEnd: Boolean = true) {
+            bus.handleDelete()
+            if (sendEnd) {
+                bus.end(
+                    bus.baseI18nValue(
+                        "user removed - {0} {1}",
+                        bus.dialogManager.userPreferences.firstName,
+                        bus.dialogManager.userPreferences.lastName
+                    )
+                )
+            }
+        }
+
+        private fun BotBus.baseI18nValue(
+            defaultLabel: String,
+            vararg args: Any?
+        ): I18nLabelValue = i18nValue(botDefinition.namespace, defaultLabel, *args)
+
+        private fun i18nValue(
+            namespace: String,
+            defaultLabel: String,
+            vararg args: Any?
+        ): I18nLabelValue =
+            I18nLabelValue(
+                I18nKeyProvider.generateKey(namespace, "keywords", defaultLabel),
+                namespace,
+                "keywords",
+                defaultLabel,
+                args.toList()
+            )
+
+        private fun BotBus.handleDelete() {
+            val userTimelineDao: UserTimelineDAO by injector.instance()
+            // run later to avoid the lock effect :)
+            vertx.setTimer(1000) {
+                vertx.executeBlocking<Unit>(
+                    {
+                        try {
+                            userTimelineDao.remove(botDefinition.namespace, userId)
+                        } catch (e: Exception) {
+                            logger.error(e)
+                        } finally {
+                            it.complete()
+                        }
+                    },
+                    false, {}
+                )
+            }
+        }
+
+        /**
+         * The default [keywordStory].
+         */
+        val defaultKeywordStory =
+            SimpleStoryDefinition(
+                "tock_keyword_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        val text = getKeyword(bus)
+                        if (!handleWithKeywordListeners(bus, text)) {
+                            when (text) {
+                                BuiltInKeywordListener.deleteKeyword -> deleteKeywordHandler(bus)
+                                BuiltInKeywordListener.testContextKeyword -> testContextKeywordHandler(bus)
+                                BuiltInKeywordListener.endTestContextKeyword -> endTestContextKeywordHandler(bus)
+                                else -> bus.end(bus.baseI18nValue("unknown keyword : {0}", text))
+                            }
+                        }
+                    }
+                },
+                setOf(Intent.keyword)
+            )
+
+        fun handleWithKeywordListeners(bus: BotBus, keyword: String?): Boolean {
+            if (keyword != null) {
+                keywordServices.asSequence().map { it.keywordHandler(keyword) }.firstOrNull()?.let { handler ->
+                    handler(bus)
+                    return true
                 }
             }
-        }
-
-        /**
-         * Finds a [StoryDefinition] from a list of [StoryDefinition] and an intent name.
-         * Is no valid [StoryDefinition] found, returns the [unknownStory].
-         */
-        internal fun findStoryDefinition(
-            stories: List<StoryDefinition>,
-            intent: String?,
-            unknownStory: StoryDefinition,
-            keywordStory: StoryDefinition
-        ): StoryDefinition {
-            return if (intent == null) {
-                unknownStory
-            } else {
-                val i = findIntent(stories, intent)
-                stories.find { it.isStarterIntent(i) }
-                    ?: if (intent == Intent.keyword.name) keywordStory else unknownStory
-            }
+            return false
         }
     }
 
-    override fun findIntent(intent: String, applicationId: String): Intent {
-        return findIntent(stories, intent)
-    }
+    override fun findIntent(intent: String, applicationId: String): Intent =
+        ScriptManagerStory.findIntent(stories, intent)
 
     override fun findMainIntent(scriptStep: ScriptStep): IntentAware? {
         return when(scriptStep) {
@@ -134,8 +255,8 @@ class ScriptManagerStoryBase(
                     helloStory,
                     goodbyeStory,
                     noInputStory,
-                    botDisabledStory,
-                    botEnabledStory,
+                    disabledStory,
+                    enabledStory,
                     userLocationStory,
                     handleAttachmentStory,
                     keywordStory
@@ -150,14 +271,14 @@ class ScriptManagerStoryBase(
     /**
      * Search story by storyId.
      */
-    fun findStoryDefinitionById(storyId: String, applicationId: String): StoryDefinition {
+    override fun findScriptDefinitionById(storyId: String, applicationId: String): ScriptDefinition {
         return stories.find { it.id == storyId } ?: unknownStory
     }
 
     /**
      * Finds a [StoryDefinition] from an [Intent].
      */
-    fun findStoryDefinition(intent: IntentAware?, applicationId: String): StoryDefinition {
+    override fun findStoryDefinition(intent: IntentAware?, applicationId: String): StoryDefinition {
         return if (intent is StoryDefinition) {
             intent
         } else {
@@ -178,26 +299,49 @@ class ScriptManagerStoryBase(
      * @param intent the intent name
      * @param applicationId the optional applicationId
      */
-    fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition {
-        return findStoryDefinition(stories, intent, unknownStory, keywordStory)
+    override fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition {
+        return ScriptManagerStory.findStoryDefinition(stories, intent, unknownStory, keywordStory)
     }
 
-    override fun isEnableEndScript(namespace: String, botId: String, applicationId: String): Boolean {
+    private fun findStoryDefinitionByTag(tag: StoryTag): List<StoryDefinition> {
+        return stories.filter { it.tags.contains(tag) }
+    }
+
+    override fun isEnableEndScript(namespace: String, botId: String, applicationId: String, scriptId: String): Boolean {
         //Check if there is a configuration for Ending story
         val storySetting = storyDAO.getStoryDefinitionsByNamespaceBotIdStoryId(
             namespace,
             botId,
-            currentStory.definition.id
+            scriptId
         )
         return storySetting?.findEnabledEndWithStoryId(applicationId) == null
     }
 
-    override fun getCurrentStep(): SimpleStoryStep? {
-        return currentStory.currentStep
+    override fun isDisabledIntent(intent: IntentAware?): Boolean {
+        return intent?.let {
+                intent ->
+                    disabledStories.any { it.isStarterIntent(intent) }
+                       || disabledStory?.isStarterIntent(intent) ?: false
+        } ?: false
     }
 
-    override fun changeCurrentStep(stepName: String?) {
-        currentStory.step = stepName
+    override fun isEnabledIntent(intent: IntentAware?): Boolean {
+        return intent?.let {
+                intent ->
+                    enabledStories.any { it.isStarterIntent(intent) }
+                        || enabledStory?.isStarterIntent(intent) ?: false
+        } ?: false
     }
 
+    override fun createScript(intent: IntentAware?, applicationId: String): Script {
+        val storyDefinition: StoryDefinition = findStoryDefinition(intent, applicationId)
+        return Story(
+            storyDefinition,
+            if (intent != null && storyDefinition.isStarterIntent(intent)) {
+                intent.wrappedIntent()
+            } else {
+                storyDefinition.mainIntent().wrappedIntent()
+            }
+        )
+    }
 }

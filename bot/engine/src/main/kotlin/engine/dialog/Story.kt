@@ -60,11 +60,15 @@ data class Story(
     override val lastUserAction: Action?
         get() = actions.findLast { it.playerId.type == PlayerType.user }
 
+    override val mainIntent: IntentAware
+        get() = definition.mainIntent()
+
     /**
      * The current step of the story.
      */
     val currentStep: SimpleStoryStep?
         get() = definition.steps.asSequence().mapNotNull { findStep(it) }.firstOrNull()
+
 
     private fun findStep(step: SimpleStoryStep): SimpleStoryStep? {
         if (step.name == this.step) {
@@ -147,7 +151,7 @@ data class Story(
     /**
      * Handles a request.
      */
-    fun handle(bus: BotBus) {
+    override fun handle(bus: BotBus) {
         definition.storyHandler.apply {
             try {
                 if (sendStartEvent(bus)) {
@@ -188,7 +192,6 @@ data class Story(
             false
         }
     }
-
 
     /**
      * Does this story supports the intent ?

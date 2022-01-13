@@ -17,11 +17,11 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.DialogManager.ScriptManager
+import ai.tock.bot.DialogManager.ScriptManagerStory.Companion.findStoryDefinition
 import ai.tock.bot.DialogManager.ScriptManagerStoryBase
-import ai.tock.bot.DialogManager.ScriptManagerStoryBase.Companion.findStoryDefinition
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase.Companion.defaultKeywordStory
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase.Companion.defaultUnknownStory
 import ai.tock.bot.connector.NotifyBotStateModifier
-import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultKeywordStory
-import ai.tock.bot.definition.BotDefinitionBase.Companion.defaultUnknownStory
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.ActionNotificationType
@@ -29,7 +29,6 @@ import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
-//import ai.tock.bot.engine.dialogManager.story.handler.*
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.story.dialogManager.handler.*
 import ai.tock.translator.UserInterfaceType

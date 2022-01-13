@@ -21,6 +21,7 @@ import ai.tock.bot.definition.*
 import ai.tock.bot.definition.BotDefinition.Companion.defaultBreath
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.storyData.StoryDataStep
@@ -59,8 +60,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
          * Has [BotBus.end] been already called?
          */
         internal fun isEndCalled(bus: BotBus): Boolean =
-            (bus.userTimeline.currentDialog ?: bus.dialog)
-                .lastAction?.run { this !== bus.action && metadata.lastAnswer } ?: false
+            bus.dialogManager.isLastAction(bus.action)
     }
 
     /**
@@ -165,6 +165,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
                         !bus.hasCurrentSwitchStoryProcess &&
                         !isEndCalled(bus)
                     ) {
+                        bus.dialogManager.
                         logger.warn { "Bus.end not called for story ${bus.story.definition.id}, user ${bus.userId.id} and connector ${bus.targetConnectorType}" }
                     }
                 }

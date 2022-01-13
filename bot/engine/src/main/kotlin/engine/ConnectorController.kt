@@ -28,6 +28,7 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.script.ScriptDefinition
 import engine.dialogManager.step.Step
 import io.vertx.ext.web.Router
 
@@ -115,9 +116,9 @@ interface ConnectorController {
     }
 
     /**
-     * Return a story definition provider for this controller.
+     * Return a script definition provider for this controller.
      */
-    fun storyDefinitionLoader(applicationId: String): (String) -> StoryDefinition = {
-        botDefinition.findStoryDefinitionById(it, applicationId)
+    fun scriptDefinitionLoader(applicationId: String): (String) -> ScriptDefinition = {
+        botDefinition.scriptManager.findScriptDefinitionById(it, applicationId)
     }
 }

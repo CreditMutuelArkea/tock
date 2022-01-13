@@ -215,7 +215,7 @@ internal class DialogflowNlp : NlpController {
                 toQueryContext(),
                 NlpQueryState(
                     dialog.state.nextActionState?.states
-                        ?: listOfNotNull(dialog.currentStory?.definition?.mainIntent()?.name()).toSet()
+                        ?: listOfNotNull(dialog.currentScript?.definition?.mainIntent()?.name()).toSet()
                 )
             )
         }

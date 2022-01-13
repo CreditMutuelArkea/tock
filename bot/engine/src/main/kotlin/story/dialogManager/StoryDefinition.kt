@@ -21,6 +21,7 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -32,33 +33,7 @@ import ai.tock.translator.UserInterfaceType
  * Story definitions should usually not directly extend this class,
  * but instead extend [SimpleStoryHandlerBase] or [StoryDefinitionBase].
  */
-interface StoryDefinition : IntentAware {
-
-    /**
-     * An unique identifier for a given bot.
-     */
-    val id: String
-
-    /**
-     * One or more intents that start the story.
-     * Usually, you don't have the same starter intent in two different story definition.
-     */
-    val starterIntents: Set<IntentAware>
-
-    /**
-     * The complete list of intents supported by the story.
-     */
-    val intents: Set<IntentAware>
-
-    /**
-     * The story definition tags that specify different story types or roles.
-     */
-    val tags: Set<StoryTag>
-
-    /**
-     * Does this story is tagged with specified [tag]?
-     */
-    fun hasTag(tag: StoryTag): Boolean = tags.contains(tag)
+interface StoryDefinition : ScriptDefinition, IntentAware {
 
     /**
      * The story handler of the story.
@@ -69,31 +44,6 @@ interface StoryDefinition : IntentAware {
      * The root steps of the story.
      */
     val steps: Set<SimpleStoryStep>
-
-    /**
-     * When this story does not support all [UserInterfaceType]s.
-     */
-    val unsupportedUserInterfaces: Set<UserInterfaceType>
-
-    /**
-     * Is the specified intent is a starter intent?
-     */
-    fun isStarterIntent(intent: IntentAware) = starterIntents.contains(intent)
-
-    /**
-     * Is the specified intent is supported by this story?
-     */
-    fun supportIntent(intent: IntentAware) = intents.contains(intent)
-
-    /**
-     * The "referent" intent for this story.
-     */
-    fun mainIntent(): IntentAware = starterIntents.first()
-
-    /**
-     * Implementation for [IntentAware].
-     */
-    override fun wrappedIntent(): Intent = mainIntent().wrappedIntent()
 
     /**
      * Returns all steps of the story.

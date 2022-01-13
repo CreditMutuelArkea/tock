@@ -19,10 +19,8 @@ package ai.tock.bot.engine.user
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.action.Action
-import ai.tock.bot.engine.dialog.ArchivedEntityValue
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.Snapshot
+import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.script.ScriptDefinition
 import org.litote.kmongo.Id
 import java.time.Instant
 
@@ -37,7 +35,7 @@ interface UserTimelineDAO {
      * @param userTimeline the timeline to save
      * @param botDefinition the bot definition (in order to add stats about the bot)
      */
-    fun save(userTimeline: UserTimeline, botDefinition: BotDefinition)
+    fun save(userTimeline: UserTimelineT<*>, botDefinition: BotDefinition)
 
     /**
      * Saves the timeline.
@@ -45,7 +43,7 @@ interface UserTimelineDAO {
      * @param userTimeline the timeline to save
      * @param namespace the namespace of the current bot
      */
-    fun save(userTimeline: UserTimeline, namespace: String)
+    fun save(userTimeline: UserTimelineT<*>, namespace: String)
 
     /**
      * Update playerId for dialog and user timelines.
@@ -66,18 +64,18 @@ interface UserTimelineDAO {
         userId: PlayerId,
         priorUserId: PlayerId? = null,
         groupId: String? = null,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): UserTimeline
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): UserTimelineT<*>
 
     /**
      * Loads without the dialogs. If no timeline, create a new one.
      */
-    fun loadWithoutDialogs(namespace: String, userId: PlayerId): UserTimeline
+    fun loadWithoutDialogs(namespace: String, userId: PlayerId): UserTimelineT<*>
 
     /**
      * Loads without the dialogs.
      */
-    fun loadByTemporaryIdsWithoutDialogs(namespace: String, temporaryIds: List<String>): List<UserTimeline>
+    fun loadByTemporaryIdsWithoutDialogs(namespace: String, temporaryIds: List<String>): List<UserTimelineT<*>>
 
     /**
      * Remove the timeline and the associated dialogs.
@@ -95,8 +93,8 @@ interface UserTimelineDAO {
     fun getClientDialogs(
         namespace: String,
         clientId: String,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): List<Dialog>
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): List<DialogT<*,*>>
 
     /**
      * Returns all dialogs updated after the specified Instant.
@@ -104,13 +102,13 @@ interface UserTimelineDAO {
     fun getDialogsUpdatedFrom(
         namespace: String,
         from: Instant,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): List<Dialog>
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): List<DialogT<*,*>>
 
     /**
      * Gets the snapshots of a dialog.
      */
-    fun getSnapshots(dialogId: Id<Dialog>): List<Snapshot>
+    fun getSnapshots(dialogId: Id<DialogT<*,*>>): List<Snapshot>
 
     /**
      * Returns the last story id of the specified user, if any.

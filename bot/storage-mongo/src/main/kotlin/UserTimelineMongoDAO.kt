@@ -625,7 +625,6 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
                 .find(PlayerIds.id `in` ids, Namespace eq namespace)
                 .descendingSort(LastUpdateDate)
                 .map { it.toDialog(storyDefinitionProvider) }
-                .toList()
         }
     }
 

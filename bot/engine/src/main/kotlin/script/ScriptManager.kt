@@ -19,6 +19,9 @@ package ai.tock.bot.DialogManager
 import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.script.Script
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
 import engine.dialogManager.step.Step
 
@@ -30,15 +33,20 @@ interface ScriptManager {
 
     fun initNameSpace(namespace: String)
 
-    fun findIntent(intent: String, applicationId: String): Intent
+    fun findIntent(intent: String, applicationId: String): IntentAware
 
-    fun isEnableEndScript(namespace: String, botId: String, applicationId: String): Boolean
+    fun isEnableEndScript(namespace: String, botId: String, applicationId: String, scriptId: String): Boolean
 
     fun getHandleAttachmentIntent(): IntentAware?
 
     fun getUserLocationIntent(): IntentAware?
 
-    fun getCurrentStep(): Step<*>?
+    fun findScriptDefinitionById(storyId: String, applicationId: String): ScriptDefinition
 
-    fun changeCurrentStep(stepName: String?)
+    fun isDisabledIntent(intent: IntentAware?): Boolean
+
+    fun isEnabledIntent(intent: IntentAware?): Boolean
+
+    fun createScript(intent: IntentAware?, applicationId: String): Script
+
 }

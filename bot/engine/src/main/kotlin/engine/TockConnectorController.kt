@@ -21,7 +21,6 @@ import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment
@@ -30,11 +29,8 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.event.TypingOnEvent
 import ai.tock.bot.engine.event.MetadataEvent
-import ai.tock.bot.engine.user.PlayerId
-import ai.tock.bot.engine.user.UserLock
-import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserTimeline
-import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.bot.engine.user.*
+import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.shared.Executor
 import ai.tock.shared.booleanProperty
 import ai.tock.shared.error
@@ -116,7 +112,7 @@ internal class TockConnectorController constructor(
         }
     }
 
-    private fun tryToParseVoiceAudio(action: Action, userTimeline: UserTimeline): Action {
+    private fun tryToParseVoiceAudio(action: Action, userTimeline: UserTimelineT<*>): Action {
         if (parseAudioFileEnabled && action is SendAttachment && action.type == audio) {
             val bytes = URL(action.url).readBytes()
             if (bytes.size < audioNlpFileLimit) {
@@ -146,13 +142,13 @@ internal class TockConnectorController constructor(
                 try {
                     callback.userLocked(action)
 
-                    val userTimeline =
+                    val userTimeline: UserTimelineT<*> =
                         userTimelineDAO.loadWithLastValidDialog(
                             botDefinition.namespace,
                             action.playerId,
                             data.priorUserId,
                             data.groupId,
-                            storyDefinitionLoader(action.applicationId)
+                            scriptDefinitionLoader(action.applicationId)
                         )
 
                     val transformedAction = tryToParseVoiceAudio(action, userTimeline)
@@ -195,7 +191,7 @@ internal class TockConnectorController constructor(
                     action.playerId,
                     data.priorUserId,
                     data.groupId,
-                    storyDefinitionLoader(action.applicationId)
+                    scriptDefinitionLoader(action.applicationId)
                 )
             bot.support(action, userTimeline, this, data)
         } catch (t: Throwable) {

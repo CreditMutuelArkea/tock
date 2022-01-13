@@ -16,6 +16,7 @@
 
 package ai.tock.bot.engine
 
+import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.definition.BotDefinition
@@ -26,12 +27,18 @@ import ai.tock.bot.engine.action.SendAttachment
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendLocation
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.DialogManagerFactory
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.feature.DefaultFeatureType
 import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
+import ai.tock.bot.script.Script
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
@@ -61,27 +68,34 @@ internal class Bot(
 
     private val nlp: NlpController by injector.instance()
 
-    val botDefinition: BotDefinitionWrapper = BotDefinitionWrapper(botDefinitionBase)
+    val botDefinition: BotStoryDefinitionWrapper = BotStoryDefinitionWrapper(botDefinitionBase)
+
+    val scriptManager: ScriptManager
+        get() = botDefinition.scriptManager
 
     fun support(
         action: Action,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         connector: ConnectorController,
         connectorData: ConnectorData
     ): Double {
         connector as TockConnectorController
 
-        loadProfileIfNotSet(connectorData, action, userTimeline, connector)
+        userTimeline.loadProfileIfNotSet(connectorData, action, connector)
 
-        val dialog = getDialog(action, userTimeline)
+        //val dialog: DialogT<*,*> = getDialog(action, userTimeline)
 
-        parseAction(action, userTimeline, dialog, connector)
+        val dialogManager: DialogManager<DialogT<*, *>> =
+            DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
 
-        val story = getStory(userTimeline, dialog, action)
+        parseAction(action, dialogManager, connector)
 
-        val bus = TockBotBus(connector, userTimeline, dialog, action, connectorData, botDefinition)
+        val bus = TockBotBus(connector, dialogManager, action, connectorData, botDefinition)
 
-        return story.support(bus)
+        //val story = getStory(userTimeline, dialog, action)
+        dialogManager.prepareNextAction(scriptManager, action)
+
+        return dialogManager.addSupport(bus)
     }
 
     /**
@@ -89,27 +103,31 @@ internal class Bot(
      */
     fun handle(
         action: Action,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         connector: ConnectorController,
         connectorData: ConnectorData
     ) {
         connector as TockConnectorController
 
-        loadProfileIfNotSet(connectorData, action, userTimeline, connector)
+        userTimeline.loadProfileIfNotSet(connectorData, action, connector)
 
-        val dialog = getDialog(action, userTimeline)
+        //val dialog = getDialog(action, userTimeline)
 
-        parseAction(action, userTimeline, dialog, connector)
+        val dialogManager: DialogManager<DialogT<*, *>> =
+            DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
+
+        //TODO: découpler l'action et le changement d'état du dialog
+        parseAction(action, dialogManager, connector)
 
         var shouldRespondBeforeDisabling = false
-        if (userTimeline.userState.botDisabled && botDefinition.enableBot(userTimeline, dialog, action)) {
+        if (userTimeline.userState.botDisabled && canEnableBot(dialogManager.currentIntent, action)) {
             logger.debug { "Enable bot for $action" }
             userTimeline.userState.botDisabled = false
             botDefinition.botEnabledListener(action)
-        } else if (!userTimeline.userState.botDisabled && botDefinition.disableBot(userTimeline, dialog, action)) {
+        } else if (!userTimeline.userState.botDisabled && canDisableBot(dialogManager.currentIntent, action)) {
             logger.debug { "Disable bot for $action" }
             // in the case of stories with disabled tag we want to respond before disabling the bot
-            shouldRespondBeforeDisabling = botDefinition.hasDisableTagIntent(dialog)
+            shouldRespondBeforeDisabling = scriptManager.isDisabledIntent(dialogManager.currentIntent)
             if (!shouldRespondBeforeDisabling) {
                 userTimeline.userState.botDisabled = true
             }
@@ -119,12 +137,17 @@ internal class Bot(
         }
 
         if (!userTimeline.userState.botDisabled) {
-            dialog.state.currentIntent?.let { intent ->
+            dialogManager.currentIntent?.let { intent ->
                 connector.sendIntent(intent, action.applicationId, connectorData)
             }
             connector.startTypingInAnswerTo(action, connectorData)
-            val story = getStory(userTimeline, dialog, action)
-            val bus = TockBotBus(connector, userTimeline, dialog, action, connectorData, botDefinition)
+
+            val dialogManager: DialogManager<DialogT<*, *>> =
+                DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
+
+            val script = getStory(dialogManager, scriptManager, action)
+
+            val bus = TockBotBus(connector, dialogManager, action, connectorData, botDefinition)
 
             if (bus.isFeatureEnabled(DefaultFeatureType.DISABLE_BOT)) {
                 logger.info { "bot is disabled for the application" }
@@ -134,7 +157,7 @@ internal class Bot(
 
             try {
                 currentBus.set(bus)
-                story.handle(bus)
+                script.handle(bus)
                 if (shouldRespondBeforeDisabling) {
                     userTimeline.userState.botDisabled = true
                 }
@@ -147,33 +170,50 @@ internal class Bot(
             logger.debug { "bot is disabled for the user" }
         }
     }
+    /**
+     * Does this action trigger bot deactivation ?
+     */
+    private fun canDisableBot(currentIntent: IntentAware?, action: Action): Boolean =
+        currentIntent?.let {action.state.notification
+              || scriptManager.isDisabledIntent(it) }?:false
 
-    private fun getDialog(action: Action, userTimeline: UserTimeline): Dialog {
+    /**
+     * Does this action trigger bot activation ?
+     */
+    private fun canEnableBot(currentIntent: IntentAware?, action: Action): Boolean {
+        return currentIntent?.let {
+                    scriptManager.isEnabledIntent(it)
+                            // send choice can reactivate disabled bot (if the intent is not a disabled intent)
+                            || (botDefinition.isSendChoiceActivateBot(action)
+                            && !scriptManager.isDisabledIntent(it))
+                }?:false
+    }
+
+/*
+    private fun getDialog(action: Action, userTimeline: UserTimelineT<*>): DialogT<*,*> {
         return userTimeline.currentDialog ?: createDialog(action, userTimeline)
     }
 
-    private fun createDialog(action: Action, userTimeline: UserTimeline): Dialog {
+    private fun createDialog(action: Action, userTimeline: UserTimeline): DialogT<*,*>  {
         val newDialog = Dialog(setOf(userTimeline.playerId, action.recipientId))
         userTimeline.dialogs.add(newDialog)
         return newDialog
     }
+*/
 
-    private fun getStory(userTimeline: UserTimeline, dialog: Dialog, action: Action): Story {
+
+    private fun getStory(dialogManager: DialogManager<*>, scriptManager: ScriptManager, action: Action): Script {
+        return dialogManager.prepareNextAction(scriptManager, action)
+
+/*
         val newIntent: IntentAware? = dialog.state.currentIntent
-        val previousStory = dialog.currentStory
+        val previousStory = dialog.currentScript
 
         val story =
-            if (previousStory == null ||
-                (newIntent != null && !previousStory.supportAction(userTimeline, dialog, action, newIntent))
-            ) {
-                val storyDefinition = botDefinition.findStoryDefinition(newIntent?.name(), action.applicationId)
-                val newStory = Story(
-                    storyDefinition,
-                    if (newIntent != null && storyDefinition.isStarterIntent(newIntent)) newIntent.wrappedIntent()
-                    else storyDefinition.mainIntent().wrappedIntent()
-                )
-                dialog.stories.add(newStory)
-                newStory
+            if(!dialogManager.supportAction(action)) {
+                val newScript = scriptManager.createScript(newIntent, action.applicationId)
+                dialog.scripts.add(newScript)
+                newScript
             } else {
                 previousStory
             }
@@ -187,27 +227,28 @@ internal class Bot(
         action.state.step = story.step
 
         return story
+*/
     }
 
     private fun parseAction(
         action: Action,
-        userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialogManager: DialogManager<*>,
         connector: TockConnectorController
     ) {
         try {
             when (action) {
                 is SendChoice -> {
-                    parseChoice(action, dialog)
+                    parseChoice(action, dialogManager)
                 }
                 is SendLocation -> {
-                    parseLocation(action, dialog)
+                    parseLocation(action, dialogManager)
                 }
                 is SendAttachment -> {
-                    parseAttachment(action, dialog)
+                    parseAttachment(action, dialogManager)
                 }
                 is SendSentence -> {
                     if (!action.hasEmptyText()) {
+                        //TODO: là il y a un truc à faire ... ça touche au NLP donc à réfléchire sur la manière
                         nlp.parseSentence(action, userTimeline, dialog, connector, botDefinition)
                     }
                 }
@@ -215,40 +256,41 @@ internal class Bot(
             }
         } finally {
             // reinitialize lastActionState
-            dialog.state.nextActionState = null
+            dialogManager.resetLastActionState()
+            //dialog.state.nextActionState = null
         }
     }
 
-    private fun parseAttachment(attachment: SendAttachment, dialog: Dialog) {
+    private fun parseAttachment(attachment: SendAttachment,  dialogManager: DialogManager<*>) {
          botDefinition.scriptManager.getHandleAttachmentIntent()?.let {
-             dialog.state.currentIntent = it
+             dialogManager.currentIntent = it
         }
     }
 
-    private fun parseLocation(location: SendLocation, dialog: Dialog) {
+    private fun parseLocation(location: SendLocation,  dialogManager: DialogManager<*>) {
         botDefinition.scriptManager.getUserLocationIntent()?.let {
-            dialog.state.currentIntent = it
+            dialogManager.currentIntent = it
         }
     }
 
-    private fun parseChoice(choice: SendChoice, dialog: Dialog) {
+    private fun parseChoice(choice: SendChoice, dialogManager: DialogManager<*>) {
         botDefinition.findIntent(choice.intentName, choice.applicationId).let { intent ->
+            dialogManager.changeState(scriptManager, choice, intent)
+
+            /*
             // restore state if it's possible (old dialog choice case)
             if (intent != Intent.unknown) {
                 // TODO use story id
                 val previousIntentName: String? = choice.previousIntent()
                 val applicationId: String = choice.applicationId
                 if (previousIntentName != null) {
-
-
-
-                    val previousStory = botDefinition.findStoryDefinition(previousIntentName, applicationId)
+                    val previousStory = scriptManager.findScriptDefinitionById(previousIntentName, applicationId)
                     if (previousStory != botDefinition.unknownStory && previousStory.supportIntent(intent)) {
                         // the previous intent is a primary intent that support the new intent
-                        val storyDefinition = botDefinition.findStoryDefinition(choice.intentName, applicationId)
+                        val storyDefinition = scriptManager.findScriptDefinitionById(choice.intentName, applicationId)
                         if (storyDefinition == botDefinition.unknownStory) {
                             // the new intent is a secondary intent, may be we need to create a intermediate story
-                            val currentStory = dialog.currentStory
+                            val currentStory = dialog.currentScript
                             if (currentStory == null
                                 || !currentStory.supportIntent(intent)
                                 || !currentStory.supportIntent(
@@ -264,32 +306,30 @@ internal class Bot(
                 }
             }
             dialog.state.currentIntent = intent
+            */
         }
     }
 
-    private fun loadProfileIfNotSet(
+    private fun UserTimelineT<*>.loadProfileIfNotSet(
         connectorData: ConnectorData,
         action: Action,
-        userTimeline: UserTimeline,
         connector: TockConnectorController
     ) {
-        with(userTimeline) {
-            if (!userState.profileLoaded) {
-                val pref = connector.loadProfile(connectorData, userTimeline.playerId)
-                if (pref != null) {
-                    userState.profileLoaded = true
-                    userState.profileRefreshed = true
-                    userPreferences.fillWith(pref)
-                }
-            } else if (!userState.profileRefreshed) {
+        if (!userState.profileLoaded) {
+            val pref = connector.loadProfile(connectorData, playerId)
+            if (pref != null) {
+                userState.profileLoaded = true
                 userState.profileRefreshed = true
-                val pref = connector.refreshProfile(connectorData, userTimeline.playerId)
-                if (pref != null) {
-                    userPreferences.refreshWith(pref)
-                }
+                userPreferences.fillWith(pref)
             }
-            action.state.testEvent = userPreferences.test
+        } else if (!userState.profileRefreshed) {
+            userState.profileRefreshed = true
+            val pref = connector.refreshProfile(connectorData, playerId)
+            if (pref != null) {
+                userPreferences.refreshWith(pref)
+            }
         }
+        action.state.testEvent = userPreferences.test
     }
 
     fun markAsUnknown(sendSentence: SendSentence, userTimeline: UserTimeline) {

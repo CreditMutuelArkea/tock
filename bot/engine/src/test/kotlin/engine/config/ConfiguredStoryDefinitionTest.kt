@@ -29,7 +29,7 @@ class ConfiguredStoryDefinitionTest {
     @Test
     fun `starterIntents returns builtin starter intents`() {
         val botDefinition = BotDefinitionTest()
-        val wrapper = BotDefinitionWrapper(botDefinition)
+        val wrapper = BotStoryDefinitionWrapper(botDefinition)
         val story = ConfiguredStoryDefinition(
             wrapper,
             StoryDefinitionConfiguration(

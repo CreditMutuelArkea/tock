@@ -40,7 +40,7 @@ internal class GAAccountLinking {
             val oldTimeline = userTimelineDAO.loadWithLastValidDialog(
                 controller.botDefinition.namespace,
                 oldUserId,
-                storyDefinitionProvider = controller.storyDefinitionLoader(applicationId)
+                storyDefinitionProvider = controller.scriptDefinitionLoader(applicationId)
             )
             val newTimeline = UserTimeline(
                 newLoggedUserId,

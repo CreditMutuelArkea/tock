@@ -23,7 +23,7 @@ import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.bot.BotVersion
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 
 /**
  * Contains list of [AnswerConfiguration].
@@ -50,12 +50,12 @@ internal interface StoryDefinitionAnswersContainer {
     fun findAnswer(type: AnswerConfigurationType): AnswerConfiguration? =
         answers.firstOrNull { it.answerType == type }
 
-    fun storyDefinition(botDefinition: BotDefinitionWrapper, storyDefinitionConfiguration: StoryDefinitionConfiguration): StoryDefinition? =
+    fun storyDefinition(botDefinition: BotStoryDefinitionWrapper, storyDefinitionConfiguration: StoryDefinitionConfiguration): StoryDefinition? =
         when (currentType) {
             script -> (findCurrentAnswer() as? ScriptAnswerConfiguration)
                 ?.findBestVersion(BotVersion.getCurrentBotVersion(botDefinition.botId))
                 ?.storyDefinition
-            builtin -> botDefinition.builtInStory(storyDefinitionConfiguration.storyId)
+            builtin -> botDefinition.scriptManager.builtInStory(storyDefinitionConfiguration.storyId)
             else -> null
         }
 

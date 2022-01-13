@@ -26,9 +26,8 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.SimpleStoryDefinition
 import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.shared.error
 import mu.KotlinLogging
 
@@ -58,7 +57,7 @@ internal class FallbackStoryDefinition(
     defaultUnknown.intents
 )
 
-internal class ApiStep(s: StepConfiguration) : StoryStep<StoryHandlerDefinition> {
+internal class ApiStep(s: StepConfiguration) : SimpleStoryStep {
     override val name: String = s.name
     override val intent: IntentAware = Intent(s.mainIntent)
     override val otherStarterIntents: Set<IntentAware> = s.otherStarterIntents.map { Intent(it) }.toSet()

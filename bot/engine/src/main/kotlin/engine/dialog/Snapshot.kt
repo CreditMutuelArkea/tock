@@ -36,12 +36,12 @@ data class Snapshot(
 ) {
 
     constructor(dialog: Dialog) : this(
-        dialog.currentStory?.definition?.id,
+        dialog.currentScript?.definition?.id,
         dialog.state.currentIntent?.name(),
-        dialog.currentStory?.step,
+        dialog.currentScript?.step,
         dialog.state.entityValues.values.mapNotNull { it.value },
-        (dialog.currentStory?.definition as? ConfiguredStoryDefinition)?.answerType ?: AnswerConfigurationType.builtin,
-        (dialog.currentStory?.definition as? ConfiguredStoryDefinition)?.name ?: dialog.currentStory?.definition?.id
+        (dialog.currentScript?.definition as? ConfiguredStoryDefinition)?.answerType ?: AnswerConfigurationType.builtin,
+        (dialog.currentScript?.definition as? ConfiguredStoryDefinition)?.name ?: dialog.currentScript?.definition?.id
     )
 
     /**

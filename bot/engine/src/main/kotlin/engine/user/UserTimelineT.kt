@@ -16,42 +16,64 @@
 
 package ai.tock.bot.engine.user
 
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.action.Action
+import ai.tock.bot.engine.dialog.DialogT
 
 /**
  * The user timeline - all dialogs and data of the user.
  */
-class UserTimeline(
+interface UserTimelineT<T : DialogT<*,*>> {
+
     /**
      * The user id.
      */
-    override val playerId: PlayerId,
+    val playerId: PlayerId
     /**
      * User data, first name, email, etc.
      */
-    override val userPreferences: UserPreferences = UserPreferences(),
+    val userPreferences: UserPreferences
     /**
      * The user state, with simple flags.
      */
-    override val userState: UserState = UserState(),
+    val userState: UserState
     /**
      * The dialogs of the timeline.
      */
-    override val dialogs: MutableList<Dialog> = mutableListOf(),
+    val dialogs: MutableList<T>
     /**
      * Temporary ids (of type [PlayerType.temporary] linked to this user timeline.
      */
-    override val temporaryIds: MutableSet<String> = mutableSetOf()
-) : UserTimelineT<Dialog> {
+    val temporaryIds: MutableSet<String>
 
     /**
-     * Returns the current story.
+     * Returns the current dialog.
      */
-    val currentStory: Story?
-        get() = currentDialog?.currentScript
+    val currentDialog: T?
+        get() = dialogs.lastOrNull()
 
-    override fun toString(): String {
-        return "UserTimeline(playerId=$playerId)"
+    /**
+     * Last action if any.
+     */
+    val lastAction: Action?
+        get() = dialogs.findLast { it.lastAction != null }?.lastAction
+
+    /**
+     * Last user action if any.
+     */
+    val lastUserAction: Action?
+        get() = dialogs.findLast { it.lastUserAction != null }?.lastUserAction
+
+    /**
+     * Does this timeline has at least one answer of a bot?
+     */
+    fun containsBotAction(): Boolean {
+        return dialogs.any {
+            it.scripts.any {
+                it.actions.any {
+                    it.playerId.type == PlayerType.bot
+                }
+            }
+        }
     }
+
 }

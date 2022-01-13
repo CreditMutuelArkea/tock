@@ -16,9 +16,11 @@
 
 package ai.tock.bot.engine.dialog
 
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.script.Script
+import org.litote.kmongo.Id
 import java.time.Instant
 
 /**
@@ -26,11 +28,16 @@ import java.time.Instant
  * Conversation history is split into a list of [stories].
  * The dialog has a (current) [state].
  */
-interface DialogT<T: Script> {
+interface DialogT<T: Script, R: DialogT<T, R>> {
     /**
      * The players of the dialog.
      */
     val playerIds: Set<PlayerId>
+
+    /**
+     * The id of the dialog.
+     */
+    val id: Id<R>
 
     /**
      * The state of the dialog.
@@ -54,10 +61,13 @@ interface DialogT<T: Script> {
         get() = lastAction?.date ?: Instant.now()
 
     /**
-     * The current story if any.
+     * The current script if any.
      */
-    val currentStory: T?
+    val currentScript: T?
         get() = scripts.lastOrNull()
+
+    val currentIntent: IntentAware?
+        get()= currentScript?.mainIntent
 
     /**
      * Returns last action.
@@ -87,6 +97,6 @@ interface DialogT<T: Script> {
      */
     fun allActions(): List<Action> = scripts.flatMap { it.actions }
 
-    fun initFromDialog(dialog: DialogT<T>): DialogT<T>
+    fun initFromDialog(dialog: DialogT<T, R>): DialogT<T, R>
 
 }

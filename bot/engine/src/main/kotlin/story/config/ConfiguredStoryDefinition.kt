@@ -24,7 +24,7 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.definition.StoryTag
-import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
@@ -32,7 +32,7 @@ import ai.tock.translator.UserInterfaceType
  * Implementation of StoryDefinition for StoryDefinitionConfiguration.
  */
 internal class ConfiguredStoryDefinition(
-    definition: BotDefinitionWrapper,
+    definition: BotStoryDefinitionWrapper,
     val configuration: StoryDefinitionConfiguration,
     private val botApplicationConfigurationKey: BotApplicationConfigurationKey? = null
 ) : StoryDefinition {

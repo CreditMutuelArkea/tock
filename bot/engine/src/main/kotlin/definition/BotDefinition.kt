@@ -25,6 +25,7 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.api.client.model.EntityType
 import ai.tock.shared.booleanProperty
@@ -94,10 +95,13 @@ interface BotDefinition : I18nKeyProvider {
 
     }
 
+    fun isSendChoiceActivateBot(action: Action): Boolean =
+        sendChoiceActivateBot && action is SendChoice && !action.state.notification
+
     /**
-     * Finds an [Intent] from an intent name.
+     * Finds an [IntentAware] from an intent name.
      */
-    fun findIntent(intent: String, applicationId: String): Intent {
+    fun findIntent(intent: String, applicationId: String): IntentAware {
         return scriptManager.findIntent(intent, applicationId)
     }
 
@@ -113,36 +117,6 @@ interface BotDefinition : I18nKeyProvider {
             property("tock_technical_error", "Technical error :( sorry!")
         )
     }
-/*
-    /**
-     * Does this action trigger bot deactivation ?
-     */
-    fun disableBot(timeline: UserTimeline, dialog: Dialog, action: Action): Boolean =
-        action.state.notification
-                || dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false
-                || hasDisableTagIntent(dialog)
-
-    /**
-     * Returns true if the dialog current intent is a disabling intent.
-     */
-    fun hasDisableTagIntent(dialog: Dialog) =
-        dialog.state.currentIntent?.let { botDisabledStories.any { story -> story.isStarterIntent(it) } } ?: false
-
-
-    /**
-     * Does this action trigger bot activation ?
-     */
-    fun enableBot(timeline: UserTimeline, dialog: Dialog, action: Action): Boolean =
-        dialog.state.currentIntent?.let { botEnabledStory?.isStarterIntent(it) } ?: false
-                || dialog.state.currentIntent?.let { botEnabledStories.any { story -> story.isStarterIntent(it) } } ?: false
-                || ( // send choice can reactivate disabled bot (is the intent is not a disabled intent)
-                    sendChoiceActivateBot &&
-                        action is SendChoice &&
-                        !action.state.notification &&
-                        !(dialog.state.currentIntent?.let { botDisabledStory?.isStarterIntent(it) } ?: false)
-                )
-
-    */
 
     /**
      * If this method returns true, the action will be added in the stored history.
@@ -150,7 +124,7 @@ interface BotDefinition : I18nKeyProvider {
      * By default, actions where the bot is not only [ai.tock.bot.engine.dialog.EventState.notification]
      * are added in the bot history.
      */
-    fun hasToPersistAction(timeline: UserTimeline, action: Action): Boolean = !action.state.notification
+    fun hasToPersistAction(timeline: UserTimelineT<*>, action: Action): Boolean = !action.state.notification
 
     /**
      * Returns a [TestBehaviour]. Used in Integration Tests.

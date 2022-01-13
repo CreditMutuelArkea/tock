@@ -25,19 +25,14 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.ParameterKey
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.action.ActionPriority
 import ai.tock.bot.engine.action.ActionVisibility
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.EntityValue
-import ai.tock.bot.engine.dialog.NextUserActionState
-import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.feature.FeatureDAO
 import ai.tock.bot.engine.feature.FeatureType
@@ -46,13 +41,13 @@ import ai.tock.bot.engine.message.MessagesList
 import ai.tock.bot.engine.message.MessagesList.Companion.toMessageList
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
+import com.github.salomonbrys.kodein.instance
 import engine.dialogManager.step.Step
 
 /**
@@ -75,29 +70,15 @@ interface BotBus : Bus<BotBus> {
     val botDefinition: BotDefinition
 
     /**
-     * The user timeline. Gets history and data about the user.
+     * Manager of Dialog, current, next and transition, to abstract the concret Dialogs and Scripts used
      */
-    val userTimeline: UserTimeline
-
-    /**
-     * The initial dialog for this user.
-     */
-    val dialog: Dialog
-
-    /**
-     * The current dialog for this user (may be different from the initial [dialog]).
-     */
-    val currentDialog: Dialog
+    val dialogManager: DialogManager<DialogT<*,*>>
 
     /**
      * The current intent for this user (may be different from the initial [intent]).
      */
-    override val currentIntent: IntentAware? get() = currentDialog.state.currentIntent
-
-    /**
-     * The current story.
-     */
-    //var story: Story
+    override val currentIntent: IntentAware?
+        get() = dialogManager.currentIntent
 
     /**
      * The user action.
@@ -115,6 +96,7 @@ interface BotBus : Bus<BotBus> {
      * User preferences of the current user.
      */
     val userPreferences: UserPreferences
+        get() = dialogManager.userPreferences
 
     /**
      * The underlying [Connector] used.
@@ -138,52 +120,66 @@ interface BotBus : Bus<BotBus> {
     var nextUserActionState: NextUserActionState?
 
     var step: Step<*>?
-        get() = botDefinition.scriptManager.getCurrentStep()
-        set(step) = botDefinition.scriptManager.changeCurrentStep(step?.name)
+        get() = dialogManager.getCurrentStep()
+        set(step) = dialogManager.changeCurrentStep(step?.name)
 
     override val stepName: String? get() = step?.name
 
     var hasCurrentSwitchStoryProcess: Boolean
-        get() = dialog.state.hasCurrentSwitchStoryProcess
+        get() = dialogManager.hasCurrentSwitchProcess
         set(v) {
-            dialog.state.hasCurrentSwitchStoryProcess = v
+            dialogManager.hasCurrentSwitchProcess = v
         }
+
+    // I18nTranslator implementation
+    override val contextId: String?
+        get() = dialogManager.dialogId
+
+    override val test: Boolean
+        get() = userPreferences.test
 
     /**
      * The text sent by the user if any.
      */
-    val userText: String? get() = (action as? SendSentence)?.stringText?.trim()
+    val userText: String? get() =
+        (action as? SendSentence)?.stringText?.trim()
 
     /**
      * To know if the current intent is owned by the [IntentAware].
      */
-    fun isIntent(intentOwner: IntentAware): Boolean = intentOwner.wrap(currentIntent?.wrappedIntent())
+    fun isIntent(intentOwner: IntentAware): Boolean =
+        intentOwner.wrap(currentIntent?.wrappedIntent())
 
     /**
      * Returns the NLP call stats if an NLP call has occurred, null either.
      */
-    fun nlpStats(): NlpCallStats? = if (action is SendSentence) (action as SendSentence).nlpStats else null
+    fun nlpStats(): NlpCallStats? =
+        if (action is SendSentence) (action as SendSentence).nlpStats else null
 
     /**
      * Is this current action is a [SendChoice]?
      */
-    fun isChoiceAction(): Boolean = action is SendChoice
+    fun isChoiceAction(): Boolean =
+        action is SendChoice
 
     /**
      * Returns the value of the specified choice parameter, null if the user action is not a [SendChoice]
      * or if this parameter is not set.
      */
-    fun choice(key: ParameterKey): String? = action.choice(key)
+    fun choice(key: ParameterKey): String? =
+        action.choice(key)
 
     /**
      * Returns true if the specified choice parameter has the "true" value, false either.
      */
-    fun booleanChoice(key: ParameterKey): Boolean = action.booleanChoice(key)
+    fun booleanChoice(key: ParameterKey): Boolean =
+        action.booleanChoice(key)
 
     /**
      * Checks that the specified choice parameter has the specified value.
      */
-    fun hasChoiceValue(param: ParameterKey, value: ParameterKey): Boolean = choice(param) == value.key
+    fun hasChoiceValue(param: ParameterKey, value: ParameterKey): Boolean =
+        choice(param) == value.key
 
     /**
      * Returns true if the current action has the specified entity role.
@@ -195,7 +191,8 @@ interface BotBus : Bus<BotBus> {
     /**
      * Returns true if the current action has the specified entity role.
      */
-    fun hasActionEntity(entity: Entity): Boolean = hasActionEntity(entity.role)
+    fun hasActionEntity(entity: Entity): Boolean =
+        hasActionEntity(entity.role)
 
     /**
      * Returns the current value for the specified entity role.
@@ -218,47 +215,50 @@ interface BotBus : Bus<BotBus> {
     /**
      * Returns the current text content for the specified entity.
      */
-    fun entityText(entity: Entity): String? = entityValueDetails(entity)?.content
+    fun entityText(entity: Entity): String? =
+        entityValueDetails(entity)?.content
 
     /**
      * Returns the current text content for the specified entity.
      */
-    fun entityText(role: String): String? = entityValueDetails(role)?.content
+    fun entityText(role: String): String? =
+        entityValueDetails(role)?.content
 
     /**
      * Returns the current [EntityValue] for the specified entity.
      */
-    fun entityValueDetails(entity: Entity): EntityValue? = entityValueDetails(entity.role)
+    fun entityValueDetails(entity: Entity): EntityValue? =
+        entityValueDetails(entity.role)
 
     /**
      * Returns the current [EntityValue] for the specified role.
      */
-    fun entityValueDetails(role: String): EntityValue? = entities[role]?.value
+    fun entityValueDetails(role: String): EntityValue? =
+        entities[role]?.value
 
     /**
      * Updates the current entity value in the dialog.
      * @param role entity role
      * @param newValue the new entity value
      */
-    fun changeEntityValue(role: String, newValue: EntityValue?) {
-        dialog.state.changeValue(role, newValue)
-    }
+    fun changeEntityValue(role: String, newValue: EntityValue?) =
+        dialogManager.changeState(role, newValue)
 
     /**
      * Updates the current entity value in the dialog.
      * @param entity the entity definition
      * @param newValue the new entity value
      */
-    fun changeEntityValue(entity: Entity, newValue: Value?) {
-        dialog.state.changeValue(entity, newValue)
-    }
+    fun changeEntityValue(entity: Entity, newValue: Value?) =
+        dialogManager.changeEntity(entity, newValue)
 
     /**
      * Updates the current entity value in the dialog.
      * @param entity the entity definition
      * @param newValue the new entity value
      */
-    fun changeEntityValue(entity: Entity, newValue: EntityValue) = changeEntityValue(entity.role, newValue)
+    fun changeEntityValue(entity: Entity, newValue: EntityValue) =
+        changeEntityValue(entity.role, newValue)
 
     /**
      * Updates the current entity text value in the dialog.
@@ -274,21 +274,20 @@ interface BotBus : Bus<BotBus> {
     /**
      * Removes entity value for the specified role.
      */
-    fun removeEntityValue(role: String) {
-        dialog.state.resetValue(role)
-    }
+    fun removeEntityValue(role: String) =
+        dialogManager.removeEntity(role)
 
     /**
      * Removes entity value for the specified role.
      */
-    fun removeEntityValue(entity: Entity) = removeEntityValue(entity.role)
+    fun removeEntityValue(entity: Entity) =
+        removeEntityValue(entity.role)
 
     /**
      * Removes all current entity values.
      */
-    fun removeAllEntityValues() {
-        dialog.state.resetAllEntityValues()
-    }
+    fun removeAllEntityValues() =
+        dialogManager.removeAllEntity()
 
     /**
      * Resets all entity values, context values, [ai.tock.bot.engine.dialog.DialogState.userLocation]
@@ -296,35 +295,33 @@ interface BotBus : Bus<BotBus> {
      * but keep entity values history.
      * @see [ai.tock.bot.engine.dialog.DialogState.resetState]
      */
-    fun resetDialogState() {
-        dialog.state.resetState()
-    }
+    fun resetDialogState() =
+        dialogManager.resetState()
 
     /**
      * Returns the persistent current context value.
      */
-    fun <T : Any> contextValue(name: String): T? {
-        @Suppress("UNCHECKED_CAST")
-        return dialog.state.context[name] as? T?
-    }
+    fun <T : Any> contextValue(name: String): T? =
+        dialogManager.contextValue(name)
 
     /**
      * Returns the persistent current context value.
      */
-    fun <T : Any> contextValue(key: ParameterKey): T? = contextValue(key.key)
+    fun <T : Any> contextValue(key: ParameterKey): T? =
+        contextValue(key.key)
 
     /**
      * Updates persistent context value.
      * Do not store Collection or Map in the context, only plain objects or typed arrays.
      */
-    fun changeContextValue(name: String, value: Any?) {
-        dialog.state.setContextValue(name, value)
-    }
+    fun changeContextValue(name: String, value: Any?) =
+        dialogManager.changeContext(name, value)
 
     /**
      * Updates persistent context value.
      */
-    fun changeContextValue(key: ParameterKey, value: Any?) = changeContextValue(key.key, value)
+    fun changeContextValue(key: ParameterKey, value: Any?) =
+        changeContextValue(key.key, value)
 
     /**
      * Returns the non persistent current context value.
@@ -336,7 +333,8 @@ interface BotBus : Bus<BotBus> {
      * Returns the non persistent current context value.
      * Bus context values are useful to store a temporary (ie request scoped) state.
      */
-    fun <T> getBusContextValue(key: ParameterKey): T? = getBusContextValue(key.key)
+    fun <T> getBusContextValue(key: ParameterKey): T? =
+        getBusContextValue(key.key)
 
     /**
      * Updates the non persistent current context value.
@@ -348,7 +346,8 @@ interface BotBus : Bus<BotBus> {
      * Updates the non persistent current context value.
      * Bus context values are useful to store a temporary (ie request scoped) state.
      */
-    fun setBusContextValue(key: ParameterKey, value: Any?) = setBusContextValue(key.key, value)
+    fun setBusContextValue(key: ParameterKey, value: Any?) =
+        setBusContextValue(key.key, value)
 
     /**
      * Sends text that should not be translated as last bot answer.
@@ -427,11 +426,14 @@ interface BotBus : Bus<BotBus> {
      */
     fun reloadProfile()
 
+    //fun addSupport(action)
+
     /**
      * Switches the context to the specified story definition (start a new [Story]).
      */
+    //TODO: à déplacer dans le dialogManager ?
     fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent().wrappedIntent()) {
-        story = Story(storyDefinition, starterIntent, story.step)
+        val story = Story(storyDefinition, starterIntent, story.step)
         hasCurrentSwitchStoryProcess = true
         story.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
         currentDialog.state.currentIntent = starterIntent
@@ -440,6 +442,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Handles the action and switches the context to the specified story definition.
      */
+    //TODO: à déplacer dans le dialogManager ?
     fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent().wrappedIntent()) {
         switchStory(storyDefinition, starterIntent)
         hasCurrentSwitchStoryProcess = false
@@ -477,6 +480,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Gets an i18n label with the specified key.
      */
+    //TODO: à déplacer dans le script manager ?
     fun i18nKey(key: String, defaultLabel: CharSequence, vararg args: Any?): I18nLabelValue =
         story.definition.storyHandler.let {
             (it as? StoryHandlerBase<*>)?.i18nKey(key, defaultLabel, *args)
@@ -494,12 +498,8 @@ interface BotBus : Bus<BotBus> {
         return this
     }
 
-    // I18nTranslator implementation
-    override val contextId: String? get() = dialog.id.toString()
-
-    override fun defaultDelay(answerIndex: Int): Long = botDefinition.defaultDelay(answerIndex)
-
-    override val test: Boolean get() = userPreferences.test
+    override fun defaultDelay(answerIndex: Int): Long =
+        botDefinition.defaultDelay(answerIndex)
 
     // override default beahviour
     override fun end(

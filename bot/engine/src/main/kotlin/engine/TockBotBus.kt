@@ -27,12 +27,9 @@ import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.action.ActionPriority
 import ai.tock.bot.engine.action.ActionVisibility
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.NextUserActionState
-import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.shared.defaultLocale
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.UserInterfaceType
@@ -43,8 +40,7 @@ import java.util.*
  */
 internal class TockBotBus(
     val connector: TockConnectorController,
-    override val userTimeline: UserTimeline,
-    override val dialog: Dialog,
+    override val dialogManager: DialogManager<DialogT<*, *>>,
     override val action: Action,
     override val connectorData: ConnectorData,
     override var i18nProvider: I18nKeyProvider
@@ -52,19 +48,16 @@ internal class TockBotBus(
 
     private val bot = connector.bot
 
-    override val currentDialog: Dialog get() = userTimeline.currentDialog ?: dialog
-
-    override var story: Story
-        get() = currentDialog.currentStory ?: dialog.currentStory!!
-        set(value) {
-            currentDialog.stories.add(value)
-        }
-
     override val botDefinition: BotDefinition = bot.botDefinition
+
     override val applicationId = action.applicationId
+
     override val botId = action.recipientId
+
     override val userId = action.playerId
-    override val userPreferences: UserPreferences = userTimeline.userPreferences
+
+    override val userPreferences: UserPreferences = dialogManager.userPreferences
+
     override val userLocale: Locale =
         userPreferences.locale.let { locale ->
             val supp = bot.supportedLocales
@@ -79,22 +72,25 @@ internal class TockBotBus(
     override val userInterfaceType: UserInterfaceType =
         action.state.userInterface ?: connector.connectorType.userInterfaceType
 
-    override val targetConnectorType: ConnectorType = action.state.targetConnectorType ?: connector.connectorType
+    override val targetConnectorType: ConnectorType =
+        action.state.targetConnectorType ?: connector.connectorType
 
     override val underlyingConnector: Connector = connector.connector
 
     private val context: BusContext = BusContext()
 
-    override val entities: Map<String, EntityStateValue> = currentDialog.state.entityValues
-    override val intent: IntentAware? = currentDialog.state.currentIntent
+    override val entities: Map<String, EntityStateValue> = dialogManager.entityValues
+
+    override val intent: IntentAware? = dialogManager.currentIntent
 
     override var nextUserActionState: NextUserActionState?
-        get() = currentDialog.state.nextActionState
+        get() = dialogManager.nextUserActionState
         set(value) {
-            currentDialog.state.nextActionState = value
+            dialogManager.nextUserActionState = value
         }
 
     private var _currentAnswerIndex: Int = 0
+
     override val currentAnswerIndex: Int get() = _currentAnswerIndex
 
     /**
@@ -130,7 +126,7 @@ internal class TockBotBus(
         _currentAnswerIndex++
 
         val actionToSent = applyBotAnswerInterceptor(a)
-        story.actions.add(actionToSent)
+        dialogManager.addAction(actionToSent) // story.actions.add(actionToSent)
         connector.send(connectorData, action, actionToSent, context.currentDelay)
         return this
     }
@@ -189,7 +185,7 @@ internal class TockBotBus(
     override fun reloadProfile() {
         val newUserPref = connector.loadProfile(connectorData, userId)
         if (newUserPref != null) {
-            userTimeline.userState.profileLoaded = true
+            dialogManager.setProfileLoaded(true)
             userPreferences.fillWith(newUserPref)
         } else {
             userPreferences.fillWith(UserPreferences())
@@ -198,7 +194,8 @@ internal class TockBotBus(
 
     override fun markAsUnknown() {
         if (action is SendSentence) {
-            bot.markAsUnknown(action, userTimeline)
+            bot.markAsUnknown(action, dialogManager.userTimeline)
         }
     }
+
 }

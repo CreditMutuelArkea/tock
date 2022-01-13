@@ -16,13 +16,19 @@
 
 package ai.tock.bot.script
 
+import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 
 interface Script {
+
+    val mainIntent: IntentAware
 
     val actions: MutableList<Action>
 
     val lastAction: Action?
 
     val lastUserAction: Action?
+
+    fun handle(bus: BotBus)
 }

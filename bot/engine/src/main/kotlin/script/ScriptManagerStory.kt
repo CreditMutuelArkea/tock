@@ -16,9 +16,52 @@
 
 package ai.tock.bot.DialogManager
 
+import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.Intent.Companion.unknown
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
 
 interface ScriptManagerStory : ScriptManager {
+
+    companion object {
+        /**
+         * Finds an intent from an intent name and a list of [StoryDefinition].
+         * Is no valid intent found, returns [unknown].
+         */
+        internal fun findIntent(stories: List<StoryDefinition>, intent: String): Intent {
+            val targetIntent = Intent(intent)
+            return if (stories.any { it.supportIntent(targetIntent) } ||
+                stories.any { it.allSteps().any { s -> s.supportIntent(targetIntent) } }
+            ) {
+                targetIntent
+            } else {
+                if (intent == Intent.keyword.name) {
+                    Intent.keyword
+                } else {
+                    unknown
+                }
+            }
+        }
+
+        /**
+         * Finds a [StoryDefinition] from a list of [StoryDefinition] and an intent name.
+         * Is no valid [StoryDefinition] found, returns the [unknownStory].
+         */
+        internal fun findStoryDefinition(
+            stories: List<StoryDefinition>,
+            intent: String?,
+            unknownStory: StoryDefinition,
+            keywordStory: StoryDefinition
+        ): StoryDefinition {
+            return if (intent == null) {
+                unknownStory
+            } else {
+                val i = findIntent(stories, intent)
+                stories.find { it.isStarterIntent(i) }
+                    ?: if (intent == Intent.keyword.name) keywordStory else unknownStory
+            }
+        }
+    }
 
     /**
      * The list of each stories.
@@ -69,25 +112,29 @@ interface ScriptManagerStory : ScriptManager {
     /**
      * To manage deactivation.
      */
-    @Deprecated("use botDisabledStories list")
-    val botDisabledStory: StoryDefinition?
+    @Deprecated("use disabledStories list")
+    val disabledStory: StoryDefinition?
 
     /**
      * List of deactivation stories.
      */
-    val botDisabledStories: List<StoryDefinition>
+    val disabledStories: List<StoryDefinition>
         get() = emptyList()
 
     /**
      * To manage reactivation.
      */
     @Deprecated("use botEnabledStories list")
-    val botEnabledStory: StoryDefinition?
+    val enabledStory: StoryDefinition?
 
     /**
      * List of reactivation stories.
      */
-    val botEnabledStories: List<StoryDefinition>
+    val enabledStories: List<StoryDefinition>
         get() = emptyList()
+
+    fun findStoryDefinition(intent: IntentAware?, applicationId: String): StoryDefinition
+
+    fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition
 
 }

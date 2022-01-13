@@ -20,6 +20,7 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.model.dump.ApplicationDump
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
@@ -38,7 +39,7 @@ interface NlpController {
     fun parseSentence(
         sentence: SendSentence,
         userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialog: DialogT<*,*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     )

@@ -24,10 +24,7 @@ import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.TockConnectorController
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.DialogState
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.EntityValue
+import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.nlp.api.client.model.Entity
@@ -70,7 +67,7 @@ internal class Nlp : NlpController {
         val nlpClient: NlpClient,
         val sentence: SendSentence,
         val userTimeline: UserTimeline,
-        val dialog: Dialog,
+        val dialog: DialogT<*,*>,
         val connector: TockConnectorController,
         val botDefinition: BotDefinition
     ) {
@@ -140,7 +137,7 @@ internal class Nlp : NlpController {
 
         private fun findIntent(
             userTimeline: UserTimeline,
-            dialog: Dialog,
+            dialog: DialogT<*,*>,
             sentence: SendSentence,
             nlpResult: NlpResult
         ): IntentAware {
@@ -226,7 +223,7 @@ internal class Nlp : NlpController {
             }
         }
 
-        private fun listenNlpErrorCall(query: NlpQuery, dialog: Dialog, throwable: Throwable?) {
+        private fun listenNlpErrorCall(query: NlpQuery, dialog: DialogT<*,*>, throwable: Throwable?) {
             BotRepository.forEachNlpListener {
                 try {
                     it.error(query, dialog, throwable)
@@ -258,7 +255,7 @@ internal class Nlp : NlpController {
                 toQueryContext(),
                 NlpQueryState(
                     dialog.state.nextActionState?.states
-                        ?: listOfNotNull(dialog.currentStory?.definition?.mainIntent()?.name()).toSet()
+                        ?: listOfNotNull(dialog.currentIntent?.name()).toSet()
                 )
             ).run {
                 var query = this
@@ -394,7 +391,7 @@ internal class Nlp : NlpController {
     override fun parseSentence(
         sentence: SendSentence,
         userTimeline: UserTimeline,
-        dialog: Dialog,
+        dialog: DialogT<*,*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     ) {

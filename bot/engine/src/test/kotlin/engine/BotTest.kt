@@ -58,8 +58,8 @@ class BotTest : BotEngineTest() {
         dialog.stories.clear()
         bot.handle(choice, userTimeline, connectorController, connectorData)
 
-        assertEquals(story.definition.id, dialog.currentStory!!.definition.id)
-        assertEquals(test.mainIntent(), dialog.currentStory!!.starterIntent)
+        assertEquals(story.definition.id, dialog.currentScript!!.definition.id)
+        assertEquals(test.mainIntent(), dialog.currentScript!!.starterIntent)
         assertEquals(secondaryIntent, dialog.state.currentIntent)
     }
 
@@ -77,8 +77,8 @@ class BotTest : BotEngineTest() {
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(otherStory, dialog.currentStory?.definition)
-        assertNull(dialog.currentStory?.step)
+        assertEquals(otherStory, dialog.currentScript?.definition)
+        assertNull(dialog.currentScript?.step)
     }
 
     @Test
@@ -97,8 +97,8 @@ class BotTest : BotEngineTest() {
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(def, dialog.currentStory?.definition)
-        assertEquals(s4.name, dialog.currentStory?.step)
+        assertEquals(def, dialog.currentScript?.definition)
+        assertEquals(s4.name, dialog.currentScript?.step)
     }
 
     @Test
@@ -117,8 +117,8 @@ class BotTest : BotEngineTest() {
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(unknown, dialog.currentStory?.definition)
-        assertNull(dialog.currentStory?.step)
+        assertEquals(unknown, dialog.currentScript?.definition)
+        assertNull(dialog.currentScript?.step)
     }
 
     @Test
@@ -137,8 +137,8 @@ class BotTest : BotEngineTest() {
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(def, dialog.currentStory?.definition)
-        assertEquals(s4.name, dialog.currentStory?.step)
+        assertEquals(def, dialog.currentScript?.definition)
+        assertEquals(s4.name, dialog.currentScript?.step)
     }
 
     @Test
@@ -157,8 +157,8 @@ class BotTest : BotEngineTest() {
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(unknown, dialog.currentStory?.definition)
-        assertNull(dialog.currentStory?.step)
+        assertEquals(unknown, dialog.currentScript?.definition)
+        assertNull(dialog.currentScript?.step)
     }
 
     @Test

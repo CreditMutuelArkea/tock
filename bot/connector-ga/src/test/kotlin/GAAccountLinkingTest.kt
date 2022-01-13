@@ -153,7 +153,7 @@ internal class GAAccountLinkingTest {
 
         val controller: ConnectorController = mockk()
         val botDefinition: BotDefinition = mockk()
-        every { controller.storyDefinitionLoader(any()) } returns { mockk() }
+        every { controller.scriptDefinitionLoader(any()) } returns { mockk() }
         every { controller.botDefinition } returns botDefinition
         every { botDefinition.namespace } returns "namespace"
 
