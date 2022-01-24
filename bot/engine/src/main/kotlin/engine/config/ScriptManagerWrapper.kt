@@ -75,9 +75,10 @@ internal class ScriptManagerStoryWrapper(
         get() = findStoryDefinitionByTag(StoryTag.ENABLE)
 
     fun updateStories(configuredStories: List<StoryDefinitionConfiguration>) {
-        this.configuredStories = configuredStories
-                                            .map { ConfiguredStoryDefinition(botDefinition, it) }
-                                            .groupBy { it.storyId }
+        this.configuredStories =
+            configuredStories
+                .map { ConfiguredStoryDefinition(botDefinition, it) }
+                .groupBy { it.storyId }
 
         allStories = (
                 this.configuredStories +
@@ -180,7 +181,7 @@ internal class ScriptManagerStoryWrapper(
             ?: findStoryDefinition(storyId, applicationId)
 
     fun findStoryByStoryHandler(storyHandler: StoryHandler, applicationId: String): StoryDefinition? {
-        val byStoryHandler: (StoryDefinition)->Boolean = { it.storyHandler == storyHandler }
+        val byStoryHandler: (StoryDefinition)->Boolean = { it.scriptHandler == storyHandler }
         val storieDefinition: StoryDefinition? = scriptManager.stories.find(byStoryHandler) ?: stories.find(byStoryHandler)
         return storieDefinition?.checkApplicationId(applicationId)
     }

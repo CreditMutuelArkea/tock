@@ -55,7 +55,7 @@ class BotTest : BotEngineTest() {
                 )
             )
         )
-        dialog.stories.clear()
+        dialog.scripts.clear()
         bot.handle(choice, userTimeline, connectorController, connectorData)
 
         assertEquals(story.definition.id, dialog.currentScript!!.definition.id)

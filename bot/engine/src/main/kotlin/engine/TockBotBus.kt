@@ -30,6 +30,7 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.shared.defaultLocale
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.UserInterfaceType
@@ -194,7 +195,9 @@ internal class TockBotBus(
 
     override fun markAsUnknown() {
         if (action is SendSentence) {
-            bot.markAsUnknown(action, dialogManager.userTimeline)
+            dialogManager.markAsUnknow(
+                { userTimeline: UserTimelineT<*> -> bot.markAsUnknown(action, userTimeline) }
+            )
         }
     }
 

@@ -16,6 +16,8 @@
 
 package ai.tock.bot.engine
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
@@ -27,7 +29,10 @@ import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.feature.FeatureDAO
 import ai.tock.bot.engine.message.Message
 import ai.tock.bot.engine.message.Sentence
@@ -71,7 +76,7 @@ abstract class BotEngineTest {
     val dialog = Dialog(setOf(userId, botId))
     val botApplicationConfiguration: BotApplicationConfiguration = mockk(relaxed = true)
     val connectorConfiguration: ConnectorConfiguration = mockk(relaxed = true)
-    val story by lazy { Story(botDefinition.stories.first(), test.mainIntent().wrappedIntent()) }
+    val story by lazy { Story((botDefinition.scriptManager as ScriptManagerStory).stories.first(), test.mainIntent().wrappedIntent()) }
     val connectorCallback: ConnectorCallback = mockk(relaxed = true)
     val connectorData = ConnectorData(connectorCallback)
 
@@ -112,7 +117,7 @@ abstract class BotEngineTest {
 
     val bus: BotBus by lazy {
         fillTimeline()
-        TockBotBus(connectorController, userTimeline, dialog, userAction, connectorData, botDefinition)
+        TockBotBus(connectorController, DialogManagerStory(userTimeline, userAction) as DialogManager<DialogT<*, *>>, userAction, connectorData, botDefinition)
     }
 
     open fun baseModule(): Kodein.Module {
@@ -175,7 +180,7 @@ abstract class BotEngineTest {
         if (!timelineFilled) {
             timelineFilled = true
             story.actions.add(userAction)
-            dialog.stories.add(story)
+            dialog.scripts.add(story)
             userTimeline.dialogs.add(dialog)
         }
     }

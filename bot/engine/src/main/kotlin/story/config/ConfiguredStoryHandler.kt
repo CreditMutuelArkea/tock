@@ -16,6 +16,7 @@
 
 package ai.tock.bot.story.config
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
 import ai.tock.bot.admin.answer.AnswerConfigurationType.simple
 import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
@@ -64,7 +65,7 @@ internal class ConfiguredStoryHandler(
                 bus.entityValueDetails(role) == null &&
                 bus.hasActionEntity(entityTypeName)
             ) {
-                bus.dialogManager.state.changeValue(
+                bus.dialogManager.changeState(
                     role,
                     bus.entityValueDetails(entityTypeName)
                         ?.let { v ->
@@ -93,15 +94,17 @@ internal class ConfiguredStoryHandler(
                 }
                 val targetIntent = step.targetIntent?.name
                     ?: (bus.intent.takeIf { !step.hasCurrentAnswer() }?.name())
-                bus.botDefinition
-                    .takeIf { targetIntent != null }
-                    ?.findStoryDefinition(targetIntent, bus.applicationId)
-                    ?.takeUnless { it == bus.botDefinition.unknownStory }
-                    ?.takeUnless { bus.viewedStories.contains(it) }
-                    ?.apply {
-                        bus.switchConfiguredStory(this, targetIntent ?: error("targetIntent is null??"))
-                        return@handle
-                    }
+
+                val scriptManagerStory: ScriptManagerStory = bus.botDefinition.scriptManager as ScriptManagerStory
+                if(targetIntent != null) {
+                    scriptManagerStory.findStoryDefinition(targetIntent, bus.applicationId)
+                        .takeUnless { it == scriptManagerStory.unknownStory }
+                        ?.takeUnless { bus.viewedStories.contains(it) }
+                        ?.apply {
+                            bus.switchConfiguredStory(this, targetIntent ?: error("targetIntent is null??"))
+                            return@handle
+                        }
+                }
                 if (step.hasCurrentAnswer()) {
                     switchStoryIfEnding(step, bus)
                     return@handle
@@ -135,23 +138,22 @@ internal class ConfiguredStoryHandler(
         step: StoryDefinitionConfigurationStep?,
         bus: BotBus
     ) {
-        if (!isMissingMandatoryEntities(bus) && bus.story.definition.steps.isEmpty() || step?.hasNoChildren == true) {
+        if (!isMissingMandatoryEntities(bus) && !bus.dialogManager.currentScriptHasSteps() || step?.hasNoChildren == true) {
             configuration.findEnabledEndWithStoryId(bus.applicationId)
-                ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
+                ?.let { bus.scriptManager.findScriptDefinitionById(it, bus.applicationId) }
                 ?.let {
-                    bus.switchConfiguredStory(it, it.mainIntent().name())
+                    bus.switchConfiguredStory(it as StoryDefinition, it.mainIntent().name())
                 }
         }
     }
 
     private val BotBus.viewedStories: Set<StoryDefinition>
-        get() =
-            getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
+        get() = getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
 
     private fun BotBus.switchConfiguredStory(target: StoryDefinition, newIntent: String) {
-        step = step?.takeUnless { story.definition == target }
+        step = step?.takeUnless { dialogManager.isCurrentScriptDefinition(target) }
         setBusContextValue(VIEWED_STORIES_BUS_KEY, viewedStories + target)
-        handleAndSwitchStory(target, Intent(newIntent))
+        handleAndSwitchScript(target, Intent(newIntent))
     }
 
     private fun StoryDefinitionAnswersContainer.send(bus: BotBus) {
@@ -161,8 +163,11 @@ internal class ConfiguredStoryHandler(
                 is SimpleAnswerConfiguration -> bus.handleSimpleAnswer(this@send, this)
                 is ScriptAnswerConfiguration -> bus.handleScriptAnswer(this@send)
                 is BuiltInAnswerConfiguration ->
-                    (bus.botDefinition as BotStoryDefinitionWrapper).builtInStory(configuration.storyId)
-                        .storyHandler.handle(bus)
+                    (bus.botDefinition as BotStoryDefinitionWrapper)
+                        .scriptManager
+                        .builtInStory(configuration.storyId)
+                        .scriptHandler
+                        .handle(bus)
                 else -> error("type not supported for now: $this")
             }
         }
@@ -171,7 +176,7 @@ internal class ConfiguredStoryHandler(
     override fun support(bus: BotBus): Double = 1.0
 
     private fun BotBus.fallbackAnswer() =
-        botDefinition.unknownStory.storyHandler.handle(this)
+        (botDefinition.scriptManager as ScriptManagerStory).unknownStory.scriptHandler.handle(this)
 
     private fun BotBus.handleSimpleAnswer(
         container: StoryDefinitionAnswersContainer,
@@ -181,7 +186,7 @@ internal class ConfiguredStoryHandler(
             fallbackAnswer()
         } else {
             val isMissingMandatoryEntities = isMissingMandatoryEntities(this)
-            val steps = story.definition.steps.isNotEmpty()
+            val hasSteps: Boolean = dialogManager.currentScriptHasSteps()
             val answers = fillCarousel(simple)
             answers.takeUnless { it.isEmpty() }
                 ?.let {
@@ -196,9 +201,9 @@ internal class ConfiguredStoryHandler(
                             container, this,
                             isMissingMandatoryEntities ||
                                 // No steps and no ending story
-                                (!steps && !endingStoryRule) ||
+                                (!hasSteps && !endingStoryRule) ||
                                 // Steps not started
-                                (steps && currentStep == null) ||
+                                (hasSteps && currentStep == null) ||
                                 // Steps started with children
                                 (currentStep?.hasNoChildren == false) ||
                                 // Steps started with no children, no target intent, no ending story
@@ -316,7 +321,7 @@ internal class ConfiguredStoryHandler(
 
     private fun BotBus.handleScriptAnswer(container: StoryDefinitionAnswersContainer) {
         container.storyDefinition(definition, configuration)
-            ?.storyHandler
+            ?.scriptHandler
             ?.handle(this)
             ?: run {
                 logger.warn { "no story definition for configured script for $container - use unknown" }

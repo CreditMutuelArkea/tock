@@ -19,7 +19,6 @@ package ai.tock.bot.engine.dialogManager
 import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.dialog.DialogT
@@ -27,7 +26,9 @@ import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.dialog.NextUserActionState
 import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.bot.script.Script
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import engine.dialogManager.step.Step
@@ -36,21 +37,29 @@ interface DialogManager<in T : DialogT<*,*>> {
 
     val userPreferences: UserPreferences
 
-    var currentIntent: IntentAware?
+    val currentDialogId: String
 
-    var hasCurrentSwitchProcess: Boolean
-
-    val dialogId: String
+    val currentScriptDefinition: ScriptDefinition
 
     val entityValues: Map<String, EntityStateValue>
 
     var nextUserActionState: NextUserActionState?
+
+    var currentIntent: IntentAware?
+
+    var hasCurrentSwitchProcess: Boolean
+
+    //TODO: pour que le NLP compile
+    val userTimelineT: UserTimelineT<*>
+    val dialogT: DialogT<*, *>
 
     fun add(dialog: T)
 
     fun getCurrentStep(): Step<*>?
 
     fun changeCurrentStep(stepName: String?)
+
+    fun currentScriptHasSteps(): Boolean
 
     fun changeState(role: String, newValue: EntityValue?)
 
@@ -81,4 +90,13 @@ interface DialogManager<in T : DialogT<*,*>> {
     fun prepareNextAction(scriptManager: ScriptManager, action: Action): Script
 
     fun changeState(scriptManager: ScriptManager, choice: SendChoice, intent: IntentAware)
+
+    fun markAsUnknow(provider: (UserTimelineT<*>)->Unit)
+
+    fun switchScript(scriptDefinition: ScriptDefinition,
+                     starterIntent: IntentAware = scriptDefinition.mainIntent(),
+                     step: String? = null,
+                     action: Action)
+
+    fun isCurrentScriptDefinition(scriptDefinition: ScriptDefinition): Boolean
 }

@@ -16,6 +16,8 @@
 
 package ai.tock.bot.engine
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
@@ -38,10 +40,12 @@ class BotDefinitionTest :
     BotDefinitionBase(
         "test",
         "namespace",
-        stories = testStoryDefinitionList + otherStory + testWithoutStep + builtInStories + disableBotTaggedStory,
-        unknownStory = unknown,
-        botEnabledStory = enableStory,
-        botDisabledStory = disableStory
+        ScriptManagerStoryBase(
+            stories = testStoryDefinitionList + otherStory + testWithoutStep + builtInStories + disableBotTaggedStory,
+            unknownStory = unknown,
+            enabledStory = enableStory,
+            disabledStory = disableStory
+        )
     )
 
 enum class StepTest : SimpleStoryStep {

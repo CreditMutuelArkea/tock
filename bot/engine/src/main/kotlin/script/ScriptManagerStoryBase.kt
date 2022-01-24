@@ -18,7 +18,9 @@ package ai.tock.bot.DialogManager
 
 import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.ScriptManager.ScriptStep.*
+import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
+import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
@@ -26,8 +28,6 @@ import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.Story
-import ai.tock.bot.engine.dialogManager.DialogManager
-import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener
@@ -64,6 +64,7 @@ class ScriptManagerStoryBase(
 
     private val storyDAO: StoryDefinitionConfigurationDAO by injector.instance()
 
+    private val storyDefinitionConfigurationDAO: StoryDefinitionConfigurationDAO get() = injector.provide()
     /**
      * List of deactivation stories.
      */
@@ -262,7 +263,7 @@ class ScriptManagerStoryBase(
                     keywordStory
                 )
         ).forEach {
-            (it.storyHandler as? StoryHandlerBase<*>)?.apply {
+            (it.scriptHandler as? StoryHandlerBase<*>)?.apply {
                 i18nNamespace = namespace
             }
         }
@@ -289,8 +290,8 @@ class ScriptManagerStoryBase(
     /**
      * Search story by storyHandler.
      */
-    fun findStoryByStoryHandler(storyHandler: ScriptHandler, applicationId: String): StoryDefinition? {
-        return stories.find { it.storyHandler == storyHandler }
+    override fun findStoryByStoryHandler(storyHandler: ScriptHandler, applicationId: String): StoryDefinition? {
+        return stories.find { it.scriptHandler == storyHandler }
     }
 
     /**
@@ -307,14 +308,14 @@ class ScriptManagerStoryBase(
         return stories.filter { it.tags.contains(tag) }
     }
 
-    override fun isEnableEndScript(namespace: String, botId: String, applicationId: String, scriptId: String): Boolean {
+    override fun findEnableEndScriptId(namespace: String, botId: String, applicationId: String, scriptDefinitionId: String): String? {
         //Check if there is a configuration for Ending story
         val storySetting = storyDAO.getStoryDefinitionsByNamespaceBotIdStoryId(
             namespace,
             botId,
-            scriptId
+            scriptDefinitionId
         )
-        return storySetting?.findEnabledEndWithStoryId(applicationId) == null
+        return storySetting?.findEnabledEndWithStoryId(applicationId)
     }
 
     override fun isDisabledIntent(intent: IntentAware?): Boolean {
@@ -342,6 +343,26 @@ class ScriptManagerStoryBase(
             } else {
                 storyDefinition.mainIntent().wrappedIntent()
             }
+        )
+    }
+
+    override fun mapScriptByIntent(): MutableMap<String, MutableList<ScriptDefinition>> {
+        val starterIntentsMap: MutableMap<String, MutableList<ScriptDefinition>> = mutableMapOf()
+        stories.map { s: StoryDefinition ->
+            s.starterIntents.forEach {
+                val l = starterIntentsMap.getOrPut(it.name()) { mutableListOf() }
+                l.add(s)
+            }
+        }
+        return starterIntentsMap
+    }
+
+    override fun createBuiltInScriptsIfNotExist(botDefinition: BotDefinition, configurationName: String?) {
+        storyDefinitionConfigurationDAO.createBuiltInStoriesIfNotExist(
+            stories.filter { it.mainIntent() != Intent.unknown }
+                .map { storyDefinition ->
+                    StoryDefinitionConfiguration(botDefinition, storyDefinition, configurationName)
+                }
         )
     }
 }

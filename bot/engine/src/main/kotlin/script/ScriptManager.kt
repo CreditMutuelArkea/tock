@@ -17,6 +17,7 @@
 package ai.tock.bot.DialogManager
 
 import ai.tock.bot.ScriptManager.ScriptStep
+import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialog.Dialog
@@ -35,8 +36,6 @@ interface ScriptManager {
 
     fun findIntent(intent: String, applicationId: String): IntentAware
 
-    fun isEnableEndScript(namespace: String, botId: String, applicationId: String, scriptId: String): Boolean
-
     fun getHandleAttachmentIntent(): IntentAware?
 
     fun getUserLocationIntent(): IntentAware?
@@ -48,5 +47,11 @@ interface ScriptManager {
     fun isEnabledIntent(intent: IntentAware?): Boolean
 
     fun createScript(intent: IntentAware?, applicationId: String): Script
+
+    fun findEnableEndScriptId(namespace: String, botId: String, applicationId: String, scriptDefinitionId: String): String?
+
+    fun mapScriptByIntent(): MutableMap<String, MutableList<ScriptDefinition>>
+
+    fun createBuiltInScriptsIfNotExist(botDefinition: BotDefinition, configurationName: String?)
 
 }

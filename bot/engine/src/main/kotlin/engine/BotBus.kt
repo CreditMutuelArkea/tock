@@ -16,15 +16,13 @@
 
 package ai.tock.bot.engine
 
+import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.ParameterKey
-import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.action.ActionPriority
@@ -41,13 +39,13 @@ import ai.tock.bot.engine.message.MessagesList
 import ai.tock.bot.engine.message.MessagesList.Companion.toMessageList
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
-import com.github.salomonbrys.kodein.instance
 import engine.dialogManager.step.Step
 
 /**
@@ -68,6 +66,9 @@ interface BotBus : Bus<BotBus> {
      * The bot definition of the current bot.
      */
     val botDefinition: BotDefinition
+
+    val scriptManager: ScriptManager
+        get() = botDefinition.scriptManager
 
     /**
      * Manager of Dialog, current, next and transition, to abstract the concret Dialogs and Scripts used
@@ -133,7 +134,7 @@ interface BotBus : Bus<BotBus> {
 
     // I18nTranslator implementation
     override val contextId: String?
-        get() = dialogManager.dialogId
+        get() = dialogManager.currentDialogId
 
     override val test: Boolean
         get() = userPreferences.test
@@ -426,28 +427,14 @@ interface BotBus : Bus<BotBus> {
      */
     fun reloadProfile()
 
-    //fun addSupport(action)
-
-    /**
-     * Switches the context to the specified story definition (start a new [Story]).
-     */
-    //TODO: à déplacer dans le dialogManager ?
-    fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent().wrappedIntent()) {
-        val story = Story(storyDefinition, starterIntent, story.step)
-        hasCurrentSwitchStoryProcess = true
-        story.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
-        currentDialog.state.currentIntent = starterIntent
-    }
-
     /**
      * Handles the action and switches the context to the specified story definition.
      */
-    //TODO: à déplacer dans le dialogManager ?
-    fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent().wrappedIntent()) {
-        switchStory(storyDefinition, starterIntent)
-        hasCurrentSwitchStoryProcess = false
+    fun handleAndSwitchScript(scriptDefinition: ScriptDefinition, starterIntent: IntentAware = scriptDefinition.mainIntent()) {
+        dialogManager.switchScript(scriptDefinition, starterIntent, null, action)
+        dialogManager.hasCurrentSwitchProcess = false
         @Suppress("UNCHECKED_CAST")
-        storyDefinition.storyHandler.handle(this)
+        scriptDefinition.scriptHandler.handle(this)
     }
 
     /**
@@ -480,6 +467,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Gets an i18n label with the specified key.
      */
+    /*
     //TODO: à déplacer dans le script manager ?
     fun i18nKey(key: String, defaultLabel: CharSequence, vararg args: Any?): I18nLabelValue =
         story.definition.storyHandler.let {
@@ -492,6 +480,7 @@ interface BotBus : Bus<BotBus> {
                     args.toList()
                 )
         }
+*/
 
     fun send(event: Event, delayInMs: Long = 0): BotBus {
         underlyingConnector.send(event, connectorData.callback, delayInMs)

@@ -21,11 +21,9 @@ import ai.tock.bot.definition.*
 import ai.tock.bot.definition.BotDefinition.Companion.defaultBreath
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.storyData.StoryDataStep
-import ai.tock.bot.engine.hasCurrentSwitchStoryProcess
 import ai.tock.shared.defaultNamespace
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nKeyProvider.Companion.generateKey
@@ -127,7 +125,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         val scriptManager: ScriptManagerStory = getScriptManager(bus)
         // if not supported user interface, use unknown
         if (storyDefinition?.unsupportedUserInterfaces?.contains(bus.userInterfaceType) == true) {
-            scriptManager.unknownStory.storyHandler.handle(bus)
+            scriptManager.unknownStory.scriptHandler.handle(bus)
         } else {
             // set current i18n provider
             bus.i18nProvider = this
@@ -165,8 +163,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
                         !bus.hasCurrentSwitchStoryProcess &&
                         !isEndCalled(bus)
                     ) {
-                        bus.dialogManager.
-                        logger.warn { "Bus.end not called for story ${bus.story.definition.id}, user ${bus.userId.id} and connector ${bus.targetConnectorType}" }
+                        logger.warn { "Bus.end not called for story ${bus.dialogManager.currentScriptDefinition.id}, user ${bus.userId.id} and connector ${bus.targetConnectorType}" }
                     }
                 }
             }
@@ -175,7 +172,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
 
     override fun support(bus: BotBus): Double {
         val scriptManager: ScriptManagerStory = getScriptManager(bus)
-        return if (bus.story.definition == scriptManager.unknownStory) {
+        return if (bus.dialogManager.currentScriptDefinition == scriptManager.unknownStory) {
             0.0
         } else {
             (bus.action as? SendSentence)?.nlpStats?.nlpResult?.intentProbability ?: 1.0
@@ -186,7 +183,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
      * Finds the story definition of this handler.
      */
     open fun findStoryDefinition(bus: BotBus): StoryDefinition? =
-        bus.botDefinition.findStoryByStoryHandler(this, bus.applicationId)
+        (bus.botDefinition.scriptManager as ScriptManagerStory).findStoryByStoryHandler(this, bus.applicationId)
 
     /**
      * Handles the action and switches the context to the underlying story definition.
@@ -194,7 +191,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
     fun handleAndSwitchStory(bus: BotBus) {
         findStoryDefinition(bus)
             ?.apply {
-                bus.switchStory(this)
+                bus.dialogManager.switchScript(this, action = bus.action)
             }
             ?: error("no story found for handler")
 

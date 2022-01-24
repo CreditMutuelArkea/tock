@@ -26,6 +26,7 @@ import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.model.NlpQuery
 import ai.tock.nlp.api.client.model.NlpResult
 
@@ -49,7 +50,7 @@ interface NlpListener {
      */
     fun precompute(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         dialog: DialogT<*,*>,
         botDefinition: BotDefinition
     ): NlpResult? = null
@@ -63,7 +64,7 @@ interface NlpListener {
      */
     fun updateQuery(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         dialog: DialogT<*,*>,
         botDefinition: BotDefinition,
         nlpQuery: NlpQuery
@@ -77,13 +78,13 @@ interface NlpListener {
      *
      * Default returns null.
      */
-    fun findIntent(userTimeline: UserTimeline, dialog: DialogT<*,*>, event: Event, nlpResult: NlpResult): IntentAware? = null
+    fun findIntent(userTimeline: UserTimelineT<*>, dialog: DialogT<*,*>, event: Event, nlpResult: NlpResult): IntentAware? = null
 
     /**
      * Allows custom entity evaluation - default returns empty list.
      */
     fun evaluateEntities(
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         dialog: DialogT<*,*>,
         event: Event,
         nlpResult: NlpResult

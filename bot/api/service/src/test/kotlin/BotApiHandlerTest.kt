@@ -89,6 +89,6 @@ class BotApiHandlerTest {
         handler.send(bus)
 
         verify { bus.setBusContextValue("_viewed_stories_tock_switch", any()) }
-        verify { bus.handleAndSwitchStory(any(), any()) }
+        verify { bus.handleAndSwitchScript(any(), any()) }
     }
 }

@@ -20,7 +20,6 @@ import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment
@@ -28,17 +27,13 @@ import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendLocation
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
-import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogT
-import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.dialogManager.DialogManagerFactory
-import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.feature.DefaultFeatureType
 import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.engine.user.UserTimelineT
-import ai.tock.bot.script.Script
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
@@ -142,10 +137,8 @@ internal class Bot(
             }
             connector.startTypingInAnswerTo(action, connectorData)
 
-            val dialogManager: DialogManager<DialogT<*, *>> =
-                DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
-
-            val script = getStory(dialogManager, scriptManager, action)
+            //val script = getStory(dialogManager, scriptManager, action)
+            val script = dialogManager.prepareNextAction(scriptManager, action)
 
             val bus = TockBotBus(connector, dialogManager, action, connectorData, botDefinition)
 
@@ -199,13 +192,10 @@ internal class Bot(
         userTimeline.dialogs.add(newDialog)
         return newDialog
     }
-*/
-
 
     private fun getStory(dialogManager: DialogManager<*>, scriptManager: ScriptManager, action: Action): Script {
         return dialogManager.prepareNextAction(scriptManager, action)
 
-/*
         val newIntent: IntentAware? = dialog.state.currentIntent
         val previousStory = dialog.currentScript
 
@@ -227,9 +217,8 @@ internal class Bot(
         action.state.step = story.step
 
         return story
-*/
     }
-
+*/
     private fun parseAction(
         action: Action,
         dialogManager: DialogManager<*>,
@@ -249,7 +238,7 @@ internal class Bot(
                 is SendSentence -> {
                     if (!action.hasEmptyText()) {
                         //TODO: là il y a un truc à faire ... ça touche au NLP donc à réfléchire sur la manière
-                        nlp.parseSentence(action, userTimeline, dialog, connector, botDefinition)
+                        nlp.parseSentence(action, dialogManager, connector, botDefinition)
                     }
                 }
                 else -> logger.warn { "${action::class.simpleName} not yet supported" }
@@ -280,7 +269,6 @@ internal class Bot(
             /*
             // restore state if it's possible (old dialog choice case)
             if (intent != Intent.unknown) {
-                // TODO use story id
                 val previousIntentName: String? = choice.previousIntent()
                 val applicationId: String = choice.applicationId
                 if (previousIntentName != null) {
@@ -332,7 +320,7 @@ internal class Bot(
         action.state.testEvent = userPreferences.test
     }
 
-    fun markAsUnknown(sendSentence: SendSentence, userTimeline: UserTimeline) {
+    fun markAsUnknown(sendSentence: SendSentence, userTimeline: UserTimelineT<*>) {
         nlp.markAsUnknown(sendSentence, userTimeline, botDefinition)
     }
 

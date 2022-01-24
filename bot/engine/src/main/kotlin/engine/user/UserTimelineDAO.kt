@@ -108,7 +108,7 @@ interface UserTimelineDAO {
     /**
      * Gets the snapshots of a dialog.
      */
-    fun getSnapshots(dialogId: Id<DialogT<*,*>>): List<Snapshot>
+    fun getSnapshots(dialogId: Id<*>): List<Snapshot>
 
     /**
      * Returns the last story id of the specified user, if any.

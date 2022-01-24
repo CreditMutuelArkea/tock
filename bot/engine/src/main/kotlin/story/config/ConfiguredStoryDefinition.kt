@@ -63,7 +63,7 @@ internal class ConfiguredStoryDefinition(
         setOf(configuration.mainIntent) +
             (configuration.storyDefinition(definition, configuration)?.starterIntents ?: emptySet())
 
-    override val storyHandler: ScriptHandler = ConfiguredStoryHandler(definition, configuration)
+    override val scriptHandler: ScriptHandler = ConfiguredStoryHandler(definition, configuration)
 
     override val steps: Set<SimpleStoryStep> =
         (configuration.storyDefinition(definition, configuration)?.steps ?: emptySet()) +

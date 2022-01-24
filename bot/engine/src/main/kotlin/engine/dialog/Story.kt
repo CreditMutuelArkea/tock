@@ -152,7 +152,7 @@ data class Story(
      * Handles a request.
      */
     override fun handle(bus: BotBus) {
-        definition.storyHandler.apply {
+        definition.scriptHandler.apply {
             try {
                 if (sendStartEvent(bus)) {
                     handle(bus)
@@ -166,7 +166,7 @@ data class Story(
     /**
      * What is the probability of this request support?
      */
-    fun support(bus: BotBus): Double = definition.storyHandler.support(bus)
+    fun support(bus: BotBus): Double = definition.scriptHandler.support(bus)
 
     /**
      * Does this story supports the action ?

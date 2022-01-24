@@ -21,7 +21,9 @@ import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogT
+import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.model.dump.ApplicationDump
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
 import ai.tock.nlp.api.client.model.dump.SentencesDump
@@ -36,10 +38,16 @@ interface NlpController {
     /**
      * Parses a sentence and set intent and entities in context.
      */
+    /*fun parseSentence(
+        sentence: SendSentence,
+        userTimeline: UserTimelineT<*>,
+        dialog: DialogT<*,*>,
+        connector: ConnectorController,
+        botDefinition: BotDefinition
+    )*/
     fun parseSentence(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
-        dialog: DialogT<*,*>,
+        dialogManager: DialogManager<*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     )
@@ -49,7 +57,7 @@ interface NlpController {
      */
     fun markAsUnknown(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         botDefinition: BotDefinition
     )
 

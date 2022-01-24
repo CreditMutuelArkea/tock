@@ -38,7 +38,7 @@ interface StoryDefinition : ScriptDefinition, IntentAware {
     /**
      * The story handler of the story.
      */
-    val storyHandler: ScriptHandler
+    //val storyHandler: ScriptHandler
 
     /**
      * The root steps of the story.

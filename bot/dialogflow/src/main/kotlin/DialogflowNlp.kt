@@ -22,11 +22,13 @@ import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.nlp.api.client.model.NlpQuery
 import ai.tock.nlp.api.client.model.NlpQueryContext
@@ -256,8 +258,8 @@ internal class DialogflowNlp : NlpController {
 
     override fun parseSentence(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
-        dialog: Dialog,
+        userTimeline: UserTimelineT<*>,
+        dialog: DialogT<*,*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     ) {

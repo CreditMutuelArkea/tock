@@ -30,7 +30,7 @@ import ai.tock.translator.UserInterfaceType
  */
 open class StoryDefinitionBase(
     val name: String,
-    override val storyHandler: ScriptHandler = {} as SimpleStoryHandlerBase,
+    override val scriptHandler: ScriptHandler = {} as SimpleStoryHandlerBase,
     otherStarterIntents: Set<IntentAware> = emptySet(),
     secondaryIntents: Set<IntentAware> = emptySet(),
     stepsList: List<SimpleStoryStep> = emptyList(),
@@ -59,7 +59,7 @@ open class StoryDefinitionBase(
     override val intents: Set<IntentAware> =
         setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.wrappedIntent() }.toSet()
 
-    open fun handle(bus: BotBus) = storyHandler.handle(bus)
+    open fun handle(bus: BotBus) = scriptHandler.handle(bus)
 
     override fun toString(): String = "Story[$name]"
 }

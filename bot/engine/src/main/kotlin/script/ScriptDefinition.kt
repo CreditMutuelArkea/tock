@@ -18,6 +18,7 @@ package ai.tock.bot.script
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.translator.UserInterfaceType
 
@@ -27,6 +28,11 @@ interface ScriptDefinition : IntentAware {
      * An unique identifier for a given bot.
      */
     val id: String
+
+    /**
+     * The story handler of the story.
+     */
+    val scriptHandler: ScriptHandler
 
     /**
      * One or more intents that start the story.

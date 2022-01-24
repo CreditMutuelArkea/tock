@@ -87,7 +87,7 @@ class BotBusTest : BotEngineTest() {
     @Test
     fun `handleAndSwitchStory switch story and run the new handler`() {
         assertEquals(test, bus.story.definition)
-        bus.handleAndSwitchStory(test2)
+        bus.handleAndSwitchScript(test2)
         assertEquals(test2, bus.story.definition)
         verify {
             connector.send(
@@ -215,7 +215,7 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `handleAndSwitchStory remove the switch story key`() {
-        bus.handleAndSwitchStory(test2)
+        bus.handleAndSwitchScript(test2)
         assertFalse(bus.hasCurrentSwitchStoryProcess)
     }
 
@@ -233,13 +233,13 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `handleAndSwitchStory set starterIntent to mainIntent in currentStory of dialog by default`() {
-        bus.handleAndSwitchStory(story_with_other_starter)
+        bus.handleAndSwitchScript(story_with_other_starter)
         assertTrue(story_with_other_starter.wrap(bus.dialog.currentStory!!.starterIntent))
     }
 
     @Test
     fun `handleAndSwitchStory set starterIntent in currentStory of dialog if specified`() {
-        bus.handleAndSwitchStory(story_with_other_starter, secondaryIntent)
+        bus.handleAndSwitchScript(story_with_other_starter, secondaryIntent)
         assertTrue(secondaryIntent.wrap(bus.dialog.currentStory!!.starterIntent))
     }
 
@@ -255,7 +255,7 @@ class BotBusTest : BotEngineTest() {
     fun `GIVEN sendChoice with step WHEN switchStory THEN step of send choice is not forced`() {
         userAction = action(Choice("test", StepTest.s1))
         bus.step = StepTest.s2
-        bus.handleAndSwitchStory(test2)
+        bus.handleAndSwitchScript(test2)
         assertEquals(test, bus.dialog.stories[0].definition)
         assertEquals(test2, bus.dialog.stories[1].definition)
         assertEquals(StepTest.s2, bus.step)

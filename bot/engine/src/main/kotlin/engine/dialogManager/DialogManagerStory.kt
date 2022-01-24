@@ -27,7 +27,9 @@ import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.user.UserPreferences
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.bot.script.Script
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
@@ -39,13 +41,19 @@ class DialogManagerStory(
     private val userTimeline: UserTimeline
 ): DialogManager<Dialog> {
 
-    //TODO: il faudrait sans doute prévoir une recopie de la usertimeline
-    // pour être certain qu'il n'y ai pas de corruption de la liste des dialogues par un process externe
     constructor(userTimeline: UserTimeline, action: Action) : this(userTimeline) {
         if(userTimeline.dialogs.isEmpty()) {
             userTimeline.dialogs.add(Dialog(setOf(userTimeline.playerId, action.recipientId)))
         }
     }
+
+    //TODO: pour que le NLP compile
+    override val userTimelineT: UserTimelineT<*>
+        get() = userTimeline
+
+    //TODO: pour que le NLP compile
+    override val dialogT: DialogT<*, *>
+        get() = currentDialog
 
     /**
      * The current dialog for this user (may be different from the initial [dialog]).
@@ -61,6 +69,9 @@ class DialogManagerStory(
         set(value) {
             currentDialog.scripts.add(value)
         }
+
+    override val currentScriptDefinition: ScriptDefinition
+        get() = currentStory.definition
 
     override val userPreferences: UserPreferences = userTimeline.userPreferences
 
@@ -79,7 +90,7 @@ class DialogManagerStory(
             currentDialog.state.currentIntent = currentIntent
         }
 
-    override val dialogId: String
+    override val currentDialogId: String
         get() = currentDialog.id.toString()
 
     override val entityValues: Map<String, EntityStateValue>
@@ -102,6 +113,10 @@ class DialogManagerStory(
     override fun changeCurrentStep(stepName: String?) {
         currentDialog.currentScript?.step = stepName
     }
+
+    override fun currentScriptHasSteps(): Boolean =
+        currentDialog.currentScript?.definition?.steps?.isNotEmpty() ?: false
+
 
     override fun changeState(role: String, newValue: EntityValue?) {
         currentDialog.state.changeValue(role, newValue)
@@ -169,6 +184,7 @@ class DialogManagerStory(
     override fun prepareNextAction(scriptManager: ScriptManager, action: Action): Script {
         val story =
             if(!supportAction(action)) {
+                //TODO: petite correction, il faudrait sans doute passé l'intention en paramètre
                 val newStory = scriptManager.createScript(currentIntent, action.applicationId) as Story
                 currentDialog.scripts.add(newStory)
                 newStory
@@ -219,4 +235,32 @@ class DialogManagerStory(
         currentDialog.state.currentIntent = intent
     }
 
+    override fun markAsUnknow(provider: (UserTimelineT<*>) -> Unit) {
+        provider.invoke(userTimeline)
+    }
+
+    /**
+     * Switches the context to the specified story definition (start a new [Story]).
+     */
+    override fun switchScript(storyDefinition: ScriptDefinition, starterIntent: IntentAware, step: String?, action: Action) {
+        // switch story if new story
+        if (storyDefinition.id != currentStory.definition.id) {
+            storyDefinition as StoryDefinition
+            currentStory = Story(storyDefinition, starterIntent.wrappedIntent(), currentStory.step)
+            hasCurrentSwitchProcess = true
+            currentDialog.state.currentIntent = starterIntent
+        }
+
+        // set step
+        if (step != null) {
+            currentStory.step = step
+        } else {
+            currentStory.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
+        }
+    }
+
+    override fun isCurrentScriptDefinition(scriptDefinition: ScriptDefinition): Boolean {
+        scriptDefinition as StoryDefinition
+        return currentStory.definition.equals(scriptDefinition)
+    }
 }

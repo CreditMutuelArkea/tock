@@ -27,7 +27,7 @@ import ai.tock.translator.UserInterfaceType
  */
 open class SimpleStoryDefinition(
     override val id: String,
-    override val storyHandler: ScriptHandler,
+    override val scriptHandler: ScriptHandler,
     override val starterIntents: Set<IntentAware>,
     /**
      * starter intents + other intents supported by the story.
@@ -49,7 +49,7 @@ open class SimpleStoryDefinition(
     ) :
         this(
             id = id,
-            storyHandler = storyHandler,
+            scriptHandler = storyHandler,
             starterIntents = starterIntents.map { it.wrappedIntent() }.toSet(),
             intents = intents.map { it.wrappedIntent() }.toSet(),
             steps = steps.toSet(),

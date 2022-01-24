@@ -17,7 +17,6 @@
 package ai.tock.bot.api.service
 
 import ai.tock.bot.admin.bot.BotConfiguration
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.api.model.BotResponse
 import ai.tock.bot.api.model.UserRequest
 import ai.tock.bot.api.model.configuration.ClientConfiguration
@@ -31,7 +30,6 @@ import ai.tock.bot.connector.media.MediaAction
 import ai.tock.bot.connector.media.MediaCard
 import ai.tock.bot.connector.media.MediaCarousel
 import ai.tock.bot.connector.media.MediaFile
-import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendAttachment.AttachmentType
@@ -39,27 +37,26 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.config.UploadedFilesService
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.api.client.model.EntityType
-import ai.tock.shared.injector
 import ai.tock.translator.I18nContext
 import ai.tock.translator.TranslatedSequence
 import ai.tock.translator.Translator
 import ai.tock.translator.raw
-import com.github.salomonbrys.kodein.instance
 
 internal class BotApiHandler(
     provider: BotApiDefinitionProvider,
     configuration: BotConfiguration,
     private val clientController: BotApiClientController = BotApiClientController(provider, configuration),
 ) {
-    private val BotBus.viewedStories: Set<StoryDefinition>
+    private val BotBus.viewedScripts: Set<ScriptDefinition>
         get() {
-           return getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
+           return getBusContextValue<Set<ScriptDefinition>>(VIEWED_SCRIPTS_BUS_KEY) ?: emptySet()
         }
 
     companion object {
-        private const val VIEWED_STORIES_BUS_KEY = "_viewed_stories_tock_switch"
+        private const val VIEWED_SCRIPTS_BUS_KEY = "_viewed_scripts_tock_switch"
     }
 
     fun configuration(): ClientConfiguration? = clientController.configuration()
@@ -72,7 +69,11 @@ internal class BotApiHandler(
 
     private fun BotBus.handleResponse(request: UserRequest, response: BotResponse?) {
         if (response != null) {
-            val isEnd: Boolean = botDefinition.scriptManager.isEnableEndScript(botDefinition.namespace, botDefinition.botId, applicationId)
+            val scriptDefinitionId: String = dialogManager.currentScriptDefinition.id
+            val endScriptId: String? = scriptManager.findEnableEndScriptId(botDefinition.namespace,
+                botDefinition.botId,
+                applicationId,
+                scriptDefinitionId)
 
             val messages = response.messages
             if (messages.isEmpty()) {
@@ -83,7 +84,7 @@ internal class BotApiHandler(
                     send(a)
                 }
             messages.last().apply {
-                send(this, isEnd)
+                send(this, endScriptId != null)
             }
             // handle entity changes
             entities
@@ -115,37 +116,22 @@ internal class BotApiHandler(
                 }
             }
 
-            try {
-                //TODO : à déplacer dans le scriptManager Story (ou le dialog manager)
+            val scriptDefinition: ScriptDefinition = scriptManager.findScriptDefinitionById(response.storyId, applicationId)
 
-                // switch story if new story
-                if (response.storyId != request.storyId) {
-                    botDefinition.findStoryDefinitionById(response.storyId, request.context.applicationId)
-                        .also {
-                            switchStory(it)
-                        }
-                }
-                // set step
-                if (response.step != null) {
-                    step = story.definition.allSteps().find { it.name == response.step }
-                }
+            dialogManager.switchScript(scriptDefinition = scriptDefinition, step = response.step, action = action)
 
-                //Handle current story and switch to ending story
-                if (endingStoryId != null) {
-                    val targetStory = botDefinition.findStoryDefinitionById(endingStoryId, applicationId)
-                    switchEndingStory(targetStory)
-                }
-            } finally {
-                //TODO : supper le try , c'est juste pour faire jolie
+            //Handle current story and switch to ending story
+            if (endScriptId != null) {
+                val targetStory = scriptManager.findScriptDefinitionById(endScriptId, applicationId)
+                switchEndingScript(targetStory)
             }
-
         }
     }
 
-    private fun BotBus.switchEndingStory(target: StoryDefinition) {
-        step = step?.takeUnless { story.definition == target }
-        setBusContextValue(VIEWED_STORIES_BUS_KEY, viewedStories + target)
-        handleAndSwitchStory(target)
+    private fun BotBus.switchEndingScript(target: ScriptDefinition) {
+        step = step?.takeUnless { dialogManager.isCurrentScriptDefinition(target) }
+        setBusContextValue(VIEWED_SCRIPTS_BUS_KEY, viewedScripts + target)
+        handleAndSwitchScript(target)
     }
 
 

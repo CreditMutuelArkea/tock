@@ -19,6 +19,7 @@ package ai.tock.bot.DialogManager
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.dialogManager.StoryDefinition
 
 interface ScriptManagerStory : ScriptManager {
@@ -137,4 +138,5 @@ interface ScriptManagerStory : ScriptManager {
 
     fun findStoryDefinition(intent: String?, applicationId: String): StoryDefinition
 
+    fun findStoryByStoryHandler(storyHandler: ScriptHandler, applicationId: String): StoryDefinition?
 }

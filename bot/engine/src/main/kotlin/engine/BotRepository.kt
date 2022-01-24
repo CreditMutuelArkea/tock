@@ -34,8 +34,6 @@ import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.story.config.StoryConfigurationMonitor
@@ -45,6 +43,7 @@ import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.nlp.NlpListener
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.shared.Executor
 import ai.tock.shared.defaultLocale
@@ -246,29 +245,16 @@ object BotRepository {
      * Register built-in story definitions.
      */
     fun registerBuiltInStoryDefinitions(botProvider: BotProvider) {
-       // botProvider.botDefinition().scriptManager.registerBuiltIn()
         val botDefinition = botProvider.botDefinition()
-        checkBuiltInStoryCompliance(botDefinition)
-        val configurationName = botProvider.botProviderId.configurationName
+        checkBuiltInScriptCompliance(botDefinition)
+        val configurationName: String? = botProvider.botProviderId.configurationName
         executor.executeBlocking {
-            storyDefinitionConfigurationDAO.createBuiltInStoriesIfNotExist(
-                botDefinition.stories
-                    .filter { it.mainIntent() != Intent.unknown }
-                    .map { storyDefinition ->
-                        StoryDefinitionConfiguration(botDefinition, storyDefinition, configurationName)
-                    }
-            )
+            botDefinition.scriptManager.createBuiltInScriptsIfNotExist(botDefinition, configurationName)
         }
     }
 
-    private fun checkBuiltInStoryCompliance(botDefinition: BotDefinition) {
-        val starterIntentsMap: MutableMap<String, MutableList<StoryDefinition>> = mutableMapOf()
-        botDefinition.stories.map { s ->
-            s.starterIntents.forEach {
-                val l = starterIntentsMap.getOrPut(it.name()) { mutableListOf() }
-                l.add(s)
-            }
-        }
+    private fun checkBuiltInScriptCompliance(botDefinition: BotDefinition) {
+        val starterIntentsMap: MutableMap<String, MutableList<ScriptDefinition>> = botDefinition.scriptManager.mapScriptByIntent()
         val duplicates = starterIntentsMap.mapValues { s -> s.value.distinctBy { it.id } }.filter { it.value.size > 1 }
         if (duplicates.isNotEmpty()) {
             error("duplicate starter intents: $duplicates")

@@ -25,7 +25,9 @@ import ai.tock.bot.engine.TockConnectorController
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.api.client.model.NlpEntityValue
@@ -66,7 +68,7 @@ internal class Nlp : NlpController {
     private class SentenceParser(
         val nlpClient: NlpClient,
         val sentence: SendSentence,
-        val userTimeline: UserTimeline,
+        val userTimeline: UserTimelineT<*>,
         val dialog: DialogT<*,*>,
         val connector: TockConnectorController,
         val botDefinition: BotDefinition
@@ -136,7 +138,7 @@ internal class Nlp : NlpController {
         }
 
         private fun findIntent(
-            userTimeline: UserTimeline,
+            userTimeline: UserTimelineT<*>,
             dialog: DialogT<*,*>,
             sentence: SendSentence,
             nlpResult: NlpResult
@@ -390,24 +392,25 @@ internal class Nlp : NlpController {
 
     override fun parseSentence(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
-        dialog: DialogT<*,*>,
+        dialogManager: DialogManager<*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     ) {
 
         BotRepository.forEachNlpListener {
-            val result = it.precompute(sentence, userTimeline, dialog, botDefinition)
+            //TODO: à ne pas faire, la userTimeline et le dialog manager n'ont pas à être partager par le dialog manager
+            val result = it.precompute(sentence, dialogManager.userTimelineT, dialogManager.dialogT, botDefinition)
             if (result != null) {
                 sentence.precomputedNlp = result
             }
         }
 
+        //TODO: ici non plus
         SentenceParser(
             nlpClient,
             sentence,
-            userTimeline,
-            dialog,
+            dialogManager.userTimelineT,
+            dialogManager.dialogT,
             connector as TockConnectorController,
             botDefinition
         ).parse()
@@ -415,7 +418,7 @@ internal class Nlp : NlpController {
 
     override fun markAsUnknown(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         botDefinition: BotDefinition
     ) {
         if (sentence.stringText != null) {

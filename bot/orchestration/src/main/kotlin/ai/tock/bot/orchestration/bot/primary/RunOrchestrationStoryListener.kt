@@ -201,10 +201,10 @@ class RunOrchestrationStoryListener(
                 orchestrationRepository.end(orchestration.playerId)
 
                 if (orchestration.targetBot.fallbackStory != null) {
-                    handleAndSwitchStory(orchestration.targetBot.fallbackStory)
+                    handleAndSwitchScript(orchestration.targetBot.fallbackStory)
                 } else {
                     end("Damn, the conversation with ${orchestration.targetBot.botLabel} was interrupted.")
-                    handleAndSwitchStory(configuration.comebackStory)
+                    handleAndSwitchScript(configuration.comebackStory)
                 }
                 false
             }
