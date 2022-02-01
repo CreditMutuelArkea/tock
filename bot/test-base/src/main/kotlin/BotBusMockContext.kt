@@ -73,7 +73,7 @@ data class BotBusMockContext(
             Story(storyDefinition, storyDefinition.mainIntent().wrappedIntent()),
             action,
             botDefinition,
-            storyDefinition.storyHandler as I18nKeyProvider,
+            storyDefinition.scriptHandler  as I18nKeyProvider,
             userInterfaceType,
             connectorType,
             testContext

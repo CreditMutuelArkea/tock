@@ -56,18 +56,21 @@ interface Step<T> {
      * If not null and if the current intent is equals to [intent],
      * this step will be automatically selected to be the current step.
      */
-    val intent: IntentAware? get() = null
+    val intent: IntentAware?
+        get() = null
 
     /**
      * Same behaviour than [intent] in the rare case when the step handle more than one intent.
      */
-    val otherStarterIntents: Set<IntentAware> get() = emptySet()
+    val otherStarterIntents: Set<IntentAware>
+        get() = emptySet()
 
     /**
      * The secondary intents of this step. If detected and if the current step is this step,
      * the current step remains this step.
      */
-    val secondaryIntents: Set<IntentAware> get() = emptySet()
+    val secondaryIntents: Set<IntentAware>
+        get() = emptySet()
 
     /**
      * Does this Step has to be selected from the Bus?

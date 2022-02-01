@@ -84,6 +84,8 @@ class Connector2(context: Def2) : ConnectorDef<Def2>(context)
 
 enum class Step2 : StoryDataStep<Def2, StoryData, StoryData2> {
     s1 {
+        override val baseIntent: IntentAware
+            get() = TODO("Not yet implemented")
 
         override fun checkPreconditions(): BotBus.(StoryData?) -> StoryData2? = {
             changeContextValue("myValue", entityText("entity"))
@@ -99,9 +101,16 @@ enum class Step2 : StoryDataStep<Def2, StoryData, StoryData2> {
 
             end("at {0}?", data?.departureDate)
         }
+
     },
 
-    s2
+    s2 {
+        override val baseIntent: IntentAware
+            get() = TODO("Not yet implemented")
+    }
 }
 
-object Step3 : StoryDataStepBase<Def2, StoryData, EmptyData>(reply = { "ok" })
+object Step3 : StoryDataStepBase<Def2, StoryData, EmptyData>(reply = { "ok" }) {
+    override val baseIntent: IntentAware
+        get() = TODO("Not yet implemented")
+}

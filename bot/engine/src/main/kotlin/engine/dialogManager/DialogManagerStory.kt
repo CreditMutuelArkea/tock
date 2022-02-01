@@ -18,6 +18,7 @@ package ai.tock.bot.engine.dialogManager
 
 import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.DialogManager.ScriptManagerStory
+import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
@@ -31,19 +32,21 @@ import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.bot.script.Script
 import ai.tock.bot.script.ScriptDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
+import ai.tock.translator.I18nLabelValue
 
-class DialogManagerStory(
+class DialogManagerStory private constructor(
     /**
      * The user timeline. Gets history and data about the user.
      */
     private val userTimeline: UserTimeline
 ): DialogManager<Dialog> {
 
-    constructor(userTimeline: UserTimeline, action: Action) : this(userTimeline) {
-        if(userTimeline.dialogs.isEmpty()) {
-            userTimeline.dialogs.add(Dialog(setOf(userTimeline.playerId, action.recipientId)))
+    constructor(userTimeline: UserTimeline, dialog: Dialog? = null) : this(userTimeline) {
+        if(dialog != null) {
+            userTimeline.dialogs.add(dialog)
         }
     }
 
@@ -262,5 +265,21 @@ class DialogManagerStory(
     override fun isCurrentScriptDefinition(scriptDefinition: ScriptDefinition): Boolean {
         scriptDefinition as StoryDefinition
         return currentStory.definition.equals(scriptDefinition)
+    }
+
+    /**
+     * Gets an i18n label with the specified key.
+     */
+    override fun i18nKey(botDefinition: BotDefinition, key: String, defaultLabel: CharSequence, vararg args: Any?): I18nLabelValue {
+        return currentStory.definition.scriptHandler.let {
+            (it as? StoryHandlerBase<*>)?.i18nKey(key, defaultLabel, *args)
+                ?: I18nLabelValue(
+                    key,
+                    botDefinition.namespace,
+                    botDefinition.botId,
+                    defaultLabel,
+                    args.toList()
+                )
+        }
     }
 }

@@ -41,7 +41,7 @@ open class SimpleStoryDefinition(
 
     constructor(
         id: String,
-        storyHandler: ScriptHandler,
+        scriptHandler: ScriptHandler,
         steps: Array<out SimpleStoryStep> = emptyArray(),
         starterIntents: Set<IntentAware>,
         intents: Set<IntentAware> = starterIntents,
@@ -49,7 +49,7 @@ open class SimpleStoryDefinition(
     ) :
         this(
             id = id,
-            scriptHandler = storyHandler,
+            scriptHandler = scriptHandler,
             starterIntents = starterIntents.map { it.wrappedIntent() }.toSet(),
             intents = intents.map { it.wrappedIntent() }.toSet(),
             steps = steps.toSet(),

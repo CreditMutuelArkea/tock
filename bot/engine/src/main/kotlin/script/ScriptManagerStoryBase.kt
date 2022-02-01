@@ -290,8 +290,8 @@ class ScriptManagerStoryBase(
     /**
      * Search story by storyHandler.
      */
-    override fun findStoryByStoryHandler(storyHandler: ScriptHandler, applicationId: String): StoryDefinition? {
-        return stories.find { it.scriptHandler == storyHandler }
+    override fun findStoryByStoryHandler(scriptHandler: ScriptHandler, applicationId: String): StoryDefinition? {
+        return stories.find { it.scriptHandler == scriptHandler }
     }
 
     /**

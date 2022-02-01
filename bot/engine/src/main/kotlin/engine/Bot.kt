@@ -32,7 +32,6 @@ import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.dialogManager.DialogManagerFactory
 import ai.tock.bot.engine.feature.DefaultFeatureType
 import ai.tock.bot.engine.nlp.NlpController
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
@@ -166,14 +165,14 @@ internal class Bot(
     /**
      * Does this action trigger bot deactivation ?
      */
-    private fun canDisableBot(currentIntent: IntentAware?, action: Action): Boolean =
+    fun canDisableBot(currentIntent: IntentAware?, action: Action): Boolean =
         currentIntent?.let {action.state.notification
               || scriptManager.isDisabledIntent(it) }?:false
 
     /**
      * Does this action trigger bot activation ?
      */
-    private fun canEnableBot(currentIntent: IntentAware?, action: Action): Boolean {
+    fun canEnableBot(currentIntent: IntentAware?, action: Action): Boolean {
         return currentIntent?.let {
                     scriptManager.isEnabledIntent(it)
                             // send choice can reactivate disabled bot (if the intent is not a disabled intent)

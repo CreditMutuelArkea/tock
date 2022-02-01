@@ -16,23 +16,14 @@
 
 package ai.tock.bot.engine.config
 
-import ai.tock.bot.DialogManager.ScriptManager
 import ai.tock.bot.DialogManager.ScriptManagerStory
-import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
-import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.definition.StoryTag
-import ai.tock.bot.engine.action.Action
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.DialogT
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.story.config.ConfiguredStoryDefinition
 import ai.tock.bot.story.dialogManager.handler.StoryHandler
 import mu.KotlinLogging
@@ -174,14 +165,14 @@ internal class ScriptManagerStoryWrapper(
             }
         }
 
-    fun findStoryDefinitionById(storyId: String, applicationId: String): StoryDefinition =
+    override fun findScriptDefinitionById(storyId: String, applicationId: String): StoryDefinition =
         // first search into built-in then in configured, fallback to search by intent
         builtInStoriesMap[storyId]
             ?: allStoriesById[storyId]?.checkApplicationId(applicationId)
             ?: findStoryDefinition(storyId, applicationId)
 
-    fun findStoryByStoryHandler(storyHandler: StoryHandler, applicationId: String): StoryDefinition? {
-        val byStoryHandler: (StoryDefinition)->Boolean = { it.scriptHandler == storyHandler }
+    fun findScriptByStoryHandler(scriptHandler: StoryHandler, applicationId: String): StoryDefinition? {
+        val byStoryHandler: (StoryDefinition)->Boolean = { it.scriptHandler == scriptHandler }
         val storieDefinition: StoryDefinition? = scriptManager.stories.find(byStoryHandler) ?: stories.find(byStoryHandler)
         return storieDefinition?.checkApplicationId(applicationId)
     }

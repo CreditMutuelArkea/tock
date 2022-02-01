@@ -21,15 +21,12 @@ import ai.tock.bot.engine.BotEngineTest
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.DialogState
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.EntityValue
-import ai.tock.bot.engine.dialog.NextUserActionState
+import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.test
 import ai.tock.bot.engine.test2
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.model.NlpIntentQualifier
 import ai.tock.nlp.api.client.model.NlpQuery
 import ai.tock.nlp.api.client.model.NlpResult
@@ -50,7 +47,7 @@ class NlpTest : BotEngineTest() {
 
     @Test
     fun parseSentence_shouldCallNlpClientParse_whenExpectedIntentIsNullInDialogState() {
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
         verify { nlpClient.parse(any()) }
         verify(exactly = 0) { nlpClient.parse(match { it.intentsSubset.isNotEmpty() }) }
     }
@@ -58,7 +55,7 @@ class NlpTest : BotEngineTest() {
     @Test
     fun `GIVEN intent qualifiers not null in dialog state THEN parse is_called with intentsSubset not empty`() {
         dialog.state.nextActionState = NextUserActionState(listOf(NlpIntentQualifier("test2")))
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
         verify { nlpClient.parse(match { it.intentsSubset.isNotEmpty() }) }
         verify(exactly = 0) { nlpClient.parse(match { it.intentsSubset.isEmpty() }) }
     }
@@ -69,7 +66,7 @@ class NlpTest : BotEngineTest() {
             NextUserActionState(listOf(NlpIntentQualifier("test3", 0.2), NlpIntentQualifier("test2", 0.5)))
         every { nlpClient.parse(any()) } returns nlpResult
         val sentence = userAction as SendSentence
-        Nlp().parseSentence(sentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(sentence, dialogManagerStory, connectorController, botDefinition)
         assertEquals("test2", sentence.nlpStats?.intentResult?.name())
     }
 
@@ -77,7 +74,7 @@ class NlpTest : BotEngineTest() {
     fun parseSentence_shouldNotRegisterQuery_whenBotIsDisabled() {
 
         userTimeline.userState.botDisabled = true
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
 
         val slot = slot<NlpQuery>()
         verify {
@@ -91,7 +88,7 @@ class NlpTest : BotEngineTest() {
     @Test
     fun parseSentence_shouldRegisterQuery_whenBotIsNotDisabledAndItIsNotATestContext() {
 
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
 
         val slot = slot<NlpQuery>()
         verify {
@@ -111,8 +108,8 @@ class NlpTest : BotEngineTest() {
         val customValue = EntityValue(entityB, object : Value {}, "b")
         val nlpListener = object : NlpListener {
             override fun evaluateEntities(
-                userTimeline: UserTimeline,
-                dialog: Dialog,
+                userTimeline: UserTimelineT<*>,
+                dialog: DialogT<*, *>,
                 event: Event,
                 nlpResult: NlpResult
             ): List<EntityValue> {
@@ -120,7 +117,7 @@ class NlpTest : BotEngineTest() {
             }
         }
         BotRepository.registerNlpListener(nlpListener)
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
 
         assertEquals(5, userAction.state.entityValues.size)
         assertTrue(userAction.state.entityValues.contains(customValue))
@@ -136,8 +133,8 @@ class NlpTest : BotEngineTest() {
 
         val nlpListener = object : NlpListener {
             override fun findIntent(
-                userTimeline: UserTimeline,
-                dialog: Dialog,
+                userTimeline: UserTimelineT<*>,
+                dialog: DialogT<*, *>,
                 event: Event,
                 nlpResult: NlpResult
             ): IntentAware? {
@@ -145,7 +142,7 @@ class NlpTest : BotEngineTest() {
             }
         }
         BotRepository.registerNlpListener(nlpListener)
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
 
         assertEquals(test2.wrappedIntent(), dialog.state.currentIntent)
         assertEquals(test2.wrappedIntent(), (userAction as SendSentence).nlpStats?.intentResult)
@@ -178,7 +175,7 @@ class NlpTest : BotEngineTest() {
                 }
         }
         BotRepository.registerNlpListener(nlpListener)
-        Nlp().parseSentence(userAction as SendSentence, userTimeline, dialog, connectorController, botDefinition)
+        Nlp().parseSentence(userAction as SendSentence, dialogManagerStory, connectorController, botDefinition)
 
         verify { nlpClient.mergeValues(any()) }
         val query = mergeQuery.captured

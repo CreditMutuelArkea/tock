@@ -17,6 +17,9 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.engine.*
+import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.translator.UserInterfaceType
 import org.junit.jupiter.api.Test
@@ -30,9 +33,10 @@ class StoryHandlerBaseTest : BotEngineTest() {
 
     @Test
     fun handleAndSwitchStory_shouldCreateANewStory_IfStoryHandlerFound() {
-        assertEquals(test, bus.story.definition)
+        //TODO: C'est pas bon du tout, il faut changer ce test
+        assertEquals(test, (((bus.dialogManager as DialogManagerStory).dialogT as Dialog).currentScript as Story).definition)
         StoryHandler2Test.handleAndSwitchStory(bus)
-        assertEquals(test2, bus.story.definition)
+        assertEquals(test2, (((bus.dialogManager as DialogManagerStory).dialogT as Dialog).currentScript as Story).definition)
     }
 
     @Test

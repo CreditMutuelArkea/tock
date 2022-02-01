@@ -19,8 +19,8 @@ package ai.tock.bot.definition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.user.UserTimeline
+import engine.dialogManager.step.Step
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -33,16 +33,18 @@ class StoryStepTest {
     private val dialog: Dialog = mockk()
     private val action: Action = mockk()
 
-    private object Step1 : StoryStep<StoryHandlerDefinition> {
+    private object Step1 : Step<StoryHandlerDefinition> {
         override val name: String = "step1"
-        override val intent: IntentAware? = Intent("test")
-        override val entityStepSelection: EntityStepSelection? = EntityStepSelection("a", "role", "type")
+        override val intent: IntentAware = Intent("test")
+        override val entityStepSelection: EntityStepSelection = EntityStepSelection("a", "role", "type")
+        override val baseIntent: IntentAware = intent
     }
 
-    private object Step2 : StoryStep<StoryHandlerDefinition> {
+    private object Step2 : Step<StoryHandlerDefinition> {
         override val name: String = "step2"
-        override val intent: IntentAware? = Intent("test")
-        override val entityStepSelection: EntityStepSelection? = EntityStepSelection(null, "role", "type")
+        override val intent: IntentAware = Intent("test")
+        override val entityStepSelection: EntityStepSelection = EntityStepSelection(null, "role", "type")
+        override val baseIntent: IntentAware = Step1.intent
     }
 
     @Test

@@ -22,9 +22,7 @@ import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.user.PlayerId
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.api.client.model.EntityType
@@ -104,7 +102,6 @@ interface BotDefinition : I18nKeyProvider {
     fun findIntent(intent: String, applicationId: String): IntentAware {
         return scriptManager.findIntent(intent, applicationId)
     }
-
 
     /**
      * Called when error occurs. By default send "technical error".

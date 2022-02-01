@@ -18,8 +18,8 @@ package ai.tock.bot.engine.dialog
 
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.user.UserTimeline
 import io.mockk.every
 import io.mockk.mockk
@@ -42,12 +42,12 @@ class StoryTest {
 
     @Test
     fun `multi-entities action triggers the step tree`() {
-        val secondLevelStep: StoryStep<*> = mockk {
+        val secondLevelStep: SimpleStoryStep = mockk {
             every { name } returns "second level"
             every { children } returns emptySet()
             every { selectFromAction(any(), any(), any(), newIntent) } returns true
         }
-        val firstLevelStep: StoryStep<*> = mockk {
+        val firstLevelStep: SimpleStoryStep = mockk {
             every { children } returns setOf(secondLevelStep)
             every { name } returns "first level"
             every { selectFromAction(any(), any(), any(), newIntent) } returns true

@@ -17,6 +17,7 @@
 package ai.tock.bot.engine.dialogManager
 
 import ai.tock.bot.DialogManager.ScriptManager
+import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
@@ -31,6 +32,7 @@ import ai.tock.bot.script.Script
 import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
+import ai.tock.translator.I18nLabelValue
 import engine.dialogManager.step.Step
 
 interface DialogManager<in T : DialogT<*,*>> {
@@ -99,4 +101,6 @@ interface DialogManager<in T : DialogT<*,*>> {
                      action: Action)
 
     fun isCurrentScriptDefinition(scriptDefinition: ScriptDefinition): Boolean
+
+    fun i18nKey(botDefinition: BotDefinition, key: String, defaultLabel: CharSequence, vararg args: Any?): I18nLabelValue
 }

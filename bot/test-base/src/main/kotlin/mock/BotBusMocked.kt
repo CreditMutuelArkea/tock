@@ -65,10 +65,10 @@ private val endCalled = ThreadLocal<Boolean>()
  */
 fun StoryDefinitionBase.test(bus: BotBus) {
     endCalled.remove()
-    val handler = storyHandler as? StoryHandlerBase<*>
+    val handler =scriptHandler as? StoryHandlerBase<*>
     handler?.checkPreconditions()?.invoke(bus)
     if (endCalled.get() != true) {
-        (storyHandler as? StoryHandlerBase<*>)?.newHandlerDefinition(bus)?.handle()
+        (scriptHandler  as? StoryHandlerBase<*>)?.newHandlerDefinition(bus)?.handle()
             ?: error("story handler is not a StoryHandlerBase")
     }
 }

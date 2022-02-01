@@ -99,11 +99,11 @@ class ConfiguredStoryHandlerTest {
                 )
             } returns connectorMessageRetriever
             every { end(messages = capture(messagesSlot), initialDelay = any()) } returns mockk()
-            every { story } returns mockk {
+           /* every { story } returns mockk {
                 every { definition } returns mockk {
                     every { steps } returns emptySet()
                 }
-            }
+            }*/
         }
 
         val configuration: StoryDefinitionConfiguration = mockk {
@@ -189,11 +189,11 @@ class ConfiguredStoryHandlerTest {
 
             every { end(messages = capture(messagesSlot), initialDelay = any()) } returns mockk()
             every { send(messages = capture(messagesSlot), initialDelay = any()) } returns mockk()
-            every { story } returns mockk {
+            /*every { story } returns mockk {
                 every { definition } returns mockk {
                     every { steps } returns emptySet()
                 }
-            }
+            }*/
         }
 
         val configuration: StoryDefinitionConfiguration = mockk {
@@ -302,11 +302,11 @@ class ConfiguredStoryHandlerTest {
 
             every { end(messages = capture(capturedMessages), initialDelay = any()) } returns mockk()
             every { send(messages = capture(capturedMessages), initialDelay = any()) } returns mockk()
-            every { story } returns mockk {
+            /*every { story } returns mockk {
                 every { definition } returns mockk {
                     every { steps } returns emptySet()
                 }
-            }
+            }*/
         }
 
         val configuration: StoryDefinitionConfiguration = mockk {

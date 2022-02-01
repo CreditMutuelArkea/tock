@@ -24,6 +24,10 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionPriority.urgent
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogState
+import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.message.Choice
 import ai.tock.bot.engine.message.Sentence
 import ai.tock.bot.engine.user.PlayerId
@@ -48,6 +52,15 @@ class BotBusTest : BotEngineTest() {
     @BeforeTest
     fun init() {
         BotRepository.botAnswerInterceptors.clear()
+    }
+
+    @Test
+    fun `GIVEN not notified action WHEN the intent is not a enable intent THEN the bot is not activated`() {
+        val dialog = mockk<Dialog>()
+        val state = DialogState()
+        every { dialog.state } returns state
+        val result = bot.canEnableBot(mockk(), mockk())
+        kotlin.test.assertFalse(result)
     }
 
     @Test
@@ -86,9 +99,10 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `handleAndSwitchStory switch story and run the new handler`() {
-        assertEquals(test, bus.story.definition)
+        //TODO: pareille que pour StoryHandlerBaseTest, il faut revoir le test pour ne pas avoir besoin d'allez chercher la story
+        assertEquals(test, (bus.dialogManager.dialogT.currentScript as Story).definition)
         bus.handleAndSwitchScript(test2)
-        assertEquals(test2, bus.story.definition)
+        assertEquals(test2, (bus.dialogManager.dialogT.currentScript as Story).definition)
         verify {
             connector.send(
                 match<SendSentence> {
@@ -101,21 +115,23 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `switchStory switch story and keep the step if relevant`() {
-        bus.switchStory(withoutStep)
+        bus.dialogManager.switchScript(withoutStep, action = bus.action)
         bus.step = StepTest.s1
-        bus.switchStory(test2)
-        assertEquals(test2, bus.story.definition)
+        bus.dialogManager.switchScript(test2, action = bus.action)
+        assertEquals(test2, (bus.dialogManager.dialogT.currentScript as Story).definition)
         assertEquals(StepTest.s1, bus.step)
     }
 
     @Test
     fun `switchStory switch story and does not keep the step if not relevant`() {
-        assertEquals(test, bus.story.definition)
+        //TODO: il faut trouver une solution, là ça ne va pas
+        // peut être une méthode équals, et on delegue au dialog manager le check
+        assertEquals(test, (bus.dialogManager.dialogT.currentScript as Story).definition)
         bus.step = StepTest.s1
-        bus.switchStory(withoutStep)
-        assertEquals(withoutStep, bus.story.definition)
+        bus.dialogManager.switchScript(withoutStep, action = bus.action)
+        assertEquals(withoutStep, (bus.dialogManager.dialogT.currentScript as Story).definition)
         assertNull(bus.step)
-        assertEquals(withoutStep, bus.dialog.stories.last().definition)
+        assertEquals(withoutStep, (bus.dialogManager.dialogT.scripts.last() as Story).definition)
     }
 
     @Test
@@ -137,7 +153,7 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `i18nKey returns a I18nLabelValue with the right key and category`() {
-        val v = bus.i18nKey("a", "b")
+        val v = bus.dialogManager.i18nKey(botDefinition, "a", "b")
         assertEquals(
             I18nLabelValue(
                 "a",
@@ -209,7 +225,7 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `switchStory set the switch story key to true`() {
-        bus.switchStory(test2)
+        bus.dialogManager.switchScript(test2, action = bus.action)
         assertTrue(bus.hasCurrentSwitchStoryProcess)
     }
 
@@ -221,34 +237,34 @@ class BotBusTest : BotEngineTest() {
 
     @Test
     fun `switchStory set starterIntent to mainIntent in currentStory of dialog by default`() {
-        bus.switchStory(story_with_other_starter)
-        assertTrue(story_with_other_starter.wrap(bus.dialog.currentStory!!.starterIntent))
+        bus.dialogManager.switchScript(story_with_other_starter, action = bus.action)
+        assertTrue(story_with_other_starter.wrap((bus.dialogManager.dialogT.currentScript as Story).starterIntent))
     }
 
     @Test
     fun `switchStory set starterIntent in currentStory of dialog if specified`() {
-        bus.switchStory(story_with_other_starter, secondaryIntent)
-        assertTrue(secondaryIntent.wrap(bus.dialog.currentStory!!.starterIntent))
+        bus.dialogManager.switchScript(story_with_other_starter, secondaryIntent, action = bus.action)
+        assertTrue(secondaryIntent.wrap((bus.dialogManager.dialogT.currentScript as Story).starterIntent))
     }
 
     @Test
     fun `handleAndSwitchStory set starterIntent to mainIntent in currentStory of dialog by default`() {
         bus.handleAndSwitchScript(story_with_other_starter)
-        assertTrue(story_with_other_starter.wrap(bus.dialog.currentStory!!.starterIntent))
+        assertTrue(story_with_other_starter.wrap((bus.dialogManager.dialogT.currentScript as Story).starterIntent))
     }
 
     @Test
     fun `handleAndSwitchStory set starterIntent in currentStory of dialog if specified`() {
         bus.handleAndSwitchScript(story_with_other_starter, secondaryIntent)
-        assertTrue(secondaryIntent.wrap(bus.dialog.currentStory!!.starterIntent))
+        assertTrue(secondaryIntent.wrap((bus.dialogManager.dialogT.currentScript as Story).starterIntent))
     }
 
     @Test
     fun `switchStory set a new story only once`() {
-        bus.switchStory(test2)
-        assertEquals(test, bus.dialog.stories[0].definition)
-        assertEquals(test2, bus.dialog.stories[1].definition)
-        assertEquals(2, bus.dialog.stories.size)
+        bus.dialogManager.switchScript(test2, action = bus.action)
+        assertEquals(test, (bus.dialogManager.dialogT as Dialog).scripts[0].definition)
+        assertEquals(test2, (bus.dialogManager.dialogT as Dialog).scripts[1].definition)
+        assertEquals(2, (bus.dialogManager.dialogT as Dialog).scripts.size)
     }
 
     @Test
@@ -256,8 +272,8 @@ class BotBusTest : BotEngineTest() {
         userAction = action(Choice("test", StepTest.s1))
         bus.step = StepTest.s2
         bus.handleAndSwitchScript(test2)
-        assertEquals(test, bus.dialog.stories[0].definition)
-        assertEquals(test2, bus.dialog.stories[1].definition)
+        assertEquals(test, (bus.dialogManager.dialogT as Dialog).scripts[0].definition)
+        assertEquals(test2, (bus.dialogManager.dialogT as Dialog).scripts[1].definition)
         assertEquals(StepTest.s2, bus.step)
     }
 }

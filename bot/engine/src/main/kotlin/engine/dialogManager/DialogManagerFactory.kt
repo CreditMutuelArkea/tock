@@ -18,6 +18,7 @@ package ai.tock.bot.engine.dialogManager
 
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.engine.action.Action
+import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.engine.user.UserTimelineT
@@ -32,12 +33,14 @@ class DialogManagerFactory {
         ): DialogManager<DialogT<*, *>> {
             //if(botDefinition.type == Type.STORY)
             return if(userTimeline is UserTimeline) {
-                DialogManagerStory(userTimeline, action) as DialogManager<DialogT<*, *>>
+                val dialog: Dialog? = if(userTimeline.currentDialog == null) {
+                    Dialog(setOf(userTimeline.playerId, action.recipientId))
+                } else { null }
+                DialogManagerStory(userTimeline, dialog) as DialogManager<DialogT<*, *>>
             } else {
                 error("can't create dialog manager")
             }
         }
     }
-
 
 }

@@ -62,7 +62,7 @@ class BotBusMockTest {
     fun before() {
         every { storyHandler.handle(any()) } answers {}
 
-        every { storyDefinition.storyHandler } returns storyHandler
+        every { storyDefinition.scriptHandler  } returns storyHandler
         every { storyDefinition.mainIntent() } returns intent
         every { storyDefinition.supportIntent(any()) } returns true
         every { storyDefinition.steps } returns emptySet()
@@ -82,7 +82,7 @@ class BotBusMockTest {
     }
 
     @Test
-    fun `storyHandlerListener start method is called AND storyhandler not called if it returns false`() {
+    fun `storyHandlerListener start method is called ANDscriptHandler not called if it returns false`() {
         val listener1: StoryHandlerListener = mockk()
         every { listener1.startAction(any(), any()) } returns true
         val listener2: StoryHandlerListener = mockk()

@@ -37,13 +37,13 @@ import io.mockk.mockk
 /**
  * Runs [StoryDefinitionBase.checkPreconditions].
  */
-fun StoryDefinitionBase.checkPreconditions(bus: BotBus) = (storyHandler as StoryHandlerBase<*>).checkPreconditions()(bus)
+fun StoryDefinitionBase.checkPreconditions(bus: BotBus) = (scriptHandler  as StoryHandlerBase<*>).checkPreconditions()(bus)
 
 /**
  * Runs the select step from Bus phase.
  */
 fun StoryDefinitionBase.selectStepFromData(def: HandlerDef<*>, data: Any?): StoryStep<*>? =
-    (storyHandler as StoryHandlerBase<*>).selectStepFromStoryHandlerAndData(def, data, this)
+    (scriptHandler  as StoryHandlerBase<*>).selectStepFromStoryHandlerAndData(def, data, this)
 
 /**
  * Provides a mock of [ConnectorDef] and run the test block.

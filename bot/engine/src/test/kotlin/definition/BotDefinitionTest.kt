@@ -16,6 +16,8 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.BotDefinitionTest
@@ -60,15 +62,6 @@ class BotDefinitionTest {
     }
 
     @Test
-    fun `GIVEN not notified action WHEN the intent is not a enable intent THEN the bot is not activated`() {
-        val dialog = mockk<Dialog>()
-        val state = DialogState()
-        every { dialog.state } returns state
-        val result = botDef.enableBot(mockk(), dialog, mockk())
-        assertFalse(result)
-    }
-
-    @Test
     fun `GIVEN step only intent WHEN findIntent is called THEN the intent is found`() {
         val r = botDef.findIntent("s4_secondary", "appId")
         assertEquals(Intent("s4_secondary"), r)
@@ -79,13 +72,13 @@ class BotDefinitionTest {
         // Given
         val wrap = BotStoryDefinitionWrapper(botDef)
 
-        wrap.updateStories(
+        wrap.scriptManager.updateStories(
             listOf(
                 StoryDefinitionConfiguration(
                     botDefinition = botDef,
                     storyDefinition = SimpleStoryDefinition(
                         id = "disable_bot",
-                        storyHandler = StoryHandlerTest,
+                        scriptHandler = StoryHandlerTest,
                         starterIntents = setOf(Intent("starter_intent"))
                     ),
                     configurationName = "toto"
@@ -94,7 +87,7 @@ class BotDefinitionTest {
         )
 
         // When
-        val result = wrap.findStoryDefinitionById("disable_bot", "appId")
+        val result = wrap.scriptManager.findScriptDefinitionById("disable_bot", "appId")
 
         // Then
         assertNotNull(result)
@@ -105,18 +98,18 @@ class BotDefinitionTest {
         // Given
         val storyConfiguration = SimpleStoryDefinition(
             id = "disable_bot",
-            storyHandler = StoryHandlerTest,
+            scriptHandler = StoryHandlerTest,
             starterIntents = setOf(Intent("starter_intent"))
         )
 
         val botDef = BotDefinitionBase(
             botId = "test",
             namespace = "namespace",
-            stories = listOf(storyConfiguration)
+            scriptManager = ScriptManagerStoryBase(listOf(storyConfiguration))
         )
 
         // When
-        val result = botDef.findStoryDefinitionById("disable_bot", "appId")
+        val result = botDef.scriptManager.findScriptDefinitionById("disable_bot", "appId")
 
         // Then
         assertNotNull(result)
@@ -128,14 +121,14 @@ class BotDefinitionTest {
         val botDef = BotDefinitionBase(
             botId = "test",
             namespace = "namespace",
-            stories = emptyList()
+            scriptManager = ScriptManagerStoryBase(emptyList())
         )
 
         // When
-        val result = botDef.findStoryDefinitionById("disable_bot", "appId")
+        val result = botDef.scriptManager.findScriptDefinitionById("disable_bot", "appId")
 
         // Then
-        assertEquals(botDef.unknownStory, result)
+        assertEquals((botDef.scriptManager as ScriptManagerStory).unknownStory, result)
     }
 
     @Test
@@ -143,7 +136,7 @@ class BotDefinitionTest {
         // Given
         val simpleStoryConfiguration = SimpleStoryDefinition(
             id = "disable_bot",
-            storyHandler = StoryHandlerTest,
+           scriptHandler = StoryHandlerTest,
             starterIntents = setOf(Intent("starter_intent"))
         )
 
@@ -153,7 +146,7 @@ class BotDefinitionTest {
                 botDefinition = botDef,
                 storyDefinition = SimpleStoryDefinition(
                     id = "enable_bot",
-                    storyHandler = StoryHandlerTest,
+                   scriptHandler = StoryHandlerTest,
                     starterIntents = setOf(Intent("starter_intent"))
                 ),
                 configurationName = "toto"
@@ -163,14 +156,14 @@ class BotDefinitionTest {
         val botDef = BotDefinitionBase(
             botId = "test",
             namespace = "namespace",
-            stories = listOf(simpleStoryConfiguration, configuredStoryConfiguration)
+            scriptManager = ScriptManagerStoryBase(listOf(simpleStoryConfiguration, configuredStoryConfiguration))
         )
 
         // When
-        val result = botDef.findStoryDefinitionById("should_not_find_id", "appId")
+        val result = botDef.scriptManager.findScriptDefinitionById("should_not_find_id", "appId")
 
         // Then
-        assertEquals(botDef.unknownStory, result)
+        assertEquals((botDef.scriptManager as ScriptManagerStory).unknownStory, result)
     }
 
     @Test
@@ -180,7 +173,7 @@ class BotDefinitionTest {
 
         val simpleTaggedStoryDefinition = SimpleStoryDefinition(
             id = "tagged_story",
-            storyHandler = StoryHandlerTest,
+            scriptHandler = StoryHandlerTest,
             starterIntents = setOf(intent),
             tags = setOf(StoryTag.DISABLE)
         )
@@ -188,7 +181,7 @@ class BotDefinitionTest {
         val botDef = BotDefinitionBase(
             botId = "test",
             namespace = "namespace",
-            stories = listOf(simpleTaggedStoryDefinition)
+            scriptManager = ScriptManagerStoryBase(listOf(simpleTaggedStoryDefinition))
         )
 
         val wrapper = BotStoryDefinitionWrapper(botDef)
@@ -201,7 +194,7 @@ class BotDefinitionTest {
                 entityValues = mutableMapOf(),
                 context = mutableMapOf()
             ),
-            stories = mutableListOf(
+            scripts = mutableListOf(
                 Story(
                     definition = simpleTaggedStoryDefinition,
                     starterIntent = intent
@@ -210,7 +203,7 @@ class BotDefinitionTest {
         )
 
         // When
-        val result = wrapper.hasDisableTagIntent(dialog)
+        val result = wrapper.scriptManager.isDisabledIntent(intent)//hasDisableTagIntent(dialog)
 
         // Then
         assertTrue(result)
@@ -223,7 +216,7 @@ class BotDefinitionTest {
 
         val simpleTaggedStoryDefinition = SimpleStoryDefinition(
             id = "not_tagged_story",
-            storyHandler = StoryHandlerTest,
+           scriptHandler = StoryHandlerTest,
             starterIntents = setOf(intent),
             tags = emptySet()
         )
@@ -231,7 +224,7 @@ class BotDefinitionTest {
         val botDef = BotDefinitionBase(
             botId = "test",
             namespace = "namespace",
-            stories = listOf(simpleTaggedStoryDefinition)
+            scriptManager = ScriptManagerStoryBase(listOf(simpleTaggedStoryDefinition))
         )
 
         val wrapper = BotStoryDefinitionWrapper(botDef)
@@ -244,7 +237,7 @@ class BotDefinitionTest {
                 entityValues = mutableMapOf(),
                 context = mutableMapOf()
             ),
-            stories = mutableListOf(
+            scripts = mutableListOf(
                 Story(
                     definition = simpleTaggedStoryDefinition,
                     starterIntent = intent
@@ -253,7 +246,7 @@ class BotDefinitionTest {
         )
 
         // When
-        val result = wrapper.hasDisableTagIntent(dialog)
+        val result = wrapper.scriptManager.isDisabledIntent(intent)//hasDisableTagIntent(dialog)
 
         // Then
         assertFalse(result)

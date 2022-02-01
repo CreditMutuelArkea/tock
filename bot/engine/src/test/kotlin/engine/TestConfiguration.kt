@@ -16,7 +16,6 @@
 
 package ai.tock.bot.engine
 
-import ai.tock.bot.DialogManager.ScriptManagerStory
 import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.definition.Intent
@@ -68,7 +67,7 @@ abstract class AbstractStoryHandler : SimpleStoryHandlerBase() {
 
 class TestStoryDefinition(
     override val name: String,
-    override val storyHandler: AbstractStoryHandler,
+    override val scriptHandler: AbstractStoryHandler,
     override val otherStarterIntents: Set<IntentAware> = emptySet(),
     override val secondaryIntents: Set<IntentAware> = emptySet(),
     override val stepsArray: Array<StepTest> = enumValues(),
@@ -76,7 +75,7 @@ class TestStoryDefinition(
     override val tags: Set<StoryTag> = emptySet()
 ) : StoryDefinitionExtended {
 
-    val registeredBus: BotBus? get() = storyHandler.registeredBus
+    val registeredBus: BotBus? get() = scriptHandler.registeredBus
 
     override fun name(): String = name
 }
@@ -116,7 +115,7 @@ val builtInStories = listOf(
 
 val disableBotTaggedStory = SimpleStoryDefinition(
     id = "tagged_story",
-    storyHandler = StoryHandlerTest,
+    scriptHandler = StoryHandlerTest,
     starterIntents = setOf(Intent("disable_bot")),
     tags = setOf(StoryTag.DISABLE)
 )

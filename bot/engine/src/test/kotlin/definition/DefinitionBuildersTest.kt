@@ -16,9 +16,9 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.engine.BotEngineTest
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.testStoryDefinitionList
 import ai.tock.nlp.entity.date.DateEntityRange
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ import kotlin.test.assertNotNull
  */
 class DefinitionBuildersTest : BotEngineTest() {
 
-    enum class Step : StoryStep<StoryHandlerDefinition> {
+    enum class Step : SimpleStoryStep {
         a, b
     }
 
@@ -41,8 +41,7 @@ class DefinitionBuildersTest : BotEngineTest() {
     override val botDefinition: BotDefinition = object : BotDefinitionBase(
         "test",
         "namespace",
-        stories = testStoryDefinitionList,
-        unknownStory = unknownStory
+        ScriptManagerStoryBase(stories = testStoryDefinitionList, unknownStory = unknownStory)
     ) {}
 
     @Test
@@ -72,7 +71,7 @@ class DefinitionBuildersTest : BotEngineTest() {
         }
         assertNotNull(s)
     }
-
+/*
     @Test
     fun `story with preconditions and steps is ok`() {
         val s = storyDefWithSteps<Def2, Step2, StoryData>("yeh") {
@@ -83,7 +82,7 @@ class DefinitionBuildersTest : BotEngineTest() {
         }
         assertNotNull(s)
     }
-
+*/
     @Test
     fun `story with preconditions and no exhaustive conditions is ok`() {
         val s = storyDef<Def>("yeh") {

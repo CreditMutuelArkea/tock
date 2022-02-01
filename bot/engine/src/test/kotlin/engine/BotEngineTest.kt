@@ -17,7 +17,6 @@
 package ai.tock.bot.engine
 
 import ai.tock.bot.DialogManager.ScriptManagerStory
-import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
@@ -113,11 +112,13 @@ abstract class BotEngineTest {
     val connector: Connector = mockk(relaxed = true)
     val userTimeline = UserTimeline(userId)
 
+    val dialogManagerStory = DialogManagerStory(userTimeline)
+
     var userAction = action(Sentence("ok computer"))
 
     val bus: BotBus by lazy {
         fillTimeline()
-        TockBotBus(connectorController, DialogManagerStory(userTimeline, userAction) as DialogManager<DialogT<*, *>>, userAction, connectorData, botDefinition)
+        TockBotBus(connectorController, dialogManagerStory as DialogManager<DialogT<*, *>>, userAction, connectorData, botDefinition)
     }
 
     open fun baseModule(): Kodein.Module {
