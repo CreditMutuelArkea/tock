@@ -22,9 +22,21 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.user.UserTimeline
 import java.util.concurrent.ConcurrentHashMap
+
+/**
+ * step -> intent default behaviour.
+ */
+internal val stepToIntentRepository = ConcurrentHashMap<Step<*>, IntentAware>()
+
+/**
+ * Use this step when you want to set a null [Step].
+ */
+val noStep = object : SimpleStoryStep {
+    override val name: String = "_NO_STEP_"
+}
 
 /**
  * A step is a part of a [StoryDefinition]. //TODO: Step is now a part of an abstraction of story
@@ -47,9 +59,9 @@ interface Step<T> {
     fun answer(): T.() -> Any? = { null }
 
     /**
-     * Returns [intent].
+     * Returns [intent] or the [ScriptDefinition.mainIntent] if [intent] is null.
      */
-    val baseIntent: IntentAware
+    val baseIntent: IntentAware get() = intent ?: stepToIntentRepository[this] ?: error("no intent for $this")
 
     /**
      * The main intent of the step.

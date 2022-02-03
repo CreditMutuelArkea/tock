@@ -23,6 +23,7 @@ import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.script.ScriptDefinition
 import ai.tock.translator.UserInterfaceType
+import engine.dialogManager.step.Step
 
 /**
  * The definition of a "Story".
@@ -43,15 +44,15 @@ interface StoryDefinition : ScriptDefinition, IntentAware {
     /**
      * The root steps of the story.
      */
-    val steps: Set<SimpleStoryStep>
+    val steps: Set<Step<*>>
 
     /**
      * Returns all steps of the story.
      */
-    fun allSteps(): Set<SimpleStoryStep> =
-        mutableSetOf<SimpleStoryStep>().apply { steps.forEach { allStep(this, it) } }
+    fun allSteps(): Set<Step<*>> =
+        mutableSetOf<Step<*>>().apply { steps.forEach { allStep(this, it) } }
 
-    private fun allStep(result: MutableSet<SimpleStoryStep>, step: SimpleStoryStep) {
+    private fun allStep(result: MutableSet<Step<*>>, step: Step<*>) {
         result.add(step)
         step.children.forEach { allStep(result, it) }
     }

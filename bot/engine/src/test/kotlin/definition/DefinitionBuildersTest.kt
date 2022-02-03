@@ -71,7 +71,7 @@ class DefinitionBuildersTest : BotEngineTest() {
         }
         assertNotNull(s)
     }
-/*
+
     @Test
     fun `story with preconditions and steps is ok`() {
         val s = storyDefWithSteps<Def2, Step2, StoryData>("yeh") {
@@ -82,7 +82,7 @@ class DefinitionBuildersTest : BotEngineTest() {
         }
         assertNotNull(s)
     }
-*/
+
     @Test
     fun `story with preconditions and no exhaustive conditions is ok`() {
         val s = storyDef<Def>("yeh") {

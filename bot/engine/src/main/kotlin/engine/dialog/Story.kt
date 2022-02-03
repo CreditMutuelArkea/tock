@@ -31,6 +31,7 @@ import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.script.Script
 import ai.tock.shared.error
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 /**
@@ -66,11 +67,11 @@ data class Story(
     /**
      * The current step of the story.
      */
-    val currentStep: SimpleStoryStep?
+    val currentStep: Step<*>?
         get() = definition.steps.asSequence().mapNotNull { findStep(it) }.firstOrNull()
 
 
-    private fun findStep(step: SimpleStoryStep): SimpleStoryStep? {
+    private fun findStep(step: Step<*>): Step<*>? {
         if (step.name == this.step) {
             return step
         } else {
@@ -79,12 +80,12 @@ data class Story(
     }
 
     private fun findStep(
-        steps: Collection<SimpleStoryStep>,
+        steps: Collection<Step<*>>,
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
         intent: IntentAware?
-    ): SimpleStoryStep? {
+    ): Step<*>? {
         // first level
         findStepInTree(steps, userTimeline, dialog, action, intent)?.also {
             return it
@@ -100,12 +101,12 @@ data class Story(
     }
 
     private fun findStepInTree(
-        steps: Collection<SimpleStoryStep>,
+        steps: Collection<Step<*>>,
         userTimeline: UserTimeline,
         dialog: Dialog,
         action: Action,
         intent: IntentAware?
-    ): SimpleStoryStep? {
+    ): Step<*>? {
         // first level
         steps.forEach { s ->
             if (s.selectFromAction(userTimeline, dialog, action, intent)) {
@@ -119,10 +120,10 @@ data class Story(
         return null
     }
 
-    private fun findParentStep(child: SimpleStoryStep): SimpleStoryStep? =
+    private fun findParentStep(child: Step<*>): Step<*>? =
         definition.steps.asSequence().mapNotNull { findParentStep(it, child) }.firstOrNull()
 
-    private fun findParentStep(current: SimpleStoryStep, child: SimpleStoryStep): SimpleStoryStep? =
+    private fun findParentStep(current: Step<*>, child: Step<*>): Step<*>? =
         current.takeIf { current.children.any { child.name == it.name } }
             ?: current.children.asSequence().mapNotNull { findParentStep(it, child) }.firstOrNull()
 
@@ -238,7 +239,7 @@ data class Story(
         if (!forced && this.step == null) {
 
             if (s != null) {
-                var parent: SimpleStoryStep? = s
+                var parent: Step<*>? = s
                 do {
                     parent = parent?.let { findParentStep(it) }
                     parent?.children?.let { findStepInTree(it, userTimeline, dialog, action, newIntent) }?.apply {

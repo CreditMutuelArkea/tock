@@ -65,7 +65,7 @@ internal class ConfiguredStoryDefinition(
 
     override val scriptHandler: ScriptHandler = ConfiguredStoryHandler(definition, configuration)
 
-    override val steps: Set<SimpleStoryStep> =
+    override val steps: Set<engine.dialogManager.step.Step<*>> =
         (configuration.storyDefinition(definition, configuration)?.steps ?: emptySet()) +
             configuration.findSteps(botApplicationConfigurationKey).map { it.toStoryStep(configuration) }
 

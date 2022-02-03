@@ -36,6 +36,7 @@ import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.translator.I18nLabelValue
+import engine.dialogManager.step.Step
 
 class DialogManagerStory private constructor(
     /**
@@ -109,7 +110,7 @@ class DialogManagerStory private constructor(
         userTimeline.dialogs.add(dialog)
     }
 
-    override fun getCurrentStep(): SimpleStoryStep? {
+    override fun getCurrentStep(): Step<*>? {
         return currentDialog.currentScript?.currentStep
     }
 

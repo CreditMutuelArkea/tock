@@ -17,6 +17,7 @@
 package ai.tock.bot.story.dialogManager.storyData
 
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import engine.dialogManager.step.Step
 
@@ -27,7 +28,7 @@ import engine.dialogManager.step.Step
  * @param TD the data of the StoryDef
  * @param D the data of the step
  */
-interface StoryDataStep<T : StoryHandlerDefinition, TD, D> : Step<T> {
+interface StoryDataStep<T : StoryHandlerDefinition, TD, D> : Step<T>  {
 
     override fun answer(): T.() -> Any? = { handler().invoke(this, null) }
 

@@ -31,7 +31,9 @@ import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.story.dialogManager.handler.*
+import ai.tock.bot.story.dialogManager.storyData.StoryDataStepBase
 import ai.tock.translator.UserInterfaceType
+import engine.dialogManager.step.Step
 
 /**
  * Creates a new story bot.
@@ -360,7 +362,7 @@ inline fun <reified T : StoryHandlerDefinition, reified S, D> storyDefWithSteps(
      * [StoryHandlerDefinition.handle] is not called and the handling of bot answer is over.
      */
     noinline preconditionsChecker: BotBus.() -> D
-): StoryDefinitionBase where S : Enum<S>, S : SimpleStoryStep =
+): StoryDefinitionBase where S : Enum<S>, S : Step<T> =
     StoryDefinitionBase(
         intentName,
         ConfigurableStoryHandler(intentName, handlerDefCreator, preconditionsChecker),

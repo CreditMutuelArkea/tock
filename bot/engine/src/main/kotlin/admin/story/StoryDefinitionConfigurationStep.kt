@@ -25,6 +25,7 @@ import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.translator.I18nLabelValue
+import engine.dialogManager.step.Step
 
 /**
  * A [StoryStep] configuration in a [StoryDefinitionConfiguration].
@@ -100,7 +101,7 @@ data class StoryDefinitionConfigurationStep(
 
     val hasNoChildren: Boolean get() = children.isEmpty()
 
-    constructor(step: SimpleStoryStep) :
+    constructor(step: engine.dialogManager.step.Step<*>) :
         this(
             step.name,
             step.intent?.intentWithoutNamespace(),
