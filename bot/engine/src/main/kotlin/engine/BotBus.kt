@@ -47,6 +47,7 @@ import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
 import engine.dialogManager.step.Step
+import java.time.Duration
 
 /**
  * Bus implementation for Tock integrated mode.

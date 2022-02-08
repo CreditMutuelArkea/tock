@@ -21,6 +21,7 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.script.Script
 import org.litote.kmongo.Id
+import org.litote.kmongo.newId
 import java.time.Instant
 
 /**

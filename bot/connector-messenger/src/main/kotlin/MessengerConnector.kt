@@ -47,7 +47,6 @@ import ai.tock.bot.connector.messenger.model.send.UrlPayload
 import ai.tock.bot.connector.messenger.model.webhook.CallbackRequest
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository.requestTimer
 import ai.tock.bot.engine.ConnectorController
@@ -73,6 +72,7 @@ import ai.tock.shared.property
 import ai.tock.shared.vertx.vertx
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.salomonbrys.kodein.instance
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 import org.apache.commons.codec.binary.Hex
 import org.apache.commons.lang3.LocaleUtils
@@ -586,7 +586,7 @@ class MessengerConnector internal constructor(
         controller: ConnectorController,
         recipientId: PlayerId,
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>?,
+        step: Step<*>?,
         parameters: Map<String, String>,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit

@@ -225,15 +225,15 @@ class RunOrchestrationStoryListener(
 }
 
 var BotBus.blockHandoverToSecondaryBot: Boolean
-    get() = userTimeline.userState.getFlag("block_handover_to_secondary_bot")?.toBoolean() ?: false
+    get() = dialogManager.getUserStateFlag("block_handover_to_secondary_bot")?.toBoolean() ?: false
     set(value) {
-        userTimeline.userState.setFlag("block_handover_to_secondary_bot", orchestrationLockTTL, value.toString())
+        dialogManager.setUserStateFlag("block_handover_to_secondary_bot", orchestrationLockTTL, value.toString())
     }
 
 var BotBus.blockTakeOverFromPrimaryBot: Boolean
-    get() = userTimeline.userState.getFlag("block_take_over_from_primary_bot")?.toBoolean() ?: false
+    get() = dialogManager.getUserStateFlag("block_take_over_from_primary_bot")?.toBoolean() ?: false
     set(value) {
-        userTimeline.userState.setFlag("block_take_over_from_primary_bot", orchestrationLockTTL, value.toString())
+        dialogManager.setUserStateFlag("block_take_over_from_primary_bot", orchestrationLockTTL, value.toString())
     }
 
 /**

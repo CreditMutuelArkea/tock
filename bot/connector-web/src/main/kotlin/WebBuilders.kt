@@ -31,12 +31,11 @@ import ai.tock.bot.connector.web.send.WebImage
 import ai.tock.bot.connector.web.send.WebWidget
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.SendAttachment.AttachmentType
 import ai.tock.bot.engine.action.SendChoice
+import engine.dialogManager.step.Step
 
 /**
  * Adds a Web [ConnectorMessage] if the current connector is Web.
@@ -88,7 +87,7 @@ fun <T : Bus<T>> T.webButton(
     title: CharSequence,
     targetIntent: IntentAware? = null,
     imageUrl: String? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters()
 ): WebButton =
     WebButton(
@@ -157,7 +156,7 @@ fun <T : Bus<T>> T.webUrlButton(
 fun <T : Bus<T>> T.webPostbackButton(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters(),
     imageUrl: String? = null,
     style: ButtonStyle
@@ -170,7 +169,7 @@ fun <T : Bus<T>> T.webPostbackButton(
 fun <T : Bus<T>> T.webPostbackButton(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters(),
     imageUrl: String? = null,
     style: String? = ButtonStyle.primary.name
@@ -189,7 +188,7 @@ fun <T : Bus<T>> T.webPostbackButton(
 fun <T : Bus<T>> T.webQuickReply(
     title: CharSequence,
     targetIntent: IntentAware? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters(),
     imageUrl: String? = null
 ): Button =
@@ -205,7 +204,7 @@ fun <T : Bus<T>> T.webQuickReply(
 fun <T : Bus<T>> T.webIntentQuickReply(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters(),
     imageUrl: String? = null,
     style: ButtonStyle
@@ -218,7 +217,7 @@ fun <T : Bus<T>> T.webIntentQuickReply(
 fun <T : Bus<T>> T.webIntentQuickReply(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Parameters = Parameters(),
     imageUrl: String? = null,
     style: String? = ButtonStyle.primary.name

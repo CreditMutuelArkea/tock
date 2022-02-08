@@ -230,7 +230,7 @@ data class AlexaConnectorCallback internal constructor(
 
     override fun onLaunch(requestEnvelope: SpeechletRequestEnvelope<LaunchRequest>): SpeechletResponse? {
         logRequest("onLaunch", requestEnvelope)
-        val helloStory = controller.botDefinition.defaultStory.mainIntent().name()
+        val helloStory = controller.botDefinition.scriptManager.defaultScript.mainIntent().name()
         return onIntent(
             SpeechletRequestEnvelope
                 .builder<IntentRequest>()

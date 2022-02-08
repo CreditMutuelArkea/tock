@@ -41,14 +41,13 @@ import ai.tock.bot.connector.ga.model.response.GASimpleSelect
 import ai.tock.bot.connector.ga.model.response.GAStructuredResponse
 import ai.tock.bot.connector.ga.model.response.GAUpdatePermissionValueSpec
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.translator.UserInterfaceType.textAndVoiceAssistant
 import ai.tock.translator.UserInterfaceType.textChat
 import emoji4j.EmojiUtils
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -305,7 +304,7 @@ fun I18nTranslator.gaButton(title: CharSequence, url: String): GAButton {
 fun <T : Bus<T>> T.optionInfo(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     vararg parameters: Pair<String, String>
 ): GAOptionInfo {
     val t = translate(title)

@@ -28,6 +28,8 @@ import engine.dialogManager.step.Step
 
 interface ScriptManager {
 
+    val defaultScript: ScriptDefinition
+
     fun findMainIntent(scriptStep: ScriptStep): IntentAware?
 
     fun getFrontUnkowIntents(frontIntents: List<IntentDefinition>): List<IntentAware>

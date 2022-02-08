@@ -142,7 +142,7 @@ internal class GAAccountLinkingTest {
             userTimelineDAO.loadWithLastValidDialog(
                 any(),
                 previousUserId,
-                storyDefinitionProvider = any()
+                scriptDefinitionProvider = any()
             )
         } returns previousTimeline
 

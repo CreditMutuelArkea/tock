@@ -1,6 +1,5 @@
 package ai.tock.bot.admin.story
 
-import ai.tock.bot.story.definition.StoryTag
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.databind.SerializerProvider
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -111,7 +110,7 @@ internal class StoryDefinitionConfiguration_Serializer :
         serializers.findTypedValueSerializer(
                 serializers.config.typeFactory.constructCollectionType(
                 kotlin.collections.Set::class.java,
-                serializers.config.typeFactory.constructType(StoryTag::class.java)
+                serializers.config.typeFactory.constructType(ai.tock.bot.story.definition.StoryTag::class.java)
                 ),
                 true,
                 null

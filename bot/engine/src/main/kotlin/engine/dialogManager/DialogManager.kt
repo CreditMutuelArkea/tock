@@ -34,6 +34,8 @@ import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.translator.I18nLabelValue
 import engine.dialogManager.step.Step
+import java.time.Duration
+import java.time.Instant
 
 interface DialogManager<in T : DialogT<*,*>> {
 
@@ -54,6 +56,8 @@ interface DialogManager<in T : DialogT<*,*>> {
     //TODO: pour que le NLP compile
     val userTimelineT: UserTimelineT<*>
     val dialogT: DialogT<*, *>
+
+    val lastUserAction: Action?
 
     fun add(dialog: T)
 
@@ -80,6 +84,10 @@ interface DialogManager<in T : DialogT<*,*>> {
     fun cleanUserState()
 
     fun setProfileLoaded(loaded: Boolean)
+
+    fun getUserStateFlag(flag: String): String?
+
+    fun setUserStateFlag(flag: String, duration: Duration, value: String)
 
     fun isLastAction(action: Action): Boolean
 

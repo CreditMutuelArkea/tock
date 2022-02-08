@@ -241,7 +241,7 @@ class GAConnector internal constructor(
                 listOf(
                     gaMessage(
                         richResponse(
-                            i18nKey("default_ga_card_title", requiredTextToSpeech),
+                            dialogManager.i18nKey(botDefinition,"default_ga_card_title", requiredTextToSpeech),
                             card.copy(buttons = listOfNotNull(redirect)),
                             suggestions
                         )

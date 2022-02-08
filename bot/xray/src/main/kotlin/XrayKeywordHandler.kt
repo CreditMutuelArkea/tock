@@ -16,11 +16,14 @@
 
 package ai.tock.bot.xray
 
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.admin.dialog.ActionReport
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.admin.dialog.DialogReportDAO
 import ai.tock.bot.definition.BotDefinitionBase
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.message.Sentence
 import ai.tock.bot.xray.XrayKeywords.XRAY_KEYWORD
 import ai.tock.bot.xray.XrayKeywords.XRAY_UPDATE_KEYWORD
@@ -45,7 +48,8 @@ class XrayKeywordHandler {
             val labelPlanMap = emptyMap<String, String>()
             val xray =
                 try {
-                    val dialog = dialogReportDAO.getDialog(bus.dialog.id)!!.cleanSurrogates()
+                    //TODO: à revoir, il ne faut pas accéder au dialog de cette manière, est ce vraiment nécessaire ?
+                    val dialog = dialogReportDAO.getDialog((bus.dialogManager.dialogT as Dialog).id)!!.cleanSurrogates()
                     val linkedJira = params.getOrNull(1)?.trim()
                     val connectorName = ""
                     val testTitle = { labels: List<String> ->
@@ -74,7 +78,8 @@ class XrayKeywordHandler {
                     logger.error(e)
                     null
                 }
-            BotDefinitionBase.endTestContextKeywordHandler(bus, false)
+            //TODO : beaucoup trop basé sur les STORY !
+            ScriptManagerStoryBase.endTestContextKeywordHandler(bus, false)
             bus.nextUserActionState = null
             if (xray != null) {
                 bus.endRawText("Xray issue created : ${xray.key}")
@@ -95,13 +100,15 @@ class XrayKeywordHandler {
         } else {
             val xray =
                 try {
-                    val dialog = dialogReportDAO.getDialog(bus.dialog.id)!!.cleanSurrogates()
+                    //TODO: à revoir, il ne faut pas accéder au dialog de cette manière, est ce vraiment nécessaire ?
+                    val dialog = dialogReportDAO.getDialog((bus.dialogManager.dialogT as Dialog).id)!!.cleanSurrogates()
                     XrayService().updateXrayTest(dialog, testKey)
                 } catch (e: Exception) {
                     logger.error(e)
                     null
                 }
-            BotDefinitionBase.endTestContextKeywordHandler(bus, false)
+            //TODO : beaucoup trop basé sur les STORY !
+            ScriptManagerStoryBase.endTestContextKeywordHandler(bus, false)
             bus.nextUserActionState = null
             if (xray != null) {
                 bus.endRawText("Xray issue updated : $testKey")

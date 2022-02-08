@@ -42,7 +42,7 @@ data class PrimaryBotConfiguration(
 
     companion object {
         fun takeBackOrchestrationByTimeOut(inactivityDuration: Duration): ((BotBus) -> Boolean) {
-            return { bus -> bus.userTimeline.currentDialog?.lastUserAction?.date?.isBefore(Instant.now().minus(inactivityDuration)) == true }
+            return { bus -> bus.dialogManager.lastUserAction?.date?.isBefore(Instant.now().minus(inactivityDuration)) == true }
         }
     }
 }

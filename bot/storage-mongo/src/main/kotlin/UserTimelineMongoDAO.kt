@@ -30,15 +30,9 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.ArchivedEntityValue
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.Snapshot
+import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.nlp.NlpCallStats
-import ai.tock.bot.engine.user.PlayerId
-import ai.tock.bot.engine.user.PlayerType
-import ai.tock.bot.engine.user.UserTimeline
-import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.bot.engine.user.*
 import ai.tock.bot.mongo.BotApplicationConfigurationMongoDAO.getApplicationIds
 import ai.tock.bot.mongo.ClientIdCol_.Companion.UserIds
 import ai.tock.bot.mongo.DialogCol_.Companion.GroupId
@@ -56,6 +50,7 @@ import ai.tock.bot.mongo.UserTimelineCol_.Companion.LastUserActionDate
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.Namespace
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.PlayerId
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.TemporaryIds
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.shared.Executor
 import ai.tock.shared.booleanProperty
 import ai.tock.shared.ensureIndex
@@ -201,12 +196,12 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
         }
     }
 
-    override fun save(userTimeline: UserTimeline, namespace: String) {
-        save(userTimeline, namespace, null)
+    override fun save(userTimeline: UserTimelineT<*>, namespace: String) {
+        save(userTimeline as UserTimeline, namespace, null)
     }
 
-    override fun save(userTimeline: UserTimeline, botDefinition: BotDefinition) {
-        save(userTimeline, botDefinition.namespace, botDefinition)
+    override fun save(userTimeline: UserTimelineT<*>, botDefinition: BotDefinition) {
+        save(userTimeline as UserTimeline, botDefinition.namespace, botDefinition)
     }
 
     private fun timelineId(userId: String, namespace: String): String =
@@ -394,11 +389,11 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
         userId: PlayerId,
         priorUserId: PlayerId?,
         groupId: String?,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): UserTimeline {
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): UserTimelineT<*> {
         val timeline = loadWithoutDialogs(namespace, userId)
 
-        loadLastValidDialog(namespace, userId, groupId, storyDefinitionProvider)?.apply { timeline.dialogs.add(this) }
+        loadLastValidDialog(namespace, userId, groupId, scriptDefinitionProvider)?.apply { timeline.dialogs.add(this) }
 
         if (priorUserId != null) {
             // link timeline
@@ -414,7 +409,7 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
                 }
 
             // copy dialog
-            loadLastValidDialog(namespace, priorUserId, groupId, storyDefinitionProvider)
+            loadLastValidDialog(namespace, priorUserId, groupId, scriptDefinitionProvider)
                 ?.apply {
                     timeline.dialogs.add(
                         copy(
@@ -487,11 +482,11 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
         namespace: String,
         userId: PlayerId,
         groupId: String? = null,
-        storyDefinitionProvider: (String) -> StoryDefinition
+        scriptDefinitionProvider: (String) -> ScriptDefinition
     ): Dialog? {
         return try {
             (groupId?.let { loadLastValidGroupDialogCol(namespace, it) } ?: loadLastValidDialogCol(namespace, userId))
-                ?.toDialog(storyDefinitionProvider)
+                ?.toDialog(scriptDefinitionProvider)
         } catch (e: Exception) {
             logger.error(e)
             null
@@ -615,8 +610,8 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
     override fun getClientDialogs(
         namespace: String,
         clientId: String,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): List<Dialog> {
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): List<DialogT<*, *>> {
         val ids = clientIdCol.findOneById(clientId)?.userIds ?: emptySet()
         return if (ids.isEmpty()) {
             emptyList()
@@ -624,18 +619,19 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
             dialogCol
                 .find(PlayerIds.id `in` ids, Namespace eq namespace)
                 .descendingSort(LastUpdateDate)
-                .map { it.toDialog(storyDefinitionProvider) }
+                .map { it.toDialog(scriptDefinitionProvider) }
+                .toList()
         }
     }
 
     override fun getDialogsUpdatedFrom(
         namespace: String,
         from: Instant,
-        storyDefinitionProvider: (String) -> StoryDefinition
-    ): List<Dialog> {
+        scriptDefinitionProvider: (String) -> ScriptDefinition
+    ): List<DialogT<*, *>> {
         return dialogCol
             .find(and(LastUpdateDate gt from, Namespace eq namespace))
-            .map { it.toDialog(storyDefinitionProvider) }
+            .map { it.toDialog(scriptDefinitionProvider) }
             .toList()
     }
 
@@ -661,7 +657,7 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
             }
     }
 
-    override fun getSnapshots(dialogId: Id<Dialog>): List<Snapshot> {
+    override fun getSnapshots(dialogId: Id<*>): List<Snapshot> {
         return try {
             snapshotCol.findOneById(dialogId)?.snapshots ?: emptyList()
         } catch (e: Exception) {

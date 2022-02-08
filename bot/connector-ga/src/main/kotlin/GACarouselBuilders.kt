@@ -25,10 +25,10 @@ import ai.tock.bot.connector.ga.model.response.GAImage
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.translator.raw
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -163,7 +163,7 @@ fun <T : Bus<T>> T.carouselItem(
  */
 fun <T : Bus<T>> T.carouselItem(
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<out StoryHandlerDefinition>?,
     title: CharSequence,
     description: CharSequence? = null,
     image: GAImage? = null,
@@ -176,7 +176,7 @@ fun <T : Bus<T>> T.carouselItem(
  */
 fun <T : Bus<T>> T.carouselItem(
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<out StoryHandlerDefinition>?,
     title: CharSequence,
     description: CharSequence? = null,
     image: GAImage? = null,

@@ -46,7 +46,6 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.ActionMetadata
@@ -55,6 +54,7 @@ import ai.tock.bot.engine.action.ActionPriority
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.user.PlayerId
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -373,7 +373,7 @@ fun I18nTranslator.standaloneQuickReply(
     /**
      * The target step.
      */
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     /**
      * The image url of the quick reply.
      */
@@ -381,7 +381,7 @@ fun I18nTranslator.standaloneQuickReply(
     /**
      * The current step of the Bus<T>.
      */
-    busStep: StoryStep<out StoryHandlerDefinition>? = null,
+    busStep: Step<out StoryHandlerDefinition>? = null,
     /**
      * The current intent of the Bus<T>.
      */
@@ -412,7 +412,7 @@ fun <T : Bus<T>> T.quickReply(
     title: CharSequence,
     targetIntent: IntentAware,
     imageUrl: String? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     parameters: Parameters
 ): QuickReply =
     quickReply(title, targetIntent, imageUrl, step, parameters.toMap())
@@ -424,7 +424,7 @@ fun <T : Bus<T>> T.quickReply(
     title: CharSequence,
     targetIntent: IntentAware,
     imageUrl: String? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     vararg parameters: Pair<String, String>
 ): QuickReply =
     quickReply(title, targetIntent.wrappedIntent(), imageUrl, step, parameters.toMap())
@@ -436,7 +436,7 @@ fun <T : Bus<T>> T.quickReply(
     title: CharSequence,
     targetIntent: IntentAware,
     imageUrl: String? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     parameters: Collection<Pair<String, String>>
 ): QuickReply =
     quickReply(title, targetIntent, imageUrl, step, parameters.toMap())
@@ -448,7 +448,7 @@ fun <T : Bus<T>> T.quickReply(
     title: CharSequence,
     targetIntent: IntentAware,
     imageUrl: String? = null,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     parameters: Map<String, String>
 ): QuickReply =
     quickReply(title, targetIntent, imageUrl, step?.name, parameters)
@@ -515,7 +515,7 @@ fun <T : Bus<T>> T.postbackButton(
 fun <T : Bus<T>> T.postbackButton(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     parameters: Parameters
 ): PostbackButton =
     postbackButton(title, targetIntent, step, *parameters.toArray())
@@ -526,7 +526,7 @@ fun <T : Bus<T>> T.postbackButton(
 fun <T : Bus<T>> T.postbackButton(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     vararg parameters: Pair<String, String>
 ): PostbackButton =
     postbackButton(
@@ -541,9 +541,9 @@ fun <T : Bus<T>> T.postbackButton(
 private fun I18nTranslator.postbackButton(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<out StoryHandlerDefinition>? = null,
     parameters: Map<String, String>,
-    payloadEncoder: (IntentAware, StoryStep<out StoryHandlerDefinition>?, Map<String, String>) -> String
+    payloadEncoder: (IntentAware, Step<out StoryHandlerDefinition>?, Map<String, String>) -> String
 ): PostbackButton {
     val t = translate(title)
     if (t.length > 20) {

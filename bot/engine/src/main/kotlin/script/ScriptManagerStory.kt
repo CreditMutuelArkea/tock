@@ -20,6 +20,7 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.Intent.Companion.unknown
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.bot.story.dialogManager.StoryDefinition
 
 interface ScriptManagerStory : ScriptManager {
@@ -89,6 +90,9 @@ interface ScriptManagerStory : ScriptManager {
      */
     val defaultStory: StoryDefinition
         get() = helloStory ?: stories.first()
+
+    override val defaultScript: ScriptDefinition
+        get() = defaultStory
 
     /**
      * The goodbye story. Used when closing the conversation.

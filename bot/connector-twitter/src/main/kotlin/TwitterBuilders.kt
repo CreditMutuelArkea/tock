@@ -32,13 +32,12 @@ import ai.tock.bot.connector.twitter.model.outcoming.DirectMessageOutcomingEvent
 import ai.tock.bot.connector.twitter.model.outcoming.OutcomingEvent
 import ai.tock.bot.connector.twitter.model.outcoming.Tweet
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.ActionVisibility
 import ai.tock.bot.engine.action.SendChoice
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -323,7 +322,7 @@ fun <T : Bus<T>> T.option(
     label: CharSequence,
     description: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     vararg parameters: Pair<String, String>
 ): Option =
     option(label, description, targetIntent.wrappedIntent(), step, parameters.toMap())
@@ -335,7 +334,7 @@ fun <T : Bus<T>> T.option(
 fun <T : Bus<T>> T.option(
     label: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     vararg parameters: Pair<String, String>
 ): OptionWithoutDescription =
     option(label, targetIntent.wrappedIntent(), step, parameters.toMap())
@@ -348,7 +347,7 @@ fun <T : Bus<T>> T.option(
     label: CharSequence,
     description: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Map<String, String>
 ): Option =
     option(label, description, targetIntent, step, parameters) { intent, s, params ->
@@ -362,7 +361,7 @@ fun <T : Bus<T>> T.option(
 fun <T : Bus<T>> T.option(
     label: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Map<String, String>
 ): OptionWithoutDescription =
     option(label, targetIntent, step, parameters) { intent, s, params ->
@@ -377,9 +376,9 @@ private fun <T : Bus<T>> T.option(
     label: CharSequence,
     description: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Map<String, String>,
-    metadataEncoder: (IntentAware, StoryStep<out StoryHandlerDefinition>?, Map<String, String>) -> String
+    metadataEncoder: (IntentAware, Step<*>?, Map<String, String>) -> String
 ): Option = Option.of(translate(label).toString(), translate(description).toString(), metadataEncoder.invoke(targetIntent, step, parameters))
 
 /**
@@ -389,9 +388,9 @@ private fun <T : Bus<T>> T.option(
 private fun <T : Bus<T>> T.option(
     label: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>? = null,
+    step: Step<*>? = null,
     parameters: Map<String, String>,
-    metadataEncoder: (IntentAware, StoryStep<out StoryHandlerDefinition>?, Map<String, String>) -> String
+    metadataEncoder: (IntentAware, Step<*>?, Map<String, String>) -> String
 ): OptionWithoutDescription = OptionWithoutDescription.of(translate(label).toString(), metadataEncoder.invoke(targetIntent, step, parameters))
 
 /**

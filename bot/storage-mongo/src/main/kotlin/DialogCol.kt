@@ -35,6 +35,7 @@ import ai.tock.bot.engine.dialog.NextUserActionState
 import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserLocation
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.shared.checkMaxLengthAllowed
 import ai.tock.shared.jackson.AnyValueWrapper
 import ai.tock.shared.security.TockObfuscatorService.obfuscate
@@ -85,15 +86,15 @@ internal data class DialogCol(
         dialog.playerIds,
         dialog.id,
         DialogStateMongoWrapper(dialog.state),
-        dialog.stories.map { StoryMongoWrapper(it) },
+        dialog.scripts.map { StoryMongoWrapper(it) },
         userTimeline.applicationIds,
         groupId = dialog.groupId,
         test = userTimeline.userPreferences.test,
         namespace = userTimeline.namespace
     )
 
-    fun toDialog(storyDefinitionProvider: (String) -> StoryDefinition): Dialog {
-        return stories.map { it.toStory(_id, storyDefinitionProvider) }.let { stories ->
+    fun toDialog(scriptDefinitionProvider: (String) -> ScriptDefinition): Dialog {
+        return stories.map { it.toStory(_id, scriptDefinitionProvider) }.let { stories ->
             Dialog(
                 playerIds,
                 _id,
@@ -214,9 +215,9 @@ internal data class DialogCol(
             story.actions.map { getActionWrapper(it) }
         )
 
-        fun toStory(dialogId: Id<Dialog>, storyDefinitionProvider: (String) -> StoryDefinition): Story {
+        fun toStory(dialogId: Id<Dialog>, scriptDefinitionProvider: (String) -> ScriptDefinition): Story {
             return Story(
-                storyDefinitionProvider.invoke(storyDefinitionId),
+                scriptDefinitionProvider.invoke(storyDefinitionId) as StoryDefinition,
                 currentIntent ?: Intent.unknown,
                 currentStep,
                 actions.map { it.toAction(dialogId) }.toMutableList()

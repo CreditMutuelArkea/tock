@@ -82,5 +82,4 @@ data class Dialog(
     override fun initFromDialog(dialog: DialogT<Story, Dialog>): Dialog {
         return Dialog.initFromDialog(dialog as Dialog)
     }
-
 }

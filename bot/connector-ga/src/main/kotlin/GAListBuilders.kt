@@ -25,11 +25,10 @@ import ai.tock.bot.connector.ga.model.response.GARichResponse
 import ai.tock.bot.connector.ga.model.response.GASuggestion
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.Bus
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.translator.raw
+import engine.dialogManager.step.Step
 import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
@@ -169,7 +168,7 @@ fun <T : Bus<T>> T.listItem(
 fun <T : Bus<T>> T.listItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<*>?,
     parameters: Parameters
 ): GAListItem = listItem(title, targetIntent, step, null, null, parameters)
 
@@ -179,7 +178,7 @@ fun <T : Bus<T>> T.listItem(
 fun <T : Bus<T>> T.listItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<*>?,
     vararg parameters: Pair<String, String>
 ): GAListItem = listItem<T>(title, targetIntent, step, null, null, *parameters)
 
@@ -189,7 +188,7 @@ fun <T : Bus<T>> T.listItem(
 fun <T : Bus<T>> T.listItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<*>?,
     description: CharSequence? = null,
     imageUrl: String? = null,
     parameters: Parameters
@@ -201,7 +200,7 @@ fun <T : Bus<T>> T.listItem(
 fun <T : Bus<T>> T.listItem(
     title: CharSequence,
     targetIntent: IntentAware,
-    step: StoryStep<out StoryHandlerDefinition>?,
+    step: Step<*>?,
     description: CharSequence? = null,
     imageUrl: String? = null,
     vararg parameters: Pair<String, String>

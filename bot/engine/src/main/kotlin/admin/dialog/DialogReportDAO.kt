@@ -28,6 +28,7 @@ interface DialogReportDAO {
 
     fun search(query: DialogReportQuery): DialogReportQueryResult
 
+    //TODO: revoir le get dialog pour tenir compte des différentes implémentation possible de Dialog.
     fun getDialog(id: Id<Dialog>): DialogReport?
 
     fun getNlpCallStats(actionId: Id<Action>, namespace: String): NlpCallStats?

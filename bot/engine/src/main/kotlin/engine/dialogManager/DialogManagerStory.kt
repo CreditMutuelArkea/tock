@@ -37,6 +37,7 @@ import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.translator.I18nLabelValue
 import engine.dialogManager.step.Step
+import java.time.Duration
 
 class DialogManagerStory private constructor(
     /**
@@ -78,6 +79,9 @@ class DialogManagerStory private constructor(
         get() = currentStory.definition
 
     override val userPreferences: UserPreferences = userTimeline.userPreferences
+
+    override val lastUserAction: Action?
+        get() = currentDialog.lastUserAction
 
     override var hasCurrentSwitchProcess: Boolean
         get() = currentDialog.state.hasCurrentSwitchStoryProcess
@@ -159,6 +163,14 @@ class DialogManagerStory private constructor(
         userTimeline.userState.profileLoaded = loaded
     }
 
+    override fun getUserStateFlag(flag: String): String? {
+        return userTimeline.userState.getFlag(flag)
+    }
+
+    override fun setUserStateFlag(flag: String, duration: Duration, value: String) {
+        return userTimeline.userState.setFlag(flag, duration, value)
+    }
+
     override fun isLastAction(action: Action): Boolean =
         userTimeline.lastAction?.run { this != action && metadata.lastAnswer } ?: false
 
@@ -176,19 +188,14 @@ class DialogManagerStory private constructor(
         currentStory.support(bus)
 
     /**
-     * retourne true si la story courante supporte l'action passer en parametre
+     * retourne true si la story courante ne supporte pas l'action passer en parametre
      */
-    private fun supportAction(action: Action): Boolean {
-        //TODO: je ne sais pas pourquoi je ne peux pas mettre directement le currentIntent en paramettre du supportAction, à creuser
-        val intent = currentIntent
-
-        return intent != null && currentStory.supportAction(userTimeline, currentDialog, action, intent)
-    }
+    private fun dontSupportAction(action: Action): Boolean =
+        currentIntent != null && !currentStory.supportAction(userTimeline, currentDialog, action, currentIntent!!)
 
     override fun prepareNextAction(scriptManager: ScriptManager, action: Action): Script {
         val story =
-            if(!supportAction(action)) {
-                //TODO: petite correction, il faudrait sans doute passé l'intention en paramètre
+            if(dontSupportAction(action)) {
                 val newStory = scriptManager.createScript(currentIntent, action.applicationId) as Story
                 currentDialog.scripts.add(newStory)
                 newStory
