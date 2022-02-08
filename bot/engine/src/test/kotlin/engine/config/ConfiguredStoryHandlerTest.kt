@@ -30,9 +30,14 @@ import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotDefinitionTest
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.engine.dialog.DialogT
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.story.config.ConfiguredStoryHandler
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
@@ -83,6 +88,7 @@ class ConfiguredStoryHandlerTest {
             every { targetConnectorType } returns ConnectorType("a")
             every { botId } returns PlayerId("botId")
             every { userId } returns PlayerId("userId")
+            every { dialogManager } returns DialogManagerStory(UserTimeline(userId), Dialog(setOf(userId))) as DialogManager<DialogT<*, *>>
             every { applicationId } returns "appId"
             every { currentAnswerIndex } returns 1
             every { botDefinition } returns BotDefinitionTest()
@@ -179,6 +185,7 @@ class ConfiguredStoryHandlerTest {
             every { targetConnectorType } returns ConnectorType("a")
             every { botId } returns PlayerId("botId")
             every { userId } returns PlayerId("userId")
+            every { dialogManager } returns DialogManagerStory(UserTimeline(userId), Dialog(setOf(userId))) as DialogManager<DialogT<*, *>>
             every { applicationId } returns "appId"
             every { currentAnswerIndex } returns 1
             every { botDefinition } returns BotDefinitionTest()
@@ -292,6 +299,7 @@ class ConfiguredStoryHandlerTest {
             every { targetConnectorType } returns ConnectorType("a")
             every { botId } returns PlayerId("botId")
             every { userId } returns PlayerId("userId")
+            every { dialogManager } returns DialogManagerStory(UserTimeline(userId), Dialog(setOf(userId))) as DialogManager<DialogT<*, *>>
             every { applicationId } returns "appId"
             every { currentAnswerIndex } returns 1
             every { botDefinition } returns BotDefinitionTest()

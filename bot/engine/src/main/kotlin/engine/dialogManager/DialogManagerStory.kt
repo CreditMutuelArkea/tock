@@ -90,8 +90,8 @@ class DialogManagerStory private constructor(
      */
     override var currentIntent: IntentAware?
         get() = currentDialog.state.currentIntent
-        set(intent: IntentAware?) {
-            currentDialog.state.currentIntent = currentIntent
+        set(intent) {
+            currentDialog.state.currentIntent = intent
         }
 
     override val currentDialogId: String

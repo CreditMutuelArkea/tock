@@ -166,8 +166,7 @@ internal class Bot(
      * Does this action trigger bot deactivation ?
      */
     fun canDisableBot(currentIntent: IntentAware?, action: Action): Boolean =
-        currentIntent?.let {action.state.notification
-              || scriptManager.isDisabledIntent(it) }?:false
+        action.state.notification || currentIntent?.let { scriptManager.isDisabledIntent(it) }?:false
 
     /**
      * Does this action trigger bot activation ?

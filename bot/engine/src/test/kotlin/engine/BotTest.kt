@@ -20,6 +20,7 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.engine.StepTest.s4
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialog.Story
 import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.message.Choice
 import ai.tock.bot.engine.message.Sentence
@@ -70,15 +71,17 @@ class BotTest : BotEngineTest() {
         val sendSentence = slot<SendSentence>()
         val capturedDialogManager = slot<DialogManagerStory>()
 
-        every { nlp.parseSentence(capture(sendSentence), capture(capturedDialogManager), any(), any())} answers {
+        every {
+            nlp.parseSentence(capture(sendSentence), capture(capturedDialogManager), any(), any())
+        } answers {
             sendSentence.captured.state.intent = otherStory.name
             capturedDialogManager.captured.currentIntent = otherStory.mainIntent()
         }
 
         bot.handle(sentence, userTimeline, connectorController, connectorData)
 
-        assertEquals(otherStory, dialog.currentScript?.definition)
-        assertNull(dialog.currentScript?.step)
+        assertEquals(otherStory, (capturedDialogManager.captured.dialogT.currentScript as Story?)?.definition)
+        assertNull((capturedDialogManager.captured.dialogT.currentScript as Story?)?.step)
     }
 
     @Test
