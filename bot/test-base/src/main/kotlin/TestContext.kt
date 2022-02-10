@@ -192,9 +192,13 @@ open class TestContext {
     /**
      * Default [StoryDefinition] if none is provided.
      */
-    open fun defaultStoryDefinition(botDefinition: BotDefinition): StoryDefinition =
-        if (isInitialized()) botBusMockContext.story.definition
-        else botDefinition.defaultStory
+    open fun defaultStoryDefinition(botDefinition: BotDefinition): StoryDefinition {
+        return if (isInitialized()) {
+            botBusMockContext.story.definition
+        } else {
+            botDefinition.scriptManager.defaultScript as StoryDefinition
+        }
+    }
 
     /**
      * Default [ConnectorType] if none is provided.

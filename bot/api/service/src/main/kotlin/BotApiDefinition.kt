@@ -26,6 +26,7 @@ import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.SimpleStoryDefinition
 import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
 import ai.tock.bot.story.dialogManager.StoryDefinition
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase.Companion.defaultUnknownStory
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.shared.error
@@ -43,7 +44,7 @@ internal class FallbackStoryHandler(
             handler.send(bus)
         } catch (e: Exception) {
             logger.error(e)
-            defaultUnknown.storyHandler.handle(bus)
+            defaultUnknown.scriptHandler.handle(bus)
         }
     }
 }
@@ -92,7 +93,7 @@ internal class BotApiDefinition(
         configuration.nlpModel
     ) {
 
-    override fun findIntent(intent: String, applicationId: String): Intent =
+    override fun findIntent(intent: String, applicationId: String): IntentAware =
         super.findIntent(intent, applicationId).let {
             if (it.wrap(Intent.unknown)) {
                 Intent(intent)

@@ -82,7 +82,7 @@ class BotBusMockTest {
     }
 
     @Test
-    fun `storyHandlerListener start method is called ANDscriptHandler not called if it returns false`() {
+    fun `storyHandlerListener start method is called AND scriptHandler not called if it returns false`() {
         val listener1: StoryHandlerListener = mockk()
         every { listener1.startAction(any(), any()) } returns true
         val listener2: StoryHandlerListener = mockk()
@@ -165,7 +165,7 @@ class BotBusMockTest {
 
         botBus.run()
 
-        assertNull(botBus.story.currentStep)
+        assertNull(botBus.dialogManager.getCurrentStep())
     }
 
     @Test
@@ -178,7 +178,7 @@ class BotBusMockTest {
 
         botBus.run()
 
-        assertEquals(Step.a, botBus.story.currentStep)
+        assertEquals(Step.a, botBus.dialogManager.getCurrentStep())
     }
 
     @Test

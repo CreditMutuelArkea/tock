@@ -16,6 +16,7 @@
 
 package ai.tock.bot.test
 
+import ai.tock.bot.DialogManager.ScriptManagerStoryBase
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.ConnectorData
@@ -31,14 +32,10 @@ import ai.tock.bot.engine.action.ActionPriority
 import ai.tock.bot.engine.action.ActionVisibility
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.EntityValue
-import ai.tock.bot.engine.dialog.NextUserActionState
-import ai.tock.bot.engine.dialog.Snapshot
-import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.shared.defaultLocale
@@ -130,16 +127,17 @@ open class BotBusMock(
      * Run the [StoryHandler] of the current [story].
      */
     fun run(): BotBusMock {
+        val scriptHandler: ScriptHandler = dialogManager.currentScriptDefinition.scriptHandler
         context.testContext.storyHandlerListeners.forEach {
-            if (!it.startAction(this, story.definition.storyHandler)) {
+            if (!it.startAction(this, scriptHandler)) {
                 return this
             }
         }
 
-        story.definition.storyHandler.handle(this)
+        scriptHandler.handle(this)
 
         context.testContext.storyHandlerListeners.forEach {
-            it.endAction(this, story.definition.storyHandler)
+            it.endAction(this, scriptHandler)
         }
 
         return this
@@ -172,7 +170,7 @@ open class BotBusMock(
      */
     fun addActionEntity(entity: Entity, textContent: String): BotBusMock =
         addActionEntity(EntityValue(entity, null, textContent))
-
+/*
     override var userTimeline: UserTimeline
         get() = context.userTimeline
         set(value) {
@@ -184,7 +182,6 @@ open class BotBusMock(
         set(value) {
             context.dialog = value
         }
-
     override val currentDialog: Dialog get() = dialog
 
     override var story: Story
@@ -193,6 +190,10 @@ open class BotBusMock(
             context.story = value
             dialog.stories.add(value)
         }
+
+*/
+    override val dialogManager: DialogManager<DialogT<*,*>>
+        get() = context.dialogManager
 
     override var botDefinition: BotDefinition
         get() = context.botDefinition
@@ -227,7 +228,7 @@ open class BotBusMock(
     override val applicationId get() = action.applicationId
     override val botId get() = action.recipientId
     override val userId get() = action.playerId
-    override val userPreferences: UserPreferences get() = userTimeline.userPreferences
+    override val userPreferences: UserPreferences get() = dialogManager.userPreferences
     override val userLocale: Locale get() = userPreferences.locale
     override var targetConnectorType: ConnectorType
         get() = action.state.targetConnectorType ?: connectorType
@@ -240,18 +241,18 @@ open class BotBusMock(
     private val mockData: BusMockData = BusMockData()
 
     override val entities: Map<String, EntityStateValue>
-        get() = dialog.state.entityValues
+        get() = dialogManager.entityValues
 
     override var intent: IntentAware?
-        get() = dialog.state.currentIntent
+        get() = dialogManager.currentIntent
         set(value) {
-            dialog.state.currentIntent = value?.wrappedIntent()
+            dialogManager.currentIntent = value?.wrappedIntent()
         }
 
     override var nextUserActionState: NextUserActionState?
-        get() = dialog.state.nextActionState
+        get() = dialogManager.nextUserActionState
         set(value) {
-            dialog.state.nextActionState = value
+            dialogManager.nextUserActionState = value
         }
 
     init {
@@ -271,18 +272,19 @@ open class BotBusMock(
         }
 
         a.state.entityValues.forEach {
-            dialog.state.changeValue(it)
+            //TODO: mauvaise idée de travailler sur le dialogT (c'est en attendant de comprendre le role de cette class)
+            dialogManager.dialogT.state.changeValue(it)
         }
 
         if (context.dialog.state.currentIntent != null &&
             !context.story.supportIntent(context.dialog.state.currentIntent!!)
         ) {
             val storyDefinition =
-                context.botDefinition.findStoryDefinition(context.dialog.state.currentIntent!!, a.applicationId)
+                (context.botDefinition.scriptManager as ScriptManagerStoryBase).findStoryDefinition(context.dialog.state.currentIntent!!, a.applicationId)
             context.story = Story(storyDefinition, storyDefinition.mainIntent().wrappedIntent())
-            context.dialog.stories.add(context.story)
-        } else if (context.dialog.stories.isEmpty()) {
-            context.dialog.stories.add(context.story)
+            context.dialog.scripts.add(context.story)
+        } else if (context.dialog.scripts.isEmpty()) {
+            context.dialog.scripts.add(context.story)
         }
 
         context.story.computeCurrentStep(context.userTimeline, context.dialog, a, context.dialog.state.currentIntent)
@@ -319,7 +321,8 @@ open class BotBusMock(
         mockData.clear()
         action.state.testEvent = userPreferences.test
 
-        story.actions.add(action)
+
+        dialogManager.dialogT.currentScript?.actions?.add(action)
 
         if (action.metadata.lastAnswer) {
             endCount++
@@ -335,7 +338,7 @@ open class BotBusMock(
     }
 
     private fun addSnapshot() {
-        context.snapshots.add(Snapshot(dialog))
+        context.snapshots.add(Snapshot(dialogManager.dialogT as Dialog))
     }
 
     /**
@@ -422,7 +425,7 @@ open class BotBusMock(
                 userLocale,
                 userInterfaceType,
                 targetConnectorType.id,
-                dialog.id.toString()
+                dialogManager.currentDialogId
             ),
             key.args
         ).raw

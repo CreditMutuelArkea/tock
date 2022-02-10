@@ -18,16 +18,16 @@ package ai.tock.nlp.dialogflow
 
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
+import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.DialogT
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.EntityValue
+import ai.tock.bot.engine.dialogManager.DialogManager
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.nlp.NlpController
-import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.bot.engine.user.UserTimelineT
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.nlp.api.client.model.NlpQuery
@@ -63,8 +63,8 @@ internal class DialogflowNlp : NlpController {
     private class SentenceParser(
         val nlpClient: NlpClient,
         val sentence: SendSentence,
-        val userTimeline: UserTimeline,
-        val dialog: Dialog,
+        val userTimeline: UserTimelineT<*>,
+        val dialog: DialogT<*, *>,
         val connector: ConnectorController,
         val botDefinition: BotDefinition
     ) {
@@ -136,11 +136,11 @@ internal class DialogflowNlp : NlpController {
         }
 
         private fun findIntent(
-            userTimeline: UserTimeline,
-            dialog: Dialog,
+            userTimeline: UserTimelineT<*>,
+            dialog: DialogT<*, *>,
             sentence: SendSentence,
             nlpResult: NlpResult
-        ): Intent {
+        ): IntentAware {
             var i: Intent? = null
             BotRepository.forEachNlpListener {
                 if (i == null) {
@@ -185,7 +185,7 @@ internal class DialogflowNlp : NlpController {
             }
         }
 
-        private fun listenNlpErrorCall(query: NlpQuery, dialog: Dialog, throwable: Throwable?) {
+        private fun listenNlpErrorCall(query: NlpQuery, dialog: DialogT<*, *>, throwable: Throwable?) {
             BotRepository.forEachNlpListener {
                 try {
                     it.error(query, dialog, throwable)
@@ -217,7 +217,7 @@ internal class DialogflowNlp : NlpController {
                 toQueryContext(),
                 NlpQueryState(
                     dialog.state.nextActionState?.states
-                        ?: listOfNotNull(dialog.currentScript?.definition?.mainIntent()?.name()).toSet()
+                        ?: listOfNotNull(dialog.currentScript?.mainIntent?.name()).toSet()
                 )
             )
         }
@@ -258,16 +258,15 @@ internal class DialogflowNlp : NlpController {
 
     override fun parseSentence(
         sentence: SendSentence,
-        userTimeline: UserTimelineT<*>,
-        dialog: DialogT<*,*>,
+        dialogManager: DialogManager<*>,
         connector: ConnectorController,
         botDefinition: BotDefinition
     ) {
         SentenceParser(
             nlpClient,
             sentence,
-            userTimeline,
-            dialog,
+            dialogManager.userTimelineT,
+            dialogManager.dialogT,
             connector,
             botDefinition
         ).parse()
@@ -275,7 +274,7 @@ internal class DialogflowNlp : NlpController {
 
     override fun markAsUnknown(
         sentence: SendSentence,
-        userTimeline: UserTimeline,
+        userTimeline: UserTimelineT<*>,
         botDefinition: BotDefinition
     ) {
         if (sentence.stringText != null) {

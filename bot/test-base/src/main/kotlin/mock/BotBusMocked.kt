@@ -27,8 +27,6 @@ import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionQuote
@@ -39,10 +37,7 @@ import ai.tock.bot.engine.dialog.EntityValue
 import ai.tock.bot.engine.dialog.EventState
 import ai.tock.bot.engine.message.Message
 import ai.tock.bot.engine.message.MessagesList
-import ai.tock.bot.engine.user.PlayerId
-import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserState
-import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.*
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.shared.defaultLocale
@@ -51,6 +46,7 @@ import ai.tock.translator.Translator
 import ai.tock.translator.UserInterfaceType.textAndVoiceAssistant
 import ai.tock.translator.UserInterfaceType.textChat
 import ai.tock.translator.raw
+import engine.dialogManager.step.Step
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
@@ -157,9 +153,9 @@ fun provideMockedBusCommon(bus: BotBus = mockk()): BotBus {
     every { bus.botId } returns botId
     every { bus.applicationId } returns "appId"
 
-    val userTimeline: UserTimeline = mockk()
+    val userTimeline: UserTimelineT<*> = mockk()
     val userState = UserState(Instant.now())
-    every { bus.userTimeline } returns userTimeline
+    //every { bus.userTimeline } returns userTimeline
     every { userTimeline.userState } returns userState
     every { userTimeline.playerId } returns playerId
 
@@ -184,12 +180,12 @@ fun provideMockedBusCommon(bus: BotBus = mockk()): BotBus {
 
     mockkObject(SendChoice.Companion)
     every {
-        SendChoice.encodeChoiceId(bus, any(), any<StoryStep<*>>(), any())
+        SendChoice.encodeChoiceId(bus, any(), any<Step<*>>(), any())
     } answers {
         @Suppress("UNCHECKED_CAST")
         SendChoice.encodeChoiceId(
             (args[1] as IntentAware).wrappedIntent(),
-            args[2] as? StoryStep<out StoryHandlerDefinition>,
+            args[2] as? Step<*>,
             (args[3] as? Map<String, String>) ?: emptyMap(),
             null,
             null,

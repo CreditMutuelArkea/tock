@@ -23,15 +23,15 @@ import ai.tock.bot.story.definition.ConnectorStoryHandlerBase
 import ai.tock.bot.definition.HandlerDef
 import ai.tock.bot.story.dialogManager.StoryDefinitionBase
 import ai.tock.bot.story.dialogManager.handler.StoryHandlerBase
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.shared.injector
 import ai.tock.shared.tockInternalInjector
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.provider
+import engine.dialogManager.step.Step
 import io.mockk.mockk
 
 /**
@@ -42,7 +42,7 @@ fun StoryDefinitionBase.checkPreconditions(bus: BotBus) = (scriptHandler  as Sto
 /**
  * Runs the select step from Bus phase.
  */
-fun StoryDefinitionBase.selectStepFromData(def: HandlerDef<*>, data: Any?): StoryStep<*>? =
+fun StoryDefinitionBase.selectStepFromData(def: HandlerDef<*>, data: Any?): Step<*>? =
     (scriptHandler  as StoryHandlerBase<*>).selectStepFromStoryHandlerAndData(def, data, this)
 
 /**

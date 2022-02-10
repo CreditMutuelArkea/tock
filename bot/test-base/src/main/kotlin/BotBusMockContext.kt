@@ -21,23 +21,23 @@ import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.Parameters
+import ai.tock.bot.definition.bot
 import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
-import ai.tock.bot.engine.dialogManager.story.storySteps.StoryStep
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendChoice
 import ai.tock.bot.engine.action.SendChoice.Companion.decodeChoiceId
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityValue
-import ai.tock.bot.engine.dialog.Snapshot
-import ai.tock.bot.engine.dialog.Story
+import ai.tock.bot.engine.dialog.*
+import ai.tock.bot.engine.dialogManager.DialogManager
+import ai.tock.bot.engine.dialogManager.DialogManagerFactory
+import ai.tock.bot.engine.dialogManager.DialogManagerStory
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.engine.user.UserPreferences
 import ai.tock.bot.engine.user.UserTimeline
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.UserInterfaceType
+import engine.dialogManager.step.Step
 
 /**
  * The context of the test.
@@ -52,7 +52,8 @@ data class BotBusMockContext(
     var userInterfaceType: UserInterfaceType = UserInterfaceType.textChat,
     var connectorType: ConnectorType = defaultTestConnectorType,
     val testContext: TestContext = currentTestContext,
-    val snapshots: MutableList<Snapshot> = mutableListOf()
+    val snapshots: MutableList<Snapshot> = mutableListOf(),
+    val dialogManager: DialogManager<DialogT<*, *>> = DialogManagerStory(userTimeline, dialog) as DialogManager<DialogT<*, *>>
 ) {
 
     constructor(
@@ -90,8 +91,7 @@ data class BotBusMockContext(
         userPreferences: UserPreferences = UserPreferences(),
         connectorType: ConnectorType = defaultTestConnectorType,
         testContext: TestContext = currentTestContext
-    ) :
-        this(
+    ): this(
             applicationId,
             userId,
             botId,
@@ -239,7 +239,7 @@ data class BotBusMockContext(
      */
     fun choice(
         intentName: String,
-        step: StoryStep<out StoryHandlerDefinition>,
+        step: Step<*>,
         vararg parameters: Pair<String, String>
     ): SendChoice = SendChoice(userId, applicationId, botId, intentName, step, parameters.toMap())
 
@@ -248,7 +248,7 @@ data class BotBusMockContext(
      */
     fun choice(
         intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>,
+        step: Step<*>,
         parameters: Parameters
     ): SendChoice = SendChoice(userId, applicationId, botId, intent.name(), step, parameters.toMap())
 

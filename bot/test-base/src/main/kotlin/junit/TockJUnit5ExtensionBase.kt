@@ -16,6 +16,7 @@
 
 package ai.tock.bot.test.junit
 
+import ai.tock.bot.DialogManager.ScriptManagerStory
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
@@ -350,7 +351,7 @@ open class TockJUnit5ExtensionBase<out T : TestContext>(
             ) {
                 testContext.defaultStoryDefinition(botDefinition)
             } else {
-                botDefinition.findStoryDefinition(intent, applicationId)
+                (botDefinition.scriptManager as ScriptManagerStory).findStoryDefinition(intent, applicationId)
             }
         }
 

@@ -74,7 +74,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Manager of Dialog, current, next and transition, to abstract the concret Dialogs and Scripts used
      */
-    val dialogManager: DialogManager<DialogT<*,*>>
+    val dialogManager: DialogManager<DialogT<*, *>>
 
     /**
      * The current intent for this user (may be different from the initial [intent]).
