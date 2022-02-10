@@ -51,9 +51,7 @@ internal class BotApiHandler(
     private val clientController: BotApiClientController = BotApiClientController(provider, configuration),
 ) {
     private val BotBus.viewedScripts: Set<ScriptDefinition>
-        get() {
-           return getBusContextValue<Set<ScriptDefinition>>(VIEWED_SCRIPTS_BUS_KEY) ?: emptySet()
-        }
+        get() = getBusContextValue<Set<ScriptDefinition>>(VIEWED_SCRIPTS_BUS_KEY) ?: emptySet()
 
     companion object {
         private const val VIEWED_SCRIPTS_BUS_KEY = "_viewed_scripts_tock_switch"

@@ -26,6 +26,7 @@ import ai.tock.bot.api.service.BotApiHandler
 import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.script.ScriptDefinition
 import ai.tock.shared.tockInternalInjector
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
@@ -48,7 +49,7 @@ class BotApiHandlerTest {
     private val bus: BotBus = mockk(relaxed = true) {
         every { action } returns mockk<SendSentence> {
             every { stringText } returns "user text"
-            every { getBusContextValue<Set<StoryDefinition>>("_viewed_stories_tock_switch") } returns emptySet()
+            every { getBusContextValue<Set<ScriptDefinition>>("_viewed_scripts_tock_switch") } returns emptySet()
         }
     }
 
@@ -88,7 +89,7 @@ class BotApiHandlerTest {
 
         handler.send(bus)
 
-        verify { bus.setBusContextValue("_viewed_stories_tock_switch", any()) }
+        verify { bus.setBusContextValue("_viewed_scripts_tock_switch", any()) }
         verify { bus.handleAndSwitchScript(any(), any()) }
     }
 }
