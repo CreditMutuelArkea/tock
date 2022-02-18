@@ -127,7 +127,7 @@ open class BotBusMock(
      * Run the [StoryHandler] of the current [story].
      */
     fun run(): BotBusMock {
-        val scriptHandler: ScriptHandler = dialogManager.currentScriptDefinition.scriptHandler
+        val scriptHandler: ScriptHandler = dialogManager.currentScriptDefinition!!.scriptHandler
         context.testContext.storyHandlerListeners.forEach {
             if (!it.startAction(this, scriptHandler)) {
                 return this

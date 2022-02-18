@@ -38,7 +38,7 @@ internal fun BotBus.toUserRequest(): UserRequest =
             .flatMap { it.newValues }
             .map { it.toEntity(this) },
         action.toApiMessage(),
-        dialogManager.currentScriptDefinition.id,
+        dialogManager.currentScriptDefinition!!.id,
         step?.name,
         toRequestContext()
     )

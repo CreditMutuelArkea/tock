@@ -67,7 +67,7 @@ internal class BotApiHandler(
 
     private fun BotBus.handleResponse(request: UserRequest, response: BotResponse?) {
         if (response != null) {
-            val scriptDefinitionId: String = dialogManager.currentScriptDefinition.id
+            val scriptDefinitionId: String = dialogManager.currentScriptDefinition!!.id
             val endScriptId: String? = scriptManager.findEnableEndScriptId(botDefinition.namespace,
                 botDefinition.botId,
                 applicationId,

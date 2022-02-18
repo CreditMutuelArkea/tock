@@ -163,7 +163,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
                         !bus.hasCurrentSwitchStoryProcess &&
                         !isEndCalled(bus)
                     ) {
-                        logger.warn { "Bus.end not called for story ${bus.dialogManager.currentScriptDefinition.id}, user ${bus.userId.id} and connector ${bus.targetConnectorType}" }
+                        logger.warn { "Bus.end not called for story ${bus.dialogManager.currentScriptDefinition?.id}, user ${bus.userId.id} and connector ${bus.targetConnectorType}" }
                     }
                 }
             }

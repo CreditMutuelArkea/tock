@@ -69,14 +69,14 @@ class DialogManagerStory private constructor(
     /**
      * The current story.
      */
-    private var currentStory: Story
-        get() = currentDialog.scripts.lastOrNull()!!
-        set(value) {
-            currentDialog.scripts.add(value)
-        }
+    private val currentStory: Story?
+        get() = currentDialog.scripts.lastOrNull()
 
-    override val currentScriptDefinition: ScriptDefinition
-        get() = currentStory.definition
+    private val hasCurrentStory: Boolean
+        get() = currentDialog.scripts.lastOrNull() != null
+
+    override val currentScriptDefinition: ScriptDefinition?
+        get() = currentStory?.definition
 
     override val userPreferences: UserPreferences = userTimeline.userPreferences
 
@@ -182,26 +182,29 @@ class DialogManagerStory private constructor(
         userTimeline.lastAction
 
     override fun addAction(action: Action): Boolean =
-        currentStory.actions.add(action)
+        currentStory?.actions?.add(action)?:false
 
     override fun addSupport(bus: BotBus): Double =
-        currentStory.support(bus)
+        currentStory?.support(bus)?:0.0
 
     /**
      * retourne true si la story courante ne supporte pas l'action passer en parametre
      */
-    private fun dontSupportAction(action: Action): Boolean =
-        currentIntent != null && !currentStory.supportAction(userTimeline, currentDialog, action, currentIntent!!)
+    private fun actionSupported(action: Action): Boolean {
+        return if(currentIntent != null && currentStory != null) {
+            currentStory!!.supportAction(userTimeline, currentDialog, action, currentIntent!!)
+        } else {
+            false
+        }
+    }
 
     override fun prepareNextAction(scriptManager: ScriptManager, action: Action): Script {
-        val story =
-            if(dontSupportAction(action)) {
-                val newStory = scriptManager.createScript(currentIntent, action.applicationId) as Story
-                currentDialog.scripts.add(newStory)
-                newStory
-            } else {
-                currentStory
-            }
+        if(!actionSupported(action)) {
+            val newStory = scriptManager.createScript(currentIntent, action.applicationId) as Story
+            currentDialog.scripts.add(newStory)
+        }
+        // la current story est le dernier script du currentDialog qui a été initialisé juste avant si empty
+        val story = currentStory!!
 
         story.computeCurrentStep(userTimeline, currentDialog, action, currentIntent)
 
@@ -255,31 +258,31 @@ class DialogManagerStory private constructor(
      */
     override fun switchScript(storyDefinition: ScriptDefinition, starterIntent: IntentAware, step: String?, action: Action) {
         // switch story if new story
-        if (storyDefinition.id != currentStory.definition.id) {
+        if (storyDefinition.id != currentStory?.definition?.id) {
             storyDefinition as StoryDefinition
-            currentStory = Story(storyDefinition, starterIntent.wrappedIntent(), currentStory.step)
+            currentDialog.scripts.add(Story(storyDefinition, starterIntent.wrappedIntent(), currentStory?.step))
             hasCurrentSwitchProcess = true
             currentDialog.state.currentIntent = starterIntent
         }
 
         // set step
         if (step != null) {
-            currentStory.step = step
+            currentStory!!.step = step
         } else {
-            currentStory.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
+            currentStory!!.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
         }
     }
 
     override fun isCurrentScriptDefinition(scriptDefinition: ScriptDefinition): Boolean {
         scriptDefinition as StoryDefinition
-        return currentStory.definition.equals(scriptDefinition)
+        return currentStory?.definition?.equals(scriptDefinition)?:false
     }
 
     /**
      * Gets an i18n label with the specified key.
      */
     override fun i18nKey(botDefinition: BotDefinition, key: String, defaultLabel: CharSequence, vararg args: Any?): I18nLabelValue {
-        return currentStory.definition.scriptHandler.let {
+        return currentStory?.definition?.scriptHandler.let {
             (it as? StoryHandlerBase<*>)?.i18nKey(key, defaultLabel, *args)
                 ?: I18nLabelValue(
                     key,

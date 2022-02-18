@@ -43,7 +43,7 @@ interface DialogManager<in T : DialogT<*,*>> {
 
     val currentDialogId: String
 
-    val currentScriptDefinition: ScriptDefinition
+    val currentScriptDefinition: ScriptDefinition?
 
     val entityValues: Map<String, EntityStateValue>
 
