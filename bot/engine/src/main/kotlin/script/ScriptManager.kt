@@ -18,13 +18,10 @@ package ai.tock.bot.DialogManager
 
 import ai.tock.bot.ScriptManager.ScriptStep
 import ai.tock.bot.definition.BotDefinition
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.script.Script
 import ai.tock.bot.script.ScriptDefinition
 import ai.tock.nlp.api.client.model.dump.IntentDefinition
-import engine.dialogManager.step.Step
 
 interface ScriptManager {
 

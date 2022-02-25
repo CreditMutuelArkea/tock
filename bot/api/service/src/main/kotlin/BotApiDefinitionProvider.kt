@@ -69,7 +69,7 @@ internal class BotApiDefinitionProvider(private val configuration: BotConfigurat
             with(botDefinition()) {
                 val applicationId: Id<ApplicationDefinition> = FrontClient.getApplicationByNamespaceAndName(namespace, nlpModelName)!!._id
                 val intents: List<ClientIntentDefinition>  = nlpClient.getIntentsByNamespaceAndName(namespace, botId)
-                scriptManager.getFrontUnkowIntents(intents)
+                getRealScriptManager().getFrontUnkowIntents(intents)
                     .map { it.name().withoutNamespace() }
                     .forEach {
                         logger.debug { "Intent $it not found, creating it..." }

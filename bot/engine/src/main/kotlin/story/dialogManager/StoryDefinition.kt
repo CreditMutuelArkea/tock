@@ -16,13 +16,8 @@
 
 package ai.tock.bot.story.dialogManager
 
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.definition.StoryTag
-import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
-import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.bot.script.ScriptDefinition
-import ai.tock.translator.UserInterfaceType
 import engine.dialogManager.step.Step
 
 /**
@@ -35,11 +30,6 @@ import engine.dialogManager.step.Step
  * but instead extend [SimpleStoryHandlerBase] or [StoryDefinitionBase].
  */
 interface StoryDefinition : ScriptDefinition, IntentAware {
-
-    /**
-     * The story handler of the story.
-     */
-    //val storyHandler: ScriptHandler
 
     /**
      * The root steps of the story.

@@ -20,7 +20,6 @@ import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.bot.BotConfiguration
-import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorConfiguration
@@ -32,7 +31,6 @@ import ai.tock.bot.definition.BotAnswerInterceptor
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.BotProvider
 import ai.tock.bot.definition.BotProviderId
-import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.story.definition.StoryHandlerListener
 import ai.tock.bot.engine.action.ActionNotificationType
@@ -249,12 +247,12 @@ object BotRepository {
         checkBuiltInScriptCompliance(botDefinition)
         val configurationName: String? = botProvider.botProviderId.configurationName
         executor.executeBlocking {
-            botDefinition.scriptManager.createBuiltInScriptsIfNotExist(botDefinition, configurationName)
+            botDefinition.getRealScriptManager().createBuiltInScriptsIfNotExist(botDefinition, configurationName)
         }
     }
 
     private fun checkBuiltInScriptCompliance(botDefinition: BotDefinition) {
-        val starterIntentsMap: MutableMap<String, MutableList<ScriptDefinition>> = botDefinition.scriptManager.mapScriptByIntent()
+        val starterIntentsMap: MutableMap<String, MutableList<ScriptDefinition>> = botDefinition.getRealScriptManager().mapScriptByIntent()
         val duplicates = starterIntentsMap.mapValues { s -> s.value.distinctBy { it.id } }.filter { it.value.size > 1 }
         if (duplicates.isNotEmpty()) {
             error("duplicate starter intents: $duplicates")

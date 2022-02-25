@@ -57,10 +57,7 @@ interface BotDefinition : I18nKeyProvider {
      */
     val nlpModelName: String
 
-    /**
-     * Manager of script of dialog. Can be a static story script, or a dynamic state graphe script, or other.
-     */
-    val scriptManager: ScriptManager
+    fun getRealScriptManager(): ScriptManager
 
     /**
      * The default unknown answer.
@@ -100,7 +97,7 @@ interface BotDefinition : I18nKeyProvider {
      * Finds an [IntentAware] from an intent name.
      */
     fun findIntent(intent: String, applicationId: String): IntentAware {
-        return scriptManager.findIntent(intent, applicationId)
+        return getRealScriptManager().findIntent(intent, applicationId)
     }
 
     /**

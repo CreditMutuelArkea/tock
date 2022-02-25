@@ -351,7 +351,7 @@ open class TockJUnit5ExtensionBase<out T : TestContext>(
             ) {
                 testContext.defaultStoryDefinition(botDefinition)
             } else {
-                (botDefinition.scriptManager as ScriptManagerStory).findStoryDefinition(intent, applicationId)
+                (botDefinition.getRealScriptManager() as ScriptManagerStory).findStoryDefinition(intent, applicationId)
             }
         }
 

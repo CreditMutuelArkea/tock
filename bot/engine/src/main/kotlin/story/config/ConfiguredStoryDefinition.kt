@@ -25,7 +25,6 @@ import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.bot.engine.dialogManager.handler.ScriptHandler
 import ai.tock.bot.story.definition.StoryTag
 import ai.tock.bot.engine.config.BotStoryDefinitionWrapper
-import ai.tock.bot.engine.dialogManager.story.storySteps.SimpleStoryStep
 import ai.tock.translator.UserInterfaceType
 
 /**

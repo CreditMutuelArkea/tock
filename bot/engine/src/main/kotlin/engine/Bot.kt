@@ -77,8 +77,6 @@ internal class Bot(
 
         userTimeline.loadProfileIfNotSet(connectorData, action, connector)
 
-        //val dialog: DialogT<*,*> = getDialog(action, userTimeline)
-
         val dialogManager: DialogManager<DialogT<*, *>> =
             DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
 
@@ -104,8 +102,6 @@ internal class Bot(
         connector as TockConnectorController
 
         userTimeline.loadProfileIfNotSet(connectorData, action, connector)
-
-        //val dialog = getDialog(action, userTimeline)
 
         val dialogManager: DialogManager<DialogT<*, *>> =
             DialogManagerFactory.createDialogManager(botDefinition, userTimeline, action)
@@ -180,43 +176,6 @@ internal class Bot(
                 }?:false
     }
 
-/*
-    private fun getDialog(action: Action, userTimeline: UserTimelineT<*>): DialogT<*,*> {
-        return userTimeline.currentDialog ?: createDialog(action, userTimeline)
-    }
-
-    private fun createDialog(action: Action, userTimeline: UserTimeline): DialogT<*,*>  {
-        val newDialog = Dialog(setOf(userTimeline.playerId, action.recipientId))
-        userTimeline.dialogs.add(newDialog)
-        return newDialog
-    }
-
-    private fun getStory(dialogManager: DialogManager<*>, scriptManager: ScriptManager, action: Action): Script {
-        return dialogManager.prepareNextAction(scriptManager, action)
-
-        val newIntent: IntentAware? = dialog.state.currentIntent
-        val previousStory = dialog.currentScript
-
-        val story =
-            if(!dialogManager.supportAction(action)) {
-                val newScript = scriptManager.createScript(newIntent, action.applicationId)
-                dialog.scripts.add(newScript)
-                newScript
-            } else {
-                previousStory
-            }
-
-        story.computeCurrentStep(userTimeline, dialog, action, newIntent)
-
-        story.actions.add(action)
-
-        // update action state
-        action.state.intent = dialog.state.currentIntent?.name()
-        action.state.step = story.step
-
-        return story
-    }
-*/
     private fun parseAction(
         action: Action,
         dialogManager: DialogManager<*>,
@@ -263,36 +222,6 @@ internal class Bot(
     private fun parseChoice(choice: SendChoice, dialogManager: DialogManager<*>) {
         botDefinition.findIntent(choice.intentName, choice.applicationId).let { intent ->
             dialogManager.changeState(scriptManager, choice, intent)
-
-            /*
-            // restore state if it's possible (old dialog choice case)
-            if (intent != Intent.unknown) {
-                val previousIntentName: String? = choice.previousIntent()
-                val applicationId: String = choice.applicationId
-                if (previousIntentName != null) {
-                    val previousStory = scriptManager.findScriptDefinitionById(previousIntentName, applicationId)
-                    if (previousStory != botDefinition.unknownStory && previousStory.supportIntent(intent)) {
-                        // the previous intent is a primary intent that support the new intent
-                        val storyDefinition = scriptManager.findScriptDefinitionById(choice.intentName, applicationId)
-                        if (storyDefinition == botDefinition.unknownStory) {
-                            // the new intent is a secondary intent, may be we need to create a intermediate story
-                            val currentStory = dialog.currentScript
-                            if (currentStory == null
-                                || !currentStory.supportIntent(intent)
-                                || !currentStory.supportIntent(
-                                        botDefinition.findIntent(previousIntentName, applicationId)
-                                    )
-                            ) {
-                                dialog.scripts.add(
-                                    Story(previousStory, intent)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            dialog.state.currentIntent = intent
-            */
         }
     }
 

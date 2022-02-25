@@ -38,26 +38,20 @@ internal class ScriptManagerStoryWrapper(
 
     private val logger = KotlinLogging.logger {}
 
-    // all stories
-    @Volatile
-    private var allStories: List<StoryDefinition> = scriptManager.stories
-
     // stories with configuration (including built-in)
     @Volatile
     private var configuredStories: Map<String, List<ConfiguredStoryDefinition>> = emptyMap()
 
     @Volatile
-    private var allStoriesById: Map<String, StoryDefinition> = scriptManager.stories.associateBy { it.id }
+    private var allStoriesById: Map<String, StoryDefinition> = stories.associateBy { it.id }
 
 
     private fun findStoryDefinitionByTag(tag: StoryTag): List<StoryDefinition> =
         stories.filter { it.tags.contains(tag) }
 
     // only built-in
-    private val builtInStoriesMap: Map<String, StoryDefinition> = scriptManager.stories.associateBy { it.id }
+    private val builtInStoriesMap: Map<String, StoryDefinition> = stories.associateBy { it.id }
 
-    override val stories: List<StoryDefinition>
-        get() = allStories
 
     override val disabledStories: List<StoryDefinition>
         get() = findStoryDefinitionByTag(StoryTag.DISABLE)
@@ -71,7 +65,7 @@ internal class ScriptManagerStoryWrapper(
                 .map { ConfiguredStoryDefinition(botDefinition, it) }
                 .groupBy { it.storyId }
 
-        allStories = (
+        stories = (
                 this.configuredStories +
                         // in order to handle built-in not yet configured...
                         scriptManager
@@ -82,7 +76,7 @@ internal class ScriptManagerStoryWrapper(
                 )
             .values.flatten()
 
-        this.allStoriesById = allStories.associateBy { it.id }
+        this.allStoriesById = stories.associateBy { it.id }
     }
 
     override fun findIntent(intent: String, applicationId: String): IntentAware {
@@ -173,7 +167,7 @@ internal class ScriptManagerStoryWrapper(
 
     fun findScriptByStoryHandler(scriptHandler: StoryHandler, applicationId: String): StoryDefinition? {
         val byStoryHandler: (StoryDefinition)->Boolean = { it.scriptHandler == scriptHandler }
-        val storieDefinition: StoryDefinition? = scriptManager.stories.find(byStoryHandler) ?: stories.find(byStoryHandler)
+        val storieDefinition: StoryDefinition? = stories.find(byStoryHandler)
         return storieDefinition?.checkApplicationId(applicationId)
     }
 

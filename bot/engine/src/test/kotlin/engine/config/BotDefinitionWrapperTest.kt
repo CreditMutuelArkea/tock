@@ -63,7 +63,7 @@ internal class BotDefinitionWrapperTest {
     private fun assertSameStory(expected: ConfiguredStoryDefinition, actual: StoryDefinition) {
         assertEquals(
             if (expected.answerType == builtin) {
-                (botDefinition.scriptManager as ScriptManagerStory).findStoryDefinition(expected.configuration.mainIntent, "appId")
+                (botDefinition.getRealScriptManager() as ScriptManagerStory).findStoryDefinition(expected.configuration.mainIntent, "appId")
             } else {
                 expected
             },
@@ -77,7 +77,7 @@ internal class BotDefinitionWrapperTest {
         @Test
         fun `GIVEN story is null WHEN find story THEN return unknown story`() {
             val inputStory = (botWrapper.scriptManager as ScriptManagerStory).findStoryDefinition(null as String?, applicationId)
-            assertEquals((botDefinition.scriptManager as ScriptManagerStory).unknownStory, inputStory)
+            assertEquals((botDefinition.getRealScriptManager() as ScriptManagerStory).unknownStory, inputStory)
         }
 
         @Test

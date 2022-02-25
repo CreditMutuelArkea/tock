@@ -47,7 +47,7 @@ open class EventListenerBase : EventListener {
 
         fun IntentAware?.sendChoice(event: OneToOneEvent, force: Boolean = false): Boolean {
             if (this != null || force) {
-                val intent: IntentAware = this ?: controller.botDefinition.scriptManager.findMainIntent(DEFAULT)!!
+                val intent: IntentAware = this ?: controller.botDefinition.getRealScriptManager().findMainIntent(DEFAULT)!!
                 sendChoice(
                     event,
                     intent,
@@ -61,9 +61,9 @@ open class EventListenerBase : EventListener {
 
         with(controller.botDefinition) {
             return when (event) {
-                is StartConversationEvent -> scriptManager.findMainIntent(START_SCRIPT).sendChoice(event, true)
-                is EndConversationEvent -> scriptManager.findMainIntent(END_SCRIPT).sendChoice(event)
-                is NoInputEvent -> scriptManager.findMainIntent(END_SCRIPT).sendChoice(event)
+                is StartConversationEvent -> getRealScriptManager().findMainIntent(START_SCRIPT).sendChoice(event, true)
+                is EndConversationEvent -> getRealScriptManager().findMainIntent(END_SCRIPT).sendChoice(event)
+                is NoInputEvent -> getRealScriptManager().findMainIntent(END_SCRIPT).sendChoice(event)
                 is PassThreadControlEvent -> passThreadControlEventListener(controller, connectorData, event)
                 else -> false
             }

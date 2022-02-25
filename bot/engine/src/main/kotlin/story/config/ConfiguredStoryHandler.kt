@@ -95,7 +95,7 @@ internal class ConfiguredStoryHandler(
                 val targetIntent = step.targetIntent?.name
                     ?: (bus.intent.takeIf { !step.hasCurrentAnswer() }?.name())
 
-                val scriptManagerStory: ScriptManagerStory = bus.botDefinition.scriptManager as ScriptManagerStory
+                val scriptManagerStory: ScriptManagerStory = bus.botDefinition.getRealScriptManager() as ScriptManagerStory
                 if(targetIntent != null) {
                     scriptManagerStory.findStoryDefinition(targetIntent, bus.applicationId)
                         .takeUnless { it == scriptManagerStory.unknownStory }
@@ -176,7 +176,7 @@ internal class ConfiguredStoryHandler(
     override fun support(bus: BotBus): Double = 1.0
 
     private fun BotBus.fallbackAnswer() =
-        (botDefinition.scriptManager as ScriptManagerStory).unknownStory.scriptHandler.handle(this)
+        (botDefinition.getRealScriptManager() as ScriptManagerStory).unknownStory.scriptHandler.handle(this)
 
     private fun BotBus.handleSimpleAnswer(
         container: StoryDefinitionAnswersContainer,

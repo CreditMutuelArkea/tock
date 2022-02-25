@@ -280,7 +280,7 @@ open class BotBusMock(
             !context.story.supportIntent(context.dialog.state.currentIntent!!)
         ) {
             val storyDefinition =
-                (context.botDefinition.scriptManager as ScriptManagerStoryBase).findStoryDefinition(context.dialog.state.currentIntent!!, a.applicationId)
+                (context.botDefinition.getRealScriptManager() as ScriptManagerStoryBase).findStoryDefinition(context.dialog.state.currentIntent!!, a.applicationId)
             context.story = Story(storyDefinition, storyDefinition.mainIntent().wrappedIntent())
             context.dialog.scripts.add(context.story)
         } else if (context.dialog.scripts.isEmpty()) {

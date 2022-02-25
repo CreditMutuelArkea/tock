@@ -75,7 +75,7 @@ abstract class BotEngineTest {
     val dialog = Dialog(setOf(userId, botId))
     val botApplicationConfiguration: BotApplicationConfiguration = mockk(relaxed = true)
     val connectorConfiguration: ConnectorConfiguration = mockk(relaxed = true)
-    val story by lazy { Story((botDefinition.scriptManager as ScriptManagerStory).stories.first(), test.mainIntent().wrappedIntent()) }
+    val story by lazy { Story((botDefinition.getRealScriptManager() as ScriptManagerStory).stories.first(), test.mainIntent().wrappedIntent()) }
     val connectorCallback: ConnectorCallback = mockk(relaxed = true)
     val connectorData = ConnectorData(connectorCallback)
 

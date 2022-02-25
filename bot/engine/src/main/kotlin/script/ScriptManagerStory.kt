@@ -68,7 +68,7 @@ interface ScriptManagerStory : ScriptManager {
     /**
      * The list of each stories.
      */
-    val stories: List<StoryDefinition>
+    var stories: List<StoryDefinition>
 
     /**
      * The unknown story. Used where no valid intent is found.

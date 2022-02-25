@@ -30,7 +30,6 @@ import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.event.TypingOnEvent
 import ai.tock.bot.engine.event.MetadataEvent
 import ai.tock.bot.engine.user.*
-import ai.tock.bot.story.dialogManager.StoryDefinition
 import ai.tock.shared.Executor
 import ai.tock.shared.booleanProperty
 import ai.tock.shared.error

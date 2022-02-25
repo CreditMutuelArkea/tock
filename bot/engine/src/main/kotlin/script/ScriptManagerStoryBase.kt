@@ -48,7 +48,7 @@ import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
 
 class ScriptManagerStoryBase(
-    override val stories: List<StoryDefinition>,
+    override var stories: List<StoryDefinition> = mutableListOf(),
     override val unknownStory: StoryDefinition = defaultUnknownStory,
     override val helloStory: StoryDefinition? = null,
     override val goodbyeStory: StoryDefinition? = null,

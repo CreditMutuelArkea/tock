@@ -17,24 +17,7 @@
 package ai.tock.bot.definition
 
 import ai.tock.bot.DialogManager.ScriptManager
-import ai.tock.bot.DialogManager.ScriptManagerStoryBase
-import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.story.dialogManager.SimpleStoryDefinition
-import ai.tock.bot.story.dialogManager.handler.SimpleStoryHandlerBase
-import ai.tock.bot.engine.nlp.BuiltInKeywordListener.deleteKeyword
-import ai.tock.bot.engine.nlp.BuiltInKeywordListener.endTestContextKeyword
-import ai.tock.bot.engine.nlp.BuiltInKeywordListener.testContextKeyword
-import ai.tock.bot.engine.nlp.keywordServices
-import ai.tock.bot.engine.user.UserTimelineDAO
-import ai.tock.shared.error
-import ai.tock.shared.injector
-import ai.tock.shared.vertx.vertx
-import ai.tock.translator.I18nKeyProvider.Companion.generateKey
 import ai.tock.translator.I18nLabelValue
-import com.github.salomonbrys.kodein.instance
-import mu.KotlinLogging
 
 /**
  * Base implementation of [BotDefinition].
@@ -42,11 +25,13 @@ import mu.KotlinLogging
 open class BotDefinitionBase(
     override val botId: String,
     override val namespace: String,
-    override val scriptManager: ScriptManager,
+    val scriptManager: ScriptManager,
     override val nlpModelName: String = botId,
     override val eventListener: EventListener = EventListenerBase(),
     override val flowDefinition: DialogFlowDefinition? = null,
 ) : BotDefinition {
+
+    override fun getRealScriptManager(): ScriptManager = scriptManager
 
     /**
      * Constructor intended to be used by an enum.

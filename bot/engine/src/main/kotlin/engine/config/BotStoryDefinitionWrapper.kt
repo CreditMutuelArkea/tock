@@ -39,8 +39,14 @@ import mu.KotlinLogging
  */
 internal class BotStoryDefinitionWrapper(val botDefinition: BotDefinition) : BotDefinition by botDefinition {
 
-    override val scriptManager: ScriptManagerStoryWrapper =
-        ScriptManagerStoryWrapper(botDefinition.scriptManager as ScriptManagerStoryBase, this)
+    val scriptManager: ScriptManagerStoryWrapper =
+        ScriptManagerStoryWrapper(botDefinition.getRealScriptManager() as ScriptManagerStoryBase, this)
+
+    override fun getRealScriptManager(): ScriptManager = scriptManager
+
+    override fun findIntent(intent: String, applicationId: String): IntentAware {
+        return scriptManager.findIntent(intent, applicationId)
+    }
 
     private val logger = KotlinLogging.logger {}
 

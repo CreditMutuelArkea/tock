@@ -22,8 +22,6 @@ import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.IntentAware
-import ai.tock.bot.story.dialogManager.StoryDefinition
-import ai.tock.bot.story.dialogManager.handler.StoryHandlerDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
@@ -119,6 +117,6 @@ interface ConnectorController {
      * Return a script definition provider for this controller.
      */
     fun scriptDefinitionLoader(applicationId: String): (String) -> ScriptDefinition = {
-        botDefinition.scriptManager.findScriptDefinitionById(it, applicationId)
+        botDefinition.getRealScriptManager().findScriptDefinitionById(it, applicationId)
     }
 }

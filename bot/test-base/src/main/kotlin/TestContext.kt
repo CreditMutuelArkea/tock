@@ -196,7 +196,7 @@ open class TestContext {
         return if (isInitialized()) {
             botBusMockContext.story.definition
         } else {
-            botDefinition.scriptManager.defaultScript as StoryDefinition
+            botDefinition.getRealScriptManager().defaultScript as StoryDefinition
         }
     }
 

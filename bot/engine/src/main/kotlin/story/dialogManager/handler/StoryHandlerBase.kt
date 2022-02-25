@@ -112,11 +112,11 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
 
     //TODO : renommer la méthode
     private fun getScriptManager(bus: BotBus): ScriptManagerStory {
-        return if(bus.botDefinition.scriptManager !is ScriptManagerStory) {
+        return if(bus.botDefinition.getRealScriptManager() !is ScriptManagerStory) {
             //TODO : mettre la bonne exception
             throw Exception("script manager incompatible")
         } else {
-            bus.botDefinition.scriptManager as ScriptManagerStory
+            bus.botDefinition.getRealScriptManager() as ScriptManagerStory
         }
     }
 
@@ -183,7 +183,7 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
      * Finds the story definition of this handler.
      */
     open fun findStoryDefinition(bus: BotBus): StoryDefinition? =
-        (bus.botDefinition.scriptManager as ScriptManagerStory).findStoryByStoryHandler(this, bus.applicationId)
+        (bus.botDefinition.getRealScriptManager() as ScriptManagerStory).findStoryByStoryHandler(this, bus.applicationId)
 
     /**
      * Handles the action and switches the context to the underlying story definition.

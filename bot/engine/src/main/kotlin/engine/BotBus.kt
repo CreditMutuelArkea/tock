@@ -47,7 +47,6 @@ import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
 import engine.dialogManager.step.Step
-import java.time.Duration
 
 /**
  * Bus implementation for Tock integrated mode.
@@ -69,7 +68,7 @@ interface BotBus : Bus<BotBus> {
     val botDefinition: BotDefinition
 
     val scriptManager: ScriptManager
-        get() = botDefinition.scriptManager
+        get() = botDefinition.getRealScriptManager()
 
     /**
      * Manager of Dialog, current, next and transition, to abstract the concret Dialogs and Scripts used
