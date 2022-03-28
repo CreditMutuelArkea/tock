@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.model.request
+package ai.tock.bot.connector.iadvize.model.response.conversation
 
-<<<<<<< HEAD
-/**
- * Request that contains the conversation history. we do not use the history messages, we only use the idOperator and the idConversation
- */
-data class ConversationsRequest(override val idOperator: String, override val idConversation: String) : IadvizeRequest
-=======
-data class ConversationsRequest(val idOperator: String, val idConversation: String) : IadvizeRequest
->>>>>>> add models and firsts route for connector iadvize
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
+
+data class IadvizeReplies(val replies: MutableList<IadvizeReply> = mutableListOf()) : IadvizeResponse {
+    constructor(iadvizeReply: IadvizeReply) : this(mutableListOf(iadvizeReply))
+}
