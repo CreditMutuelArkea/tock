@@ -101,6 +101,10 @@ export abstract class AnswerContainer {
     return this.currentType === AnswerConfigurationType.script;
   }
 
+  isTickAnswer(): boolean {
+    return this.currentType === AnswerConfigurationType.tick;
+  }
+
   isBuiltIn(): boolean {
     return this.currentType === AnswerConfigurationType.builtin;
   }
@@ -111,6 +115,10 @@ export abstract class AnswerContainer {
 
   scriptAnswer(): ScriptAnswerConfiguration {
     return this.findAnswer(AnswerConfigurationType.script) as ScriptAnswerConfiguration;
+  }
+
+  tickAnswer(): TickAnswerConfiguration {
+    return this.findAnswer(AnswerConfigurationType.tick) as TickAnswerConfiguration;
   }
 
   currentAnswer(): AnswerConfiguration {
@@ -301,7 +309,8 @@ export enum AnswerConfigurationType {
   simple,
   message,
   script,
-  builtin
+  builtin,
+  tick
 }
 
 export class MandatoryEntity extends AnswerContainer {
@@ -1026,5 +1035,28 @@ export class BotConfiguredSteps {
     return Object.assign(value, json, {
       steps: StoryStep.fromJSONArray(json.steps)
     });
+  }
+}
+
+export class TickAnswerConfiguration extends AnswerConfiguration {
+
+  constructor() {
+    super(AnswerConfigurationType.tick);
+  }
+
+  isEmpty(): boolean {
+    return false;
+  }
+
+  simpleTextView(wide: boolean): string {
+    return '[Tick]';
+  }
+
+  clone(): AnswerConfiguration {
+    return new TickAnswerConfiguration();
+  }
+
+  duplicate(bot: BotService): AnswerConfiguration {
+    return this.clone();
   }
 }

@@ -27,6 +27,7 @@
       <mat-radio-group aria-labelledby="answer-type-label" [(ngModel)]="answer.currentType" (change)="changeType($event)">
         <mat-radio-button [value]="0" class="answer-type">Simple</mat-radio-button>
         <mat-radio-button *ngIf="shared.configuration && shared.configuration.compilerAvailable" [value]="2" class="answer-type">Script</mat-radio-button>
+        <mat-radio-button [value]="4" class="answer-type">Tick</mat-radio-button>
       </mat-radio-group>
     </div>
 
@@ -35,6 +36,9 @@
     </div>
     <div *ngIf="answer.isScriptAnswer()">
       <tock-script-answer [container]="answer"></tock-script-answer>
+    </div>
+    <div *ngIf="answer.isTickAnswer()">
+      Tick story
     </div>
   </div>
 </div>

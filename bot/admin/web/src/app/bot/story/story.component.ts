@@ -321,7 +321,9 @@ export class StoryComponent implements OnInit, OnChanges {
   }
 
   canCustomiseMainAnswer(): boolean {
-    return this.story.currentType === AnswerConfigurationType.simple || this.story.currentType === AnswerConfigurationType.script;
+    return this.story.currentType === AnswerConfigurationType.simple ||
+      this.story.currentType === AnswerConfigurationType.script ||
+      this.story.currentType === AnswerConfigurationType.tick;
   }
 
   deleteCustomAnswers(answer: BotConfiguredAnswer) {

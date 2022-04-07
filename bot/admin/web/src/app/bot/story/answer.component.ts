@@ -20,7 +20,8 @@ import {
   AnswerContainer,
   ScriptAnswerConfiguration,
   ScriptAnswerVersionedConfiguration,
-  SimpleAnswerConfiguration
+  SimpleAnswerConfiguration,
+  TickAnswerConfiguration
 } from '../model/story';
 import {BotService} from '../bot-service';
 import {MatDialog} from '@angular/material/dialog';
@@ -93,21 +94,31 @@ export class AnswerComponent implements OnInit {
 
   private changeAnswerType(value: AnswerConfigurationType) {
     this.answer.changeCurrentType(value);
-    if (value === AnswerConfigurationType.simple) {
-      if (!this.answer.simpleAnswer()) {
-        const newAnswer = new SimpleAnswerConfiguration([]);
-        newAnswer.allowNoAnswer = this.answer.allowNoAnwser();
-        this.answer.addNewAnswerType(newAnswer);
-      }
-    } else if (value === AnswerConfigurationType.script) {
-      if (!this.answer.scriptAnswer()) {
-        const s = 'import ai.tock.bot.definition.story\n' +
-          '\n' +
-          'val s = story("' + this.answer.containerId() + '") { \n' +
-          '           end("Hello World! :)")\n' +
-          '}';
-        const script = new ScriptAnswerVersionedConfiguration(s);
-        this.answer.addNewAnswerType(new ScriptAnswerConfiguration([script], script));
+
+    switch(value) {
+      case AnswerConfigurationType.simple:
+        if (!this.answer.simpleAnswer()) {
+          const newAnswer = new SimpleAnswerConfiguration([]);
+          newAnswer.allowNoAnswer = this.answer.allowNoAnwser();
+          this.answer.addNewAnswerType(newAnswer);
+        }
+        break;
+      case AnswerConfigurationType.script:
+        if (!this.answer.scriptAnswer()) {
+          const s = 'import ai.tock.bot.definition.story\n' +
+            '\n' +
+            'val s = story("' + this.answer.containerId() + '") { \n' +
+            '           end("Hello World! :)")\n' +
+            '}';
+          const script = new ScriptAnswerVersionedConfiguration(s);
+          this.answer.addNewAnswerType(new ScriptAnswerConfiguration([script], script));
+        }
+        break;
+      case AnswerConfigurationType.tick: {
+        if (!this.answer.tickAnswer()) {
+          this.answer.addNewAnswerType(new TickAnswerConfiguration())
+        }
+        break;
       }
     }
   }

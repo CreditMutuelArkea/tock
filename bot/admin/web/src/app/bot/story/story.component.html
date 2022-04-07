@@ -28,6 +28,8 @@
                icon="message-square-outline"></nb-icon>
       <nb-icon *ngIf="!storyNode && story.isScriptAnswer()" class="story-type" nbTooltip="Script Story"
                icon="code"></nb-icon>
+      <nb-icon *ngIf="!storyNode && story.isTickAnswer()" class="story-type" nbTooltip="Tick Story"
+               icon="message-circle-outline"></nb-icon>
       <span *ngIf="!storyNode" nbTooltip="Story name" class="answer-title">{{story.name}}</span>
       <span *ngIf="storyNode" nbTooltip="Story name" [matBadge]="storyNode.displayCount()"
             [matBadgeHidden]="!displayCount"
