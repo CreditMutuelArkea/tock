@@ -15,6 +15,7 @@
  */
 
 import {Injectable} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import {RestService} from '../core-nlp/rest/rest.service';
 import {
   CreateStoryRequest,
@@ -31,8 +32,10 @@ import {Feature} from './model/feature';
 @Injectable()
 export class BotService {
 
-  constructor(private rest: RestService) {
-  }
+  constructor(
+    private httpClient: HttpClient,
+    private rest: RestService
+  ) {}
 
   newStory(request: CreateStoryRequest): Observable<Intent> {
     return this.rest.post('/bot/story/new', request, Intent.fromJSON);
@@ -160,6 +163,10 @@ export class BotService {
 
   deleteFeature(botId: string, category: string, name: string, applicationId: string): Observable<boolean> {
     return this.rest.delete(`/feature/${encodeURIComponent(botId)}/${encodeURIComponent(category)}/${encodeURIComponent(name)}/${applicationId ? encodeURIComponent(applicationId) : ''}`);
+  }
+
+  getBotActions(url: string): Observable<string[]> {
+    return this.httpClient.get<string[]>(url);
   }
 
 }
