@@ -21,6 +21,7 @@ import {
   ScriptAnswerConfiguration,
   ScriptAnswerVersionedConfiguration,
   SimpleAnswerConfiguration,
+  TickAnswer,
   TickAnswerConfiguration
 } from '../model/story';
 import {BotService} from '../bot-service';
@@ -116,7 +117,9 @@ export class AnswerComponent implements OnInit {
         break;
       case AnswerConfigurationType.tick: {
         if (!this.answer.tickAnswer()) {
-          this.answer.addNewAnswerType(new TickAnswerConfiguration())
+          const newAnswer = new TickAnswer([], [], '', {});
+
+          this.answer.addNewAnswerType(new TickAnswerConfiguration(newAnswer));
         }
         break;
       }

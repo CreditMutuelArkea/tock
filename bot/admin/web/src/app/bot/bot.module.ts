@@ -37,6 +37,7 @@ import {StoryComponent} from './story/story.component';
 import {AnswerComponent} from './story/answer.component';
 import {SimpleAnswerComponent} from './story/simple-answer.component';
 import {ScriptAnswerComponent} from './story/script-answer.component';
+import {TickAnswerComponent} from './story/tick-answer.component';
 import {AnswerDialogComponent} from './story/answer-dialog.component';
 import {StoryDialogComponent} from './story/story-dialog.component';
 import {MandatoryEntitiesDialogComponent} from './story/mandatory-entities-dialog.component';
@@ -54,6 +55,7 @@ import {
   NbFormFieldModule,
   NbIconModule,
   NbInputModule,
+  NbListModule,
   NbRadioModule,
   NbRouteTabsetModule,
   NbSelectModule,
@@ -71,6 +73,7 @@ import {MatGridListModule} from '@angular/material/grid-list';
 import {I18nExportComponent} from './i18n/i18n-export.component';
 import {I18nImportComponent} from './i18n/i18n-import.component';
 import {ApplicationFeaturesTableComponent} from "./feature/application-features-table.component";
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -82,8 +85,8 @@ const routes: Routes = [
     },
     children: [
       {
-        path: '', 
-        redirectTo: 'story-create', 
+        path: '',
+        redirectTo: 'story-create',
         pathMatch: 'full'
       },
       {
@@ -141,7 +144,9 @@ export class BotRoutingModule {
     MatGridListModule,
     NbFormFieldModule,
     NbIconModule,
-    NbButtonModule
+    NbButtonModule,
+    ReactiveFormsModule,
+    NbListModule
   ],
   declarations: [
     BotTabsComponent,
@@ -156,6 +161,7 @@ export class BotRoutingModule {
     AnswerComponent,
     SimpleAnswerComponent,
     ScriptAnswerComponent,
+    TickAnswerComponent,
     StoryDialogComponent,
     AnswerDialogComponent,
     MandatoryEntitiesDialogComponent,

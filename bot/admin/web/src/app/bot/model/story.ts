@@ -86,7 +86,7 @@ export abstract class AnswerContainer {
   }
 
   isConfiguredAnswer(): boolean {
-    return this.isSimpleAnswer() || this.isMessageAnswer() || this.isScriptAnswer();
+    return this.isSimpleAnswer() || this.isMessageAnswer() || this.isScriptAnswer() || this.isTickAnswer();
   }
 
   isSimpleAnswer(): boolean {
@@ -1040,23 +1040,32 @@ export class BotConfiguredSteps {
 
 export class TickAnswerConfiguration extends AnswerConfiguration {
 
-  constructor() {
+  constructor(public tickAnswer: TickAnswer) {
     super(AnswerConfigurationType.tick);
   }
 
   isEmpty(): boolean {
     return false;
   }
-
+  SimpleAnswerConfiguration
   simpleTextView(wide: boolean): string {
     return '[Tick]';
   }
 
   clone(): AnswerConfiguration {
-    return new TickAnswerConfiguration();
+    return new TickAnswerConfiguration(this.tickAnswer);
   }
 
   duplicate(bot: BotService): AnswerConfiguration {
     return this.clone();
   }
+}
+
+export class TickAnswer {
+  constructor(
+    public mainIntent: string[] = [],
+    public secondIntent: string[] = [],
+    public urlBotAction: string,
+    public stateMachine: any
+  ) {}
 }

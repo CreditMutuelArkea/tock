@@ -1,0 +1,66 @@
+<form [formGroup]="form" class="row">
+  <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
+    <label for="mainIntent">Other main intents</label>
+    <nb-select
+      formControlName="mainIntent"
+      id="mainIntent"
+      multiple
+      placeholder="Select intent"
+    >
+      <nb-option *ngFor="let intent of intents" [value]="intent" [disabled]="disabledIntent(intent, 'second')">{{ intent }}</nb-option>
+    </nb-select>
+  </div>
+
+  <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
+    <label for="secondIntent">Secondary intents</label>
+    <nb-select
+      formControlName="secondIntent"
+      id="secondIntent"
+      multiple
+      placeholder="Select intent"
+    >
+      <nb-option *ngFor="let intent of intents" [value]="intent" [disabled]="disabledIntent(intent, 'main')">{{ intent }}</nb-option>
+    </nb-select>
+  </div>
+
+  <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
+    <label for="botActionUrl">Bot actions (*)</label>
+    <nb-form-field
+      class=" mb-1"
+      [nbSpinner]="loading.botActions"
+    >
+      <input
+        formControlName="botActionUrl"
+        nbInput
+        id="botActionUrl"
+        type="text"
+        placeholder="url"
+      >
+      <button
+        nbSuffix
+        nbButton
+        ghost
+        [disabled]="botActionUrl.errors?.url"
+        (click)="vizualizeBotActions()"
+      >
+        <nb-icon icon="eye-outline"></nb-icon>
+      </button>
+    </nb-form-field>
+
+    <div>
+      <nb-list *ngIf="botActions?.length" class="list-bot-actions">
+        <nb-list-item *ngFor="let botAction of botActions">{{ botAction }}</nb-list-item>
+      </nb-list>
+
+      <span *ngIf="!loading.botActions && botActions && !botActions.length">No data found</span>
+    </div>
+
+  </div>
+
+  <div class="col-lg-3 col-md-6 d-flex">
+    <div>
+      <label for="formFile" class="form-label">State machine (*)</label>
+      <input formControlName="stateMAchine" class="form-control" type="file" id="formFile">
+    </div>
+  </div>
+</form>
