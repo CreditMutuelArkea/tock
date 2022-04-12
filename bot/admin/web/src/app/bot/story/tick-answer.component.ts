@@ -73,7 +73,7 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
     }
   }
 
-  vizualizeBotActions(): void {
+  visualizeBotActions(): void {
     const tmp = ['Bot action 1', 'Bot action 2', 'Bot action 3', 'Bot action 4', 'Bot action 5', 'Bot action 1', 'Bot action 2', 'Bot action 3', 'Bot action 4', 'Bot action 5'];
 
     this.botActions = undefined;

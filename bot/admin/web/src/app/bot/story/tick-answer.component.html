@@ -37,11 +37,12 @@
         placeholder="url"
       >
       <button
-        nbSuffix
         nbButton
+        nbSuffix
+        nbTooltip="Visualiaze bot actions list"
         ghost
         [disabled]="botActionUrl.errors?.url"
-        (click)="vizualizeBotActions()"
+        (click)="visualizeBotActions()"
       >
         <nb-icon icon="eye-outline"></nb-icon>
       </button>
