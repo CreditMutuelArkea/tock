@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,9 @@
 
 package ai.tock.bot.connector.iadvize.model.request
 
-/**
- * Request that contains the conversation history. we do not use the history messages, we only use the idOperator and the idConversation
- */
-data class ConversationsRequest(val idOperator: String, val idConversation: String) : IadvizeRequest
+class UnsupportRequest(override val idOperator: String, override val idConversation: String, val type: String) : IadvizeRequest {
+    data class UnsupportRequestJson(val idOperator: String)
+
+    constructor(unsupportRequestJson: UnsupportRequestJson, idConversation: String, type: String) :
+            this(unsupportRequestJson.idOperator, idConversation, type)
+}
