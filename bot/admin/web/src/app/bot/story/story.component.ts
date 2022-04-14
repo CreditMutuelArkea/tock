@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import {saveAs} from 'file-saver';
+import { saveAs } from "file-saver-es";
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange, SimpleChanges} from '@angular/core';
 import {
   AnswerConfigurationType,

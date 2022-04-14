@@ -20,7 +20,7 @@ import {ActivatedRoute} from "@angular/router";
 import {StateService} from "../../core-nlp/state.service";
 import {Application, NlpApplicationConfiguration, NlpModelConfiguration} from "../../model/application";
 import {ApplicationService} from "../../core-nlp/applications.service";
-import {saveAs} from "file-saver";
+import { saveAs } from "file-saver-es";
 import {ApplicationScopedQuery} from "../../model/commons";
 import {NlpEngineType} from "../../model/nlp";
 import {Subject} from "rxjs";
