@@ -75,7 +75,7 @@
             <nb-icon *ngIf="row.data.isBuiltIn()" class="story-type" nbTooltip="Built-in Story" icon="cube"></nb-icon>
             <nb-icon *ngIf="row.data.isSimpleAnswer()" class="story-type" nbTooltip="Message Story" icon="message-square-outline"></nb-icon>
             <nb-icon *ngIf="row.data.isScriptAnswer()" class="story-type" nbTooltip="Script Story" icon="code"></nb-icon>
-
+            <nb-icon *ngIf="row.data.isTickAnswer()" class="story-type" nbTooltip="Tick Story" icon="message-circle-outline"></nb-icon>
             {{row.data.name}}
           </span>
         </td>

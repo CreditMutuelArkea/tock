@@ -3,11 +3,18 @@
     <label for="mainIntent">Other main intents</label>
     <nb-select
       formControlName="mainIntent"
+      fullWidth
       id="mainIntent"
       multiple
       placeholder="Select intent"
     >
-      <nb-option *ngFor="let intent of intents" [value]="intent" [disabled]="disabledIntent(intent, 'second')">{{ intent }}</nb-option>
+      <nb-option
+        *ngFor="let intent of intents"
+        [value]="intent"
+        [disabled]="disabledIntent(intent, intentList.SECOND)"
+      >
+        {{ intent }}
+      </nb-option>
     </nb-select>
   </div>
 
@@ -15,22 +22,30 @@
     <label for="secondIntent">Secondary intents</label>
     <nb-select
       formControlName="secondIntent"
+      fullWidth
       id="secondIntent"
       multiple
       placeholder="Select intent"
     >
-      <nb-option *ngFor="let intent of intents" [value]="intent" [disabled]="disabledIntent(intent, 'main')">{{ intent }}</nb-option>
+      <nb-option
+        *ngFor="let intent of intents"
+        [value]="intent"
+        [disabled]="disabledIntent(intent, intentList.MAIN)"
+      >
+        {{ intent }}
+      </nb-option>
     </nb-select>
   </div>
 
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
     <label for="botActionUrl">Bot actions (*)</label>
     <nb-form-field
-      class=" mb-1"
+      class="mb-1"
       [nbSpinner]="loading.botActions"
     >
       <input
         formControlName="botActionUrl"
+        fullWidth
         nbInput
         id="botActionUrl"
         type="text"
@@ -58,10 +73,32 @@
 
   </div>
 
-  <div class="col-lg-3 col-md-6 d-flex">
-    <div>
+  <div class="col-lg-3 col-md-6">
+    <div class="d-flex flex-column">
       <label for="formFile" class="form-label">State machine (*)</label>
-      <input formControlName="stateMAchine" class="form-control" type="file" id="formFile">
+      <tock-file-upload
+        id="formFile"
+        formControlName="stateMachine"
+        [currentFile]="stateMachine.value"
+        [fullWidth]="true"
+      >
+        <nb-button-group outline>
+          <a
+            nbButton
+            nbTooltip="Redirect to stately.ai"
+            href="https://stately.ai/viz"
+            target="_blank"
+            >
+            <nb-icon icon="cloud-upload-outline"></nb-icon>
+          </a>
+          <button
+            nbButton
+            disabled
+          >
+            <nb-icon icon="eye-outline"></nb-icon>
+          </button>
+        </nb-button-group>
+      </tock-file-upload>
     </div>
   </div>
 </form>

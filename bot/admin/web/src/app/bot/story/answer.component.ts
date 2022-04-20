@@ -117,7 +117,7 @@ export class AnswerComponent implements OnInit {
         break;
       case AnswerConfigurationType.tick: {
         if (!this.answer.tickAnswer()) {
-          const newAnswer = new TickAnswer([], [], '', {});
+          const newAnswer = new TickAnswer([], [], '', null);
 
           this.answer.addNewAnswerType(new TickAnswerConfiguration(newAnswer));
         }

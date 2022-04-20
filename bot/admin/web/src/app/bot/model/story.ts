@@ -184,6 +184,10 @@ export class StoryDefinitionConfigurationSummary {
     return this.currentType === AnswerConfigurationType.script;
   }
 
+  isTickAnswer(): boolean {
+    return this.currentType === AnswerConfigurationType.tick;
+  }
+
   isBuiltIn(): boolean {
     return this.currentType === AnswerConfigurationType.builtin;
   }
@@ -1065,7 +1069,7 @@ export class TickAnswer {
   constructor(
     public mainIntent: string[] = [],
     public secondIntent: string[] = [],
-    public urlBotAction: string,
+    public botActionUrl: string,
     public stateMachine: any
   ) {}
 }

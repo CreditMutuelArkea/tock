@@ -83,6 +83,10 @@ export class StoryNode {
     return this.storyType === AnswerConfigurationType.script;
   }
 
+  isTickAnswer(): boolean {
+    return this.storyType === AnswerConfigurationType.tick;
+  }
+
   isBuiltIn(): boolean {
     return this.storyType === AnswerConfigurationType.builtin;
   }
