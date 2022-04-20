@@ -39,6 +39,7 @@ import {
 } from '@nebular/theme';
 import {InfoButtonComponent} from './info-button/info-button.component';
 import {ConfirmationDialogComponent} from './confirmation-dialog/confirmation-dialog.component';
+import { FileUploadComponent } from './file-upload/file-upload.component';
 
 @NgModule({
   imports: [
@@ -64,14 +65,16 @@ import {ConfirmationDialogComponent} from './confirmation-dialog/confirmation-di
     SelectBotComponent,
     DateRangeCalendarComponent,
     InfoButtonComponent,
-    ConfirmationDialogComponent
+    ConfirmationDialogComponent,
+    FileUploadComponent
   ],
   exports: [
     BotMessageComponent,
     DisplayDialogComponent,
     SelectBotComponent,
     DateRangeCalendarComponent,
-    InfoButtonComponent
+    InfoButtonComponent,
+    FileUploadComponent
   ],
   providers: [
     BotSharedService

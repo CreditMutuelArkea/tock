@@ -49,6 +49,7 @@ import {ThemeModule} from '../theme/theme.module';
 import {
   NbAccordionModule,
   NbBadgeModule,
+  NbButtonGroupModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
@@ -146,7 +147,8 @@ export class BotRoutingModule {
     NbIconModule,
     NbButtonModule,
     ReactiveFormsModule,
-    NbListModule
+    NbListModule,
+    NbButtonGroupModule
   ],
   declarations: [
     BotTabsComponent,

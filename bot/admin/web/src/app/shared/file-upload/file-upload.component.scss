@@ -1,0 +1,81 @@
+.inputfile {
+  width: 0.1px;
+	height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+	z-index: -1;
+
+  + label {
+    display: inline-block;
+    border-radius: 0.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5rem;
+    padding: 0.4375rem 1rem;
+    transition-duration: 0.15s;
+    transition-property: border, background-color, color, box-shadow;
+    transition-timing-function: ease-in;
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    font-family: Open Sans, sans-serif;
+    appearance: none;
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    & nb-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  &:disabled + label {
+    cursor: not-allowed;
+  }
+}
+
+.default-theme {
+  &.inputfile {
+    + label {
+      background-color: #f7f9fc;
+      border-color: #e4e9f2;
+      color: #222b45;
+
+      &:hover {
+        background-color: #edf1f7;
+        border-color: #e4e9f2;
+      }
+    }
+
+    &:focus + label {
+      background-color: #ffffff;
+      border-color: #3366ff;
+    }
+  }
+}
+
+.dark-theme {
+  &.inputfile {
+    + label {
+      background-color: #192038;
+      border-color: #101426;
+      color: #ffffff;
+
+      &:hover {
+        background-color: #151a30;
+        border-color: #101426;
+      }
+    }
+
+    &:focus + label {
+      background-color: #222b45;
+      border-color: #3366ff;
+    }
+  }
+}
+
+.max-width {
+  max-width: 20rem;
+}

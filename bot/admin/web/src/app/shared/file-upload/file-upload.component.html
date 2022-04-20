@@ -1,0 +1,22 @@
+<div class="d-flex align-items-start">
+  <input
+    type="file"
+    id="file"
+    class="inputfile"
+    [disabled]="disabled"
+    [class.default-theme]="!isDarkTheme"
+    [class.dark-theme]="isDarkTheme"
+  />
+  <label
+    for="file"
+    [class.mr-1]="actions.children?.length"
+    [class.max-width]="!fullWidth"
+  >
+    <nb-icon icon="upload-outline"></nb-icon>
+    {{ label }}
+  </label>
+
+  <div #actions>
+    <ng-content></ng-content>
+  </div>
+</div>
