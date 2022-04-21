@@ -21,7 +21,7 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
   container: AnswerContainer;
 
   @Input()
-  answerLabel: string = "Answer";
+  answerLabel: string = 'Answer';
 
   private answer: TickAnswerConfiguration;
   private currentBotActionUrl: string = '';
@@ -40,7 +40,7 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
 
   public loading = {
     botActions: false
-  }
+  };
 
   get mainIntent(): FormControl {
     return this.form.get('mainIntent') as FormControl;
@@ -58,20 +58,18 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
     return this.form.get('stateMachine') as FormControl;
   }
 
-  constructor(
-    private botService: BotService
-  ) {}
+  constructor(private botService: BotService) {}
 
   ngOnInit(): void {
     this.answer = this.container.tickAnswer();
 
     this.initForm();
 
-    console.log('answer', this.answer)
+    console.log('answer', this.answer);
 
     this.subscriptions.add(
       this.form.valueChanges.subscribe((values) => {
-        console.log('values form', values)
+        console.log('values form', values);
         this.answer.tickAnswer.mainIntent = values.mainIntent;
         this.answer.tickAnswer.secondIntent = values.secondIntent;
         this.answer.tickAnswer.botActionUrl = values.botActionUrl;
@@ -103,7 +101,18 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
 
   visualizeBotActions(): void {
     if (this.currentBotActionUrl !== this.botActionUrl.value) {
-      const tmp = ['Bot action 1', 'Bot action 2', 'Bot action 3', 'Bot action 4', 'Bot action 5', 'Bot action 1', 'Bot action 2', 'Bot action 3', 'Bot action 4', 'Bot action 5'];
+      const tmp = [
+        'Bot action 1',
+        'Bot action 2',
+        'Bot action 3',
+        'Bot action 4',
+        'Bot action 5',
+        'Bot action 1',
+        'Bot action 2',
+        'Bot action 3',
+        'Bot action 4',
+        'Bot action 5'
+      ];
 
       this.botActions = undefined;
       this.currentBotActionUrl = this.botActionUrl.value;
@@ -113,7 +122,6 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
         this.botActions = [...tmp];
         this.loading.botActions = false;
       }, 1500);
-
 
       /*
       this.subscriptions.add(

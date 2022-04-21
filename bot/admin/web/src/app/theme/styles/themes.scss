@@ -19,107 +19,119 @@
 // @nebular out of the box themes
 @import '~@nebular/theme/styles/themes';
 
-$nb-themes: nb-register-theme((
-  layout-padding-top: 2.25rem,
+$nb-themes: nb-register-theme(
+  (
+    layout-padding-top: 2.25rem,
 
-  menu-item-icon-margin: 0 0.5rem 0 0,
+    menu-item-icon-margin: 0 0.5rem 0 0,
 
-  card-height-tiny: 13.5rem,
-  card-height-small: 21.1875rem,
-  card-height-medium: 28.875rem,
-  card-height-large: 36.5625rem,
-  card-height-giant: 44.25rem,
-  card-margin-bottom: 1.875rem,
-  card-header-with-select-padding-top: 0.5rem,
-  card-header-with-select-padding-bottom: 0.5rem,
+    card-height-tiny: 13.5rem,
+    card-height-small: 21.1875rem,
+    card-height-medium: 28.875rem,
+    card-height-large: 36.5625rem,
+    card-height-giant: 44.25rem,
+    card-margin-bottom: 1.875rem,
+    card-header-with-select-padding-top: 0.5rem,
+    card-header-with-select-padding-bottom: 0.5rem,
 
-  img-revert: invert(0%),
+    img-revert: invert(0%),
+    select-min-width: 6rem,
 
-  select-min-width: 6rem,
+    slide-out-background: #f7f9fc,
+    slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+    slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
+    tree-grid-cell-border-width: 3px,
 
-  slide-out-background: #f7f9fc,
-  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
-  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
-  tree-grid-cell-border-width: 3px,
+    button-disabled-cursor: not-allowed
+  ),
+  default,
+  default
+);
 
-  button-disabled-cursor: not-allowed
-), default, default);
+$nb-themes: nb-register-theme(
+  (
+    layout-padding-top: 2.25rem,
 
-$nb-themes: nb-register-theme((
-  layout-padding-top: 2.25rem,
+    menu-item-icon-margin: 0 0.5rem 0 0,
 
-  menu-item-icon-margin: 0 0.5rem 0 0,
+    card-height-tiny: 13.5rem,
+    card-height-small: 21.1875rem,
+    card-height-medium: 28.875rem,
+    card-height-large: 36.5625rem,
+    card-height-giant: 44.25rem,
+    card-margin-bottom: 1.875rem,
+    card-header-with-select-padding-top: 0.5rem,
+    card-header-with-select-padding-bottom: 0.5rem,
 
-  card-height-tiny: 13.5rem,
-  card-height-small: 21.1875rem,
-  card-height-medium: 28.875rem,
-  card-height-large: 36.5625rem,
-  card-height-giant: 44.25rem,
-  card-margin-bottom: 1.875rem,
-  card-header-with-select-padding-top: 0.5rem,
-  card-header-with-select-padding-bottom: 0.5rem,
+    img-revert: invert(0%),
+    select-min-width: 6rem,
 
-  img-revert: invert(0%),
+    slide-out-background: #252547,
+    slide-out-shadow-color: 2px 0 3px #29157a,
+    slide-out-shadow-color-rtl: -2px 0 3px #29157a,
 
-  select-min-width: 6rem,
+    button-disabled-cursor: not-allowed
+  ),
+  cosmic,
+  cosmic
+);
 
-  slide-out-background: #252547,
-  slide-out-shadow-color: 2px 0 3px #29157a,
-  slide-out-shadow-color-rtl: -2px 0 3px #29157a,
+$nb-themes: nb-register-theme(
+  (
+    layout-padding-top: 2.25rem,
 
-  button-disabled-cursor: not-allowed
-), cosmic, cosmic);
+    menu-item-icon-margin: 0 0.5rem 0 0,
 
-$nb-themes: nb-register-theme((
-  layout-padding-top: 2.25rem,
+    card-height-tiny: 13.5rem,
+    card-height-small: 21.1875rem,
+    card-height-medium: 28.875rem,
+    card-height-large: 36.5625rem,
+    card-height-giant: 44.25rem,
+    card-margin-bottom: 1.875rem,
+    card-header-with-select-padding-top: 0.5rem,
+    card-header-with-select-padding-bottom: 0.5rem,
 
-  menu-item-icon-margin: 0 0.5rem 0 0,
+    img-revert: invert(0%),
+    select-min-width: 6rem,
 
-  card-height-tiny: 13.5rem,
-  card-height-small: 21.1875rem,
-  card-height-medium: 28.875rem,
-  card-height-large: 36.5625rem,
-  card-height-giant: 44.25rem,
-  card-margin-bottom: 1.875rem,
-  card-header-with-select-padding-top: 0.5rem,
-  card-header-with-select-padding-bottom: 0.5rem,
+    slide-out-background: linear-gradient(270deg, #edf1f7 0%, #e4e9f2 100%),
+    slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+    slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
 
-  img-revert: invert(0%),
+    tree-grid-cell-border-width: 3px,
 
-  select-min-width: 6rem,
+    button-disabled-cursor: not-allowed
+  ),
+  corporate,
+  corporate
+);
 
-  slide-out-background: linear-gradient(270deg, #edf1f7 0%, #e4e9f2 100%),
-  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
-  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
+$nb-themes: nb-register-theme(
+  (
+    layout-padding-top: 2.25rem,
 
-  tree-grid-cell-border-width: 3px,
+    menu-item-icon-margin: 0 0.5rem 0 0,
 
-  button-disabled-cursor: not-allowed
-), corporate, corporate);
+    card-height-tiny: 13.5rem,
+    card-height-small: 21.1875rem,
+    card-height-medium: 28.875rem,
+    card-height-large: 36.5625rem,
+    card-height-giant: 44.25rem,
+    card-margin-bottom: 1.875rem,
+    card-header-with-select-padding-top: 0.5rem,
+    card-header-with-select-padding-bottom: 0.5rem,
 
-$nb-themes: nb-register-theme((
-  layout-padding-top: 2.25rem,
+    img-revert: invert(100%),
+    select-min-width: 6rem,
 
-  menu-item-icon-margin: 0 0.5rem 0 0,
+    slide-out-background: linear-gradient(270deg, #222b45 0%, #151a30 100%),
+    slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
+    slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
 
-  card-height-tiny: 13.5rem,
-  card-height-small: 21.1875rem,
-  card-height-medium: 28.875rem,
-  card-height-large: 36.5625rem,
-  card-height-giant: 44.25rem,
-  card-margin-bottom: 1.875rem,
-  card-header-with-select-padding-top: 0.5rem,
-  card-header-with-select-padding-bottom: 0.5rem,
+    tree-grid-cell-border-width: 3px,
 
-  img-revert: invert(100%),
-
-  select-min-width: 6rem,
-
-  slide-out-background: linear-gradient(270deg, #222b45 0%, #151a30 100%),
-  slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
-  slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
-
-  tree-grid-cell-border-width: 3px,
-
-  button-disabled-cursor: not-allowed
-), dark, dark);
+    button-disabled-cursor: not-allowed
+  ),
+  dark,
+  dark
+);

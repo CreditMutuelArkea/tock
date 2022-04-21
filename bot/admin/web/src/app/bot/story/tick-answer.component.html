@@ -1,4 +1,7 @@
-<form [formGroup]="form" class="row">
+<form
+  [formGroup]="form"
+  class="row"
+>
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
     <label for="mainIntent">Other main intents</label>
     <nb-select
@@ -50,7 +53,7 @@
         id="botActionUrl"
         type="text"
         placeholder="url"
-      >
+      />
       <button
         nbButton
         nbSuffix
@@ -64,18 +67,25 @@
     </nb-form-field>
 
     <div>
-      <nb-list *ngIf="botActions?.length" class="list-bot-actions">
+      <nb-list
+        *ngIf="botActions?.length"
+        class="list-bot-actions"
+      >
         <nb-list-item *ngFor="let botAction of botActions">{{ botAction }}</nb-list-item>
       </nb-list>
 
       <span *ngIf="!loading.botActions && botActions && !botActions.length">No data found</span>
     </div>
-
   </div>
 
   <div class="col-lg-3 col-md-6">
     <div class="d-flex flex-column">
-      <label for="formFile" class="form-label">State machine (*)</label>
+      <label
+        for="formFile"
+        class="form-label"
+      >
+        State machine (*)
+      </label>
       <tock-file-upload
         id="formFile"
         formControlName="stateMachine"
@@ -88,7 +98,7 @@
             nbTooltip="Redirect to stately.ai"
             href="https://stately.ai/viz"
             target="_blank"
-            >
+          >
             <nb-icon icon="cloud-upload-outline"></nb-icon>
           </a>
           <button
