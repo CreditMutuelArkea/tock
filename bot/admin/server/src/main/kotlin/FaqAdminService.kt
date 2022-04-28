@@ -60,17 +60,17 @@ object FaqAdminService {
     /**
      * Save the Frequently asked question into database
      */
-    fun saveFAQ(query: FaqDefinitionRequest, userLogin: UserLogin, applicationDefinition: ApplicationDefinition) {
-        val intent = createOrUpdateIntent(query, applicationDefinition)
+    fun saveFAQ(query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition) {
+        val intent = createOrUpdateIntent(query, application)
         if (intent == null) {
             badRequest("Trouble when creating/updating intent : $intent")
         } else {
             logger.debug { "Saved intent $intent for FAQ" }
             createOrUpdateUtterances(query, intent._id, userLogin)
             val existingFaq = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
-            val i18nLabel = manageI18nLabelUpdate(query, applicationDefinition.namespace, existingFaq)
+            val i18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
 
-            faqDefinitionDAO.save(prepareCreationOrUpdatingFaqDefinition(query, intent, i18nLabel, existingFaq))
+            faqDefinitionDAO.save(prepareCreationOrUpdatingFaqDefinition(query, application, intent, i18nLabel, existingFaq))
 
             // create the story and intent
             createOrUpdateStory(
@@ -78,7 +78,7 @@ object FaqAdminService {
                 intent,
                 userLogin,
                 i18nLabel,
-                applicationDefinition
+                application
             )
         }
     }
@@ -88,6 +88,7 @@ object FaqAdminService {
      */
     private fun prepareCreationOrUpdatingFaqDefinition(
         query: FaqDefinitionRequest,
+        application: ApplicationDefinition,
         intent: IntentDefinition,
         i18nLabel: I18nLabel,
         existingFaq: FaqDefinition?
@@ -97,6 +98,7 @@ object FaqAdminService {
                 logger.info { "Updating FAQ \"${intent.label}\"" }
                 FaqDefinition(
                     _id = existingFaq._id,
+                    applicationId = existingFaq.applicationId,
                     intentId = existingFaq.intentId,
                     i18nId = existingFaq.i18nId,
                     tags = query.tags,
@@ -108,6 +110,7 @@ object FaqAdminService {
             } else {
                 logger.info { "Creating FAQ \"${intent.label}\"" }
                 FaqDefinition(
+                    applicationId = application._id,
                     intentId = intent._id,
                     i18nId = i18nLabel._id,
                     tags = query.tags,
@@ -171,6 +174,7 @@ object FaqAdminService {
         existingStory?.let {
             val savedFaq = FaqDefinition(
                 _id = currentFaq._id,
+                applicationId = currentFaq.applicationId,
                 intentId = currentFaq.intentId,
                 i18nId = currentFaq.i18nId,
                 tags = currentFaq.tags,

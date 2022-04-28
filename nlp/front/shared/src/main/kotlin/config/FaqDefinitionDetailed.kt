@@ -23,6 +23,10 @@ import java.time.Instant
 data class FaqDefinitionDetailed(
     val _id: Id<FaqDefinition>?,
     /**
+     * The application id.
+     */
+    val applicationId: Id<ApplicationDefinition>,
+    /**
      * The intent id.
      */
     val intentId: Id<IntentDefinition>,

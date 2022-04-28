@@ -90,7 +90,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
         private const val userLogin: UserLogin = "userLogin"
 
-        private val faqDefinition = FaqDefinition(faqId, intentId, i18nId, tagList, true, now, now)
+        private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
 
         val applicationDefinition = ApplicationDefinition("my App", namespace = namespace)
         val storyId = "storyId".toId<StoryDefinitionConfiguration>()
@@ -312,7 +312,7 @@ class FaqAdminServiceTest : AbstractTest() {
             @Test
             fun `GIVEN save faq WHEN and saving the same story THEN update the story`() {
                 val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
-                val savedFaqDefinition = FaqDefinition(faqId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
+                val savedFaqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                 every {
                     faqAdminService["createOrUpdateIntent"](
@@ -333,6 +333,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 every {
                     faqAdminService["prepareCreationOrUpdatingFaqDefinition"](
                         allAny<FaqDefinitionRequest>(),
+                        allAny<ApplicationDefinition>(),
                         allAny<IntentDefinition>(),
                         allAny<I18nLabel>(),
                         allAny<FaqDefinition>()
