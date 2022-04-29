@@ -305,4 +305,7 @@ object ApplicationConfigurationService :
 
     override fun isEntityTypeObfuscated(name: String): Boolean =
         ConfigurationRepository.entityTypeByName(name)?.obfuscated ?: true
+
+    override fun getFaqsDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
+            = faqDefinitionDAO.getFaqDefinitionByApplicationId(id)
 }

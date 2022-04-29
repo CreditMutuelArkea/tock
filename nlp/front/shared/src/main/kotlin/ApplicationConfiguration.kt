@@ -24,6 +24,7 @@ import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.EntityDefinition
 import ai.tock.nlp.front.shared.config.EntityTypeDefinition
+import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQuery
 import ai.tock.nlp.front.shared.config.SentencesQueryResult
@@ -243,4 +244,9 @@ interface ApplicationConfiguration {
      * Is this namespace exists ?
      */
     fun isExistingNamespace(namespace: String): Boolean
+
+    /**
+     * Returns all application FAQs
+     */
+    fun getFaqsDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
 }

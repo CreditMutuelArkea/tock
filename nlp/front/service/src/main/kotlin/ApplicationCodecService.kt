@@ -77,7 +77,8 @@ internal object ApplicationCodecService : ApplicationCodec {
         val entities = config.getEntityTypesByNamespaceAndSharedEntityTypes(app.namespace)
         val intents = config.getIntentsByApplicationId(applicationId)
         val sentences = config.getSentences(intents.map { it._id }.toSet()).sortedBy { it.updateDate }
-        return ApplicationDump(app, entities, intents, sentences)
+        val faqs = config.getFaqsDefinitionByApplicationId(applicationId)
+        return ApplicationDump(app, entities, intents, sentences, faqs)
     }
 
     override fun prepareImport(dump: ApplicationDump): ApplicationImportConfiguration {

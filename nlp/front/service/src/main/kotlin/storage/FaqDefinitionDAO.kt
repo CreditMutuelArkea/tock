@@ -29,6 +29,8 @@ interface FaqDefinitionDAO {
 
     fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition?
 
+    fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
+
     fun listenFaqDefinitionChanges(listener: () -> Unit)
 
     fun getFaqDefinitionByI18nId(id: Id<I18nLabel>): FaqDefinition?
