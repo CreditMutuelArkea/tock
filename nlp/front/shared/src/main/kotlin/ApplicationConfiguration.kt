@@ -143,6 +143,8 @@ interface ApplicationConfiguration {
 
     fun save(intent: IntentDefinition)
 
+    fun save(faq: FaqDefinition)
+
     fun getIntentIdByQualifiedName(name: String): Id<IntentDefinition>?
 
     /**
@@ -249,4 +251,9 @@ interface ApplicationConfiguration {
      * Returns all application FAQs
      */
     fun getFaqsDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
+
+    /**
+     * Returns FaqDefinition by Intent
+     */
+    fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition?
 }
