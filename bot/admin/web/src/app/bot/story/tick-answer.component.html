@@ -2,6 +2,7 @@
   [formGroup]="form"
   class="row"
 >
+  {{ intentGroups | json }}
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
     <label for="mainIntent">Other main intents</label>
     <nb-select
@@ -11,13 +12,18 @@
       multiple
       placeholder="Select intent"
     >
-      <nb-option
-        *ngFor="let intent of intents"
-        [value]="intent"
-        [disabled]="disabledIntent(intent, intentList.SECOND)"
+      <nb-option-group
+        *ngFor="let group of intentGroups"
+        [title]="group.name"
       >
-        {{ intent }}
-      </nb-option>
+        <nb-option
+          *ngFor="let intent of group.children"
+          [value]="intent.value"
+          [disabled]="disabledIntent(intent.value, intentList.SECOND)"
+        >
+          {{ intent.label }}
+        </nb-option>
+      </nb-option-group>
     </nb-select>
   </div>
 
@@ -30,13 +36,18 @@
       multiple
       placeholder="Select intent"
     >
-      <nb-option
-        *ngFor="let intent of intents"
-        [value]="intent"
-        [disabled]="disabledIntent(intent, intentList.MAIN)"
+      <nb-option-group
+        *ngFor="let group of intentGroups"
+        [title]="group.name"
       >
-        {{ intent }}
-      </nb-option>
+        <nb-option
+          *ngFor="let intent of group.children"
+          [value]="intent.value"
+          [disabled]="disabledIntent(intent.value, intentList.MAIN)"
+        >
+          {{ intent.label }}
+        </nb-option>
+      </nb-option-group>
     </nb-select>
   </div>
 
@@ -92,22 +103,15 @@
         [currentFile]="stateMachine.value"
         [fullWidth]="true"
       >
-        <nb-button-group outline>
-          <a
-            nbButton
-            nbTooltip="Redirect to stately.ai"
-            href="https://stately.ai/viz"
-            target="_blank"
-          >
-            <nb-icon icon="cloud-upload-outline"></nb-icon>
-          </a>
-          <button
-            nbButton
-            disabled
-          >
-            <nb-icon icon="eye-outline"></nb-icon>
-          </button>
-        </nb-button-group>
+        <a
+          nbButton
+          outline
+          nbTooltip="Redirect to stately.ai"
+          href="https://stately.ai/viz"
+          target="_blank"
+        >
+          <nb-icon icon="eye-outline"></nb-icon>
+        </a>
       </tock-file-upload>
     </div>
   </div>

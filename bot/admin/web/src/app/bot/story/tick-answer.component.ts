@@ -3,8 +3,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { AnswerContainer, TickAnswerConfiguration } from '../model/story';
-import { CustomsValidators } from '../../shared/validators/customsValidators.validators';
 import { BotService } from '../bot-service';
+import { CustomsValidators } from '../../shared/validators/customsValidators.validators';
+import { FilterOption, Group } from '../../search/filter/search-filter.component';
+import { StateService } from '../../core-nlp/state.service';
 
 enum Intent {
   MAIN = 'main',
@@ -28,7 +30,7 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   public botActions?: string[];
-  public intents = ['M_intent_1', 'M_intent_2', 'M_intent_3', 'M_intent_4'];
+  public intentGroups: Group[] = [];
   public intentList: typeof Intent = Intent;
 
   public form = new FormGroup({
@@ -58,9 +60,10 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
     return this.form.get('stateMachine') as FormControl;
   }
 
-  constructor(private botService: BotService) {}
+  constructor(private botService: BotService, private stateService: StateService) {}
 
   ngOnInit(): void {
+    this.buildIntentGroups();
     this.answer = this.container.tickAnswer();
 
     this.initForm();
@@ -89,6 +92,17 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
       botActionUrl: this.answer.tickAnswer.botActionUrl,
       stateMachine: this.answer.tickAnswer.stateMachine
     });
+  }
+
+  buildIntentGroups(): void {
+    const currentIntentsCategories = this.stateService.currentIntentsCategories.getValue();
+    this.intentGroups = currentIntentsCategories.map(
+      (entry) =>
+        new Group(
+          entry.category,
+          entry.intents.map((intent) => new FilterOption(intent._id, intent.intentLabel()))
+        )
+    );
   }
 
   disabledIntent(intent: string, list: Intent.MAIN | Intent.SECOND): boolean {
