@@ -216,6 +216,35 @@ class IadvizeConnectorTest {
     }
 
     @Test
+    fun handleRequestWithQuickReply_shouldHandleWell_MessageMarcus() {
+        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
+        val expectedResponse: String = Resources.toString(resource("/response_message_quickreply.json"), Charsets.UTF_8)
+
+        val iadvizeReply: IadvizeReply = IadvizeMessage(TextPayload("MARCUS"), listOf(QuickReply("MARCUS_YES"), QuickReply("MARCUS_NO")))
+
+        val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeReply))
+        val connectorData = slot<ConnectorData>()
+        every { controller.handle(any(), capture(connectorData)) } answers {
+            val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.addAction(action, 0)
+            callback.eventAnswered(action)
+        }
+
+        connector.handleRequest(
+            controller,
+            context,
+            iAdvizeRequest
+        )
+
+        verify { controller.handle(any(), any()) }
+
+        val messageResponse = slot<String>()
+        verify { response.end(capture(messageResponse)) }
+        assertEquals(expectedResponse, messageResponse.captured)
+    }
+
+
+    @Test
     fun handlerGetBots_shouldHandleWell_TockBot() {
         val expectedResponse: String = Resources.toString(resource("/response_get_bots.json"), Charsets.UTF_8)
 
