@@ -539,6 +539,8 @@ export abstract class AnswerConfiguration {
         return ScriptAnswerConfiguration.fromJSON(json);
       case AnswerConfigurationType.builtin:
         return BuiltinAnswerConfiguration.fromJSON(json);
+      case AnswerConfigurationType.tick:
+        return TickAnswerConfiguration.fromJSON(json);
       default:
         throw new Error('unknown type : ' + json.answerType);
     }
@@ -1011,32 +1013,47 @@ export class BotConfiguredSteps {
 
 export class TickAnswerConfiguration extends AnswerConfiguration {
 
-  constructor(public tickAnswer: TickAnswer) {
+  constructor(public otherStarterIntents: IntentName[],
+    public secondaryIntents: IntentName[],
+    public webhookURL: String,
+    public stateMachine: any
+    ) {
     super(AnswerConfigurationType.tick);
   }
 
   isEmpty(): boolean {
     return false;
   }
-  SimpleAnswerConfiguration
+
   simpleTextView(wide: boolean): string {
     return '[Tick]';
   }
 
   clone(): AnswerConfiguration {
-    return new TickAnswerConfiguration(this.tickAnswer);
+    return new TickAnswerConfiguration(this.otherStarterIntents,
+      this.secondaryIntents,
+      this.webhookURL,
+      this.stateMachine)
   }
 
   duplicate(bot: BotService): AnswerConfiguration {
     return this.clone();
   }
+
+  static fromJSON(json: any): TickAnswerConfiguration {
+    const value = Object.create(TickAnswerConfiguration.prototype);
+    const result = Object.assign(value, json, {});
+
+    result.answerType = AnswerConfigurationType.tick
+    return result;
+  }
 }
 
 export class TickAnswer {
   constructor(
-    public mainIntent: string[] = [],
-    public secondIntent: string[] = [],
-    public botActionUrl: string,
+    public otherStarterIntents: IntentName[] = [],
+    public secondaryIntents: IntentName[] = [],
+    public webhookURL: string,
     public stateMachine: any
   ) {}
 }

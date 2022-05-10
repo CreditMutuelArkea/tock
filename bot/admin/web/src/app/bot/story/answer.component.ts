@@ -114,7 +114,10 @@ export class AnswerComponent implements OnInit {
         if (!this.answer.tickAnswer()) {
           const newAnswer = new TickAnswer([], [], '', null);
 
-          this.answer.addNewAnswerType(new TickAnswerConfiguration(newAnswer));
+          this.answer.addNewAnswerType(new TickAnswerConfiguration(newAnswer.otherStarterIntents,
+            newAnswer.secondaryIntents,
+            newAnswer.webhookURL,
+            newAnswer.stateMachine));
         }
         break;
       }

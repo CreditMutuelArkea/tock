@@ -2,13 +2,12 @@
   [formGroup]="form"
   class="row"
 >
-  {{ intentGroups | json }}
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
-    <label for="mainIntent">Other main intents</label>
+    <label for="otherStarterIntents">Other main intents</label>
     <nb-select
-      formControlName="mainIntent"
+      formControlName="otherStarterIntents"
       fullWidth
-      id="mainIntent"
+      id="otherStarterIntents"
       multiple
       placeholder="Select intent"
     >
@@ -28,11 +27,11 @@
   </div>
 
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
-    <label for="secondIntent">Secondary intents</label>
+    <label for="secondaryIntents">Secondary intents</label>
     <nb-select
-      formControlName="secondIntent"
+      formControlName="secondaryIntents"
       fullWidth
-      id="secondIntent"
+      id="secondaryIntents"
       multiple
       placeholder="Select intent"
     >
@@ -52,16 +51,16 @@
   </div>
 
   <div class="col-lg-3 col-md-6 d-flex flex-column mb-2">
-    <label for="botActionUrl">Bot actions (*)</label>
+    <label for="webhookURL">Bot actions (*)</label>
     <nb-form-field
       class="mb-1"
       [nbSpinner]="loading.botActions"
     >
       <input
-        formControlName="botActionUrl"
+        formControlName="webhookURL"
         fullWidth
         nbInput
-        id="botActionUrl"
+        id="webhookURL"
         type="text"
         placeholder="url"
       />
@@ -70,7 +69,7 @@
         nbSuffix
         nbTooltip="Visualiaze bot actions list"
         ghost
-        [disabled]="botActionUrl.errors?.url"
+        [disabled]="webhookURL.errors?.url"
         (click)="visualizeBotActions()"
       >
         <nb-icon icon="eye-outline"></nb-icon>

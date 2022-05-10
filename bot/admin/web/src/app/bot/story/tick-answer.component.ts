@@ -8,7 +8,7 @@ import { CustomsValidators } from '../../shared/validators/customsValidators.val
 import { FilterOption, Group } from '../../search/filter/search-filter.component';
 import { StateService } from '../../core-nlp/state.service';
 
-enum Intent {
+enum IntentType {
   MAIN = 'main',
   SECOND = 'second'
 }
@@ -26,17 +26,17 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
   answerLabel: string = 'Answer';
 
   private answer: TickAnswerConfiguration;
-  private currentBotActionUrl: string = '';
+  private currentWebhookURL: string = '';
   private subscriptions = new Subscription();
 
   public botActions?: string[];
   public intentGroups: Group[] = [];
-  public intentList: typeof Intent = Intent;
+  public intentList: typeof IntentType = IntentType;
 
   public form = new FormGroup({
-    mainIntent: new FormControl([]),
-    secondIntent: new FormControl([]),
-    botActionUrl: new FormControl(null, [Validators.required, CustomsValidators.url]),
+    otherStarterIntents: new FormControl([]),
+    secondaryIntents: new FormControl([]),
+    webhookURL: new FormControl(null, [Validators.required, CustomsValidators.url]),
     stateMachine: new FormControl(null, Validators.required)
   });
 
@@ -44,16 +44,16 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
     botActions: false
   };
 
-  get mainIntent(): FormControl {
-    return this.form.get('mainIntent') as FormControl;
+  get otherStarterIntents(): FormControl {
+    return this.form.get('otherStarterIntents') as FormControl;
   }
 
-  get secondIntent(): FormControl {
-    return this.form.get('secondIntent') as FormControl;
+  get secondaryIntents(): FormControl {
+    return this.form.get('secondaryIntents') as FormControl;
   }
 
-  get botActionUrl(): FormControl {
-    return this.form.get('botActionUrl') as FormControl;
+  get webhookURL(): FormControl {
+    return this.form.get('webhookURL') as FormControl;
   }
 
   get stateMachine(): FormControl {
@@ -68,15 +68,12 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
 
     this.initForm();
 
-    console.log('answer', this.answer);
-
     this.subscriptions.add(
       this.form.valueChanges.subscribe((values) => {
-        console.log('values form', values);
-        this.answer.tickAnswer.mainIntent = values.mainIntent;
-        this.answer.tickAnswer.secondIntent = values.secondIntent;
-        this.answer.tickAnswer.botActionUrl = values.botActionUrl;
-        this.answer.tickAnswer.stateMachine = values.stateMachine;
+        this.answer.otherStarterIntents = values.otherStarterIntents.map((str, index) => ({ name: str}))
+        this.answer.secondaryIntents = values.secondaryIntents.map((str, index) => ({ name: str}))
+        this.answer.webhookURL = values.webhookURL;
+        this.answer.stateMachine = values.stateMachine;
       })
     );
   }
@@ -87,10 +84,10 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
 
   initForm(): void {
     this.form.setValue({
-      mainIntent: this.answer.tickAnswer.mainIntent,
-      secondIntent: this.answer.tickAnswer.secondIntent,
-      botActionUrl: this.answer.tickAnswer.botActionUrl,
-      stateMachine: this.answer.tickAnswer.stateMachine
+      otherStarterIntents: this.answer.otherStarterIntents.map(i => i.name),
+      secondaryIntents: this.answer.secondaryIntents.map(i => i.name),
+      webhookURL: this.answer.webhookURL,
+      stateMachine: null
     });
   }
 
@@ -100,21 +97,21 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
       (entry) =>
         new Group(
           entry.category,
-          entry.intents.map((intent) => new FilterOption(intent._id, intent.intentLabel()))
+          entry.intents.map((intent) => new FilterOption(intent.name, intent.intentLabel()))
         )
     );
   }
 
-  disabledIntent(intent: string, list: Intent.MAIN | Intent.SECOND): boolean {
+  disabledIntent(intent: string, list: IntentType.MAIN | IntentType.SECOND): boolean {
     if (list === this.intentList.MAIN) {
-      return this.mainIntent.value.includes(intent);
+      return this.otherStarterIntents.value.includes(intent);
     } else if (list === this.intentList.SECOND) {
-      return this.secondIntent.value.includes(intent);
+      return this.secondaryIntents.value.includes(intent);
     }
   }
 
   visualizeBotActions(): void {
-    if (this.currentBotActionUrl !== this.botActionUrl.value) {
+    if (this.currentWebhookURL !== this.webhookURL.value) {
       const tmp = [
         'Bot action 1',
         'Bot action 2',
@@ -129,7 +126,7 @@ export class TickAnswerComponent implements OnInit, OnDestroy {
       ];
 
       this.botActions = undefined;
-      this.currentBotActionUrl = this.botActionUrl.value;
+      this.currentWebhookURL = this.webhookURL.value;
       this.loading.botActions = true;
 
       setTimeout(() => {
