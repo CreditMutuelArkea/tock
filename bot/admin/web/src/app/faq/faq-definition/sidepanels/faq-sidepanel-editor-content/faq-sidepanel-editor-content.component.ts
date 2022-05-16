@@ -18,7 +18,7 @@ import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, Si
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {NbTagInputAddEvent} from '@nebular/theme/components/tag/tag-input.directive';
 import {NbTagComponent} from '@nebular/theme/components/tag/tag.component';
-import {BehaviorSubject, combineLatest, Observable, ReplaySubject} from 'rxjs';
+import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from 'rxjs';
 import {concatMap, debounceTime, filter, map, startWith, take, takeUntil} from 'rxjs/operators';
 import {DialogService} from 'src/app/core-nlp/dialog.service';
 import {notCancelled, ValidUtteranceResult} from 'src/app/faq/common/components/edit-utterance/edit-utterance-result';
@@ -41,6 +41,12 @@ import {
   NAME_MINLENGTH,
   NoProblems
 } from '../../../common/model/form-problems';
+import { StateService } from 'src/app/core-nlp/state.service';
+import { ConfirmDialogComponent } from 'src/app/shared-nlp/confirm-dialog/confirm-dialog.component';
+import { Intent } from 'src/app/model/nlp';
+
+type DialogEvent = 'EditFaq' | 'IntentExistsInApp' | 'DoNotShareExistingIntent' | 'ShareExistingIntentWithApplication' | 'IntentNotExistsInAllApplications'
+const UNQUALIFIED_UNKNOWN_NAME = Intent.unknown.split(":")[1];
 
 // Simple builder for text 'utterance predicate'
 function textMatch(text: string): (Utterance) => boolean {
@@ -117,6 +123,7 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
   public readonly ERR_MSG = DEFAULT_ERROR_MAPPING; // shorcut for access inside template
 
   constructor(
+    private readonly state: StateService,
     private readonly sidepanelEditorService: FaqDefinitionSidepanelEditorService,
     private readonly qaService: FaqDefinitionService,
     private readonly dialog: DialogService,
@@ -178,7 +185,8 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
 
   save(evt: FaqEditorEvent): Observable<ActionResult> {
     // replay last known utterances array
-    return this.editedUtterances$.pipe(take(1), concatMap(utterances => {
+    return this.editedUtterances$.pipe(take(1), concatMap(async utterances => {
+      const faqTitle = this.newFaqForm.controls['name'].value.trim() || ''
 
       // validate and construct entity from form data
       const fq: FaqDefinition = {
@@ -187,24 +195,90 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
         applicationId: this.fq.applicationId,
         language: this.fq.language,
         tags: Array.from(this.tags).map(el => el.trim()),
-        description: '' + (this.newFaqForm.controls['description'].value.trim() || ''),
-        answer: '' + (this.newFaqForm.controls['answer'].value.trim() || ''),
-        title: '' + (this.newFaqForm.controls['name'].value.trim() || ''),
+        description: this.newFaqForm.controls['description'].value.trim(),
+        answer: this.newFaqForm.controls['answer'].value.trim(),
+        title: faqTitle,
+        intentName: this.formatName(faqTitle),
         status: this.fq.status,
         utterances: Array.from(utterances.map(el => el.trim())),
-        enabled: (true === this.newFaqForm.controls['active'].value)
+        enabled: this.newFaqForm.controls['active'].value
       };
 
-      return this.qaService.save(fq, this.destroy$).pipe(
-        map(fq => {
-          const res: ActionResult = {
-            outcome: 'save-done',
-            payload: fq
-          };
-          return res;
-        })
-      );
+      const canSave = await this.canSaveIntent(fq)
+      if(canSave === 'DoNotShareExistingIntent') {
+        fq.intentName = this.generateIntentName(fq)
+      }
+
+      if(canSave !== 'IntentExistsInApp'){
+        return this.qaService.save(fq, this.destroy$).pipe(
+          map(fq => {
+            const res: ActionResult = {
+              outcome: 'save-done',
+              payload: fq
+            };
+            return res;
+          })
+        ).toPromise();
+      } else {
+        const res: ActionResult = {
+          outcome: 'cancel-save',
+          payload: null
+        };
+        return res;
+      }
     }));
+  }
+
+  private formatName(faqTitle?: string): string {
+    if (faqTitle) {
+      return faqTitle
+        .replace(/[^A-Za-z_-]*/g, '')
+        .toLowerCase()
+        .trim();
+    }
+  }
+
+  private generateIntentName(fq : FaqDefinition): string {
+    let candidate = fq.intentName;
+    let count = 1;
+    const candidateBase = candidate;
+    while (this.state.intentExists(candidate)) {
+      candidate = candidateBase + count++;
+    }
+    return candidate;
+  }
+
+  private canSaveIntent(fq : FaqDefinition): Promise<DialogEvent> {
+    if(fq.intentId){
+      return Promise.resolve('EditFaq');
+    }
+
+    if (StateService.intentExistsInApp(this.state.currentApplication, fq.intentName) || fq.intentName === UNQUALIFIED_UNKNOWN_NAME) {
+      this.dialog.notify(`Intent ${fq.intentName} already exists`, 'Cancelled',
+        {duration: 5000, status: "warning"});
+      return Promise.resolve('IntentExistsInApp');
+    }
+
+    if (this.state.intentExistsInOtherApplication(fq.intentName)) {
+      const dialogRef = this.dialog.openDialog(ConfirmDialogComponent, {
+        context: {
+          title: 'This intent is already used in an other application',
+          subtitle: 'If you confirm the name, the intent will be shared between the two applications.',
+          action: 'Confirm'
+        }
+      });
+      return dialogRef.onClose.pipe(
+        map(res => {
+          let dialogEvent : DialogEvent = 'DoNotShareExistingIntent';
+          if (res === 'confirm'){
+            dialogEvent = 'ShareExistingIntentWithApplication';
+          }
+          return dialogEvent;
+        }, take(1))
+      ).toPromise();
+    } else {
+      return Promise.resolve('IntentNotExistsInAllApplications');
+    }
   }
 
   getControlStatus(controlName: string): 'success' | 'basic' | 'warning' {

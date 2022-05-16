@@ -17,7 +17,7 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import { Router } from '@angular/router';
 import {ReplaySubject, Subscription} from 'rxjs';
-import {takeUntil} from "rxjs/operators";
+import {map, take, takeUntil} from "rxjs/operators";
 
 import {StateService} from 'src/app/core-nlp/state.service';
 import {isDockedOrSmall} from '../common/model/view-mode';

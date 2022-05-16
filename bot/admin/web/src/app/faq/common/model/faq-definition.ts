@@ -21,6 +21,7 @@ export type FaqDefinitionStatus = 'draft' | 'deleted'; // frontend view status
 export type FaqDefinition = {
   id?: string,
   intentId?: string,
+  intentName?: string,
   language: string,
   applicationId: string,
   creationDate?: Date,
