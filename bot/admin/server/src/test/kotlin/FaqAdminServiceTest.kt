@@ -98,6 +98,22 @@ class FaqAdminServiceTest : AbstractTest() {
         private val firstUterrance = "FAQ utterance A"
         private val secondUterrance = "FAQ utterance B"
 
+        private val newFaqQuery = FaqDefinitionRequest(
+            null,
+            null,
+            Locale.FRENCH,
+            applicationId,
+            now,
+            now,
+            "NEW FAQ TITLE",
+            "NEW FAQ DESCRIPTION",
+            listOf("NEW FAQ QUESTION"),
+            emptyList(),
+            "NEW FAQ ANSWER",
+            true,
+            intentName="new_faq_intent"
+        )
+
         private val faqDefinitionRequest = FaqDefinitionRequest(
             faqId.toString(),
             intentId.toString(),
@@ -424,6 +440,17 @@ class FaqAdminServiceTest : AbstractTest() {
 
             }
 
+        }
+
+        @Nested
+        inner class NewFaqWithoutIntentNameTest {
+            @Test
+            fun `GIVEN create faq WHEN intent name is null THEN Throw IllegalArgumentException`() {
+                val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+                assertThrows<IllegalArgumentException>("Intent name is missing !") {
+                    faqAdminService.saveFAQ(newFaqQuery.copy(intentName = null), userLogin, applicationDefinition)
+                }
+            }
         }
     }
 

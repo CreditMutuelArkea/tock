@@ -37,8 +37,6 @@ import ai.tock.shared.vertx.WebVerticle.Companion.badRequest
 import ai.tock.translator.*
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.apache.commons.lang3.RegExUtils
-import org.apache.commons.lang3.StringUtils
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
@@ -521,8 +519,10 @@ object FaqAdminService {
         query: FaqDefinitionRequest,
         applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
+        val name: String = requireNotNull(this.getIntentName(query)) { "Intent name is missing !" }
+
         val intent = IntentDefinition(
-            name = this.getIntentName(query),
+            name = name,
             namespace = applicationDefinition.namespace,
             applications = setOf(applicationDefinition._id),
             entities = emptySet(),
@@ -534,19 +534,20 @@ object FaqAdminService {
         return AdminService.createOrUpdateIntent(applicationDefinition.namespace, intent)
     }
 
-    private fun getIntentName(query: FaqDefinitionRequest,) : String {
+    private fun getIntentName(query: FaqDefinitionRequest): String? {
         return if(query.id != null) {
             // On edit mode
-            this.findFaqDefinitionIntent(query.id.toId())!!.name
+            findFaqDefinitionIntent(query.id.toId())?.name
         }
         else {
-            query.intentName!!
+            query.intentName
         }
     }
 
-    private fun findFaqDefinitionIntent(faqId : Id<FaqDefinition>) : IntentDefinition? {
-        val faq = faqDefinitionDAO.getFaqDefinitionById(faqId)
-        return intentDAO.getIntentById(faq!!.intentId)
+    private fun findFaqDefinitionIntent(faqId : Id<FaqDefinition>): IntentDefinition? {
+        return faqDefinitionDAO.getFaqDefinitionById(faqId)?.let {
+            intentDAO.getIntentById(it.intentId)
+        }
     }
 
     /**
