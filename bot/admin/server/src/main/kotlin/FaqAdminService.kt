@@ -519,7 +519,7 @@ object FaqAdminService {
         query: FaqDefinitionRequest,
         applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
-        val name: String = requireNotNull(this.getIntentName(query)) { "Intent name is missing !" }
+        val name: String = getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
 
         val intent = IntentDefinition(
             name = name,

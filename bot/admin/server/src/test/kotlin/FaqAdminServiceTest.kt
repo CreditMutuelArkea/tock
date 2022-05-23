@@ -98,21 +98,7 @@ class FaqAdminServiceTest : AbstractTest() {
         private val firstUterrance = "FAQ utterance A"
         private val secondUterrance = "FAQ utterance B"
 
-        private val newFaqQuery = FaqDefinitionRequest(
-            null,
-            null,
-            Locale.FRENCH,
-            applicationId,
-            now,
-            now,
-            "NEW FAQ TITLE",
-            "NEW FAQ DESCRIPTION",
-            listOf("NEW FAQ QUESTION"),
-            emptyList(),
-            "NEW FAQ ANSWER",
-            true,
-            intentName="new_faq_intent"
-        )
+
 
         private val faqDefinitionRequest = FaqDefinitionRequest(
             faqId.toString(),
@@ -441,18 +427,128 @@ class FaqAdminServiceTest : AbstractTest() {
             }
 
         }
+    }
 
-        @Nested
-        inner class NewFaqWithoutIntentNameTest {
-            @Test
-            fun `GIVEN create faq WHEN intent name is null THEN Throw IllegalArgumentException`() {
-                val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
-                assertThrows<IllegalArgumentException>("Intent name is missing !") {
-                    faqAdminService.saveFAQ(newFaqQuery.copy(intentName = null), userLogin, applicationDefinition)
-                }
+    @Nested
+    inner class FaqWithIntentNameTest {
+
+        private val newFaqQuery = FaqDefinitionRequest(
+            null,
+            null,
+            Locale.FRENCH,
+            applicationId,
+            now,
+            now,
+            "NEW FAQ TITLE",
+            "NEW FAQ DESCRIPTION",
+            listOf("NEW FAQ QUESTION"),
+            emptyList(),
+            "NEW FAQ ANSWER",
+            true,
+            intentName="new_faq_intent"
+        )
+
+        private val existingFaqQuery = newFaqQuery.copy(
+            id = "myFaq",
+            intentName = null
+        )
+
+        private val newIntentDefinition = IntentDefinition(
+            name = "myIntentName",
+            namespace = namespace,
+            applications = setOf(applicationId),
+            label = "my Intent Label",
+            description = "my Intent Description",
+            category = "faq",
+            entities = emptySet()
+        )
+
+        private val existingIntentDefinition = newIntentDefinition.copy(
+            _id = "myIntent".toId<IntentDefinition>(),
+        )
+
+        private val newFaqDefinition = FaqDefinition(
+            applicationId = applicationId,
+            intentId = "myIntent".toId<IntentDefinition>(),
+            i18nId = "myI18n".toId<I18nLabel>(),
+            tags = emptyList(),
+            enabled = true,
+            creationDate = Instant.now(),
+            updateDate = Instant.now(),
+        )
+
+        private val existingFaqDefinition= newFaqDefinition.copy(
+            _id = "myFaq".toId<FaqDefinition>()
+        )
+
+        @Test
+        fun `GIVEN create faq WHEN intent name is null THEN Throw IllegalArgumentException`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            assertThrows<BadRequestException>() {
+                faqAdminService.saveFAQ(
+                    newFaqQuery.copy(id = null, intentName = null),
+                    userLogin,
+                    applicationDefinition
+                )
+            }
+        }
+
+        @Test
+        fun `GIVEN create faq WHEN intent name is not null THEN Throw IllegalArgumentException`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            initMock(faqAdminService)
+
+            faqAdminService.saveFAQ(newFaqQuery, userLogin, applicationDefinition)
+
+            verify(exactly = 1)  { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
+            verify(exactly = 0)  { faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>()) }
+        }
+
+        @Test
+        fun `GIVEN update faq WHEN intent name is null THEN save`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            initMock(faqAdminService)
+
+            faqAdminService.saveFAQ(existingFaqQuery, userLogin, applicationDefinition)
+
+            verify(exactly = 1)  { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
+            verify(exactly = 1)  { faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>()) }
+        }
+
+        private fun initMock(faqAdminService: FaqAdminService) {
+            every {
+                faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>())
+            } returns existingIntentDefinition
+
+            justRun {
+                faqAdminService["createOrUpdateUtterances"](
+                    any<FaqDefinitionRequest>(),
+                    any<Id<IntentDefinition>>(),
+                    any<UserLogin>()
+                )
+            }
+
+            every {
+                faqAdminService["manageI18nLabelUpdate"](
+                    any<FaqDefinitionRequest>(),
+                    any<String>(),
+                    any<FaqDefinition>()
+                )
+            } returns mockedI18n
+
+            every { faqDefinitionDAO.getFaqDefinitionByIntentId(any()) } returns existingFaqDefinition
+
+            justRun { faqDefinitionDAO.save(any()) }
+
+            justRun {
+                faqAdminService["createOrUpdateStory"](
+                    any<FaqDefinitionRequest>(),
+                    any<IntentDefinition>(),
+                    any<UserLogin>(),
+                    any<I18nLabel>(),
+                    any<ApplicationDefinition>()
+                )
             }
         }
     }
-
-
 }
