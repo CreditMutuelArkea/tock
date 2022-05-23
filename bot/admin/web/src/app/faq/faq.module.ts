@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import { RouterModule, Routes } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { SharedModule } from '../shared-nlp/shared.module';
-import { AuthGuard } from '../core-nlp/auth/auth.guard';
-import { ApplicationResolver } from '../core-nlp/application.resolver';
 import { BotSharedModule } from '../shared/bot-shared.module';
 import { BotModule } from '../bot/bot.module';
 import { NlpModule } from '../nlp-tabs/nlp.module';
@@ -76,32 +73,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EditUtteranceComponent } from './common/components/edit-utterance/edit-utterance.component';
 import { FaqDefinitionSidepanelEditorService } from './faq-definition/sidepanels/faq-definition-sidepanel-editor.service';
 import { FaqQaSidepanelSettingsComponent } from './faq-definition/sidepanels/faq-qa-sidepanel-settings/faq-qa-sidepanel-settings.component';
-
-const routes: Routes = [
-  {
-    path: 'train',
-    component: TrainComponent,
-    canActivate: [AuthGuard],
-    resolve: {
-      application: ApplicationResolver
-    }
-  },
-  {
-    path: 'qa',
-    component: FaqDefinitionComponent,
-    canActivate: [AuthGuard],
-    resolve: {
-      application: ApplicationResolver
-    }
-  }
-];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
-  declarations: []
-})
-export class FaqRoutingModule {}
+import { FaqRoutingModule } from './faq-routing.module';
 
 @NgModule({
   imports: [
