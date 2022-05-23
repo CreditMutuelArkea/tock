@@ -26,7 +26,7 @@ import { FaqDefinition } from '../../common/model/faq-definition';
  **/
 
 // Which action it is
-type ActionName = 'save' | 'exit-edit-mode' | 'save-settings';
+type ActionName = 'save' | 'exit-edit-mode';
 
 // Which action result it is
 type OutcomeName = 'cancel-save' | 'save-done' | 'adhoc-action-done';
@@ -91,23 +91,6 @@ export class FaqDefinitionSidepanelEditorService {
       this.takeActionOutcome(actionEvt, cancel$).subscribe((evt) => {
         if (evt.name === 'save-done') {
           resolve(<FaqDefinition>evt.payload);
-        } else {
-          reject(evt.name);
-        }
-      });
-    });
-    this.action$.next(actionEvt);
-
-    return result;
-  }
-
-  public saveSettings(cancel$: Observable<any>): Promise<any> {
-    const actionEvt = newAction('save-settings');
-
-    const result = new Promise<any>((resolve, reject) => {
-      this.takeActionOutcome(actionEvt, cancel$).subscribe((evt) => {
-        if (evt.name === 'save-done') {
-          resolve(<any>evt.payload);
         } else {
           reject(evt.name);
         }
