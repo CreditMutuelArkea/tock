@@ -22,7 +22,8 @@ import { takeUntil } from 'rxjs/operators';
 
 import { StateService } from 'src/app/core-nlp/state.service';
 import { DEFAULT_PANEL_NAME, WithSidePanel } from '../common/mixin/with-side-panel';
-import { FaqQaFilter, FaqGridComponent } from './faq-grid/faq-grid.component';
+import { FaqGridComponent } from './faq-grid/faq-grid.component';
+import { FaqDefinitionFilter } from '../common/model/faq-definition-filter';
 import { truncate } from '../common/util/string-utils';
 import { DialogService } from 'src/app/core-nlp/dialog.service';
 import { FaqDefinitionSidepanelEditorService } from './sidepanels/faq-definition-sidepanel-editor.service';
@@ -71,13 +72,14 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
     story: null
   };
 
-  public filter: FaqQaFilter;
+  public filter: FaqDefinitionFilter;
+
   @ViewChild(FaqGridComponent) grid;
 
   private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   get isAuthorized(): boolean {
-    return this.state.hasRole(UserRole.botUser);
+    return this.state.hasRole(UserRole.faqBotUser);
   }
 
   constructor(
@@ -136,7 +138,7 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
     };
   }
 
-  search(filter: Partial<FaqQaFilter>): void {
+  search(filter: Partial<FaqDefinitionFilter>): void {
     this.filter.search = filter.search;
     this.filter.sort = filter.sort;
     this.grid.refresh();

@@ -41,6 +41,26 @@ export class FaqDefinitionService {
     private botService: BotService
   ) {}
 
+  /**
+   * Compare faq but without creation or update Date
+   * @param newFaq
+   * @param oldFaq
+   * @private
+   */
+  private static compareFaqSave(newFaq: FaqDefinition, oldFaq: FaqDefinition): boolean {
+    return (
+      newFaq.id === oldFaq.id &&
+      newFaq.intentId === oldFaq.intentId &&
+      newFaq.title === oldFaq.title &&
+      newFaq.description === oldFaq.description &&
+      newFaq.applicationId === oldFaq.applicationId &&
+      newFaq.enabled === oldFaq.enabled &&
+      JSON.stringify(newFaq.utterances) === JSON.stringify(oldFaq.utterances) &&
+      newFaq.answer === oldFaq.answer &&
+      JSON.stringify(newFaq.tags) === JSON.stringify(oldFaq.tags)
+    );
+  }
+
   // add random data at initialization until real backend is there instead
   setupData({
     applicationId,
@@ -70,6 +90,8 @@ export class FaqDefinitionService {
     return this.rest.delete(`/faq/${fq.id}`).pipe(
       takeUntil(cancel$),
       map((r) => {
+        //delete to current state
+        this.state.resetConfiguration();
         if (r) {
           this.faqData.rows = this.faqData.rows.map((item) => {
             if (fq.id && item.id === fq.id) {
@@ -110,26 +132,6 @@ export class FaqDefinitionService {
     } else {
       return of(faq);
     }
-  }
-
-  /**
-   * Compare faq but without creation or update Date
-   * @param newFaq
-   * @param oldFaq
-   * @private
-   */
-  private static compareFaqSave(newFaq: FaqDefinition, oldFaq: FaqDefinition): boolean {
-    return (
-      newFaq.id == oldFaq.id &&
-      newFaq.intentId == oldFaq.intentId &&
-      newFaq.title == oldFaq.title &&
-      newFaq.description == oldFaq.description &&
-      newFaq.applicationId == oldFaq.applicationId &&
-      newFaq.enabled == oldFaq.enabled &&
-      JSON.stringify(newFaq.utterances) == JSON.stringify(oldFaq.utterances) &&
-      newFaq.answer == oldFaq.answer &&
-      JSON.stringify(newFaq.tags) == JSON.stringify(oldFaq.tags)
-    );
   }
 
   searchFaq(
