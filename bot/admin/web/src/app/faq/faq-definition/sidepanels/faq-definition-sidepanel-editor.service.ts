@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import {Injectable} from '@angular/core';
-import {empty, Observable, Subject} from 'rxjs';
-import {concatMap, debounceTime, delay, filter, map, take, takeUntil} from 'rxjs/operators';
-import {FaqDefinition} from '../../common/model/faq-definition';
+import { Injectable } from '@angular/core';
+import { empty, Observable, Subject } from 'rxjs';
+import { concatMap, debounceTime, delay, filter, map, take, takeUntil } from 'rxjs/operators';
+import { FaqDefinition } from '../../common/model/faq-definition';
 
 /**
  * FAQ Editor Dialog related service and types
@@ -26,21 +26,20 @@ import {FaqDefinition} from '../../common/model/faq-definition';
  **/
 
 // Which action it is
-type ActionName = 'save' | 'exit-edit-mode';
+type ActionName = 'save' | 'exit-edit-mode' | 'save-settings';
 
 // Which action result it is
 type OutcomeName = 'cancel-save' | 'save-done' | 'adhoc-action-done';
 
-
 // event
 export type FaqEditorEvent = {
-  transactionId: number,
-  name: ActionName | OutcomeName,
-  payload?: FaqDefinition
+  transactionId: number;
+  name: ActionName | OutcomeName;
+  payload?: FaqDefinition;
 };
 
 // produce outcome for a specific event
-export type ActionResult = { outcome: OutcomeName, payload?: FaqDefinition };
+export type ActionResult = { outcome: OutcomeName; payload?: FaqDefinition };
 export type ActionHandler = (QaEditorEvent) => Observable<ActionResult>;
 
 export type EventListener = (QaEditorEvent) => void;
@@ -57,8 +56,8 @@ const newAction = (() => {
   };
 })();
 
-
-const isInitiatedBy = (action: FaqEditorEvent) => (evt: FaqEditorEvent) => evt.transactionId === action.transactionId;
+const isInitiatedBy = (action: FaqEditorEvent) => (evt: FaqEditorEvent) =>
+  evt.transactionId === action.transactionId;
 
 const hasName = (name: ActionName | OutcomeName) => (evt: FaqEditorEvent) => evt.name === name;
 
@@ -67,20 +66,17 @@ const hasName = (name: ActionName | OutcomeName) => (evt: FaqEditorEvent) => evt
  */
 @Injectable()
 export class FaqDefinitionSidepanelEditorService {
-
   private action$: Subject<FaqEditorEvent> = new Subject<FaqEditorEvent>();
 
   private outcome$: Subject<FaqEditorEvent> = new Subject<FaqEditorEvent>();
 
-  constructor() {
-  }
+  constructor() {}
 
-  private takeActionOutcome(action: FaqEditorEvent, cancel$: Observable<any> = empty()): Observable<FaqEditorEvent> {
-    return this.outcome$.pipe(
-      takeUntil(cancel$),
-      filter(isInitiatedBy(action)),
-      take(1)
-    );
+  private takeActionOutcome(
+    action: FaqEditorEvent,
+    cancel$: Observable<any> = empty()
+  ): Observable<FaqEditorEvent> {
+    return this.outcome$.pipe(takeUntil(cancel$), filter(isInitiatedBy(action)), take(1));
   }
 
   /**
@@ -92,13 +88,30 @@ export class FaqDefinitionSidepanelEditorService {
     const actionEvt = newAction('save');
 
     const result = new Promise<FaqDefinition>((resolve, reject) => {
-      this.takeActionOutcome(actionEvt, cancel$).subscribe(evt => {
+      this.takeActionOutcome(actionEvt, cancel$).subscribe((evt) => {
         if (evt.name === 'save-done') {
           resolve(<FaqDefinition>evt.payload);
         } else {
           reject(evt.name);
         }
-      })
+      });
+    });
+    this.action$.next(actionEvt);
+
+    return result;
+  }
+
+  public saveSettings(cancel$: Observable<any>): Promise<any> {
+    const actionEvt = newAction('save-settings');
+
+    const result = new Promise<any>((resolve, reject) => {
+      this.takeActionOutcome(actionEvt, cancel$).subscribe((evt) => {
+        if (evt.name === 'save-done') {
+          resolve(<any>evt.payload);
+        } else {
+          reject(evt.name);
+        }
+      });
     });
     this.action$.next(actionEvt);
 
@@ -119,22 +132,24 @@ export class FaqDefinitionSidepanelEditorService {
    * @param handler
    */
   public registerActionHandler(name: ActionName, cancel$: Observable<any>, handler: ActionHandler) {
-    return this.action$.pipe(
-      takeUntil(cancel$),
-      filter(hasName(name)),
-      concatMap(action => {
-        return handler(action).pipe(map(
-          res => {
-            const outcome: FaqEditorEvent = {
-              transactionId: action.transactionId,
-              name: res.outcome,
-              payload: res.payload
-            };
-            return outcome;
-          }
-        ));
-      })
-    ).subscribe(this.outcome$.next.bind(this.outcome$));
+    return this.action$
+      .pipe(
+        takeUntil(cancel$),
+        filter(hasName(name)),
+        concatMap((action) => {
+          return handler(action).pipe(
+            map((res) => {
+              const outcome: FaqEditorEvent = {
+                transactionId: action.transactionId,
+                name: res.outcome,
+                payload: res.payload
+              };
+              return outcome;
+            })
+          );
+        })
+      )
+      .subscribe(this.outcome$.next.bind(this.outcome$));
   }
 
   /**
@@ -144,16 +159,19 @@ export class FaqDefinitionSidepanelEditorService {
    * @param cancel$ Cancellation trigger
    * @param listener Listen function
    */
-  public registerOutcomeListener(outcome: OutcomeName,
-                                 delayMillis: number,
-                                 cancel$: Observable<any>,
-                                 listener: EventListener): void {
-    this.outcome$.pipe(
-      takeUntil(cancel$),
-      filter(hasName(outcome)),
-      delay(delayMillis),
-      debounceTime(delayMillis),
-    ).subscribe(listener.bind(this));
-
+  public registerOutcomeListener(
+    outcome: OutcomeName,
+    delayMillis: number,
+    cancel$: Observable<any>,
+    listener: EventListener
+  ): void {
+    this.outcome$
+      .pipe(
+        takeUntil(cancel$),
+        filter(hasName(outcome)),
+        delay(delayMillis),
+        debounceTime(delayMillis)
+      )
+      .subscribe(listener.bind(this));
   }
 }

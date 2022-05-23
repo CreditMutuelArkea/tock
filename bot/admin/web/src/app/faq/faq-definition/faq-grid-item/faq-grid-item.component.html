@@ -14,7 +14,12 @@
   ~ limitations under the License.
   -->
 
-<h6 class="tock-toggleable mb-1" [ngClass]="cssState">{{item.title}}</h6>
+<h6
+  class="tock-toggleable mb-1"
+  [ngClass]="cssState"
+>
+  {{ item.title }}
+</h6>
 <div class="d-flex w-100 justify-content-between">
   <div class="pb-2 d-flex align-items-center">
     <small class="mr-1">
@@ -59,9 +64,11 @@
 
         <button
           nbButton
+          nbButton
           nbTooltip="Edit"
-          class="tock-action tock--subtle-hover text-muted"
+          class="tock--subtle-hover text-muted"
           ghost
+          shape="round"
           status="secondary"
           (click)="edit()"
         >
@@ -71,8 +78,9 @@
         <button
           nbButton
           nbTooltip="Download"
-          class="tock-action tock--subtle-hover text-muted"
+          class="tock--subtle-hover text-muted"
           ghost
+          shape="round"
           status="secondary"
           (click)="download()"
         >
@@ -82,8 +90,9 @@
         <button
           nbButton
           nbTooltip="Delete"
-          class="tock-action tock--subtle-hover text-muted"
+          class="tock--subtle-hover text-muted"
           ghost
+          shape="round"
           status="secondary"
           (click)="remove()"
         >
