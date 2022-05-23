@@ -15,8 +15,8 @@
  */
 
 import { Injectable } from '@angular/core';
-import { empty, Observable, of } from 'rxjs';
-import { map, takeUntil, filter, mergeAll, flatMap } from 'rxjs/operators';
+import { BehaviorSubject, empty, merge, Observable, of } from 'rxjs';
+import { map, switchMap, takeUntil, tap, filter, mergeMap } from 'rxjs/operators';
 
 import { BotService } from '../../bot/bot-service';
 import { FaqDefinition } from './model/faq-definition';
@@ -24,13 +24,29 @@ import { FaqSearchQuery } from './model/faq-search-query';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { FaqDefinitionResult } from './model/faq-definition-result';
 import { StateService } from '../../core-nlp/state.service';
-import { StoryDefinitionConfigurationSummary, StorySearchQuery } from 'src/app/bot/model/story';
+import { Settings } from './model';
+
+interface FaqState {
+  loaded: boolean;
+  settings: Settings;
+}
+
+const faqInitialState: { loaded: boolean; settings: Settings } = {
+  loaded: false,
+  settings: {
+    enableSatisfactionAsk: false,
+    story: null
+  }
+};
 
 /**
  * Faq Definition operations for FAQ module
  */
 @Injectable()
 export class FaqDefinitionService {
+  private _state: BehaviorSubject<FaqState>;
+  state$: Observable<FaqState>;
+
   appIdByAppName = new Map<string, string>(); // for mock purpose only
 
   faqData: FaqDefinitionResult = new FaqDefinitionResult([], 0, 0, 0);
@@ -39,7 +55,18 @@ export class FaqDefinitionService {
     private rest: RestService,
     private state: StateService,
     private botService: BotService
-  ) {}
+  ) {
+    this._state = new BehaviorSubject(faqInitialState);
+    this.state$ = this._state.asObservable();
+  }
+
+  getState(): FaqState {
+    return this._state.getValue();
+  }
+
+  setState(state: FaqState): void {
+    return this._state.next(state);
+  }
 
   /**
    * Compare faq but without creation or update Date
@@ -115,7 +142,6 @@ export class FaqDefinitionService {
       .filter((item) => item.id == faq.id)
       .some((item) => {
         if (FaqDefinitionService.compareFaqSave(faq, item)) {
-          console.log(FaqDefinitionService.compareFaqSave(faq, item));
           dirty = true;
         }
       });
@@ -125,7 +151,9 @@ export class FaqDefinitionService {
         takeUntil(cancel$),
         map((_) => {
           // add the current save to the state
+          console.log(this.state.currentApplication.intents);
           this.state.resetConfiguration();
+          console.log(this.state.currentApplication.intents);
           return JSON.parse(JSON.stringify(faq));
         })
       );
@@ -195,7 +223,43 @@ export class FaqDefinitionService {
     }
   }
 
+  getSettings(): Observable<Settings> {
+    const faqState = this.state$;
+    const notLoaded = faqState.pipe(
+      filter((state) => !state.loaded),
+      switchMap(() =>
+        this.rest.get<Settings>('/faq/settings', (settings: any) => ({
+          enableSatisfactionAsk: settings.enableSatisfactionAsk,
+          story: settings.story
+        }))
+      ),
+      tap((settings: Settings) =>
+        this.setState({
+          loaded: true,
+          settings
+        })
+      ),
+      switchMap(() => faqState),
+      map((state) => state.settings)
+    );
+    const loaded = faqState.pipe(
+      filter((state) => state.loaded === true),
+      map((state) => state.settings)
+    );
+    return merge(notLoaded, loaded);
+  }
+
   saveSettings(settings: any, cancel$: Observable<any>): Observable<any> {
-    return this.rest.post('/faq/settings', settings).pipe(takeUntil(cancel$));
+    return this.rest.post('/faq/settings', settings).pipe(
+      takeUntil(cancel$),
+      tap((newSettings: Settings) => {
+        let state = this.getState();
+        state.settings = {
+          enableSatisfactionAsk: newSettings.enableSatisfactionAsk,
+          story: newSettings.story
+        };
+        this.setState(state);
+      })
+    );
   }
 }

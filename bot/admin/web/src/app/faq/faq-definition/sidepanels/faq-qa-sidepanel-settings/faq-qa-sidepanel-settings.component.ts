@@ -8,6 +8,7 @@ import { BotService } from '../../../../bot/bot-service';
 import { Settings } from '../../../common/model';
 import { StorySearchQuery } from '../../../../bot/model/story';
 import { StateService } from '../../../../core-nlp/state.service';
+import { FaqDefinitionService } from '../../../../faq/common/faq-definition.service';
 
 @Component({
   selector: 'tock-faq-qa-sidepanel-settings',
@@ -41,29 +42,13 @@ export class FaqQaSidepanelSettingsComponent implements OnInit, OnDestroy {
   constructor(
     private botService: BotService,
     private state: StateService,
-    private toastService: NbToastrService
+    private toastService: NbToastrService,
+    private faqDefinitionService: FaqDefinitionService
   ) {}
 
   ngOnInit(): void {
-    this.botService
-      .searchStories(
-        new StorySearchQuery(
-          this.state.currentApplication.namespace,
-          this.state.currentApplication.name,
-          this.state.currentLocale,
-          0,
-          10000
-        )
-      )
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (stories) => {
-          this.availableStories = stories.filter((story) => story.category !== 'faq');
-        },
-        error: () => {
-          this.toastService.danger('Failed to load stories', 'Error');
-        }
-      });
+    this.getStories();
+    this.getSettings();
 
     this.form.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       this.settings.emit(value);
@@ -86,5 +71,44 @@ export class FaqQaSidepanelSettingsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
+  }
+
+  getSettings(): void {
+    this.faqDefinitionService
+      .getSettings()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (settings: Settings) => {
+          this.form.patchValue({
+            enableSatisfactionAsk: settings.enableSatisfactionAsk,
+            story: settings.story
+          });
+        },
+        error: () => {
+          this.toastService.danger('Failed to load settings', 'Error');
+        }
+      });
+  }
+
+  getStories(): void {
+    this.botService
+      .searchStories(
+        new StorySearchQuery(
+          this.state.currentApplication.namespace,
+          this.state.currentApplication.name,
+          this.state.currentLocale,
+          0,
+          10000
+        )
+      )
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (stories) => {
+          this.availableStories = stories.filter((story) => story.category !== 'faq');
+        },
+        error: () => {
+          this.toastService.danger('Failed to load stories', 'Error');
+        }
+      });
   }
 }
