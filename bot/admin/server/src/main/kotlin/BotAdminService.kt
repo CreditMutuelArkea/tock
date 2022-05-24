@@ -24,6 +24,7 @@ import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerVersionedConfiguration
 import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
+import ai.tock.bot.admin.answer.TickAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.bot.BotConfiguration
@@ -43,6 +44,7 @@ import ai.tock.bot.admin.model.BotSimpleAnswerConfiguration
 import ai.tock.bot.admin.model.BotStoryDefinitionConfiguration
 import ai.tock.bot.admin.model.BotStoryDefinitionConfigurationMandatoryEntity
 import ai.tock.bot.admin.model.BotStoryDefinitionConfigurationStep
+import ai.tock.bot.admin.model.BotTickAnswerConfiguration
 import ai.tock.bot.admin.model.CreateI18nLabelRequest
 import ai.tock.bot.admin.model.CreateStoryRequest
 import ai.tock.bot.admin.model.DialogFlowRequest
@@ -893,6 +895,12 @@ object BotAdminService {
         )
     }
 
+    private fun tickAnswer(
+        answer: BotTickAnswerConfiguration
+    ): TickAnswerConfiguration {
+        return answer.toConfiguration()
+    }
+
     private fun String.toScriptConfiguration(
         botId: String,
         oldAnswer: ScriptAnswerConfiguration?
@@ -939,6 +947,7 @@ object BotAdminService {
                     answers?.find { it.answerType == script } as? ScriptAnswerConfiguration
                 )
             is BotBuiltinAnswerConfiguration -> BuiltInAnswerConfiguration(storyHandlerClassName)
+            is BotTickAnswerConfiguration -> tickAnswer(this)
             else -> error("unsupported type $this")
         }
 

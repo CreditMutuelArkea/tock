@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 package ai.tock.bot.admin.answer
 
+import ai.tock.bot.definition.IntentWithoutNamespace
+
 /**
- * The types of [AnswerConfiguration] available.
+ * An [AnswerConfiguration] with multiple [IntentWithoutNamespace] intents based on state machine
  */
-enum class AnswerConfigurationType {
-    simple,
-    message,
-    script,
-    builtin,
-    tick
-}
+data class TickAnswerConfiguration(val otherStarterIntents: Set<IntentWithoutNamespace> = emptySet(),
+                                   val secondaryIntents: Set<IntentWithoutNamespace> = emptySet(),
+                                   val webhookURL: String,
+                                   val stateMachine: String?) :
+    AnswerConfiguration(AnswerConfigurationType.tick)
