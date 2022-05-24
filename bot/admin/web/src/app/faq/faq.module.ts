@@ -38,6 +38,7 @@ import {
   NbContextMenuModule,
   NbDatepickerModule,
   NbDialogModule,
+  NbFormFieldModule,
   NbInputModule,
   NbListModule,
   NbMenuModule,
@@ -137,7 +138,8 @@ export class FaqRoutingModule {}
     BotAnalyticsModule,
     ReactiveFormsModule,
     NbTagModule,
-    NbAlertModule
+    NbAlertModule,
+    NbFormFieldModule
   ],
   declarations: [
     TrainComponent,
