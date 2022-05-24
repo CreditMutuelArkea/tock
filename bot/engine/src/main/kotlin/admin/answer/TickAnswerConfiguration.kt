@@ -18,6 +18,9 @@ package ai.tock.bot.admin.answer
 
 import ai.tock.bot.definition.IntentWithoutNamespace
 
+/**
+ * An [AnswerConfiguration] with multiple [IntentWithoutNamespace] intents based on state machine
+ */
 data class TickAnswerConfiguration(val otherStarterIntents: Set<IntentWithoutNamespace> = emptySet(),
                                    val secondaryIntents: Set<IntentWithoutNamespace> = emptySet(),
                                    val webhookURL: String,

@@ -16,6 +16,7 @@
 
 package ai.tock.bot.admin.model
 
+import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
 import ai.tock.bot.admin.answer.SimpleAnswer
@@ -24,6 +25,9 @@ import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.translator.I18nLabelValue
 
+/**
+ * An [BotAnswerConfiguration] for the Tick Story Answer
+ */
 data class BotTickAnswerConfiguration(val otherStarterIntents: Set<IntentWithoutNamespace> = emptySet(),
                                       val secondaryIntents: Set<IntentWithoutNamespace> = emptySet(),
                                       val webhookURL: String,
