@@ -16,13 +16,10 @@
 
 package ai.tock.bot.admin.answer
 
-/**
- * The types of [AnswerConfiguration] available.
- */
-enum class AnswerConfigurationType {
-    simple,
-    message,
-    script,
-    builtin,
-    tick
-}
+import ai.tock.bot.definition.IntentWithoutNamespace
+
+data class TickAnswerConfiguration(val otherStarterIntents: Set<IntentWithoutNamespace> = emptySet(),
+                                   val secondaryIntents: Set<IntentWithoutNamespace> = emptySet(),
+                                   val webhookURL: String,
+                                   val stateMachine: String?) :
+    AnswerConfiguration(AnswerConfigurationType.tick)
