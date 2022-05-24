@@ -16,14 +16,17 @@
 
 <nb-card>
   <!-- DIALOG HEADER -->
-  <nb-card-header status="info">{{title}}</nb-card-header>
+  <nb-card-header status="info">{{ title }}</nb-card-header>
 
   <!-- DIALOG BODY -->
   <nb-card-body>
     <div class="tock--notice w-100 m-auto py-2">
       Sample question a user might type or say, which matches accepted response
     </div>
-    <div class="w-100 my-4" [formGroup]="form">
+    <div
+      class="w-100 my-4"
+      [formGroup]="form"
+    >
       <label class="block">Question (*)</label>
       <input
         nbInput
@@ -31,7 +34,7 @@
         fullWidth
         placeholder="How many sides does a heptadecagon have?"
         type="text"
-        (keyup.enter)="canSave && save()"
+        (keyup.enter)="canSave && checkUtteranceAndSave()"
       />
       <tock-error-helper
         *ngIf="isSubmitted"
@@ -40,11 +43,31 @@
       ></tock-error-helper>
     </div>
 
-    <div *ngIf="!!existingQuestion" class="tock-alert tock--warning mx-5 p-2 mb-4">
-      <div class="alert alert-warning" role="alert">
+    <div
+      *ngIf="!!existingQuestion"
+      class="tock-alert tock--warning mx-5 p-2 mb-4"
+    >
+      <div
+        class="alert alert-warning"
+        role="alert"
+      >
         A similar question would be replaced:
-        <br/>
-        <strong> {{existingQuestion}} </strong>
+        <br />
+        <strong> {{ existingQuestion }} </strong>
+      </div>
+    </div>
+
+    <div
+      *ngIf="existingQuestionInOtherintent"
+      class="tock-alert tock--warning mx-5 p-2 mb-4"
+    >
+      <div
+        class="alert alert-danger"
+        role="alert"
+      >
+        This Sentence is already associated with the intent :
+        <br />
+        <strong> {{ existingQuestionInOtherintent }} </strong>
       </div>
     </div>
   </nb-card-body>
@@ -64,37 +87,37 @@
 
     <!-- EDIT MODE -->
     <button
-      *ngIf="mode=='edit'"
+      *ngIf="mode == 'edit'"
       nbButton
       class="float-right"
       size="small"
       status="primary"
       [disabled]="!canSave"
-      (click)="saveAndClose()"
+      (click)="checkUtteranceAndSave(true)"
     >
       Edit
     </button>
 
     <!-- ADD MODE -->
     <button
-      *ngIf="mode=='add'"
+      *ngIf="mode == 'add'"
       nbButton
       class="float-right"
       size="small"
       status="primary"
       [disabled]="!canSave"
-      (click)="saveAndClose()"
+      (click)="checkUtteranceAndSave(true)"
     >
       Add & close
     </button>
     <button
-      *ngIf="mode=='add'"
+      *ngIf="mode == 'add'"
       nbButton
       class="float-right mr-2"
       size="small"
       status="primary"
       [disabled]="!canSave"
-      (click)="save()"
+      (click)="checkUtteranceAndSave()"
     >
       Add
     </button>
