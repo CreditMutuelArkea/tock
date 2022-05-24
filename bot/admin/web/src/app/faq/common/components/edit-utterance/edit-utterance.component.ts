@@ -18,10 +18,15 @@ import { Component, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
 import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { debounceTime, take } from 'rxjs/operators';
 
 import { EditUtteranceResult } from './edit-utterance-result';
 import { Utterance } from '../../model/utterance';
+import { Intent, SearchQuery } from '../../../../model/nlp';
+import { PaginatedQuery } from '../../../../model/commons';
+import { NlpService } from '../../../../nlp-tabs/nlp.service';
+import { StateService } from '../../../../core-nlp/state.service';
+import { somewhatSimilar } from '../../util/string-utils';
 
 /**
  * Edit Utterance DIALOG
@@ -29,10 +34,10 @@ import { Utterance } from '../../model/utterance';
 @Component({
   selector: 'tock-edit-utterance',
   templateUrl: './edit-utterance.component.html',
-  styleUrls: ['./edit-utterance.component.scss']
+  styleUrls: ['./edit-utterance.component.scss'],
+  providers: [NlpService]
 })
 export class EditUtteranceComponent implements OnInit, OnDestroy {
-
   @Input()
   public title: string;
 
@@ -40,15 +45,19 @@ export class EditUtteranceComponent implements OnInit, OnDestroy {
   public value: string;
 
   @Input()
-  public lookup?: (v: string) => (Utterance | null);
+  public lookup?: (v: string) => Utterance | null;
 
   @Input()
   public mode?: string;
+
+  @Input()
+  public faqIntentId?: string;
 
   @Output()
   public saveAction?: (string) => void;
 
   public existingQuestion?: string;
+  public existingQuestionInOtherintent?: string;
 
   public form = new FormGroup({
     utterance: new FormControl('', [Validators.required, Validators.maxLength(260)])
@@ -63,23 +72,35 @@ export class EditUtteranceComponent implements OnInit, OnDestroy {
   }
 
   get canSave(): boolean {
-    return this.isSubmitted ? this.form.valid : this.form.dirty;
+    return this.isSubmitted
+      ? this.form.valid && !this.existingQuestionInOtherintent
+      : this.form.dirty && !this.existingQuestionInOtherintent;
   }
 
   constructor(
-    private readonly dialogRef: NbDialogRef<EditUtteranceComponent>
+    private readonly dialogRef: NbDialogRef<EditUtteranceComponent>,
+    private nlp: NlpService,
+    private readonly state: StateService
   ) {}
 
   ngOnInit() {
     this.utterance.patchValue(this.value);
 
     this.subscriptions.add(
-      this.utterance.valueChanges
-        .pipe(debounceTime(500))
-        .subscribe(v => {
-          this.ensureUniq(v);
-        })
+      this.utterance.valueChanges.pipe(debounceTime(500)).subscribe((v) => {
+        this.existingQuestionInOtherintent = undefined;
+        this.ensureUniq(v);
+      })
     );
+  }
+
+  ensureUniq(evt: string): void {
+    const res = this.lookup ? this.lookup(evt) : undefined; // look for similar question
+    if (res) {
+      this.existingQuestion = res;
+    } else {
+      this.existingQuestion = undefined;
+    }
   }
 
   ngOnDestroy(): void {
@@ -106,7 +127,7 @@ export class EditUtteranceComponent implements OnInit, OnDestroy {
   }
 
   save(): void {
-    if(!this.saveAction)return this.saveAndClose()
+    if (!this.saveAction) return this.saveAndClose();
 
     this.isSubmitted = true;
 
@@ -117,12 +138,52 @@ export class EditUtteranceComponent implements OnInit, OnDestroy {
     }
   }
 
-  ensureUniq(evt: string): void {
-    const res = this.lookup ? this.lookup(evt) : undefined; // look for similar question
-    if (res) {
-      this.existingQuestion = res;
-    } else {
-      this.existingQuestion = undefined;
-    }
+  checkUtteranceAndSave(saveAndClose = false) {
+    this.existingQuestionInOtherintent = undefined;
+
+    const searchQuery: SearchQuery = this.createSearchIntentsQuery({
+      searchString: this.utterance.value
+    });
+
+    this.nlp
+      .searchSentences(searchQuery)
+      .pipe(take(1))
+      .subscribe((res) => {
+        let existingIntentId;
+        res.rows.forEach((sentence) => {
+          if (somewhatSimilar(sentence.text, this.utterance.value)) {
+            if (
+              !this.faqIntentId ||
+              (sentence.classification.intentId != Intent.unknown &&
+                sentence.classification.intentId != this.faqIntentId)
+            ) {
+              existingIntentId = sentence.classification.intentId;
+            }
+          }
+        });
+
+        if (existingIntentId) {
+          let intent = this.state.findIntentById(existingIntentId);
+          this.existingQuestionInOtherintent = intent.label || intent.name;
+        } else {
+          if (saveAndClose) this.saveAndClose();
+          else this.save();
+        }
+      });
+  }
+
+  createSearchIntentsQuery(params: { searchString?: string; intentId?: string }): SearchQuery {
+    const cursor: number = 0;
+    const paginatedQuery: PaginatedQuery = this.state.createPaginatedQuery(cursor);
+    return new SearchQuery(
+      paginatedQuery.namespace,
+      paginatedQuery.applicationName,
+      paginatedQuery.language,
+      paginatedQuery.start,
+      paginatedQuery.size,
+      paginatedQuery.searchMark,
+      params.searchString || null,
+      params.intentId || null
+    );
   }
 }
