@@ -13,24 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-@import '../../common/_base_faq.scss';
-
-.tock-bar-search {
-  width: 400px;
-}
-
-
-.tock-input-clear {
-  cursor: pointer;
-}
-
-.tock--no-select {
-  user-select: none;
-  pointer-events: none;
-}
-
-nb-card-body {
-  user-select: none;
-}
-
