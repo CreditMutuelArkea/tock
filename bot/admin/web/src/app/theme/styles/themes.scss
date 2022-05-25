@@ -40,7 +40,11 @@ $nb-themes: nb-register-theme(
     slide-out-background: #f7f9fc,
     slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
     slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
-    tree-grid-cell-border-width: 3px
+    tree-grid-cell-border-width: 3px,
+
+    button-disabled-cursor: not-allowed,
+    select-disabled-cursor: not-allowed,
+    toggle-disabled-cursor: not-allowed
   ),
   default,
   default
@@ -66,7 +70,11 @@ $nb-themes: nb-register-theme(
 
     slide-out-background: #252547,
     slide-out-shadow-color: 2px 0 3px #29157a,
-    slide-out-shadow-color-rtl: -2px 0 3px #29157a
+    slide-out-shadow-color-rtl: -2px 0 3px #29157a,
+
+    button-disabled-cursor: not-allowed,
+    select-disabled-cursor: not-allowed,
+    toggle-disabled-cursor: not-allowed
   ),
   cosmic,
   cosmic
@@ -94,7 +102,11 @@ $nb-themes: nb-register-theme(
     slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
     slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
 
-    tree-grid-cell-border-width: 3px
+    tree-grid-cell-border-width: 3px,
+
+    button-disabled-cursor: not-allowed,
+    select-disabled-cursor: not-allowed,
+    toggle-disabled-cursor: not-allowed
   ),
   corporate,
   corporate
@@ -122,7 +134,11 @@ $nb-themes: nb-register-theme(
     slide-out-shadow-color: 0 4px 14px 0 #8f9bb3,
     slide-out-shadow-color-rtl: 0 4px 14px 0 #8f9bb3,
 
-    tree-grid-cell-border-width: 3px
+    tree-grid-cell-border-width: 3px,
+
+    button-disabled-cursor: not-allowed,
+    select-disabled-cursor: not-allowed,
+    toggle-disabled-cursor: not-allowed
   ),
   dark,
   dark
