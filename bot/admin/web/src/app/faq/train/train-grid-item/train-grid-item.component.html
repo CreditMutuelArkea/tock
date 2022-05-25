@@ -65,8 +65,6 @@
             nbTooltip="Create new FAQ"
             ghost
             shape="round"
-            status="secondary"
-            class="tock--subtle-hover text-muted"
             (click)="redirectToFaqManagement()"
           >
             <nb-icon icon="plus-circle-outline"></nb-icon>
@@ -78,10 +76,9 @@
         <button
           nbButton
           nbTooltip="Validate"
-          class="tock--success tock--subtle-hover"
+          class="tock--success"
           ghost
           shape="round"
-          status="secondary"
           (click)="validate()"
         >
           <nb-icon icon="checkmark-circle-2"></nb-icon>
@@ -90,10 +87,9 @@
         <button
           nbButton
           nbTooltip="Unknown"
-          class="tock--danger tock--subtle-hover"
+          class="tock--danger"
           ghost
           shape="round"
-          status="secondary"
           (click)="unknown()"
         >
           <nb-icon icon="close-circle-outline"></nb-icon>
@@ -102,10 +98,8 @@
         <button
           nbButton
           nbTooltip="Delete"
-          class="tock--subtle-hover text-muted"
           ghost
           shape="round"
-          status="secondary"
           (click)="remove()"
         >
           <nb-icon icon="trash-2-outline"></nb-icon>
@@ -114,10 +108,8 @@
         <button
           nbButton
           nbTooltip="Details"
-          class="tock--subtle-hover text-muted"
           ghost
           shape="round"
-          status="secondary"
           (click)="details()"
         >
           <nb-icon icon="message-circle-outline"></nb-icon>

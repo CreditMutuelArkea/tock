@@ -33,14 +33,6 @@ nb-tag-list {
   justify-content: stretch;
 }
 
-.tock--subtle-hover {
-  transition: background 0.5s ease;
-
-  &:hover {
-    background: #eee;
-  }
-}
-
 /* Wrap utterances bloc to handle overflow-y */
 
 .tock-utterances-wrapper {
