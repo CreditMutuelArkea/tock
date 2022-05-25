@@ -15,10 +15,10 @@
  */
 
 @import '../../common/_base_faq.scss';
-@include faq-item-style(); /* Better button hover style */
 
 /* Fix card overflow */
-nb-card,nb-card-body {
+nb-card,
+nb-card-body {
   overflow-x: hidden;
 }
 
@@ -35,7 +35,7 @@ nb-card,nb-card-body {
 }
 
 nb-card {
-  transition: opacity .5s ease;
+  transition: opacity 0.5s ease;
   opacity: 1;
 
   &.tock--hidden {
@@ -43,6 +43,6 @@ nb-card {
   }
 
   &.tock--closed {
-    opacity: .8;
+    opacity: 0.8;
   }
 }

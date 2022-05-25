@@ -57,7 +57,6 @@
       <div class="col-lg-auto mt-2 mb-2 d-flex align-items-center">
         <nb-toggle
           nbTooltip="Disable"
-          status="basic"
           [ngModel]="item.enabled"
           (mousedown)="toggleEnabled($event)"
         ></nb-toggle>
@@ -66,10 +65,8 @@
           nbButton
           nbButton
           nbTooltip="Edit"
-          class="tock--subtle-hover text-muted"
           ghost
           shape="round"
-          status="secondary"
           (click)="edit()"
         >
           <nb-icon icon="edit-outline"></nb-icon>
@@ -78,10 +75,8 @@
         <button
           nbButton
           nbTooltip="Download"
-          class="tock--subtle-hover text-muted"
           ghost
           shape="round"
-          status="secondary"
           (click)="download()"
         >
           <nb-icon icon="download-outline"></nb-icon>
@@ -90,10 +85,8 @@
         <button
           nbButton
           nbTooltip="Delete"
-          class="tock--subtle-hover text-muted"
           ghost
           shape="round"
-          status="secondary"
           (click)="remove()"
         >
           <nb-icon icon="trash-2-outline"></nb-icon>

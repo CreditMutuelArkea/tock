@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
@@ -22,31 +23,20 @@ import { BotSharedModule } from '../shared/bot-shared.module';
 import { BotModule } from '../bot/bot.module';
 import { NlpModule } from '../nlp-tabs/nlp.module';
 import { MomentModule } from 'ngx-moment';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
-  NbAccordionModule,
   NbAlertModule,
   NbButtonModule,
-  NbCalendarModule,
-  NbCalendarRangeModule,
   NbCardModule,
   NbCheckboxModule,
-  NbContextMenuModule,
-  NbDatepickerModule,
-  NbDialogModule,
+  NbFormFieldModule,
   NbInputModule,
   NbListModule,
-  NbMenuModule,
   NbPopoverModule,
-  NbRadioModule,
   NbRouteTabsetModule,
   NbSelectModule,
-  NbSidebarModule,
   NbSpinnerModule,
   NbTagModule,
-  NbTooltipModule,
-  NbUserModule
+  NbTooltipModule
 } from '@nebular/theme';
 import { TrainComponent } from './train/train.component';
 import { TrainHeaderComponent } from './train/train-header/train-header.component';
@@ -69,7 +59,6 @@ import { FaqDefinitionService } from './common/faq-definition.service';
 import { InviewSidepanelComponent } from './common/components/inview-sidepanel/inview-sidepanel.component';
 import { FaqSidepanelImportContentComponent } from './faq-definition/sidepanels/faq-sidepanel-import-content/faq-sidepanel-import-content.component';
 import { FaqSidepanelEditorContentComponent } from './faq-definition/sidepanels/faq-sidepanel-editor-content/faq-sidepanel-editor-content.component';
-import { ReactiveFormsModule } from '@angular/forms';
 import { EditUtteranceComponent } from './common/components/edit-utterance/edit-utterance.component';
 import { FaqDefinitionSidepanelEditorService } from './faq-definition/sidepanels/faq-definition-sidepanel-editor.service';
 import { FaqQaSidepanelSettingsComponent } from './faq-definition/sidepanels/faq-qa-sidepanel-settings/faq-qa-sidepanel-settings.component';
@@ -85,8 +74,6 @@ import { FaqRoutingModule } from './faq-routing.module';
     BotSharedModule,
     BotModule,
     NlpModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     NbRouteTabsetModule,
     NbPopoverModule,
     NbCheckboxModule,
@@ -96,21 +83,12 @@ import { FaqRoutingModule } from './faq-routing.module';
     NbButtonModule,
     NbInputModule,
     NbSelectModule,
-    NbCalendarModule,
-    NbUserModule,
-    NbDatepickerModule,
     NbListModule,
-    NbAccordionModule,
-    NbContextMenuModule,
-    NbMenuModule.forRoot(),
-    NbCalendarRangeModule,
-    NbDialogModule.forRoot(),
-    NbRadioModule,
-    NbSidebarModule.forRoot(),
     BotAnalyticsModule,
     ReactiveFormsModule,
     NbTagModule,
-    NbAlertModule
+    NbAlertModule,
+    NbFormFieldModule
   ],
   declarations: [
     TrainComponent,
