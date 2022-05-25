@@ -94,7 +94,7 @@
     </div>
   </div>
   <div [ngClass]="tabName === 'Question' ? 'tock--active' : 'tock--hidden'">
-    <div class="mb-2 w-100 d-flex justify-content-between">
+    <div class="mb-4 d-flex justify-content-between">
       <nb-form-field>
         <nb-icon
           nbPrefix
@@ -131,46 +131,42 @@
       >
         Please add at least one question
       </nb-alert>
-      <table class="table table-sm table-bordered table-fixed tock-utterances-table">
-        <colgroup>
-          <col />
-          <col />
-        </colgroup>
-        <tbody>
-          <tr *ngFor="let u of displayedUtterances$ | async">
-            <td>
-              {{ u }}
-            </td>
-            <td>
-              <div class="d-flex justify-content-center w-100">
-                <button
-                  nbButton
-                  nbTooltip="Edit"
-                  class="tock-action tock--subtle-hover text-muted"
-                  ghost
-                  size="small"
-                  status="secondary"
-                  (click)="edit(u)"
-                >
-                  <nb-icon icon="edit-outline"></nb-icon>
-                </button>
 
-                <button
-                  nbButton
-                  nbTooltip="Delete"
-                  class="tock-action tock--subtle-hover text-muted"
-                  ghost
-                  size="small"
-                  status="secondary"
-                  (click)="remove(u)"
-                >
-                  <nb-icon icon="trash-2-outline"></nb-icon>
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <nb-list>
+        <nb-list-item
+          *ngFor="let u of displayedUtterances$ | async"
+          class="d-flex justify-content-between"
+        >
+          {{ u }}
+          <div class="d-flex">
+            <button
+              nbButton
+              nbTooltip="Edit"
+              class="tock-action tock--subtle-hover text-muted"
+              ghost
+              shape="round"
+              size="small"
+              status="secondary"
+              (click)="edit(u)"
+            >
+              <nb-icon icon="edit-outline"></nb-icon>
+            </button>
+
+            <button
+              nbButton
+              nbTooltip="Delete"
+              class="tock-action tock--subtle-hover text-muted"
+              ghost
+              shape="round"
+              size="small"
+              status="secondary"
+              (click)="remove(u)"
+            >
+              <nb-icon icon="trash-2-outline"></nb-icon>
+            </button>
+          </div>
+        </nb-list-item>
+      </nb-list>
     </div>
   </div>
 </form>
