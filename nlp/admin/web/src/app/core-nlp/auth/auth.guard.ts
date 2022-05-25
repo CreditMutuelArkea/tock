@@ -73,22 +73,21 @@ export class AuthGuard implements CanActivate, CanActivateChild {
       // and check there is an url present in configuration.roleMap in core.module.ts in tock-nlp-admin-web
       // and bot-core.module.ts in tock-bot-admin
       if (!this.isAllowedToAccess(url)) {
-        setTimeout((_) => {
-          // try to navigate to the url present for the role
-          if (this.userState.hasRole(UserRole.nlpUser)) {
-            this.router.navigateByUrl(this.rolesMap.get(UserRole.nlpUser)[0]);
-          } else if (this.userState.hasRole(UserRole.faqNlpUser)) {
-            this.router.navigateByUrl(this.rolesMap.get(UserRole.faqNlpUser)[0]);
-          } else if (this.userState.hasRole(UserRole.faqBotUser)) {
-            this.router.navigateByUrl(this.rolesMap.get(UserRole.faqBotUser)[0]);
-          } else if (this.userState.hasRole(UserRole.botUser)) {
-            this.router.navigateByUrl(this.rolesMap.get(UserRole.botUser)[0]);
-          } else if (this.userState.hasRole(UserRole.admin)) {
-            this.router.navigateByUrl(this.rolesMap.get(UserRole.admin)[0]);
-          } else if (this.userState.hasRole(UserRole.technicalAdmin)) {
-            this.router.navigateByUrl(this.configuration.roleMap.get(UserRole.technicalAdmin)[0]);
-          }
-        });
+        // try to navigate to the first url present for the role
+        if (this.userState.hasRole(UserRole.nlpUser)) {
+          this.router.navigateByUrl(this.rolesMap.get(UserRole.nlpUser)[0]);
+        } else if (this.userState.hasRole(UserRole.faqNlpUser)) {
+          this.router.navigateByUrl(this.rolesMap.get(UserRole.faqNlpUser)[0]);
+        } else if (this.userState.hasRole(UserRole.faqBotUser)) {
+          this.router.navigateByUrl(this.rolesMap.get(UserRole.faqBotUser)[0]);
+        } else if (this.userState.hasRole(UserRole.botUser)) {
+          this.router.navigateByUrl(this.rolesMap.get(UserRole.botUser)[0]);
+        } else if (this.userState.hasRole(UserRole.admin)) {
+          this.router.navigateByUrl(this.rolesMap.get(UserRole.admin)[0]);
+        } else if (this.userState.hasRole(UserRole.technicalAdmin)) {
+          this.router.navigateByUrl(this.configuration.roleMap.get(UserRole.technicalAdmin)[0]);
+        }
+
         return false;
       }
       return true;
