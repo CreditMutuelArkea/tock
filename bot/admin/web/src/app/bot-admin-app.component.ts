@@ -117,6 +117,24 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
         icon: 'color-palette-outline',
         link: '/build/i18n',
         hidden: this.state.hasRole(UserRole.botUser) || !this.state.hasRole(UserRole.faqBotUser)
+      },
+      {
+        title: 'FAQ Training refacto',
+        icon: {
+          icon: 'school',
+          pack: 'material-icons'
+        },
+        link: '/faq-refacto/training',
+        hidden: !this.state.hasRole(UserRole.faqNlpUser)
+      },
+      {
+        title: 'FAQ Management refacto',
+        icon: {
+          icon: 'question_answer',
+          pack: 'material-icons'
+        },
+        link: '/faq-refacto/management',
+        hidden: !this.state.hasRole(UserRole.faqBotUser)
       }
     ];
   }
