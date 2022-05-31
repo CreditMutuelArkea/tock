@@ -1,0 +1,15 @@
+.loading {
+  min-height: 50px;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 100%;
+}
+
+@media screen and (min-width: 1000px) {
+  .grid {
+    grid-template-columns: calc(65% - 1rem) 35%;
+  }
+}

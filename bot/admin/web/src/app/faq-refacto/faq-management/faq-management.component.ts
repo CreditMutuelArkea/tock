@@ -1,15 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 
 @Component({
-  selector: 'app-faq-management',
+  selector: 'tock-faq-management',
   templateUrl: './faq-management.component.html',
-  styleUrls: ['./faq-management.component.css']
+  styleUrls: ['./faq-management.component.scss']
 })
 export class FaqManagementComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit(): void {
-  }
-
+  ngOnInit(): void {}
 }

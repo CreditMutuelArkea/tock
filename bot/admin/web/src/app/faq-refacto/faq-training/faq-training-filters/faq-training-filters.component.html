@@ -1,0 +1,23 @@
+<nb-card>
+  <nb-card-body>
+    <form
+      class="grid"
+      [formGroup]="form"
+    >
+      <nb-form-field>
+        <nb-icon
+          nbPrefix
+          icon="search-outline"
+        ></nb-icon>
+        <input
+          nbInput
+          fullWidth
+          fieldSize="medium"
+          placeholder="Search"
+          type="text"
+          formControlName="search"
+        />
+      </nb-form-field>
+    </form>
+  </nb-card-body>
+</nb-card>

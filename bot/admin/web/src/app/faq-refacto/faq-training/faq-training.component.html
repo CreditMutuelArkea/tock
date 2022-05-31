@@ -1,1 +1,17 @@
-<p>faq-training works!</p>
+<header>
+  <h1>FAQ training</h1>
+</header>
+
+<main [class.grid]="isSidePanelOpen">
+  <nb-card
+    *ngIf="loading.list"
+    class="loading"
+    [nbSpinner]="loading.list"
+  ></nb-card>
+
+  <div>
+    <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
+
+    {{ sentences | json }}
+  </div>
+</main>

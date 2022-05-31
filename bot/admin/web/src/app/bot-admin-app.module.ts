@@ -38,8 +38,6 @@ import {
 import { CustomNbIconLibraries } from './shared/icons/custom-nb-icon-libraries';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { BotService } from './bot/bot-service';
-import { FaqTrainingComponent } from './faq-refacto/faq-training/faq-training.component';
-import { FaqManagementComponent } from './faq-refacto/faq-management/faq-management.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/nlp/inbox', pathMatch: 'full' },
@@ -82,7 +80,7 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
   exports: [RouterModule],
-  declarations: [FaqTrainingComponent, FaqManagementComponent]
+  declarations: []
 })
 export class BotAdminAppRoutingModule {}
 
