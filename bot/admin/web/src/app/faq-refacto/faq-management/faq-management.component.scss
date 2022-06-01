@@ -1,0 +1,34 @@
+section {
+  &.grid-actions {
+    display: grid;
+    grid-gap: 0.5rem;
+    grid-auto-flow: column;
+    align-items: center;
+    justify-content: end;
+  }
+
+  & nb-card {
+    height: min-content;
+
+    .tock-robot {
+      width: 4rem;
+      height: fit-content;
+    }
+  }
+}
+
+.loading {
+  min-height: 50px;
+}
+
+.grid {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: 100%;
+}
+
+@media screen and (min-width: 1000px) {
+  .grid {
+    grid-template-columns: 6fr 4fr;
+  }
+}

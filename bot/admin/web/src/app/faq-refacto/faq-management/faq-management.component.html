@@ -1,1 +1,70 @@
-<p>faq-management works!</p>
+<div class="d-flex flex-wrap mb-2">
+  <h1 class="flex-grow-1">FAQ management</h1>
+
+  <section class="grid-actions">
+    <button
+      *ngIf="isAuthorized"
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="FAQ Parameters"
+      (click)="openSettings()"
+    >
+      <nb-icon icon="settings-outline"></nb-icon>
+    </button>
+
+    <button
+      nbButton
+      status="primary"
+      (click)="addFaq()"
+    >
+      <nb-icon icon="plus-outline"></nb-icon>
+      NEW FAQ
+    </button>
+  </section>
+</div>
+
+<section [class.grid]="isSidePanelOpen">
+  <nb-card
+    *ngIf="loading.list"
+    class="loading"
+    [nbSpinner]="loading.list"
+  ></nb-card>
+
+  <div>
+    <tock-faq-management-filters
+      [faqs]="faqs"
+      (onFilter)="filterFaqs($event)"
+    ></tock-faq-management-filters>
+
+    <nb-card *ngIf="!loading.list && !faqs?.length">
+      <nb-card-body class="d-flex">
+        <img
+          src="{{ baseHref }}assets/images/best_bot_gray.png"
+          class="tock-robot mr-4"
+        />
+        <div>
+          <h2 class="text-muted">No Faq found</h2>
+          You may create a new one using above button "NEW FAQ".
+        </div>
+      </nb-card-body>
+    </nb-card>
+
+    <tock-faq-management-list
+      *ngIf="!loading.list && faqs?.length"
+      [nbSpinner]="loading.delete"
+      [faqs]="faqs"
+      (handleEdit)="editFaq($event)"
+      (handleDelete)="deleteFaq($event)"
+    ></tock-faq-management-list>
+  </div>
+
+  <tock-faq-management-edit
+    *ngIf="isSidePanelOpen"
+    [loading]="loading.edit"
+    [faq]="faqEdit"
+    [faqs]="faqs"
+    (handleClose)="closeSidePanel()"
+    (handleSave)="saveFaq($event)"
+  ></tock-faq-management-edit>
+</section>
