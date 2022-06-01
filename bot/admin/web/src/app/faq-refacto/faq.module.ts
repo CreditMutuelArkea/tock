@@ -10,6 +10,8 @@ import {
   NbInputModule,
   NbSelectModule,
   NbSpinnerModule,
+  NbTabsetModule,
+  NbTagModule,
   NbTooltipModule
 } from '@nebular/theme';
 import { NlpModule } from '../nlp-tabs/nlp.module';
@@ -22,9 +24,14 @@ import { FaqTrainingListComponent } from './faq-training/faq-training-list/faq-t
 import { SharedModule } from '../shared-nlp/shared.module';
 import { MomentModule } from 'ngx-moment';
 import { SentencesService } from '../faq/common/sentences.service';
+import { FaqManagementFiltersComponent } from './faq-management/faq-management-filters/faq-management-filters.component';
+import { FaqManagementListComponent } from './faq-management/faq-management-list/faq-management-list.component';
+import { FaqManagementEditComponent } from './faq-management/faq-management-edit/faq-management-edit.component';
+import { BotSharedModule } from '../shared/bot-shared.module';
 
 @NgModule({
   imports: [
+    BotSharedModule,
     CommonModule,
     FaqRoutingModule,
     NlpModule,
@@ -39,13 +46,18 @@ import { SentencesService } from '../faq/common/sentences.service';
     NbInputModule,
     NbSelectModule,
     NbSpinnerModule,
+    NbTagModule,
+    NbTabsetModule,
     NbTooltipModule
   ],
   declarations: [
     FaqManagementComponent,
     FaqTrainingComponent,
     FaqTrainingFiltersComponent,
-    FaqTrainingListComponent
+    FaqTrainingListComponent,
+    FaqManagementFiltersComponent,
+    FaqManagementListComponent,
+    FaqManagementEditComponent
   ],
   exports: [],
   providers: [SentencesService]
