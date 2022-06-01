@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
+import { FaqTrainingFIlter } from '../../models';
 
 @Component({
   selector: 'tock-faq-training-filters',
@@ -7,11 +10,28 @@ import { FormControl, FormGroup } from '@angular/forms';
   styleUrls: ['./faq-training-filters.component.scss']
 })
 export class FaqTrainingFiltersComponent implements OnInit {
+  @Output()
+  onFilter = new EventEmitter<FaqTrainingFIlter>();
+
+  subscription = new Subscription();
+
   form = new FormGroup({
     search: new FormControl()
   });
 
+  get search(): FormControl {
+    return this.form.get('search') as FormControl;
+  }
+
   constructor() {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.subscription = this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+      this.onFilter.emit(this.form.value as FaqTrainingFIlter);
+    });
+  }
+
+  clearSearch() {
+    this.search.reset();
+  }
 }

@@ -17,6 +17,16 @@
           type="text"
           formControlName="search"
         />
+        <button
+          *ngIf="!!search.value"
+          nbButton
+          nbSuffix
+          nbTooltip="Clear"
+          ghost
+          (click)="clearSearch()"
+        >
+          <nb-icon icon="close-outline"></nb-icon>
+        </button>
       </nb-form-field>
     </form>
   </nb-card-body>

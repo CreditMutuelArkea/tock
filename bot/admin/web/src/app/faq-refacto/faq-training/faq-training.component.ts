@@ -6,6 +6,7 @@ import { StateService } from 'src/app/core-nlp/state.service';
 import { PaginatedQuery } from 'src/app/model/commons';
 import { PaginatedResult, SearchQuery, Sentence } from 'src/app/model/nlp';
 import { NlpService } from 'src/app/nlp-tabs/nlp.service';
+import { FaqTrainingFIlter } from '../models';
 
 @Component({
   selector: 'tock-faq-training',
@@ -43,7 +44,10 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  filterFaqTraining(filters: any): void {}
+  filterFaqTraining(filters: FaqTrainingFIlter): void {
+    this.filter = { ...this.filter, ...filters };
+    this.loadData();
+  }
 
   toSearchQuery(query: PaginatedQuery): SearchQuery {
     const result = new SearchQuery(
@@ -84,7 +88,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data: PaginatedResult<Sentence>) => {
           this.loading.list = false;
-          this.sentences = [...this.sentences, ...data.rows];
+          this.sentences = data.rows;
         },
         error: () => {
           this.loading.list = false;

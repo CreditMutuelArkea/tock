@@ -1,4 +1,4 @@
-<header>
+<header class="d-flex mb-2">
   <h1>FAQ training</h1>
 </header>
 
@@ -11,6 +11,18 @@
 
   <div>
     <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
+
+    <nb-card *ngIf="!loading.list && !sentences?.length">
+      <nb-card-body class="d-flex">
+        <img
+          src="{{ baseHref }}assets/images/best_bot_gray.png"
+          class="tock-robot mr-4"
+        />
+        <div>
+          <h2 class="text-muted">No sentences found</h2>
+        </div>
+      </nb-card-body>
+    </nb-card>
 
     <tock-faq-training-list
       [sentences]="sentences"
