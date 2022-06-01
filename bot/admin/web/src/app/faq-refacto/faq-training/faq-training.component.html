@@ -12,6 +12,9 @@
   <div>
     <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
 
-    {{ sentences | json }}
+    <tock-faq-training-list
+      [sentences]="sentences"
+      (onReload)="loadData()"
+    ></tock-faq-training-list>
   </div>
 </main>

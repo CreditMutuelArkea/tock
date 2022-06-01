@@ -1,1 +1,81 @@
-<p>faq-training-list works!</p>
+<nb-card
+  *ngFor="let sentence of sentences"
+  class="mb-2"
+>
+  <nb-card-body class="grid-columns">
+    <nb-checkbox></nb-checkbox>
+
+    <div>
+      <small class="d-block text-muted">
+        {{ sentence.creationDate | amDateFormat: 'MM/DD HH:mm' }}
+      </small>
+      <span>
+        {{ sentence.text }}
+      </span>
+    </div>
+
+    <div class="select-intent">
+      <span>FAQ</span>
+      <nb-select
+        fullWidth
+        placeholder="{{ selectIntent(sentence, 'placeholder') }}"
+        (selectedChange)="addIntentToSentence($event, sentence)"
+      >
+        <nb-option
+          *ngFor="let intent of intents"
+          value="{{ intent._id }}"
+        >
+          <span
+            class="tock-option-label"
+            title="{{ intent.intentLabel() }}"
+          >
+            {{ intent.intentLabel() }}
+          </span>
+        </nb-option>
+      </nb-select>
+      <span nbTooltip="Detection probability"> {{ selectIntent(sentence, 'probability') }}% </span>
+      <button
+        *ngIf="state.hasRole(UserRole.botUser)"
+        nbButton
+        nbTooltip="Create new FAQ"
+        ghost
+        shape="round"
+        (click)="redirectToFaqManagement(sentence)"
+      >
+        <nb-icon icon="plus-circle-outline"></nb-icon>
+      </button>
+    </div>
+
+    <div>
+      <button
+        nbButton
+        nbTooltip="Validate"
+        class="tock--success"
+        ghost
+        shape="round"
+      >
+        <nb-icon icon="checkmark-circle-2"></nb-icon>
+      </button>
+
+      <button
+        nbButton
+        nbTooltip="Unknown"
+        class="tock--danger"
+        ghost
+        shape="round"
+      >
+        <nb-icon icon="close-circle-outline"></nb-icon>
+      </button>
+
+      <button
+        nbButton
+        nbTooltip="Delete"
+        ghost
+        shape="round"
+        (click)="handleAction(Action.DELETE, sentence)"
+      >
+        <nb-icon icon="trash-2-outline"></nb-icon>
+      </button>
+    </div>
+  </nb-card-body>
+</nb-card>

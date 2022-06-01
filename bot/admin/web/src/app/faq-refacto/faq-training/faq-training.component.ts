@@ -16,10 +16,10 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
   filter = {
-    search: '',
-    sort: [],
+    search: null,
+    sort: [{ first: 'creationDate', second: false }],
     intentId: null,
-    status: [],
+    status: [0],
     onlyToReview: false,
     maxIntentProbability: 100,
     minIntentProbability: 0
