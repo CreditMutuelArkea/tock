@@ -19,7 +19,7 @@ package ai.tock.bot.admin.model
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import org.litote.kmongo.Id
 import java.time.Instant
-import java.util.*
+import java.util.Locale
 
 data class FaqDefinitionRequest(
     val id: String?,
