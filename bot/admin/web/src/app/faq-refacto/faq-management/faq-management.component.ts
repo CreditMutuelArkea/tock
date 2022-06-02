@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 import { RestService } from '../../core-nlp/rest/rest.service';
@@ -24,7 +25,11 @@ export class FaqManagementComponent implements OnInit {
     list: false
   };
 
-  constructor(private rest: RestService, private state: StateService) {}
+  constructor(
+    private rest: RestService,
+    private state: StateService,
+    private readonly toastrService: NbToastrService
+  ) {}
 
   ngOnInit(): void {
     this.search();
@@ -122,10 +127,29 @@ export class FaqManagementComponent implements OnInit {
       .pipe(take(1))
       .subscribe(() => {
         this.faqs = this.faqs.filter((f) => f.id != faqId);
+        this.toastrService.success(`Faq successfully deleted`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
       });
   }
 
-  saveFaq() {}
+  enableFaq(faq: FaqDefinition) {
+    faq.enabled = !faq.enabled;
+    this.rest
+      .post('/faq', faq)
+      .pipe(take(1))
+      .subscribe(() => {
+        this.toastrService.success(`Faq successfully updated`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+      });
+  }
+
+  saveFaq(faq: FaqDefinition) {
+    console.log(faq);
+  }
 
   ngOnDestroy() {
     this.destroy.next();

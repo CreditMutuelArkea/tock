@@ -11,8 +11,13 @@ import {
 } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { DialogService } from '../../../core-nlp/dialog.service';
+import { StateService } from '../../../core-nlp/state.service';
+import { PaginatedQuery } from '../../../model/commons';
+import { Intent, SearchQuery } from '../../../model/nlp';
+import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { FaqDefinition } from '../../models';
 
@@ -37,13 +42,42 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   @Output()
   handleSave = new EventEmitter();
 
+  @ViewChild('nameInput') nameInput: ElementRef;
+  @ViewChild('tagInput') tagInput: ElementRef;
+  @ViewChild('addUtteranceInput') addUtteranceInput: ElementRef;
+  @ViewChild('utterancesListWrapper') utterancesListWrapper: ElementRef;
+
+  constructor(
+    private dialogService: DialogService,
+    private nlp: NlpService,
+    private readonly state: StateService
+  ) {}
+
   isSubmitted: boolean = false;
 
+  currentTab = 'info';
+
+  setCurrentTab($event) {
+    this.currentTab = $event.tabTitle;
+    if ($event.tabTitle == 'info') {
+      this.nameInput?.nativeElement.focus();
+      setTimeout(() => {
+        this.nameInput?.nativeElement.focus();
+      });
+    }
+  }
+
   form = new FormGroup({
-    description: new FormControl(),
     title: new FormControl(undefined, Validators.required),
-    tags: new FormArray([])
+    description: new FormControl(),
+    tags: new FormArray([]),
+    utterances: new FormArray([], Validators.required),
+    answer: new FormControl(undefined, Validators.required)
   });
+
+  get answer(): FormControl {
+    return this.form.get('answer') as FormControl;
+  }
 
   get description(): FormControl {
     return this.form.get('description') as FormControl;
@@ -57,22 +91,26 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     return this.form.get('tags') as FormArray;
   }
 
-  get canSave(): boolean {
-    return this.isSubmitted ? this.form.valid : this.form.dirty;
+  get utterances(): FormArray {
+    return this.form.get('utterances') as FormArray;
   }
 
-  constructor(private dialogService: DialogService) {}
+  get canSave(): boolean {
+    return this.form.valid;
+    // return this.isSubmitted ? this.form.valid : this.form.dirty;
+  }
 
   ngOnInit(): void {}
 
-  tagsAutocompleteValues;
+  tagsAutocompleteValues: Observable<any[]>;
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.scenario?.currentValue) {
+    if (changes.faq?.currentValue) {
       const faq: FaqDefinition = changes.faq.currentValue;
 
       this.form.reset();
       this.tags.clear();
+      this.utterances.clear();
       this.isSubmitted = false;
 
       if (faq) {
@@ -83,6 +121,16 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
             this.tags.push(new FormControl(tag));
           });
         }
+
+        faq.utterances.forEach((utterance) => {
+          this.utterances.push(new FormControl(utterance));
+        });
+      }
+
+      if (!faq.id) {
+        setTimeout(() => {
+          this.setCurrentTab({ tabTitle: 'info' });
+        }, 100);
       }
     }
 
@@ -94,6 +142,10 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
         )
       )
     ]);
+  }
+
+  tagSelected($event) {
+    this.onTagAdd({ value: $event, input: this.tagInput });
   }
 
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
@@ -116,6 +168,102 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     }
   }
 
+  normalizeString(str) {
+    /*
+      Remove diacrtitics
+      Trim
+      toLowerCase
+      Remove western punctuations
+      Deduplicate spaces
+    */
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, '')
+      .replace(/\s\s+/g, ' ');
+  }
+
+  utterancesInclude(str) {
+    return this.utterances.controls.find((u) => {
+      return this.normalizeString(u.value) == this.normalizeString(str);
+    });
+  }
+
+  existingUterranceInOtherintent: string;
+  lookingForSameUterranceInOtherInent: boolean = false;
+
+  addUtterance() {
+    this.existingUterranceInOtherintent = undefined;
+
+    let utterance = this.addUtteranceInput.nativeElement.value.trim();
+    if (utterance) {
+      if (!this.utterancesInclude(utterance)) {
+        this.lookingForSameUterranceInOtherInent = true;
+        const searchQuery: SearchQuery = this.createSearchIntentsQuery({
+          searchString: utterance
+        });
+
+        this.nlp
+          .searchSentences(searchQuery)
+          .pipe(take(1))
+          .subscribe((res) => {
+            let existingIntentId;
+            res.rows.forEach((sentence) => {
+              if (this.normalizeString(sentence.text) == this.normalizeString(utterance)) {
+                if (
+                  !this.faq.intentId ||
+                  (sentence.classification.intentId != Intent.unknown &&
+                    sentence.classification.intentId != this.faq.intentId)
+                ) {
+                  existingIntentId = sentence.classification.intentId;
+                }
+              }
+            });
+
+            if (existingIntentId) {
+              let intent = this.state.findIntentById(existingIntentId);
+              this.existingUterranceInOtherintent = intent.label || intent.name;
+            } else {
+              this.utterances.push(new FormControl(utterance));
+              this.form.markAsDirty();
+              setTimeout(() => {
+                this.utterancesListWrapper.nativeElement.scrollTop =
+                  this.utterancesListWrapper.nativeElement.scrollHeight;
+              });
+            }
+            this.lookingForSameUterranceInOtherInent = false;
+          });
+      }
+      this.addUtteranceInput.nativeElement.value = '';
+    }
+  }
+
+  createSearchIntentsQuery(params: { searchString?: string; intentId?: string }): SearchQuery {
+    const cursor: number = 0;
+    const paginatedQuery: PaginatedQuery = this.state.createPaginatedQuery(cursor);
+    return new SearchQuery(
+      paginatedQuery.namespace,
+      paginatedQuery.applicationName,
+      paginatedQuery.language,
+      paginatedQuery.start,
+      paginatedQuery.size,
+      paginatedQuery.searchMark,
+      params.searchString || null,
+      params.intentId || null
+    );
+  }
+
+  editUtterance(utterance) {
+    console.log('editUtterance', utterance);
+  }
+
+  removeUtterance(utterance) {
+    const index = this.utterances.controls.findIndex((u) => u.value == utterance);
+    this.utterances.removeAt(index);
+  }
+
   close(): void {
     if (this.form.dirty) {
       const validAction = 'yes';
@@ -136,13 +284,13 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     }
   }
 
-  save(redirect = false): void {
+  save(): void {
     this.isSubmitted = true;
 
     if (this.canSave) {
       this.handleSave.emit({
-        redirect: redirect,
-        scenario: { ...this.faq, ...this.form.value }
+        ...this.faq,
+        ...this.form.value
       });
     }
   }

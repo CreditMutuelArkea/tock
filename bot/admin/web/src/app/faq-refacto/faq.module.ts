@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import {
+  NbAutocompleteModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
@@ -48,7 +49,8 @@ import { BotSharedModule } from '../shared/bot-shared.module';
     NbSpinnerModule,
     NbTagModule,
     NbTabsetModule,
-    NbTooltipModule
+    NbTooltipModule,
+    NbAutocompleteModule
   ],
   declarations: [
     FaqManagementComponent,

@@ -6,6 +6,7 @@
     <div class="d-flex justify-content-between align-items-start">
       <h4>{{ faq?.id ? 'Edit "' + faq.title + '"' : 'New faq' }}</h4>
       <button
+        type="button"
         nbButton
         ghost
         shape="round"
@@ -18,124 +19,206 @@
   </nb-card-header>
 
   <nb-card-body>
-    <form
-      [formGroup]="form"
-      (submit)="save()"
-    >
-      <nb-tabset>
-        <nb-tab tabTitle="Info"> </nb-tab>
-        <nb-tab tabTitle="Question"> </nb-tab>
-        <nb-tab tabTitle="Answer"> </nb-tab>
+    <form [formGroup]="form">
+      <nb-tabset
+        fullWidth
+        (changeTab)="setCurrentTab($event)"
+      >
+        <nb-tab
+          tabTitle="info"
+          [active]="currentTab == 'info'"
+        >
+        </nb-tab>
+        <nb-tab
+          tabTitle="question"
+          [active]="currentTab == 'question'"
+        >
+        </nb-tab>
+        <nb-tab
+          tabTitle="answer"
+          [active]="currentTab == 'answer'"
+        >
+        </nb-tab>
       </nb-tabset>
 
-      <!-- <div class="d-flex flex-column mb-2">
-        <label for="name">Name <span class="text-muted">(*)</span></label>
-        <input
-          #nameInput
-          nbInput
-          formControlName="name"
-          fullWidth
-          id="name"
-          type="text"
-          placeholder="Enter name"
-        />
-      </div>
-
-      <div class="d-flex flex-column mb-2">
-        <label for="category">Category</label>
-        <input
-          nbInput
-          formControlName="category"
-          fullWidth
-          id="category"
-          type="text"
-          placeholder="Select category"
-          autocomplete="off"
-          [nbAutocomplete]="categoryAutocomplete"
-        />
-        <nb-autocomplete #categoryAutocomplete>
-          <nb-option
-            *ngFor="let option of categoryAutocompleteValues | async"
-            [value]="option"
-          >
-            {{ option }}
-          </nb-option>
-        </nb-autocomplete>
-      </div>
-
-      <div class="d-flex flex-column mb-2">
-        <label for="description">Description</label>
-        <textarea
-          nbInput
-          formControlName="description"
-          fullWidth
-          id="description"
-          type="text"
-          placeholder="Enter description"
-        ></textarea>
-      </div>
-
-      <div class="d-flex flex-column mb-2">
-        <label for="tags">Tags</label>
-        <nb-tag-list (tagRemove)="onTagRemove($event)">
-          <nb-tag
-            *ngFor="let tag of tags.value"
-            removable
-            [text]="tag"
-          ></nb-tag>
+      <div *ngIf="currentTab == 'info'">
+        <div class="d-flex flex-column mb-2">
+          <label for="name">Name <span class="text-muted">(*)</span></label>
           <input
-            nbTagInput
+            #nameInput
+            nbInput
+            formControlName="title"
             fullWidth
-            id="tags"
             type="text"
-            placeholder="Enter tags"
-            (tagAdd)="onTagAdd($event)"
-            (keydown.enter)="eventPreventDefault($event)"
-            autocomplete="off"
-            [nbAutocomplete]="tagsAutocomplete"
+            placeholder="Enter faq title"
           />
-          <nb-autocomplete #tagsAutocomplete>
-            <nb-option
-              *ngFor="let option of tagsAutocompleteValues | async"
-              [value]="option"
+        </div>
+        <div class="d-flex flex-column mb-2">
+          <label for="description">Description</label>
+          <textarea
+            nbInput
+            formControlName="description"
+            fullWidth
+            id="description"
+            type="text"
+            rows="8"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+        <div class="d-flex flex-column mb-2">
+          <label for="tags">Tags</label>
+          <nb-tag-list (tagRemove)="onTagRemove($event)">
+            <nb-tag
+              *ngFor="let tag of tags.value"
+              removable
+              [text]="tag"
+            ></nb-tag>
+            <input
+              nbTagInput
+              #tagInput
+              fullWidth
+              id="tags"
+              type="text"
+              placeholder="Type tag and press enter"
+              (tagAdd)="onTagAdd($event)"
+              (keydown.enter)="eventPreventDefault($event)"
+              autocomplete="off"
+              [nbAutocomplete]="tagsAutocomplete"
+            />
+            <nb-autocomplete
+              #tagsAutocomplete
+              (selectedChange)="tagSelected($event)"
             >
-              {{ option }}
-            </nb-option>
-          </nb-autocomplete>
-        </nb-tag-list>
+              <nb-option
+                *ngFor="let option of tagsAutocompleteValues | async"
+                [value]="option"
+              >
+                {{ option }}
+              </nb-option>
+            </nb-autocomplete>
+          </nb-tag-list>
+        </div>
       </div>
 
-      <div class="grid-button mt-4">
-        <button
-          nbButton
-          outline
-          status="primary"
-          size="small"
-          type="button"
-          (click)="close()"
+      <div *ngIf="currentTab == 'question'">
+        <div
+          #utterancesListWrapper
+          class="entries-list d-flex flex-column mb-2"
+          [nbSpinner]="lookingForSameUterranceInOtherInent"
         >
-          Cancel
-        </button>
-        <button
-          nbButton
-          status="primary"
-          size="small"
-          type="submit"
-          [disabled]="!canSave"
-        >
-          Save
-        </button>
-        <button
-          nbButton
-          status="primary"
-          size="small"
-          type="button"
-          [disabled]="!canSave"
-          (click)="save(true)"
-        >
-          Save & design
-        </button>
-      </div> -->
+          <ul>
+            <li
+              *ngFor="let utterance of utterances.value"
+              class="d-flex justify-content-between align-items-center"
+            >
+              <div class="flex-grow-1">
+                {{ utterance }}
+              </div>
+
+              <button
+                type="button"
+                nbButton
+                nbTooltip="Edit"
+                ghost
+                shape="round"
+                size="small"
+                (click)="editUtterance(utterance)"
+              >
+                <nb-icon icon="edit-outline"></nb-icon>
+              </button>
+
+              <button
+                type="button"
+                nbButton
+                nbTooltip="Delete"
+                ghost
+                shape="round"
+                size="small"
+                class="status-danger"
+                (click)="removeUtterance(utterance)"
+              >
+                <nb-icon icon="trash-2-outline"></nb-icon>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mb-2">
+          <div
+            *ngIf="existingUterranceInOtherintent"
+            class="alert alert-danger"
+            role="alert"
+          >
+            This Sentence is already associated with the intent :
+            <strong> {{ existingUterranceInOtherintent }} </strong>
+            <br />
+            Addition cancelled
+          </div>
+
+          <div class="d-flex">
+            <input
+              #addUtteranceInput
+              nbInput
+              fullWidth
+              type="text"
+              placeholder="Add a new formulation and press enter"
+              [disabled]="lookingForSameUterranceInOtherInent"
+              (keyup.enter)="addUtterance()"
+            />
+            <button
+              type="button"
+              nbButton
+              nbTooltip="Add"
+              ghost
+              size="small"
+              [disabled]="lookingForSameUterranceInOtherInent"
+              (click)="addUtterance()"
+            >
+              Add
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="currentTab == 'answer'">
+        <div class="d-flex flex-column mb-2">
+          <label for="answer">Answer <span class="text-muted">(*)</span></label>
+          <textarea
+            nbInput
+            formControlName="answer"
+            fullWidth
+            id="answer"
+            type="text"
+            rows="8"
+            placeholder="Enter answer"
+          ></textarea>
+        </div>
+      </div>
     </form>
   </nb-card-body>
+
+  <nb-card-footer>
+    <div class="grid-button mt-4">
+      <button
+        type="button"
+        nbButton
+        outline
+        status="primary"
+        size="small"
+        (click)="close()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        nbButton
+        status="primary"
+        size="small"
+        [disabled]="!canSave"
+        (click)="save()"
+      >
+        Save
+      </button>
+    </div>
+  </nb-card-footer>
 </nb-card>

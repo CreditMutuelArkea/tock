@@ -16,11 +16,29 @@ export class FaqManagementListComponent {
 
   @Output() handleEdit = new EventEmitter<FaqDefinition>();
   @Output() handleDelete = new EventEmitter<FaqDefinition>();
+  @Output() handleEnable = new EventEmitter<FaqDefinition>();
 
   constructor(private state: StateService, private dialogService: DialogService) {}
 
-  toggleEnabled($event) {
-    console.log('TO DO', $event);
+  toggleEnabled(faq: FaqDefinition) {
+    let action = 'Enable';
+    if (faq.enabled) {
+      action = 'Disable';
+    }
+
+    const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
+      context: {
+        title: `${action} faq "${faq.title}"`,
+        subtitle: `Are you sure you want to ${action.toLowerCase()} this faq ?`,
+        action: action
+      }
+    });
+    dialogRef.onClose.subscribe((result) => {
+      console.log(result, action);
+      if (result === action.toLowerCase()) {
+        this.handleEnable.emit(faq);
+      }
+    });
   }
 
   editFaq(faq: FaqDefinition): void {
