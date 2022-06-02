@@ -2,17 +2,17 @@
   <h1>FAQ training</h1>
 </header>
 
-<main [class.grid]="isSidePanelOpen">
+<main>
   <nb-card
-    *ngIf="loading.list"
+    *ngIf="loading"
     class="loading"
-    [nbSpinner]="loading.list"
+    [nbSpinner]="loading"
   ></nb-card>
 
   <div>
     <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
 
-    <nb-card *ngIf="!loading.list && !sentences?.length">
+    <nb-card *ngIf="!loading && !sentences?.length">
       <nb-card-body class="d-flex">
         <img
           src="{{ baseHref }}assets/images/best_bot_gray.png"
@@ -25,8 +25,12 @@
     </nb-card>
 
     <tock-faq-training-list
+      *ngIf="sentences?.length"
       [sentences]="sentences"
-      (onReload)="loadData()"
+      [selection]="selection"
+      (onAction)="handleAction($event)"
+      (onBatchAction)="handleBatchAction($event)"
+      (onSort)="sortFaqTraining($event)"
     ></tock-faq-training-list>
   </div>
 </main>

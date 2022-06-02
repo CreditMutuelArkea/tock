@@ -1,30 +1,13 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
-import { Intent, Sentence, SentenceStatus } from '../../../model/nlp';
+import { Intent, Sentence } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
-import { Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
-import { DialogService } from 'src/app/core-nlp/dialog.service';
-import { SentencesService } from 'src/app/faq/common/sentences.service';
-import { truncate } from 'src/app/faq/common/util/string-utils';
-
-enum Action {
-  DELETE = 'DELETE',
-  TOGGLE = 'TOGGLE',
-  VALIDATE = 'VALIDATE',
-  UNKNOWN = 'UNKNOWN'
-}
+import { Action } from '../../models';
 
 @Component({
   selector: 'tock-faq-training-list',
@@ -33,26 +16,20 @@ enum Action {
 })
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
   @Input() sentences: Sentence[] = [];
+  @Input() selection!: SelectionModel<Sentence>;
 
-  @Output() onReload = new EventEmitter<boolean>();
-
-  @Output() onDelete = new EventEmitter<number>();
-  @Output() onToggle = new EventEmitter<number>();
-  @Output() onValidate = new EventEmitter<number>();
-  @Output() onUnknown = new EventEmitter<number>();
+  @Output() onAction = new EventEmitter<{ action: Action; sentence: Sentence }>();
+  @Output() onBatchAction = new EventEmitter<Action>();
+  @Output() onSort = new EventEmitter<boolean>();
 
   private readonly destroy$: Subject<boolean> = new Subject();
 
   intents: Intent[] = [];
-  UserRole = UserRole;
-  Action = Action;
+  UserRole: typeof UserRole = UserRole;
+  Action: typeof Action = Action;
+  sort: boolean = false;
 
-  constructor(
-    private readonly dialogService: DialogService,
-    private readonly sentencesService: SentencesService,
-    public readonly state: StateService,
-    private router: Router
-  ) {}
+  constructor(public readonly state: StateService, private router: Router) {}
 
   ngOnInit(): void {
     this.state.currentIntents.pipe(takeUntil(this.destroy$)).subscribe({
@@ -84,63 +61,32 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     sentence = sentence.withIntent(this.state, intentId);
   }
 
-  async handleAction(action: Action, sentence: Sentence): Promise<void> {
-    switch (action) {
-      case Action.DELETE:
-        sentence.status = SentenceStatus.deleted;
-        await this.sentencesService.save(sentence, this.destroy$).pipe(take(1)).toPromise();
-        this.onReload.emit(true);
-        break;
-    }
-
-    this.dialogService.notify(`Deleted`, truncate(sentence.text), {
-      duration: 2000,
-      status: 'basic'
-    });
-  }
-  /*
-  public async validate(): Promise<void> {
-    const intentId = this.sentence.classification.intentId;
-    if (!intentId) {
-      this.dialog.notify(`Please select an intent first`);
-      return;
-    }
-
-    if (intentId === Intent.unknown) {
-      this.sentence.classification.intentId = Intent.unknown;
-      this.sentence.classification.entities = [];
-    }
-    this.sentence.status = SentenceStatus.validated;
-
-    await this.sentencesService.save(this.sentence, this.destroy$).pipe(take(1)).toPromise();
-
-    this.dialog.notify(`Validated`, truncate(this.sentence.text), {
-      duration: 2000,
-      status: 'basic'
-    });
+  handleAction(action: Action, sentence: Sentence): void {
+    this.onAction.emit({ action, sentence });
   }
 
-  public async unknown(): Promise<void> {
-    this.sentence.classification.intentId = Intent.unknown;
-    this.sentence.classification.entities = [];
-    this.sentence.status = SentenceStatus.validated;
-
-    await this.sentencesService.save(this.sentence, this.destroy$).pipe(take(1)).toPromise();
-
-    this.dialog.notify(`Unknown`, truncate(this.sentence.text), {
-      duration: 2000,
-      status: 'basic'
-    });
+  handleBatchAction(action: Action): void {
+    this.onBatchAction.emit(action);
   }
 
-  public async remove(): Promise<void> {
-    this.sentence.status = SentenceStatus.deleted;
+  handleToggleSelectAll(value: boolean): void {
+    if (!value) {
+      this.selection.clear();
+    } else {
+      this.sentences.forEach((sentence) => this.selection.select(sentence));
+    }
+  }
 
-    await this.sentencesService.save(this.sentence, this.destroy$).pipe(take(1)).toPromise();
+  isSentenceSelected(sentence: Sentence): boolean {
+    return this.selection.isSelected(sentence);
+  }
 
-    this.dialog.notify(`Deleted`, truncate(this.sentence.text), {
-      duration: 2000,
-      status: 'basic'
-    });
-  }*/
+  toggle(sentence: Sentence): void {
+    this.selection.toggle(sentence);
+  }
+
+  toggleSort(): void {
+    this.sort = !this.sort;
+    this.onSort.emit(this.sort);
+  }
 }
