@@ -325,6 +325,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
         ...this.faq,
         ...this.form.value
       });
+      if (!this.faq.id) this.handleClose.emit(true);
     }
   }
 
