@@ -1,11 +1,16 @@
+import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { NbToastrService } from '@nebular/theme';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 
-import { StateService } from 'src/app/core-nlp/state.service';
-import { PaginatedQuery } from 'src/app/model/commons';
-import { PaginatedResult, SearchQuery, Sentence } from 'src/app/model/nlp';
-import { NlpService } from 'src/app/nlp-tabs/nlp.service';
+import { StateService } from '../../core-nlp/state.service';
+import { SentencesService } from '../../faq/common/sentences.service';
+import { truncate } from '../../faq/common/util/string-utils';
+import { PaginatedQuery } from '../../model/commons';
+import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
+import { NlpService } from '../../nlp-tabs/nlp.service';
+import { Action, FaqTrainingFIlter } from '../models';
 
 @Component({
   selector: 'tock-faq-training',
@@ -15,6 +20,8 @@ import { NlpService } from 'src/app/nlp-tabs/nlp.service';
 export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
+  selection: SelectionModel<Sentence> = new SelectionModel<Sentence>(true, []);
+  Action = Action;
   filter = {
     search: null,
     sort: [{ first: 'creationDate', second: false }],
@@ -24,15 +31,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     maxIntentProbability: 100,
     minIntentProbability: 0
   };
-  isSidePanelOpen: boolean = false;
 
-  loading = {
-    list: false
-  };
+  loading: boolean = false;
 
   sentences: Sentence[] = [];
 
-  constructor(private nlp: NlpService, private state: StateService) {}
+  constructor(
+    private nlp: NlpService,
+    private state: StateService,
+    private sentencesService: SentencesService,
+    private toastrService: NbToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadData();
@@ -43,7 +52,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  filterFaqTraining(filters: any): void {}
+  filterFaqTraining(filters: FaqTrainingFIlter): void {
+    this.selection.clear();
+    this.filter = { ...this.filter, ...filters };
+    this.loadData();
+  }
+
+  sortFaqTraining(sort: boolean): void {
+    this.selection.clear();
+    this.filter.sort[0].second = sort;
+    this.loadData();
+  }
 
   toSearchQuery(query: PaginatedQuery): SearchQuery {
     const result = new SearchQuery(
@@ -77,18 +96,100 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   }
 
   loadData(start: number = 0, size: number = 10): void {
-    this.loading.list = true;
+    this.loading = true;
 
     this.search(this.state.createPaginatedQuery(start, size))
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (data: PaginatedResult<Sentence>) => {
-          this.loading.list = false;
-          this.sentences = [...this.sentences, ...data.rows];
+          this.loading = false;
+          this.sentences = data.rows;
         },
         error: () => {
-          this.loading.list = false;
+          this.loading = false;
         }
       });
+  }
+
+  async handleAction({ action, sentence }): Promise<void> {
+    const actionTitle = this.setActionTitle(action);
+
+    this.setSentenceAccordingToAction(action, sentence);
+
+    await this.sentencesService.save(sentence, this.destroy$).pipe(take(1)).toPromise();
+
+    if (this.selection.isSelected(sentence)) {
+      this.selection.deselect(sentence);
+    }
+    this.sentences = this.sentences.filter((s) => sentence.text !== s.text);
+
+    this.toastrService.success(truncate(sentence.text), actionTitle, {
+      duration: 2000,
+      status: 'basic'
+    });
+  }
+
+  async handleBatchAction(action: Action): Promise<void> {
+    if (!this?.selection?.selected?.length) {
+      this.toastrService.warning('No data selected', { duration: 2000, status: 'info' });
+      return;
+    }
+    const actionTitle = this.setActionTitle(action);
+
+    for (let sentence of this.selection.selected) {
+      this.setSentenceAccordingToAction(action, sentence);
+    }
+
+    await this.sentencesService.saveBulk(this.selection.selected, this.destroy$).toPromise();
+
+    this.toastrService.success(
+      `${actionTitle} ${this.selection.selected.length} sentences`,
+      actionTitle,
+      {
+        duration: 2000,
+        status: 'basic'
+      }
+    );
+
+    this.loadData();
+  }
+
+  private setSentenceAccordingToAction(action: Action, sentence: Sentence): void {
+    switch (action) {
+      case Action.DELETE:
+        sentence.status = SentenceStatus.deleted;
+        break;
+      case Action.TOGGLE:
+        break;
+      case Action.UNKNOWN:
+        sentence.classification.intentId = Intent.unknown;
+        sentence.classification.entities = [];
+        sentence.status = SentenceStatus.validated;
+        break;
+      case Action.VALIDATE:
+        const intentId = sentence.classification.intentId;
+
+        if (!intentId) {
+          this.toastrService.show(`Please select an intent first`);
+          break;
+        }
+        if (intentId === Intent.unknown) {
+          sentence.classification.intentId = Intent.unknown;
+          sentence.classification.entities = [];
+        }
+        sentence.status = SentenceStatus.validated;
+        break;
+    }
+  }
+
+  private setActionTitle(action: Action): string {
+    switch (action) {
+      case Action.DELETE:
+        return 'Delete';
+      case Action.UNKNOWN:
+        return 'Unknown';
+      case Action.VALIDATE:
+        return 'Validate';
+    }
   }
 }

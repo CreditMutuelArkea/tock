@@ -6,9 +6,13 @@
 }
 
 .grid-columns-header {
-  font-size: 70%;
-  color: gray;
+  font-size: 0.8rem;
+  color: #8f8f8f;
   padding: 0 1.5rem 0 1.5rem;
+  display: grid;
+  grid-gap: 1rem;
+  align-items: center;
+  grid-template-columns: 100%;
 }
 
 .tock--success > nb-icon {
@@ -29,5 +33,9 @@
 @media screen and (min-width: 768px) {
   .grid-columns {
     grid-template-columns: auto 1fr 1fr auto;
+  }
+
+  .grid-columns-header {
+    grid-template-columns: auto 1fr auto;
   }
 }

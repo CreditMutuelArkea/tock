@@ -1,9 +1,91 @@
+<div class="grid-columns-header mb-1">
+  <div>
+    <nb-checkbox
+      [checked]="selection?.selected?.length === sentences?.length"
+      [indeterminate]="selection?.selected?.length && selection.selected.length < sentences?.length"
+      (checkedChange)="handleToggleSelectAll($event)"
+    ></nb-checkbox>
+  </div>
+  <div>
+    <span
+      class="pointer"
+      (click)="toggleSort()"
+    >
+      Sort by creation date
+      <nb-icon
+        *ngIf="!sort"
+        icon="chevron-down-outline"
+        class="valign-middle"
+      ></nb-icon>
+      <nb-icon
+        *ngIf="sort"
+        icon="chevron-up-outline"
+        class="valign-middle"
+      ></nb-icon>
+    </span>
+  </div>
+
+  <div>
+    <nb-form-field>
+      <nb-icon
+        nbPrefix
+        pack="material-icons"
+        icon="bolt"
+      ></nb-icon>
+      <div class="nb-form-control-container nb-form-field-control-with-prefix">
+        <nb-select
+          placeholder="Apply to selection"
+          size="small"
+          status="primary"
+          [disabled]="!selection.selected.length"
+        >
+          <nb-option
+            class="tock--success"
+            tock-click-capture
+            (click)="handleBatchAction(Action.VALIDATE)"
+          >
+            <nb-icon
+              [ngClass]="['float-right', 'mr-2']"
+              icon="checkmark-circle-2"
+            ></nb-icon>
+            Validate
+          </nb-option>
+          <nb-option
+            class="tock--danger"
+            tock-click-capture
+            (click)="handleBatchAction(Action.UNKNOWN)"
+          >
+            <nb-icon
+              [ngClass]="['float-right', 'mr-2']"
+              icon="checkmark-outline"
+            ></nb-icon>
+            Unknown
+          </nb-option>
+          <nb-option
+            tock-click-capture
+            (click)="handleBatchAction(Action.DELETE)"
+          >
+            <nb-icon
+              [ngClass]="['float-right', 'mr-2']"
+              icon="trash-2-outline"
+            ></nb-icon>
+            Delete
+          </nb-option>
+        </nb-select>
+      </div>
+    </nb-form-field>
+  </div>
+</div>
+
 <nb-card
   *ngFor="let sentence of sentences"
   class="mb-2"
 >
   <nb-card-body class="grid-columns">
-    <nb-checkbox></nb-checkbox>
+    <nb-checkbox
+      [checked]="isSentenceSelected(sentence)"
+      (checkedChange)="toggle(sentence)"
+    ></nb-checkbox>
 
     <div>
       <small class="d-block text-muted">
@@ -53,6 +135,7 @@
         class="tock--success"
         ghost
         shape="round"
+        (click)="handleAction(Action.VALIDATE, sentence)"
       >
         <nb-icon icon="checkmark-circle-2"></nb-icon>
       </button>
@@ -63,6 +146,7 @@
         class="tock--danger"
         ghost
         shape="round"
+        (click)="handleAction(Action.UNKNOWN, sentence)"
       >
         <nb-icon icon="close-circle-outline"></nb-icon>
       </button>

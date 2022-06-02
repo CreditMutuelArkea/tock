@@ -28,3 +28,7 @@ export interface FaqFilter {
   tags: Array<string>;
   sort;
 }
+
+export interface FaqTrainingFIlter {
+  search: string;
+}
