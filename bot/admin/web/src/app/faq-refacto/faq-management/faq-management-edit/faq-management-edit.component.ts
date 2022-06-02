@@ -43,6 +43,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   handleSave = new EventEmitter();
 
   @ViewChild('nameInput') nameInput: ElementRef;
+  @ViewChild('answerInput') answerInput: ElementRef;
   @ViewChild('tagInput') tagInput: ElementRef;
   @ViewChild('addUtteranceInput') addUtteranceInput: ElementRef;
   @ViewChild('utterancesListWrapper') utterancesListWrapper: ElementRef;
@@ -63,6 +64,18 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       this.nameInput?.nativeElement.focus();
       setTimeout(() => {
         this.nameInput?.nativeElement.focus();
+      });
+    }
+    if ($event.tabTitle == 'question') {
+      this.addUtteranceInput?.nativeElement.focus();
+      setTimeout(() => {
+        this.addUtteranceInput?.nativeElement.focus();
+      });
+    }
+    if ($event.tabTitle == 'answer') {
+      this.answerInput?.nativeElement.focus();
+      setTimeout(() => {
+        this.answerInput?.nativeElement.focus();
       });
     }
   }
@@ -194,6 +207,10 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   existingUterranceInOtherintent: string;
   lookingForSameUterranceInOtherInent: boolean = false;
 
+  resetAlerts() {
+    this.existingUterranceInOtherintent = undefined;
+  }
+
   addUtterance() {
     this.existingUterranceInOtherintent = undefined;
 
@@ -229,6 +246,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
               this.utterances.push(new FormControl(utterance));
               this.form.markAsDirty();
               setTimeout(() => {
+                this.addUtteranceInput?.nativeElement.focus();
                 this.utterancesListWrapper.nativeElement.scrollTop =
                   this.utterancesListWrapper.nativeElement.scrollHeight;
               });
@@ -255,8 +273,23 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     );
   }
 
+  utteranceEditionValue: string;
   editUtterance(utterance) {
-    console.log('editUtterance', utterance);
+    this.utterances.controls.forEach((c) => {
+      delete c['_edit'];
+    });
+    const ctrl = this.utterances.controls.find((u) => u.value == utterance);
+    this.utteranceEditionValue = ctrl.value;
+    ctrl['_edit'] = true;
+  }
+
+  validateEditUtterance(utterance: FormControl) {
+    utterance.setValue(this.utteranceEditionValue);
+    this.cancelEditUtterance(utterance);
+  }
+
+  cancelEditUtterance(utterance: FormControl) {
+    delete utterance['_edit'];
   }
 
   removeUtterance(utterance) {
