@@ -33,6 +33,9 @@ export class FaqManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.search();
+    this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe((_) => {
+      this.search();
+    });
   }
   get isAuthorized(): boolean {
     return this.state.hasRole(UserRole.faqBotUser);

@@ -141,9 +141,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       }
 
       if (!faq.id) {
-        setTimeout(() => {
-          this.setCurrentTab({ tabTitle: 'info' });
-        }, 100);
+        this.setCurrentTab({ tabTitle: 'info' });
       }
     }
 
