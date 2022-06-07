@@ -34,14 +34,17 @@ import ai.tock.nlp.front.service.applicationDAO
 import ai.tock.nlp.front.service.faqDefinitionDAO
 import ai.tock.nlp.front.service.intentDAO
 import ai.tock.nlp.front.service.storage.ClassifiedSentenceDAO
+import ai.tock.nlp.front.service.storage.FaqSettingsDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.FaqDefinitionDetailed
+import ai.tock.nlp.front.shared.config.FaqSettings
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQuery
+import ai.tock.nlp.front.shared.config.Settings
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.security.UserLogin
@@ -68,6 +71,7 @@ object FaqAdminService {
     private val i18nDao: I18nDAO get() = injector.provide()
     private val classifiedSentenceDAO: ClassifiedSentenceDAO get() = injector.provide()
     private val storyDefinitionDAO: StoryDefinitionConfigurationDAO get() = injector.provide()
+    private val faqSettingsDAO: FaqSettingsDAO get() = injector.provide()
     private val front = FrontClient
 
     private const val FAQ_CATEGORY = "faq"
@@ -231,6 +235,45 @@ object FaqAdminService {
 
             botStoryDefinitionConfiguration?.let {
                 logger.info { "Update FAQ status with feature activation : ${query.enabled}" }
+            }
+        }
+    }
+
+    /**
+     * Update FAQ story with the settings (Add or Remove the ending rule)
+     */
+    fun updateAllFaqStoryWithSettings(
+        applicationDefinition: ApplicationDefinition,
+        faqSettings: FaqSettings){
+
+        val listFaq = faqDefinitionDAO.getFaqDefinitionByApplicationId(applicationDefinition._id)
+
+        listFaq.forEach{
+            val currentIntent = it.intentId?.let {
+                AdminService.front.getIntentById(it)
+            }
+
+            val existingStory = currentIntent?.let {
+                storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
+                    applicationDefinition.namespace,
+                    applicationDefinition.name,
+                    currentIntent.name
+                )
+            }
+
+            existingStory?.let {
+                val features = mutableListOf<StoryDefinitionConfigurationFeature>()
+                features.addAll(existingStory.features)
+
+                features.removeIf { feature -> feature.endWithStoryId != null}
+                logger.info { "Remove all features ending from FAQ Story '${existingStory.storyId}'" }
+
+                if(faqSettings.satisfactionEnabled) {
+                    features.add(StoryDefinitionConfigurationFeature(null, true, null, faqSettings.satisfactionStoryId))
+                    logger.info { "Add the feature ending '${faqSettings.satisfactionStoryId}' to FAQ Story '${existingStory.storyId}'" }
+                }
+
+                storyDefinitionDAO.save(existingStory.copy(features = features))
             }
         }
     }
@@ -629,5 +672,27 @@ object FaqAdminService {
             }
         }
         return false
+    }
+
+    fun getSettings(applicationDefinition: ApplicationDefinition): Settings? {
+        return faqSettingsDAO.getFaqSettingsByApplicationId(applicationDefinition._id)?.toSettings()
+    }
+
+    fun saveSettings(applicationDefinition: ApplicationDefinition, settings: Settings): Settings {
+        val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(applicationDefinition._id)
+
+        val faqSettingsUpdated = (
+                faqSettings ?: FaqSettings(
+                    applicationId = applicationDefinition._id, creationDate = Instant.now(), updateDate = Instant.now())
+                ).copy(
+                    satisfactionEnabled = settings.satisfactionEnabled,
+                    satisfactionStoryId = settings.satisfactionStoryId,
+                    updateDate = Instant.now()
+                )
+
+        faqSettingsDAO.save(faqSettingsUpdated)
+        updateAllFaqStoryWithSettings(applicationDefinition, faqSettingsUpdated)
+
+        return faqSettingsUpdated.toSettings();
     }
 }

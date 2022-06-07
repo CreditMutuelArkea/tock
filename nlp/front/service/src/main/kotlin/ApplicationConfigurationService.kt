@@ -27,6 +27,7 @@ import ai.tock.nlp.front.service.storage.ApplicationDefinitionDAO
 import ai.tock.nlp.front.service.storage.ClassifiedSentenceDAO
 import ai.tock.nlp.front.service.storage.EntityTypeDefinitionDAO
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
+import ai.tock.nlp.front.service.storage.FaqSettingsDAO
 import ai.tock.nlp.front.service.storage.IntentDefinitionDAO
 import ai.tock.nlp.front.service.storage.UserNamespaceDAO
 import ai.tock.nlp.front.shared.ApplicationConfiguration
@@ -51,6 +52,7 @@ val intentDAO: IntentDefinitionDAO get() = injector.provide()
 val sentenceDAO: ClassifiedSentenceDAO get() = injector.provide()
 val userNamespaceDAO: UserNamespaceDAO get() = injector.provide()
 val faqDefinitionDAO: FaqDefinitionDAO get() = injector.provide()
+val faqSettingsDAO: FaqSettingsDAO get() = injector.provide()
 
 /**
  *

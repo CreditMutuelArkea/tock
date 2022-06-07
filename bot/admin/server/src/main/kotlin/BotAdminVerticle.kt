@@ -53,6 +53,7 @@ import ai.tock.nlp.admin.model.ApplicationScopedQuery
 import ai.tock.nlp.admin.model.TranslateReport
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
+import ai.tock.nlp.front.shared.config.Settings
 import ai.tock.shared.error
 import ai.tock.shared.injector
 import ai.tock.shared.jackson.mapper
@@ -889,6 +890,30 @@ open class BotAdminVerticle : AdminVerticle() {
             val applicationDefinition = front.getApplicationById(query.applicationId)
             if (context.organization == applicationDefinition?.namespace) {
                 FaqAdminService.updateActivationStatusStory(query, context.userLogin, applicationDefinition)
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonGet(
+            "/faq/settings/:applicationId",
+            setOf(botUser,faqBotUser)
+        ) { context ->
+            val applicationDefinition = front.getApplicationById(context.path("applicationId").toId())
+            if (context.organization == applicationDefinition?.namespace) {
+                FaqAdminService.getSettings(applicationDefinition)
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonPost(
+            "/faq/settings/:applicationId",
+            setOf(botUser,faqBotUser)
+        ) { context, settings: Settings ->
+            val applicationDefinition = front.getApplicationById(context.path("applicationId").toId())
+            if (context.organization == applicationDefinition?.namespace) {
+                FaqAdminService.saveSettings(applicationDefinition, settings)
             } else {
                 unauthorized()
             }
