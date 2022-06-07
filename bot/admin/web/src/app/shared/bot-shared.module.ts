@@ -40,7 +40,8 @@ import {
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
-import {ErrorHelperComponent} from './error-helper/error-helper.component';
+import { ErrorHelperComponent } from './error-helper/error-helper.component';
+import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import {ErrorHelperComponent} from './error-helper/error-helper.component';
     DateRangeCalendarComponent,
     InfoButtonComponent,
     ConfirmationDialogComponent,
-    ErrorHelperComponent
+    ErrorHelperComponent,
+    NoDataFoundComponent
   ],
   exports: [
     BotMessageComponent,
@@ -75,11 +77,10 @@ import {ErrorHelperComponent} from './error-helper/error-helper.component';
     SelectBotComponent,
     DateRangeCalendarComponent,
     InfoButtonComponent,
-    ErrorHelperComponent
+    ErrorHelperComponent,
+    NoDataFoundComponent
   ],
   providers: [BotSharedService],
   entryComponents: []
 })
-export class BotSharedModule {
-
-}
+export class BotSharedModule {}

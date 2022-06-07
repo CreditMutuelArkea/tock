@@ -9,17 +9,10 @@
     class="loading"
     [nbSpinner]="loading"
   >
-    <nb-card *ngIf="!loading && !sentences?.length">
-      <nb-card-body class="d-flex">
-        <img
-          src="{{ baseHref }}assets/images/best_bot_gray.png"
-          class="tock-robot mr-4"
-        />
-        <div>
-          <h2 class="text-muted">No sentences found</h2>
-        </div>
-      </nb-card-body>
-    </nb-card>
+    <tock-no-data-found
+      *ngIf="!loading && !sentences?.length"
+      title="No sentences found"
+    ></tock-no-data-found>
 
     <tock-faq-training-list
       *ngIf="sentences?.length"
