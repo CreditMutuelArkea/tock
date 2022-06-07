@@ -33,6 +33,9 @@ export class FaqManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.search();
+    this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe((_) => {
+      this.search();
+    });
   }
   get isAuthorized(): boolean {
     return this.state.hasRole(UserRole.faqBotUser);
@@ -121,6 +124,7 @@ export class FaqManagementComponent implements OnInit {
   }
 
   deleteFaq(faq: FaqDefinition) {
+    this.loading.delete = true;
     const faqId = faq.id;
     this.rest
       .delete(`/faq/${faqId}`)
@@ -131,24 +135,39 @@ export class FaqManagementComponent implements OnInit {
           duration: 5000,
           status: 'success'
         });
+        this.loading.delete = false;
       });
   }
 
   enableFaq(faq: FaqDefinition) {
     faq.enabled = !faq.enabled;
-    this.rest
-      .post('/faq', faq)
-      .pipe(take(1))
-      .subscribe(() => {
-        this.toastrService.success(`Faq successfully updated`, 'Success', {
-          duration: 5000,
-          status: 'success'
-        });
-      });
+    this.saveFaq(faq);
   }
 
   saveFaq(faq: FaqDefinition) {
-    console.log(faq);
+    this.loading.edit = true;
+    this.rest
+      .post('/faq', faq)
+      .pipe(take(1))
+      .subscribe((res) => {
+        if (faq.id) {
+          const index = this.faqs.findIndex((f) => f.id == faq.id);
+          this.faqs.splice(index, 1, faq);
+
+          this.toastrService.success(`Faq successfully updated`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        } else {
+          this.search();
+
+          this.toastrService.success(`Faq successfully created`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        }
+        this.loading.edit = false;
+      });
   }
 
   ngOnDestroy() {
