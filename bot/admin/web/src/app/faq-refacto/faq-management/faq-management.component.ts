@@ -124,6 +124,7 @@ export class FaqManagementComponent implements OnInit {
   }
 
   deleteFaq(faq: FaqDefinition) {
+    this.loading.delete = true;
     const faqId = faq.id;
     this.rest
       .delete(`/faq/${faqId}`)
@@ -134,6 +135,7 @@ export class FaqManagementComponent implements OnInit {
           duration: 5000,
           status: 'success'
         });
+        this.loading.delete = false;
       });
   }
 
@@ -143,6 +145,7 @@ export class FaqManagementComponent implements OnInit {
   }
 
   saveFaq(faq: FaqDefinition) {
+    this.loading.edit = true;
     this.rest
       .post('/faq', faq)
       .pipe(take(1))
@@ -163,6 +166,7 @@ export class FaqManagementComponent implements OnInit {
             status: 'success'
           });
         }
+        this.loading.edit = false;
       });
   }
 

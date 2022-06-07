@@ -164,15 +164,14 @@
                 class="flex-grow-1 mr-3"
                 *ngIf="utterance._edit"
               >
-                <input
+                <textarea
                   nbInput
                   fullWidth
-                  type="text"
                   fieldSize="small"
                   [(ngModel)]="utteranceEditionValue"
                   [ngModelOptions]="{ standalone: true }"
                   (keyup.enter)="validateEditUtterance(utterance)"
-                />
+                ></textarea>
               </div>
 
               <button
