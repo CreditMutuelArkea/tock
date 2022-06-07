@@ -28,6 +28,7 @@ import { BotSharedService } from './bot-shared.service';
 import { DisplayDialogComponent } from './bot-dialog/display-dialog.component';
 import { MomentModule } from 'ngx-moment';
 import { SelectBotComponent } from './select-bot/select-bot.component';
+import { PaginationComponent } from './pagination/pagination.component';
 import {
   NbCalendarRangeModule,
   NbCardModule,
@@ -40,7 +41,7 @@ import {
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
-import {ErrorHelperComponent} from './error-helper/error-helper.component';
+import { ErrorHelperComponent } from './error-helper/error-helper.component';
 
 @NgModule({
   imports: [
@@ -67,7 +68,8 @@ import {ErrorHelperComponent} from './error-helper/error-helper.component';
     DateRangeCalendarComponent,
     InfoButtonComponent,
     ConfirmationDialogComponent,
-    ErrorHelperComponent
+    ErrorHelperComponent,
+    PaginationComponent
   ],
   exports: [
     BotMessageComponent,
@@ -75,11 +77,10 @@ import {ErrorHelperComponent} from './error-helper/error-helper.component';
     SelectBotComponent,
     DateRangeCalendarComponent,
     InfoButtonComponent,
-    ErrorHelperComponent
+    ErrorHelperComponent,
+    PaginationComponent
   ],
   providers: [BotSharedService],
   entryComponents: []
 })
-export class BotSharedModule {
-
-}
+export class BotSharedModule {}

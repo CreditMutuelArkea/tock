@@ -74,6 +74,13 @@
       </div>
     </nb-form-field>
   </div>
+
+  <div class="text-right">
+    <tock-pagination
+      [pagination]="pagination"
+      (onPaginationChange)="paginationChange($event)"
+    ></tock-pagination>
+  </div>
 </div>
 
 <nb-card

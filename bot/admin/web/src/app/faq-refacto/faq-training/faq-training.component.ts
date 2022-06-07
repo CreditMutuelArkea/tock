@@ -10,6 +10,7 @@ import { truncate } from '../../faq/common/util/string-utils';
 import { PaginatedQuery } from '../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
+import { pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 
 @Component({
@@ -50,6 +51,18 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
+  }
+
+  pagination: pagination = {
+    pageStart: 0,
+    pageEnd: undefined,
+    pageSize: 10,
+    pageTotal: undefined
+  };
+
+  paginationChange(pagination: pagination) {
+    this.pagination = { ...this.pagination, ...pagination };
+    this.loadData(this.pagination.pageStart, this.pagination.pageSize);
   }
 
   filterFaqTraining(filters: FaqTrainingFilter): void {
@@ -103,6 +116,9 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (data: PaginatedResult<Sentence>) => {
           this.loading = false;
+          this.pagination.pageTotal = data.total;
+          this.pagination.pageStart = data.start;
+          this.pagination.pageEnd = data.end;
           this.sentences = data.rows;
         },
         error: () => {

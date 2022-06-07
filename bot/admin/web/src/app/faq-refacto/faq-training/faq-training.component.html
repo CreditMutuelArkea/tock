@@ -28,6 +28,8 @@
       (onAction)="handleAction($event)"
       (onBatchAction)="handleBatchAction($event)"
       (onSort)="sortFaqTraining($event)"
+      [pagination]="pagination"
+      (onPaginationChange)="paginationChange($event)"
     ></tock-faq-training-list>
   </div>
 </main>

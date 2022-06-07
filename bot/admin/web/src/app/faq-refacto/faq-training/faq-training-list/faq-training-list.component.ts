@@ -8,6 +8,7 @@ import { Intent, Sentence } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
 import { Action } from '../../models';
+import { pagination } from '../../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'tock-faq-training-list',
@@ -17,7 +18,9 @@ import { Action } from '../../models';
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
   @Input() sentences: Sentence[] = [];
   @Input() selection!: SelectionModel<Sentence>;
+  @Input() pagination: pagination;
 
+  @Output() onPaginationChange = new EventEmitter<pagination>();
   @Output() onAction = new EventEmitter<{ action: Action; sentence: Sentence }>();
   @Output() onBatchAction = new EventEmitter<Action>();
   @Output() onSort = new EventEmitter<boolean>();
@@ -42,6 +45,10 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
+  }
+
+  paginationChange(pagination: pagination) {
+    this.onPaginationChange.emit(pagination);
   }
 
   redirectToFaqManagement(sentence: Sentence): void {
