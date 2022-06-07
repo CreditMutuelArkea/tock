@@ -3,15 +3,12 @@
 </header>
 
 <main>
-  <nb-card
-    *ngIf="loading"
+  <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
+
+  <div
     class="loading"
     [nbSpinner]="loading"
-  ></nb-card>
-
-  <div>
-    <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
-
+  >
     <nb-card *ngIf="!loading && !sentences?.length">
       <nb-card-body class="d-flex">
         <img

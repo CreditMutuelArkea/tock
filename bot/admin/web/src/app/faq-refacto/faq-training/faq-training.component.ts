@@ -10,7 +10,7 @@ import { truncate } from '../../faq/common/util/string-utils';
 import { PaginatedQuery } from '../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
-import { Action, FaqTrainingFIlter } from '../models';
+import { Action, FaqTrainingFilter } from '../models';
 
 @Component({
   selector: 'tock-faq-training',
@@ -52,7 +52,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  filterFaqTraining(filters: FaqTrainingFIlter): void {
+  filterFaqTraining(filters: FaqTrainingFilter): void {
     this.selection.clear();
     this.filter = { ...this.filter, ...filters };
     this.loadData();

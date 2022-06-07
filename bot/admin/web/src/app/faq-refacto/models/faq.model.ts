@@ -29,6 +29,6 @@ export interface FaqFilter {
   sort;
 }
 
-export interface FaqTrainingFIlter {
+export interface FaqTrainingFilter {
   search: string;
 }
