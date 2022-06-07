@@ -67,6 +67,6 @@ import { FaqDefinitionService } from '../faq/common/faq-definition.service';
     FaqManagementSettingsComponent
   ],
   exports: [],
-  providers: [SentencesService, FaqDefinitionService]
+  providers: [FaqDefinitionService]
 })
 export class FaqModule {}

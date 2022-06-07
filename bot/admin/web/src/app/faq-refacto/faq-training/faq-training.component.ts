@@ -5,7 +5,6 @@ import { Observable, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 import { StateService } from '../../core-nlp/state.service';
-import { SentencesService } from '../../faq/common/sentences.service';
 import { PaginatedQuery } from '../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
@@ -40,7 +39,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   constructor(
     private nlp: NlpService,
     private state: StateService,
-    private sentencesService: SentencesService,
     private toastrService: NbToastrService
   ) {}
 
@@ -136,6 +134,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.setSentenceAccordingToAction(action, sentence);
 
     await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
+    this.pagination.pageEnd--;
+    this.pagination.pageTotal--;
 
     if (this.selection.isSelected(sentence)) {
       this.selection.deselect(sentence);
@@ -146,6 +146,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       duration: 2000,
       status: 'basic'
     });
+
+    if (this.pagination.pageEnd < 1) this.loadData();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
@@ -159,7 +161,14 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       this.setSentenceAccordingToAction(action, sentence);
     }
 
-    await this.sentencesService.saveBulk(this.selection.selected, this.destroy$).toPromise();
+    await Promise.all(
+      this.selection.selected.map(async (sentence) => {
+        await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
+        this.sentences = this.sentences.filter((s) => sentence.text !== s.text);
+        this.pagination.pageEnd--;
+        this.pagination.pageTotal--;
+      })
+    );
 
     this.toastrService.success(
       `${actionTitle} ${this.selection.selected.length} sentences`,
@@ -170,7 +179,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.loadData();
+    if (this.pagination.pageEnd < 1) this.loadData();
   }
 
   private setSentenceAccordingToAction(action: Action, sentence: Sentence): void {

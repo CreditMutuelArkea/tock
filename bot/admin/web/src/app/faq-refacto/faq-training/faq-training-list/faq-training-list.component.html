@@ -93,7 +93,10 @@
       (checkedChange)="toggle(sentence)"
     ></nb-checkbox>
 
-    <div>
+    <div
+      (click)="toggle(sentence)"
+      class="pointer"
+    >
       <small class="d-block text-muted">
         {{ sentence.creationDate | amDateFormat: 'MM/DD HH:mm' }}
       </small>
