@@ -24,7 +24,7 @@
   </section>
 </div>
 
-<section [class.grid]="isSidePanelOpen">
+<section [class.grid]="isSidePanelOpen.edit || isSidePanelOpen.settings">
   <nb-card
     *ngIf="loading.list"
     class="loading"
@@ -61,11 +61,18 @@
   </div>
 
   <tock-faq-management-edit
-    *ngIf="isSidePanelOpen"
+    *ngIf="isSidePanelOpen.edit"
     [loading]="loading.edit"
     [faq]="faqEdit"
     [faqs]="faqs"
     (handleClose)="closeSidePanel()"
     (handleSave)="saveFaq($event)"
   ></tock-faq-management-edit>
+
+  <tock-faq-management-settings
+    *ngIf="isSidePanelOpen.settings"
+    [isLoading]="loading.settings"
+    (onClose)="closeSidePanel()"
+    (onSave)="handleSaveSettings($event)"
+  ></tock-faq-management-settings>
 </section>
