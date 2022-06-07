@@ -6,12 +6,12 @@ import { take, takeUntil } from 'rxjs/operators';
 
 import { StateService } from '../../core-nlp/state.service';
 import { SentencesService } from '../../faq/common/sentences.service';
-import { truncate } from '../../faq/common/util/string-utils';
 import { PaginatedQuery } from '../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
 import { pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
+import { truncate } from '../../model/commons';
 
 @Component({
   selector: 'tock-faq-training',
@@ -135,7 +135,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
     this.setSentenceAccordingToAction(action, sentence);
 
-    await this.sentencesService.save(sentence, this.destroy$).pipe(take(1)).toPromise();
+    await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
 
     if (this.selection.isSelected(sentence)) {
       this.selection.deselect(sentence);
