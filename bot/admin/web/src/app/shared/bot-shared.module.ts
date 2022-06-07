@@ -42,6 +42,7 @@ import {
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 import { ErrorHelperComponent } from './error-helper/error-helper.component';
+import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
 
 @NgModule({
   imports: [
@@ -69,7 +70,8 @@ import { ErrorHelperComponent } from './error-helper/error-helper.component';
     InfoButtonComponent,
     ConfirmationDialogComponent,
     ErrorHelperComponent,
-    PaginationComponent
+    PaginationComponent,
+    NoDataFoundComponent
   ],
   exports: [
     BotMessageComponent,
@@ -78,7 +80,8 @@ import { ErrorHelperComponent } from './error-helper/error-helper.component';
     DateRangeCalendarComponent,
     InfoButtonComponent,
     ErrorHelperComponent,
-    PaginationComponent
+    PaginationComponent,
+    NoDataFoundComponent
   ],
   providers: [BotSharedService],
   entryComponents: []

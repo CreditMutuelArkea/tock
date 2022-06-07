@@ -2,11 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
+
+import { DialogService } from '../../core-nlp/dialog.service';
+import { FaqDefinitionService } from '../../faq/common/faq-definition.service';
+import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
-import { FaqDefinition, FaqFilter, PaginatedFaqResult } from '../models';
+import { FaqDefinition, FaqFilter, PaginatedFaqResult, Settings } from '../models';
 @Component({
   selector: 'tock-faq-management',
   templateUrl: './faq-management.component.html',
@@ -17,18 +21,25 @@ export class FaqManagementComponent implements OnInit {
 
   faqs: FaqDefinition[];
   faqEdit: FaqDefinition;
-  isSidePanelOpen: boolean = false;
+
+  isSidePanelOpen = {
+    edit: false,
+    settings: false
+  };
 
   loading = {
     delete: false,
     edit: false,
-    list: false
+    list: false,
+    settings: false
   };
 
   constructor(
     private rest: RestService,
     private state: StateService,
-    private readonly toastrService: NbToastrService
+    private readonly toastrService: NbToastrService,
+    private dialogService: DialogService,
+    private readonly faqService: FaqDefinitionService
   ) {}
 
   ngOnInit(): void {
@@ -42,7 +53,24 @@ export class FaqManagementComponent implements OnInit {
   }
 
   openSettings(): void {
-    console.log('TO DO');
+    if (this.isSidePanelOpen.edit) {
+      const validAction = 'yes';
+      const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
+        context: {
+          title: `Cancel ${this.faqEdit.id ? 'edit' : 'create'} faq`,
+          subtitle: 'Are you sure you want to cancel ? Changes will not be saved.',
+          action: validAction
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result === validAction) {
+          this.isSidePanelOpen.edit = false;
+          this.isSidePanelOpen.settings = true;
+        }
+      });
+    } else {
+      this.isSidePanelOpen.settings = true;
+    }
   }
 
   DEFAULT_FAQ_SENTENCE_SORT: Entry<string, boolean> = new Entry('creationDate', false);
@@ -98,7 +126,8 @@ export class FaqManagementComponent implements OnInit {
   }
 
   closeSidePanel(): void {
-    this.isSidePanelOpen = false;
+    this.isSidePanelOpen.settings = false;
+    this.isSidePanelOpen.edit = false;
     this.faqEdit = undefined;
   }
 
@@ -115,12 +144,34 @@ export class FaqManagementComponent implements OnInit {
       applicationId: this.state.currentApplication._id,
       language: this.state.currentLocale
     };
-    this.isSidePanelOpen = true;
+
+    this.setSidePanelSettings();
   }
 
   editFaq(faq: FaqDefinition) {
     this.faqEdit = faq;
-    this.isSidePanelOpen = true;
+    this.setSidePanelSettings();
+  }
+
+  setSidePanelSettings(): void {
+    if (this.isSidePanelOpen.settings) {
+      const validAction = 'yes';
+      const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
+        context: {
+          title: `Cancel edit parameters`,
+          subtitle: 'Are you sure you want to cancel ? Changes will not be saved.',
+          action: validAction
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result === validAction) {
+          this.isSidePanelOpen.settings = false;
+          this.isSidePanelOpen.edit = true;
+        }
+      });
+    } else {
+      this.isSidePanelOpen.edit = true;
+    }
   }
 
   deleteFaq(faq: FaqDefinition) {
@@ -168,6 +219,28 @@ export class FaqManagementComponent implements OnInit {
         }
         this.loading.edit = false;
       });
+  }
+
+  handleSaveSettings(settings: Settings): void {
+    this.loading.settings = true;
+
+    this.faqService.saveSettings(settings, this.destroy).subscribe({
+      next: () => {
+        this.loading.settings = false;
+        this.isSidePanelOpen.settings = false;
+        this.toastrService.success(`Settings successfully updated`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+      },
+      error: () => {
+        this.loading.settings = false;
+        this.toastrService.danger(`Failed to update settings`, 'Error', {
+          duration: 5000,
+          status: 'danger'
+        });
+      }
+    });
   }
 
   ngOnDestroy() {

@@ -30,6 +30,8 @@ import { FaqManagementFiltersComponent } from './faq-management/faq-management-f
 import { FaqManagementListComponent } from './faq-management/faq-management-list/faq-management-list.component';
 import { FaqManagementEditComponent } from './faq-management/faq-management-edit/faq-management-edit.component';
 import { BotSharedModule } from '../shared/bot-shared.module';
+import { FaqManagementSettingsComponent } from './faq-management/faq-management-settings/faq-management-settings.component';
+import { FaqDefinitionService } from '../faq/common/faq-definition.service';
 
 @NgModule({
   imports: [
@@ -61,9 +63,10 @@ import { BotSharedModule } from '../shared/bot-shared.module';
     FaqTrainingListComponent,
     FaqManagementFiltersComponent,
     FaqManagementListComponent,
-    FaqManagementEditComponent
+    FaqManagementEditComponent,
+    FaqManagementSettingsComponent
   ],
   exports: [],
-  providers: [SentencesService]
+  providers: [SentencesService, FaqDefinitionService]
 })
 export class FaqModule {}

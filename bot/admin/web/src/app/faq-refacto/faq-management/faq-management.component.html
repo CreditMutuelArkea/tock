@@ -24,7 +24,7 @@
   </section>
 </div>
 
-<section [class.grid]="isSidePanelOpen">
+<section [class.grid]="isSidePanelOpen.edit || isSidePanelOpen.settings">
   <nb-card
     *ngIf="loading.list"
     class="loading"
@@ -37,18 +37,11 @@
       (onFilter)="filterFaqs($event)"
     ></tock-faq-management-filters>
 
-    <nb-card *ngIf="!loading.list && !faqs?.length">
-      <nb-card-body class="d-flex">
-        <img
-          src="{{ baseHref }}assets/images/best_bot_gray.png"
-          class="tock-robot mr-4"
-        />
-        <div>
-          <h2 class="text-muted">No Faq found</h2>
-          You may create a new one using above button "NEW FAQ".
-        </div>
-      </nb-card-body>
-    </nb-card>
+    <tock-no-data-found
+      *ngIf="!loading.list && !faqs?.length"
+      title="No Faq found"
+      message="You may create a new one using above button &#34;NEW FAQ&#34;."
+    ></tock-no-data-found>
 
     <tock-faq-management-list
       *ngIf="!loading.list && faqs?.length"
@@ -61,11 +54,18 @@
   </div>
 
   <tock-faq-management-edit
-    *ngIf="isSidePanelOpen"
+    *ngIf="isSidePanelOpen.edit"
     [loading]="loading.edit"
     [faq]="faqEdit"
     [faqs]="faqs"
     (handleClose)="closeSidePanel()"
     (handleSave)="saveFaq($event)"
   ></tock-faq-management-edit>
+
+  <tock-faq-management-settings
+    *ngIf="isSidePanelOpen.settings"
+    [isLoading]="loading.settings"
+    (onClose)="closeSidePanel()"
+    (onSave)="handleSaveSettings($event)"
+  ></tock-faq-management-settings>
 </section>
