@@ -46,6 +46,9 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData();
+    this.state.configurationChange.pipe(takeUntil(this.destroy$)).subscribe((_) => {
+      this.loadData();
+    });
   }
 
   ngOnDestroy(): void {
