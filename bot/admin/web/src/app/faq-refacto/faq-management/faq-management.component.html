@@ -25,32 +25,31 @@
 </div>
 
 <section [class.grid]="isSidePanelOpen.edit || isSidePanelOpen.settings">
-  <nb-card
-    *ngIf="loading.list"
-    class="loading"
-    [nbSpinner]="loading.list"
-  ></nb-card>
-
   <div>
     <tock-faq-management-filters
       [faqs]="faqs"
       (onFilter)="filterFaqs($event)"
     ></tock-faq-management-filters>
 
-    <tock-no-data-found
-      *ngIf="!loading.list && !faqs?.length"
-      title="No Faq found"
-      message="You may create a new one using above button &#34;NEW FAQ&#34;."
-    ></tock-no-data-found>
+    <div
+      class="loading"
+      [nbSpinner]="loading.list"
+    >
+      <tock-no-data-found
+        *ngIf="!loading.list && !faqs?.length"
+        title="No Faq found"
+        message="You may create a new one using above button &#34;NEW FAQ&#34;."
+      ></tock-no-data-found>
 
-    <tock-faq-management-list
-      *ngIf="!loading.list && faqs?.length"
-      [nbSpinner]="loading.delete"
-      [faqs]="faqs"
-      (handleEdit)="editFaq($event)"
-      (handleDelete)="deleteFaq($event)"
-      (handleEnable)="enableFaq($event)"
-    ></tock-faq-management-list>
+      <tock-faq-management-list
+        *ngIf="!loading.list && faqs?.length"
+        [nbSpinner]="loading.delete"
+        [faqs]="faqs"
+        (handleEdit)="editFaq($event)"
+        (handleDelete)="deleteFaq($event)"
+        (handleEnable)="enableFaq($event)"
+      ></tock-faq-management-list>
+    </div>
   </div>
 
   <tock-faq-management-edit

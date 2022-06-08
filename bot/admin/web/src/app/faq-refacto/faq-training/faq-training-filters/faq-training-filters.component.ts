@@ -2,6 +2,7 @@ import { Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/cor
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
+
 import { FaqTrainingFilter } from '../../models';
 
 @Component({

@@ -12,7 +12,8 @@
 
 @media screen and (min-width: 400px) {
   .grid-button {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
 
     button {
       width: fit-content;

@@ -26,16 +26,25 @@
       >
         <nb-tab
           tabTitle="info"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && (title.errors || description.errors)"
           [active]="currentTab == 'info'"
         >
         </nb-tab>
         <nb-tab
           tabTitle="question"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && utterances.errors"
           [active]="currentTab == 'question'"
         >
         </nb-tab>
         <nb-tab
           tabTitle="answer"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && answer.errors"
           [active]="currentTab == 'answer'"
         >
         </nb-tab>
@@ -48,10 +57,16 @@
             #nameInput
             nbInput
             formControlName="title"
+            id="name"
             fullWidth
             type="text"
             placeholder="Enter faq title"
           />
+          <tock-error-helper
+            *ngIf="isSubmitted"
+            class="mt-1"
+            [field]="title"
+          ></tock-error-helper>
         </div>
         <div class="d-flex flex-column mb-2">
           <label for="description">Description</label>
@@ -64,10 +79,18 @@
             rows="8"
             placeholder="Enter description"
           ></textarea>
+          <tock-error-helper
+            *ngIf="isSubmitted"
+            class="mt-1"
+            [field]="description"
+          ></tock-error-helper>
         </div>
         <div class="d-flex flex-column mb-2">
           <label for="tags">Tags</label>
-          <nb-tag-list (tagRemove)="onTagRemove($event)">
+          <nb-tag-list
+            tock-delay
+            (tagRemove)="onTagRemove($event)"
+          >
             <nb-tag
               *ngFor="let tag of tags.value"
               removable
@@ -143,6 +166,12 @@
             <strong> "{{ existingUterranceInOtherintent }}" </strong>
           </nb-alert>
         </div>
+
+        <tock-error-helper
+          *ngIf="isSubmitted"
+          class="mt-1"
+          [field]="utterances"
+        ></tock-error-helper>
 
         <div
           #utterancesListWrapper
@@ -243,13 +272,18 @@
             rows="8"
             placeholder="Enter answer"
           ></textarea>
+          <tock-error-helper
+            *ngIf="isSubmitted"
+            class="mt-1"
+            [field]="answer"
+          ></tock-error-helper>
         </div>
       </div>
     </form>
   </nb-card-body>
 
   <nb-card-footer>
-    <div class="grid-button mt-4">
+    <div class="grid-button">
       <button
         type="button"
         nbButton

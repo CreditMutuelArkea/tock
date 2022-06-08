@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   NbAlertModule,
   NbAutocompleteModule,
+  NbBadgeModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
@@ -30,8 +31,8 @@ import { FaqManagementListComponent } from './faq-management/faq-management-list
 import { FaqManagementEditComponent } from './faq-management/faq-management-edit/faq-management-edit.component';
 import { BotSharedModule } from '../shared/bot-shared.module';
 import { FaqManagementSettingsComponent } from './faq-management/faq-management-settings/faq-management-settings.component';
-import { FaqDefinitionService } from '../faq/common/faq-definition.service';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { FaqService } from './services/faq.service';
 
 @NgModule({
   imports: [
@@ -42,6 +43,9 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     MomentModule,
     SharedModule,
     ReactiveFormsModule,
+    NbAlertModule,
+    NbAutocompleteModule,
+    NbBadgeModule,
     NbButtonModule,
     NbCardModule,
     NbCheckboxModule,
@@ -68,6 +72,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     FaqManagementSettingsComponent
   ],
   exports: [],
-  providers: [FaqDefinitionService]
+  providers: [FaqService]
 })
 export class FaqModule {}

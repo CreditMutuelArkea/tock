@@ -36,13 +36,13 @@ import {
   NbSelectModule,
   NbTooltipModule,
   NbPopoverModule,
-  NbButtonModule,
-  NbIconLibraries
+  NbButtonModule
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 import { ErrorHelperComponent } from './error-helper/error-helper.component';
 import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
+import { DelayDirective } from './directives/delay.directive';
 
 @NgModule({
   imports: [
@@ -71,7 +71,8 @@ import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
     ConfirmationDialogComponent,
     ErrorHelperComponent,
     PaginationComponent,
-    NoDataFoundComponent
+    NoDataFoundComponent,
+    DelayDirective
   ],
   exports: [
     BotMessageComponent,
@@ -81,7 +82,8 @@ import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
     InfoButtonComponent,
     ErrorHelperComponent,
     PaginationComponent,
-    NoDataFoundComponent
+    NoDataFoundComponent,
+    DelayDirective
   ],
   providers: [BotSharedService],
   entryComponents: []
