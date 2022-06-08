@@ -19,6 +19,7 @@ package ai.tock.nlp.front.storage.mongo
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
+import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.FaqDefinitionDetailed
 import ai.tock.nlp.front.shared.config.FaqDefinitionTag
@@ -30,9 +31,13 @@ import ai.tock.translator.I18nLabel
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
 import com.mongodb.client.model.UnwindOptions
+import com.mongodb.client.model.Variable
 import mu.KotlinLogging
 import org.bson.conversions.Bson
 import org.litote.kmongo.Id
+import org.litote.kmongo.MongoOperator.and
+import org.litote.kmongo.MongoOperator.eq
+import org.litote.kmongo.MongoOperator.ne
 import org.litote.kmongo.`in`
 import org.litote.kmongo.aggregate
 import org.litote.kmongo.allPosOp
@@ -44,6 +49,7 @@ import org.litote.kmongo.document
 import org.litote.kmongo.ensureUniqueIndex
 import org.litote.kmongo.eq
 import org.litote.kmongo.excludeId
+import org.litote.kmongo.expr
 import org.litote.kmongo.findOne
 import org.litote.kmongo.findOneById
 import org.litote.kmongo.first
@@ -132,6 +138,9 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
     private const val INTENT_DEFINITION_COLLECTION = "intent_definition"
 
+    //create a variable for let parameter in lookup in order to join two collection
+    private const val FAQ_INTENTID = "faq_intentId"
+
     /**
      * Retrieve faq details with total count numbers according to the filter present un [FaqQuery]
      * @param : [FaqQuery] the query search
@@ -191,9 +200,28 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 ),
                 lookup(
                     CLASSIFIED_SENTENCE_COLLECTION,
-                    FaqDefinition::intentId.name,
-                    ClassifiedSentence::classification.name + "." + Classification::intentId.name, //classification.intentId
-                    FaqQueryResult::utterances.name,
+                    listOf(
+                        Variable(FAQ_INTENTID, FaqDefinition::intentId)
+                    ),
+                    FaqQueryResult::utterances,
+                    match(
+                        expr(
+                            and from
+                                    listOf(
+                                        // join classifiedSentence intentId and FaqDefintion intentId
+                                        eq from listOf(
+                                            ClassifiedSentence::classification / Classification::intentId,
+                                            "\$\$$FAQ_INTENTID"
+                                        ),
+                                        // do not take classified sentences with deleted status because of the BuildWorker scheduled delay (1 second)
+                                        // needed to check and erase the ones with deleted status each
+                                        ne from listOf(
+                                            ClassifiedSentence::status,
+                                            ClassifiedSentenceStatus.deleted
+                                        )
+                                    ),
+                        )
+                    )
                 ),
                 FaqQueryResult::faq.unwind(),
                 match(
