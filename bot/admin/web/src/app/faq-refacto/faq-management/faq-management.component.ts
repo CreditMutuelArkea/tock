@@ -4,13 +4,13 @@ import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 import { DialogService } from '../../core-nlp/dialog.service';
-import { FaqDefinitionService } from '../../faq/common/faq-definition.service';
 import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
 import { FaqDefinition, FaqFilter, PaginatedFaqResult, Settings } from '../models';
+import { FaqService } from '../services/faq.service';
 @Component({
   selector: 'tock-faq-management',
   templateUrl: './faq-management.component.html',
@@ -39,7 +39,7 @@ export class FaqManagementComponent implements OnInit {
     private state: StateService,
     private readonly toastrService: NbToastrService,
     private dialogService: DialogService,
-    private readonly faqService: FaqDefinitionService
+    private readonly faqService: FaqService
   ) {}
 
   ngOnInit(): void {

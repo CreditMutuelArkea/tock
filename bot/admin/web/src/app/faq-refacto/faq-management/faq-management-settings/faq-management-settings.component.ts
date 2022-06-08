@@ -9,8 +9,8 @@ import { ConfirmDialogComponent } from 'src/app/shared-nlp/confirm-dialog/confir
 import { BotService } from '../../../bot/bot-service';
 import { StorySearchQuery } from '../../../bot/model/story';
 import { StateService } from '../../../core-nlp/state.service';
-import { FaqDefinitionService } from '../../../faq/common/faq-definition.service';
 import { Settings } from '../../models';
+import { FaqService } from '../../services/faq.service';
 
 @Component({
   selector: 'tock-faq-management-settings',
@@ -50,7 +50,7 @@ export class FaqManagementSettingsComponent implements OnInit {
     private botService: BotService,
     private state: StateService,
     private toastService: NbToastrService,
-    private faqService: FaqDefinitionService,
+    private faqService: FaqService,
     private dialogService: DialogService
   ) {}
 
