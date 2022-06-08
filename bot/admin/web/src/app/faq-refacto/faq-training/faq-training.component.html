@@ -8,6 +8,9 @@
   <div
     class="loading"
     [nbSpinner]="loading"
+    infinite-scroll
+    [infiniteScrollDistance]="1"
+    (scrolled)="onScroll()"
   >
     <tock-no-data-found
       *ngIf="!loading && !sentences?.length"

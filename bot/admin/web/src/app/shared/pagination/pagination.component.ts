@@ -15,34 +15,43 @@ export interface pagination {
 export class PaginationComponent implements OnInit {
   @Input() pagination: pagination;
   @Output() onPaginationChange = new EventEmitter<pagination>();
+  @Input() pageSizes: number[] = [10, 25, 50, 100];
 
-  paginationSizeStr;
-
-  ngOnInit(): void {
-    this.paginationSizeStr = String(this.pagination.pageSize);
+  ngOnInit() {
+    if (!this.pageSizes.includes(this.pagination.pageSize)) {
+      this.pageSizes = [...this.pageSizes, this.pagination.pageSize].sort(function (a, b) {
+        return a - b;
+      });
+    }
   }
 
   paginationPrevious(): void {
     let pageStart = this.pagination.pageStart - this.pagination.pageSize;
     if (pageStart < 0) pageStart = 0;
     this.pagination.pageStart = pageStart;
-    this.onPaginationChange.emit(this.pagination);
+    this.onPaginationChange.emit();
   }
 
   paginationNext(): void {
-    let pageStart = this.pagination.pageStart + this.pagination.pageSize;
-    this.pagination.pageStart = pageStart;
-    this.onPaginationChange.emit(this.pagination);
+    this.pagination.pageStart = this.pagination.pageStart + this.pagination.pageSize;
+    this.onPaginationChange.emit();
   }
 
   paginationSize(): void {
-    this.pagination.pageSize = parseInt(this.paginationSizeStr);
-    this.onPaginationChange.emit(this.pagination);
+    this.onPaginationChange.emit();
   }
 
   paginationString(): string {
     return `${this.pagination.pageStart + 1} - ${this.pagination.pageEnd} of ${
       this.pagination.pageTotal
     }`;
+  }
+
+  showPrevious() {
+    return this.pagination.pageStart > 0;
+  }
+
+  showNext() {
+    return this.pagination.pageTotal > this.pagination.pageEnd;
   }
 }

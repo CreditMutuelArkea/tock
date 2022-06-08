@@ -4,13 +4,15 @@
       size="small"
       class="nb-select-smaller"
       nbTooltip="Items per page"
-      [(selected)]="paginationSizeStr"
+      [(selected)]="pagination.pageSize"
       (selectedChange)="paginationSize()"
     >
-      <nb-option value="10"> 10</nb-option>
-      <nb-option value="25"> 25</nb-option>
-      <nb-option value="50"> 50</nb-option>
-      <nb-option value="100"> 100</nb-option>
+      <nb-option
+        *ngFor="let size of pageSizes"
+        [value]="size"
+      >
+        {{ size }}</nb-option
+      >
     </nb-select>
   </div>
 
@@ -23,7 +25,7 @@
       ghost
       shape="round"
       (click)="paginationPrevious()"
-      *ngIf="pagination.pageStart > 0"
+      *ngIf="showPrevious()"
     >
       <nb-icon icon="arrow-ios-back-outline"></nb-icon>
     </button>
@@ -34,7 +36,7 @@
       ghost
       shape="round"
       (click)="paginationNext()"
-      *ngIf="pagination.pageTotal > pagination.pageStart + pagination.pageSize"
+      *ngIf="showNext()"
     >
       <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
     </button>

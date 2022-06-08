@@ -54,18 +54,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  pagination: pagination = {
-    pageStart: 0,
-    pageEnd: undefined,
-    pageSize: 10,
-    pageTotal: undefined
-  };
-
-  paginationChange(pagination: pagination) {
-    this.pagination = { ...this.pagination, ...pagination };
-    this.loadData(this.pagination.pageStart, this.pagination.pageSize);
-  }
-
   filterFaqTraining(filters: FaqTrainingFilter): void {
     this.selection.clear();
     this.filter = { ...this.filter, ...filters };
@@ -76,6 +64,57 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.selection.clear();
     this.filter.sort[0].second = sort;
     this.loadData();
+  }
+
+  pagination: pagination = {
+    pageStart: 0,
+    pageEnd: undefined,
+    pageSize: 10,
+    pageTotal: undefined
+  };
+
+  paginationChange() {
+    this.loadData(this.pagination.pageStart, this.pagination.pageSize);
+  }
+
+  onScroll() {
+    if (this.loading || this.pagination.pageEnd >= this.pagination.pageTotal) return;
+
+    this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+  }
+
+  loadData(
+    start: number = 0,
+    size: number = this.pagination.pageSize,
+    add: boolean = false,
+    showLoadingSpinner: boolean = true
+  ): void {
+    if (showLoadingSpinner) this.loading = true;
+
+    this.search(this.state.createPaginatedQuery(start, size))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: PaginatedResult<Sentence>) => {
+          this.pagination.pageTotal = data.total;
+          this.pagination.pageEnd = data.end;
+
+          if (add) {
+            this.sentences = [...this.sentences, ...data.rows];
+          } else {
+            this.sentences = data.rows;
+            this.pagination.pageStart = data.start;
+          }
+
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+  }
+
+  search(query: PaginatedQuery): Observable<PaginatedResult<Sentence>> {
+    return this.nlp.searchSentences(this.toSearchQuery(query));
   }
 
   toSearchQuery(query: PaginatedQuery): SearchQuery {
@@ -105,29 +144,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     return result;
   }
 
-  search(query: PaginatedQuery): Observable<PaginatedResult<Sentence>> {
-    return this.nlp.searchSentences(this.toSearchQuery(query));
-  }
-
-  loadData(start: number = 0, size: number = 10): void {
-    this.loading = true;
-
-    this.search(this.state.createPaginatedQuery(start, size))
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data: PaginatedResult<Sentence>) => {
-          this.loading = false;
-          this.pagination.pageTotal = data.total;
-          this.pagination.pageStart = data.start;
-          this.pagination.pageEnd = data.end;
-          this.sentences = data.rows;
-        },
-        error: () => {
-          this.loading = false;
-        }
-      });
-  }
-
   async handleAction({ action, sentence }): Promise<void> {
     const actionTitle = this.setActionTitle(action);
 
@@ -147,11 +163,11 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       status: 'basic'
     });
 
-    if (this.pagination.pageEnd < 1) this.loadData();
+    if (this.sentences.length < 1) this.loadData();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
-    if (!this?.selection?.selected?.length) {
+    if (!this.selection?.selected?.length) {
       this.toastrService.warning('No data selected', { duration: 2000, status: 'info' });
       return;
     }
@@ -179,7 +195,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       }
     );
 
-    if (this.pagination.pageEnd < 1) this.loadData();
+    this.selection.clear();
+    if (this.sentences.length < 1) this.loadData();
   }
 
   private setSentenceAccordingToAction(action: Action, sentence: Sentence): void {
