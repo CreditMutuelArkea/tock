@@ -81,11 +81,15 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   }
 
   form = new FormGroup({
-    title: new FormControl(undefined, Validators.required),
-    description: new FormControl(),
+    title: new FormControl(undefined, [
+      Validators.required,
+      Validators.minLength(6),
+      Validators.maxLength(40)
+    ]),
+    description: new FormControl(undefined, Validators.maxLength(500)),
     tags: new FormArray([]),
     utterances: new FormArray([], Validators.required),
-    answer: new FormControl(undefined, Validators.required)
+    answer: new FormControl(undefined, [Validators.required, Validators.maxLength(960)])
   });
 
   get answer(): FormControl {
@@ -109,8 +113,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   }
 
   get canSave(): boolean {
-    return this.form.valid;
-    // return this.isSubmitted ? this.form.valid : this.form.dirty;
+    return this.isSubmitted ? this.form.valid : this.form.dirty;
   }
 
   ngOnInit(): void {}
