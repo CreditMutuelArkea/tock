@@ -4,6 +4,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import {
   NbAlertModule,
   NbAutocompleteModule,
+  NbBadgeModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
@@ -42,6 +43,9 @@ import { FaqService } from './services/faq.service';
     MomentModule,
     SharedModule,
     ReactiveFormsModule,
+    NbAlertModule,
+    NbAutocompleteModule,
+    NbBadgeModule,
     NbButtonModule,
     NbCardModule,
     NbCheckboxModule,
@@ -52,9 +56,7 @@ import { FaqService } from './services/faq.service';
     NbSpinnerModule,
     NbTagModule,
     NbTabsetModule,
-    NbTooltipModule,
-    NbAutocompleteModule,
-    NbAlertModule
+    NbTooltipModule
   ],
   declarations: [
     FaqManagementComponent,

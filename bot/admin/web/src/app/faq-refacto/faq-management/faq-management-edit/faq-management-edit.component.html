@@ -26,16 +26,25 @@
       >
         <nb-tab
           tabTitle="info"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && (title.errors || description.errors)"
           [active]="currentTab == 'info'"
         >
         </nb-tab>
         <nb-tab
           tabTitle="question"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && utterances.errors"
           [active]="currentTab == 'question'"
         >
         </nb-tab>
         <nb-tab
           tabTitle="answer"
+          badgePosition="top right"
+          badgeStatus="danger"
+          [badgeDot]="isSubmitted && answer.errors"
           [active]="currentTab == 'answer'"
         >
         </nb-tab>
