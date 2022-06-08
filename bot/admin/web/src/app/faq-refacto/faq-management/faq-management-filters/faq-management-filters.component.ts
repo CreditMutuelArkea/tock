@@ -10,7 +10,8 @@ import {
 } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { debounceTime, pairwise, startWith } from 'rxjs/operators';
+import { debounceTime } from 'rxjs/operators';
+
 import { FaqDefinition } from '../../../faq/common/model';
 import { FaqFilter } from '../../models';
 

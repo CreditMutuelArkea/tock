@@ -3,10 +3,10 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService } from '@nebular/theme';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { DialogService } from 'src/app/core-nlp/dialog.service';
-import { ConfirmDialogComponent } from 'src/app/shared-nlp/confirm-dialog/confirm-dialog.component';
 
 import { BotService } from '../../../bot/bot-service';
+import { DialogService } from '../../../core-nlp/dialog.service';
+import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { StorySearchQuery } from '../../../bot/model/story';
 import { StateService } from '../../../core-nlp/state.service';
 import { Settings } from '../../models';
@@ -78,6 +78,8 @@ export class FaqManagementSettingsComponent implements OnInit {
   }
 
   getSettings(): void {
+    this.isLoading = true;
+
     this.faqService
       .getSettings()
       .pipe(takeUntil(this.destroy$))
@@ -89,7 +91,7 @@ export class FaqManagementSettingsComponent implements OnInit {
           });
         },
         error: () => {
-          this.toastService.danger('Failed to load settings', 'Error');
+          this.isLoading = false;
         }
       });
   }
@@ -106,13 +108,8 @@ export class FaqManagementSettingsComponent implements OnInit {
         )
       )
       .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (stories) => {
-          this.availableStories = stories.filter((story) => story.category !== 'faq');
-        },
-        error: () => {
-          this.toastService.danger('Failed to load stories', 'Error');
-        }
+      .subscribe((stories) => {
+        this.availableStories = stories.filter((story) => story.category !== 'faq');
       });
   }
 

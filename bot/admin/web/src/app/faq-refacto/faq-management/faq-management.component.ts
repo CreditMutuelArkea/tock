@@ -235,10 +235,6 @@ export class FaqManagementComponent implements OnInit {
       },
       error: () => {
         this.loading.settings = false;
-        this.toastrService.danger(`Failed to update settings`, 'Error', {
-          duration: 5000,
-          status: 'danger'
-        });
       }
     });
   }
