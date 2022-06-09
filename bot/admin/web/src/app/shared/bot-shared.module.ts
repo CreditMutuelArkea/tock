@@ -43,6 +43,7 @@ import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-
 import { ErrorHelperComponent } from './error-helper/error-helper.component';
 import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
 import { DelayDirective } from './directives/delay.directive';
+import { FormControlComponent } from './form-control/form-control.component';
 
 @NgModule({
   imports: [
@@ -72,6 +73,7 @@ import { DelayDirective } from './directives/delay.directive';
     ErrorHelperComponent,
     PaginationComponent,
     NoDataFoundComponent,
+    FormControlComponent,
     DelayDirective
   ],
   exports: [
@@ -83,6 +85,7 @@ import { DelayDirective } from './directives/delay.directive';
     ErrorHelperComponent,
     PaginationComponent,
     NoDataFoundComponent,
+    FormControlComponent,
     DelayDirective
   ],
   providers: [BotSharedService],

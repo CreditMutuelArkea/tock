@@ -1,0 +1,8 @@
+@import '~@nebular/theme/styles/theming';
+@import '~@nebular/theme/styles/themes';
+
+@include nb-install-component() {
+  .error {
+    color: nb-theme(color-danger-500);
+  }
+}
