@@ -20,6 +20,7 @@ export class FaqManagementComponent implements OnInit {
   destroy = new Subject();
 
   faqs: FaqDefinition[];
+  filteredFaqs: FaqDefinition[];
   faqEdit: FaqDefinition;
 
   isSidePanelOpen = {
@@ -120,7 +121,11 @@ export class FaqManagementComponent implements OnInit {
       .post('/faq/search', request)
       .pipe(takeUntil(this.destroy))
       .subscribe((faqs: PaginatedFaqResult) => {
-        this.faqs = faqs.faq;
+        if (!this.faqs?.length) {
+          this.faqs = faqs.faq;
+        }
+
+        this.filteredFaqs = faqs.faq;
         this.loading.list = false;
       });
   }
@@ -182,6 +187,7 @@ export class FaqManagementComponent implements OnInit {
       .pipe(take(1))
       .subscribe(() => {
         this.faqs = this.faqs.filter((f) => f.id != faqId);
+        this.filteredFaqs = this.filteredFaqs.filter((f) => f.id != faqId);
         this.toastrService.success(`Faq successfully deleted`, 'Success', {
           duration: 5000,
           status: 'success'
