@@ -50,7 +50,7 @@ $red: #ff3d71;
 
 @import './layout';
 @import './overrides';
-@import './shared';
+@import './utilities';
 
 // install the framework and custom global styles
 @include nb-install() {
@@ -63,5 +63,3 @@ $red: #ff3d71;
 
   @include nb-overrides();
 }
-
-@import './utilities';
