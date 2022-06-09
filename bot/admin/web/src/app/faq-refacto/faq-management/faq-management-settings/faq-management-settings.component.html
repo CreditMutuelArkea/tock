@@ -28,8 +28,13 @@
         </nb-checkbox>
       </div>
 
-      <div class="d-flex flex-column">
-        <label for="story">Select story</label>
+      <tock-form-control
+        label="Select story"
+        name="story"
+        [controls]="story"
+        [showError]="isSubmitted"
+        [required]="enableSatisfactionAsk.value"
+      >
         <nb-select
           placeholder="Select story"
           formControlName="story"
@@ -43,13 +48,9 @@
             {{ story.name }}
           </nb-option>
         </nb-select>
-        <tock-error-helper
-          *ngIf="isSubmitted"
-          class="mt-1"
-          [field]="story"
-        ></tock-error-helper>
-      </div>
+      </tock-form-control>
     </nb-card-body>
+
     <nb-card-footer>
       <div class="grid-button">
         <button

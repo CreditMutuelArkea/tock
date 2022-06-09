@@ -260,7 +260,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
 
             if (existingIntentId) {
               let intent = this.state.findIntentById(existingIntentId);
-              this.existingUterranceInOtherintent = intent.label || intent.name;
+              this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
             } else {
               this.utterances.push(new FormControl(utterance));
               this.form.markAsDirty();
