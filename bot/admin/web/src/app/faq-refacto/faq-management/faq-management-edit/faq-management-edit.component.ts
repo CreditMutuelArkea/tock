@@ -58,6 +58,11 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
 
   currentTab = 'info';
 
+  controlsMaxLength = {
+    description: 500,
+    answer: 960
+  };
+
   setCurrentTab($event) {
     this.currentTab = $event.tabTitle;
     if ($event.tabTitle == 'info') {
@@ -86,11 +91,24 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       Validators.minLength(6),
       Validators.maxLength(40)
     ]),
-    description: new FormControl(undefined, Validators.maxLength(500)),
+    description: new FormControl(
+      undefined,
+      Validators.maxLength(this.controlsMaxLength.description)
+    ),
     tags: new FormArray([]),
     utterances: new FormArray([], Validators.required),
-    answer: new FormControl(undefined, [Validators.required, Validators.maxLength(960)])
+    answer: new FormControl(undefined, [
+      Validators.required,
+      Validators.maxLength(this.controlsMaxLength.answer)
+    ])
   });
+
+  getControlLengthIndicatorClass(controlName) {
+    if (this.form.controls[controlName].value.length > this.controlsMaxLength[controlName]) {
+      return 'text-danger';
+    }
+    return 'text-muted';
+  }
 
   get answer(): FormControl {
     return this.form.get('answer') as FormControl;

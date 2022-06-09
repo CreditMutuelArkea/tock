@@ -79,6 +79,10 @@
             rows="8"
             placeholder="Enter description"
           ></textarea>
+          <small [ngClass]="getControlLengthIndicatorClass('description')"
+            >{{ form.controls.description.value.length }} characters out of
+            {{ controlsMaxLength.description }} max</small
+          >
           <tock-error-helper
             *ngIf="isSubmitted"
             class="mt-1"
@@ -272,6 +276,10 @@
             rows="8"
             placeholder="Enter answer"
           ></textarea>
+          <small [ngClass]="getControlLengthIndicatorClass('answer')"
+            >{{ form.controls.answer.value.length }} characters out of
+            {{ controlsMaxLength.answer }} max</small
+          >
           <tock-error-helper
             *ngIf="isSubmitted"
             class="mt-1"
