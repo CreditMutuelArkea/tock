@@ -52,7 +52,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   redirectToFaqManagement(sentence: Sentence): void {
-    this.router.navigate(['faq/qa'], { state: { question: sentence.text } });
+    this.router.navigate(['faq-refacto/management'], { state: { question: sentence.text } });
   }
 
   selectIntent(sentence: Sentence, category: 'placeholder' | 'probability'): string | number {

@@ -11,6 +11,7 @@ import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
 import { FaqDefinition, FaqFilter, PaginatedFaqResult, Settings } from '../models';
 import { FaqService } from '../services/faq.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'tock-faq-management',
   templateUrl: './faq-management.component.html',
@@ -34,20 +35,30 @@ export class FaqManagementComponent implements OnInit {
     settings: false
   };
 
+  initUtterance: string;
+
   constructor(
     private rest: RestService,
     private state: StateService,
     private readonly toastrService: NbToastrService,
     private dialogService: DialogService,
-    private readonly faqService: FaqService
-  ) {}
+    private readonly faqService: FaqService,
+    private router: Router
+  ) {
+    this.initUtterance = this.router.getCurrentNavigation().extras?.state?.question;
+  }
 
   ngOnInit(): void {
     this.search();
     this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe((_) => {
       this.search();
     });
+
+    if (this.initUtterance) {
+      this.addFaq(this.initUtterance);
+    }
   }
+
   get isAuthorized(): boolean {
     return this.state.hasRole(UserRole.faqBotUser);
   }
@@ -131,13 +142,13 @@ export class FaqManagementComponent implements OnInit {
     this.faqEdit = undefined;
   }
 
-  addFaq() {
+  addFaq(initUtterance?: string) {
     this.faqEdit = {
       id: undefined,
       intentId: undefined,
-      title: '',
+      title: initUtterance ? initUtterance : '',
       description: '',
-      utterances: [],
+      utterances: initUtterance ? [initUtterance] : [],
       tags: [],
       answer: '',
       enabled: true,
