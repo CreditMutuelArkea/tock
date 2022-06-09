@@ -36,3 +36,13 @@ nb-select.appearance-outline .select-button {
   background-color: unset;
   color: #8f9bb354;
 }
+
+label.required {
+  position: relative;
+  abbr {
+    position: absolute;
+    left: -0.8rem;
+    text-decoration: none;
+    color: red;
+  }
+}

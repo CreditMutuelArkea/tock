@@ -52,7 +52,11 @@
 
       <div *ngIf="currentTab == 'info'">
         <div class="d-flex flex-column mb-2">
-          <label for="name">Name <span class="text-muted">(*)</span></label>
+          <label
+            for="name"
+            class="required"
+            ><abbr title="Required">*</abbr>Name</label
+          >
           <input
             #nameInput
             nbInput
@@ -129,28 +133,36 @@
 
       <div *ngIf="currentTab == 'question'">
         <div class="mb-2">
-          <div class="d-flex">
-            <input
-              #addUtteranceInput
-              nbInput
-              fullWidth
-              type="text"
-              placeholder="Add a new formulation and press enter"
-              [disabled]="lookingForSameUterranceInOtherInent"
-              (keyup)="resetAlerts()"
-              (keyup.enter)="addUtterance()"
-            />
-            <button
-              type="button"
-              nbButton
-              nbTooltip="Add"
-              ghost
-              size="small"
-              [disabled]="lookingForSameUterranceInOtherInent"
-              (click)="addUtterance()"
+          <div>
+            <label
+              for="question"
+              class="required"
+              ><abbr title="Required">*</abbr>Question</label
             >
-              Add
-            </button>
+            <div class="d-flex">
+              <input
+                #addUtteranceInput
+                nbInput
+                fullWidth
+                id="question"
+                type="text"
+                placeholder="Add a new formulation and press enter"
+                [disabled]="lookingForSameUterranceInOtherInent"
+                (keyup)="resetAlerts()"
+                (keyup.enter)="addUtterance()"
+              />
+              <button
+                type="button"
+                nbButton
+                nbTooltip="Add"
+                ghost
+                size="small"
+                [disabled]="lookingForSameUterranceInOtherInent"
+                (click)="addUtterance()"
+              >
+                Add
+              </button>
+            </div>
           </div>
           <nb-alert
             status="danger"
@@ -265,7 +277,11 @@
 
       <div *ngIf="currentTab == 'answer'">
         <div class="d-flex flex-column mb-2">
-          <label for="answer">Answer <span class="text-muted">(*)</span></label>
+          <label
+            for="answer"
+            class="required"
+            ><abbr title="Required">*</abbr>Answer</label
+          >
           <textarea
             #answerInput
             nbInput
