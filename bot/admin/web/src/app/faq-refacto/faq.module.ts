@@ -26,12 +26,12 @@ import { FaqTrainingComponent } from './faq-training/faq-training.component';
 import { FaqTrainingListComponent } from './faq-training/faq-training-list/faq-training-list.component';
 import { SharedModule } from '../shared-nlp/shared.module';
 import { MomentModule } from 'ngx-moment';
-import { SentencesService } from '../faq/common/sentences.service';
 import { FaqManagementFiltersComponent } from './faq-management/faq-management-filters/faq-management-filters.component';
 import { FaqManagementListComponent } from './faq-management/faq-management-list/faq-management-list.component';
 import { FaqManagementEditComponent } from './faq-management/faq-management-edit/faq-management-edit.component';
 import { BotSharedModule } from '../shared/bot-shared.module';
 import { FaqManagementSettingsComponent } from './faq-management/faq-management-settings/faq-management-settings.component';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { FaqService } from './services/faq.service';
 
 @NgModule({
@@ -56,7 +56,10 @@ import { FaqService } from './services/faq.service';
     NbSpinnerModule,
     NbTagModule,
     NbTabsetModule,
-    NbTooltipModule
+    NbTooltipModule,
+    NbAutocompleteModule,
+    NbAlertModule,
+    InfiniteScrollModule
   ],
   declarations: [
     FaqManagementComponent,
