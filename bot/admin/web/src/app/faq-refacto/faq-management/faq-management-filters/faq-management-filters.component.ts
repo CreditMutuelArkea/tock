@@ -1,18 +1,8 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 
-import { FaqDefinition } from '../../../faq/common/model';
 import { FaqFilter } from '../../models';
 
 @Component({
@@ -20,16 +10,14 @@ import { FaqFilter } from '../../models';
   templateUrl: './faq-management-filters.component.html',
   styleUrls: ['./faq-management-filters.component.scss']
 })
-export class FaqManagementFiltersComponent implements OnInit, OnChanges, OnDestroy {
+export class FaqManagementFiltersComponent implements OnInit, OnDestroy {
   @Input()
-  faqs!: FaqDefinition[];
+  tagsCache: string[];
 
   @Output()
   onFilter = new EventEmitter<FaqFilter>();
 
   subscription = new Subscription();
-
-  tagsAvailableValues: string[] = [];
 
   form = new FormGroup({
     search: new FormControl(''),
@@ -63,21 +51,6 @@ export class FaqManagementFiltersComponent implements OnInit, OnChanges, OnDestr
     if (this.enabled.value === null) this.enabled.setValue(true);
     else if (this.enabled.value === true) this.enabled.setValue(false);
     else if (this.enabled.value === false) this.enabled.setValue(null);
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    const faqs = changes.faqs.currentValue;
-
-    if (faqs) {
-      this.tagsAvailableValues = [
-        ...new Set(
-          <string>[].concat.apply(
-            [],
-            faqs.map((v: FaqDefinition) => v.tags)
-          )
-        )
-      ];
-    }
   }
 
   clearFilters(): void {

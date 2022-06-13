@@ -1,13 +1,6 @@
-import { Entry } from '../../model/commons';
-import { PaginatedResult } from '../../model/nlp';
-
-export interface PaginatedFaqResult extends PaginatedResult<FaqDefinition> {
-  faq: FaqDefinition[];
-}
-
 export type Utterance = string;
 
-export type FaqDefinition = {
+export interface FaqDefinition {
   id?: string;
   intentId?: string;
   language: string;
@@ -20,8 +13,7 @@ export type FaqDefinition = {
   tags: string[];
   answer: string;
   enabled: boolean;
-};
-
+}
 export interface FaqFilter {
   enabled: boolean;
   search: string;

@@ -113,6 +113,7 @@
               type="text"
               placeholder="Type tag and press enter"
               (tagAdd)="onTagAdd($event)"
+              (keyup)="updateTagsAutocompleteValues($event)"
               (keydown.enter)="eventPreventDefault($event)"
               autocomplete="off"
               [nbAutocomplete]="tagsAutocomplete"

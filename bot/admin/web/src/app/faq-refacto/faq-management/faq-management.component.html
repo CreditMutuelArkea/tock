@@ -16,7 +16,7 @@
     <button
       nbButton
       status="primary"
-      (click)="addFaq()"
+      (click)="addOrEditFaq()"
     >
       <nb-icon icon="plus-outline"></nb-icon>
       NEW FAQ
@@ -27,7 +27,7 @@
 <section [class.grid]="isSidePanelOpen.edit || isSidePanelOpen.settings">
   <div>
     <tock-faq-management-filters
-      [faqs]="faqs"
+      [tagsCache]="tagsCache"
       (onFilter)="filterFaqs($event)"
     ></tock-faq-management-filters>
 
@@ -36,7 +36,7 @@
       [nbSpinner]="loading.list"
     >
       <tock-no-data-found
-        *ngIf="!loading.list && !filteredFaqs?.length"
+        *ngIf="!loading.list && !faqs?.length"
         title="No Faq found"
         message="You may create a new one using above button &#34;NEW FAQ&#34;."
       ></tock-no-data-found>
@@ -44,27 +44,28 @@
       <tock-faq-management-list
         *ngIf="!loading.list && faqs?.length"
         [nbSpinner]="loading.delete"
-        [faqs]="filteredFaqs"
-        (handleEdit)="editFaq($event)"
-        (handleDelete)="deleteFaq($event)"
-        (handleEnable)="enableFaq($event)"
+        [faqs]="faqs"
+        (onEdit)="addOrEditFaq($event)"
+        (onDelete)="deleteFaq($event)"
+        (onEnable)="enableFaq($event)"
       ></tock-faq-management-list>
     </div>
   </div>
 
   <tock-faq-management-edit
+    #faqEditComponent
     *ngIf="isSidePanelOpen.edit"
     [loading]="loading.edit"
     [faq]="faqEdit"
-    [faqs]="faqs"
-    (handleClose)="closeSidePanel()"
-    (handleSave)="saveFaq($event)"
+    [tagsCache]="tagsCache"
+    (onClose)="closeSidePanel()"
+    (onSave)="saveFaq($event)"
   ></tock-faq-management-edit>
 
   <tock-faq-management-settings
     *ngIf="isSidePanelOpen.settings"
     [isLoading]="loading.settings"
     (onClose)="closeSidePanel()"
-    (onSave)="handleSaveSettings($event)"
+    (onSave)="saveSettings($event)"
   ></tock-faq-management-settings>
 </section>
