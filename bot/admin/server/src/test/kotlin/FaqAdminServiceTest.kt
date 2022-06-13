@@ -60,7 +60,7 @@ import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 
