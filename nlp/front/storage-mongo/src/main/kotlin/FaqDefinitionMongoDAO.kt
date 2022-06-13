@@ -71,6 +71,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
         val c = MongoFrontConfiguration.database.getCollection<FaqDefinition>().apply {
             ensureUniqueIndex(
+                FaqDefinition::applicationId,
                 FaqDefinition::intentId,
                 FaqDefinition::i18nId,
                 FaqDefinition::tags,
@@ -120,6 +121,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.replaceOneWithFilter(
             and(
                 FaqDefinition::_id eq faqDefinition._id,
+                FaqDefinition::applicationId eq faqDefinition.applicationId,
                 FaqDefinition::intentId eq faqDefinition.intentId,
                 FaqDefinition::i18nId eq faqDefinition.i18nId,
             ),

@@ -17,6 +17,7 @@
 package ai.tock.nlp.front.storage.mongo
 
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.shared.injector
@@ -34,6 +35,7 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
 
     private val faqDefinitionDao: FaqDefinitionDAO get() = injector.provide()
 
+    private val applicationId = "idApplication".toId<ApplicationDefinition>()
     private val intentId = "idIntent".toId<IntentDefinition>()
     private val faqId = "faqDefId".toId<FaqDefinition>()
     private val faqId2 = "faqDefId2".toId<FaqDefinition>()
@@ -42,7 +44,7 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     private val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
     private val tagList = listOf("TAG1", "TAG2")
 
-    private val faqDefinition = FaqDefinition(faqId, intentId, i18nId, tagList, true, now, now)
+    private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
 
     private val col: MongoCollection<FaqDefinition> by lazy { FaqDefinitionMongoDAO.col }
 
@@ -120,7 +122,7 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList2 = listOf("TAG1")
 
         val otherFaqDefinition =
-            FaqDefinition(faqId2, intentId2, i18nId2, tagList2, true, now.plusSeconds(1), now.plusSeconds(1))
+            FaqDefinition(faqId2, applicationId, intentId2, i18nId2, tagList2, true, now.plusSeconds(1), now.plusSeconds(1))
         faqDefinitionDao.save(otherFaqDefinition)
 
         //some another faq
@@ -129,7 +131,7 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList3 = listOf("TAG2")
 
         val someOtherFaqDefinition =
-            FaqDefinition(faqId3, intentId3, i18nId3, tagList3, true, now.plusSeconds(2), now.plusSeconds(2))
+            FaqDefinition(faqId3, applicationId, intentId3, i18nId3, tagList3, true, now.plusSeconds(2), now.plusSeconds(2))
         faqDefinitionDao.save(someOtherFaqDefinition)
 
         assertEquals(
