@@ -36,7 +36,9 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     private val faqDefinitionDao: FaqDefinitionDAO get() = injector.provide()
 
     private val applicationId = "idApplication".toId<ApplicationDefinition>()
+    private val applicationId2 = "idApplication2".toId<ApplicationDefinition>()
     private val intentId = "idIntent".toId<IntentDefinition>()
+    private val intentId2 = "idIntent2".toId<IntentDefinition>()
     private val faqId = "faqDefId".toId<FaqDefinition>()
     private val faqId2 = "faqDefId2".toId<FaqDefinition>()
     private val faqId3 = "faqDefId3".toId<FaqDefinition>()
@@ -45,6 +47,8 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     private val tagList = listOf("TAG1", "TAG2")
 
     private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
+    private val faq2Definition = FaqDefinition(faqId2, applicationId, intentId2, i18nId, tagList, true, now, now)
+    private val faq3Definition = FaqDefinition(faqId3, applicationId2, intentId, i18nId, tagList, true, now, now)
 
     private val col: MongoCollection<FaqDefinition> by lazy { FaqDefinitionMongoDAO.col }
 
@@ -58,6 +62,11 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     @Test
     fun `Get a FaqDefinition just saved`() {
         faqDefinitionDao.save(faqDefinition)
+        assertEquals(
+            expected = faqDefinition,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId)?.first(),
+            message = "There should be something returned with an applicationId"
+        )
         assertEquals(
             expected = faqDefinition,
             actual = faqDefinitionDao.getFaqDefinitionByIntentId(intentId),
@@ -79,6 +88,26 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
             message = "There should be something returned with tags"
         )
         assertEquals(1, col.countDocuments())
+    }
+
+    @Test
+    fun `Get a FaqDefinition by application ID`() {
+        faqDefinitionDao.save(faqDefinition)
+        faqDefinitionDao.save(faq2Definition)
+        faqDefinitionDao.save(faq3Definition)
+
+        assertEquals(3, col.countDocuments())
+
+        assertEquals(
+            expected = 2,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId)?.size,
+            message = "There should be something returned with an applicationId"
+        )
+        assertEquals(
+            expected = 1,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId2)?.size,
+            message = "There should be something returned with an applicationId"
+        )
     }
 
     @Test

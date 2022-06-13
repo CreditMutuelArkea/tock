@@ -97,6 +97,10 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         return col.findOneById(id)
     }
 
+    override fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition> {
+        return col.find(FaqDefinition::applicationId eq id).into(ArrayList())
+    }
+
     override fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition? {
         return col.findOne(FaqDefinition::intentId eq id)
     }
