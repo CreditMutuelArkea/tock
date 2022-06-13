@@ -17,7 +17,6 @@
 package ai.tock.nlp.front.storage.mongo
 
 import ai.tock.nlp.front.service.storage.EntityTypeDefinitionDAO
-import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
 import ai.tock.shared.getAsyncDatabase
 import ai.tock.shared.getDatabase
 import ai.tock.shared.sharedTestModule
@@ -47,8 +46,18 @@ abstract class AbstractTest {
                     )
                 }
                 bind<EntityTypeDefinitionDAO>() with provider { EntityTypeDefinitionMongoDAO }
-                bind<FaqDefinitionDAO>() with provider { FaqDefinitionMongoDAO }
+                import(moreBindingModules())
             }
         )
     }
+
+    /**
+     * Add binding modules
+     * is useful when overriden
+     */
+    open fun moreBindingModules(): Kodein.Module {
+        //no module initiated
+        return Kodein.Module {}
+    }
+
 }

@@ -168,6 +168,8 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
             return if (count > start) {
                 val res = col.aggregate(aggregationWithSkipAndLimit, FaqQueryResult::class.java)
+
+                logger.debug { " result : ${res.mapNotNull { it }}  " }
                 Pair(
                     res.mapNotNull { it }.sortedBy { it.faq._id.toString() },
                     count.toLong()
@@ -190,7 +192,9 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
+            //inspired from https://github.com/Litote/kmongo/blob/master/kmongo-core-tests/src/main/kotlin/org/litote/kmongo/AggregateTypedTest.kt#L322
             return arrayListOf(
+                // sort the i18n by ids
                 sort(ascending(FaqDefinition::i18nId)),
                 lookup(
                     INTENT_DEFINITION_COLLECTION,
@@ -200,6 +204,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 ),
                 lookup(
                     CLASSIFIED_SENTENCE_COLLECTION,
+                    // declare a variable FAQ_INTENTID to call it in the pipeline exp below
                     listOf(
                         Variable(FAQ_INTENTID, FaqDefinition::intentId)
                     ),
@@ -231,7 +236,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                             if (search == null) null else FaqQueryResult::faq / IntentDefinition::name regex search!!,
                             if (search == null) null else FaqQueryResult::faq / IntentDefinition::description regex search!!,
                             if (search == null) null else FaqQueryResult::utterances.allPosOp / ClassifiedSentence::text regex search!!,
-                            //i18nIds are optional and can be used if the request has i18nsIds
+                            //i18nIds are optional and can be used if the request has i18nIds
                             if (i18nIds == null) null else FaqQueryResult::i18nId `in` i18nIds,
                         )
                     ),
