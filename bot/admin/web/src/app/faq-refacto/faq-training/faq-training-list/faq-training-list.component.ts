@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
-import { Subject } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { Intent, Sentence } from '../../../model/nlp';
+import { IntentsCategory, Sentence } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
 import { Action } from '../../models';
@@ -27,7 +27,8 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
 
   private readonly destroy$: Subject<boolean> = new Subject();
 
-  intents: Intent[] = [];
+  intentGroups: IntentsCategory[];
+  filteredIntentGroups: Observable<IntentsCategory[]>;
   UserRole: typeof UserRole = UserRole;
   Action: typeof Action = Action;
   sort: boolean = false;
@@ -35,11 +36,12 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   constructor(public readonly stateService: StateService, private router: Router) {}
 
   ngOnInit(): void {
-    this.stateService.currentIntents.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (intents: Intent[]) => {
-        this.intents = intents;
-      }
-    });
+    this.stateService.currentIntentsCategories
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((groups) => {
+        this.intentGroups = groups;
+        this.resetIntentsListFilter();
+      });
   }
 
   ngOnDestroy(): void {
@@ -65,7 +67,39 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   addIntentToSentence(intentId: string, sentence: Sentence): void {
+    let originalIndex = this.sentences.findIndex((s) => s === sentence);
     sentence = sentence.withIntent(this.stateService, intentId);
+    this.sentences.splice(originalIndex, 1, sentence);
+    this.resetIntentsListFilter();
+  }
+
+  resetIntentsListFilter(): void {
+    this.filteredIntentGroups = of(this.intentGroups);
+  }
+
+  filterIntentsList($event): void {
+    if (['ArrowDown', 'ArrowUp', 'Escape'].includes($event.key)) return;
+
+    let str = $event.target.value.toLowerCase();
+    let result: IntentsCategory[] = [];
+    this.intentGroups.forEach((group) => {
+      group.intents.forEach((intent) => {
+        if (intent.label?.toLowerCase().includes(str) || intent.name?.toLowerCase().includes(str)) {
+          let cat = result.find((cat) => cat.category == group.category);
+          if (!cat) {
+            cat = { category: group.category, intents: [] };
+            result.push(cat);
+          }
+          cat.intents.push(intent);
+        }
+      });
+    });
+    this.filteredIntentGroups = of(result);
+  }
+
+  onBlur($event): void {
+    $event.target.value = '';
+    this.resetIntentsListFilter();
   }
 
   handleAction(action: Action, sentence: Sentence): void {
