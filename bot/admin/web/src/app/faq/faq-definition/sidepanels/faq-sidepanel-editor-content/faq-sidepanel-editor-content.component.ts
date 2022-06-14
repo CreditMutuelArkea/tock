@@ -14,42 +14,22 @@
  * limitations under the License.
  */
 
-import {
-  Component,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChange
-} from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NbTagInputAddEvent } from '@nebular/theme/components/tag/tag-input.directive';
-import { NbTagComponent } from '@nebular/theme/components/tag/tag.component';
-import { BehaviorSubject, combineLatest, Observable, ReplaySubject } from 'rxjs';
-import { concatMap, debounceTime, filter, map, startWith, take, takeUntil } from 'rxjs/operators';
-import { DialogService } from 'src/app/core-nlp/dialog.service';
-import {
-  notCancelled,
-  ValidUtteranceResult
-} from 'src/app/faq/common/components/edit-utterance/edit-utterance-result';
-import { EditUtteranceComponent } from 'src/app/faq/common/components/edit-utterance/edit-utterance.component';
-import { FaqDefinition } from 'src/app/faq/common/model/faq-definition';
-import {
-  Utterance,
-  utteranceEquals,
-  utteranceSomewhatSimilar
-} from 'src/app/faq/common/model/utterance';
-import {
-  ActionResult,
-  FaqEditorEvent,
-  FaqDefinitionSidepanelEditorService
-} from '../faq-definition-sidepanel-editor.service';
-import { getPosition, hasItem } from '../../../common/util/array-utils';
-import { somewhatSimilar } from 'src/app/faq/common/util/string-utils';
-import { FaqDefinitionService } from 'src/app/faq/common/faq-definition.service';
-import { EditorTabName } from '../../faq-definition.component';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChange} from '@angular/core';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {NbTagInputAddEvent} from '@nebular/theme/components/tag/tag-input.directive';
+import {NbTagComponent} from '@nebular/theme/components/tag/tag.component';
+import {BehaviorSubject, combineLatest, Observable, of, ReplaySubject} from 'rxjs';
+import {concatMap, debounceTime, filter, map, startWith, take, takeUntil} from 'rxjs/operators';
+import {DialogService} from 'src/app/core-nlp/dialog.service';
+import {notCancelled, ValidUtteranceResult} from 'src/app/faq/common/components/edit-utterance/edit-utterance-result';
+import {EditUtteranceComponent} from 'src/app/faq/common/components/edit-utterance/edit-utterance.component';
+import {FaqDefinition} from 'src/app/faq/common/model/faq-definition';
+import {Utterance, utteranceEquals, utteranceSomewhatSimilar} from 'src/app/faq/common/model/utterance';
+import {ActionResult, FaqEditorEvent, FaqDefinitionSidepanelEditorService} from '../faq-definition-sidepanel-editor.service';
+import {getPosition, hasItem} from '../../../common/util/array-utils';
+import {somewhatSimilar} from 'src/app/faq/common/util/string-utils';
+import {FaqDefinitionService} from 'src/app/faq/common/faq-definition.service';
+import {EditorTabName} from '../../faq-definition.component';
 import {
   ANSWER_MAXLENGTH,
   collectProblems,
@@ -61,11 +41,17 @@ import {
   NAME_MINLENGTH,
   NoProblems
 } from '../../../common/model/form-problems';
+import { StateService } from 'src/app/core-nlp/state.service';
+import { ConfirmDialogComponent } from 'src/app/shared-nlp/confirm-dialog/confirm-dialog.component';
+import { Intent } from 'src/app/model/nlp';
+
+type DialogEvent = 'EditFaq' | 'IntentExistsInApp' | 'DoNotShareExistingIntent' | 'ShareExistingIntentWithApplication' | 'IntentNotExistsInAllApplications'
+const UNQUALIFIED_UNKNOWN_NAME = Intent.unknown.split(":")[1];
 
 // Simple builder for text 'utterance predicate'
 function textMatch(text: string): (Utterance) => boolean {
   if (!text?.trim()) {
-    return (_) => true;
+    return _ => true;
   }
   const lowerText = text.trim().toLowerCase();
 
@@ -87,7 +73,7 @@ function textMatch(text: string): (Utterance) => boolean {
   templateUrl: './faq-sidepanel-editor-content.component.html',
   styleUrls: ['./faq-sidepanel-editor-content.component.scss'],
   host: {
-    class: 'h-100 d-flex flex-column justify-content-start align-items-stretch'
+    "class": "h-100 d-flex flex-column justify-content-start align-items-stretch"
   }
 })
 export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, OnChanges {
@@ -114,9 +100,16 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
       Validators.minLength(NAME_MINLENGTH),
       Validators.maxLength(NAME_MAXLENGTH)
     ]),
-    description: new FormControl('', [Validators.maxLength(DESCRIPTION_MAXLENGTH)]),
-    answer: new FormControl('', [Validators.required, Validators.maxLength(ANSWER_MAXLENGTH)]),
-    active: new FormControl(true, [Validators.required])
+    description: new FormControl('', [
+      Validators.maxLength(DESCRIPTION_MAXLENGTH)
+    ]),
+    answer: new FormControl('', [
+      Validators.required,
+      Validators.maxLength(ANSWER_MAXLENGTH)
+    ]),
+    active: new FormControl(true, [
+      Validators.required
+    ]),
   });
 
   /* Search */
@@ -129,10 +122,12 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
   public readonly ERR_MSG = DEFAULT_ERROR_MAPPING; // shorcut for access inside template
 
   constructor(
+    private readonly state: StateService,
     private readonly sidepanelEditorService: FaqDefinitionSidepanelEditorService,
     private readonly qaService: FaqDefinitionService,
-    private readonly dialog: DialogService
-  ) {}
+    private readonly dialog: DialogService,
+  ) {
+  }
 
   ngOnInit(): void {
     this.observeUtteranceSearch();
@@ -140,7 +135,8 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
     this.registerSaveAction();
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
@@ -168,15 +164,18 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
   }
 
   observeValidity(): void {
-    const valueChanges$ = this.newFaqForm.valueChanges.pipe(
-      startWith(null), // so combineLatest just has to wait for first editedUtterances$ event
-      takeUntil(this.destroy$),
-      debounceTime(200)
-    );
+    const valueChanges$ = this.newFaqForm.valueChanges
+      .pipe(
+        startWith(null), // so combineLatest just has to wait for first editedUtterances$ event
+        takeUntil(this.destroy$),
+        debounceTime(200)
+      );
 
     combineLatest(this.editedUtterances$, valueChanges$)
-      .pipe(map(([utterances, _]) => this.buildProblemsReport(this.newFaqForm, utterances)))
-      .subscribe((problems) => this.validityChanged.next(problems));
+      .pipe(
+        map(([utterances, _]) => this.buildProblemsReport(this.newFaqForm, utterances))
+      )
+      .subscribe(problems => this.validityChanged.next(problems));
   }
 
   registerSaveAction(): void {
@@ -186,35 +185,100 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
 
   save(evt: FaqEditorEvent): Observable<ActionResult> {
     // replay last known utterances array
-    return this.editedUtterances$.pipe(
-      take(1),
-      concatMap((utterances) => {
-        // validate and construct entity from form data
-        const fq: FaqDefinition = {
-          id: this.fq.id,
-          intentId: this.fq.intentId,
-          applicationId: this.fq.applicationId,
-          language: this.fq.language,
-          tags: Array.from(this.tags).map((el) => el.trim()),
-          description: '' + (this.newFaqForm.controls['description'].value.trim() || ''),
-          answer: '' + (this.newFaqForm.controls['answer'].value.trim() || ''),
-          title: '' + (this.newFaqForm.controls['name'].value.trim() || ''),
-          status: this.fq.status,
-          utterances: Array.from(utterances.map((el) => el.trim())),
-          enabled: true === this.newFaqForm.controls['active'].value
-        };
+    return this.editedUtterances$.pipe(take(1), concatMap(async utterances => {
+      const faqTitle = this.newFaqForm.controls['name'].value.trim() || ''
 
+      // validate and construct entity from form data
+      const fq: FaqDefinition = {
+        id: this.fq.id,
+        intentId: this.fq.intentId,
+        applicationId: this.fq.applicationId,
+        language: this.fq.language,
+        tags: Array.from(this.tags).map(el => el.trim()),
+        description: this.newFaqForm.controls['description'].value.trim(),
+        answer: this.newFaqForm.controls['answer'].value.trim(),
+        title: faqTitle,
+        intentName: this.formatName(faqTitle),
+        status: this.fq.status,
+        utterances: Array.from(utterances.map(el => el.trim())),
+        enabled: this.newFaqForm.controls['active'].value
+      };
+
+      const canSave = await this.canSaveIntent(fq)
+      if(canSave === 'DoNotShareExistingIntent') {
+        fq.intentName = this.generateIntentName(fq)
+      }
+
+      if(canSave !== 'IntentExistsInApp'){
         return this.qaService.save(fq, this.destroy$).pipe(
-          map((fq) => {
+          map(fq => {
             const res: ActionResult = {
               outcome: 'save-done',
               payload: fq
             };
             return res;
           })
-        );
-      })
-    );
+        ).toPromise();
+      } else {
+        const res: ActionResult = {
+          outcome: 'cancel-save',
+          payload: null
+        };
+        return res;
+      }
+    }));
+  }
+
+  private formatName(faqTitle?: string): string {
+    if (faqTitle) {
+      return faqTitle
+        .replace(/[^A-Za-z_-]*/g, '')
+        .toLowerCase()
+        .trim();
+    }
+  }
+
+  private generateIntentName(fq : FaqDefinition): string {
+    let candidate = fq.intentName;
+    let count = 1;
+    const candidateBase = candidate;
+    while (this.state.intentExists(candidate)) {
+      candidate = candidateBase + count++;
+    }
+    return candidate;
+  }
+
+  private canSaveIntent(fq : FaqDefinition): Promise<DialogEvent> {
+    if(fq.intentId){
+      return Promise.resolve('EditFaq');
+    }
+
+    if (StateService.intentExistsInApp(this.state.currentApplication, fq.intentName) || fq.intentName === UNQUALIFIED_UNKNOWN_NAME) {
+      this.dialog.notify(`Intent ${fq.intentName} already exists`, 'Cancelled',
+        {duration: 5000, status: "warning"});
+      return Promise.resolve('IntentExistsInApp');
+    }
+
+    if (this.state.intentExistsInOtherApplication(fq.intentName)) {
+      const dialogRef = this.dialog.openDialog(ConfirmDialogComponent, {
+        context: {
+          title: 'This intent is already used in an other application',
+          subtitle: 'If you confirm the name, the intent will be shared between the two applications.',
+          action: 'Confirm'
+        }
+      });
+      return dialogRef.onClose.pipe(
+        map(res => {
+          let dialogEvent : DialogEvent = 'DoNotShareExistingIntent';
+          if (res === 'confirm'){
+            dialogEvent = 'ShareExistingIntentWithApplication';
+          }
+          return dialogEvent;
+        }, take(1))
+      ).toPromise();
+    } else {
+      return Promise.resolve('IntentNotExistsInAllApplications');
+    }
   }
 
   getControlStatus(controlName: string): 'success' | 'basic' | 'warning' {
@@ -399,14 +463,17 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
     const origValue = utterance || '';
 
     // ask user to modify its utterance
-    const dialogRef = this.dialog.openDialog(EditUtteranceComponent, {
-      context: {
-        value: '' + origValue,
-        title: 'Edit training question',
-        mode: 'edit',
-        faqIntentId: this.fq?.intentId
+    const dialogRef = this.dialog.openDialog(
+      EditUtteranceComponent,
+      {
+        context:
+          {
+            value: '' + origValue,
+            title: 'Edit training question',
+            mode : "edit"
+          }
       }
-    });
+    );
 
     // wait for user response
     dialogRef.onClose
@@ -431,18 +498,21 @@ export class FaqSidepanelEditorContentComponent implements OnInit, OnDestroy, On
   async addUtterance(): Promise<any> {
     const allUtterances = await this.editedUtterances$.pipe(take(1)).toPromise();
 
-    const dialogRef = this.dialog.openDialog(EditUtteranceComponent, {
-      context: {
-        value: '',
-        title: 'New training question',
-        lookup: this.utteranceLookupFor(allUtterances),
-        mode: 'add',
-        faqIntentId: this.fq?.intentId,
-        saveAction: (utterance) => {
-          this.appendToUtterances('' + (utterance || ''));
-        }
+    const dialogRef = this.dialog.openDialog(
+      EditUtteranceComponent,
+      {
+        context:
+          {
+            value: '',
+            title: 'New training question',
+            lookup: this.utteranceLookupFor(allUtterances),
+            mode : "add",
+            saveAction : (utterance) => {
+              this.appendToUtterances('' + (utterance || ''));
+            }
+          }
       }
-    });
+    );
     dialogRef.onClose
       .pipe(take(1), takeUntil(this.destroy$), filter(notCancelled))
       .subscribe((result: ValidUtteranceResult) => {

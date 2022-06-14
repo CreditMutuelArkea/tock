@@ -55,8 +55,6 @@ import ai.tock.translator.I18nLocalizedLabel
 import ai.tock.translator.UserInterfaceType
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import org.apache.commons.lang3.RegExUtils
-import org.apache.commons.lang3.StringUtils
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
@@ -539,11 +537,7 @@ object FaqAdminService {
         query: FaqDefinitionRequest,
         applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
-        val name: String
-        val intentId = createOrFindFaqDefinitionIntentId(query)
-        // name must not be modified if it already exists
-        val foundCurrentIntent = AdminService.front.getIntentById(intentId)
-        name = foundCurrentIntent?.name ?: formatIntentName(query.title)
+        val name: String = getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
 
         val intent = IntentDefinition(
             name = name,
@@ -553,31 +547,24 @@ object FaqAdminService {
             // label without accents and whitespace and numbers and lowercase
             label = query.title.trim(),
             description = query.description.trim(),
-            category = FAQ_CATEGORY,
-            _id = intentId,
+            category = FAQ_CATEGORY
         )
         return AdminService.createOrUpdateIntent(applicationDefinition.namespace, intent)
     }
 
-    /**
-     * Format intent name to corresponding frontend regex replacement for intent name
-     */
-    private fun formatIntentName(intentName: String): String {
-        return StringUtils.deleteWhitespace(
-            RegExUtils.replaceAll(
-                StringUtils.stripAccents(intentName.lowercase()),
-                "[^A-Za-z_-]",
-                ""
-            )
-        )
+    private fun getIntentName(query: FaqDefinitionRequest): String? {
+        return if(query.id != null) {
+            // On edit mode
+            findFaqDefinitionIntent(query.id.toId())?.name
+        }
+        else {
+            query.intentName
+        }
     }
 
-
-    private fun createOrFindFaqDefinitionIntentId(query: FaqDefinitionRequest): Id<IntentDefinition> {
-        return if (query.id != null) {
-            faqDefinitionDAO.getFaqDefinitionById(query.id.toId())!!.intentId
-        } else {
-            newId()
+    private fun findFaqDefinitionIntent(faqId : Id<FaqDefinition>): IntentDefinition? {
+        return faqDefinitionDAO.getFaqDefinitionById(faqId)?.let {
+            intentDAO.getIntentById(it.intentId)
         }
     }
 
