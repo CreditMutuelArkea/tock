@@ -1,7 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
+import { NbCardModule } from '@nebular/theme';
 
 import { NoDataFoundComponent } from './no-data-found.component';
+import { TestSharedModule } from '../../shared/test-shared.module';
 
 describe('NoDataFoundComponent', () => {
   let component: NoDataFoundComponent;
@@ -9,7 +11,8 @@ describe('NoDataFoundComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [NoDataFoundComponent]
+      declarations: [NoDataFoundComponent],
+      imports: [TestSharedModule, NbCardModule]
     }).compileComponents();
   });
 
@@ -42,14 +45,15 @@ describe('NoDataFoundComponent', () => {
     const message = 'message to display';
     component.message = undefined;
     fixture.detectChanges();
-    const messageElement: HTMLElement = fixture.debugElement.query(By.css('p')).nativeElement;
+    let messageElement = fixture.debugElement.query(By.css('p'));
 
-    expect(messageElement).toBeNull();
+    expect(messageElement).toBeFalsy();
 
     component.message = message;
     fixture.detectChanges();
+    messageElement = fixture.debugElement.query(By.css('p'));
 
-    expect(messageElement.textContent.toLowerCase()).toBe(message);
+    expect(messageElement.nativeElement.textContent.toLowerCase()).toBe(message);
   });
 
   it('should display logo of robot', () => {

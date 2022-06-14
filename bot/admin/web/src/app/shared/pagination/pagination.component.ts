@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
-export interface pagination {
+export interface Pagination {
   pageSize: number;
   pageStart: number;
   pageEnd: number;
@@ -13,9 +13,10 @@ export interface pagination {
   styleUrls: ['./pagination.component.scss']
 })
 export class PaginationComponent implements OnInit {
-  @Input() pagination: pagination;
-  @Output() onPaginationChange = new EventEmitter<pagination>();
+  @Input() pagination!: Pagination;
   @Input() pageSizes: number[] = [10, 25, 50, 100];
+
+  @Output() onPaginationChange = new EventEmitter<Pagination>();
 
   ngOnInit() {
     if (!this.pageSizes.includes(this.pagination.pageSize)) {

@@ -8,7 +8,7 @@ import { StateService } from '../../core-nlp/state.service';
 import { PaginatedQuery } from '../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
-import { pagination } from '../../shared/pagination/pagination.component';
+import { Pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
 
@@ -66,7 +66,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  pagination: pagination = {
+  pagination: Pagination = {
     pageStart: 0,
     pageEnd: undefined,
     pageSize: 10,
@@ -168,7 +168,10 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   async handleBatchAction(action: Action): Promise<void> {
     if (!this.selection?.selected?.length) {
-      this.toastrService.warning('No data selected', { duration: 2000, status: 'info' });
+      this.toastrService.warning('No data selected', 'Warning', {
+        duration: 2000,
+        status: 'warning'
+      });
       return;
     }
     const actionTitle = this.setActionTitle(action);

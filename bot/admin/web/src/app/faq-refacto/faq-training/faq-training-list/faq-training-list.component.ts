@@ -8,7 +8,7 @@ import { IntentsCategory, Sentence } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
 import { Action } from '../../models';
-import { pagination } from '../../../shared/pagination/pagination.component';
+import { Pagination } from '../../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'tock-faq-training-list',
@@ -16,13 +16,13 @@ import { pagination } from '../../../shared/pagination/pagination.component';
   styleUrls: ['./faq-training-list.component.scss']
 })
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
+  @Input() pagination: Pagination;
   @Input() sentences: Sentence[] = [];
   @Input() selection!: SelectionModel<Sentence>;
-  @Input() pagination: pagination;
 
-  @Output() onPaginationChange = new EventEmitter<pagination>();
   @Output() onAction = new EventEmitter<{ action: Action; sentence: Sentence }>();
   @Output() onBatchAction = new EventEmitter<Action>();
+  @Output() onPaginationChange = new EventEmitter<Pagination>();
   @Output() onSort = new EventEmitter<boolean>();
 
   private readonly destroy$: Subject<boolean> = new Subject();
@@ -33,13 +33,15 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   sort: boolean = false;
 
-  constructor(public readonly state: StateService, private router: Router) {}
+  constructor(public readonly stateService: StateService, private router: Router) {}
 
   ngOnInit(): void {
-    this.state.currentIntentsCategories.pipe(takeUntil(this.destroy$)).subscribe((groups) => {
-      this.intentGroups = groups;
-      this.resetIntentsListFilter();
-    });
+    this.stateService.currentIntentsCategories
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((groups) => {
+        this.intentGroups = groups;
+        this.resetIntentsListFilter();
+      });
   }
 
   ngOnDestroy(): void {
@@ -47,7 +49,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  paginationChange(pagination: pagination): void {
+  paginationChange(pagination: Pagination) {
     this.onPaginationChange.emit(pagination);
   }
 
@@ -58,7 +60,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   selectIntent(sentence: Sentence, category: 'placeholder' | 'probability'): string | number {
     switch (category) {
       case 'placeholder':
-        return sentence.getIntentLabel(this.state);
+        return sentence.getIntentLabel(this.stateService);
       case 'probability':
         return Math.trunc(sentence.classification.intentProbability * 100);
     }
@@ -66,7 +68,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
 
   addIntentToSentence(intentId: string, sentence: Sentence): void {
     let originalIndex = this.sentences.findIndex((s) => s === sentence);
-    sentence = sentence.withIntent(this.state, intentId);
+    sentence = sentence.withIntent(this.stateService, intentId);
     this.sentences.splice(originalIndex, 1, sentence);
     this.resetIntentsListFilter();
   }

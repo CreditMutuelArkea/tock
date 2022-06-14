@@ -2,7 +2,6 @@
   <div>
     <nb-select
       size="small"
-      class="nb-select-smaller"
       nbTooltip="Items per page"
       [(selected)]="pagination.pageSize"
       (selectedChange)="paginationSize()"
@@ -11,8 +10,8 @@
         *ngFor="let size of pageSizes"
         [value]="size"
       >
-        {{ size }}</nb-option
-      >
+        {{ size }}
+      </nb-option>
     </nb-select>
   </div>
 

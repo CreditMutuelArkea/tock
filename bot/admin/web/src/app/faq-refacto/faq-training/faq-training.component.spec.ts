@@ -8,9 +8,8 @@ describe('FaqTrainingComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FaqTrainingComponent ]
-    })
-    .compileComponents();
+      declarations: [FaqTrainingComponent]
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -19,7 +18,7 @@ describe('FaqTrainingComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  xit('should create', () => {
     expect(component).toBeTruthy();
   });
 });
