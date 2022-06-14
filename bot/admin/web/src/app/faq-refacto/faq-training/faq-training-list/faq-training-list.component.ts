@@ -8,7 +8,7 @@ import { Intent, Sentence } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
 import { Action } from '../../models';
-import { pagination } from '../../../shared/pagination/pagination.component';
+import { Pagination } from '../../../shared/pagination/pagination.component';
 
 @Component({
   selector: 'tock-faq-training-list',
@@ -16,13 +16,13 @@ import { pagination } from '../../../shared/pagination/pagination.component';
   styleUrls: ['./faq-training-list.component.scss']
 })
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
+  @Input() pagination: Pagination;
   @Input() sentences: Sentence[] = [];
   @Input() selection!: SelectionModel<Sentence>;
-  @Input() pagination: pagination;
 
-  @Output() onPaginationChange = new EventEmitter<pagination>();
   @Output() onAction = new EventEmitter<{ action: Action; sentence: Sentence }>();
   @Output() onBatchAction = new EventEmitter<Action>();
+  @Output() onPaginationChange = new EventEmitter<Pagination>();
   @Output() onSort = new EventEmitter<boolean>();
 
   private readonly destroy$: Subject<boolean> = new Subject();
@@ -47,7 +47,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  paginationChange(pagination: pagination) {
+  paginationChange(pagination: Pagination) {
     this.onPaginationChange.emit(pagination);
   }
 
