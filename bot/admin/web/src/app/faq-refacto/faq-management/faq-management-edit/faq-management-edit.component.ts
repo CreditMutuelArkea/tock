@@ -177,7 +177,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
 
   updateTagsAutocompleteValues($event) {
     this.tagsAutocompleteValues = of(
-      this.tagsCache.filter((tag) => tag.toLowerCase().includes($event.target.value))
+      this.tagsCache.filter((tag) => tag.toLowerCase().includes($event.target.value.toLowerCase()))
     );
   }
 

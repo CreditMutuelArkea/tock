@@ -106,24 +106,35 @@
     </div>
 
     <div class="select-intent">
-      <span>FAQ</span>
-      <nb-select
+      <input
+        nbInput
         fullWidth
+        type="text"
         placeholder="{{ selectIntent(sentence, 'placeholder') }}"
+        (blur)="onBlur($event)"
+        (keyup.escape)="onBlur($event)"
+        (keyup)="filterIntentsList($event)"
+        autocomplete="off"
+        [nbAutocomplete]="intentsAutocomplete"
+      />
+      <nb-autocomplete
+        size="tiny"
+        #intentsAutocomplete
         (selectedChange)="addIntentToSentence($event, sentence)"
       >
-        <nb-option
-          *ngFor="let intent of intents"
-          value="{{ intent._id }}"
+        <nb-option-group
+          *ngFor="let group of filteredIntentGroups | async"
+          [title]="group.category"
         >
-          <span
-            class="tock-option-label"
-            title="{{ intent.intentLabel() }}"
+          <nb-option
+            *ngFor="let intent of group.intents"
+            [value]="intent._id"
           >
-            {{ intent.intentLabel() }}
-          </span>
-        </nb-option>
-      </nb-select>
+            {{ intent.label || intent.name }}
+          </nb-option>
+        </nb-option-group>
+      </nb-autocomplete>
+
       <span nbTooltip="Detection probability"> {{ selectIntent(sentence, 'probability') }}% </span>
       <button
         *ngIf="state.hasRole(UserRole.botUser)"

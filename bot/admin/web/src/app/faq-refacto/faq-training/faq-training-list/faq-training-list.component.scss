@@ -25,7 +25,7 @@
 
 .select-intent {
   display: grid;
-  grid-template-columns: auto minmax(0, 5fr) minmax(0, 0.5fr) auto;
+  grid-template-columns: minmax(0, 5fr) 0 minmax(0, 0.5fr) auto;
   align-items: center;
   grid-gap: 0.5rem;
 }
