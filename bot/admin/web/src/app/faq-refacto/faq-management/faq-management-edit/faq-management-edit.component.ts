@@ -19,7 +19,7 @@ import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { FaqDefinition } from '../../models';
+import { FaqDefinitionExtended } from '../faq-management.component';
 
 @Component({
   selector: 'tock-faq-management-edit',
@@ -31,16 +31,16 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   loading: boolean;
 
   @Input()
-  faq?: FaqDefinition;
+  faq?: FaqDefinitionExtended;
 
   @Input()
-  faqs?: FaqDefinition[];
+  tagsCache?: string[];
 
   @Output()
-  handleClose = new EventEmitter<boolean>();
+  onClose = new EventEmitter<boolean>();
 
   @Output()
-  handleSave = new EventEmitter();
+  onSave = new EventEmitter();
 
   @ViewChild('nameInput') nameInput: ElementRef;
   @ViewChild('answerInput') answerInput: ElementRef;
@@ -140,7 +140,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.faq?.currentValue) {
-      const faq: FaqDefinition = changes.faq.currentValue;
+      const faq: FaqDefinitionExtended = changes.faq.currentValue;
 
       this.form.reset();
       this.tags.clear();
@@ -149,6 +149,12 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
 
       if (faq) {
         this.form.patchValue(faq);
+
+        if (faq._makeDirty) {
+          delete faq._makeDirty;
+          this.form.markAsDirty();
+          this.form.markAsTouched();
+        }
 
         if (faq.tags?.length) {
           faq.tags.forEach((tag) => {
@@ -166,14 +172,13 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       }
     }
 
-    this.tagsAutocompleteValues = of([
-      ...new Set(
-        [].concat.apply(
-          [],
-          this.faqs.map((v) => v.tags)
-        )
-      )
-    ]);
+    this.tagsAutocompleteValues = of(this.tagsCache);
+  }
+
+  updateTagsAutocompleteValues($event) {
+    this.tagsAutocompleteValues = of(
+      this.tagsCache.filter((tag) => tag.toLowerCase().includes($event.target.value))
+    );
   }
 
   tagSelected($event) {
@@ -181,8 +186,12 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   }
 
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
-    if (value && !this.tags.value.find((v: string) => v.toUpperCase() === value.toUpperCase())) {
-      this.tags.push(new FormControl(value));
+    let deduplicatedSpaces = value.replace(/\s\s+/g, ' ');
+    if (
+      deduplicatedSpaces &&
+      !this.tags.value.find((v: string) => v.toUpperCase() === deduplicatedSpaces.toUpperCase())
+    ) {
+      this.tags.push(new FormControl(deduplicatedSpaces));
       this.form.markAsDirty();
       this.form.markAsTouched();
     }
@@ -316,9 +325,9 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     this.utterances.removeAt(index);
   }
 
-  close(): void {
+  close(): Observable<any> {
+    const validAction = 'yes';
     if (this.form.dirty) {
-      const validAction = 'yes';
       const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
         context: {
           title: `Cancel ${this.faq?.id ? 'edit' : 'create'} faq`,
@@ -328,11 +337,13 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       });
       dialogRef.onClose.subscribe((result) => {
         if (result === validAction) {
-          this.handleClose.emit(true);
+          this.onClose.emit(true);
         }
       });
+      return dialogRef.onClose;
     } else {
-      this.handleClose.emit(true);
+      this.onClose.emit(true);
+      return of(validAction);
     }
   }
 
@@ -340,11 +351,11 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     this.isSubmitted = true;
 
     if (this.canSave) {
-      this.handleSave.emit({
+      this.onSave.emit({
         ...this.faq,
         ...this.form.value
       });
-      if (!this.faq.id) this.handleClose.emit(true);
+      if (!this.faq.id) this.onClose.emit(true);
     }
   }
 

@@ -1,7 +1,7 @@
 import { saveAs } from 'file-saver';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { FaqDefinition } from '../../models';
+import { FaqDefinitionExtended } from '../faq-management.component';
 import { StateService } from '../../../core-nlp/state.service';
 import { DialogService } from '../../../core-nlp/dialog.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
@@ -12,15 +12,15 @@ import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confi
   styleUrls: ['./faq-management-list.component.scss']
 })
 export class FaqManagementListComponent {
-  @Input() faqs!: FaqDefinition[];
+  @Input() faqs!: FaqDefinitionExtended[];
 
-  @Output() handleEdit = new EventEmitter<FaqDefinition>();
-  @Output() handleDelete = new EventEmitter<FaqDefinition>();
-  @Output() handleEnable = new EventEmitter<FaqDefinition>();
+  @Output() onEdit = new EventEmitter<FaqDefinitionExtended>();
+  @Output() onDelete = new EventEmitter<FaqDefinitionExtended>();
+  @Output() onEnable = new EventEmitter<FaqDefinitionExtended>();
 
   constructor(private state: StateService, private dialogService: DialogService) {}
 
-  toggleEnabled(faq: FaqDefinition) {
+  toggleEnabled(faq: FaqDefinitionExtended) {
     let action = 'Enable';
     if (faq.enabled) {
       action = 'Disable';
@@ -36,16 +36,16 @@ export class FaqManagementListComponent {
     dialogRef.onClose.subscribe((result) => {
       console.log(result, action);
       if (result === action.toLowerCase()) {
-        this.handleEnable.emit(faq);
+        this.onEnable.emit(faq);
       }
     });
   }
 
-  editFaq(faq: FaqDefinition): void {
-    this.handleEdit.emit(faq);
+  editFaq(faq: FaqDefinitionExtended): void {
+    this.onEdit.emit(faq);
   }
 
-  delete(faq: FaqDefinition): void {
+  delete(faq: FaqDefinitionExtended): void {
     const deleteAction = 'delete';
     const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
       context: {
@@ -56,12 +56,12 @@ export class FaqManagementListComponent {
     });
     dialogRef.onClose.subscribe((result) => {
       if (result === deleteAction) {
-        this.handleDelete.emit(faq);
+        this.onDelete.emit(faq);
       }
     });
   }
 
-  download(faq: FaqDefinition): void {
+  download(faq: FaqDefinitionExtended): void {
     var jsonBlob = new Blob([JSON.stringify(faq)], {
       type: 'application/json'
     });

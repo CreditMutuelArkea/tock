@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
@@ -9,20 +9,25 @@ import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
-import { FaqDefinition, FaqFilter, PaginatedFaqResult, Settings } from '../models';
+import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult, Settings } from '../models';
 import { FaqService } from '../services/faq.service';
 import { Router } from '@angular/router';
+import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
+
+export type FaqDefinitionExtended = FaqDefinition & { _makeDirty?: true };
+
 @Component({
   selector: 'tock-faq-management',
   templateUrl: './faq-management.component.html',
   styleUrls: ['./faq-management.component.scss']
 })
 export class FaqManagementComponent implements OnInit {
+  @ViewChild('faqEditComponent') faqEditComponent: FaqManagementEditComponent;
+
   destroy = new Subject();
 
-  faqs: FaqDefinition[];
-  filteredFaqs: FaqDefinition[];
-  faqEdit: FaqDefinition;
+  faqs: FaqDefinitionExtended[];
+  faqEdit: FaqDefinitionExtended;
 
   isSidePanelOpen = {
     edit: false,
@@ -41,9 +46,9 @@ export class FaqManagementComponent implements OnInit {
   constructor(
     private rest: RestService,
     private state: StateService,
-    private readonly toastrService: NbToastrService,
+    private toastrService: NbToastrService,
     private dialogService: DialogService,
-    private readonly faqService: FaqService,
+    private faqService: FaqService,
     private router: Router
   ) {
     this.initUtterance = this.router.getCurrentNavigation().extras?.state?.question;
@@ -51,7 +56,7 @@ export class FaqManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.search();
-    this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe((_) => {
+    this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
       this.search();
     });
 
@@ -118,6 +123,8 @@ export class FaqManagementComponent implements OnInit {
   pageSize: number = 5;
   mark: SearchMark;
 
+  tagsCache: string[] = [];
+
   search() {
     this.loading.list = true;
 
@@ -132,11 +139,17 @@ export class FaqManagementComponent implements OnInit {
       .post('/faq/search', request)
       .pipe(takeUntil(this.destroy))
       .subscribe((faqs: PaginatedFaqResult) => {
-        if (!this.faqs?.length) {
-          this.faqs = faqs.faq;
-        }
+        this.faqs = faqs.faq;
 
-        this.filteredFaqs = faqs.faq;
+        this.tagsCache = [
+          ...new Set(
+            <string>[].concat.apply(
+              [...this.tagsCache],
+              this.faqs.map((v: FaqDefinitionExtended) => v.tags)
+            )
+          )
+        ];
+
         this.loading.list = false;
       });
   }
@@ -145,6 +158,23 @@ export class FaqManagementComponent implements OnInit {
     this.isSidePanelOpen.settings = false;
     this.isSidePanelOpen.edit = false;
     this.faqEdit = undefined;
+  }
+
+  addOrEditFaq(faq?: FaqDefinitionExtended): void {
+    if (this.faqEditComponent) {
+      this.faqEditComponent
+        .close()
+        .pipe(take(1))
+        .subscribe((res) => {
+          if (res != 'cancel') {
+            if (faq) this.editFaq(faq);
+            else this.addFaq();
+          }
+        });
+    } else {
+      if (faq) this.editFaq(faq);
+      else this.addFaq();
+    }
   }
 
   addFaq(initUtterance?: string) {
@@ -161,12 +191,62 @@ export class FaqManagementComponent implements OnInit {
       language: this.state.currentLocale
     };
 
+    if (initUtterance) this.faqEdit._makeDirty = true;
+
     this.setSidePanelSettings();
   }
 
-  editFaq(faq: FaqDefinition) {
+  editFaq(faq: FaqDefinitionExtended) {
     this.faqEdit = faq;
     this.setSidePanelSettings();
+  }
+
+  deleteFaq(faq: FaqDefinitionExtended) {
+    this.loading.delete = true;
+    const faqId = faq.id;
+    this.rest
+      .delete(`/faq/${faqId}`)
+      .pipe(take(1))
+      .subscribe(() => {
+        this.faqs = this.faqs.filter((f) => f.id != faqId);
+        this.toastrService.success(`Faq successfully deleted`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+        this.loading.delete = false;
+      });
+  }
+
+  enableFaq(faq: FaqDefinitionExtended) {
+    faq.enabled = !faq.enabled;
+    this.saveFaq(faq);
+  }
+
+  saveFaq(faq: FaqDefinitionExtended) {
+    this.loading.edit = true;
+    this.rest
+      .post('/faq', faq)
+      .pipe(take(1))
+      .subscribe((res) => {
+        if (faq.id) {
+          const index = this.faqs.findIndex((f) => f.id == faq.id);
+          this.faqs.splice(index, 1, faq);
+
+          this.toastrService.success(`Faq successfully updated`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        } else {
+          this.search();
+
+          this.toastrService.success(`Faq successfully created`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        }
+        this.loading.edit = false;
+        this.closeSidePanel();
+      });
   }
 
   setSidePanelSettings(): void {
@@ -190,55 +270,7 @@ export class FaqManagementComponent implements OnInit {
     }
   }
 
-  deleteFaq(faq: FaqDefinition) {
-    this.loading.delete = true;
-    const faqId = faq.id;
-    this.rest
-      .delete(`/faq/${faqId}`)
-      .pipe(take(1))
-      .subscribe(() => {
-        this.faqs = this.faqs.filter((f) => f.id != faqId);
-        this.filteredFaqs = this.filteredFaqs.filter((f) => f.id != faqId);
-        this.toastrService.success(`Faq successfully deleted`, 'Success', {
-          duration: 5000,
-          status: 'success'
-        });
-        this.loading.delete = false;
-      });
-  }
-
-  enableFaq(faq: FaqDefinition) {
-    faq.enabled = !faq.enabled;
-    this.saveFaq(faq);
-  }
-
-  saveFaq(faq: FaqDefinition) {
-    this.loading.edit = true;
-    this.rest
-      .post('/faq', faq)
-      .pipe(take(1))
-      .subscribe((res) => {
-        if (faq.id) {
-          const index = this.faqs.findIndex((f) => f.id == faq.id);
-          this.faqs.splice(index, 1, faq);
-
-          this.toastrService.success(`Faq successfully updated`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
-        } else {
-          this.search();
-
-          this.toastrService.success(`Faq successfully created`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
-        }
-        this.loading.edit = false;
-      });
-  }
-
-  handleSaveSettings(settings: Settings): void {
+  saveSettings(settings: Settings): void {
     this.loading.settings = true;
 
     this.faqService.saveSettings(settings, this.destroy).subscribe({
@@ -259,24 +291,5 @@ export class FaqManagementComponent implements OnInit {
   ngOnDestroy() {
     this.destroy.next();
     this.destroy.complete();
-  }
-}
-
-export class FaqSearchQuery extends PaginatedQuery {
-  constructor(
-    public namespace: string,
-    public applicationName: string,
-    public language: string,
-    public start: number,
-    public size: number,
-    public tags: string[] = [],
-    public searchMark?: SearchMark,
-    public search?: string,
-    public sort?: Entry<string, boolean>[],
-    public enabled: Boolean = null,
-    public user?: string,
-    public allButUser?: string
-  ) {
-    super(namespace, applicationName, language, start, size, searchMark, sort);
   }
 }
