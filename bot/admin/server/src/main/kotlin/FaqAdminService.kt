@@ -81,6 +81,7 @@ object FaqAdminService {
      * Save the Frequently asked question into database
      */
     fun saveFAQ(query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition) {
+        val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toSettings()
         val intent = createOrUpdateIntent(query, application)
         if (intent == null) {
             badRequest("Trouble when creating/updating intent : $intent")
@@ -98,7 +99,8 @@ object FaqAdminService {
                 intent,
                 userLogin,
                 i18nLabel,
-                application
+                application,
+                faqSettings
             )
         }
     }
@@ -149,7 +151,8 @@ object FaqAdminService {
         intent: IntentDefinition,
         userLogin: UserLogin,
         i18nLabel: I18nLabel,
-        applicationDefinition: ApplicationDefinition
+        applicationDefinition: ApplicationDefinition,
+        faqSettings: Settings?
     ) {
         val existingStory = storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
             applicationDefinition.namespace,
@@ -160,7 +163,7 @@ object FaqAdminService {
         // create active story
         if (query.enabled) {
             val storyDefinitionConfiguration =
-                prepareStoryCreationOrUpdate(query, intent, i18nLabel, applicationDefinition, existingStory)
+                prepareStoryCreationOrUpdate(query, intent, i18nLabel, applicationDefinition, existingStory, faqSettings)
 
             BotAdminService.saveStory(
                 applicationDefinition.namespace,
@@ -287,8 +290,17 @@ object FaqAdminService {
         intent: IntentDefinition,
         i18nLabel: I18nLabel,
         applicationDefinition: ApplicationDefinition,
-        existingStory: StoryDefinitionConfiguration?
+        existingStory: StoryDefinitionConfiguration?,
+        faqSettings: Settings?
     ): StoryDefinitionConfiguration {
+        val features = mutableListOf<StoryDefinitionConfigurationFeature>()
+        features.add(StoryDefinitionConfigurationFeature(
+            null, query.enabled, null, null))
+        faqSettings?.let {
+            features.add(StoryDefinitionConfigurationFeature(
+                null, true, null, it.satisfactionStoryId))
+        }
+
         return if (existingStory != null) {
             StoryDefinitionConfiguration(
                 existingStory.storyId,
@@ -306,7 +318,7 @@ object FaqAdminService {
                 query.utterances.first(),
                 i18nLabel.defaultLocale,
                 existingStory.configurationName,
-                listOf(StoryDefinitionConfigurationFeature(null, query.enabled, null, null)),
+                features,
                 existingStory._id,
                 existingStory.tags,
                 existingStory.configuredAnswers,
@@ -328,7 +340,7 @@ object FaqAdminService {
                 intent.description!!,
                 query.utterances.first(),
                 i18nLabel.defaultLocale,
-                features = listOf(StoryDefinitionConfigurationFeature(null, query.enabled, null, null))
+                features = features
             )
         }
     }
