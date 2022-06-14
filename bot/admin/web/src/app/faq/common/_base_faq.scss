@@ -21,7 +21,7 @@
  is imported everytime by every components.
 */
 
-@import 'colors';
+@import "colors";
 
 /**
   Grid component related styles
@@ -36,12 +36,26 @@
 }
 
 /**
+  Grid item component related styles
+ */
+@mixin faq-item-style {
+  .tock--subtle-hover {
+    transition: background .5s ease;
+
+    &:hover {
+      background: $faq-subtle-hover-color;
+    }
+  }
+}
+
+/**
   Shared behavior
  */
 @mixin faq-element-behavior {
+
   /* Something  you can toggle off */
   .tock-toggleable {
-    transition: opacity 0.5s ease;
+    transition: opacity .5s ease;
     opacity: 1;
 
     &.tock--hidden {
@@ -49,7 +63,7 @@
     }
 
     &.tock--closed {
-      opacity: 0.8;
+      opacity: .8;
     }
   }
 }
@@ -75,3 +89,10 @@
 .tock-col-half {
   flex: 0 0 4%;
 }
+
+.tock-action {
+  /* because horizontal space is to huge by default */
+  padding: 0.6875rem 0.425rem !important; /* Todo: find better solution than !important */
+  font-size: 0.8rem !important;
+}
+

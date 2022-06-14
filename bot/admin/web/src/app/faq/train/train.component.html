@@ -15,18 +15,18 @@
   -->
 
 <h5 class="h5 mb-4">FAQ Training</h5>
-<tock-train-header [ngClass]="{ 'tock--docked': isDocked() }" [filter]="filter" (onSearch)="search($event)">
+<tock-train-header (onSearch)="search($event)" [filter]="filter" [ngClass]="{ 'tock--docked': isDocked() }">
 </tock-train-header>
-<div class="tock-train-viewport d-flex justify-content-between w-100"
-     [ngClass]="{
+<div [ngClass]="{
      'tock--docked-panel': isDocked(),
      'tock--full_width': viewMode === 'FULL_WIDTH',
      'tock--full_width--small': viewMode === 'RESPONSIVE_FULL_WIDTH'
      }"
+     class="tock-train-viewport d-flex justify-content-between w-100"
 >
-  <tock-train-grid (onDetails)="details($event)" [viewMode]="viewMode" [filter]="filter"></tock-train-grid>
-  <tock-train-sidepanel *ngIf="isDocked()"
-                      (onSentenceSelect)="sentenceSelect($event)"
-                      (onClose)="undock()"
-                      [sentence]="selectedSentence"></tock-train-sidepanel>
+  <tock-train-grid (onDetails)="details($event)" [filter]="filter" [viewMode]="viewMode"></tock-train-grid>
+  <tock-train-sidepanel (onClose)="undock()"
+                        (onSentenceSelect)="sentenceSelect($event)"
+                        *ngIf="isDocked()"
+                        [sentence]="selectedSentence"></tock-train-sidepanel>
 </div>

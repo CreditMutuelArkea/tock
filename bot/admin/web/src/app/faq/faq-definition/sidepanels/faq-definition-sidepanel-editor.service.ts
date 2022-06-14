@@ -56,6 +56,7 @@ const newAction = (() => {
   };
 })();
 
+
 const isInitiatedBy = (action: FaqEditorEvent) => (evt: FaqEditorEvent) =>
   evt.transactionId === action.transactionId;
 
@@ -66,6 +67,7 @@ const hasName = (name: ActionName | OutcomeName) => (evt: FaqEditorEvent) => evt
  */
 @Injectable()
 export class FaqDefinitionSidepanelEditorService {
+
   private action$: Subject<FaqEditorEvent> = new Subject<FaqEditorEvent>();
 
   private outcome$: Subject<FaqEditorEvent> = new Subject<FaqEditorEvent>();
@@ -88,12 +90,14 @@ export class FaqDefinitionSidepanelEditorService {
     const actionEvt = newAction('save');
 
     const result = new Promise<FaqDefinition>((resolve, reject) => {
+      this.takeActionOutcome(actionEvt, cancel$).subscribe(evt => {
       this.takeActionOutcome(actionEvt, cancel$).subscribe((evt) => {
         if (evt.name === 'save-done') {
           resolve(<FaqDefinition>evt.payload);
         } else {
           reject(evt.name);
         }
+      })
       });
     });
     this.action$.next(actionEvt);
@@ -115,6 +119,22 @@ export class FaqDefinitionSidepanelEditorService {
    * @param handler
    */
   public registerActionHandler(name: ActionName, cancel$: Observable<any>, handler: ActionHandler) {
+    return this.action$.pipe(
+      takeUntil(cancel$),
+      filter(hasName(name)),
+      concatMap(action => {
+        return handler(action).pipe(map(
+          res => {
+            const outcome: FaqEditorEvent = {
+              transactionId: action.transactionId,
+              name: res.outcome,
+              payload: res.payload
+            };
+            return outcome;
+          }
+        ));
+      })
+    ).subscribe(this.outcome$.next.bind(this.outcome$));
     return this.action$
       .pipe(
         takeUntil(cancel$),

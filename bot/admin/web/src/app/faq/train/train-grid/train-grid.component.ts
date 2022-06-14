@@ -36,6 +36,7 @@ import {ViewMode} from "../../common/model/view-mode";
   templateUrl: './train-grid.component.html',
   styleUrls: ['./train-grid.component.scss']
 })
+
 export class TrainGridComponent extends ScrollComponent<Sentence> implements AfterViewInit, OnDestroy {
 
   @Input()
@@ -58,10 +59,8 @@ export class TrainGridComponent extends ScrollComponent<Sentence> implements Aft
   dataSource: SentencesDataSource | null;
 
   numHidden = 0;
-
-  private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
   public readonly currentIntents$: Observable<Intent[]>;
-
+  private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
   private sort: Sort[] = [];
 
   constructor(state: StateService,
@@ -72,14 +71,6 @@ export class TrainGridComponent extends ScrollComponent<Sentence> implements Aft
 
     this.currentIntents$ = state.currentIntents;
   }
-
-  protected searchMark(t: Sentence): SearchMark {
-    return new SearchMark(
-      t.text,
-      t.updateDate
-    );
-  }
-
 
   ngOnInit(): void {
     this.dataSource = new SentencesDataSource();
@@ -171,8 +162,6 @@ export class TrainGridComponent extends ScrollComponent<Sentence> implements Aft
     this.selectionMode = SelectionMode.SELECT_SOME;
   }
 
-
-
   refresh() {
     this.selection.clear();
     super.refresh();
@@ -240,6 +229,13 @@ export class TrainGridComponent extends ScrollComponent<Sentence> implements Aft
     return d1.text === d2.text
   }
 
+  protected searchMark(t: Sentence): SearchMark {
+    return new SearchMark(
+      t.text,
+      t.updateDate
+    );
+  }
+
   protected loadResults(result: PaginatedResult<Sentence>, init: boolean): boolean {
     if (super.loadResults(result, init)) {
       this.dataSource.setNewValues(result.rows);
@@ -296,4 +292,3 @@ export class SentencesDataSource extends DataSource<Sentence> {
   disconnect() {
   }
 }
-

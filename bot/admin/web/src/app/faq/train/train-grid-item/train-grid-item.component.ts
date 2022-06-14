@@ -24,7 +24,7 @@ import {
   OnInit,
   Output
 } from '@angular/core';
-import { Router } from '@angular/router';
+import {Router} from '@angular/router';
 import {SelectionModel} from "@angular/cdk/collections";
 import {Observable, of, ReplaySubject} from "rxjs";
 import {delay, take, tap} from 'rxjs/operators';
@@ -36,7 +36,7 @@ import {SentencesService} from "../../common/sentences.service";
 import {SelectionMode} from "../../common/model/selection-mode";
 import {truncate} from "../../common/util/string-utils";
 import {isDocked, ViewMode} from "../../common/model/view-mode";
-import { UserRole } from '../../../model/auth';
+import {UserRole} from '../../../model/auth';
 
 @Component({
   selector: 'tock-train-grid-item',
@@ -74,7 +74,7 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
   onDetails = new EventEmitter<Sentence>();
 
   @Output()
-  onToggle= new EventEmitter<boolean>();
+  onToggle = new EventEmitter<boolean>();
 
   selectedIntentId: string;
 
@@ -86,7 +86,7 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
   public cardCssClass = "tock--opened"; // card closing animation
 
   public UserRole = UserRole;
-
+  styleUrls: ['./train-grid-item.component.scss']
   private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(
@@ -95,7 +95,8 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly sentencesService: SentencesService,
     public readonly state: StateService
-  ) {}
+  ) {
+  }
 
   ngOnInit(): void {
     this.selectedIntent = {
@@ -110,7 +111,7 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
   }
 
   public redirectToFaqManagement(): void {
-    this.router.navigate(['faq/qa'], { state: { question: this.sentence.getText() }})
+    this.router.navigate(['faq/qa'], {state: {question: this.sentence.getText()}})
   }
 
   public async validate(): Promise<void> {
@@ -175,16 +176,6 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
     this.onDetails.emit(this.sentence);
   }
 
-  private hide(): Observable<boolean> {
-    this.cardCssClass = 'tock--closed';
-
-    return of(true)
-      .pipe(
-        delay(500),
-        tap(_ => this.cardCssClass = 'tock--hidden')
-      );
-  }
-
   toggle(): void {
     this.selection.toggle(this.sentence);
 
@@ -231,5 +222,15 @@ export class TrainGridItemComponent implements OnInit, OnDestroy {
 
   isDocked(): boolean {
     return isDocked(this.viewMode);
+  }
+
+  private hide(): Observable<boolean> {
+    this.cardCssClass = 'tock--closed';
+
+    return of(true)
+      .pipe(
+        delay(500),
+        tap(_ => this.cardCssClass = 'tock--hidden')
+      );
   }
 }

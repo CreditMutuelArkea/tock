@@ -113,7 +113,7 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonPost("/analytics/messages", setOf(botUser, faqBotUser)) { context, request: DialogFlowRequest ->
+        blockingJsonPost("/analytics/messages",setOf(botUser, faqBotUser)) { context, request: DialogFlowRequest ->
             if (context.organization == request.namespace) {
                 measureTimeMillis(
                     context
@@ -125,7 +125,7 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonPost("/analytics/users", setOf(botUser, faqBotUser)) { context, request: DialogFlowRequest ->
+        blockingJsonPost("/analytics/users",setOf(botUser, faqBotUser)) { context, request: DialogFlowRequest ->
             if (context.organization == request.namespace) {
                 measureTimeMillis(
                     context
@@ -352,7 +352,7 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonGet("/bots/:botId", setOf(botUser, faqNlpUser, faqBotUser)) { context ->
+        blockingJsonGet("/bots/:botId",setOf(botUser, faqNlpUser, faqBotUser)) { context ->
             BotAdminService.getBots(context.organization, context.path("botId"))
         }
 
@@ -369,7 +369,7 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonGet("/configuration/bots/:botId", setOf(botUser, faqBotUser)) { context ->
+        blockingJsonGet("/configuration/bots/:botId",setOf(botUser, faqBotUser)) { context ->
             BotAdminService.getBotConfigurationsByNamespaceAndBotId(context.organization, context.path("botId"))
         }
 
@@ -482,18 +482,18 @@ open class BotAdminVerticle : AdminVerticle() {
                 } ?: unauthorized()
         }
 
-        blockingJsonGet("/action/nlp-stats/:actionId", setOf(botUser, faqBotUser)) { context ->
+        blockingJsonGet("/action/nlp-stats/:actionId",setOf(botUser, faqBotUser)) { context ->
             dialogReportDAO.getNlpCallStats(context.pathId("actionId"), context.organization)
         }
 
-        blockingJsonGet("/feature/:applicationId", setOf(botUser, faqBotUser)) { context ->
+        blockingJsonGet("/feature/:applicationId",setOf(botUser, faqBotUser)) { context ->
             val applicationId = context.path("applicationId")
             BotAdminService.getFeatures(applicationId, context.organization)
         }
 
         blockingPost(
             "/feature/:applicationId/toggle",
-            setOf(botUser, faqBotUser),
+           setOf(botUser, faqBotUser),
             simpleLogger("Toogle Application Feature", { it.bodyAsString })
         ) { context ->
             val applicationId = context.path("applicationId")
@@ -504,7 +504,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingPost(
             "/feature/:applicationId/update",
-            setOf(botUser, faqBotUser),
+           setOf(botUser, faqBotUser),
             simpleLogger("Update Application Feature", { it.bodyAsString })
         ) { context ->
             val applicationId = context.path("applicationId")
@@ -519,7 +519,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingPost(
             "/feature/:applicationId/add",
-            setOf(botUser, faqBotUser),
+           setOf(botUser, faqBotUser),
             simpleLogger("Create Application Feature", { it.bodyAsString })
         ) { context ->
             val applicationId = context.path("applicationId")
@@ -530,7 +530,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingDelete(
             "/feature/:botId/:category/:name/",
-            botUser,
+           botUser,
             simpleLogger(
                 "Delete Application Feature",
                 { listOf(it.path("botId"), it.path("category"), it.path("name")) }
@@ -544,7 +544,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingDelete(
             "/feature/:botId/:category/:name/:applicationId",
-            botUser,
+           botUser,
             simpleLogger(
                 "Delete Application Feature",
                 { listOf(it.path("botId"), it.path("category"), it.path("name"), it.path("applicationId")) }

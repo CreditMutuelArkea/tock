@@ -19,32 +19,32 @@
     <div class="col-md-4 mt-1 mb-1">
       <nb-form-field>
         <nb-icon
-          nbPrefix
           icon="search-outline"
+          nbPrefix
         ></nb-icon>
         <input
-          nbInput
-          fullWidth
-          fieldSize="medium"
-          placeholder="Search"
-          type="text"
-          [(ngModel)]="filter.search"
-          [ngModelChangeDebounceTime]="1000"
           (keyup.enter)="search()"
           (ngModelChangeDebounced)="searchChange($event)"
+          [(ngModel)]="filter.search"
+          [ngModelChangeDebounceTime]="1000"
+          fieldSize="medium"
+          fullWidth
+          nbInput
+          placeholder="Search"
+          type="text"
         />
       </nb-form-field>
     </div>
 
     <div class="col-md-4 mt-1 mb-1">
       <nb-select
-        multiple
-        placeholder="Tags"
+        (ngModelChange)="selectedTagsChanged($event)"
+        [(ngModel)]="filter.tags"
+        [disabled]="availableTags.length <= 0"
         [fullWidth]="true"
         [optionsListClass]="'option-list--break-word'"
-        [disabled]="availableTags.length <= 0"
-        [(ngModel)]="filter.tags"
-        (ngModelChange)="selectedTagsChanged($event)"
+        multiple
+        placeholder="Tags"
       >
         <nb-option
           *ngFor="let tag of availableTags"
@@ -57,11 +57,11 @@
 
     <div class="col-md-2 mt-1 mb-1">
       <nb-checkbox
+        (ngModelChange)="toggleFaqActivationSearch($event)"
         [checked]="activationStatus"
         [indeterminate]="activationStatus === null"
         [ngModel]="activationStatus"
-        (ngModelChange)="toggleFaqActivationSearch($event)"
-        >Active
+      >Active
       </nb-checkbox>
     </div>
   </nb-card-body>
@@ -70,18 +70,15 @@
 <ng-template #menu>
   <nb-card [style]="{ 'margin-bottom': 0 }">
     <button
+      (click)="newFaqDefinition()"
       class="d-block"
       fullWidth
-      nbButton
       ghost
+      nbButton
       size="small"
-      (click)="newFaqDefinition()"
       status="primary"
     >
       New FAQ
     </button>
-    <!-- NOT YET IMPLEMENTED-->
-    <!--      <button class="d-block" fullWidth nbButton ghost size="small" status="basic">Export FAQ</button>-->
-    <!--      <button class="d-block" fullWidth nbButton ghost size="small" (click)="importFaq()" status="basic">Import FAQ</button>-->
   </nb-card>
 </ng-template>

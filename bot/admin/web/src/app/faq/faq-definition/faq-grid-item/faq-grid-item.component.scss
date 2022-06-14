@@ -15,6 +15,7 @@
  */
 
 @import '../../common/_base_faq.scss';
+@include faq-item-style(); /* Better button hover style */
 @include faq-element-behavior(); /* Hiding animation for things */
 
 /* Fix toggle control position */

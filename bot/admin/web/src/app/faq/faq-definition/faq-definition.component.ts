@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { Router } from '@angular/router';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Router} from '@angular/router';
+import {ReplaySubject, Subscription} from 'rxjs';
 import { NbToastrService } from '@nebular/theme';
-import { ReplaySubject, Subscription } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import {takeUntil} from "rxjs/operators";
 
 import { StateService } from 'src/app/core-nlp/state.service';
 import { DEFAULT_PANEL_NAME, WithSidePanel } from '../common/mixin/with-side-panel';
@@ -51,6 +51,7 @@ export type EditorTabName = 'Info' | 'Answer' | 'Question';
   styleUrls: ['./faq-definition.component.scss']
 })
 export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, OnDestroy {
+
   activeQaTab: EditorTabName = 'Info';
 
   configurations: BotApplicationConfiguration[];

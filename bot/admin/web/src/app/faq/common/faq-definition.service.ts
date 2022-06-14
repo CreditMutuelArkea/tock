@@ -151,9 +151,7 @@ export class FaqDefinitionService {
         takeUntil(cancel$),
         map((_) => {
           // add the current save to the state
-          console.log(this.state.currentApplication.intents);
           this.state.resetConfiguration();
-          console.log(this.state.currentApplication.intents);
           return JSON.parse(JSON.stringify(faq));
         })
       );
