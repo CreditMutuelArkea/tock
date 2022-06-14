@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { NbToastrService } from '@nebular/theme';
 import { ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -49,7 +48,6 @@ export class FaqManagementSettingsComponent implements OnInit {
   constructor(
     private botService: BotService,
     private state: StateService,
-    private toastService: NbToastrService,
     private faqService: FaqService,
     private dialogService: DialogService
   ) {}

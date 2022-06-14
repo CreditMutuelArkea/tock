@@ -32,10 +32,10 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   sort: boolean = false;
 
-  constructor(public readonly state: StateService, private router: Router) {}
+  constructor(public readonly stateService: StateService, private router: Router) {}
 
   ngOnInit(): void {
-    this.state.currentIntents.pipe(takeUntil(this.destroy$)).subscribe({
+    this.stateService.currentIntents.pipe(takeUntil(this.destroy$)).subscribe({
       next: (intents: Intent[]) => {
         this.intents = intents;
       }
@@ -58,14 +58,14 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   selectIntent(sentence: Sentence, category: 'placeholder' | 'probability'): string | number {
     switch (category) {
       case 'placeholder':
-        return sentence.getIntentLabel(this.state);
+        return sentence.getIntentLabel(this.stateService);
       case 'probability':
         return Math.trunc(sentence.classification.intentProbability * 100);
     }
   }
 
   addIntentToSentence(intentId: string, sentence: Sentence): void {
-    sentence = sentence.withIntent(this.state, intentId);
+    sentence = sentence.withIntent(this.stateService, intentId);
   }
 
   handleAction(action: Action, sentence: Sentence): void {

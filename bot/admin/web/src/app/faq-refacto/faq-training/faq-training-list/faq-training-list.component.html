@@ -29,8 +29,7 @@
     <nb-form-field>
       <nb-icon
         nbPrefix
-        pack="material-icons"
-        icon="bolt"
+        icon="flash-outline"
       ></nb-icon>
       <div class="nb-form-control-container nb-form-field-control-with-prefix">
         <nb-select
@@ -126,7 +125,7 @@
       </nb-select>
       <span nbTooltip="Detection probability"> {{ selectIntent(sentence, 'probability') }}% </span>
       <button
-        *ngIf="state.hasRole(UserRole.botUser)"
+        *ngIf="stateService.hasRole(UserRole.botUser)"
         nbButton
         nbTooltip="Create new FAQ"
         ghost
