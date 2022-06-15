@@ -38,36 +38,16 @@
           [disabled]="!selection.selected.length"
         >
           <nb-option
-            class="tock--success"
-            tock-click-capture
-            (click)="handleBatchAction(Action.VALIDATE)"
+            *ngFor="let option of selectionOption"
+            class="d-flex align-items-center"
+            [class]="option.class"
+            (click)="handleBatchAction(option.action)"
           >
             <nb-icon
-              [ngClass]="['float-right', 'mr-2']"
-              icon="checkmark-circle-2"
+              class="mr-2"
+              [icon]="option.icon"
             ></nb-icon>
-            Validate
-          </nb-option>
-          <nb-option
-            class="tock--danger"
-            tock-click-capture
-            (click)="handleBatchAction(Action.UNKNOWN)"
-          >
-            <nb-icon
-              [ngClass]="['float-right', 'mr-2']"
-              icon="checkmark-outline"
-            ></nb-icon>
-            Unknown
-          </nb-option>
-          <nb-option
-            tock-click-capture
-            (click)="handleBatchAction(Action.DELETE)"
-          >
-            <nb-icon
-              [ngClass]="['float-right', 'mr-2']"
-              icon="trash-2-outline"
-            ></nb-icon>
-            Delete
+            {{ option.label }}
           </nb-option>
         </nb-select>
       </div>

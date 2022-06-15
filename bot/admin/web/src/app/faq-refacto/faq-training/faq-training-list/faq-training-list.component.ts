@@ -33,6 +33,27 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   sort: boolean = false;
 
+  selectionOption = [
+    {
+      action: Action.VALIDATE,
+      class: 'tock--success',
+      icon: 'checkmark-circle-2',
+      label: 'Validate'
+    },
+    {
+      action: Action.UNKNOWN,
+      class: 'tock--danger',
+      icon: 'close-circle-outline',
+      label: 'Unknown'
+    },
+    {
+      action: Action.DELETE,
+      class: null,
+      icon: 'trash-2-outline',
+      label: 'Delete'
+    }
+  ];
+
   constructor(public readonly stateService: StateService, private router: Router) {}
 
   ngOnInit(): void {
