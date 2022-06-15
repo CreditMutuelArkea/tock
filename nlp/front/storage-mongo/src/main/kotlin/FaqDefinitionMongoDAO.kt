@@ -44,6 +44,7 @@ import org.litote.kmongo.allPosOp
 import org.litote.kmongo.and
 import org.litote.kmongo.ascending
 import org.litote.kmongo.deleteOneById
+import org.litote.kmongo.descending
 import org.litote.kmongo.div
 import org.litote.kmongo.document
 import org.litote.kmongo.ensureUniqueIndex
@@ -170,7 +171,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
                 logger.debug { " result : ${res.mapNotNull { it }}  " }
                 Pair(
-                    res.mapNotNull { it }.sortedBy { it.faq._id.toString() },
+                    res.mapNotNull { it },
                     count.toLong()
                 )
             } else {
@@ -195,6 +196,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
             return arrayListOf(
                 // sort the i18n by ids
                 sort(ascending(FaqDefinition::i18nId)),
+                //join with IntentDefinition collection
                 lookup(
                     INTENT_DEFINITION_COLLECTION,
                     FaqDefinition::intentId.name,
@@ -203,7 +205,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 ),
                 lookup(
                     CLASSIFIED_SENTENCE_COLLECTION,
-                    // declare a variable FAQ_INTENTID to call it in the pipeline exp below
+                    // declare a variable FAQ_INTENTID to call it in the pipeline expr below
                     listOf(
                         Variable(FAQ_INTENTID, FaqDefinition::intentId)
                     ),
@@ -248,8 +250,8 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                     )
                 ),
                 sort(
-                    ascending(
-                        FaqQueryResult::faq / IntentDefinition::name
+                    descending(
+                        FaqQueryResult::creationDate
                     )
                 ),
             )
@@ -290,4 +292,3 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     }
 
 }
-
