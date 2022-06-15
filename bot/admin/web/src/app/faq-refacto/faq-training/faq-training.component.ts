@@ -12,6 +12,8 @@ import { Pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
 
+export type SentenceExtended = Sentence & { _selected?: boolean };
+
 @Component({
   selector: 'tock-faq-training',
   templateUrl: './faq-training.component.html',
@@ -20,7 +22,7 @@ import { truncate } from '../../model/commons';
 export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
-  selection: SelectionModel<Sentence> = new SelectionModel<Sentence>(true, []);
+  selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action = Action;
   filter = {
     search: null,
@@ -34,7 +36,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   loading: boolean = false;
 
-  sentences: Sentence[] = [];
+  sentences: SentenceExtended[] = [];
 
   constructor(
     private nlp: NlpService,
@@ -94,7 +96,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.search(this.state.createPaginatedQuery(start, size))
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data: PaginatedResult<Sentence>) => {
+        next: (data: PaginatedResult<SentenceExtended>) => {
           this.pagination.pageTotal = data.total;
           this.pagination.pageEnd = data.end;
 
@@ -113,7 +115,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       });
   }
 
-  search(query: PaginatedQuery): Observable<PaginatedResult<Sentence>> {
+  search(query: PaginatedQuery): Observable<PaginatedResult<SentenceExtended>> {
     return this.nlp.searchSentences(this.toSearchQuery(query));
   }
 
@@ -142,6 +144,24 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       this.filter.minIntentProbability / 100
     );
     return result;
+  }
+
+  dialogDetailsSentence;
+
+  closeDetails() {
+    this.sentences.forEach((s) => (s._selected = false));
+    this.dialogDetailsSentence = undefined;
+  }
+
+  showDetails(sentence: SentenceExtended) {
+    this.sentences.forEach((s) => (s._selected = false));
+
+    if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
+      this.dialogDetailsSentence = undefined;
+    } else {
+      sentence._selected = true;
+      this.dialogDetailsSentence = sentence;
+    }
   }
 
   async handleAction({ action, sentence }): Promise<void> {
@@ -202,7 +222,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     if (this.sentences.length < 1) this.loadData();
   }
 
-  private setSentenceAccordingToAction(action: Action, sentence: Sentence): void {
+  private setSentenceAccordingToAction(action: Action, sentence: SentenceExtended): void {
     switch (action) {
       case Action.DELETE:
         sentence.status = SentenceStatus.deleted;

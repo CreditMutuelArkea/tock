@@ -9,6 +9,7 @@ import { StateService } from '../../../core-nlp/state.service';
 import { UserRole } from '../../../model/auth';
 import { Action } from '../../models';
 import { Pagination } from '../../../shared/pagination/pagination.component';
+import { SentenceExtended } from '../faq-training.component';
 
 @Component({
   selector: 'tock-faq-training-list',
@@ -17,10 +18,11 @@ import { Pagination } from '../../../shared/pagination/pagination.component';
 })
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
   @Input() pagination: Pagination;
-  @Input() sentences: Sentence[] = [];
-  @Input() selection!: SelectionModel<Sentence>;
+  @Input() sentences: SentenceExtended[] = [];
+  @Input() selection!: SelectionModel<SentenceExtended>;
 
-  @Output() onAction = new EventEmitter<{ action: Action; sentence: Sentence }>();
+  @Output() onDetails = new EventEmitter<SentenceExtended>();
+  @Output() onAction = new EventEmitter<{ action: Action; sentence: SentenceExtended }>();
   @Output() onBatchAction = new EventEmitter<Action>();
   @Output() onPaginationChange = new EventEmitter<Pagination>();
   @Output() onSort = new EventEmitter<boolean>();
@@ -53,11 +55,14 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.onPaginationChange.emit(pagination);
   }
 
-  redirectToFaqManagement(sentence: Sentence): void {
+  redirectToFaqManagement(sentence: SentenceExtended): void {
     this.router.navigate(['faq-refacto/management'], { state: { question: sentence.text } });
   }
 
-  selectIntent(sentence: Sentence, category: 'placeholder' | 'probability'): string | number {
+  selectIntent(
+    sentence: SentenceExtended,
+    category: 'placeholder' | 'probability'
+  ): string | number {
     switch (category) {
       case 'placeholder':
         return sentence.getIntentLabel(this.stateService);
@@ -66,7 +71,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     }
   }
 
-  addIntentToSentence(intentId: string, sentence: Sentence): void {
+  addIntentToSentence(intentId: string, sentence: SentenceExtended): void {
     let originalIndex = this.sentences.findIndex((s) => s === sentence);
     sentence = sentence.withIntent(this.stateService, intentId);
     this.sentences.splice(originalIndex, 1, sentence);
@@ -97,12 +102,18 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.filteredIntentGroups = of(result);
   }
 
-  onBlur($event): void {
-    $event.target.value = '';
+  onFocus($event): void {
     this.resetIntentsListFilter();
   }
+  onBlur($event): void {
+    $event.target.value = '';
+  }
 
-  handleAction(action: Action, sentence: Sentence): void {
+  showDetails(sentence: SentenceExtended) {
+    this.onDetails.emit(sentence);
+  }
+
+  handleAction(action: Action, sentence: SentenceExtended): void {
     this.onAction.emit({ action, sentence });
   }
 
@@ -118,11 +129,11 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     }
   }
 
-  isSentenceSelected(sentence: Sentence): boolean {
+  isSentenceSelected(sentence: SentenceExtended): boolean {
     return this.selection.isSelected(sentence);
   }
 
-  toggle(sentence: Sentence): void {
+  toggle(sentence: SentenceExtended): void {
     this.selection.toggle(sentence);
   }
 

@@ -42,3 +42,31 @@ nb-select.appearance-outline .select-button {
     word-break: break-word;
   }
 }
+
+.cdk-overlay-pane {
+  nb-option-list {
+    min-width: 15rem;
+  }
+}
+
+nb-chat.minimalInterface {
+  box-shadow: none;
+  border-radius: unset;
+  > .header {
+    display: none;
+  }
+}
+
+nb-chat-message.currentsentence {
+  .text {
+    background-color: var(--success) !important;
+    color: white !important;
+  }
+}
+
+nb-card.selected {
+  border-left: 0.5rem solid var(--success);
+  nb-card-body {
+    padding-left: 1rem;
+  }
+}

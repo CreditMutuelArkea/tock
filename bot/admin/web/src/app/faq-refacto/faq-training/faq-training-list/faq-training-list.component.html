@@ -84,7 +84,7 @@
 
 <nb-card
   *ngFor="let sentence of sentences"
-  class="mb-2"
+  [ngClass]="{ 'mb-2': true, selected: sentence._selected }"
 >
   <nb-card-body class="grid-columns">
     <nb-checkbox
@@ -110,6 +110,7 @@
         fullWidth
         type="text"
         placeholder="{{ selectIntent(sentence, 'placeholder') }}"
+        (focus)="onFocus($event)"
         (blur)="onBlur($event)"
         (keyup.escape)="onBlur($event)"
         (keyup)="filterIntentsList($event)"
@@ -141,6 +142,7 @@
         nbTooltip="Create new FAQ"
         ghost
         shape="round"
+        class="mx-2"
         (click)="redirectToFaqManagement(sentence)"
       >
         <nb-icon icon="plus-circle-outline"></nb-icon>
@@ -178,6 +180,16 @@
         (click)="handleAction(Action.DELETE, sentence)"
       >
         <nb-icon icon="trash-2-outline"></nb-icon>
+      </button>
+
+      <button
+        nbButton
+        nbTooltip="Details"
+        ghost
+        shape="round"
+        (click)="showDetails(sentence)"
+      >
+        <nb-icon icon="message-circle-outline"></nb-icon>
       </button>
     </div>
   </nb-card-body>
