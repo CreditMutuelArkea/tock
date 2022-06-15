@@ -45,7 +45,7 @@ export class FaqManagementComponent implements OnInit {
 
   constructor(
     private rest: RestService,
-    private state: StateService,
+    private stateService: StateService,
     private toastrService: NbToastrService,
     private dialogService: DialogService,
     private faqService: FaqService,
@@ -56,7 +56,7 @@ export class FaqManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.search();
-    this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
+    this.stateService.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
       this.search();
     });
 
@@ -66,7 +66,7 @@ export class FaqManagementComponent implements OnInit {
   }
 
   get isAuthorized(): boolean {
-    return this.state.hasRole(UserRole.faqBotUser);
+    return this.stateService.hasRole(UserRole.faqBotUser);
   }
 
   openSettings(): void {
@@ -128,7 +128,7 @@ export class FaqManagementComponent implements OnInit {
   search() {
     this.loading.list = true;
 
-    let query: PaginatedQuery = this.state.createPaginatedQuery(
+    let query: PaginatedQuery = this.stateService.createPaginatedQuery(
       this.cursor,
       this.pageSize,
       this.mark
@@ -187,8 +187,8 @@ export class FaqManagementComponent implements OnInit {
       tags: [],
       answer: '',
       enabled: true,
-      applicationId: this.state.currentApplication._id,
-      language: this.state.currentLocale
+      applicationId: this.stateService.currentApplication._id,
+      language: this.stateService.currentLocale
     };
 
     if (initUtterance) this.faqEdit._makeDirty = true;
@@ -273,19 +273,21 @@ export class FaqManagementComponent implements OnInit {
   saveSettings(settings: Settings): void {
     this.loading.settings = true;
 
-    this.faqService.saveSettings(settings, this.destroy).subscribe({
-      next: () => {
-        this.loading.settings = false;
-        this.isSidePanelOpen.settings = false;
-        this.toastrService.success(`Settings successfully updated`, 'Success', {
-          duration: 5000,
-          status: 'success'
-        });
-      },
-      error: () => {
-        this.loading.settings = false;
-      }
-    });
+    this.faqService
+      .saveSettings(this.stateService.currentApplication._id, settings, this.destroy)
+      .subscribe({
+        next: () => {
+          this.loading.settings = false;
+          this.isSidePanelOpen.settings = false;
+          this.toastrService.success(`Settings successfully updated`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        },
+        error: () => {
+          this.loading.settings = false;
+        }
+      });
   }
 
   ngOnDestroy() {

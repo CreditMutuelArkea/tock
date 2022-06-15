@@ -47,7 +47,7 @@ export class FaqManagementFiltersComponent implements OnInit, OnDestroy {
     });
   }
 
-  enabledCheckChanged($event) {
+  enabledCheckChanged() {
     if (this.enabled.value === null) this.enabled.setValue(true);
     else if (this.enabled.value === true) this.enabled.setValue(false);
     else if (this.enabled.value === false) this.enabled.setValue(null);

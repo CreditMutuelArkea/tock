@@ -29,8 +29,8 @@ interface FaqState {
 const faqInitialState: { loaded: boolean; settings: Settings } = {
   loaded: false,
   settings: {
-    enableSatisfactionAsk: false,
-    story: null
+    satisfactionEnabled: false,
+    satisfactionStoryId: null
   }
 };
 
@@ -57,14 +57,14 @@ export class FaqService {
     return this._state.next(state);
   }
 
-  getSettings(): Observable<Settings> {
+  getSettings(applicationId: string): Observable<Settings> {
     const faqState = this.state$;
     const notLoaded = faqState.pipe(
       filter((state) => !state.loaded),
       switchMap(() =>
-        this.rest.get<Settings>('/faq/settings', (settings: any) => ({
-          enableSatisfactionAsk: settings.enableSatisfactionAsk,
-          story: settings.story
+        this.rest.get<Settings>(`/faq/settings/${applicationId}`, (settings: Settings) => ({
+          satisfactionEnabled: settings.satisfactionEnabled,
+          satisfactionStoryId: settings.satisfactionStoryId
         }))
       ),
       tap((settings: Settings) =>
@@ -83,14 +83,18 @@ export class FaqService {
     return merge(notLoaded, loaded);
   }
 
-  saveSettings(settings: any, cancel$: Observable<any>): Observable<any> {
-    return this.rest.post('/faq/settings', settings).pipe(
+  saveSettings(
+    applicationId: string,
+    settings: Settings,
+    cancel$: Observable<any>
+  ): Observable<any> {
+    return this.rest.post(`/faq/settings/${applicationId}`, settings).pipe(
       takeUntil(cancel$),
       tap((newSettings: Settings) => {
         let state = this.getState();
         state.settings = {
-          enableSatisfactionAsk: newSettings.enableSatisfactionAsk,
-          story: newSettings.story
+          satisfactionEnabled: newSettings.satisfactionEnabled,
+          satisfactionStoryId: newSettings.satisfactionStoryId
         };
         this.setState(state);
       })

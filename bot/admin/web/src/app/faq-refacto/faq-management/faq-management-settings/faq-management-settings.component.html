@@ -23,7 +23,7 @@
       <p>Parameters are shared by all FAQ of this bot</p>
 
       <div class="mb-2">
-        <nb-checkbox formControlName="enableSatisfactionAsk">
+        <nb-checkbox formControlName="satisfactionEnabled">
           Ask for satisfaction after answering on FAQ question
         </nb-checkbox>
       </div>
@@ -31,19 +31,19 @@
       <tock-form-control
         label="Select story"
         name="story"
-        [controls]="story"
+        [controls]="satisfactionStoryId"
         [showError]="isSubmitted"
-        [required]="enableSatisfactionAsk.value"
+        [required]="satisfactionEnabled.value"
       >
         <nb-select
           placeholder="Select story"
-          formControlName="story"
+          formControlName="satisfactionStoryId"
           [fullWidth]="true"
           [optionsListClass]="'option-list--break-word'"
         >
           <nb-option
             *ngFor="let story of availableStories"
-            [value]="story"
+            [value]="story.storyId"
           >
             {{ story.name }}
           </nb-option>
