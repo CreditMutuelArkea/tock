@@ -35,7 +35,6 @@ export class FaqManagementListComponent {
       }
     });
     dialogRef.onClose.subscribe((result) => {
-      console.log(result, action);
       if (result === action.toLowerCase()) {
         this.onEnable.emit(faq);
       }
@@ -63,7 +62,7 @@ export class FaqManagementListComponent {
   }
 
   download(faq: FaqDefinitionExtended): void {
-    var jsonBlob = new Blob([JSON.stringify(faq)], {
+    const jsonBlob = new Blob([JSON.stringify(faq)], {
       type: 'application/json'
     });
 

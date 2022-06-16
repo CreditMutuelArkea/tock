@@ -70,3 +70,8 @@ nb-card.selected {
     padding-left: 1rem;
   }
 }
+
+.nb-theme-default nb-tabset .tab-link,
+.nb-theme-dark nb-tabset .tab-link {
+  padding: 1rem 1.5rem;
+}
