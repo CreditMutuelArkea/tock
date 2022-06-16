@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Observable, Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
@@ -11,6 +11,7 @@ import { NlpService } from '../../nlp-tabs/nlp.service';
 import { Pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
+import { FaqTrainingListComponent } from './faq-training-list/faq-training-list.component';
 
 export type SentenceExtended = Sentence & { _selected?: boolean };
 
@@ -21,6 +22,8 @@ export type SentenceExtended = Sentence & { _selected?: boolean };
 })
 export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
+
+  @ViewChild('faqTrainingList') faqTrainingList: FaqTrainingListComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action = Action;
@@ -149,13 +152,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   dialogDetailsSentence;
 
-  closeDetails() {
+  unselectAllSentences() {
     this.sentences.forEach((s) => (s._selected = false));
+  }
+
+  closeDetails() {
+    this.unselectAllSentences();
     this.dialogDetailsSentence = undefined;
   }
 
   showDetails(sentence: SentenceExtended) {
-    this.sentences.forEach((s) => (s._selected = false));
+    this.unselectAllSentences();
 
     if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
       this.dialogDetailsSentence = undefined;
@@ -259,6 +266,20 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
         return 'Unknown';
       case Action.VALIDATE:
         return 'Validate';
+    }
+  }
+
+  retrieveSentence(sentence: Sentence) {
+    let exists = this.sentences.find((stnce) => {
+      return stnce.text == sentence.text;
+    });
+    if (exists) {
+      this.unselectAllSentences();
+      exists._selected = true;
+      this.faqTrainingList.scrollToSentence(sentence);
+      // found.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+    } else {
+      console.log('nop');
     }
   }
 }

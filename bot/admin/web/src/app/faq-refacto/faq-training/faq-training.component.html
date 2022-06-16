@@ -19,6 +19,7 @@
       ></tock-no-data-found>
 
       <tock-faq-training-list
+        #faqTrainingList
         *ngIf="sentences?.length"
         [sentences]="sentences"
         [selection]="selection"
@@ -36,5 +37,6 @@
     *ngIf="dialogDetailsSentence"
     [sentence]="dialogDetailsSentence"
     (onClose)="closeDetails()"
+    (onSearchSentence)="retrieveSentence($event)"
   ></tock-faq-training-dialog>
 </section>

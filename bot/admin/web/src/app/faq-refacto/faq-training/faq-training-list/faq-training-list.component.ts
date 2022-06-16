@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
@@ -56,7 +64,11 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     }
   ];
 
-  constructor(public readonly stateService: StateService, private router: Router) {}
+  constructor(
+    public readonly stateService: StateService,
+    private router: Router,
+    private readonly elementRef: ElementRef
+  ) {}
 
   ngOnInit(): void {
     this.stateService.currentIntentsCategories
@@ -161,5 +173,29 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   toggleSort(): void {
     this.sort = !this.sort;
     this.onSort.emit(this.sort);
+  }
+
+  normalizeString(str) {
+    /*
+      Remove diacrtitics
+      Remove western punctuations
+      Remove spaces
+    */
+    return str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`'~()?]/g, '')
+      .replace(/\s+/g, '');
+  }
+
+  getSentenceId(sentence: SentenceExtended) {
+    return this.normalizeString(sentence.text);
+  }
+
+  scrollToSentence(sentence: SentenceExtended) {
+    const id = this.normalizeString(sentence.text);
+    const nativeElement: HTMLElement = this.elementRef.nativeElement;
+    const found: Element | null = nativeElement.querySelector(`#${id}`);
+    if (found) found.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
   }
 }

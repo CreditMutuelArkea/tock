@@ -65,6 +65,7 @@
 <nb-card
   *ngFor="let sentence of sentences"
   [ngClass]="{ 'mb-2': true, selected: sentence._selected }"
+  [id]="getSentenceId(sentence)"
 >
   <nb-card-body class="grid-columns">
     <nb-checkbox
