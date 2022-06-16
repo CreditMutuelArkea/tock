@@ -225,21 +225,26 @@ export class FaqManagementComponent implements OnInit {
     this.rest
       .post('/faq', faq)
       .pipe(take(1))
-      .subscribe(() => {
-        if (faq.id) {
-          const index = this.faqs.findIndex((f) => f.id == faq.id);
-          this.faqs.splice(index, 1, faq);
-          toastLabel = 'updated';
-        } else {
-          this.search();
-        }
+      .subscribe({
+        next: () => {
+          if (faq.id) {
+            const index = this.faqs.findIndex((f) => f.id == faq.id);
+            this.faqs.splice(index, 1, faq);
+            toastLabel = 'updated';
+          } else {
+            this.search();
+          }
 
-        this.toastrService.success(`Faq successfully ${toastLabel}`, 'Success', {
-          duration: 5000,
-          status: 'success'
-        });
-        this.loading.edit = false;
-        this.closeSidePanel();
+          this.toastrService.success(`Faq successfully ${toastLabel}`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+          this.loading.edit = false;
+          this.closeSidePanel();
+        },
+        error: () => {
+          this.loading.edit = false;
+        }
       });
   }
 
