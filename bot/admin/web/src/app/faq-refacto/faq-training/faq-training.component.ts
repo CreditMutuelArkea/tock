@@ -82,6 +82,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   onScroll() {
     if (this.loading || this.pagination.pageEnd >= this.pagination.pageTotal) return;
 
+    //this.selection.clear();
     this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
   }
 

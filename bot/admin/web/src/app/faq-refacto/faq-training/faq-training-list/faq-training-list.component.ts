@@ -27,7 +27,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   @Output() onPaginationChange = new EventEmitter<Pagination>();
   @Output() onSort = new EventEmitter<boolean>();
 
-  private readonly destroy$: Subject<boolean> = new Subject();
+  private readonly _destroy$: Subject<boolean> = new Subject();
 
   intentGroups: IntentsCategory[];
   filteredIntentGroups: Observable<IntentsCategory[]>;
@@ -35,11 +35,32 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   sort: boolean = false;
 
+  selectionOption = [
+    {
+      action: Action.VALIDATE,
+      class: 'tock--success',
+      icon: 'checkmark-circle-2',
+      label: 'Validate'
+    },
+    {
+      action: Action.UNKNOWN,
+      class: 'tock--danger',
+      icon: 'close-circle-outline',
+      label: 'Unknown'
+    },
+    {
+      action: Action.DELETE,
+      class: null,
+      icon: 'trash-2-outline',
+      label: 'Delete'
+    }
+  ];
+
   constructor(public readonly stateService: StateService, private router: Router) {}
 
   ngOnInit(): void {
     this.stateService.currentIntentsCategories
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntil(this._destroy$))
       .subscribe((groups) => {
         this.intentGroups = groups;
         this.resetIntentsListFilter();
@@ -47,8 +68,8 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
+    this._destroy$.next(true);
+    this._destroy$.complete();
   }
 
   paginationChange(pagination: Pagination) {

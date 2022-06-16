@@ -6,7 +6,7 @@ import { takeUntil } from 'rxjs/operators';
 import { BotService } from '../../../bot/bot-service';
 import { DialogService } from '../../../core-nlp/dialog.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { StorySearchQuery } from '../../../bot/model/story';
+import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../../bot/model/story';
 import { StateService } from '../../../core-nlp/state.service';
 import { Settings } from '../../models';
 import { FaqService } from '../../services/faq.service';
@@ -24,21 +24,21 @@ export class FaqManagementSettingsComponent implements OnInit {
 
   private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  availableStories: any = [];
+  availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   isSubmitted: boolean = false;
 
   form = new FormGroup({
-    enableSatisfactionAsk: new FormControl(false),
-    story: new FormControl({ value: null, disabled: true })
+    satisfactionEnabled: new FormControl(false),
+    satisfactionStoryId: new FormControl({ value: null, disabled: true })
   });
 
-  get enableSatisfactionAsk(): FormControl {
-    return this.form.get('enableSatisfactionAsk') as FormControl;
+  get satisfactionEnabled(): FormControl {
+    return this.form.get('satisfactionEnabled') as FormControl;
   }
 
-  get story(): FormControl {
-    return this.form.get('story') as FormControl;
+  get satisfactionStoryId(): FormControl {
+    return this.form.get('satisfactionStoryId') as FormControl;
   }
 
   get canSave(): boolean {
@@ -47,7 +47,7 @@ export class FaqManagementSettingsComponent implements OnInit {
 
   constructor(
     private botService: BotService,
-    private state: StateService,
+    private stateService: StateService,
     private faqService: FaqService,
     private dialogService: DialogService
   ) {}
@@ -56,15 +56,15 @@ export class FaqManagementSettingsComponent implements OnInit {
     this.getStories();
     this.getSettings();
 
-    this.enableSatisfactionAsk.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
+    this.satisfactionEnabled.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (!value) {
-        this.story.reset();
-        this.story.disable();
-        this.story.clearValidators();
+        this.satisfactionStoryId.reset();
+        this.satisfactionStoryId.disable();
+        this.satisfactionStoryId.clearValidators();
         this.form.updateValueAndValidity();
       } else {
-        this.story.setValidators(Validators.required);
-        this.story.enable();
+        this.satisfactionStoryId.setValidators(Validators.required);
+        this.satisfactionStoryId.enable();
         this.form.updateValueAndValidity();
       }
     });
@@ -79,13 +79,13 @@ export class FaqManagementSettingsComponent implements OnInit {
     this.isLoading = true;
 
     this.faqService
-      .getSettings()
+      .getSettings(this.stateService.currentApplication._id)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (settings: Settings) => {
           this.form.patchValue({
-            enableSatisfactionAsk: settings.enableSatisfactionAsk,
-            story: settings.story
+            satisfactionEnabled: settings.satisfactionEnabled,
+            satisfactionStoryId: settings.satisfactionStoryId
           });
         },
         error: () => {
@@ -98,15 +98,15 @@ export class FaqManagementSettingsComponent implements OnInit {
     this.botService
       .searchStories(
         new StorySearchQuery(
-          this.state.currentApplication.namespace,
-          this.state.currentApplication.name,
-          this.state.currentLocale,
+          this.stateService.currentApplication.namespace,
+          this.stateService.currentApplication.name,
+          this.stateService.currentLocale,
           0,
           10000
         )
       )
       .pipe(takeUntil(this.destroy$))
-      .subscribe((stories) => {
+      .subscribe((stories: StoryDefinitionConfigurationSummary[]) => {
         this.availableStories = stories.filter((story) => story.category !== 'faq');
       });
   }
@@ -135,7 +135,7 @@ export class FaqManagementSettingsComponent implements OnInit {
     this.isSubmitted = true;
 
     if (this.canSave) {
-      if (!this.enableSatisfactionAsk.value) {
+      if (!this.satisfactionEnabled.value) {
         const validAction = 'yes';
         const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
           context: {

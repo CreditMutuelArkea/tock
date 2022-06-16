@@ -13,7 +13,7 @@ import { FaqTrainingFilter } from '../../models';
 export class FaqTrainingFiltersComponent implements OnInit, OnDestroy {
   @Output() onFilter = new EventEmitter<FaqTrainingFilter>();
 
-  subscription = new Subscription();
+  private _subscription = new Subscription();
 
   form = new FormGroup({
     search: new FormControl()
@@ -26,13 +26,13 @@ export class FaqTrainingFiltersComponent implements OnInit, OnDestroy {
   constructor() {}
 
   ngOnInit(): void {
-    this.subscription = this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
+    this._subscription = this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.onFilter.emit(this.form.value as FaqTrainingFilter);
     });
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this._subscription.unsubscribe();
   }
 
   clearSearch() {

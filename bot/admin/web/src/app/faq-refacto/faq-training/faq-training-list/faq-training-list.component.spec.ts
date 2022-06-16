@@ -17,7 +17,7 @@ import { TestSharedModule } from '../../../shared/test-shared.module';
 import { FaqTrainingListComponent } from './faq-training-list.component';
 
 class StateServiceMock {
-  currentIntents: BehaviorSubject<any[]> = new BehaviorSubject([]);
+  currentIntentsCategories: BehaviorSubject<any[]> = new BehaviorSubject([]);
 }
 
 describe('FaqTrainingListComponent', () => {
