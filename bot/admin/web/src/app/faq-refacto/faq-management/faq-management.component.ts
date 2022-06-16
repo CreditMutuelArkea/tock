@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
+import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
 import { DialogService } from '../../core-nlp/dialog.service';
-import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
 import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult, Settings } from '../models';
 import { FaqService } from '../services/faq.service';
-import { Router } from '@angular/router';
 import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
+import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
 
 export type FaqDefinitionExtended = FaqDefinition & { _makeDirty?: true };
 
@@ -23,6 +23,7 @@ export type FaqDefinitionExtended = FaqDefinition & { _makeDirty?: true };
 })
 export class FaqManagementComponent implements OnInit {
   @ViewChild('faqEditComponent') faqEditComponent: FaqManagementEditComponent;
+  @ViewChild('faqSettingsComponent') faqSettingsComponent: FaqManagementSettingsComponent;
 
   destroy = new Subject();
 
@@ -67,27 +68,6 @@ export class FaqManagementComponent implements OnInit {
 
   get isAuthorized(): boolean {
     return this.stateService.hasRole(UserRole.faqBotUser);
-  }
-
-  openSettings(): void {
-    if (this.isSidePanelOpen.edit) {
-      const validAction = 'yes';
-      const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
-        context: {
-          title: `Cancel ${this.faqEdit.id ? 'edit' : 'create'} faq`,
-          subtitle: 'Are you sure you want to cancel ? Changes will not be saved.',
-          action: validAction
-        }
-      });
-      dialogRef.onClose.subscribe((result) => {
-        if (result === validAction) {
-          this.isSidePanelOpen.edit = false;
-          this.isSidePanelOpen.settings = true;
-        }
-      });
-    } else {
-      this.isSidePanelOpen.settings = true;
-    }
   }
 
   DEFAULT_FAQ_SENTENCE_SORT: Entry<string, boolean> = new Entry('creationDate', false);
@@ -161,7 +141,18 @@ export class FaqManagementComponent implements OnInit {
   }
 
   addOrEditFaq(faq?: FaqDefinitionExtended): void {
-    if (this.faqEditComponent) {
+    if (this.faqSettingsComponent) {
+      this.faqSettingsComponent
+        .close()
+        .pipe(take(1))
+        .subscribe((res) => {
+          if (res != 'cancel') {
+            setTimeout(() => {
+              this.addOrEditFaq(faq);
+            }, 200);
+          }
+        });
+    } else if (this.faqEditComponent) {
       this.faqEditComponent
         .close()
         .pipe(take(1))
@@ -193,12 +184,12 @@ export class FaqManagementComponent implements OnInit {
 
     if (initUtterance) this.faqEdit._makeDirty = true;
 
-    this.setSidePanelSettings();
+    this.isSidePanelOpen.edit = true;
   }
 
   editFaq(faq: FaqDefinitionExtended) {
     this.faqEdit = faq;
-    this.setSidePanelSettings();
+    this.isSidePanelOpen.edit = true;
   }
 
   deleteFaq(faq: FaqDefinitionExtended) {
@@ -207,13 +198,19 @@ export class FaqManagementComponent implements OnInit {
     this.rest
       .delete(`/faq/${faqId}`)
       .pipe(take(1))
-      .subscribe(() => {
-        this.faqs = this.faqs.filter((f) => f.id != faqId);
-        this.toastrService.success(`Faq successfully deleted`, 'Success', {
-          duration: 5000,
-          status: 'success'
-        });
-        this.loading.delete = false;
+      .subscribe({
+        next: () => {
+          this.faqs = this.faqs.filter((f) => f.id != faqId);
+          this.toastrService.success(`Faq successfully deleted`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+          this.loading.delete = false;
+          this.closeSidePanel();
+        },
+        error: () => {
+          this.loading.delete = false;
+        }
       });
   }
 
@@ -223,50 +220,41 @@ export class FaqManagementComponent implements OnInit {
   }
 
   saveFaq(faq: FaqDefinitionExtended) {
+    let toastLabel = 'created';
     this.loading.edit = true;
     this.rest
       .post('/faq', faq)
       .pipe(take(1))
-      .subscribe((res) => {
+      .subscribe(() => {
         if (faq.id) {
           const index = this.faqs.findIndex((f) => f.id == faq.id);
           this.faqs.splice(index, 1, faq);
-
-          this.toastrService.success(`Faq successfully updated`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
+          toastLabel = 'updated';
         } else {
           this.search();
-
-          this.toastrService.success(`Faq successfully created`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
         }
+
+        this.toastrService.success(`Faq successfully ${toastLabel}`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
         this.loading.edit = false;
         this.closeSidePanel();
       });
   }
 
-  setSidePanelSettings(): void {
-    if (this.isSidePanelOpen.settings) {
-      const validAction = 'yes';
-      const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
-        context: {
-          title: `Cancel edit parameters`,
-          subtitle: 'Are you sure you want to cancel ? Changes will not be saved.',
-          action: validAction
-        }
-      });
-      dialogRef.onClose.subscribe((result) => {
-        if (result === validAction) {
-          this.isSidePanelOpen.settings = false;
-          this.isSidePanelOpen.edit = true;
-        }
-      });
+  openSettings(): void {
+    if (this.faqEditComponent) {
+      this.faqEditComponent
+        .close()
+        .pipe(take(1))
+        .subscribe((res) => {
+          if (res != 'cancel') {
+            this.isSidePanelOpen.settings = true;
+          }
+        });
     } else {
-      this.isSidePanelOpen.edit = true;
+      this.isSidePanelOpen.settings = true;
     }
   }
 

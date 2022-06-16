@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ReplaySubject } from 'rxjs';
+import { Observable, of, ReplaySubject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { BotService } from '../../../bot/bot-service';
@@ -111,9 +111,9 @@ export class FaqManagementSettingsComponent implements OnInit {
       });
   }
 
-  close(): void {
+  close(): Observable<any> {
+    const validAction = 'yes';
     if (this.form.dirty) {
-      const validAction = 'yes';
       const dialogRef = this.dialogService.openDialog(ConfirmDialogComponent, {
         context: {
           title: `Cancel edit settings`,
@@ -126,8 +126,10 @@ export class FaqManagementSettingsComponent implements OnInit {
           this.onClose.emit(true);
         }
       });
+      return dialogRef.onClose;
     } else {
       this.onClose.emit(true);
+      return of(validAction);
     }
   }
 

@@ -91,19 +91,16 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       Validators.minLength(6),
       Validators.maxLength(40)
     ]),
-    description: new FormControl(
-      undefined,
-      Validators.maxLength(this.controlsMaxLength.description)
-    ),
+    description: new FormControl('', Validators.maxLength(this.controlsMaxLength.description)),
     tags: new FormArray([]),
     utterances: new FormArray([], Validators.required),
-    answer: new FormControl(undefined, [
+    answer: new FormControl('', [
       Validators.required,
       Validators.maxLength(this.controlsMaxLength.answer)
     ])
   });
 
-  getControlLengthIndicatorClass(controlName) {
+  getControlLengthIndicatorClass(controlName: string) {
     if (this.form.controls[controlName].value.length > this.controlsMaxLength[controlName]) {
       return 'text-danger';
     }

@@ -63,6 +63,7 @@
   ></tock-faq-management-edit>
 
   <tock-faq-management-settings
+    #faqSettingsComponent
     *ngIf="isSidePanelOpen.settings"
     [isLoading]="loading.settings"
     (onClose)="closeSidePanel()"
