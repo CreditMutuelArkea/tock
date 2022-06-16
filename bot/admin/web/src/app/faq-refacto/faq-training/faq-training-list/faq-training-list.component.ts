@@ -189,11 +189,11 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   getSentenceId(sentence: SentenceExtended) {
-    return this.normalizeString(sentence.text);
+    return `stnc_${this.normalizeString(sentence.text)}`;
   }
 
   scrollToSentence(sentence: SentenceExtended) {
-    const id = this.normalizeString(sentence.text);
+    const id = this.getSentenceId(sentence);
     const nativeElement: HTMLElement = this.elementRef.nativeElement;
     const found: Element | null = nativeElement.querySelector(`#${id}`);
     if (found) found.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });

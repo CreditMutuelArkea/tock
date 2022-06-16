@@ -57,7 +57,7 @@
         [avatar]="getUserAvatar(action)"
         [message]="action.message.text"
         [date]="action.date"
-        [class.currentsentence]="isCurrentSentence(action)"
+        [ngClass]="{ currentsentence: isCurrentSentence(action), pointer: !action.isBot() }"
         (click)="searchSentence(action)"
       >
       </nb-chat-message>

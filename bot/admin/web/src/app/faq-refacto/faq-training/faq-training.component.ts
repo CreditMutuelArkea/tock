@@ -2,7 +2,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Observable, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { take, takeUntil, share } from 'rxjs/operators';
 
 import { StateService } from '../../core-nlp/state.service';
 import { PaginatedQuery } from '../../model/commons';
@@ -12,6 +12,7 @@ import { Pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
 import { FaqTrainingListComponent } from './faq-training-list/faq-training-list.component';
+import { FaqTrainingDialogComponent } from './faq-training-dialog/faq-training-dialog.component';
 
 export type SentenceExtended = Sentence & { _selected?: boolean };
 
@@ -24,6 +25,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
   @ViewChild('faqTrainingList') faqTrainingList: FaqTrainingListComponent;
+  @ViewChild('faqTrainingDialog') faqTrainingDialog: FaqTrainingDialogComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action = Action;
@@ -85,8 +87,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   onScroll() {
     if (this.loading || this.pagination.pageEnd >= this.pagination.pageTotal) return;
 
-    //this.selection.clear();
-    this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+    return this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
   }
 
   loadData(
@@ -94,29 +95,34 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     size: number = this.pagination.pageSize,
     add: boolean = false,
     showLoadingSpinner: boolean = true
-  ): void {
+  ): Observable<PaginatedResult<SentenceExtended>> {
     if (showLoadingSpinner) this.loading = true;
 
-    this.search(this.state.createPaginatedQuery(start, size))
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data: PaginatedResult<SentenceExtended>) => {
-          this.pagination.pageTotal = data.total;
-          this.pagination.pageEnd = data.end;
+    let search = this.search(this.state.createPaginatedQuery(start, size)).pipe(
+      takeUntil(this.destroy$),
+      share()
+    );
 
-          if (add) {
-            this.sentences = [...this.sentences, ...data.rows];
-          } else {
-            this.sentences = data.rows;
-            this.pagination.pageStart = data.start;
-          }
+    search.subscribe({
+      next: (data: PaginatedResult<SentenceExtended>) => {
+        this.pagination.pageTotal = data.total;
+        this.pagination.pageEnd = data.end;
 
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
+        if (add) {
+          this.sentences = [...this.sentences, ...data.rows];
+        } else {
+          this.sentences = data.rows;
+          this.pagination.pageStart = data.start;
         }
-      });
+
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+
+    return search;
   }
 
   search(query: PaginatedQuery): Observable<PaginatedResult<SentenceExtended>> {
@@ -277,9 +283,21 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       this.unselectAllSentences();
       exists._selected = true;
       this.faqTrainingList.scrollToSentence(sentence);
-      // found.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+      this.faqTrainingDialog.updateSentence(sentence);
     } else {
-      console.log('nop');
+      let scrollOservable = this.onScroll();
+      if (scrollOservable) {
+        scrollOservable.pipe(take(1)).subscribe(() => {
+          setTimeout(() => {
+            this.retrieveSentence(sentence);
+          }, 200);
+        });
+      } else {
+        this.toastrService.warning('Sentence not found', 'Warning', {
+          duration: 2000,
+          status: 'warning'
+        });
+      }
     }
   }
 }

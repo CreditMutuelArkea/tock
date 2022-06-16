@@ -13,8 +13,8 @@ import { take } from 'rxjs/operators';
 import { AnalyticsService } from '../../../analytics/analytics.service';
 import { DialogReportQuery } from '../../../analytics/dialogs/dialogs';
 import { StateService } from '../../../core-nlp/state.service';
-import { Sentence } from '../../../model/nlp';
-import { ActionReport, BotMessage, DialogReport } from '../../../shared/model/dialog-data';
+import { ActionReport, DialogReport } from '../../../shared/model/dialog-data';
+import { SentenceExtended } from '../faq-training.component';
 
 @Component({
   selector: 'tock-faq-training-dialog',
@@ -24,7 +24,7 @@ import { ActionReport, BotMessage, DialogReport } from '../../../shared/model/di
 export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
-  @Input() sentence!: Sentence;
+  @Input() sentence!: SentenceExtended;
   @Output() onClose = new EventEmitter();
   @Output() onSearchSentence = new EventEmitter();
 
@@ -55,8 +55,8 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
         changes.sentence.currentValue.text != changes.sentence.previousValue.text)
     ) {
       this.sentence = changes.sentence.currentValue;
-      const query: DialogReportQuery = this.buildDialogQuery(this.sentence.text);
 
+      const query: DialogReportQuery = this.buildDialogQuery(this.sentence.text);
       this.analyticsService
         .dialogs(query)
         .pipe(take(1))
@@ -69,12 +69,20 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     }
   }
 
-  scrollToCurrent() {
+  updateSentence(sentence: SentenceExtended) {
+    this.sentence = sentence;
+  }
+
+  scrollToCurrent(bavr = 'smooth') {
     window.setTimeout(() => {
       const nativeElement: HTMLElement = this.elementRef.nativeElement;
       const found: Element | null = nativeElement.querySelector('.currentsentence');
       if (found) {
-        found.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        found.scrollIntoView({
+          behavior: bavr as ScrollBehavior,
+          block: 'nearest',
+          inline: 'start'
+        });
       }
     }, 200);
   }
@@ -99,7 +107,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     if (action.isBot()) return false;
     if (action.message.isSentence()) {
       // Hack because the use of fromJSON static functions doesn't instanciate correctly classes and so here action.message is only of type BotMessage
-      let mssg = action.message as unknown as Sentence;
+      let mssg = action.message as unknown as SentenceExtended;
       return mssg.text == this.sentence.text;
     }
     return false;
