@@ -24,6 +24,6 @@ section {
 
 @media screen and (min-width: 1000px) {
   .grid {
-    grid-template-columns: 6fr 4fr;
+    grid-template-columns: 6fr minmax(0, 4fr);
   }
 }

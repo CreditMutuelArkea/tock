@@ -53,9 +53,6 @@ export class FaqManagementSettingsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.getStories();
-    this.getSettings();
-
     this.satisfactionEnabled.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((value) => {
       if (!value) {
         this.satisfactionStoryId.reset();
@@ -68,6 +65,9 @@ export class FaqManagementSettingsComponent implements OnInit {
         this.form.updateValueAndValidity();
       }
     });
+
+    this.getStories();
+    this.getSettings();
   }
 
   ngOnDestroy(): void {
@@ -87,6 +87,7 @@ export class FaqManagementSettingsComponent implements OnInit {
             satisfactionEnabled: settings.satisfactionEnabled,
             satisfactionStoryId: settings.satisfactionStoryId
           });
+          this.isLoading = false;
         },
         error: () => {
           this.isLoading = false;

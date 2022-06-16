@@ -13,6 +13,7 @@ import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confi
 })
 export class FaqManagementListComponent {
   @Input() faqs!: FaqDefinitionExtended[];
+  @Input() selectedFaq?: FaqDefinitionExtended;
 
   @Output() onEdit = new EventEmitter<FaqDefinitionExtended>();
   @Output() onDelete = new EventEmitter<FaqDefinitionExtended>();

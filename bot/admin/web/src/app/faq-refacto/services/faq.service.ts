@@ -92,10 +92,7 @@ export class FaqService {
       takeUntil(cancel$),
       tap((newSettings: Settings) => {
         let state = this.getState();
-        state.settings = {
-          satisfactionEnabled: newSettings.satisfactionEnabled,
-          satisfactionStoryId: newSettings.satisfactionStoryId
-        };
+        state.settings = { ...newSettings };
         this.setState(state);
       })
     );
