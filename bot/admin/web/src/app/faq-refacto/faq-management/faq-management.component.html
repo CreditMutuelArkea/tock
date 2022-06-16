@@ -45,6 +45,7 @@
         *ngIf="!loading.list && faqs?.length"
         [nbSpinner]="loading.delete"
         [faqs]="faqs"
+        [selectedFaq]="faqEdit"
         (onEdit)="addOrEditFaq($event)"
         (onDelete)="deleteFaq($event)"
         (onEnable)="enableFaq($event)"

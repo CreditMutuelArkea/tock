@@ -1,6 +1,6 @@
 <nb-card
   *ngFor="let faq of faqs"
-  class="mb-2"
+  [ngClass]="{ 'mb-2': true, selected: selectedFaq?.id === faq.id }"
 >
   <nb-card-body class="grid-columns">
     <div>
