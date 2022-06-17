@@ -13,6 +13,7 @@ import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
 import { FaqTrainingListComponent } from './faq-training-list/faq-training-list.component';
 import { FaqTrainingDialogComponent } from './faq-training-dialog/faq-training-dialog.component';
+import { FaqTrainingFiltersComponent } from './faq-training-filters/faq-training-filters.component';
 
 export type SentenceExtended = Sentence & { _selected?: boolean };
 
@@ -26,6 +27,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   @ViewChild('faqTrainingList') faqTrainingList: FaqTrainingListComponent;
   @ViewChild('faqTrainingDialog') faqTrainingDialog: FaqTrainingDialogComponent;
+  @ViewChild('faqTrainingFilter') faqTrainingFilter: FaqTrainingFiltersComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action = Action;
@@ -275,29 +277,33 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     }
   }
 
-  retrieveSentence(sentence: Sentence) {
+  retrieveSentence(sentence: SentenceExtended, tryCount = 0) {
     let exists = this.sentences.find((stnce) => {
       return stnce.text == sentence.text;
     });
+
     if (exists) {
       this.unselectAllSentences();
       exists._selected = true;
-      this.faqTrainingList.scrollToSentence(sentence);
       this.faqTrainingDialog.updateSentence(sentence);
+      setTimeout(() => {
+        this.faqTrainingList.scrollToSentence(sentence);
+      }, 200);
     } else {
-      let scrollOservable = this.onScroll();
-      if (scrollOservable) {
-        scrollOservable.pipe(take(1)).subscribe(() => {
-          setTimeout(() => {
-            this.retrieveSentence(sentence);
-          }, 200);
-        });
-      } else {
-        this.toastrService.warning('Sentence not found', 'Warning', {
-          duration: 2000,
-          status: 'warning'
-        });
+      if (this.pagination.pageSize * tryCount < 50) {
+        let scrollOservable = this.onScroll();
+        if (scrollOservable) {
+          return scrollOservable.pipe(take(1)).subscribe(() => {
+            setTimeout(() => {
+              this.retrieveSentence(sentence, tryCount++);
+            }, 200);
+          });
+        }
       }
+
+      this.faqTrainingFilter.updateFilter({
+        search: sentence.text
+      });
     }
   }
 }

@@ -4,7 +4,10 @@
 
 <section [class.grid]="dialogDetailsSentence">
   <div>
-    <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
+    <tock-faq-training-filters
+      #faqTrainingFilter
+      (onFilter)="filterFaqTraining($event)"
+    ></tock-faq-training-filters>
 
     <div
       class="loading"
