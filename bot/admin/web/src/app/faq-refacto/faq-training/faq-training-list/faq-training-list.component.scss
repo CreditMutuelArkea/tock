@@ -24,7 +24,7 @@
 
 @media screen and (min-width: 768px) {
   .grid-columns {
-    grid-template-columns: auto 1fr 1fr auto;
+    grid-template-columns: auto 0.8fr 1.2fr auto;
   }
 
   .grid-columns-header {
