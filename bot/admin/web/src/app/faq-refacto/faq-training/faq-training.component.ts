@@ -1,8 +1,8 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Observable, Subject } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { take, takeUntil, share } from 'rxjs/operators';
 
 import { StateService } from '../../core-nlp/state.service';
 import { PaginatedQuery } from '../../model/commons';
@@ -11,6 +11,9 @@ import { NlpService } from '../../nlp-tabs/nlp.service';
 import { Pagination } from '../../shared/pagination/pagination.component';
 import { Action, FaqTrainingFilter } from '../models';
 import { truncate } from '../../model/commons';
+import { FaqTrainingListComponent } from './faq-training-list/faq-training-list.component';
+import { FaqTrainingDialogComponent } from './faq-training-dialog/faq-training-dialog.component';
+import { FaqTrainingFiltersComponent } from './faq-training-filters/faq-training-filters.component';
 
 export type SentenceExtended = Sentence & { _selected?: boolean };
 
@@ -21,6 +24,10 @@ export type SentenceExtended = Sentence & { _selected?: boolean };
 })
 export class FaqTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
+
+  @ViewChild('faqTrainingList') faqTrainingList: FaqTrainingListComponent;
+  @ViewChild('faqTrainingDialog') faqTrainingDialog: FaqTrainingDialogComponent;
+  @ViewChild('faqTrainingFilter') faqTrainingFilter: FaqTrainingFiltersComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action = Action;
@@ -82,8 +89,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   onScroll() {
     if (this.loading || this.pagination.pageEnd >= this.pagination.pageTotal) return;
 
-    //this.selection.clear();
-    this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+    return this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
   }
 
   loadData(
@@ -91,29 +97,34 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     size: number = this.pagination.pageSize,
     add: boolean = false,
     showLoadingSpinner: boolean = true
-  ): void {
+  ): Observable<PaginatedResult<SentenceExtended>> {
     if (showLoadingSpinner) this.loading = true;
 
-    this.search(this.state.createPaginatedQuery(start, size))
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (data: PaginatedResult<SentenceExtended>) => {
-          this.pagination.pageTotal = data.total;
-          this.pagination.pageEnd = data.end;
+    let search = this.search(this.state.createPaginatedQuery(start, size)).pipe(
+      takeUntil(this.destroy$),
+      share()
+    );
 
-          if (add) {
-            this.sentences = [...this.sentences, ...data.rows];
-          } else {
-            this.sentences = data.rows;
-            this.pagination.pageStart = data.start;
-          }
+    search.subscribe({
+      next: (data: PaginatedResult<SentenceExtended>) => {
+        this.pagination.pageTotal = data.total;
+        this.pagination.pageEnd = data.end;
 
-          this.loading = false;
-        },
-        error: () => {
-          this.loading = false;
+        if (add) {
+          this.sentences = [...this.sentences, ...data.rows];
+        } else {
+          this.sentences = data.rows;
+          this.pagination.pageStart = data.start;
         }
-      });
+
+        this.loading = false;
+      },
+      error: () => {
+        this.loading = false;
+      }
+    });
+
+    return search;
   }
 
   search(query: PaginatedQuery): Observable<PaginatedResult<SentenceExtended>> {
@@ -149,13 +160,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   dialogDetailsSentence;
 
-  closeDetails() {
+  unselectAllSentences() {
     this.sentences.forEach((s) => (s._selected = false));
+  }
+
+  closeDetails() {
+    this.unselectAllSentences();
     this.dialogDetailsSentence = undefined;
   }
 
   showDetails(sentence: SentenceExtended) {
-    this.sentences.forEach((s) => (s._selected = false));
+    this.unselectAllSentences();
 
     if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
       this.dialogDetailsSentence = undefined;
@@ -259,6 +274,36 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
         return 'Unknown';
       case Action.VALIDATE:
         return 'Validate';
+    }
+  }
+
+  retrieveSentence(sentence: SentenceExtended, tryCount = 0) {
+    let exists = this.sentences.find((stnce) => {
+      return stnce.text == sentence.text;
+    });
+
+    if (exists) {
+      this.unselectAllSentences();
+      exists._selected = true;
+      this.faqTrainingDialog.updateSentence(sentence);
+      setTimeout(() => {
+        this.faqTrainingList.scrollToSentence(sentence);
+      }, 200);
+    } else {
+      if (this.pagination.pageSize * tryCount < 50) {
+        let scrollOservable = this.onScroll();
+        if (scrollOservable) {
+          return scrollOservable.pipe(take(1)).subscribe(() => {
+            setTimeout(() => {
+              this.retrieveSentence(sentence, tryCount++);
+            }, 200);
+          });
+        }
+      }
+
+      this.faqTrainingFilter.updateFilter({
+        search: sentence.text
+      });
     }
   }
 }

@@ -4,18 +4,12 @@
   grid-template-columns: 5fr 2fr 2fr;
 }
 
-.grid-columns-header {
-  font-size: 70%;
-  color: gray;
-  padding: 0 1.5rem 0 1.5rem;
-}
-
 .truncate {
   max-height: 5rem;
+  -webkit-line-clamp: 4;
   -webkit-box-orient: vertical;
   display: block;
   display: -webkit-box;
   overflow: hidden !important;
   text-overflow: ellipsis;
-  -webkit-line-clamp: 4;
 }

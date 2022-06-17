@@ -61,6 +61,7 @@
 <nb-card
   *ngFor="let sentence of sentences"
   [ngClass]="{ 'mb-2': true, selected: sentence._selected }"
+  [id]="getSentenceId(sentence)"
 >
   <nb-card-body class="grid-columns">
     <nb-checkbox
@@ -118,7 +119,7 @@
         nbTooltip="Create new FAQ"
         ghost
         shape="round"
-        class="mx-2"
+        class="ml-2"
         (click)="redirectToFaqManagement(sentence)"
       >
         <nb-icon icon="plus-circle-outline"></nb-icon>
@@ -129,7 +130,7 @@
       <button
         nbButton
         nbTooltip="Validate"
-        class="tock--success"
+        class="text-success"
         ghost
         shape="round"
         (click)="handleAction(Action.VALIDATE, sentence)"
@@ -140,7 +141,7 @@
       <button
         nbButton
         nbTooltip="Unknown"
-        class="tock--danger"
+        class="text-danger"
         ghost
         shape="round"
         (click)="handleAction(Action.UNKNOWN, sentence)"

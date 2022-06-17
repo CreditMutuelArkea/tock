@@ -4,7 +4,10 @@
 
 <section [class.grid]="dialogDetailsSentence">
   <div>
-    <tock-faq-training-filters (onFilter)="filterFaqTraining($event)"></tock-faq-training-filters>
+    <tock-faq-training-filters
+      #faqTrainingFilter
+      (onFilter)="filterFaqTraining($event)"
+    ></tock-faq-training-filters>
 
     <div
       class="loading"
@@ -19,6 +22,7 @@
       ></tock-no-data-found>
 
       <tock-faq-training-list
+        #faqTrainingList
         *ngIf="sentences?.length"
         [sentences]="sentences"
         [selection]="selection"
@@ -33,8 +37,10 @@
   </div>
 
   <tock-faq-training-dialog
+    #faqTrainingDialog
     *ngIf="dialogDetailsSentence"
     [sentence]="dialogDetailsSentence"
     (onClose)="closeDetails()"
+    (onSearchSentence)="retrieveSentence($event)"
   ></tock-faq-training-dialog>
 </section>

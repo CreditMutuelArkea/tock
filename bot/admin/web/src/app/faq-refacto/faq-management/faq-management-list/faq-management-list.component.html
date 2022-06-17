@@ -7,37 +7,34 @@
       <div class="font-weight-bold initial-capitalize">
         {{ faq.title }}
       </div>
-      <!-- <span class="text-muted">
-        {{ faq.description }}
-      </span> -->
 
       <div class="row">
         <div class="col-md-6">
-          <div class="truncate">
+          <div class="truncate text-muted">
             <small
-              class="d-block text-muted"
+              class="d-block"
               *ngIf="faq.utterances.length == 1"
               >Question</small
             >
             <small
-              class="d-block text-muted"
+              class="d-block"
               *ngIf="faq.utterances.length > 1"
               >First question (out of {{ faq.utterances.length }})</small
             >
-            <span class="text-muted">{{ faq.utterances[0] }}</span>
+            {{ faq.utterances[0] }}
           </div>
         </div>
 
         <div class="col-md-6">
-          <div class="truncate">
-            <small class="d-block text-muted">Answer</small>
-            <span class="text-muted">{{ faq.answer }}</span>
+          <div class="truncate text-muted">
+            <small class="d-block">Answer</small>
+            {{ faq.answer }}
           </div>
         </div>
       </div>
     </div>
 
-    <div class="d-flex">
+    <div>
       <nb-tag-list>
         <nb-tag
           appearance="filled"

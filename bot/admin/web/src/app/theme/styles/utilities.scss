@@ -1,3 +1,9 @@
+@for $i from 1 through 4 {
+  .gap-#{$i} {
+    gap: #{$i}rem;
+  }
+}
+
 .text-muted {
   color: #8f959b;
 }
@@ -71,8 +77,7 @@ nb-card.selected {
   }
 }
 
-@for $i from 1 through 4 {
-  .gap-#{$i} {
-    gap: #{$i}rem;
-  }
+.nb-theme-default nb-tabset .tab-link,
+.nb-theme-dark nb-tabset .tab-link {
+  padding: 1rem 1.5rem;
 }

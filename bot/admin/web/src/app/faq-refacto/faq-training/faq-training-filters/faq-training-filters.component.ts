@@ -38,4 +38,8 @@ export class FaqTrainingFiltersComponent implements OnInit, OnDestroy {
   clearSearch() {
     this.search.reset();
   }
+
+  updateFilter(filter: FaqTrainingFilter) {
+    this.form.patchValue(filter);
+  }
 }
