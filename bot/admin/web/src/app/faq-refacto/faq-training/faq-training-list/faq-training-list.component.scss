@@ -10,17 +10,9 @@
   color: #8f8f8f;
   padding: 0 1.5rem 0 1.5rem;
   display: grid;
-  grid-gap: 1rem;
+  grid-gap: 0.5rem;
   align-items: center;
   grid-template-columns: 100%;
-}
-
-.tock--success > nb-icon {
-  color: #00d68f;
-}
-
-.tock--danger > nb-icon {
-  color: red;
 }
 
 .select-intent {

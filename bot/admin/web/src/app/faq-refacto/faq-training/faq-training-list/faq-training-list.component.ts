@@ -46,13 +46,13 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   selectionOption = [
     {
       action: Action.VALIDATE,
-      class: 'tock--success',
+      class: 'text-success',
       icon: 'checkmark-circle-2',
       label: 'Validate'
     },
     {
       action: Action.UNKNOWN,
-      class: 'tock--danger',
+      class: 'text-danger',
       icon: 'close-circle-outline',
       label: 'Unknown'
     },
