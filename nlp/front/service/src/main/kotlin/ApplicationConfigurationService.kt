@@ -90,10 +90,9 @@ object ApplicationConfigurationService :
         sentenceDAO.deleteSentencesByApplicationId(id)
         val app = applicationDAO.getApplicationById(id)!!
         intentDAO.getIntentsByApplicationId(id).forEach { intent ->
-            faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
-                .let { faqDefinitionDAO.deleteFaqDefinitionById(it!!._id) }
             removeIntentFromApplication(app, intent._id)
         }
+        faqDefinitionDAO.deleteFaqDefinitionByApplicationId(id)
         applicationDAO.deleteApplicationById(id)
     }
 

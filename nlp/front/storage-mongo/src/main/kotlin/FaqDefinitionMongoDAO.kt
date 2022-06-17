@@ -94,6 +94,10 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.deleteOneById(id)
     }
 
+    override fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>) {
+        col.deleteMany(FaqDefinition::applicationId eq id)
+    }
+
     override fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition? {
         return col.findOneById(id)
     }

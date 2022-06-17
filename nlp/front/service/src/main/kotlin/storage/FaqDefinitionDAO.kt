@@ -28,6 +28,8 @@ interface FaqDefinitionDAO {
 
     fun deleteFaqDefinitionById(id: Id<FaqDefinition>)
 
+    fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>)
+
     fun save(faqDefinition: FaqDefinition)
 
     fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition?

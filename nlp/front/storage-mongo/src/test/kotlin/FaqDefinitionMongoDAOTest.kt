@@ -26,6 +26,7 @@ import ai.tock.translator.I18nLabel
 import com.mongodb.client.MongoCollection
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.litote.kmongo.Id
 import org.litote.kmongo.toId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
@@ -168,5 +169,24 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
             actual = faqDefinitionDao.getFaqDefinitionByTags(setOf("TAG1")).size,
             message = "There should be something returned with tags"
         )
+    }
+
+    @Test
+    fun `Delete faq by application id`(){
+        val appId1: Id<ApplicationDefinition> = "appID1".toId()
+        val appId2: Id<ApplicationDefinition> = "appID2".toId()
+
+        faqDefinitionDao.save(faqDefinition.copy(applicationId = appId1))
+        faqDefinitionDao.save(faq2Definition.copy(applicationId = appId1))
+        faqDefinitionDao.save(faq3Definition.copy(applicationId = appId2))
+
+        assertEquals(3, col.countDocuments())
+
+        assertEquals(2, faqDefinitionDao.getFaqDefinitionByApplicationId(appId1).size)
+
+        faqDefinitionDao.deleteFaqDefinitionByApplicationId(appId1)
+
+        assertEquals(0, faqDefinitionDao.getFaqDefinitionByApplicationId(appId1).size)
+        assertEquals(1, faqDefinitionDao.getFaqDefinitionByApplicationId(appId2).size)
     }
 }
