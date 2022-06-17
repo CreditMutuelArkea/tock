@@ -4,15 +4,15 @@ import {
   EventEmitter,
   Input,
   OnChanges,
-  OnInit,
   Output,
   SimpleChanges,
   ViewChild
 } from '@angular/core';
-import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
-import { NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
+import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
+import { NbTabComponent, NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
 import { Observable, of } from 'rxjs';
 import { take } from 'rxjs/operators';
+
 import { DialogService } from '../../../core-nlp/dialog.service';
 import { StateService } from '../../../core-nlp/state.service';
 import { PaginatedQuery } from '../../../model/commons';
@@ -21,12 +21,18 @@ import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
+enum FaqTabs {
+  INFO = 'info',
+  QUESTION = 'question',
+  ANSWER = 'answer'
+}
+
 @Component({
   selector: 'tock-faq-management-edit',
   templateUrl: './faq-management-edit.component.html',
   styleUrls: ['./faq-management-edit.component.scss']
 })
-export class FaqManagementEditComponent implements OnInit, OnChanges {
+export class FaqManagementEditComponent implements OnChanges {
   @Input()
   loading: boolean;
 
@@ -54,31 +60,30 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     private readonly state: StateService
   ) {}
 
+  faqTabs: typeof FaqTabs = FaqTabs;
+
   isSubmitted: boolean = false;
 
-  currentTab = 'info';
+  currentTab = FaqTabs.INFO;
 
   controlsMaxLength = {
     description: 500,
     answer: 960
   };
 
-  setCurrentTab($event) {
-    this.currentTab = $event.tabTitle;
-    if ($event.tabTitle == 'info') {
-      this.nameInput?.nativeElement.focus();
+  setCurrentTab(tab: NbTabComponent): void {
+    this.currentTab = tab.tabTitle as FaqTabs;
+    if (tab.tabTitle == FaqTabs.INFO) {
       setTimeout(() => {
         this.nameInput?.nativeElement.focus();
       });
     }
-    if ($event.tabTitle == 'question') {
-      this.addUtteranceInput?.nativeElement.focus();
+    if (tab.tabTitle == FaqTabs.QUESTION) {
       setTimeout(() => {
         this.addUtteranceInput?.nativeElement.focus();
       });
     }
-    if ($event.tabTitle == 'answer') {
-      this.answerInput?.nativeElement.focus();
+    if (tab.tabTitle == FaqTabs.ANSWER) {
       setTimeout(() => {
         this.answerInput?.nativeElement.focus();
       });
@@ -100,7 +105,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     ])
   });
 
-  getControlLengthIndicatorClass(controlName: string) {
+  getControlLengthIndicatorClass(controlName: string): string {
     if (this.form.controls[controlName].value.length > this.controlsMaxLength[controlName]) {
       return 'text-danger';
     }
@@ -130,8 +135,6 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   get canSave(): boolean {
     return this.isSubmitted ? this.form.valid : this.form.dirty;
   }
-
-  ngOnInit(): void {}
 
   tagsAutocompleteValues: Observable<any[]>;
 
@@ -165,21 +168,21 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       }
 
       if (!faq.id) {
-        this.setCurrentTab({ tabTitle: 'info' });
+        this.setCurrentTab({ tabTitle: FaqTabs.INFO } as NbTabComponent);
       }
     }
 
     this.tagsAutocompleteValues = of(this.tagsCache);
   }
 
-  updateTagsAutocompleteValues($event) {
+  updateTagsAutocompleteValues(event: any) {
     this.tagsAutocompleteValues = of(
-      this.tagsCache.filter((tag) => tag.toLowerCase().includes($event.target.value.toLowerCase()))
+      this.tagsCache.filter((tag) => tag.toLowerCase().includes(event.target.value.toLowerCase()))
     );
   }
 
-  tagSelected($event) {
-    this.onTagAdd({ value: $event, input: this.tagInput });
+  tagSelected(value: string) {
+    this.onTagAdd({ value, input: this.tagInput });
   }
 
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
@@ -206,11 +209,10 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     }
   }
 
-  normalizeString(str) {
+  normalizeString(str: string): string {
     /*
       Remove diacrtitics
       Trim
-      toLowerCase
       Remove western punctuations
       Deduplicate spaces
     */
@@ -218,12 +220,11 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       .normalize('NFD')
       .replace(/[\u0300-\u036f]/g, '')
       .trim()
-      .toLowerCase()
       .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g, '')
       .replace(/\s\s+/g, ' ');
   }
 
-  utterancesInclude(str) {
+  utterancesInclude(str: string): AbstractControl | undefined {
     return this.utterances.controls.find((u) => {
       return this.normalizeString(u.value) == this.normalizeString(str);
     });
@@ -237,7 +238,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   }
 
   addUtterance() {
-    this.existingUterranceInOtherintent = undefined;
+    this.resetAlerts();
 
     let utterance = this.addUtteranceInput.nativeElement.value.trim();
     if (utterance) {
@@ -299,7 +300,7 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
   }
 
   utteranceEditionValue: string;
-  editUtterance(utterance) {
+  editUtterance(utterance: string): void {
     this.utterances.controls.forEach((c) => {
       delete c['_edit'];
     });
@@ -308,16 +309,16 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
     ctrl['_edit'] = true;
   }
 
-  validateEditUtterance(utterance: FormControl) {
+  validateEditUtterance(utterance: FormControl): void {
     utterance.setValue(this.utteranceEditionValue);
     this.cancelEditUtterance(utterance);
   }
 
-  cancelEditUtterance(utterance: FormControl) {
+  cancelEditUtterance(utterance: FormControl): void {
     delete utterance['_edit'];
   }
 
-  removeUtterance(utterance) {
+  removeUtterance(utterance: string): void {
     const index = this.utterances.controls.findIndex((u) => u.value == utterance);
     this.utterances.removeAt(index);
   }
@@ -354,9 +355,5 @@ export class FaqManagementEditComponent implements OnInit, OnChanges {
       });
       if (!this.faq.id) this.onClose.emit(true);
     }
-  }
-
-  eventPreventDefault(e: KeyboardEvent): void {
-    e.preventDefault();
   }
 }

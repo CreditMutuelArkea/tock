@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Observable, of, ReplaySubject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Observable, of, Subject } from 'rxjs';
+import { take, takeUntil } from 'rxjs/operators';
 
 import { BotService } from '../../../bot/bot-service';
 import { DialogService } from '../../../core-nlp/dialog.service';
@@ -10,6 +10,7 @@ import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../../
 import { StateService } from '../../../core-nlp/state.service';
 import { Settings } from '../../models';
 import { FaqService } from '../../services/faq.service';
+import { NbToastrService } from '@nebular/theme';
 
 @Component({
   selector: 'tock-faq-management-settings',
@@ -17,12 +18,11 @@ import { FaqService } from '../../services/faq.service';
   styleUrls: ['./faq-management-settings.component.scss']
 })
 export class FaqManagementSettingsComponent implements OnInit {
-  @Input() isLoading: boolean = false;
-
   @Output() onClose = new EventEmitter<boolean>();
   @Output() onSave = new EventEmitter<Settings>();
 
-  private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
+  private readonly destroy$: Subject<boolean> = new Subject();
+  loading: boolean = false;
 
   availableStories: StoryDefinitionConfigurationSummary[] = [];
 
@@ -49,7 +49,8 @@ export class FaqManagementSettingsComponent implements OnInit {
     private botService: BotService,
     private stateService: StateService,
     private faqService: FaqService,
-    private dialogService: DialogService
+    private dialogService: DialogService,
+    private toastrService: NbToastrService
   ) {}
 
   ngOnInit(): void {
@@ -76,7 +77,7 @@ export class FaqManagementSettingsComponent implements OnInit {
   }
 
   getSettings(): void {
-    this.isLoading = true;
+    this.loading = true;
 
     this.faqService
       .getSettings(this.stateService.currentApplication._id)
@@ -87,10 +88,10 @@ export class FaqManagementSettingsComponent implements OnInit {
             satisfactionEnabled: settings.satisfactionEnabled,
             satisfactionStoryId: settings.satisfactionStoryId
           });
-          this.isLoading = false;
+          this.loading = false;
         },
         error: () => {
-          this.isLoading = false;
+          this.loading = false;
         }
       });
   }
@@ -149,12 +150,34 @@ export class FaqManagementSettingsComponent implements OnInit {
         });
         dialogRef.onClose.subscribe((result) => {
           if (result === validAction) {
-            this.onSave.emit(this.form.value as Settings);
+            this.saveSettings(this.form.value as Settings);
           }
         });
       } else {
-        this.onSave.emit(this.form.value as Settings);
+        this.saveSettings(this.form.value as Settings);
       }
     }
+  }
+
+  saveSettings(settings: Settings): void {
+    this.loading = true;
+
+    this.faqService
+      .saveSettings(this.stateService.currentApplication._id, settings)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.loading = false;
+          this.form.reset();
+          this.close();
+          this.toastrService.success(`Settings successfully updated`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
   }
 }

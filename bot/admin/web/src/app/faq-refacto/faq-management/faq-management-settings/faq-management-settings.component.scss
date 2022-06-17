@@ -1,3 +1,5 @@
+@import '~@nebular/theme/styles/global/_breakpoints.scss';
+
 .side-panel {
   height: min-content;
   position: sticky;
@@ -10,7 +12,7 @@
   grid-gap: 0.5rem;
 }
 
-@media screen and (min-width: 400px) {
+@include media-breakpoint-up(sm) {
   .grid-button {
     grid-template-columns: auto auto;
     justify-content: space-between;
