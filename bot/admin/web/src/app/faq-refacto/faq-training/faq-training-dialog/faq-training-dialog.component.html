@@ -43,6 +43,14 @@
       No conversations with this phrase were found.
     </div>
 
+    <tock-chat-ui *ngIf="displayedDialog?.actions">
+      <tock-chat-ui-message
+        *ngFor="let action of displayedDialog.actions"
+        [message]="action.message.text"
+      >
+      </tock-chat-ui-message>
+    </tock-chat-ui>
+
     <nb-chat
       *ngIf="displayedDialog?.actions"
       class="minimalInterface"

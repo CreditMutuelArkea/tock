@@ -44,6 +44,8 @@ import { ErrorHelperComponent } from './error-helper/error-helper.component';
 import { NoDataFoundComponent } from './no-data-found/no-data-found.component';
 import { DelayDirective } from './directives/delay.directive';
 import { FormControlComponent } from './form-control/form-control.component';
+import { ChatUiComponent } from './chat-ui/chat-ui.component';
+import { ChatUiMessageComponent } from './chat-ui/chat-ui-message/chat-ui-message.component';
 
 @NgModule({
   imports: [
@@ -74,7 +76,9 @@ import { FormControlComponent } from './form-control/form-control.component';
     PaginationComponent,
     NoDataFoundComponent,
     FormControlComponent,
-    DelayDirective
+    DelayDirective,
+    ChatUiComponent,
+    ChatUiMessageComponent
   ],
   exports: [
     BotMessageComponent,
@@ -86,7 +90,9 @@ import { FormControlComponent } from './form-control/form-control.component';
     PaginationComponent,
     NoDataFoundComponent,
     FormControlComponent,
-    DelayDirective
+    DelayDirective,
+    ChatUiComponent,
+    ChatUiMessageComponent
   ],
   providers: [BotSharedService],
   entryComponents: []
