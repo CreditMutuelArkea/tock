@@ -29,7 +29,7 @@
           badgePosition="top right"
           badgeStatus="danger"
           [badgeDot]="isSubmitted && (title.errors || description.errors)"
-          [active]="currentTab == 'info'"
+          [active]="currentTab == faqTabs.INFO"
         >
         </nb-tab>
         <nb-tab
@@ -37,7 +37,7 @@
           badgePosition="top right"
           badgeStatus="danger"
           [badgeDot]="isSubmitted && utterances.errors"
-          [active]="currentTab == 'question'"
+          [active]="currentTab == faqTabs.QUESTION"
         >
         </nb-tab>
         <nb-tab
@@ -45,12 +45,12 @@
           badgePosition="top right"
           badgeStatus="danger"
           [badgeDot]="isSubmitted && answer.errors"
-          [active]="currentTab == 'answer'"
+          [active]="currentTab == faqTabs.ANSWER"
         >
         </nb-tab>
       </nb-tabset>
 
-      <div *ngIf="currentTab == 'info'">
+      <div *ngIf="currentTab == faqTabs.INFO">
         <tock-form-control
           label="Name"
           name="name"
@@ -112,10 +112,9 @@
               id="tags"
               type="text"
               placeholder="Type tag and press enter"
+              autocomplete="off"
               (tagAdd)="onTagAdd($event)"
               (keyup)="updateTagsAutocompleteValues($event)"
-              (keydown.enter)="eventPreventDefault($event)"
-              autocomplete="off"
               [nbAutocomplete]="tagsAutocomplete"
             />
             <nb-autocomplete
@@ -156,7 +155,6 @@
             <button
               type="button"
               nbButton
-              nbTooltip="Add"
               ghost
               size="small"
               [disabled]="lookingForSameUterranceInOtherInent"

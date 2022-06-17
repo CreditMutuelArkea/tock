@@ -1,12 +1,10 @@
 <div class="grid-columns-header mb-1">
-  <div>
+  <div class="d-flex gap-1">
     <nb-checkbox
       [checked]="selection?.selected?.length === sentences?.length"
       [indeterminate]="selection?.selected?.length && selection.selected.length < sentences?.length"
       (checkedChange)="handleToggleSelectAll($event)"
     ></nb-checkbox>
-  </div>
-  <div>
     <span
       class="pointer"
       (click)="toggleSort()"
@@ -25,7 +23,7 @@
     </span>
   </div>
 
-  <div>
+  <div class="d-flex justify-content-between flex-wrap gap-1">
     <nb-form-field>
       <nb-icon
         nbPrefix
@@ -52,9 +50,7 @@
         </nb-select>
       </div>
     </nb-form-field>
-  </div>
 
-  <div class="text-right">
     <tock-pagination
       [pagination]="pagination"
       (onPaginationChange)="paginationChange($event)"

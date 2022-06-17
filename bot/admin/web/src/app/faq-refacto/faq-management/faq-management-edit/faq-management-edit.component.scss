@@ -1,3 +1,7 @@
+@import '~@nebular/theme/styles/global/_breakpoints.scss';
+@import '~@nebular/theme/styles/theming';
+@import '~@nebular/theme/styles/themes';
+
 .side-panel {
   height: min-content;
   position: sticky;
@@ -10,7 +14,7 @@
   grid-gap: 0.5rem;
 }
 
-@media screen and (min-width: 400px) {
+@include media-breakpoint-up(sm) {
   .grid-button {
     grid-template-columns: auto auto;
     justify-content: space-between;
@@ -21,21 +25,22 @@
   }
 }
 
-.entries-list {
-  max-height: 35vh;
-  overflow-y: auto;
-  UL {
-    padding: 0;
-    margin: 0;
-    list-style-type: none;
-    LI {
-      padding: 0.4rem;
-      border-bottom: 1px solid #bebebe;
-      font-style: italic;
+@include nb-install-component() {
+  .entries-list {
+    max-height: 35vh;
+    overflow-y: auto;
+    UL {
+      padding: 0;
+      margin: 0;
+      list-style-type: none;
+      LI {
+        padding: 0.4rem;
+        border-bottom: 1px solid nb-theme(color-basic-transparent-300);
+        font-style: italic;
+      }
     }
   }
 }
-
 .alert-custom-close {
   right: 0;
   position: absolute;

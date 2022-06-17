@@ -4,13 +4,11 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
-import { DialogService } from '../../core-nlp/dialog.service';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
 import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult, Settings } from '../models';
-import { FaqService } from '../services/faq.service';
 import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
 
@@ -38,8 +36,7 @@ export class FaqManagementComponent implements OnInit {
   loading = {
     delete: false,
     edit: false,
-    list: false,
-    settings: false
+    list: false
   };
 
   initUtterance: string;
@@ -48,8 +45,6 @@ export class FaqManagementComponent implements OnInit {
     private rest: RestService,
     private stateService: StateService,
     private toastrService: NbToastrService,
-    private dialogService: DialogService,
-    private faqService: FaqService,
     private router: Router
   ) {
     this.initUtterance = this.router.getCurrentNavigation().extras?.state?.question;
@@ -261,26 +256,6 @@ export class FaqManagementComponent implements OnInit {
     } else {
       this.isSidePanelOpen.settings = true;
     }
-  }
-
-  saveSettings(settings: Settings): void {
-    this.loading.settings = true;
-
-    this.faqService
-      .saveSettings(this.stateService.currentApplication._id, settings, this.destroy)
-      .subscribe({
-        next: () => {
-          this.loading.settings = false;
-          this.isSidePanelOpen.settings = false;
-          this.toastrService.success(`Settings successfully updated`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
-        },
-        error: () => {
-          this.loading.settings = false;
-        }
-      });
   }
 
   ngOnDestroy() {
