@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 @Component({
   selector: 'tock-chat-ui',
@@ -6,10 +6,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./chat-ui.component.scss']
 })
 export class ChatUiComponent implements OnInit {
-
-  constructor() { }
+  @Input() height: string;
+  constructor() {}
 
   ngOnInit(): void {
+    console.log(this.height);
   }
-
 }

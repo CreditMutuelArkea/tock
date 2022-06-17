@@ -6,13 +6,14 @@
   font-weight: 400;
   line-height: 1.25rem;
 
-  height: 36rem;
-
   .scrollable {
+    min-height: 16rem;
+    height: calc(100vh - 320px);
+
     overflow: auto;
     flex: 1;
 
-    tock-chat-ui .messages {
+    .messages {
       padding: 1rem 1.25rem;
       overflow-y: auto;
       overflow-x: hidden;
@@ -23,12 +24,37 @@
   }
 }
 
-.nb-theme-default tock-chat-ui {
+.nb-theme-default :host {
   background-color: #ffffff;
   color: #222b45;
 }
 
-.nb-theme-dark tock-chat-ui {
+.nb-theme-dark :host {
   background-color: #222b45;
   color: #ffffff;
+}
+
+// ScrollBars
+:host .scrollable::-webkit-scrollbar {
+  width: 0.3125rem;
+  height: 0.3125rem;
+}
+
+:host .scrollable::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  border-radius: 0.15625rem;
+}
+
+.nb-theme-default :host .scrollable::-webkit-scrollbar-thumb {
+  background: #e4e9f2;
+}
+.nb-theme-default :host .scrollable::-webkit-scrollbar-track {
+  background: #f7f9fc;
+}
+
+.nb-theme-dark :host .scrollable::-webkit-scrollbar-thumb {
+  background: #101426;
+}
+.nb-theme-dark :host .scrollable::-webkit-scrollbar-track {
+  background: #192038;
 }

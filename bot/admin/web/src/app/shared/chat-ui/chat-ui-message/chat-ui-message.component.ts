@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, HostBinding, Input, OnInit } from '@angular/core';
+import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 @Component({
   selector: 'tock-chat-ui-message',
@@ -6,9 +7,32 @@ import { Component, Input, OnInit } from '@angular/core';
   styleUrls: ['./chat-ui-message.component.scss']
 })
 export class ChatUiMessageComponent implements OnInit {
-  @Input() message;
+  @Input() message: string;
+  @Input() sender: string;
+  @Input() date: Date;
+  @Input()
+  set avatar(value: string) {
+    this.avatarStyle = value ? this.domSanitizer.bypassSecurityTrustStyle(`url(${value})`) : null;
+  }
 
-  constructor() {}
+  avatarStyle: SafeStyle;
+
+  @HostBinding('class.not-reply')
+  get notReply() {
+    return !this.reply;
+  }
+
+  @Input()
+  @HostBinding('class.reply')
+  get reply(): boolean {
+    return this._reply;
+  }
+  set reply(value: boolean) {
+    this._reply = value;
+  }
+  protected _reply: boolean = false;
+
+  constructor(protected domSanitizer: DomSanitizer) {}
 
   ngOnInit(): void {}
 }
