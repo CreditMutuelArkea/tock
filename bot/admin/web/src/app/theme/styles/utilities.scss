@@ -70,3 +70,9 @@ nb-card.selected {
     padding-left: 1rem;
   }
 }
+
+@for $i from 1 through 4 {
+  .gap-#{$i} {
+    gap: #{$i}rem;
+  }
+}
