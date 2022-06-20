@@ -85,6 +85,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   paginationChange(pagination: Pagination) {
+    this.selection.clear();
     this.onPaginationChange.emit(pagination);
   }
 
