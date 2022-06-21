@@ -59,7 +59,7 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.Instant
-import java.util.*
+import java.util.Locale
 
 object FaqAdminService {
 
@@ -76,17 +76,28 @@ object FaqAdminService {
     /**
      * Save the Frequently asked question into database
      */
-    fun saveFAQ(query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition) {
+    fun saveFAQ(
+        query: FaqDefinitionRequest,
+        userLogin: UserLogin,
+        application: ApplicationDefinition
+    ): FaqDefinitionRequest {
         val intent = createOrUpdateIntent(query, application)
         if (intent == null) {
             badRequest("Trouble when creating/updating intent : $intent")
         } else {
             logger.debug { "Saved intent $intent for FAQ" }
             createOrUpdateUtterances(query, intent._id, userLogin)
-            val existingFaq = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
-            val i18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
+            val existingFaq: FaqDefinition = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
+            val i18nLabel: I18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
 
-            faqDefinitionDAO.save(prepareCreationOrUpdatingFaqDefinition(query, application, intent, i18nLabel, existingFaq))
+            val faqDefinition: FaqDefinition = prepareCreationOrUpdatingFaqDefinition(
+                query,
+                application,
+                intent,
+                i18nLabel,
+                existingFaq
+            )
+            faqDefinitionDAO.save(faqDefinition)
 
             // create the story and intent
             createOrUpdateStory(
@@ -96,7 +107,26 @@ object FaqAdminService {
                 i18nLabel,
                 application
             )
+
+            return FaqDefinitionRequest(
+                faqDefinition._id.toString(),
+                faqDefinition.intentId.toString(),
+                query.language,
+                query.applicationId,
+                faqDefinition.creationDate,
+                faqDefinition.updateDate,
+                intent.label.toString(),
+                intent.description.toString(),
+                query.utterances,
+                query.tags,
+                //get the only answer for the Faq
+                i18nLabel.i18n.first().label,
+                query.enabled,
+                intent.name
+            )
         }
+
+
     }
 
     /**
@@ -108,33 +138,33 @@ object FaqAdminService {
         intent: IntentDefinition,
         i18nLabel: I18nLabel,
         existingFaq: FaqDefinition?
-    ) : FaqDefinition {
+    ): FaqDefinition {
         //updating existing faq or creating faq
         return if (existingFaq != null) {
-                logger.info { "Updating FAQ \"${intent.label}\"" }
-                FaqDefinition(
-                    _id = existingFaq._id,
-                    applicationId = existingFaq.applicationId,
-                    intentId = existingFaq.intentId,
-                    i18nId = existingFaq.i18nId,
-                    tags = query.tags,
-                    enabled = query.enabled,
-                    creationDate = existingFaq.creationDate,
-                    updateDate = Instant.now()
-                )
+            logger.info { "Updating FAQ \"${intent.label}\"" }
+            FaqDefinition(
+                _id = existingFaq._id,
+                applicationId = existingFaq.applicationId,
+                intentId = existingFaq.intentId,
+                i18nId = existingFaq.i18nId,
+                tags = query.tags,
+                enabled = query.enabled,
+                creationDate = existingFaq.creationDate,
+                updateDate = Instant.now()
+            )
 
-            } else {
-                logger.info { "Creating FAQ \"${intent.label}\"" }
-                FaqDefinition(
-                    applicationId = application._id,
-                    intentId = intent._id,
-                    i18nId = i18nLabel._id,
-                    tags = query.tags,
-                    enabled = query.enabled,
-                    creationDate = Instant.now(),
-                    updateDate = Instant.now()
-                )
-            }
+        } else {
+            logger.info { "Creating FAQ \"${intent.label}\"" }
+            FaqDefinition(
+                applicationId = application._id,
+                intentId = intent._id,
+                i18nId = i18nLabel._id,
+                tags = query.tags,
+                enabled = query.enabled,
+                creationDate = Instant.now(),
+                updateDate = Instant.now()
+            )
+        }
     }
 
     /**
@@ -500,7 +530,7 @@ object FaqAdminService {
     ): Set<FaqDefinitionRequest> {
 
         return setFaqDetailed
-            // filter empty uterrances if any empty data to not create them
+            // filter empty utterances if any empty data to not create them
             .filter { it.utterances.isNotEmpty() }
             // map the FaqDefinition to the set
             .map { faqDefinition ->
@@ -537,7 +567,8 @@ object FaqAdminService {
         query: FaqDefinitionRequest,
         applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
-        val name: String = getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
+        val name: String =
+            getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
 
         val intent = IntentDefinition(
             name = name,
@@ -553,16 +584,15 @@ object FaqAdminService {
     }
 
     private fun getIntentName(query: FaqDefinitionRequest): String? {
-        return if(query.id != null) {
+        return if (query.id != null) {
             // On edit mode
             findFaqDefinitionIntent(query.id.toId())?.name
-        }
-        else {
+        } else {
             query.intentName
         }
     }
 
-    private fun findFaqDefinitionIntent(faqId : Id<FaqDefinition>): IntentDefinition? {
+    private fun findFaqDefinitionIntent(faqId: Id<FaqDefinition>): IntentDefinition? {
         return faqDefinitionDAO.getFaqDefinitionById(faqId)?.let {
             intentDAO.getIntentById(it.intentId)
         }
@@ -590,8 +620,10 @@ object FaqAdminService {
             i18nLabel
         } else {
             BotAdminService.createI18nRequest(
-                namespace, CreateI18nLabelRequest(
-                    query.answer.trim(), query.language,
+                namespace,
+                CreateI18nLabelRequest(
+                    query.answer.trim(),
+                    query.language,
                     FAQ_CATEGORY
                 ).also { logger.info { "Creating I18n label : ${it.label}" } }
             )

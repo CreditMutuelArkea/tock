@@ -829,7 +829,7 @@ open class BotAdminVerticle : AdminVerticle() {
             } else {
                 val applicationDefinition = front.getApplicationById(query.applicationId)
                 if (context.organization == applicationDefinition?.namespace) {
-                    FaqAdminService.saveFAQ(query, context.userLogin, applicationDefinition)
+                    return@blockingJsonPost FaqAdminService.saveFAQ(query, context.userLogin, applicationDefinition)
                 } else {
                     unauthorized()
                 }
