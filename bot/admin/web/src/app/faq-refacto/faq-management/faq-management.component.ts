@@ -77,6 +77,12 @@ export class FaqManagementComponent implements OnInit {
     this.search(this.pagination.pageStart, this.pagination.pageSize);
   }
 
+  onScroll() {
+    if (this.loading.list || this.pagination.pageEnd >= this.pagination.pageTotal) return;
+
+    return this.search(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+  }
+
   DEFAULT_FAQ_SENTENCE_SORT: Entry<string, boolean> = new Entry('creationDate', false);
 
   currentFilters: FaqFilter = {
@@ -106,14 +112,15 @@ export class FaqManagementComponent implements OnInit {
     );
   }
 
-  // cursor: number = 0;
-  // pageSize: number = 5;
-  // mark: SearchMark;
-
   tagsCache: string[] = [];
 
-  search(start: number = 0, size: number = this.pagination.pageSize) {
-    this.loading.list = true;
+  search(
+    start: number = 0,
+    size: number = this.pagination.pageSize,
+    add: boolean = false,
+    showLoadingSpinner: boolean = true
+  ) {
+    if (showLoadingSpinner) this.loading.list = true;
 
     let query: PaginatedQuery = this.stateService.createPaginatedQuery(start, size);
     const request = this.toSearchQuery(query);
@@ -125,7 +132,12 @@ export class FaqManagementComponent implements OnInit {
         this.pagination.pageTotal = faqs.total;
         this.pagination.pageEnd = faqs.end;
 
-        this.faqs = faqs.faq;
+        if (add) {
+          this.faqs = [...this.faqs, ...faqs.faq];
+        } else {
+          this.faqs = faqs.faq;
+          this.pagination.pageStart = faqs.start;
+        }
 
         this.tagsCache = [
           ...new Set(
@@ -207,10 +219,14 @@ export class FaqManagementComponent implements OnInit {
       .subscribe({
         next: () => {
           this.faqs = this.faqs.filter((f) => f.id != faqId);
+          this.pagination.pageEnd--;
+          this.pagination.pageTotal--;
+
           this.toastrService.success(`Faq successfully deleted`, 'Success', {
             duration: 5000,
             status: 'success'
           });
+
           this.loading.delete = false;
           this.closeSidePanel();
         },

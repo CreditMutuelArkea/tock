@@ -31,14 +31,19 @@
       (onFilter)="filterFaqs($event)"
     ></tock-faq-management-filters>
 
-    <tock-pagination
-      [pagination]="pagination"
-      (onPaginationChange)="paginationChange($event)"
-    ></tock-pagination>
+    <div class="d-flex justify-content-end">
+      <tock-pagination
+        [pagination]="pagination"
+        (onPaginationChange)="paginationChange($event)"
+      ></tock-pagination>
+    </div>
 
     <div
       class="loading"
       [nbSpinner]="loading.list"
+      infinite-scroll
+      [infiniteScrollDistance]="1"
+      (scrolled)="onScroll()"
     >
       <tock-no-data-found
         *ngIf="!loading.list && !faqs?.length"
