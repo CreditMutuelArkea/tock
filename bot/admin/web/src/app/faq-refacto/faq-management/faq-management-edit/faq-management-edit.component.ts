@@ -252,31 +252,36 @@ export class FaqManagementEditComponent implements OnChanges {
         this.nlp
           .searchSentences(searchQuery)
           .pipe(take(1))
-          .subscribe((res) => {
-            let existingIntentId;
-            res.rows.forEach((sentence) => {
-              if (this.normalizeString(sentence.text) == this.normalizeString(utterance)) {
-                if (
-                  sentence.classification.intentId != Intent.unknown &&
-                  (!this.faq.intentId || sentence.classification.intentId != this.faq.intentId)
-                ) {
-                  existingIntentId = sentence.classification.intentId;
+          .subscribe({
+            next: (res) => {
+              let existingIntentId;
+              res.rows.forEach((sentence) => {
+                if (this.normalizeString(sentence.text) == this.normalizeString(utterance)) {
+                  if (
+                    sentence.classification.intentId != Intent.unknown &&
+                    (!this.faq.intentId || sentence.classification.intentId != this.faq.intentId)
+                  ) {
+                    existingIntentId = sentence.classification.intentId;
+                  }
                 }
-              }
-            });
-            if (existingIntentId) {
-              let intent = this.state.findIntentById(existingIntentId);
-              this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
-            } else {
-              this.utterances.push(new FormControl(utterance));
-              this.form.markAsDirty();
-              setTimeout(() => {
-                this.addUtteranceInput?.nativeElement.focus();
-                this.utterancesListWrapper.nativeElement.scrollTop =
-                  this.utterancesListWrapper.nativeElement.scrollHeight;
               });
+              if (existingIntentId) {
+                let intent = this.state.findIntentById(existingIntentId);
+                this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
+              } else {
+                this.utterances.push(new FormControl(utterance));
+                this.form.markAsDirty();
+                setTimeout(() => {
+                  this.addUtteranceInput?.nativeElement.focus();
+                  this.utterancesListWrapper.nativeElement.scrollTop =
+                    this.utterancesListWrapper.nativeElement.scrollHeight;
+                });
+              }
+              this.lookingForSameUterranceInOtherInent = false;
+            },
+            error: () => {
+              this.lookingForSameUterranceInOtherInent = false;
             }
-            this.lookingForSameUterranceInOtherInent = false;
           });
       }
       this.addUtteranceInput.nativeElement.value = '';

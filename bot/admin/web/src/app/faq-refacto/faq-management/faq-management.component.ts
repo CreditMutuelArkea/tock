@@ -73,11 +73,11 @@ export class FaqManagementComponent implements OnInit {
     pageTotal: undefined
   };
 
-  paginationChange(pagination: Pagination) {
+  paginationChange(pagination: Pagination): void {
     this.search(this.pagination.pageStart, this.pagination.pageSize);
   }
 
-  onScroll() {
+  onScroll(): void {
     if (this.loading.list || this.pagination.pageEnd >= this.pagination.pageTotal) return;
 
     return this.search(this.pagination.pageEnd, this.pagination.pageSize, true, false);
@@ -92,7 +92,7 @@ export class FaqManagementComponent implements OnInit {
     sort: [this.DEFAULT_FAQ_SENTENCE_SORT]
   };
 
-  filterFaqs(filters: FaqFilter) {
+  filterFaqs(filters: FaqFilter): void {
     this.currentFilters = filters;
     this.search();
   }
