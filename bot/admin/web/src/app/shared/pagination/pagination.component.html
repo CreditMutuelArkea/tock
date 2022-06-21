@@ -40,12 +40,22 @@
     </button>
 
     <button
+      *ngIf="showNext()"
       nbButton
       nbTooltip="Next page"
       ghost
       shape="round"
       (click)="paginationNext()"
-      [disabled]="!showNext()"
+    >
+      <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
+    </button>
+    <!-- Workaround because tooltip is not hiding if button is disabled programmatically. Strangely this doesn't happen on Next page button below...  -->
+    <button
+      *ngIf="!showNext()"
+      nbButton
+      ghost
+      shape="round"
+      disabled
     >
       <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
     </button>
