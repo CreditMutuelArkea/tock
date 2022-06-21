@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { take, takeUntil } from 'rxjs/operators';
 
+import { BotApplicationConfiguration } from '../../core/model/configuration';
+import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
@@ -24,6 +26,8 @@ export class FaqManagementComponent implements OnInit {
   @ViewChild('faqEditComponent') faqEditComponent: FaqManagementEditComponent;
   @ViewChild('faqSettingsComponent') faqSettingsComponent: FaqManagementSettingsComponent;
 
+  configurations: BotApplicationConfiguration[];
+
   destroy = new Subject();
 
   faqs: FaqDefinitionExtended[];
@@ -43,6 +47,7 @@ export class FaqManagementComponent implements OnInit {
   initUtterance: string;
 
   constructor(
+    private botConfiguration: BotConfigurationService,
     private rest: RestService,
     private stateService: StateService,
     private toastrService: NbToastrService,
@@ -52,14 +57,20 @@ export class FaqManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.search();
-    this.stateService.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
-      this.search();
-    });
+    this.botConfiguration.configurations.pipe(takeUntil(this.destroy)).subscribe((confs) => {
+      this.configurations = confs;
 
-    if (this.initUtterance) {
-      this.addFaq(this.initUtterance);
-    }
+      if (confs.length) {
+        this.search();
+        this.stateService.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
+          this.search();
+        });
+
+        if (this.initUtterance) {
+          this.addFaq(this.initUtterance);
+        }
+      }
+    });
   }
 
   get isAuthorized(): boolean {

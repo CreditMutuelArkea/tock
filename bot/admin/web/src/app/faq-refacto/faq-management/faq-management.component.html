@@ -8,6 +8,7 @@
       ghost
       shape="round"
       nbTooltip="FAQ Parameters"
+      [disabled]="!configurations?.length"
       (click)="openSettings()"
     >
       <nb-icon icon="settings-outline"></nb-icon>
@@ -16,6 +17,7 @@
     <button
       nbButton
       status="primary"
+      [disabled]="!configurations?.length"
       (click)="addOrEditFaq()"
     >
       <nb-icon icon="plus-outline"></nb-icon>
@@ -25,7 +27,20 @@
 </div>
 
 <section [class.grid]="isSidePanelOpen.edit || isSidePanelOpen.settings">
-  <div>
+  <nb-alert
+    *ngIf="configurations?.length === 0"
+    class="alert-config flex-row align-items-center"
+    accent="warning"
+  >
+    <nb-icon
+      class="mr-1"
+      icon="alert-triangle-outline"
+      status="warning"
+    ></nb-icon>
+    No bot configuration detected
+  </nb-alert>
+
+  <div *ngIf="configurations?.length">
     <tock-faq-management-filters
       [tagsCache]="tagsCache"
       (onFilter)="filterFaqs($event)"
