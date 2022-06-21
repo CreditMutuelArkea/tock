@@ -9,7 +9,5 @@ export class ChatUiComponent implements OnInit {
   @Input() height: string;
   constructor() {}
 
-  ngOnInit(): void {
-    console.log(this.height);
-  }
+  ngOnInit(): void {}
 }
