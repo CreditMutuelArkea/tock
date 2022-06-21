@@ -11,6 +11,7 @@ import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
 import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult, Settings } from '../models';
 import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
+import { Pagination } from '../../shared/pagination/pagination.component';
 
 export type FaqDefinitionExtended = FaqDefinition & { _makeDirty?: true };
 
@@ -65,6 +66,17 @@ export class FaqManagementComponent implements OnInit {
     return this.stateService.hasRole(UserRole.faqBotUser);
   }
 
+  pagination: Pagination = {
+    pageStart: 0,
+    pageEnd: undefined,
+    pageSize: 10,
+    pageTotal: undefined
+  };
+
+  paginationChange(pagination: Pagination) {
+    this.search(this.pagination.pageStart, this.pagination.pageSize);
+  }
+
   DEFAULT_FAQ_SENTENCE_SORT: Entry<string, boolean> = new Entry('creationDate', false);
 
   currentFilters: FaqFilter = {
@@ -94,26 +106,25 @@ export class FaqManagementComponent implements OnInit {
     );
   }
 
-  cursor: number = 0;
-  pageSize: number = 5;
-  mark: SearchMark;
+  // cursor: number = 0;
+  // pageSize: number = 5;
+  // mark: SearchMark;
 
   tagsCache: string[] = [];
 
-  search() {
+  search(start: number = 0, size: number = this.pagination.pageSize) {
     this.loading.list = true;
 
-    let query: PaginatedQuery = this.stateService.createPaginatedQuery(
-      this.cursor,
-      this.pageSize,
-      this.mark
-    );
+    let query: PaginatedQuery = this.stateService.createPaginatedQuery(start, size);
     const request = this.toSearchQuery(query);
 
     this.rest
       .post('/faq/search', request)
       .pipe(takeUntil(this.destroy))
       .subscribe((faqs: PaginatedFaqResult) => {
+        this.pagination.pageTotal = faqs.total;
+        this.pagination.pageEnd = faqs.end;
+
         this.faqs = faqs.faq;
 
         this.tagsCache = [

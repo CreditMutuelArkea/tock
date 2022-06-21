@@ -1,5 +1,5 @@
 <div class="d-flex flex-wrap mb-2">
-  <h1 class="flex-grow-1">FAQ management</h1>
+  <h1 class="flex-grow-1">FAQ Management</h1>
 
   <section class="grid-actions">
     <button
@@ -30,6 +30,11 @@
       [tagsCache]="tagsCache"
       (onFilter)="filterFaqs($event)"
     ></tock-faq-management-filters>
+
+    <tock-pagination
+      [pagination]="pagination"
+      (onPaginationChange)="paginationChange($event)"
+    ></tock-pagination>
 
     <div
       class="loading"

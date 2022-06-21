@@ -345,14 +345,28 @@ export class FaqManagementEditComponent implements OnChanges {
     }
   }
 
+  getFormatedIntentName(): string {
+    return this.title.value
+      .replace(/[^A-Za-z_-]*/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
   save(): void {
     this.isSubmitted = true;
 
     if (this.canSave) {
-      this.onSave.emit({
+      let faqDFata = {
         ...this.faq,
         ...this.form.value
-      });
+      };
+
+      if (!this.faq.id) {
+        faqDFata.intentName = this.getFormatedIntentName();
+      }
+
+      this.onSave.emit(faqDFata);
+
       if (!this.faq.id) this.onClose.emit(true);
     }
   }

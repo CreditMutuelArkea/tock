@@ -3,6 +3,7 @@ export type Utterance = string;
 export interface FaqDefinition {
   id?: string;
   intentId?: string;
+  intentName?: string;
   language: string;
   applicationId: string;
   creationDate?: Date;
