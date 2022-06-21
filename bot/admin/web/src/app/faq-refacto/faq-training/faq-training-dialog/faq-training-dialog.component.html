@@ -43,7 +43,24 @@
       No conversations with this phrase were found.
     </div>
 
-    <nb-chat
+    <tock-chat-ui
+      *ngIf="displayedDialog?.actions"
+      height="calc(100vh - 320px)"
+    >
+      <tock-chat-ui-message
+        *ngFor="let action of displayedDialog.actions"
+        [message]="action.message.text"
+        [reply]="action.isBot()"
+        [sender]="getUserName(action)"
+        [avatar]="getUserAvatar(action)"
+        [date]="action.date"
+        [ngClass]="{ currentsentence: isCurrentSentence(action), pointer: !action.isBot() }"
+        (click)="searchSentence(action)"
+      >
+      </tock-chat-ui-message>
+    </tock-chat-ui>
+
+    <!-- <nb-chat
       *ngIf="displayedDialog?.actions"
       class="minimalInterface"
       title="Conversation featuring this sentence"
@@ -61,6 +78,6 @@
         (click)="searchSentence(action)"
       >
       </nb-chat-message>
-    </nb-chat>
+    </nb-chat> -->
   </nb-card-body>
 </nb-card>
