@@ -119,7 +119,7 @@ export class FaqManagementComponent implements OnInit {
     size: number = this.pagination.pageSize,
     add: boolean = false,
     showLoadingSpinner: boolean = true
-  ) {
+  ): void {
     if (showLoadingSpinner) this.loading.list = true;
 
     let query: PaginatedQuery = this.stateService.createPaginatedQuery(start, size);

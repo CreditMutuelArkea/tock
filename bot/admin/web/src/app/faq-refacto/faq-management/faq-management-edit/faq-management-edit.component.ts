@@ -145,6 +145,7 @@ export class FaqManagementEditComponent implements OnChanges {
       this.form.reset();
       this.tags.clear();
       this.utterances.clear();
+      this.resetAlerts();
       this.isSubmitted = false;
 
       if (faq) {
@@ -256,15 +257,13 @@ export class FaqManagementEditComponent implements OnChanges {
             res.rows.forEach((sentence) => {
               if (this.normalizeString(sentence.text) == this.normalizeString(utterance)) {
                 if (
-                  !this.faq.intentId ||
-                  (sentence.classification.intentId != Intent.unknown &&
-                    sentence.classification.intentId != this.faq.intentId)
+                  sentence.classification.intentId != Intent.unknown &&
+                  (!this.faq.intentId || sentence.classification.intentId != this.faq.intentId)
                 ) {
                   existingIntentId = sentence.classification.intentId;
                 }
               }
             });
-
             if (existingIntentId) {
               let intent = this.state.findIntentById(existingIntentId);
               this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
