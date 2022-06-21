@@ -55,10 +55,7 @@ export class FaqManagementComponent implements OnInit {
     this.search();
     this.stateService.configurationChange.pipe(takeUntil(this.destroy)).subscribe(() => {
       this.search();
-      this.isSidePanelOpen = {
-        edit: false,
-        settings: false
-      };
+      this.closeSidePanel();
     });
 
     if (this.initUtterance) {
