@@ -16,7 +16,7 @@ import { take } from 'rxjs/operators';
 import { DialogService } from '../../../core-nlp/dialog.service';
 import { StateService } from '../../../core-nlp/state.service';
 import { PaginatedQuery } from '../../../model/commons';
-import { Intent, SearchQuery } from '../../../model/nlp';
+import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
@@ -258,6 +258,7 @@ export class FaqManagementEditComponent implements OnChanges {
               res.rows.forEach((sentence) => {
                 if (this.normalizeString(sentence.text) == this.normalizeString(utterance)) {
                   if (
+                    [SentenceStatus.model, SentenceStatus.validated].includes(sentence.status) &&
                     sentence.classification.intentId != Intent.unknown &&
                     (!this.faq.intentId || sentence.classification.intentId != this.faq.intentId)
                   ) {
