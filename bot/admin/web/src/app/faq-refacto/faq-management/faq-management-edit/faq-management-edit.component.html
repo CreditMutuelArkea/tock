@@ -124,6 +124,7 @@
               <nb-option
                 *ngFor="let option of tagsAutocompleteValues | async"
                 [value]="option"
+                class="text-capitalize"
               >
                 {{ option }}
               </nb-option>

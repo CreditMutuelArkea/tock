@@ -15,7 +15,7 @@ import { FaqManagementEditComponent } from './faq-management-edit/faq-management
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
 import { Pagination } from '../../shared/pagination/pagination.component';
 
-export type FaqDefinitionExtended = FaqDefinition & { _makeDirty?: true };
+export type FaqDefinitionExtended = FaqDefinition & { _initUtterance?: string };
 
 @Component({
   selector: 'tock-faq-management',
@@ -95,13 +95,11 @@ export class FaqManagementComponent implements OnInit {
     return this.search(this.pagination.pageEnd, this.pagination.pageSize, true, false);
   }
 
-  DEFAULT_FAQ_SENTENCE_SORT: Entry<string, boolean> = new Entry('creationDate', false);
-
   currentFilters: FaqFilter = {
     search: null,
     tags: [],
     enabled: undefined,
-    sort: [this.DEFAULT_FAQ_SENTENCE_SORT]
+    sort: []
   };
 
   filterFaqs(filters: FaqFilter): void {
@@ -208,7 +206,7 @@ export class FaqManagementComponent implements OnInit {
       intentId: undefined,
       title: initUtterance ? initUtterance : '',
       description: '',
-      utterances: initUtterance ? [initUtterance] : [],
+      utterances: [],
       tags: [],
       answer: '',
       enabled: true,
@@ -216,7 +214,9 @@ export class FaqManagementComponent implements OnInit {
       language: this.stateService.currentLocale
     };
 
-    if (initUtterance) this.faqEdit._makeDirty = true;
+    if (initUtterance) {
+      this.faqEdit._initUtterance = initUtterance;
+    }
 
     this.isSidePanelOpen.edit = true;
   }

@@ -151,12 +151,6 @@ export class FaqManagementEditComponent implements OnChanges {
       if (faq) {
         this.form.patchValue(faq);
 
-        if (faq._makeDirty) {
-          delete faq._makeDirty;
-          this.form.markAsDirty();
-          this.form.markAsTouched();
-        }
-
         if (faq.tags?.length) {
           faq.tags.forEach((tag) => {
             this.tags.push(new FormControl(tag));
@@ -166,9 +160,21 @@ export class FaqManagementEditComponent implements OnChanges {
         faq.utterances.forEach((utterance) => {
           this.utterances.push(new FormControl(utterance));
         });
+
+        if (faq._initUtterance) {
+          this.form.markAsDirty();
+          this.form.markAsTouched();
+
+          this.setCurrentTab({ tabTitle: FaqTabs.QUESTION } as NbTabComponent);
+
+          setTimeout(() => {
+            this.addUtterance(faq._initUtterance);
+            delete faq._initUtterance;
+          });
+        }
       }
 
-      if (!faq.id) {
+      if (!faq.id && !faq._initUtterance) {
         this.setCurrentTab({ tabTitle: FaqTabs.INFO } as NbTabComponent);
       }
     }
@@ -187,7 +193,7 @@ export class FaqManagementEditComponent implements OnChanges {
   }
 
   onTagAdd({ value, input }: NbTagInputAddEvent): void {
-    let deduplicatedSpaces = value.replace(/\s\s+/g, ' ');
+    let deduplicatedSpaces = value.replace(/\s\s+/g, ' ').toLowerCase();
     if (
       deduplicatedSpaces &&
       !this.tags.value.find((v: string) => v.toUpperCase() === deduplicatedSpaces.toUpperCase())
@@ -238,10 +244,10 @@ export class FaqManagementEditComponent implements OnChanges {
     this.existingUterranceInOtherintent = undefined;
   }
 
-  addUtterance() {
+  addUtterance(utt?) {
     this.resetAlerts();
 
-    let utterance = this.addUtteranceInput.nativeElement.value.trim();
+    let utterance = utt || this.addUtteranceInput.nativeElement.value.trim();
     if (utterance) {
       if (!this.utterancesInclude(utterance)) {
         this.lookingForSameUterranceInOtherInent = true;
