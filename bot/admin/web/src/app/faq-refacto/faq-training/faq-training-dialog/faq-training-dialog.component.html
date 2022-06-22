@@ -49,7 +49,7 @@
     >
       <tock-chat-ui-message
         *ngFor="let action of displayedDialog.actions"
-        [message]="action.message.text"
+        [message]="getActionMessageText(action)"
         [reply]="action.isBot()"
         [sender]="getUserName(action)"
         [avatar]="getUserAvatar(action)"

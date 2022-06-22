@@ -13,7 +13,7 @@ import { take } from 'rxjs/operators';
 import { AnalyticsService } from '../../../analytics/analytics.service';
 import { DialogReportQuery } from '../../../analytics/dialogs/dialogs';
 import { StateService } from '../../../core-nlp/state.service';
-import { ActionReport, DialogReport } from '../../../shared/model/dialog-data';
+import { ActionReport, DialogReport, Sentence } from '../../../shared/model/dialog-data';
 import { SentenceExtended } from '../faq-training.component';
 
 @Component({
@@ -107,8 +107,8 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     if (action.isBot()) return false;
     if (action.message.isSentence()) {
       // Hack because the use of fromJSON static functions doesn't instanciate correctly classes and so here action.message is only of type BotMessage
-      let mssg = action.message as unknown as SentenceExtended;
-      return mssg.text == this.sentence.text;
+      let msg = action.message as unknown as Sentence;
+      return msg.text == this.sentence.text;
     }
     return false;
   }
@@ -126,6 +126,20 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     client: { name: 'Human', avatar: 'assets/images/scenario-client.svg' },
     bot: { name: 'Bot', avatar: 'assets/images/scenario-bot.svg' }
   };
+
+  getActionMessageText(action: ActionReport) {
+    let msg = action.message as unknown as Sentence;
+
+    if (msg.text) {
+      return msg.text;
+    }
+
+    return msg.messages
+      .map((msg) => {
+        return msg.texts.get('text');
+      })
+      .join(' ');
+  }
 
   searchSentence(action: ActionReport) {
     if (action.isBot()) return;
