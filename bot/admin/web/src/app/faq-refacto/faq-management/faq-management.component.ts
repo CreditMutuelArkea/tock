@@ -126,6 +126,17 @@ export class FaqManagementComponent implements OnInit {
 
   tagsCache: string[] = [];
 
+  updateTagsCache() {
+    this.tagsCache = [
+      ...new Set(
+        <string>[].concat.apply(
+          [...this.tagsCache],
+          this.faqs.map((v: FaqDefinitionExtended) => v.tags)
+        )
+      )
+    ].sort();
+  }
+
   search(
     start: number = 0,
     size: number = this.pagination.pageSize,
@@ -151,14 +162,7 @@ export class FaqManagementComponent implements OnInit {
           this.pagination.pageStart = faqs.start;
         }
 
-        this.tagsCache = [
-          ...new Set(
-            <string>[].concat.apply(
-              [...this.tagsCache],
-              this.faqs.map((v: FaqDefinitionExtended) => v.tags)
-            )
-          )
-        ];
+        this.updateTagsCache();
 
         this.loading.list = false;
       });
@@ -265,6 +269,7 @@ export class FaqManagementComponent implements OnInit {
             const index = this.faqs.findIndex((f) => f.id == faq.id);
             this.faqs.splice(index, 1, faq);
             toastLabel = 'updated';
+            this.updateTagsCache();
           } else {
             this.search();
           }
