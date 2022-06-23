@@ -404,8 +404,7 @@ export class FaqManagementEditComponent implements OnChanges {
               title: `This intent is already used in an other application`,
               subtitle:
                 'Do you want to share the intent between the two applications or create a new one ?',
-              action1: shareAction,
-              action2: createNewAction
+              actions: [{ actionName: shareAction }, { actionName: createNewAction }]
             }
           });
           dialogRef.onClose.subscribe((result) => {
