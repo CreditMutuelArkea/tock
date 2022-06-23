@@ -68,7 +68,9 @@ export class FaqManagementComponent implements OnInit {
         });
 
         if (this.initUtterance) {
-          this.addFaq(this.initUtterance);
+          let initUtterance = this.initUtterance;
+          this.initUtterance = undefined;
+          this.addFaq(initUtterance);
         }
       }
     });
