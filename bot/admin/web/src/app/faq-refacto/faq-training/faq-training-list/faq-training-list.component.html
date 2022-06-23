@@ -1,5 +1,5 @@
-<div class="grid-columns-header mb-1">
-  <div class="d-flex gap-1">
+<div class="grid-columns-header">
+  <div class="d-flex gap-1 align-items-center">
     <nb-checkbox
       [checked]="selection?.selected?.length === sentences?.length"
       [indeterminate]="selection?.selected?.length && selection.selected.length < sentences?.length"
@@ -60,7 +60,7 @@
 
 <nb-card
   *ngFor="let sentence of sentences"
-  [ngClass]="{ 'mb-2': true, selected: sentence._selected }"
+  [ngClass]="{ 'my-2': true, selected: sentence._selected }"
   [id]="getSentenceId(sentence)"
 >
   <nb-card-body class="grid-columns">

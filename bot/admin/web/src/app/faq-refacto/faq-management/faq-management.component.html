@@ -44,18 +44,21 @@
     <tock-faq-management-filters
       [tagsCache]="tagsCache"
       (onFilter)="filterFaqs($event)"
+      class="d-block mb-2"
     ></tock-faq-management-filters>
 
-    <div class="d-flex justify-content-end">
+    <div
+      class="d-flex justify-content-end"
+      *ngIf="!loading.list && faqs?.length"
+    >
       <tock-pagination
-        class="my-2"
         [pagination]="pagination"
         (onPaginationChange)="paginationChange($event)"
       ></tock-pagination>
     </div>
 
     <div
-      class="loading"
+      class="loading mt-2"
       [nbSpinner]="loading.list"
       infinite-scroll
       [infiniteScrollDistance]="1"

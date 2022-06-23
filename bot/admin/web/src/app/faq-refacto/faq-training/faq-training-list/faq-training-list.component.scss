@@ -1,3 +1,6 @@
+@import '~@nebular/theme/styles/theming';
+@import '~@nebular/theme/styles/themes';
+
 .grid-columns {
   display: grid;
   grid-gap: 1rem;
@@ -6,9 +9,9 @@
 }
 
 .grid-columns-header {
-  font-size: 0.8rem;
-  color: #8f8f8f;
-  padding: 0 1.5rem 0 1.5rem;
+  font-size: nb-theme(text-label-font-size);
+  color: nb-theme(color-basic-600);
+  padding: 0 0 0 1.5rem;
   display: grid;
   grid-gap: 0.5rem;
   align-items: center;
