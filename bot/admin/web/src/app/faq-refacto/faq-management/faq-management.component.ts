@@ -9,8 +9,8 @@ import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
-import { Entry, PaginatedQuery, SearchMark } from '../../model/commons';
-import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult, Settings } from '../models';
+import { PaginatedQuery } from '../../model/commons';
+import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult } from '../models';
 import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
 import { Pagination } from '../../shared/pagination/pagination.component';
@@ -266,20 +266,16 @@ export class FaqManagementComponent implements OnInit {
       .subscribe({
         next: () => {
           if (faq.id) {
-            const index = this.faqs.findIndex((f) => f.id == faq.id);
-            this.faqs.splice(index, 1, faq);
             toastLabel = 'updated';
-            this.updateTagsCache();
-          } else {
-            this.search();
           }
+
+          this.stateService.resetConfiguration();
 
           this.toastrService.success(`Faq successfully ${toastLabel}`, 'Success', {
             duration: 5000,
             status: 'success'
           });
           this.loading.edit = false;
-          this.closeSidePanel();
         },
         error: () => {
           this.loading.edit = false;

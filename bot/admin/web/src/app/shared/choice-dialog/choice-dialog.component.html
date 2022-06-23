@@ -1,0 +1,25 @@
+<nb-card [status]="modalStatus">
+  <nb-card-header>{{ title }}</nb-card-header>
+  <nb-card-body class="message">
+    <label>{{ subtitle }}</label>
+  </nb-card-body>
+  <nb-card-footer class="footer">
+    <button
+      nbButton
+      size="small"
+      status="primary"
+      (click)="dialogRef.close(action1.toLowerCase())"
+    >
+      {{ action1 }}
+    </button>
+    <button
+      nbButton
+      size="small"
+      status="primary"
+      class="submit-button"
+      (click)="dialogRef.close(action2.toLowerCase())"
+    >
+      {{ action2 }}
+    </button>
+  </nb-card-footer>
+</nb-card>

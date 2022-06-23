@@ -19,6 +19,7 @@ import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { ChoiceDialogComponent } from '../../../shared/choice-dialog/choice-dialog.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
 enum FaqTabs {
@@ -363,9 +364,7 @@ export class FaqManagementEditComponent implements OnChanges {
       .trim();
   }
 
-  save(): void {
-    this.isSubmitted = true;
-
+  checkIntentNameAndSave(): void {
     if (this.canSave) {
       let faqDFata = {
         ...this.faq,
@@ -374,11 +373,55 @@ export class FaqManagementEditComponent implements OnChanges {
 
       if (!this.faq.id) {
         faqDFata.intentName = this.getFormatedIntentName();
+        let existsInApp = StateService.intentExistsInApp(
+          this.state.currentApplication,
+          faqDFata.intentName
+        );
+        console.log('existsInApp', existsInApp);
+
+        let existsInOtherApp = this.state.intentExistsInOtherApplication(faqDFata.intentName);
+
+        if (existsInOtherApp) {
+          const shareAction = 'Share the intent';
+          const createNewAction = 'Create a new intent';
+          const dialogRef = this.dialogService.openDialog(ChoiceDialogComponent, {
+            context: {
+              title: `This intent is already used in an other application`,
+              subtitle:
+                'Do you want to share the intent between the two applications or create a new one ?',
+              action1: shareAction,
+              action2: createNewAction
+            }
+          });
+          dialogRef.onClose.subscribe((result) => {
+            if (result) {
+              if (result == createNewAction) {
+                faqDFata.intentName = this.generateIntentName(faqDFata);
+              }
+              this.save(faqDFata);
+            }
+          });
+          return;
+        }
       }
 
-      this.onSave.emit(faqDFata);
-
-      if (!this.faq.id) this.onClose.emit(true);
+      this.save(faqDFata);
     }
+  }
+
+  private generateIntentName(fq: FaqDefinitionExtended): string {
+    let candidate = fq.intentName;
+    let count = 1;
+    const candidateBase = candidate;
+    while (this.state.intentExists(candidate)) {
+      candidate = candidateBase + count++;
+    }
+    return candidate;
+  }
+
+  save(faqDFata): void {
+    this.isSubmitted = true;
+    this.onSave.emit(faqDFata);
+    if (!this.faq.id) this.onClose.emit(true);
   }
 }

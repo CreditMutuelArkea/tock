@@ -46,6 +46,7 @@ import { DelayDirective } from './directives/delay.directive';
 import { FormControlComponent } from './form-control/form-control.component';
 import { ChatUiComponent } from './chat-ui/chat-ui.component';
 import { ChatUiMessageComponent } from './chat-ui/chat-ui-message/chat-ui-message.component';
+import { ChoiceDialogComponent } from './choice-dialog/choice-dialog.component';
 
 @NgModule({
   imports: [
@@ -78,7 +79,8 @@ import { ChatUiMessageComponent } from './chat-ui/chat-ui-message/chat-ui-messag
     FormControlComponent,
     DelayDirective,
     ChatUiComponent,
-    ChatUiMessageComponent
+    ChatUiMessageComponent,
+    ChoiceDialogComponent
   ],
   exports: [
     BotMessageComponent,
@@ -92,7 +94,8 @@ import { ChatUiMessageComponent } from './chat-ui/chat-ui-message/chat-ui-messag
     FormControlComponent,
     DelayDirective,
     ChatUiComponent,
-    ChatUiMessageComponent
+    ChatUiMessageComponent,
+    ChoiceDialogComponent
   ],
   providers: [BotSharedService],
   entryComponents: []
