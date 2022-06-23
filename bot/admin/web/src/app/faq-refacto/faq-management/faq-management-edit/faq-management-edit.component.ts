@@ -324,6 +324,8 @@ export class FaqManagementEditComponent implements OnChanges {
   validateEditUtterance(utterance: FormControl): void {
     utterance.setValue(this.utteranceEditionValue);
     this.cancelEditUtterance(utterance);
+    this.form.markAsDirty();
+    this.form.markAsTouched();
   }
 
   cancelEditUtterance(utterance: FormControl): void {
@@ -333,6 +335,8 @@ export class FaqManagementEditComponent implements OnChanges {
   removeUtterance(utterance: string): void {
     const index = this.utterances.controls.findIndex((u) => u.value == utterance);
     this.utterances.removeAt(index);
+    this.form.markAsDirty();
+    this.form.markAsTouched();
   }
 
   close(): Observable<any> {
@@ -373,11 +377,16 @@ export class FaqManagementEditComponent implements OnChanges {
 
       if (!this.faq.id) {
         faqDFata.intentName = this.getFormatedIntentName();
+
         let existsInApp = StateService.intentExistsInApp(
           this.state.currentApplication,
           faqDFata.intentName
         );
-        console.log('existsInApp', existsInApp);
+
+        if (existsInApp) {
+          console.log('existsInApp', existsInApp);
+          return;
+        }
 
         let existsInOtherApp = this.state.intentExistsInOtherApplication(faqDFata.intentName);
 
