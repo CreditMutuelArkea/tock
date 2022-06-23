@@ -59,7 +59,7 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.Instant
-import java.util.*
+import java.util.Locale
 
 object FaqAdminService {
 
@@ -86,7 +86,15 @@ object FaqAdminService {
             val existingFaq = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
             val i18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
 
-            faqDefinitionDAO.save(prepareCreationOrUpdatingFaqDefinition(query, application, intent, i18nLabel, existingFaq))
+            faqDefinitionDAO.save(
+                prepareCreationOrUpdatingFaqDefinition(
+                    query,
+                    application,
+                    intent,
+                    i18nLabel,
+                    existingFaq
+                )
+            )
 
             // create the story and intent
             createOrUpdateStory(
@@ -108,33 +116,33 @@ object FaqAdminService {
         intent: IntentDefinition,
         i18nLabel: I18nLabel,
         existingFaq: FaqDefinition?
-    ) : FaqDefinition {
+    ): FaqDefinition {
         //updating existing faq or creating faq
         return if (existingFaq != null) {
-                logger.info { "Updating FAQ \"${intent.label}\"" }
-                FaqDefinition(
-                    _id = existingFaq._id,
-                    applicationId = existingFaq.applicationId,
-                    intentId = existingFaq.intentId,
-                    i18nId = existingFaq.i18nId,
-                    tags = query.tags,
-                    enabled = query.enabled,
-                    creationDate = existingFaq.creationDate,
-                    updateDate = Instant.now()
-                )
+            logger.info { "Updating FAQ \"${intent.label}\"" }
+            FaqDefinition(
+                _id = existingFaq._id,
+                applicationId = existingFaq.applicationId,
+                intentId = existingFaq.intentId,
+                i18nId = existingFaq.i18nId,
+                tags = query.tags,
+                enabled = query.enabled,
+                creationDate = existingFaq.creationDate,
+                updateDate = Instant.now()
+            )
 
-            } else {
-                logger.info { "Creating FAQ \"${intent.label}\"" }
-                FaqDefinition(
-                    applicationId = application._id,
-                    intentId = intent._id,
-                    i18nId = i18nLabel._id,
-                    tags = query.tags,
-                    enabled = query.enabled,
-                    creationDate = Instant.now(),
-                    updateDate = Instant.now()
-                )
-            }
+        } else {
+            logger.info { "Creating FAQ \"${intent.label}\"" }
+            FaqDefinition(
+                applicationId = application._id,
+                intentId = intent._id,
+                i18nId = i18nLabel._id,
+                tags = query.tags,
+                enabled = query.enabled,
+                creationDate = Instant.now(),
+                updateDate = Instant.now()
+            )
+        }
     }
 
     /**
@@ -537,7 +545,8 @@ object FaqAdminService {
         query: FaqDefinitionRequest,
         applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
-        val name: String = getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
+        val name: String =
+            getIntentName(query) ?: badRequest("Trouble when creating/updating intent : Intent name is missing")
 
         val intent = IntentDefinition(
             name = name,
@@ -553,16 +562,15 @@ object FaqAdminService {
     }
 
     private fun getIntentName(query: FaqDefinitionRequest): String? {
-        return if(query.id != null) {
+        return if (query.id != null) {
             // On edit mode
             findFaqDefinitionIntent(query.id.toId())?.name
-        }
-        else {
+        } else {
             query.intentName
         }
     }
 
-    private fun findFaqDefinitionIntent(faqId : Id<FaqDefinition>): IntentDefinition? {
+    private fun findFaqDefinitionIntent(faqId: Id<FaqDefinition>): IntentDefinition? {
         return faqDefinitionDAO.getFaqDefinitionById(faqId)?.let {
             intentDAO.getIntentById(it.intentId)
         }
