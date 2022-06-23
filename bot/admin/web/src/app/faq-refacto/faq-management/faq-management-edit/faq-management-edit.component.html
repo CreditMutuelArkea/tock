@@ -28,7 +28,7 @@
           tabTitle="info"
           badgePosition="top right"
           badgeStatus="danger"
-          [badgeDot]="isSubmitted && (title.errors || description.errors)"
+          [badgeDot]="isSubmitted && (title.errors || description.errors || intentNameExistInApp)"
           [active]="currentTab == faqTabs.INFO"
         >
         </nb-tab>
@@ -66,7 +66,14 @@
             fullWidth
             type="text"
             placeholder="Enter faq title"
+            (keyup)="resetAlerts()"
           />
+          <div
+            class="text-danger"
+            *ngIf="intentNameExistInApp"
+          >
+            <small> This title corresponds to an existing intent in this application </small>
+          </div>
         </tock-form-control>
 
         <tock-form-control

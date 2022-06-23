@@ -243,6 +243,7 @@ export class FaqManagementEditComponent implements OnChanges {
 
   resetAlerts() {
     this.existingUterranceInOtherintent = undefined;
+    this.intentNameExistInApp = undefined;
   }
 
   addUtterance(utt?) {
@@ -368,7 +369,12 @@ export class FaqManagementEditComponent implements OnChanges {
       .trim();
   }
 
+  intentNameExistInApp: boolean;
+
   checkIntentNameAndSave(): void {
+    this.isSubmitted = true;
+    this.resetAlerts();
+
     if (this.canSave) {
       let faqDFata = {
         ...this.faq,
@@ -384,7 +390,7 @@ export class FaqManagementEditComponent implements OnChanges {
         );
 
         if (existsInApp) {
-          console.log('existsInApp', existsInApp);
+          this.intentNameExistInApp = true;
           return;
         }
 
@@ -429,7 +435,6 @@ export class FaqManagementEditComponent implements OnChanges {
   }
 
   save(faqDFata): void {
-    this.isSubmitted = true;
     this.onSave.emit(faqDFata);
     if (!this.faq.id) this.onClose.emit(true);
   }
