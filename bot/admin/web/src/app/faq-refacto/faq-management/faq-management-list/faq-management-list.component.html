@@ -6,6 +6,13 @@
     <div>
       <div class="font-weight-bold initial-capitalize">
         {{ faq.title }}
+        <span
+          *ngIf="state.intentIdExistsInOtherApplication(faq.intentId)"
+          class="valign-middle text-primary"
+          nbTooltip="This faq uses an intent that is shared by at least one other application. Any change to the intent will also affect other applications that use that intent."
+        >
+          <mat-icon>share</mat-icon>
+        </span>
       </div>
 
       <div class="row">
