@@ -47,6 +47,7 @@ import com.github.salomonbrys.kodein.provider
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.spyk
@@ -102,7 +103,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
         private const val userLogin: UserLogin = "userLogin"
 
-        private val faqDefinition = FaqDefinition(faqId, intentId, i18nId, tagList, true, now, now)
+        private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
 
         val applicationDefinition = ApplicationDefinition("my App", namespace = namespace)
         val storyId = "storyId".toId<StoryDefinitionConfiguration>()
@@ -324,7 +325,8 @@ class FaqAdminServiceTest : AbstractTest() {
             @Test
             fun `GIVEN save faq WHEN and saving the same story THEN update the story`() {
                 val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
-                val savedFaqDefinition = FaqDefinition(faqId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
+                val savedFaqDefinition =
+                    FaqDefinition(faqId, applicationId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                 every {
                     faqAdminService["createOrUpdateIntent"](
@@ -345,6 +347,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 every {
                     faqAdminService["prepareCreationOrUpdatingFaqDefinition"](
                         allAny<FaqDefinitionRequest>(),
+                        allAny<ApplicationDefinition>(),
                         allAny<IntentDefinition>(),
                         allAny<I18nLabel>(),
                         allAny<FaqDefinition>()
@@ -438,5 +441,126 @@ class FaqAdminServiceTest : AbstractTest() {
         }
     }
 
+    @Nested
+    inner class FaqWithIntentNameTest {
 
+        private val newFaqQuery = FaqDefinitionRequest(
+            null,
+            null,
+            Locale.FRENCH,
+            applicationId,
+            now,
+            now,
+            "NEW FAQ TITLE",
+            "NEW FAQ DESCRIPTION",
+            listOf("NEW FAQ QUESTION"),
+            emptyList(),
+            "NEW FAQ ANSWER",
+            true,
+            intentName = "new_faq_intent"
+        )
+
+        private val existingFaqQuery = newFaqQuery.copy(
+            id = "myFaq",
+            intentName = null
+        )
+
+        private val newIntentDefinition = IntentDefinition(
+            name = "myIntentName",
+            namespace = namespace,
+            applications = setOf(applicationId),
+            label = "my Intent Label",
+            description = "my Intent Description",
+            category = "faq",
+            entities = emptySet()
+        )
+
+        private val existingIntentDefinition = newIntentDefinition.copy(
+            _id = "myIntent".toId<IntentDefinition>(),
+        )
+
+        private val newFaqDefinition = FaqDefinition(
+            applicationId = applicationId,
+            intentId = "myIntent".toId<IntentDefinition>(),
+            i18nId = "myI18n".toId<I18nLabel>(),
+            tags = emptyList(),
+            enabled = true,
+            creationDate = Instant.now(),
+            updateDate = Instant.now(),
+        )
+
+        private val existingFaqDefinition = newFaqDefinition.copy(
+            _id = "myFaq".toId<FaqDefinition>()
+        )
+
+        @Test
+        fun `GIVEN create faq WHEN intent name is null THEN Throw IllegalArgumentException`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            assertThrows<BadRequestException>() {
+                faqAdminService.saveFAQ(
+                    newFaqQuery.copy(id = null, intentName = null),
+                    userLogin,
+                    applicationDefinition
+                )
+            }
+        }
+
+        @Test
+        fun `GIVEN create faq WHEN intent name is not null THEN Throw IllegalArgumentException`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            initMock(faqAdminService)
+
+            faqAdminService.saveFAQ(newFaqQuery, userLogin, applicationDefinition)
+
+            verify(exactly = 1) { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
+            verify(exactly = 0) { faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>()) }
+        }
+
+        @Test
+        fun `GIVEN update faq WHEN intent name is null THEN save`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            initMock(faqAdminService)
+
+            faqAdminService.saveFAQ(existingFaqQuery, userLogin, applicationDefinition)
+
+            verify(exactly = 1) { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
+            verify(exactly = 1) { faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>()) }
+        }
+
+        private fun initMock(faqAdminService: FaqAdminService) {
+            every {
+                faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>())
+            } returns existingIntentDefinition
+
+            justRun {
+                faqAdminService["createOrUpdateUtterances"](
+                    any<FaqDefinitionRequest>(),
+                    any<Id<IntentDefinition>>(),
+                    any<UserLogin>()
+                )
+            }
+
+            every {
+                faqAdminService["manageI18nLabelUpdate"](
+                    any<FaqDefinitionRequest>(),
+                    any<String>(),
+                    any<FaqDefinition>()
+                )
+            } returns mockedI18n
+
+            every { faqDefinitionDAO.getFaqDefinitionByIntentId(any()) } returns existingFaqDefinition
+
+            justRun { faqDefinitionDAO.save(any()) }
+
+            justRun {
+                faqAdminService["createOrUpdateStory"](
+                    any<FaqDefinitionRequest>(),
+                    any<IntentDefinition>(),
+                    any<UserLogin>(),
+                    any<I18nLabel>(),
+                    any<ApplicationDefinition>()
+                )
+            }
+        }
+    }
 }

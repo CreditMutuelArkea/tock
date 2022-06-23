@@ -35,12 +35,12 @@ export class NlpCoreConfig implements CoreConfig {
   /** url to answer to sentence if it exists */
   answerToSentenceUrl: string;
   /** url map for each default rights */
-  roleMap: Map<UserRole, string> = new Map([
-    [UserRole.nlpUser, "/nlp"],
-    [UserRole.faqNlpUser, "/faq/train"],
-    [UserRole.faqBotUser, "/faq/qa"],
-    [UserRole.admin, "/configuration"],
-    [UserRole.technicalAdmin, "/configuration"],
+  roleMap: Map<UserRole, string[]> = new Map([
+    [UserRole.nlpUser, ["/nlp"]],
+    [UserRole.faqNlpUser, ["/faq/train"]],
+    [UserRole.faqBotUser, ["/faq/qa"]],
+    [UserRole.admin, ["/configuration"]],
+    [UserRole.technicalAdmin, ["/configuration"]],
   ]);
 
 }

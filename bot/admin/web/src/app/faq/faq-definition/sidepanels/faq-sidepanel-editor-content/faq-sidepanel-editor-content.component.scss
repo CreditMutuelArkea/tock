@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@import  '../../../common/_colors.scss';
+@import '../../../common/_colors.scss';
 @import '~@nebular/theme/styles/theming';
 @import '~@nebular/theme/styles/themes';
 
@@ -69,7 +69,8 @@ nb-tag-list {
   }
 }
 
-@include nb-install-component { /* Nebular theme dependent classes */
+@include nb-install-component {
+  /* Nebular theme dependent classes */
 
   /* A distinctive style for critical field */
   .tock-activate-field {

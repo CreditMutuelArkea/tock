@@ -38,6 +38,7 @@ import {
   NbContextMenuModule,
   NbDatepickerModule,
   NbDialogModule,
+  NbFormFieldModule,
   NbInputModule,
   NbListModule,
   NbMenuModule,
@@ -70,8 +71,12 @@ import {FaqGridComponent} from "./faq-definition/faq-grid/faq-grid.component";
 import {FaqGridItemComponent} from "./faq-definition/faq-grid-item/faq-grid-item.component";
 import {FaqDefinitionService} from "./common/faq-definition.service";
 import {InviewSidepanelComponent} from './common/components/inview-sidepanel/inview-sidepanel.component';
-import {FaqSidepanelImportContentComponent} from "./faq-definition/sidepanels/faq-sidepanel-import-content/faq-sidepanel-import-content.component";
-import {FaqSidepanelEditorContentComponent} from "./faq-definition/sidepanels/faq-sidepanel-editor-content/faq-sidepanel-editor-content.component";
+import {
+  FaqSidepanelImportContentComponent
+} from "./faq-definition/sidepanels/faq-sidepanel-import-content/faq-sidepanel-import-content.component";
+import {
+  FaqSidepanelEditorContentComponent
+} from "./faq-definition/sidepanels/faq-sidepanel-editor-content/faq-sidepanel-editor-content.component";
 import {ReactiveFormsModule} from "@angular/forms";
 import {EditUtteranceComponent} from './common/components/edit-utterance/edit-utterance.component';
 import {FaqDefinitionSidepanelEditorService} from "./faq-definition/sidepanels/faq-definition-sidepanel-editor.service";
@@ -138,7 +143,8 @@ export class FaqRoutingModule {
     BotAnalyticsModule,
     ReactiveFormsModule,
     NbTagModule,
-    NbAlertModule
+    NbAlertModule,
+    NbFormFieldModule
   ],
   declarations: [
     TrainComponent,

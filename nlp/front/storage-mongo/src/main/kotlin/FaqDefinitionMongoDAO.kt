@@ -17,6 +17,7 @@
 package ai.tock.nlp.front.storage.mongo
 
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
@@ -77,6 +78,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
         val c = MongoFrontConfiguration.database.getCollection<FaqDefinition>().apply {
             ensureUniqueIndex(
+                FaqDefinition::applicationId,
                 FaqDefinition::intentId,
                 FaqDefinition::i18nId,
                 FaqDefinition::tags,
@@ -98,8 +100,16 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.deleteOneById(id)
     }
 
+    override fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>) {
+        col.deleteMany(FaqDefinition::applicationId eq id)
+    }
+
     override fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition? {
         return col.findOneById(id)
+    }
+
+    override fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition> {
+        return col.find(FaqDefinition::applicationId eq id).into(ArrayList())
     }
 
     override fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition? {
@@ -126,6 +136,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.replaceOneWithFilter(
             and(
                 FaqDefinition::_id eq faqDefinition._id,
+                FaqDefinition::applicationId eq faqDefinition.applicationId,
                 FaqDefinition::intentId eq faqDefinition.intentId,
                 FaqDefinition::i18nId eq faqDefinition.i18nId,
             ),

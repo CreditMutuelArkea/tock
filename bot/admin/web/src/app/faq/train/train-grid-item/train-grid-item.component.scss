@@ -15,34 +15,39 @@
  */
 
 @import '../../common/_base_faq.scss';
-@include faq-item-style(); /* Better button hover style */
 
 /* Fix card overflow */
-nb-card,nb-card-body {
-  overflow-x: hidden;
-}
+nb-card,
+nb-card-body {
+  @include faq-item-style(); /* Better button hover style */
 
-.tock-select-faq > nb-select {
-  width: 280px;
-}
-
-.tock-option-label {
-  display: inline-block;
-  width: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-nb-card {
-  transition: opacity .5s ease;
-  opacity: 1;
-
-  &.tock--hidden {
-    display: none;
+  /* Fix card overflow */
+  nb-card, nb-card-body {
+    overflow-x: hidden;
   }
 
-  &.tock--closed {
-    opacity: .8;
+  .tock-select-faq > nb-select {
+    width: 280px;
+  }
+
+  .tock-option-label {
+    display: inline-block;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  nb-card {
+    transition: opacity 0.5s ease;
+    opacity: 1;
+
+    &.tock--hidden {
+      display: none;
+    }
+
+    &.tock--closed {
+      opacity: 0.8;
+    }
   }
 }

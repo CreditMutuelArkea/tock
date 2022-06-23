@@ -17,21 +17,30 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {Router} from '@angular/router';
 import {ReplaySubject, Subscription} from 'rxjs';
+import { NbToastrService } from '@nebular/theme';
 import {takeUntil} from "rxjs/operators";
 
-import {StateService} from 'src/app/core-nlp/state.service';
-import {isDockedOrSmall} from '../common/model/view-mode';
-import {DEFAULT_PANEL_NAME, WithSidePanel} from '../common/mixin/with-side-panel';
-import {blankFaqDefinition, FaqDefinition} from '../common/model/faq-definition';
-import {FaqGridComponent} from './faq-grid/faq-grid.component';
-import {truncate} from '../common/util/string-utils';
-import {DialogService} from 'src/app/core-nlp/dialog.service';
-import {FormProblems, InvalidFormProblems} from '../common/model/form-problems';
-import {FaqDefinitionSidepanelEditorService} from "./sidepanels/faq-definition-sidepanel-editor.service";
-import {Utterance} from '../common/model/utterance';
-import {BotConfigurationService} from '../../core/bot-configuration.service';
-import {BotApplicationConfiguration} from '../../core/model/configuration';
-import {FaqDefinitionFilter} from "../common/model/faq-definition-filter";
+import { StateService } from 'src/app/core-nlp/state.service';
+import { DEFAULT_PANEL_NAME, WithSidePanel } from '../common/mixin/with-side-panel';
+import { FaqGridComponent } from './faq-grid/faq-grid.component';
+import { FaqDefinitionFilter } from '../common/model/faq-definition-filter';
+import { truncate } from '../common/util/string-utils';
+import { DialogService } from 'src/app/core-nlp/dialog.service';
+import { FaqDefinitionSidepanelEditorService } from './sidepanels/faq-definition-sidepanel-editor.service';
+import { BotConfigurationService } from '../../core/bot-configuration.service';
+import { BotApplicationConfiguration } from '../../core/model/configuration';
+import { UserRole } from 'src/app/model/auth';
+import { ConfirmDialogComponent } from 'src/app/shared-nlp/confirm-dialog/confirm-dialog.component';
+import { FaqDefinitionService } from '../common/faq-definition.service';
+import {
+  blankFaqDefinition,
+  FaqDefinition,
+  FormProblems,
+  InvalidFormProblems,
+  isDockedOrSmall,
+  Settings,
+  Utterance
+} from '../common/model';
 
 // Specific action payload
 export type EditorTabName = 'Info' | 'Answer' | 'Question';
@@ -58,17 +67,30 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
 
   subscriptions = new Subscription();
 
+  isSubmittedSettings = false;
+  settings: Settings = {
+    enableSatisfactionAsk: false,
+    story: null
+  };
+
   public filter: FaqDefinitionFilter;
+
   @ViewChild(FaqGridComponent) grid;
 
   private readonly destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
+
+  get isAuthorized(): boolean {
+    return this.state.hasRole(UserRole.faqBotUser);
+  }
 
   constructor(
     private readonly state: StateService,
     private readonly sidepanelEditorService: FaqDefinitionSidepanelEditorService,
     private readonly dialog: DialogService,
     private readonly botConfiguration: BotConfigurationService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly qaService: FaqDefinitionService,
+    private readonly toastrService: NbToastrService
   ) {
     super();
 
@@ -82,18 +104,18 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
 
     this.state.currentApplicationEmitter // when bot switch
       .pipe(takeUntil(this.destroy$))
-      .subscribe(a => {
+      .subscribe((a) => {
         this.currentItem = undefined;
         this.clearFilter();
         this.undock();
       });
 
-      if(this.initUtterance){
-        this.openNewSidepanel(this.initUtterance);
-      }
+    if (this.initUtterance) {
+      this.openNewSidepanel(this.initUtterance);
+    }
 
     this.subscriptions.add(
-      this.botConfiguration.configurations.subscribe(confs => {
+      this.botConfiguration.configurations.subscribe((confs) => {
         this.configurations = confs;
       })
     );
@@ -112,7 +134,7 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
       search: null,
       tags: [],
       clone: function () {
-        return {...this};
+        return { ...this };
       }
     };
   }
@@ -124,13 +146,13 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
   }
 
   openImportSidepanel(): void {
-    this.dock("import");
+    this.dock('import');
   }
 
   edit(fq: FaqDefinition): void {
     this.editorPanelName = 'Edit FAQ';
     this.currentItem = fq;
-    this.dock("edit");
+    this.dock('edit');
   }
 
   dock(name = DEFAULT_PANEL_NAME): void {
@@ -146,31 +168,34 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
   }
 
   onEditorValidityChanged(report: FormProblems): void {
-    window.setTimeout(() => { // ExpressionChangedAfterItHasBeenCheckedError workaround
+    window.setTimeout(() => {
+      // ExpressionChangedAfterItHasBeenCheckedError workaround
       // enable/disable 'save' button
       this.editorFormValid = report.formValid;
 
       // extract error labels
-      this.editorFormWarnings = report.formValid ? [] : (<InvalidFormProblems>report).items.map(item => {
-        return item.errorLabel;
-      });
+      this.editorFormWarnings = report.formValid
+        ? []
+        : (<InvalidFormProblems>report).items.map((item) => {
+            return item.errorLabel;
+          });
     }, 0);
   }
 
-  openNewSidepanel(initUtterance?:Utterance) {
+  openNewSidepanel(initUtterance?: Utterance) {
     const currentLocale = this.state.currentLocale;
     const applicationId = this.state.currentApplication._id;
 
     this.editorPanelName = 'New FAQ';
-    this.currentItem = blankFaqDefinition({applicationId, language: currentLocale});
+    this.currentItem = blankFaqDefinition({ applicationId, language: currentLocale });
     this.activeQaTab = 'Info';
 
-    if(initUtterance) {
+    if (initUtterance) {
       this.currentItem.utterances = [initUtterance];
       this.activeQaTab = 'Question';
     }
 
-    this.dock("edit");
+    this.dock('edit');
   }
 
   activateEditorTab(tabName: EditorTabName): void {
@@ -181,8 +206,7 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
     const fq = await this.sidepanelEditorService.save(this.destroy$);
     this.currentItem = fq;
 
-    this.dialog.notify(`Saved`,
-      truncate(fq.title || ''), {duration: 2000, status: "basic"});
+    this.dialog.notify(`Saved`, truncate(fq.title || ''), { duration: 2000, status: 'basic' });
 
     this.grid.refresh();
   }
@@ -191,4 +215,57 @@ export class FaqDefinitionComponent extends WithSidePanel() implements OnInit, O
     return isDockedOrSmall(this.viewMode);
   }
 
+  openSettings(): void {
+    this.isSubmittedSettings = false;
+    this.dock('settings');
+  }
+
+  setSettings(settings: Settings): void {
+    this.settings = settings;
+  }
+
+  handleSaveSettings(): void {
+    if (!this.settings.enableSatisfactionAsk) {
+      const validAction = 'yes';
+      const dialogRef = this.dialog.openDialog(ConfirmDialogComponent, {
+        context: {
+          title: `Disable satisfaction`,
+          subtitle: 'This will disable the satisfaction question for all FAQs. Do you confirm ?',
+          action: validAction
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result === validAction) {
+          this.saveSettings();
+        }
+      });
+    } else {
+      this.saveSettings();
+    }
+  }
+
+  saveSettings(): void {
+    this.isSubmittedSettings = true;
+
+    if (
+      (this.settings.enableSatisfactionAsk && this.settings.story) ||
+      !this.settings.enableSatisfactionAsk
+    ) {
+      this.qaService.saveSettings(this.settings, this.destroy$).subscribe({
+        next: () => {
+          this.toastrService.success(`Settings successfully updated`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+          this.undock();
+        },
+        error: () => {
+          this.toastrService.danger(`Failed to update settings`, 'Error', {
+            duration: 5000,
+            status: 'danger'
+          });
+        }
+      });
+    }
+  }
 }

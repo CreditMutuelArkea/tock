@@ -14,98 +14,107 @@
   ~ limitations under the License.
   -->
 
-  <nb-card class="overflow-hidden mb-2" [ngClass]="cardCssClass">
-    <nb-card-body>
-      <div class="row align-items-center">
-        <div class="col-lg-auto mt-2 mb-2">
-          <nb-checkbox
-            [checked]="isSelected()"
-            (checkedChange)="toggle()"
-          ></nb-checkbox>
-        </div>
-        <div class="col mt-2 mb-2">
-          <small class="text-muted d-block">
-            {{sentence.creationDate | amDateFormat: 'MM/DD HH:mm' }}
-          </small>
-          {{sentence.text}}
-        </div>
+<nb-card
+  class="overflow-hidden mb-2"
+  [ngClass]="cardCssClass"
+>
+  <nb-card-body>
+    <div class="row align-items-center">
+      <div class="col-lg-auto mt-2 mb-2">
+        <nb-checkbox
+          [checked]="isSelected()"
+          (checkedChange)="toggle()"
+        ></nb-checkbox>
+      </div>
+      <div class="col mt-2 mb-2">
+        <small class="text-muted d-block">
+          {{ sentence.creationDate | amDateFormat: 'MM/DD HH:mm' }}
+        </small>
+        {{ sentence.text }}
+      </div>
 
-        <div class="col-lg-auto mt-2 mb-2">
-          <div class="d-flex align-items-center tock-select-faq">
-            <span>FAQ</span>
-            <nb-select
-              class="ml-2 mr-2"
-              placeholder="{{ selectedIntent.placeholder }}"
-              [(ngModel)]="selectedIntentId"
-              (selectedChange)="changeIntent($event)"
+      <div class="col-lg-auto mt-2 mb-2">
+        <div class="d-flex align-items-center tock-select-faq">
+          <span>FAQ</span>
+          <nb-select
+            class="ml-2 mr-2"
+            placeholder="{{ selectedIntent.placeholder }}"
+            [(ngModel)]="selectedIntentId"
+            (selectedChange)="changeIntent($event)"
+          >
+            <nb-option
+              *ngFor="let intent of intents"
+              value="{{ intent._id }}"
             >
-              <nb-option *ngFor="let intent of intents" value="{{ intent._id }}">
-                <span class="tock-option-label" title="{{ intent.intentLabel() }}">
-                  {{ intent.intentLabel() }}
-                </span>
-              </nb-option>
-            </nb-select>
-            <span nbTooltip="Detection probability" class="mr-2">{{ selectedIntent.probability }}%</span>
-            <button
-              *ngIf="state.hasRole(UserRole.botUser)"
-              nbButton
-              nbTooltip="Create new FAQ"
-              ghost
-              status="secondary"
-              class="tock--subtle-hover text-muted"
-              (click)="redirectToFaqManagement()"
-            >
-              <nb-icon icon="plus-circle-outline"></nb-icon>
-            </button>
-          </div>
-        </div>
-
-        <div class="col-lg-auto mt-2 mb-2">
-          <button
-            nbButton
-            nbTooltip="Validate"
-            class="tock--success tock--subtle-hover"
-            ghost
-            status="secondary"
-            (click)="validate()"
+              <span
+                class="tock-option-label"
+                title="{{ intent.intentLabel() }}"
+              >
+                {{ intent.intentLabel() }}
+              </span>
+            </nb-option>
+          </nb-select>
+          <span
+            nbTooltip="Detection probability"
+            class="mr-2"
+            >{{ selectedIntent.probability }}%</span
           >
-            <nb-icon icon="checkmark-circle-2"></nb-icon>
-          </button>
-
           <button
+            *ngIf="state.hasRole(UserRole.botUser)"
             nbButton
-            nbTooltip="Unknown"
-            class="tock--danger tock--subtle-hover"
+            nbTooltip="Create new FAQ"
             ghost
-            status="secondary"
-            (click)="unknown()"
+            shape="round"
+            (click)="redirectToFaqManagement()"
           >
-            <nb-icon icon="close-circle-outline"></nb-icon>
+            <nb-icon icon="plus-circle-outline"></nb-icon>
           </button>
-
-          <button
-            nbButton
-            nbTooltip="Delete"
-            class="tock--subtle-hover text-muted"
-            ghost
-            status="secondary"
-            (click)="remove()"
-          >
-            <nb-icon icon="trash-2-outline"></nb-icon>
-          </button>
-
-          <button
-            nbButton
-            nbTooltip="Details"
-            class="tock--subtle-hover text-muted"
-            ghost
-            status="secondary"
-            (click)="details()"
-          >
-            <nb-icon icon="message-circle-outline"></nb-icon>
-          </button>
-
         </div>
       </div>
-    </nb-card-body>
-  </nb-card>
+
+      <div class="col-lg-auto mt-2 mb-2">
+        <button
+          nbButton
+          nbTooltip="Validate"
+          class="tock--success"
+          ghost
+          shape="round"
+          (click)="validate()"
+        >
+          <nb-icon icon="checkmark-circle-2"></nb-icon>
+        </button>
+
+        <button
+          nbButton
+          nbTooltip="Unknown"
+          class="tock--danger"
+          ghost
+          shape="round"
+          (click)="unknown()"
+        >
+          <nb-icon icon="close-circle-outline"></nb-icon>
+        </button>
+
+        <button
+          nbButton
+          nbTooltip="Delete"
+          ghost
+          shape="round"
+          (click)="remove()"
+        >
+          <nb-icon icon="trash-2-outline"></nb-icon>
+        </button>
+
+        <button
+          nbButton
+          nbTooltip="Details"
+          ghost
+          shape="round"
+          (click)="details()"
+        >
+          <nb-icon icon="message-circle-outline"></nb-icon>
+        </button>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>

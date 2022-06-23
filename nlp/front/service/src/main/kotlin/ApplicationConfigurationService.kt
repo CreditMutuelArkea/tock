@@ -90,10 +90,9 @@ object ApplicationConfigurationService :
         sentenceDAO.deleteSentencesByApplicationId(id)
         val app = applicationDAO.getApplicationById(id)!!
         intentDAO.getIntentsByApplicationId(id).forEach { intent ->
-            faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
-                .let { faqDefinitionDAO.deleteFaqDefinitionById(it!!._id) }
             removeIntentFromApplication(app, intent._id)
         }
+        faqDefinitionDAO.deleteFaqDefinitionByApplicationId(id)
         applicationDAO.deleteApplicationById(id)
     }
 
@@ -315,4 +314,10 @@ object ApplicationConfigurationService :
 
     override fun isEntityTypeObfuscated(name: String): Boolean =
         ConfigurationRepository.entityTypeByName(name)?.obfuscated ?: true
+
+    override fun getFaqsDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
+            = faqDefinitionDAO.getFaqDefinitionByApplicationId(id)
+
+    override fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition?
+            = faqDefinitionDAO.getFaqDefinitionByIntentId(id)
 }

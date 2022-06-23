@@ -49,8 +49,8 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     private val intentDefinitionDao: IntentDefinitionDAO get() = injector.provide()
     private val classifiedSentencesDao: ClassifiedSentenceDAO get() = injector.provide()
 
-    private val applicationId = "applicationId".toId<ApplicationDefinition>()
-
+    private val applicationId = "idApplication".toId<ApplicationDefinition>()
+    private val applicationId2 = "idApplication2".toId<ApplicationDefinition>()
     private val intentId = "idIntent".toId<IntentDefinition>()
     private val intentId2 = "idIntent2".toId<IntentDefinition>()
     private val intentId3 = "idIntent3".toId<IntentDefinition>()
@@ -58,16 +58,18 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     private val faqId = "faqDefId".toId<FaqDefinition>()
     private val faqId2 = "faqDefId2".toId<FaqDefinition>()
     private val faqId3 = "faqDefId3".toId<FaqDefinition>()
-
     private val i18nId = "idI18n".toId<I18nLabel>()
     private val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
     private val tagList = listOf("TAG1", "TAG2")
+
+    private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
+    private val faq2Definition = FaqDefinition(faqId2, applicationId, intentId2, i18nId, tagList, true, now, now)
+    private val faq3Definition = FaqDefinition(faqId3, applicationId2, intentId, i18nId, tagList, true, now, now)
 
     private val namespace = "namespace"
     private val faq_category = "faq"
     private val userLogin: UserLogin = "whateverLogin"
 
-    private val faqDefinition = FaqDefinition(faqId, intentId, i18nId, tagList, true, now, now)
     private val col: MongoCollection<FaqDefinition> by lazy { FaqDefinitionMongoDAO.col }
 
     override fun moreBindingModules(): Kodein.Module {
@@ -94,6 +96,11 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         faqDefinitionDao.save(faqDefinition)
         assertEquals(
             expected = faqDefinition,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId)?.first(),
+            message = "There should be something returned with an applicationId"
+        )
+        assertEquals(
+            expected = faqDefinition,
             actual = faqDefinitionDao.getFaqDefinitionByIntentId(intentId),
             message = "There should be something returned with an intentId"
         )
@@ -113,6 +120,26 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
             message = "There should be something returned with tags"
         )
         assertEquals(1, col.countDocuments())
+    }
+
+    @Test
+    fun `Get a FaqDefinition by application ID`() {
+        faqDefinitionDao.save(faqDefinition)
+        faqDefinitionDao.save(faq2Definition)
+        faqDefinitionDao.save(faq3Definition)
+
+        assertEquals(3, col.countDocuments())
+
+        assertEquals(
+            expected = 2,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId)?.size,
+            message = "There should be something returned with an applicationId"
+        )
+        assertEquals(
+            expected = 1,
+            actual = faqDefinitionDao.getFaqDefinitionByApplicationId(applicationId2)?.size,
+            message = "There should be something returned with an applicationId"
+        )
     }
 
     @Test
@@ -144,7 +171,7 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `FaqDefinition search filtered by tag`() {
+    fun `Get a faqDefinition search filtered by tag`() {
         //prepare a Faq save
         faqDefinitionDao.save(faqDefinition)
 
@@ -153,7 +180,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList2 = listOf("TAG1")
 
         val otherFaqDefinition =
-            FaqDefinition(faqId2, intentId2, i18nId2, tagList2, true, now.plusSeconds(1), now.plusSeconds(1))
+            FaqDefinition(
+                faqId2,
+                applicationId,
+                intentId2,
+                i18nId2,
+                tagList2,
+                true,
+                now.plusSeconds(1),
+                now.plusSeconds(1)
+            )
         faqDefinitionDao.save(otherFaqDefinition)
 
         //some another faq
@@ -161,7 +197,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList3 = listOf("TAG2")
 
         val someOtherFaqDefinition =
-            FaqDefinition(faqId3, intentId3, i18nId3, tagList3, true, now.plusSeconds(2), now.plusSeconds(2))
+            FaqDefinition(
+                faqId3,
+                applicationId,
+                intentId3,
+                i18nId3,
+                tagList3,
+                true,
+                now.plusSeconds(2),
+                now.plusSeconds(2)
+            )
         faqDefinitionDao.save(someOtherFaqDefinition)
 
         assertEquals(
@@ -169,6 +214,25 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
             actual = faqDefinitionDao.getFaqDefinitionByTags(setOf("TAG1")).size,
             message = "There should be something returned with tags"
         )
+    }
+
+    @Test
+    fun `Delete faq by application id`() {
+        val appId1: Id<ApplicationDefinition> = "appID1".toId()
+        val appId2: Id<ApplicationDefinition> = "appID2".toId()
+
+        faqDefinitionDao.save(faqDefinition.copy(applicationId = appId1))
+        faqDefinitionDao.save(faq2Definition.copy(applicationId = appId1))
+        faqDefinitionDao.save(faq3Definition.copy(applicationId = appId2))
+
+        assertEquals(3, col.countDocuments())
+
+        assertEquals(2, faqDefinitionDao.getFaqDefinitionByApplicationId(appId1).size)
+
+        faqDefinitionDao.deleteFaqDefinitionByApplicationId(appId1)
+
+        assertEquals(0, faqDefinitionDao.getFaqDefinitionByApplicationId(appId1).size)
+        assertEquals(1, faqDefinitionDao.getFaqDefinitionByApplicationId(appId2).size)
     }
 
     @Test
@@ -192,7 +256,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val otherTagList = listOf("OTHERTAG")
 
         val secondFaqDefinition =
-            FaqDefinition(faqId3, intentId3, i18nId, otherTagList, true, now.plusSeconds(2), now.plusSeconds(2))
+            FaqDefinition(
+                faqId3,
+                applicationId,
+                intentId3,
+                i18nId,
+                otherTagList,
+                true,
+                now.plusSeconds(2),
+                now.plusSeconds(2)
+            )
 
         val secondIntentWithIntentId3 = IntentDefinition(
             "Faq name 2",
@@ -217,7 +290,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList2 = listOf("TAG1")
 
         val firstFaqDefinition =
-            FaqDefinition(faqId2, intentId2, i18nId2, tagList2, true, now.plusSeconds(1), now.plusSeconds(1))
+            FaqDefinition(
+                faqId2,
+                applicationId,
+                intentId2,
+                i18nId2,
+                tagList2,
+                true,
+                now.plusSeconds(1),
+                now.plusSeconds(1)
+            )
         val firstIntentWithIntentId2 = IntentDefinition(
             "FAQ name",
             namespace,
@@ -238,7 +320,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList3 = listOf("TAG2")
 
         val secondFaqDefinition =
-            FaqDefinition(faqId3, intentId3, i18nId3, tagList3, true, now.plusSeconds(2), now.plusSeconds(2))
+            FaqDefinition(
+                faqId3,
+                applicationId,
+                intentId3,
+                i18nId3,
+                tagList3,
+                true,
+                now.plusSeconds(2),
+                now.plusSeconds(2)
+            )
 
         val secondIntentWithIntentId3 = IntentDefinition(
             "FAQ name 2",
@@ -261,7 +352,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagListToDel = listOf("TAG2")
         // Faq Definition in deletion with build Worker schedule for example
         val inDeletionFaqDefinition =
-            FaqDefinition(faqId, intentIdtoDel, i18nIdToDel, tagListToDel, true, now.plusSeconds(3), now.plusSeconds(3))
+            FaqDefinition(
+                faqId,
+                applicationId,
+                intentIdtoDel,
+                i18nIdToDel,
+                tagListToDel,
+                true,
+                now.plusSeconds(3),
+                now.plusSeconds(3)
+            )
 
         val thirdIntentWithIntentId = IntentDefinition(
             "FAQ name in deletion",
@@ -316,7 +416,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList2 = listOf("TAG1")
 
         val firstFaqDefinition =
-            FaqDefinition(faqId2, intentId2, i18nId2, tagList2, true, now.plusSeconds(1), now.plusSeconds(1))
+            FaqDefinition(
+                faqId2,
+                applicationId,
+                intentId2,
+                i18nId2,
+                tagList2,
+                true,
+                now.plusSeconds(1),
+                now.plusSeconds(1)
+            )
         val firstIntentWithIntentId2 = IntentDefinition(
             "FAQ name",
             namespace,
@@ -337,7 +446,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagList3 = listOf("TAG2")
 
         val secondFaqDefinition =
-            FaqDefinition(faqId3, intentId3, i18nId3, tagList3, true, now.plusSeconds(2), now.plusSeconds(2))
+            FaqDefinition(
+                faqId3,
+                applicationId,
+                intentId3,
+                i18nId3,
+                tagList3,
+                true,
+                now.plusSeconds(2),
+                now.plusSeconds(2)
+            )
 
         val secondIntentWithIntentId3 = IntentDefinition(
             faqName2,
@@ -360,7 +478,16 @@ class FaqDefinitionMongoDAOTest : AbstractTest() {
         val tagListToDel = listOf("TAG2")
         // Faq Definition in deletion with build Worker schedule for example
         val inDeletionFaqDefinition =
-            FaqDefinition(faqId, intentIdtoDel, i18nIdToDel, tagListToDel, true, now.plusSeconds(3), now.plusSeconds(3))
+            FaqDefinition(
+                faqId,
+                applicationId,
+                intentIdtoDel,
+                i18nIdToDel,
+                tagListToDel,
+                true,
+                now.plusSeconds(3),
+                now.plusSeconds(3)
+            )
 
         val thirdIntentWithIntentId = IntentDefinition(
             "FAQ name in deletion",

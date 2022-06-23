@@ -14,130 +14,127 @@
   ~ limitations under the License.
   -->
 
-  <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
-      <h5 class="h5">FAQ Content Management</h5>
-      <!-- NOT YET IMPLEMENTED-->
-      <!-- <button class="mr-2" nbButton status="basic">Export FAQ</button>-->
-      <!-- <button (click)="importFaq()" class="mr-2" nbButton status="basic">Import FAQ</button>-->
-      <button (click)="openNewSidepanel()" nbButton status="primary">New FAQ</button>
-  </div>
+<div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
+  <h5 class="h5">FAQ Content Management</h5>
+  <button (click)="openNewSidepanel()" nbButton status="primary">New FAQ</button>
+</div>
 
-  <nb-alert
-    *ngIf="configurations?.length === 0"
-    class="flex-row align-items-center"
-    accent="warning"
-  >
-    <nb-icon
-      class="mr-1"
-      icon="alert-triangle-outline"
-      status="warning"
-    ></nb-icon>
-    No bot configuration detected
-  </nb-alert>
+<nb-alert
+  *ngIf="configurations?.length === 0"
+  accent="warning"
+  class="flex-row align-items-center"
+>
+  <nb-icon
+    class="mr-1"
+    icon="alert-triangle-outline"
+    status="warning"
+  ></nb-icon>
+  No bot configuration detected
+</nb-alert>
 
-  <div *ngIf="configurations?.length">
+<div *ngIf="configurations?.length">
 
-    <!-- SEARCH BAR -->
-    <tock-qa-header [ngClass]="{ 'tock--docked': isDocked(), 'tock-header': true }"
-                    [viewMode]="viewMode"
-                    [filter]="filter"
-                    (onSearch)="search($event)"
-                    (onNew)="openNewSidepanel()"
-                    (onImport)="openImportSidepanel()">
-    </tock-qa-header>
+  <!-- SEARCH BAR -->
+  <tock-qa-header (onImport)="openImportSidepanel()"
+                  (onNew)="openNewSidepanel()"
+                  (onSearch)="search($event)"
+                  [filter]="filter"
+                  [ngClass]="{ 'tock--docked': isDocked(), 'tock-header': true }"
+                  [viewMode]="viewMode">
+  </tock-qa-header>
 
-    <!-- VIEWPORT -->
-    <div class="tock-viewport d-flex justify-content-between w-100"
-        [ngClass]="isDocked() ? 'tock--docked' : 'tock--undocked'">
+  <!-- VIEWPORT -->
+  <div [ngClass]="isDocked() ? 'tock--docked' : 'tock--undocked'"
+       class="tock-viewport d-flex justify-content-between w-100">
 
-      <!-- GRID -->
-      <tock-faq-grid [ngClass]="'tock-grid'" (onEdit)="edit($event)" [viewMode]="viewMode" [filter]="filter">
-      </tock-faq-grid>
+    <!-- GRID -->
+    <tock-faq-grid (onEdit)="edit($event)" [filter]="filter" [ngClass]="'tock-grid'" [viewMode]="viewMode">
+    </tock-faq-grid>
 
-      <!-- SIDE PANEL IMPORT -->
-      <tock-inview-sidepanel *ngIf="isPanelDocked('import')"
-                            [ngClass]="'tock-sidepanel'"
-                            [isContentHeader]="false"
-                            (onClose)="undock()">
-        <div tock-header>
-          <h5>Import FAQ</h5>
-        </div>
-        <tock-qa-sidepanel-import-content tock-content></tock-qa-sidepanel-import-content>
+    <!-- SIDE PANEL IMPORT -->
+    <tock-inview-sidepanel (onClose)="undock()"
+                           *ngIf="isPanelDocked('import')"
+                           [isContentHeader]="false"
+                           [ngClass]="'tock-sidepanel'">
+      <div tock-header>
+        <h5>Import FAQ</h5>
+      </div>
+      <tock-qa-sidepanel-import-content tock-content></tock-qa-sidepanel-import-content>
 
-        <ng-container tock-footer>
-          <button nbButton outline status="primary" size="small" (click)="undock()">
-            Cancel
-          </button>
-          <button class="float-right" nbButton status="primary" size="small">
-            Start
-          </button>
-        </ng-container>
-      </tock-inview-sidepanel>
+      <ng-container tock-footer>
+        <button (click)="undock()" nbButton outline size="small" status="primary">
+          Cancel
+        </button>
+        <button class="float-right" nbButton size="small" status="primary">
+          Start
+        </button>
+      </ng-container>
+    </tock-inview-sidepanel>
 
 
-      <!-- SIDE PANEL EDIT -->
-      <tock-inview-sidepanel *ngIf="isPanelDocked('edit')"
-                            [ngClass]="'tock-sidepanel'"
-                            [isContentHeader]="true"
-                            (onClose)="undock()">
-        <div tock-header>
-          <h5>{{editorPanelName || 'QA Editor'}}</h5>
-        </div>
+    <!-- SIDE PANEL EDIT -->
+    <tock-inview-sidepanel (onClose)="undock()"
+                           *ngIf="isPanelDocked('edit')"
+                           [isContentHeader]="true"
+                           [ngClass]="'tock-sidepanel'">
+      <div tock-header>
+        <h5>{{editorPanelName || 'QA Editor'}}</h5>
+      </div>
 
-        <ng-container tock-contentheader>
-          <span class="tock-tab" [ngClass]="{'tock--active': activeQaTab === 'Info'}"
-                (click)="activateEditorTab('Info')">
+      <ng-container tock-contentheader>
+          <span (click)="activateEditorTab('Info')" [ngClass]="{'tock--active': activeQaTab === 'Info'}"
+                class="tock-tab">
             Info
           </span>
-          <span class="tock-tab" [ngClass]="{'tock--active': activeQaTab === 'Question'}"
-                (click)="activateEditorTab('Question')">
+        <span (click)="activateEditorTab('Question')" [ngClass]="{'tock--active': activeQaTab === 'Question'}"
+              class="tock-tab">
             Question
           </span>
-          <span class="tock-tab" [ngClass]="{'tock--active': activeQaTab === 'Answer'}"
-                (click)="activateEditorTab('Answer')">
+        <span (click)="activateEditorTab('Answer')" [ngClass]="{'tock--active': activeQaTab === 'Answer'}"
+              class="tock-tab">
             Answer
           </span>
 
-          <div *ngIf="editorFormWarnings.length > 0"
-              [nbPopover]="editorwarnings"
-              nbPopoverTrigger="hint"
-              nbPopoverPlacement="bottom"
-              class="tock-form-problems float-right">
-            <nb-icon icon="alert-triangle-outline"></nb-icon>
+        <div *ngIf="editorFormWarnings.length > 0"
+             [nbPopover]="editorwarnings"
+             class="tock-form-problems float-right"
+             nbPopoverPlacement="bottom"
+             nbPopoverTrigger="hint">
+          <nb-icon icon="alert-triangle-outline"></nb-icon>
 
-            {{editorFormWarnings.length}}
-          </div>
-        </ng-container>
+          {{editorFormWarnings.length}}
+        </div>
+      </ng-container>
 
-        <tock-qa-sidepanel-editor-content tock-content
-                                        (validityChanged)="onEditorValidityChanged($event)"
+      <tock-qa-sidepanel-editor-content (validityChanged)="onEditorValidityChanged($event)"
+                                        [fq]="currentItem"
                                         [tabName]="activeQaTab"
-                                        [fq]="currentItem">
-        </tock-qa-sidepanel-editor-content>
-        <ng-container tock-footer>
-          <button nbButton outline status="primary" size="small" (click)="undock()">
-            Cancel
-          </button>
-          <button [disabled]="!editorFormValid" class="float-right"
-                  (click)="save()"
-                  nbButton status="primary" size="small">
-            Save
-          </button>
-        </ng-container>
-      </tock-inview-sidepanel>
+                                        tock-content>
+      </tock-qa-sidepanel-editor-content>
+      <ng-container tock-footer>
+        <button (click)="undock()" nbButton outline size="small" status="primary">
+          Cancel
+        </button>
+        <button (click)="save()" [disabled]="!editorFormValid"
+                class="float-right"
+                nbButton size="small" status="primary">
+          Save
+        </button>
+      </ng-container>
+    </tock-inview-sidepanel>
 
-      <!-- TODO: SIDE PANEL EXPORT -->
-    </div>
-
+    <!-- TODO: SIDE PANEL EXPORT -->
   </div>
 
+</div>
 
-  <ng-template #editorwarnings>
-    <nb-card [ngClass]="'tock-editor-warns'" status="danger" [style]="{'margin-bottom': 0}">
-      <nb-list>
-        <nb-list-item *ngFor="let message of editorFormWarnings">
-          {{ message }}
-        </nb-list-item>
-      </nb-list>
-    </nb-card>
-  </ng-template>
+
+<ng-template #editorwarnings>
+  <nb-card [ngClass]="'tock-editor-warns'" [style]="{'margin-bottom': 0}" status="danger">
+    <nb-list>
+      <nb-list-item *ngFor="let message of editorFormWarnings">
+        {{ message }}
+      </nb-list-item>
+    </nb-list>
+  </nb-card>
+</ng-template>

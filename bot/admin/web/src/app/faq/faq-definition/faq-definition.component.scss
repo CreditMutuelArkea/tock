@@ -16,13 +16,14 @@
 
 @import  '../common/_colors.scss';
 @import  '../common/_sidepanel_layout.scss';
+@import '../common/_colors.scss';
+@import '../common/_sidepanel_layout.scss';
 @import '~@nebular/theme/styles/theming';
 @import '~@nebular/theme/styles/themes';
 
 @include faq-sidepanel-layout(400px); /* dock/undock side panels */
 
 @include nb-install-component {
-
   .tock-tab {
     background-color: nb-theme(color-primary-transparent-200);
     border-color: nb-theme(color-primary-500);
@@ -40,7 +41,6 @@
       color: nb-theme(background-basic-color-1);
     }
   }
-
 }
 
 .tock-form-problems {
@@ -60,3 +60,9 @@
   color: $faq-problembox-fg-color;
 }
 
+.header-actions {
+  display: grid;
+  grid-gap: 0.5rem;
+  grid-auto-flow: column;
+  justify-content: end;
+}
