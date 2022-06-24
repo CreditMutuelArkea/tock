@@ -19,6 +19,9 @@ internal class FaqDefinition_Serializer : StdSerializer<FaqDefinition>(FaqDefini
         gen.writeFieldName("_id")
         val __id_ = value._id
         serializers.defaultSerializeValue(__id_, gen)
+        gen.writeFieldName("applicationId")
+        val _applicationId_ = value.applicationId
+        serializers.defaultSerializeValue(_applicationId_, gen)
         gen.writeFieldName("intentId")
         val _intentId_ = value.intentId
         serializers.defaultSerializeValue(_intentId_, gen)

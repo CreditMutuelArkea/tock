@@ -28,6 +28,8 @@ internal class FaqDefinition_Deserializer : JsonDeserializer<FaqDefinition>(),
         with(p) {
             var __id_: Id<FaqDefinition>? = null
             var __id_set : Boolean = false
+            var _applicationId_: Id<ApplicationDefinition>? = null
+            var _applicationId_set : Boolean = false
             var _intentId_: Id<IntentDefinition>? = null
             var _intentId_set : Boolean = false
             var _i18nId_: Id<I18nLabel>? = null
@@ -54,6 +56,11 @@ internal class FaqDefinition_Deserializer : JsonDeserializer<FaqDefinition>(),
                             __id_ = if(_token_ == JsonToken.VALUE_NULL) null
                              else p.readValueAs(__id__reference);
                             __id_set = true
+                            }
+                    "applicationId" -> {
+                            _applicationId_ = if(_token_ == JsonToken.VALUE_NULL) null
+                             else p.readValueAs(_applicationId__reference);
+                            _applicationId_set = true
                             }
                     "intentId" -> {
                             _intentId_ = if(_token_ == JsonToken.VALUE_NULL) null
@@ -93,15 +100,18 @@ internal class FaqDefinition_Deserializer : JsonDeserializer<FaqDefinition>(),
                     } 
                 _token_ = currentToken
                         } 
-            return if(__id_set && _intentId_set && _i18nId_set && _tags_set && _enabled_set &&
-                    _creationDate_set && _updateDate_set)
-                    FaqDefinition(_id = __id_!!, intentId = _intentId_!!, i18nId = _i18nId_!!, tags
-                            = _tags_!!, enabled = _enabled_!!, creationDate = _creationDate_!!,
-                            updateDate = _updateDate_!!)
+            return if(__id_set && _applicationId_set && _intentId_set && _i18nId_set && _tags_set &&
+                    _enabled_set && _creationDate_set && _updateDate_set)
+                    FaqDefinition(_id = __id_!!, applicationId = _applicationId_!!, intentId =
+                            _intentId_!!, i18nId = _i18nId_!!, tags = _tags_!!, enabled =
+                            _enabled_!!, creationDate = _creationDate_!!, updateDate =
+                            _updateDate_!!)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
                     if(__id_set)
                     map[parameters.getValue("_id")] = __id_
+                    if(_applicationId_set)
+                    map[parameters.getValue("applicationId")] = _applicationId_
                     if(_intentId_set)
                     map[parameters.getValue("intentId")] = _intentId_
                     if(_i18nId_set)
@@ -125,6 +135,7 @@ internal class FaqDefinition_Deserializer : JsonDeserializer<FaqDefinition>(),
 
         private val parameters: Map<String, KParameter> by lazy(LazyThreadSafetyMode.PUBLICATION) {
                 kotlin.collections.mapOf("_id" to primaryConstructor.findParameterByName("_id")!!,
+                "applicationId" to primaryConstructor.findParameterByName("applicationId")!!,
                 "intentId" to primaryConstructor.findParameterByName("intentId")!!, "i18nId" to
                 primaryConstructor.findParameterByName("i18nId")!!, "tags" to
                 primaryConstructor.findParameterByName("tags")!!, "enabled" to
@@ -134,6 +145,9 @@ internal class FaqDefinition_Deserializer : JsonDeserializer<FaqDefinition>(),
 
         private val __id__reference: TypeReference<Id<FaqDefinition>> = object :
                 TypeReference<Id<FaqDefinition>>() {}
+
+        private val _applicationId__reference: TypeReference<Id<ApplicationDefinition>> = object :
+                TypeReference<Id<ApplicationDefinition>>() {}
 
         private val _intentId__reference: TypeReference<Id<IntentDefinition>> = object :
                 TypeReference<Id<IntentDefinition>>() {}
