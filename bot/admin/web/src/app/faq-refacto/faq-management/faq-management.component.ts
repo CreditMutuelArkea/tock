@@ -81,20 +81,20 @@ export class FaqManagementComponent implements OnInit {
   }
 
   pagination: Pagination = {
-    pageStart: 0,
-    pageEnd: undefined,
-    pageSize: 10,
-    pageTotal: undefined
+    start: 0,
+    end: undefined,
+    size: 10,
+    total: undefined
   };
 
   paginationChange(pagination: Pagination): void {
-    this.search(this.pagination.pageStart, this.pagination.pageSize);
+    this.search(this.pagination.start, this.pagination.size);
   }
 
   onScroll(): void {
-    if (this.loading.list || this.pagination.pageEnd >= this.pagination.pageTotal) return;
+    if (this.loading.list || this.pagination.end >= this.pagination.total) return;
 
-    return this.search(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+    return this.search(this.pagination.end, this.pagination.size, true, false);
   }
 
   currentFilters: FaqFilter = {
@@ -139,7 +139,7 @@ export class FaqManagementComponent implements OnInit {
 
   search(
     start: number = 0,
-    size: number = this.pagination.pageSize,
+    size: number = this.pagination.size,
     add: boolean = false,
     showLoadingSpinner: boolean = true
   ): void {
@@ -152,14 +152,14 @@ export class FaqManagementComponent implements OnInit {
       .post('/faq/search', request)
       .pipe(takeUntil(this.destroy))
       .subscribe((faqs: PaginatedFaqResult) => {
-        this.pagination.pageTotal = faqs.total;
-        this.pagination.pageEnd = faqs.end;
+        this.pagination.total = faqs.total;
+        this.pagination.end = faqs.end;
 
         if (add) {
           this.faqs = [...this.faqs, ...faqs.faq];
         } else {
           this.faqs = faqs.faq;
-          this.pagination.pageStart = faqs.start;
+          this.pagination.start = faqs.start;
         }
 
         this.updateTagsCache();
@@ -237,8 +237,8 @@ export class FaqManagementComponent implements OnInit {
       .subscribe({
         next: () => {
           this.faqs = this.faqs.filter((f) => f.id != faqId);
-          this.pagination.pageEnd--;
-          this.pagination.pageTotal--;
+          this.pagination.end--;
+          this.pagination.total--;
 
           this.toastrService.success(`Faq successfully deleted`, 'Success', {
             duration: 5000,

@@ -23,8 +23,6 @@ export class FaqTrainingFiltersComponent implements OnInit, OnDestroy {
     return this.form.get('search') as FormControl;
   }
 
-  constructor() {}
-
   ngOnInit(): void {
     this._subscription = this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.onFilter.emit(this.form.value as FaqTrainingFilter);
@@ -35,11 +33,11 @@ export class FaqTrainingFiltersComponent implements OnInit, OnDestroy {
     this._subscription.unsubscribe();
   }
 
-  clearSearch() {
+  clearSearch(): void {
     this.search.reset();
   }
 
-  updateFilter(filter: FaqTrainingFilter) {
+  updateFilter(filter: FaqTrainingFilter): void {
     this.form.patchValue(filter);
   }
 }

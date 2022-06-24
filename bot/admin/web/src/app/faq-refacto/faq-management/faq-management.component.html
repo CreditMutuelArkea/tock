@@ -40,7 +40,10 @@
     No bot configuration detected
   </nb-alert>
 
-  <div *ngIf="configurations?.length">
+  <div
+    *ngIf="configurations?.length"
+    class="main"
+  >
     <tock-faq-management-filters
       [tagsCache]="tagsCache"
       (onFilter)="filterFaqs($event)"
@@ -85,6 +88,7 @@
   <tock-faq-management-edit
     #faqEditComponent
     *ngIf="isSidePanelOpen.edit"
+    class="aside"
     [loading]="loading.edit"
     [faq]="faqEdit"
     [tagsCache]="tagsCache"
@@ -95,6 +99,7 @@
   <tock-faq-management-settings
     #faqSettingsComponent
     *ngIf="isSidePanelOpen.settings"
+    class="aside"
     (onClose)="closeSidePanel()"
   ></tock-faq-management-settings>
 </section>

@@ -1,10 +1,30 @@
 <div class="grid-columns-header">
   <div class="d-flex gap-1 align-items-center">
     <nb-checkbox
+      class="lineHeight-0"
       [checked]="selection?.selected?.length === sentences?.length"
       [indeterminate]="selection?.selected?.length && selection.selected.length < sentences?.length"
       (checkedChange)="handleToggleSelectAll($event)"
     ></nb-checkbox>
+    <div
+      *ngIf="selection.selected.length"
+      class="d-flex gap-1"
+    >
+      <button
+        *ngFor="let option of selectionOption"
+        nbButton
+        nbTooltip="{{ option.label }}"
+        [class]="option.class"
+        ghost
+        shape="round"
+        (click)="handleBatchAction(option.action)"
+      >
+        <nb-icon [icon]="option.icon"></nb-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
     <span
       class="pointer"
       (click)="toggleSort()"
@@ -21,35 +41,6 @@
         class="valign-middle"
       ></nb-icon>
     </span>
-  </div>
-
-  <div class="d-flex justify-content-between flex-wrap gap-1">
-    <nb-form-field>
-      <nb-icon
-        nbPrefix
-        icon="flash-outline"
-      ></nb-icon>
-      <div class="nb-form-control-container nb-form-field-control-with-prefix">
-        <nb-select
-          placeholder="Apply to selection"
-          size="small"
-          [disabled]="!selection.selected.length"
-        >
-          <nb-option
-            *ngFor="let option of selectionOption"
-            class="d-flex align-items-center"
-            [class]="option.class"
-            (click)="handleBatchAction(option.action)"
-          >
-            <nb-icon
-              class="mr-2"
-              [icon]="option.icon"
-            ></nb-icon>
-            {{ option.label }}
-          </nb-option>
-        </nb-select>
-      </div>
-    </nb-form-field>
 
     <tock-pagination
       [pagination]="pagination"
@@ -74,7 +65,7 @@
       class="pointer"
     >
       <small class="d-block text-muted">
-        {{ sentence.creationDate | amDateFormat: 'MM/DD HH:mm' }}
+        <time>{{ sentence.creationDate | date: 'MM/dd HH:mm' }}</time>
       </small>
       <span>
         {{ sentence.text }}
@@ -114,7 +105,7 @@
 
       <span nbTooltip="Detection probability"> {{ selectIntent(sentence, 'probability') }}% </span>
       <button
-        *ngIf="stateService.hasRole(UserRole.botUser)"
+        *ngIf="state.hasRole(UserRole.botUser)"
         nbButton
         nbTooltip="Create new FAQ"
         ghost

@@ -1,4 +1,4 @@
-<nb-card>
+<nb-card class="mb-0">
   <nb-card-header>
     <div class="d-flex justify-content-between align-items-start">
       <h5>Conversation featuring this sentence</h5>
@@ -59,25 +59,5 @@
       >
       </tock-chat-ui-message>
     </tock-chat-ui>
-
-    <!-- <nb-chat
-      *ngIf="displayedDialog?.actions"
-      class="minimalInterface"
-      title="Conversation featuring this sentence"
-      size="large"
-    >
-      <nb-chat-message
-        *ngFor="let action of displayedDialog.actions"
-        type="text"
-        [reply]="action.isBot()"
-        [sender]="getUserName(action)"
-        [avatar]="getUserAvatar(action)"
-        [message]="action.message.text"
-        [date]="action.date"
-        [ngClass]="{ currentsentence: isCurrentSentence(action), pointer: !action.isBot() }"
-        (click)="searchSentence(action)"
-      >
-      </nb-chat-message>
-    </nb-chat> -->
   </nb-card-body>
 </nb-card>

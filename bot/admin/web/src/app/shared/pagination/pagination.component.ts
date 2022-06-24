@@ -1,10 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 export interface Pagination {
-  pageSize: number;
-  pageStart: number;
-  pageEnd: number;
-  pageTotal: number;
+  size: number;
+  start: number;
+  end: number;
+  total: number;
 }
 
 @Component({
@@ -14,27 +14,27 @@ export interface Pagination {
 })
 export class PaginationComponent implements OnInit {
   @Input() pagination!: Pagination;
-  @Input() pageSizes: number[] = [10, 25, 50, 100];
+  @Input() sizes: number[] = [10, 25, 50, 100];
 
   @Output() onPaginationChange = new EventEmitter<Pagination>();
 
   ngOnInit() {
-    if (!this.pageSizes.includes(this.pagination.pageSize)) {
-      this.pageSizes = [...this.pageSizes, this.pagination.pageSize].sort(function (a, b) {
+    if (!this.sizes.includes(this.pagination.size)) {
+      this.sizes = [...this.sizes, this.pagination.size].sort(function (a, b) {
         return a - b;
       });
     }
   }
 
   paginationPrevious(): void {
-    let pageStart = this.pagination.pageStart - this.pagination.pageSize;
+    let pageStart = this.pagination.start - this.pagination.size;
     if (pageStart < 0) pageStart = 0;
-    this.pagination.pageStart = pageStart;
+    this.pagination.start = pageStart;
     this.onPaginationChange.emit();
   }
 
   paginationNext(): void {
-    this.pagination.pageStart = this.pagination.pageStart + this.pagination.pageSize;
+    this.pagination.start = this.pagination.start + this.pagination.size;
     this.onPaginationChange.emit();
   }
 
@@ -43,16 +43,14 @@ export class PaginationComponent implements OnInit {
   }
 
   paginationString(): string {
-    return `${this.pagination.pageStart + 1} - ${this.pagination.pageEnd} of ${
-      this.pagination.pageTotal
-    }`;
+    return `${this.pagination.start + 1} - ${this.pagination.end} of ${this.pagination.total}`;
   }
 
-  showPrevious() {
-    return this.pagination.pageStart > 0;
+  showPrevious(): boolean {
+    return this.pagination.start > 0;
   }
 
-  showNext() {
-    return this.pagination.pageTotal > this.pagination.pageEnd;
+  showNext(): boolean {
+    return this.pagination.total > this.pagination.end;
   }
 }

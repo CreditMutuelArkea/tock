@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input, OnInit } from '@angular/core';
+import { Component, HostBinding, Input } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
 
 @Component({
@@ -6,7 +6,7 @@ import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
   templateUrl: './chat-ui-message.component.html',
   styleUrls: ['./chat-ui-message.component.scss']
 })
-export class ChatUiMessageComponent implements OnInit {
+export class ChatUiMessageComponent {
   @Input() message: string;
   @Input() sender: string;
   @Input() date: Date;
@@ -33,6 +33,4 @@ export class ChatUiMessageComponent implements OnInit {
   protected _reply: boolean = false;
 
   constructor(protected domSanitizer: DomSanitizer) {}
-
-  ngOnInit(): void {}
 }

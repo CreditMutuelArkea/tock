@@ -45,14 +45,13 @@
   }
 
   &.currentsentence .text {
-    background-color: var(--success) !important;
+    background-color: nb-theme(color-success-500) !important;
     color: white !important;
   }
 
   &.not-reply {
     .message {
       margin-left: 0.5rem;
-      //       margin-right: 3rem;
     }
 
     align-items: flex-start;
@@ -73,7 +72,6 @@
       align-items: flex-end;
       margin-left: 0;
       margin-right: 0.5rem;
-      //       margin-left: 3rem;
     }
 
     .message-text {

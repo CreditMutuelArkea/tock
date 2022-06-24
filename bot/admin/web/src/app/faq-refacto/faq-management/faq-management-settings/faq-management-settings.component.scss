@@ -1,11 +1,5 @@
 @import '~@nebular/theme/styles/global/_breakpoints.scss';
 
-.side-panel {
-  height: min-content;
-  position: sticky;
-  top: 5.75rem;
-}
-
 .grid-button {
   display: grid;
   grid-template-columns: 1fr;

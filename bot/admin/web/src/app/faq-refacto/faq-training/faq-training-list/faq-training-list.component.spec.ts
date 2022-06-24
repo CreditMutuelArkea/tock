@@ -51,10 +51,10 @@ describe('FaqTrainingListComponent', () => {
     component = fixture.componentInstance;
     component.selection = new SelectionModel();
     component.pagination = {
-      pageSize: 0,
-      pageStart: 0,
-      pageEnd: 0,
-      pageTotal: 0
+      size: 0,
+      start: 0,
+      end: 0,
+      total: 0
     };
     fixture.detectChanges();
   });

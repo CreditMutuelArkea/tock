@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
+
 import { AnalyticsService } from '../../../analytics/analytics.service';
 import { DialogReportQuery } from '../../../analytics/dialogs/dialogs';
 import { StateService } from '../../../core-nlp/state.service';
@@ -38,11 +39,11 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
   displayedDialog: DialogReport;
   displayedDialogIndex: number = 0;
 
-  close() {
+  close(): void {
     this.onClose.emit();
   }
 
-  displayDialog(index) {
+  displayDialog(index: number): void {
     this.displayedDialogIndex = index;
     this.displayedDialog = this.dialogs[this.displayedDialogIndex];
     this.scrollToCurrent();
@@ -69,17 +70,17 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     }
   }
 
-  updateSentence(sentence: SentenceExtended) {
+  updateSentence(sentence: SentenceExtended): void {
     this.sentence = sentence;
   }
 
-  scrollToCurrent(bavr = 'smooth') {
+  scrollToCurrent(): void {
     window.setTimeout(() => {
       const nativeElement: HTMLElement = this.elementRef.nativeElement;
       const found: Element | null = nativeElement.querySelector('.currentsentence');
       if (found) {
         found.scrollIntoView({
-          behavior: bavr as ScrollBehavior,
+          behavior: 'smooth',
           block: 'nearest',
           inline: 'start'
         });
@@ -103,7 +104,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     );
   }
 
-  isCurrentSentence(action: ActionReport) {
+  isCurrentSentence(action: ActionReport): boolean {
     if (action.isBot()) return false;
     if (action.message.isSentence()) {
       // Hack because the use of fromJSON static functions doesn't instanciate correctly classes and so here action.message is only of type BotMessage
@@ -113,11 +114,12 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     return false;
   }
 
-  getUserName(action: ActionReport) {
+  getUserName(action: ActionReport): string {
     if (action.isBot()) return this.userIdentities.bot.name;
     return this.userIdentities.client.name;
   }
-  getUserAvatar(action: ActionReport) {
+
+  getUserAvatar(action: ActionReport): string {
     if (action.isBot()) return this.userIdentities.bot.avatar;
     return this.userIdentities.client.avatar;
   }
@@ -127,7 +129,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     bot: { name: 'Bot', avatar: 'assets/images/scenario-bot.svg' }
   };
 
-  getActionMessageText(action: ActionReport) {
+  getActionMessageText(action: ActionReport): string {
     let msg = action.message as unknown as Sentence;
 
     if (msg.text) {
@@ -141,7 +143,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
       .join(' ');
   }
 
-  searchSentence(action: ActionReport) {
+  searchSentence(action: ActionReport): void {
     if (action.isBot()) return;
     if (action.message.isSentence()) {
       this.onSearchSentence.emit(action.message);

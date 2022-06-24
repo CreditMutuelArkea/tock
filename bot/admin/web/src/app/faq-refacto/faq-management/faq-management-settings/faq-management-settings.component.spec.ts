@@ -6,6 +6,7 @@ import {
   NbIconModule,
   NbSelectModule,
   NbSpinnerModule,
+  NbToastrService,
   NbTooltipModule
 } from '@nebular/theme';
 import { of } from 'rxjs';
@@ -60,7 +61,8 @@ describe('FaqManagementSettingsComponent', () => {
         { provide: BotService, useClass: BotServiceMock },
         { provide: StateService, useClass: StateServiceMock },
         { provide: FaqService, useClass: FaqServiceMock },
-        { provide: DialogService, useValue: {} }
+        { provide: DialogService, useValue: {} },
+        { provide: NbToastrService, useValue: {} }
       ]
     }).compileComponents();
   });

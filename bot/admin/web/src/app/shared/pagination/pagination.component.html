@@ -3,11 +3,11 @@
     <nb-select
       size="small"
       nbTooltip="Items per page"
-      [(selected)]="pagination.pageSize"
+      [(selected)]="pagination.size"
       (selectedChange)="paginationSize()"
     >
       <nb-option
-        *ngFor="let size of pageSizes"
+        *ngFor="let size of sizes"
         [value]="size"
       >
         {{ size }}
@@ -28,7 +28,7 @@
     >
       <nb-icon icon="arrow-ios-back-outline"></nb-icon>
     </button>
-    <!-- Workaround because tooltip is not hiding if button is disabled programmatically. Strangely this doesn't happen on Next page button below...  -->
+    <!-- Workaround because tooltip is not hiding if button is disabled programmatically. -->
     <button
       nbButton
       ghost
@@ -49,7 +49,7 @@
     >
       <nb-icon icon="arrow-ios-forward-outline"></nb-icon>
     </button>
-    <!-- Workaround because tooltip is not hiding if button is disabled programmatically. Strangely this doesn't happen on Next page button below...  -->
+    <!-- Workaround because tooltip is not hiding if button is disabled programmatically. -->
     <button
       *ngIf="!showNext()"
       nbButton

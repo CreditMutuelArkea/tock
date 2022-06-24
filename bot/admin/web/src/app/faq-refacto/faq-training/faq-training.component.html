@@ -1,9 +1,9 @@
-<header class="d-flex mb-2">
+<header class="mb-2">
   <h1>FAQ Training</h1>
 </header>
 
 <section [class.grid]="dialogDetailsSentence">
-  <div>
+  <div class="main">
     <tock-faq-training-filters
       #faqTrainingFilter
       (onFilter)="filterFaqTraining($event)"
@@ -40,6 +40,7 @@
   <tock-faq-training-dialog
     #faqTrainingDialog
     *ngIf="dialogDetailsSentence"
+    class="aside"
     [sentence]="dialogDetailsSentence"
     (onClose)="closeDetails()"
     (onSearchSentence)="retrieveSentence($event)"

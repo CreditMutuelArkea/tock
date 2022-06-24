@@ -25,7 +25,7 @@ import { SentenceExtended } from '../faq-training.component';
   styleUrls: ['./faq-training-list.component.scss']
 })
 export class FaqTrainingListComponent implements OnInit, OnDestroy {
-  @Input() pagination: Pagination;
+  @Input() pagination!: Pagination;
   @Input() sentences: SentenceExtended[] = [];
   @Input() selection!: SelectionModel<SentenceExtended>;
 
@@ -48,35 +48,33 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
       action: Action.VALIDATE,
       class: 'text-success',
       icon: 'checkmark-circle-2',
-      label: 'Validate'
+      label: 'Validate all selected sentences'
     },
     {
       action: Action.UNKNOWN,
       class: 'text-danger',
       icon: 'close-circle-outline',
-      label: 'Unknown'
+      label: 'Set all selected sentences as unknown'
     },
     {
       action: Action.DELETE,
       class: null,
       icon: 'trash-2-outline',
-      label: 'Delete'
+      label: 'Delete all selected sentences'
     }
   ];
 
   constructor(
-    public readonly stateService: StateService,
+    public readonly state: StateService,
     private router: Router,
     private readonly elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
-    this.stateService.currentIntentsCategories
-      .pipe(takeUntil(this._destroy$))
-      .subscribe((groups) => {
-        this.intentGroups = groups;
-        this.resetIntentsListFilter();
-      });
+    this.state.currentIntentsCategories.pipe(takeUntil(this._destroy$)).subscribe((groups) => {
+      this.intentGroups = groups;
+      this.resetIntentsListFilter();
+    });
   }
 
   ngOnDestroy(): void {
@@ -84,7 +82,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this._destroy$.complete();
   }
 
-  paginationChange(pagination: Pagination) {
+  paginationChange(pagination: Pagination): void {
     this.selection.clear();
     this.onPaginationChange.emit(pagination);
   }
@@ -99,7 +97,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   ): string | number {
     switch (category) {
       case 'placeholder':
-        return sentence.getIntentLabel(this.stateService);
+        return sentence.getIntentLabel(this.state);
       case 'probability':
         return Math.trunc(sentence.classification.intentProbability * 100);
     }
@@ -107,7 +105,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
 
   addIntentToSentence(intentId: string, sentence: SentenceExtended): void {
     let originalIndex = this.sentences.findIndex((s) => s === sentence);
-    sentence = sentence.withIntent(this.stateService, intentId);
+    sentence = sentence.withIntent(this.state, intentId);
     this.sentences.splice(originalIndex, 1, sentence);
     this.resetIntentsListFilter();
   }
@@ -116,10 +114,10 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.filteredIntentGroups = of(this.intentGroups);
   }
 
-  filterIntentsList($event): void {
-    if (['ArrowDown', 'ArrowUp', 'Escape'].includes($event.key)) return;
+  filterIntentsList(event: any): void {
+    if (['ArrowDown', 'ArrowUp', 'Escape'].includes(event.key)) return;
 
-    let str = $event.target.value.toLowerCase();
+    let str = event.target.value.toLowerCase();
     let result: IntentsCategory[] = [];
     this.intentGroups.forEach((group) => {
       group.intents.forEach((intent) => {
@@ -136,14 +134,14 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.filteredIntentGroups = of(result);
   }
 
-  onFocus($event): void {
+  onFocus(): void {
     this.resetIntentsListFilter();
   }
-  onBlur($event): void {
-    $event.target.value = '';
+  onBlur(event: any): void {
+    event.target.value = '';
   }
 
-  showDetails(sentence: SentenceExtended) {
+  showDetails(sentence: SentenceExtended): void {
     this.onDetails.emit(sentence);
   }
 
@@ -176,7 +174,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
     this.onSort.emit(this.sort);
   }
 
-  normalizeString(str) {
+  normalizeString(str: string): string {
     /*
       Remove diacrtitics
       Remove western punctuations
@@ -189,11 +187,11 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
       .replace(/\s+/g, '');
   }
 
-  getSentenceId(sentence: SentenceExtended) {
+  getSentenceId(sentence: SentenceExtended): string {
     return `stnc_${this.normalizeString(sentence.text)}`;
   }
 
-  scrollToSentence(sentence: SentenceExtended) {
+  scrollToSentence(sentence: SentenceExtended): void {
     const id = this.getSentenceId(sentence);
     const nativeElement: HTMLElement = this.elementRef.nativeElement;
     const found: Element | null = nativeElement.querySelector(`#${id}`);

@@ -1,7 +1,7 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { take, takeUntil, share } from 'rxjs/operators';
 
 import { StateService } from '../../core-nlp/state.service';
@@ -30,8 +30,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
   @ViewChild('faqTrainingFilter') faqTrainingFilter: FaqTrainingFiltersComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
-  Action = Action;
-  filter = {
+  Action: typeof Action = Action;
+  filters = {
     search: null,
     sort: [{ first: 'creationDate', second: false }],
     intentId: null,
@@ -53,7 +53,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadData();
-    this.state.configurationChange.pipe(takeUntil(this.destroy$)).subscribe((_) => {
+    this.state.configurationChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadData();
       this.closeDetails();
     });
@@ -66,36 +66,36 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
   filterFaqTraining(filters: FaqTrainingFilter): void {
     this.selection.clear();
-    this.filter = { ...this.filter, ...filters };
+    this.filters = { ...this.filters, ...filters };
     this.loadData();
   }
 
   sortFaqTraining(sort: boolean): void {
     this.selection.clear();
-    this.filter.sort[0].second = sort;
+    this.filters.sort[0].second = sort;
     this.loadData();
   }
 
   pagination: Pagination = {
-    pageStart: 0,
-    pageEnd: undefined,
-    pageSize: 10,
-    pageTotal: undefined
+    start: 0,
+    end: undefined,
+    size: 10,
+    total: undefined
   };
 
   paginationChange() {
-    this.loadData(this.pagination.pageStart, this.pagination.pageSize);
+    this.loadData(this.pagination.start, this.pagination.size);
   }
 
   onScroll() {
-    if (this.loading || this.pagination.pageEnd >= this.pagination.pageTotal) return;
+    if (this.loading || this.pagination.end >= this.pagination.total) return;
 
-    return this.loadData(this.pagination.pageEnd, this.pagination.pageSize, true, false);
+    return this.loadData(this.pagination.end, this.pagination.size, true, false);
   }
 
   loadData(
     start: number = 0,
-    size: number = this.pagination.pageSize,
+    size: number = this.pagination.size,
     add: boolean = false,
     showLoadingSpinner: boolean = true
   ): Observable<PaginatedResult<SentenceExtended>> {
@@ -108,14 +108,14 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
 
     search.subscribe({
       next: (data: PaginatedResult<SentenceExtended>) => {
-        this.pagination.pageTotal = data.total;
-        this.pagination.pageEnd = data.end;
+        this.pagination.total = data.total;
+        this.pagination.end = data.end;
 
         if (add) {
           this.sentences = [...this.sentences, ...data.rows];
         } else {
           this.sentences = data.rows;
-          this.pagination.pageStart = data.start;
+          this.pagination.start = data.start;
         }
 
         this.loading = false;
@@ -140,37 +140,37 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       query.start,
       query.size,
       null /* NOTE: There is a weird behavior when set */,
-      this.filter.search,
-      this.filter.intentId,
-      this.filter.status,
+      this.filters.search,
+      this.filters.intentId,
+      this.filters.status,
       null,
       [],
       [],
       null,
       null,
-      this.filter.sort,
-      this.filter.onlyToReview,
+      this.filters.sort,
+      this.filters.onlyToReview,
       null,
       null,
       null,
-      this.filter.maxIntentProbability / 100,
-      this.filter.minIntentProbability / 100
+      this.filters.maxIntentProbability / 100,
+      this.filters.minIntentProbability / 100
     );
     return result;
   }
 
-  dialogDetailsSentence;
+  dialogDetailsSentence: SentenceExtended;
 
-  unselectAllSentences() {
+  unselectAllSentences(): void {
     this.sentences.forEach((s) => (s._selected = false));
   }
 
-  closeDetails() {
+  closeDetails(): void {
     this.unselectAllSentences();
     this.dialogDetailsSentence = undefined;
   }
 
-  showDetails(sentence: SentenceExtended) {
+  showDetails(sentence: SentenceExtended): void {
     this.unselectAllSentences();
 
     if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
@@ -187,8 +187,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.setSentenceAccordingToAction(action, sentence);
 
     await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
-    this.pagination.pageEnd--;
-    this.pagination.pageTotal--;
+    this.pagination.end--;
+    this.pagination.total--;
 
     if (this.selection.isSelected(sentence)) {
       this.selection.deselect(sentence);
@@ -221,8 +221,8 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       this.selection.selected.map(async (sentence) => {
         await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
         this.sentences = this.sentences.filter((s) => sentence.text !== s.text);
-        this.pagination.pageEnd--;
-        this.pagination.pageTotal--;
+        this.pagination.end--;
+        this.pagination.total--;
       })
     );
 
@@ -243,8 +243,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     switch (action) {
       case Action.DELETE:
         sentence.status = SentenceStatus.deleted;
-        break;
-      case Action.TOGGLE:
         break;
       case Action.UNKNOWN:
         sentence.classification.intentId = Intent.unknown;
@@ -278,7 +276,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     }
   }
 
-  retrieveSentence(sentence: SentenceExtended, tryCount = 0) {
+  retrieveSentence(sentence: SentenceExtended, tryCount = 0): Subscription | void {
     let exists = this.sentences.find((stnce) => {
       return stnce.text == sentence.text;
     });
@@ -291,10 +289,10 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
         this.faqTrainingList.scrollToSentence(sentence);
       }, 200);
     } else {
-      if (this.pagination.pageSize * tryCount < 50) {
-        let scrollOservable = this.onScroll();
-        if (scrollOservable) {
-          return scrollOservable.pipe(take(1)).subscribe(() => {
+      if (this.pagination.size * tryCount < 50) {
+        let scrollObservable = this.onScroll();
+        if (scrollObservable) {
+          return scrollObservable.pipe(take(1)).subscribe(() => {
             setTimeout(() => {
               this.retrieveSentence(sentence, tryCount++);
             }, 200);
