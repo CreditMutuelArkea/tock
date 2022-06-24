@@ -29,9 +29,7 @@ export class FaqDefinitionResult implements PaginatedResult<FaqDefinition> {
   static fromJSON(json?: any): FaqDefinitionResult {
     const value = Object.create(FaqDefinitionResult.prototype);
 
-    return  Object.assign(value, json, {
-      rows: json.faq,
-    })
+    return Object.assign(value, json)
   }
 
 }
