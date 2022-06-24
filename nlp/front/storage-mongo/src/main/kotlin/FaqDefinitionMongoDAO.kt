@@ -22,7 +22,6 @@ import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.FaqDefinition
-import ai.tock.nlp.front.shared.config.FaqDefinitionDetailed
 import ai.tock.nlp.front.shared.config.FaqDefinitionTag
 import ai.tock.nlp.front.shared.config.FaqQuery
 import ai.tock.nlp.front.shared.config.FaqQueryResult
@@ -200,7 +199,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
-            //inspired from https://github.com/Litote/kmongo/blob/master/kmongo-core-tests/src/main/kotlin/org/litote/kmongo/AggregateTypedTest.kt#L322
             return arrayListOf(
                 // sort the i18n by ids
                 sortAscending(FaqDefinition::i18nId),
@@ -218,7 +216,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                         filterI18nIds(i18nIds)
                     ),
                     andNotNull(
-                        FaqQueryResult::faq / IntentDefinition::applications `in` applicationId,
+                        filterOnApplicationId(applicationId),
                         filterTags(),
                         filterEnabled()
                     )
@@ -256,6 +254,12 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     private fun FaqQuery.filterEnabled(): Bson? = if (enabled == null) null else FaqQueryResult::enabled eq enabled
 
     /**
+     * Filter on th applicationId
+     */
+    private fun filterOnApplicationId(applicationId: String): Bson =
+        FaqDefinition::applicationId `in` applicationId
+
+    /**
      * Perform a lookup join from the FaqDefinition.intentId on IntentDefinition._id
      */
     private fun joinOnIntentDefinition() = lookup(
@@ -269,6 +273,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      * Perform a lookup join from the FaqDefinition.intentId on ClassifiedSentence.classification.intentId and avoid returning deleted sentences
      */
     private fun FaqQuery.joinOnClassifiedSentenceNotDeleted() =
+        //inspired from https://github.com/Litote/kmongo/blob/master/kmongo-core-tests/src/main/kotlin/org/litote/kmongo/AggregateTypedTest.kt#L322
         lookup(
             CLASSIFIED_SENTENCE_COLLECTION,
             // declare a variable FAQ_INTENTID to call it in the pipeline exp below
@@ -316,9 +321,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
             sortAscending(FaqDefinitionTag::tag),
         ).map { it.tag }.toList()
     }
-
-    private fun filterOnApplicationId(applicationId: String): Bson =
-        FaqDefinitionDetailed::faq / IntentDefinition::applications `in` applicationId
 
     /**
      * Create group by tag name
