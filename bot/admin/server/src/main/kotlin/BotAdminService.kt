@@ -17,6 +17,7 @@
 package ai.tock.bot.admin
 
 import ai.tock.bot.admin.answer.AnswerConfiguration
+import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
 import ai.tock.bot.admin.answer.AnswerConfigurationType.script
 import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
@@ -24,6 +25,7 @@ import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerVersionedConfiguration
 import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
+import ai.tock.bot.admin.answer.TickAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.bot.BotConfiguration
@@ -49,6 +51,7 @@ import ai.tock.bot.admin.model.DialogFlowRequest
 import ai.tock.bot.admin.model.DialogsSearchQuery
 import ai.tock.bot.admin.model.Feature
 import ai.tock.bot.admin.model.StorySearchRequest
+import ai.tock.bot.bean.TickStory
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.model.UserSearchQueryResult
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
@@ -89,11 +92,13 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.security.UserLogin
 import ai.tock.shared.vertx.WebVerticle.Companion.badRequest
+import ai.tock.shared.withoutNamespace
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.Translator
 import com.github.salomonbrys.kodein.instance
+import com.mongodb.MongoWriteException
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
@@ -104,10 +109,9 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZonedDateTime
 import java.time.format.TextStyle
-import java.util.Locale
+import java.util.*
 import java.util.stream.LongStream
 import java.util.stream.Stream
-import kotlin.streams.toList
 
 object BotAdminService {
 
@@ -860,7 +864,6 @@ object BotAdminService {
         request: CreateStoryRequest,
         user: UserLogin
     ): IntentDefinition? {
-
         val botConf =
             getBotConfigurationsByNamespaceAndBotId(namespace, request.story.botId).firstOrNull()
         return if (botConf != null) {
@@ -881,6 +884,18 @@ object BotAdminService {
             intentDefinition
         } else {
             null
+        }
+    }
+
+    fun createTickStory(
+        namespace: String,
+        tickStory: TickStory
+    ) {
+        val errors = tickStory.validateTickStory()
+        if(errors.isEmpty()) {
+            saveTickStory(namespace, tickStory)
+        } else {
+            badRequest("Inconsistent tick story", errors)
         }
     }
 
@@ -1096,6 +1111,8 @@ object BotAdminService {
         user: UserLogin,
         createdIntent: IntentDefinition? = null
     ): BotStoryDefinitionConfiguration? {
+        // TODO MASS : RG existantes, quel est l'attendu pour la tickstory ?
+        // ------------ MASS : RG - debut -------------------------------
 
         // Two stories (built-in or configured) should not have the same _id
         // There should be max one built-in (resp. configured) story for given namespace+bot+intent (or namespace+bot+storyId)
@@ -1149,6 +1166,7 @@ object BotAdminService {
                     badRequest("Story ${story.name} (${story.currentType}) already exists")
                 }
             }
+            // ------------ MASS : RG - fin -------------------------------
 
             val newStory = when {
                 storyWithSameId != null -> {
@@ -1222,6 +1240,41 @@ object BotAdminService {
             BotStoryDefinitionConfiguration(newStory, story.userSentenceLocale)
         } else {
             null
+        }
+    }
+
+    private fun saveTickStory(
+        namespace: String,
+        story: TickStory,
+    ) {
+
+        val botConf = getBotConfigurationsByNamespaceAndBotId(namespace, story.botId).firstOrNull()
+        botConf ?: return
+
+        val newStory =
+            StoryDefinitionConfiguration(
+                storyId = story.storyId,
+                botId = story.botId,
+                intent = IntentWithoutNamespace(story.mainIntent.withoutNamespace()),
+                currentType = AnswerConfigurationType.tick,
+                answers = listOf(TickAnswerConfiguration(
+                    story.stateMachine,
+                    story.primaryIntents,
+                    story.secondaryIntents,
+                    story.contexts,
+                    story.actions,
+                    debug = true,
+                )),
+                namespace = namespace,
+                name = story.name,
+                category = "tick",
+                description = story.description,
+            )
+
+        try {
+            storyDefinitionDAO.save(newStory)
+        }catch(e: MongoWriteException){
+            badRequest(e.message ?: "Tick Story: registration failed ")
         }
     }
 

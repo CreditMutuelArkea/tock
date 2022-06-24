@@ -50,7 +50,10 @@ data class Dialog(
     /**
      * An optional group identifier.
      */
-    val groupId: String? = null
+    val groupId: String? = null,
+
+    // TODO MASS : Experimental. à mettre dans DialogState ?
+    val tickStates: MutableMap<String, TickState> = mutableMapOf()
 ) {
 
     companion object {
@@ -70,7 +73,8 @@ data class Dialog(
                         }
                         s
                     }
-                ).toMutableList()
+                ).toMutableList(),
+                tickStates = dialog.tickStates
             )
         }
     }

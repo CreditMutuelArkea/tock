@@ -21,11 +21,13 @@ import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.answer.SimpleAnswer
 import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
+import ai.tock.bot.admin.answer.TickAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
 import ai.tock.bot.admin.story.StoryDefinitionAnswersContainer
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
+import ai.tock.bot.bean.TickSession
 import ai.tock.bot.connector.ConnectorFeature.CAROUSEL
 import ai.tock.bot.connector.media.MediaCardDescriptor
 import ai.tock.bot.connector.media.MediaCarouselDescriptor
@@ -36,10 +38,15 @@ import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
 import ai.tock.nlp.api.client.model.Entity
+import ai.tock.bot.bean.TickUserAction
+import ai.tock.bot.engine.dialog.TickState
 import mu.KotlinLogging
+import ai.tock.bot.processor.TickStoryProcessor
+import java.time.Instant
 
 /**
  *
@@ -173,6 +180,7 @@ internal class ConfiguredStoryHandler(
                 is BuiltInAnswerConfiguration ->
                     (bus.botDefinition as BotDefinitionWrapper).builtInStory(configuration.storyId)
                         .storyHandler.handle(bus)
+                is TickAnswerConfiguration -> bus.handleTickAnswer(this@send, this)
                 else -> error("type not supported for now: $this")
             }
         }
@@ -217,6 +225,58 @@ internal class ConfiguredStoryHandler(
                     }
                 }
         }
+    }
+
+    /**
+     * A tick story handler
+     */
+    private fun BotBus.handleTickAnswer(container: StoryDefinitionAnswersContainer, configuration: TickAnswerConfiguration) {
+        val intentName = this.intent?.intentWithoutNamespace()?.name!!
+        val story = container as StoryDefinitionConfiguration
+
+        // Get a stored tick state. Start a new session if it doesn't exist
+        val tickState = dialog.tickStates[story.storyId]
+        val tickSession =
+            with(tickState){
+                if (this == null) {
+                    TickSession()
+                } else {
+                    TickSession(currentState, contexts, ranHandlers, objectivesStack, init)
+                }
+            }
+
+        // Call the tick story processor
+        val (newTickSession, isFinal) =
+            TickStoryProcessor(
+                tickSession,
+                configuration.toTickConfiguration(),
+                TickSenderBotBus(this)
+            ).process(
+                TickUserAction(intentName, parseEntities(entities, tickSession.init)))
+
+        // Manage final state or action
+        when(isFinal) {
+            true -> dialog.tickStates.remove(story.storyId)
+            else -> dialog.tickStates[story.storyId] = TickState(
+                newTickSession.currentState!!,
+                newTickSession.contexts,
+                newTickSession.ranHandlers,
+                newTickSession.objectivesStack,
+                newTickSession.init
+            )
+        }
+    }
+
+    /**
+     * Feed the contexts by the entities provided from the initialization date
+     */
+    private fun parseEntities(entities: Map<String, EntityStateValue>, init: Instant): Map<String, String?> {
+        val contexts = mutableMapOf<String, String?>()
+        entities
+            .filter { (_, value) -> value.lastUpdate.isAfter(init) }
+            .forEach { (key, value) -> contexts[key] = value.value?.content }
+
+        return contexts
     }
 
     private fun BotBus.fillCarousel(simple: SimpleAnswerConfiguration): List<SimpleAnswer> {
@@ -267,7 +327,7 @@ internal class ConfiguredStoryHandler(
         return transformedAnswers
     }
 
-    private fun BotBus.send(container: StoryDefinitionAnswersContainer, answer: SimpleAnswer, end: Boolean = false) {
+    fun BotBus.send(container: StoryDefinitionAnswersContainer, answer: SimpleAnswer, end: Boolean = false) {
         val label = translate(answer.key)
         val suggestions = container.findNextSteps(this, configuration).map { this.translate(it) }
         val connectorMessages =
@@ -321,6 +381,23 @@ internal class ConfiguredStoryHandler(
             end(messagesList, delay)
         } else {
             send(messagesList, delay)
+        }
+    }
+
+    fun BotBus.send(answer: SimpleAnswer, end: Boolean = false) {
+        val label = translate(answer.key)
+        val actions = listOf(SendSentence(
+            botId,
+            applicationId,
+            userId,
+            label
+        ))
+
+        val messagesList = MessagesList(actions.map { ActionWrappedMessage(it, 0) })
+        if (end) {
+            end(messagesList, answer.delay)
+        } else {
+            send(messagesList, answer.delay)
         }
     }
 

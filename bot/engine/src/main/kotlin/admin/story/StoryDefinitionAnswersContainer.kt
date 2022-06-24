@@ -20,10 +20,15 @@ import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.AnswerConfigurationType.*
 import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
+import ai.tock.bot.admin.answer.TickAnswerConfiguration
 import ai.tock.bot.admin.bot.BotVersion
+import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.definition.StoryHandler
+import ai.tock.bot.definition.TickStoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.config.BotDefinitionWrapper
+import ai.tock.bot.engine.config.ConfiguredStoryHandler
 
 /**
  * Contains list of [AnswerConfiguration].
@@ -56,8 +61,19 @@ internal interface StoryDefinitionAnswersContainer {
                 ?.findBestVersion(BotVersion.getCurrentBotVersion(botDefinition.botId))
                 ?.storyDefinition
             builtin -> botDefinition.builtInStory(storyDefinitionConfiguration.storyId)
+            tick -> tickStory(storyDefinitionConfiguration, botDefinition)
             else -> null
         }
+
+    private fun tickStory(story: StoryDefinitionConfiguration, botDefinition: BotDefinitionWrapper): StoryDefinition? {
+        val tickAnswer = (story.answers.first() as TickAnswerConfiguration)
+        return TickStoryDefinition(
+            name = story.name,
+            handler = ConfiguredStoryHandler(botDefinition, story),
+            otherStarterIntents = tickAnswer.primaryIntents.map { Intent(it) }.toSet(),
+            secondaryIntents = tickAnswer.secondaryIntents.map {Intent(it) }.toSet()
+        )
+    }
 
     fun findNextSteps(bus: BotBus, story: StoryDefinitionConfiguration): List<CharSequence> = emptyList()
 }

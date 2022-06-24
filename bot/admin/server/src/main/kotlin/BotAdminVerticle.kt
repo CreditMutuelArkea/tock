@@ -38,6 +38,7 @@ import ai.tock.bot.admin.model.FaqSearchRequest
 import ai.tock.bot.admin.model.Feature
 import ai.tock.bot.admin.model.I18LabelQuery
 import ai.tock.bot.admin.model.StorySearchRequest
+import ai.tock.bot.bean.TickStory
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.scenario.ScenarioVerticle
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
@@ -74,6 +75,7 @@ import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
+import org.litote.kmongo.Id
 import org.litote.kmongo.toId
 
 /**
@@ -558,6 +560,13 @@ open class BotAdminVerticle : AdminVerticle() {
             BotAdminService.createStory(context.organization, query, context.userLogin) ?: unauthorized()
         }
 
+        blockingJsonPost(
+            "/bot/story/tick",
+            botUser
+        ) { context, tickStory: TickStory ->
+            BotAdminService.createTickStory(context.organization, tickStory)
+        }
+
         blockingJsonGet("/bot/story/:appName/export", botUser) { context ->
             BotAdminService.exportStories(context.organization, context.path("appName"))
         }
@@ -868,6 +877,13 @@ open class BotAdminVerticle : AdminVerticle() {
         findTestService().registerServices().invoke(this)
 
         configureStaticHandling()
+    }
+
+    private fun checkOrganisation(context: RoutingContext, applicationId: Id<ApplicationDefinition>) {
+        val applicationDefinition = front.getApplicationById(applicationId)
+        if(applicationDefinition == null || context.organization != applicationDefinition.namespace) {
+            unauthorized()
+        }
     }
 
     override fun deleteApplication(app: ApplicationDefinition) {

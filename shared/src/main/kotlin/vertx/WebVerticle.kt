@@ -22,6 +22,7 @@ import ai.tock.shared.error
 import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.exception.rest.NotFoundException
 import ai.tock.shared.exception.rest.RestException
+import ai.tock.shared.exception.rest.RestMultipleErrorsException
 import ai.tock.shared.exception.rest.UnauthorizedException
 import ai.tock.shared.intProperty
 import ai.tock.shared.jackson.mapper
@@ -85,6 +86,7 @@ abstract class WebVerticle : AbstractVerticle() {
         fun notFound(): Nothing = throw NotFoundException()
 
         fun badRequest(message: String): Nothing = throw BadRequestException(message)
+        fun badRequest(message: String, errors: List<String>): Nothing = throw RestMultipleErrorsException(message, errors)
 
         /**
          * Default request logger does nothing.
@@ -806,6 +808,11 @@ abstract class WebVerticle : AbstractVerticle() {
                 if (it.failed()) {
                     it.cause().apply {
                         when {
+                            this is RestMultipleErrorsException -> {
+                                logger.error(this)
+                                response().statusMessage = statusMessage
+                                response().endJson(errors, statusCode)
+                            }
                             this is RestException -> {
                                 response().statusCode = statusCode
                                 response().statusMessage = statusMessage
@@ -884,6 +891,12 @@ abstract class WebVerticle : AbstractVerticle() {
             val output = mapper.writeValueAsString(result)
             end(output)
         }
+    }
+
+    fun HttpServerResponse.endJson(result: Any, httpStatus: Int) {
+        this.putHeader("content-type", "application/json; charset=utf-8")
+        statusCode = httpStatus
+        end(mapper.writeValueAsString(result))
     }
 
     /**
