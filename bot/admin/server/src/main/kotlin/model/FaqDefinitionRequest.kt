@@ -17,10 +17,9 @@
 package ai.tock.bot.admin.model
 
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
-import ai.tock.nlp.front.shared.config.FaqStatus
 import org.litote.kmongo.Id
 import java.time.Instant
-import java.util.*
+import java.util.Locale
 
 data class FaqDefinitionRequest(
     val id: String?,
@@ -35,4 +34,5 @@ data class FaqDefinitionRequest(
     val tags: List<String>,
     val answer: String,
     val enabled: Boolean,
+    val intentName: String? = null
 )
