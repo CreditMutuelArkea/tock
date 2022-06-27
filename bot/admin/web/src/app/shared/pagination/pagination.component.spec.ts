@@ -45,6 +45,7 @@ describe('NoDataFoundComponent', () => {
   });
 
   it('should enable the back button if the beginning of the page is strictly upper than 0', () => {
+    spyOn(component.onPaginationChange, 'emit');
     component.pagination.start = 1;
     component.pagination.size = 10;
     fixture.detectChanges();
@@ -52,7 +53,10 @@ describe('NoDataFoundComponent', () => {
       By.css('[icon="arrow-ios-back-outline"]')
     ).nativeElement.parentElement;
 
+    previousButtonElement.click();
+
     expect(previousButtonElement.hasAttribute('disabled')).toBeFalsy();
+    expect(component.onPaginationChange.emit).toHaveBeenCalled();
   });
 
   it('should disable the next button if the end of the page is greater than or equal to the total of the result', () => {
@@ -79,7 +83,8 @@ describe('NoDataFoundComponent', () => {
     expect(component.onPaginationChange.emit).not.toHaveBeenCalled();
   });
 
-  it('should enable the back button if the ending of the page is strictly less than the total of result', () => {
+  it('should enable the next button if the ending of the page is strictly less than the total of result', () => {
+    spyOn(component.onPaginationChange, 'emit');
     component.pagination.end = 13;
     component.pagination.total = 22;
     fixture.detectChanges();
@@ -87,7 +92,10 @@ describe('NoDataFoundComponent', () => {
       By.css('[icon="arrow-ios-forward-outline"]')
     ).nativeElement.parentElement;
 
+    nextButtonElement.click();
+
     expect(nextButtonElement.hasAttribute('disabled')).toBeFalsy();
+    expect(component.onPaginationChange.emit).toHaveBeenCalled();
   });
 
   it('should reduce page start count based on page size when back button is clicked', () => {
