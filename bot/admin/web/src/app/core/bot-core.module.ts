@@ -31,8 +31,8 @@ export class BotCoreConfig implements CoreConfig {
   /** url map for each default rights */
   roleMap: Map<UserRole, string[]> = new Map([
     [UserRole.nlpUser, ['/nlp']],
-    [UserRole.faqNlpUser, ['/faq/train']],
-    [UserRole.faqBotUser, ['/faq/qa', '/build/i18n']],
+    [UserRole.faqNlpUser, ['/faq/training']],
+    [UserRole.faqBotUser, ['/faq/manangement', '/build/i18n']],
     [UserRole.botUser, ['/build']],
     [UserRole.admin, ['/configuration']],
     [UserRole.technicalAdmin, ['/configuration']]
