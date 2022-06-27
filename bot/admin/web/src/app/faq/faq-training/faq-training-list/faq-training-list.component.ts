@@ -88,7 +88,7 @@ export class FaqTrainingListComponent implements OnInit, OnDestroy {
   }
 
   redirectToFaqManagement(sentence: SentenceExtended): void {
-    this.router.navigate(['faq-refacto/management'], { state: { question: sentence.text } });
+    this.router.navigate(['faq/management'], { state: { question: sentence.text } });
   }
 
   selectIntent(

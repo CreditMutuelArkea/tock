@@ -70,10 +70,6 @@ const routes: Routes = [
     path: 'faq',
     loadChildren: () => import('./faq/faq.module').then((m) => m.FaqModule)
   },
-  {
-    path: 'faq-refacto',
-    loadChildren: () => import('./faq-refacto/faq.module').then((m) => m.FaqModule)
-  },
   { path: '**', redirectTo: '/nlp/inbox' }
 ];
 
