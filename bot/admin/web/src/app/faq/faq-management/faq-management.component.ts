@@ -156,7 +156,7 @@ export class FaqManagementComponent implements OnInit {
         this.pagination.end = faqs.end;
 
         if (add) {
-          this.faqs = [...this.faqs, ...faqs.faq];
+          this.faqs = [...this.faqs, ...faqs.rows];
         } else {
           this.faqs = faqs.rows;
           this.pagination.start = faqs.start;
