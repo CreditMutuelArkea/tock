@@ -101,7 +101,7 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     partialReload: boolean = false
   ): Observable<PaginatedResult<SentenceExtended>> {
     if (showLoadingSpinner) this.loading = true;
-    console.log('start', start);
+
     let search = this.search(this.state.createPaginatedQuery(start, size)).pipe(
       takeUntil(this.destroy$),
       share()
@@ -238,11 +238,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     );
 
     if (this.pagination.end <= this.pagination.total) {
-      this.loadData(this.pagination.end - actionPerformed, actionPerformed, true, true, true);
+      const start =
+        this.pagination.end - actionPerformed >= 0 ? this.pagination.end - actionPerformed : 0;
+      this.loadData(start, actionPerformed, true, true, true);
     } else {
-      this.pagination.end = actionPerformed;
+      this.pagination.end = this.pagination.end - actionPerformed;
+      const start =
+        this.pagination.end - this.pagination.size >= this.pagination.size
+          ? this.pagination.end - this.pagination.size
+          : 0;
       if (this.pagination.start > 0 && this.pagination.start === this.pagination.total) {
-        this.loadData(this.pagination.end - this.pagination.size);
+        this.loadData(start);
       }
     }
 
