@@ -238,11 +238,17 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     );
 
     if (this.pagination.end <= this.pagination.total) {
-      this.loadData(this.pagination.end - actionPerformed, actionPerformed, true, true, true);
+      const start =
+        this.pagination.end - actionPerformed >= 0 ? this.pagination.end - actionPerformed : 0;
+      this.loadData(start, actionPerformed, true, true, true);
     } else {
       this.pagination.end = actionPerformed;
+      const start =
+        this.pagination.end - this.pagination.size >= 0
+          ? this.pagination.end - this.pagination.size
+          : 0;
       if (this.pagination.start > 0 && this.pagination.start === this.pagination.total) {
-        this.loadData(this.pagination.end - this.pagination.size);
+        this.loadData(start);
       }
     }
 
