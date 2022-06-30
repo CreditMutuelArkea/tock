@@ -97,10 +97,11 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     start: number = 0,
     size: number = this.pagination.size,
     add: boolean = false,
-    showLoadingSpinner: boolean = true
+    showLoadingSpinner: boolean = true,
+    partialReload: boolean = false
   ): Observable<PaginatedResult<SentenceExtended>> {
     if (showLoadingSpinner) this.loading = true;
-
+    console.log('start', start);
     let search = this.search(this.state.createPaginatedQuery(start, size)).pipe(
       takeUntil(this.destroy$),
       share()
@@ -109,7 +110,9 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     search.subscribe({
       next: (data: PaginatedResult<SentenceExtended>) => {
         this.pagination.total = data.total;
-        this.pagination.end = data.end;
+        if (!partialReload || this.pagination.end > this.pagination.total) {
+          this.pagination.end = data.end;
+        }
 
         if (add) {
           this.sentences = [...this.sentences, ...data.rows];
@@ -187,8 +190,16 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     this.setSentenceAccordingToAction(action, sentence);
 
     await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
-    this.pagination.end--;
+
     this.pagination.total--;
+    if (this.pagination.end <= this.pagination.total) {
+      this.loadData(this.pagination.end - 1, 1, true, true, true);
+    } else {
+      this.pagination.end--;
+      if (this.pagination.start > 0 && this.pagination.start === this.pagination.total) {
+        this.loadData(this.pagination.end - this.pagination.size);
+      }
+    }
 
     if (this.selection.isSelected(sentence)) {
       this.selection.deselect(sentence);
@@ -199,8 +210,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       duration: 2000,
       status: 'basic'
     });
-
-    if (this.sentences.length < 1) this.loadData();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
@@ -211,7 +220,9 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       });
       return;
     }
+
     const actionTitle = this.setActionTitle(action);
+    let actionPerformed = 0;
 
     for (let sentence of this.selection.selected) {
       this.setSentenceAccordingToAction(action, sentence);
@@ -221,10 +232,19 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
       this.selection.selected.map(async (sentence) => {
         await this.nlp.updateSentence(sentence).pipe(take(1)).toPromise();
         this.sentences = this.sentences.filter((s) => sentence.text !== s.text);
-        this.pagination.end--;
         this.pagination.total--;
+        actionPerformed++;
       })
     );
+
+    if (this.pagination.end <= this.pagination.total) {
+      this.loadData(this.pagination.end - actionPerformed, actionPerformed, true, true, true);
+    } else {
+      this.pagination.end = actionPerformed;
+      if (this.pagination.start > 0 && this.pagination.start === this.pagination.total) {
+        this.loadData(this.pagination.end - this.pagination.size);
+      }
+    }
 
     this.toastrService.success(
       `${actionTitle} ${this.selection.selected.length} sentences`,
@@ -236,7 +256,6 @@ export class FaqTrainingComponent implements OnInit, OnDestroy {
     );
 
     this.selection.clear();
-    if (this.sentences.length < 1) this.loadData();
   }
 
   private setSentenceAccordingToAction(action: Action, sentence: SentenceExtended): void {
