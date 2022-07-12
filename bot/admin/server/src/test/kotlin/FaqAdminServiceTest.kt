@@ -25,12 +25,14 @@ import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.nlp.admin.AdminService
 import ai.tock.nlp.front.service.storage.ClassifiedSentenceDAO
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
+import ai.tock.nlp.front.service.storage.FaqSettingsDAO
 import ai.tock.nlp.front.service.storage.IntentDefinitionDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.FaqDefinition
+import ai.tock.nlp.front.shared.config.FaqSettingsQuery
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQueryResult
 import ai.tock.shared.security.UserLogin
@@ -72,6 +74,7 @@ class FaqAdminServiceTest : AbstractTest() {
         val sentenceDAO: ClassifiedSentenceDAO = mockk(relaxed = false)
         val intentDAO: IntentDefinitionDAO = mockk(relaxed = false)
         val i18nDAO: I18nDAO = mockk(relaxed = false)
+        val faqSettingsDAO: FaqSettingsDAO = mockk(relaxed = true)
 
         init {
             // IOC
@@ -82,6 +85,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 bind<ClassifiedSentenceDAO>() with provider { sentenceDAO }
                 bind<IntentDefinitionDAO>() with provider { intentDAO }
                 bind<I18nDAO>() with provider { i18nDAO }
+                bind<FaqSettingsDAO>() with provider { faqSettingsDAO }
             }
             tockInternalInjector.inject(
                 Kodein {
@@ -340,7 +344,8 @@ class FaqAdminServiceTest : AbstractTest() {
                         allAny<IntentDefinition>(),
                         allAny<UserLogin>(),
                         allAny<I18nLabel>(),
-                        allAny<ApplicationDefinition>()
+                        allAny<ApplicationDefinition>(),
+                        allAny<FaqSettingsQuery>()
                     ) as Unit
                 } just Runs
 
@@ -435,7 +440,61 @@ class FaqAdminServiceTest : AbstractTest() {
                 //story name must no be overwritten
                 assertNotEquals(slotStory.captured.name, existingMessageStory.name)
                 assertEquals(slotStory.captured.category, FAQ_CATEGORY)
+            }
 
+            @Test
+            fun `GIVEN save faq and story When existing Faq THEN save and disable the story`() {
+
+                val faqDefinitionRequestDisabledStory = faqDefinitionRequest.copy(enabled = false)
+                val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+                every {
+                    faqAdminService["createOrUpdateIntent"](
+                        allAny<FaqDefinitionRequest>(),
+                        allAny<ApplicationDefinition>()
+                    )
+                } returns existingIntent
+
+                faqAdminService.saveFAQ(faqDefinitionRequestDisabledStory, userLogin, applicationDefinition)
+
+                val botAdminService = spyk<BotAdminService>()
+                every {
+                    botAdminService["getBotConfigurationsByNamespaceAndBotId"](
+                        any<String>(),
+                        any<String>()
+                    )
+                } answers { aApplication }
+                every {
+                    botAdminService.saveStory(
+                        any<String>(),
+                        any<BotStoryDefinitionConfiguration>(),
+                        any<UserLogin>(),
+                        any<IntentDefinition>()
+                    )
+                } returns existingMessageStory
+
+                val slotStory = slot<StoryDefinitionConfiguration>()
+
+                verify(exactly = 0) {
+                    botAdminService["createOrGetIntent"](
+                        any<String>(),
+                        any<String>(),
+                        any<Id<ApplicationDefinition>>(),
+                        any<String>()
+                    )
+                }
+                verify(exactly = 1) { faqDefinitionDAO.save(any()) }
+                verify(exactly = 1) { i18nDAO.save(listOf(mockedI18n)) }
+                verify(exactly = 1) { storyDefinitionDAO.save(capture(slotStory)) }
+
+                assertEquals(slotStory.captured.storyId, existingMessageStory.storyId)
+                //story name must no be overwritten
+                assertNotEquals(slotStory.captured.name, existingMessageStory.name)
+                assertEquals(
+                    slotStory.captured.features.get(0).enabled,
+                    faqDefinitionRequestDisabledStory.enabled,
+                    "Should be equals to false, considered as disabled"
+                )
+                assertEquals(slotStory.captured.category, FAQ_CATEGORY)
             }
 
         }
@@ -558,7 +617,8 @@ class FaqAdminServiceTest : AbstractTest() {
                     any<IntentDefinition>(),
                     any<UserLogin>(),
                     any<I18nLabel>(),
-                    any<ApplicationDefinition>()
+                    any<ApplicationDefinition>(),
+                    any<FaqSettingsQuery>()
                 )
             }
         }

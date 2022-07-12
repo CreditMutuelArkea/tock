@@ -34,12 +34,15 @@ import ai.tock.nlp.front.service.applicationDAO
 import ai.tock.nlp.front.service.faqDefinitionDAO
 import ai.tock.nlp.front.service.intentDAO
 import ai.tock.nlp.front.service.storage.ClassifiedSentenceDAO
+import ai.tock.nlp.front.service.storage.FaqSettingsDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
 import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.FaqDefinitionDetailed
+import ai.tock.nlp.front.shared.config.FaqSettings
+import ai.tock.nlp.front.shared.config.FaqSettingsQuery
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQuery
 import ai.tock.shared.injector
@@ -68,6 +71,7 @@ object FaqAdminService {
     private val i18nDao: I18nDAO get() = injector.provide()
     private val classifiedSentenceDAO: ClassifiedSentenceDAO get() = injector.provide()
     private val storyDefinitionDAO: StoryDefinitionConfigurationDAO get() = injector.provide()
+    private val faqSettingsDAO: FaqSettingsDAO get() = injector.provide()
     private val front = FrontClient
 
     private const val FAQ_CATEGORY = "faq"
@@ -81,6 +85,7 @@ object FaqAdminService {
         userLogin: UserLogin,
         application: ApplicationDefinition
     ): FaqDefinitionRequest {
+        val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
         val intent = createOrUpdateIntent(query, application)
         if (intent == null) {
             badRequest("Trouble when creating/updating intent : $intent")
@@ -105,7 +110,8 @@ object FaqAdminService {
                 intent,
                 userLogin,
                 i18nLabel,
-                application
+                application,
+                faqSettings
             )
 
             return FaqDefinitionRequest(
@@ -173,7 +179,8 @@ object FaqAdminService {
         intent: IntentDefinition,
         userLogin: UserLogin,
         i18nLabel: I18nLabel,
-        applicationDefinition: ApplicationDefinition
+        applicationDefinition: ApplicationDefinition,
+        faqFaqSettingsQuery: FaqSettingsQuery?
     ) {
         val existingStory = storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
             applicationDefinition.namespace,
@@ -181,86 +188,79 @@ object FaqAdminService {
             intent.name
         )
 
-        // create active story
-        if (query.enabled) {
-            val storyDefinitionConfiguration =
-                prepareStoryCreationOrUpdate(query, intent, i18nLabel, applicationDefinition, existingStory)
+        val storyDefinitionConfiguration =
+            prepareStoryCreationOrUpdate(
+                query,
+                intent,
+                i18nLabel,
+                applicationDefinition,
+                existingStory,
+                faqFaqSettingsQuery
+            )
 
-            BotAdminService.saveStory(
-                applicationDefinition.namespace,
-                BotStoryDefinitionConfiguration(storyDefinitionConfiguration, i18nLabel.defaultLocale, false),
-                userLogin, intent
-            ).also { logger.info { "Saved FAQ with story \"${it?.intent?.name}\" enabled" } }
-        } else {
-            logger.info { "Saved FAQ without story enabled" }
+        BotAdminService.saveStory(
+            applicationDefinition.namespace,
+            BotStoryDefinitionConfiguration(storyDefinitionConfiguration, i18nLabel.defaultLocale, false),
+            userLogin, intent
+
+        ).also {
+            val enabledLog: String = if (query.enabled) "enabled" else "disabled"
+            logger.info { "Saved FAQ with story \"${it?.intent?.name}\" $enabledLog" }
         }
     }
 
     /**
-     * Update the FAQ status with the use of story activation feature
+     * Update FAQ story with the settings (Add or Remove the ending rule)
      */
-    fun updateActivationStatusStory(
-        query: FaqDefinitionRequest,
-        userLogin: UserLogin,
-        applicationDefinition: ApplicationDefinition
+    fun updateAllFaqStoryWithSettings(
+        applicationDefinition: ApplicationDefinition,
+        faqSettings: FaqSettings
     ) {
-        val currentFaq = query.id?.let { faqDefinitionDAO.getFaqDefinitionById(it.toId()) }
-        val currentIntent = currentFaq?.intentId?.let { AdminService.front.getIntentById(it) }
 
-        val existingStory = currentIntent?.let {
-            storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
-                applicationDefinition.namespace,
-                applicationDefinition.name,
-                currentIntent.name
-            )
-        }
+        val listFaq = faqDefinitionDAO.getFaqDefinitionByApplicationId(applicationDefinition._id)
 
-        existingStory?.let {
-            val savedFaq = FaqDefinition(
-                _id = currentFaq._id,
-                applicationId = currentFaq.applicationId,
-                intentId = currentFaq.intentId,
-                i18nId = currentFaq.i18nId,
-                tags = currentFaq.tags,
-                enabled = query.enabled,
-                creationDate = currentFaq.creationDate,
-                updateDate = Instant.now()
-            )
-            faqDefinitionDAO.save(savedFaq).also { logger.info { "Updating FAQ \"${currentFaq._id}\"" } }
+        listFaq.forEach {
+            val currentIntent = it.intentId?.let {
+                AdminService.front.getIntentById(it)
+            }
 
-            val botStoryDefinitionConfiguration = BotAdminService.saveStory(
-                applicationDefinition.namespace,
-                BotStoryDefinitionConfiguration(
-                    StoryDefinitionConfiguration(
-                        existingStory.storyId,
-                        existingStory.botId,
-                        existingStory.intent,
-                        existingStory.currentType,
-                        existingStory.answers,
-                        existingStory.version,
-                        existingStory.namespace,
-                        existingStory.mandatoryEntities,
-                        existingStory.steps,
-                        existingStory.name,
-                        existingStory.category,
-                        existingStory.description,
-                        existingStory.userSentence,
-                        existingStory.userSentenceLocale,
-                        existingStory.configurationName,
-                        listOf(StoryDefinitionConfigurationFeature(null, query.enabled, null, null)),
-                        existingStory._id,
-                        existingStory.tags,
-                        existingStory.configuredAnswers,
-                        existingStory.configuredSteps
-                    ), existingStory.userSentenceLocale!!, false
-                ),
-                userLogin, currentIntent
-            )
+            val existingStory = currentIntent?.let {
+                storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
+                    applicationDefinition.namespace,
+                    applicationDefinition.name,
+                    currentIntent.name
+                )
+            }
 
-            botStoryDefinitionConfiguration?.let {
-                logger.info { "Update FAQ status with feature activation : ${query.enabled}" }
+            existingStory?.let {
+                storyDefinitionDAO.save(
+                    existingStory.copy(
+                        features = prepareEndingFeatures(
+                            existingStory,
+                            faqSettings
+                        )
+                    )
+                )
             }
         }
+    }
+
+    private fun prepareEndingFeatures(
+        existingStory: StoryDefinitionConfiguration,
+        faqSettings: FaqSettings
+    ): List<StoryDefinitionConfigurationFeature> {
+        val features = mutableListOf<StoryDefinitionConfigurationFeature>()
+        features.addAll(existingStory.features)
+
+        features.removeIf { feature -> feature.endWithStoryId != null }
+        logger.info { "Remove all features ending from FAQ Story '${existingStory.storyId}'" }
+
+        if (faqSettings.satisfactionEnabled) {
+            features.add(StoryDefinitionConfigurationFeature(null, true, null, faqSettings.satisfactionStoryId))
+            logger.info { "Add the feature ending '${faqSettings.satisfactionStoryId}' to FAQ Story '${existingStory.storyId}'" }
+        }
+
+        return features
     }
 
     /**
@@ -272,8 +272,10 @@ object FaqAdminService {
         intent: IntentDefinition,
         i18nLabel: I18nLabel,
         applicationDefinition: ApplicationDefinition,
-        existingStory: StoryDefinitionConfiguration?
+        existingStory: StoryDefinitionConfiguration?,
+        faqFaqSettingsQuery: FaqSettingsQuery?
     ): StoryDefinitionConfiguration {
+        val features = prepareStoryFeatures(query.enabled, faqFaqSettingsQuery)
         return if (existingStory != null) {
             StoryDefinitionConfiguration(
                 existingStory.storyId,
@@ -291,7 +293,7 @@ object FaqAdminService {
                 query.utterances.first(),
                 i18nLabel.defaultLocale,
                 existingStory.configurationName,
-                listOf(StoryDefinitionConfigurationFeature(null, query.enabled, null, null)),
+                features,
                 existingStory._id,
                 existingStory.tags,
                 existingStory.configuredAnswers,
@@ -313,9 +315,36 @@ object FaqAdminService {
                 intent.description!!,
                 query.utterances.first(),
                 i18nLabel.defaultLocale,
-                features = listOf(StoryDefinitionConfigurationFeature(null, query.enabled, null, null))
+                features = features
             )
         }
+    }
+
+    /**
+     * Prepare the story features for the faq
+     * @param : enabled : is the Story Enabled : enable the feature concerning the activation rule feature
+     * @param : faqFaqSettingsQuery : enable the feature concerning the ending rule feature
+     */
+    private fun prepareStoryFeatures(
+        enabled: Boolean,
+        faqFaqSettingsQuery: FaqSettingsQuery?
+    ): MutableList<StoryDefinitionConfigurationFeature> {
+        val features = mutableListOf<StoryDefinitionConfigurationFeature>()
+        //activation rule feature
+        features.add(
+            StoryDefinitionConfigurationFeature(
+                null, enabled, null, null
+            )
+        )
+        //ending rule feature
+        faqFaqSettingsQuery?.let {
+            features.add(
+                StoryDefinitionConfigurationFeature(
+                    null, true, null, it.satisfactionStoryId
+                )
+            )
+        }
+        return features
     }
 
     /**
@@ -659,5 +688,31 @@ object FaqAdminService {
             }
         }
         return false
+    }
+
+    fun getSettings(applicationDefinition: ApplicationDefinition): FaqSettingsQuery? {
+        return faqSettingsDAO.getFaqSettingsByApplicationId(applicationDefinition._id)?.toFaqSettingsQuery()
+    }
+
+    fun saveSettings(
+        applicationDefinition: ApplicationDefinition,
+        faqSettingsQuery: FaqSettingsQuery
+    ): FaqSettingsQuery {
+        val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(applicationDefinition._id)
+
+        val faqSettingsUpdated = (
+                faqSettings ?: FaqSettings(
+                    applicationId = applicationDefinition._id, creationDate = Instant.now(), updateDate = Instant.now()
+                )
+                ).copy(
+                satisfactionEnabled = faqSettingsQuery.satisfactionEnabled,
+                satisfactionStoryId = faqSettingsQuery.satisfactionStoryId,
+                updateDate = Instant.now()
+            )
+
+        faqSettingsDAO.save(faqSettingsUpdated)
+        updateAllFaqStoryWithSettings(applicationDefinition, faqSettingsUpdated)
+
+        return faqSettingsUpdated.toFaqSettingsQuery()
     }
 }
