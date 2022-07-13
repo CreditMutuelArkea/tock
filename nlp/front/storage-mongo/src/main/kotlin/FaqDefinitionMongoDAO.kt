@@ -48,6 +48,7 @@ import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.descending
 import org.litote.kmongo.div
 import org.litote.kmongo.document
+import org.litote.kmongo.ensureUniqueIndex
 import org.litote.kmongo.eq
 import org.litote.kmongo.excludeId
 import org.litote.kmongo.expr
@@ -80,11 +81,14 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     internal val col: MongoCollection<FaqDefinition> by lazy {
 
         val c = MongoFrontConfiguration.database.getCollection<FaqDefinition>().apply {
-            ensureIndex(FaqDefinition::applicationId)
-            ensureIndex(FaqDefinition::i18nId)
-            ensureIndex(FaqDefinition::creationDate)
-            ensureIndex(FaqDefinition::tags)
-            ensureIndex(FaqDefinition::intentId)
+            ensureUniqueIndex(
+                FaqDefinition::intentId,
+                FaqDefinition::i18nId,
+                FaqDefinition::tags,
+                FaqDefinition::updateDate
+            )
+            ensureIndex(FaqDefinition::intentId, FaqDefinition::i18nId, FaqDefinition::applicationId)
+            ensureIndex(FaqDefinition::intentId, FaqDefinition::creationDate, FaqDefinition::applicationId)
         }
         c
     }
@@ -320,6 +324,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      */
     private fun filterOnApplicationId(applicationId: String): Bson =
         FaqDefinition::applicationId `in` applicationId
+
 
     /**
      * Group aggregation pipeline to recompose and group data after multiple unwind especially due to utterances unwind
