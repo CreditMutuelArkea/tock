@@ -767,29 +767,46 @@ object FaqAdminService {
             val intent = intentDAO.getIntentById(faqDefinition.intentId)
             if (intent != null) {
                 logger.info { "Deleting FAQ Definition \"${intent.label}\"" }
-
                 val applicationDefinitionIds = intent.applications.map { it }
                 if (applicationDefinitionIds.isNotEmpty() && applicationDefinitionIds.size == 1) {
-                    val applicationDefinition = applicationDAO.getApplicationById(applicationDefinitionIds.first())
-                    if (applicationDefinition != null) {
-                        front.removeIntentFromApplication(applicationDefinition, faqDefinition.intentId)
-                        faqDefinitionDAO.deleteFaqDefinitionById(faqDefinition._id)
-                        i18nDao.deleteByNamespaceAndId(namespace, faqDefinition.i18nId)
-
-                        val existingStory = storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
-                            applicationDefinition.namespace,
-                            applicationDefinition.name,
-                            intent.name
-                        )
-                        if (existingStory != null) {
-                            BotAdminService.deleteStory(existingStory.namespace, existingStory._id.toString())
-                        }
-                        return true
-                    }
+                    return deleteOneFaqDefinition(applicationDefinitionIds, faqDefinition, namespace, intent.name)
                 } else {
                     throw NotImplementedError("Multiple application definition found for intent not IMPLEMENTED")
                 }
             }
+        }
+        return false
+    }
+
+
+    /**
+     * Delete a FaqDefinition when associated with only on application without shared intents
+     * @param applicationDefinitionIds A list of applicationDefintion Ids : only first is used
+     * @param faqDefinition The FaqDefinition
+     * @param namespace The application namespace
+     * @param intentName Then intent name
+     *
+     */
+    private fun deleteOneFaqDefinition(
+        applicationDefinitionIds: List<Id<ApplicationDefinition>>,
+        faqDefinition: FaqDefinition,
+        namespace: String,
+        intentName: String
+    ): Boolean {
+        val applicationDefinition = applicationDAO.getApplicationById(applicationDefinitionIds.first())
+        if (applicationDefinition != null) {
+            front.removeIntentFromApplication(applicationDefinition, faqDefinition.intentId)
+            faqDefinitionDAO.deleteFaqDefinitionById(faqDefinition._id)
+            i18nDao.deleteByNamespaceAndId(namespace, faqDefinition.i18nId)
+
+            val existingStory = storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
+                applicationDefinition.namespace, applicationDefinition.name, intentName
+            )
+
+            if (existingStory != null) {
+                BotAdminService.deleteStory(existingStory.namespace, existingStory._id.toString())
+            }
+            return true
         }
         return false
     }
