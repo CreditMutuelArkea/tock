@@ -94,12 +94,10 @@ class FaqAdminServiceTest : AbstractTest() {
                 bind<I18nDAO>() with provider { i18nDAO }
                 bind<FaqSettingsDAO>() with provider { faqSettingsDAO }
             }
-            tockInternalInjector.inject(
-                Kodein {
-                    import(defaultModulesBinding())
-                    import(specificModule)
-                }
-            )
+            tockInternalInjector.inject(Kodein {
+                import(defaultModulesBinding())
+                import(specificModule)
+            })
         }
 
         private val applicationId = newId<ApplicationDefinition>()
@@ -133,7 +131,10 @@ class FaqAdminServiceTest : AbstractTest() {
         private val secondUterrance = "FAQ utterance B"
 
         private val faqDefinitionRequest = FaqDefinitionRequest(
-            faqId.toString(), intentId.toString(), Locale.FRENCH, applicationId,
+            faqId.toString(),
+            intentId.toString(),
+            Locale.FRENCH,
+            applicationId,
             now,
             now,
             "FAQ TITLE",
@@ -174,6 +175,7 @@ class FaqAdminServiceTest : AbstractTest() {
             connectorId = null,
             alternatives = emptyList()
         )
+
         val mockedI18n = I18nLabel(
             _id = i18nId, namespace = namespace, category = "faq", linkedSetOf(
                 mockedDefaultLocalizedLabel
@@ -650,14 +652,6 @@ class FaqAdminServiceTest : AbstractTest() {
                     ConnectorType.rest, ConnectorType.rest
                 )
             )
-            val botAdminService = spyk<BotAdminService>()
-
-            every {
-                botAdminService.deleteStory(
-                    eq(mockedStoryDefinition.namespace),
-                    eq(mockedStoryDefinition._id.toString())
-                )
-            } returns true
         }
 
         @Test
@@ -668,6 +662,13 @@ class FaqAdminServiceTest : AbstractTest() {
             val isDeleted = faqAdminService.deleteFaqDefinition(namespace, faqId.toString())
 
             assertTrue(isDeleted, "It should returns true because faq should be deleted")
+            verify(exactly = 1) {
+                faqDefinitionDAO.getFaqDefinitionById(any())
+                faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
+                intentDAO.getIntentById(any())
+                i18nDAO.deleteByNamespaceAndId(any(), any())
+                storyDefinitionDAO.delete(any())
+            }
         }
 
         @Test
@@ -678,6 +679,13 @@ class FaqAdminServiceTest : AbstractTest() {
             val isDeleted = faqAdminService.deleteFaqDefinition(namespace, faqId.toString())
 
             assertFalse(isDeleted, "It should returns false because faq could not be deleted")
+
+            verify(exactly = 1) { faqDefinitionDAO.getFaqDefinitionById(any()) }
+            verify(exactly = 0) {
+                faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
+                i18nDAO.deleteByNamespaceAndId(any(), any())
+                storyDefinitionDAO.delete(any())
+            }
         }
 
         @Test
@@ -686,6 +694,13 @@ class FaqAdminServiceTest : AbstractTest() {
             initDeleteFaqMock(mockedFaqDefinition = null)
 
             val isDeleted = faqAdminService.deleteFaqDefinition(namespace, faqId.toString())
+            verify(exactly = 1) { faqDefinitionDAO.getFaqDefinitionById(any()) }
+            verify(exactly = 0) {
+                faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
+                intentDAO.getIntentById(any())
+                i18nDAO.deleteByNamespaceAndId(any(), any())
+                storyDefinitionDAO.delete(any())
+            }
 
             assertFalse(isDeleted, "It should returns false because faq could not be deleted")
         }
