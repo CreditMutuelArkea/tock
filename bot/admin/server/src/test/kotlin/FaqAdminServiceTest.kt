@@ -100,10 +100,16 @@ class FaqAdminServiceTest : AbstractTest() {
         private val applicationId = newId<ApplicationDefinition>()
         private val intentId = "idIntent".toId<IntentDefinition>()
         private val intentId2 = "idIntent2".toId<IntentDefinition>()
+        private val intentId3 = "idIntent3".toId<IntentDefinition>()
+        private val intentId4 = "idIntent4".toId<IntentDefinition>()
         private val faqId = "faqDefId".toId<FaqDefinition>()
         private val faqId2 = "faqDefId2".toId<FaqDefinition>()
+        private val faqId3 = "faqDefId3".toId<FaqDefinition>()
+        private val faqId4 = "faqDefId4".toId<FaqDefinition>()
         private val i18nId = "idI18n".toId<I18nLabel>()
         private val i18nId2 = "idI18n2".toId<I18nLabel>()
+        private val i18nId3 = "idI18n3".toId<I18nLabel>()
+        private val i18nId4 = "idI18n4".toId<I18nLabel>()
         private val now = Instant.now().truncatedTo(ChronoUnit.MILLIS)
         private val tagList = listOf("TAG1", "TAG2")
 
@@ -616,11 +622,13 @@ class FaqAdminServiceTest : AbstractTest() {
         @Test
         fun `GIVEN no classifiedSentences associated to a faq THEN should return MISSING_UTTERANCE as search`() {
             val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            val numberOfUtterances = 1
+            val expectedUtteranceLabel = "expectedLabel"
             initSearchFaqMockWithoutLabelsSearch(
-                faqAdminService, listOf(
+                listOf(
                     createFaqQueryResult(
                         faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0
-                    ), createFaqQueryResult()
+                    ), createFaqQueryResult(numberOfUtterances = 1, utteranceText = expectedUtteranceLabel)
                 )
             )
 
@@ -633,10 +641,12 @@ class FaqAdminServiceTest : AbstractTest() {
                 faqResult.rows.first().utterances[0],
                 "The name of the utterance should be 'MISSING_UTTERANCE'"
             )
+            //test name is the utterranceText+numberOfutterance
+            //here 0 is the first label, see createFaqQueryResult() method
             assertEquals(
-                "randomText 1",
+                expectedUtteranceLabel + numberOfUtterances,
                 faqResult.rows.get(1).utterances[0],
-                "The name of the utterance should be 'randomText 1'"
+                "The name of the utterance should be $expectedUtteranceLabel$numberOfUtterances"
             )
 
             verify(exactly = 1) {
@@ -654,31 +664,69 @@ class FaqAdminServiceTest : AbstractTest() {
                     any<List<FaqQueryResult>>(), any<ApplicationDefinition>()
                 )
             }
-
             verify(atLeast = 2) { i18nDAO.getLabelById(any()) }
+        }
+
+        @Test
+        fun `GIVEN search faq with a query text 'Question' WHEN i18nLabels search found THEN return expected number of faq`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+            initSearchFaqMockWithLabelsSearch(
+                listOf(
+                    createFaqQueryResult(
+                        faqId = faqId2,
+                        faqName = "FAQ A",
+                        intentId = intentId2,
+                        i18nId = i18nId2,
+                        utteranceText = "Question with answer to find",
+                        numberOfUtterances = 3
+                    ),
+                    createFaqQueryResult(
+                        faqId = faqId3,
+                        intentId = intentId3,
+                        i18nId = i18nId3,
+                        faqName = "FAQ B",
+                        numberOfUtterances = 3,
+                        utteranceText = "Question with answer also expected"
+                    ),
+                    createFaqQueryResult(
+                        faqId = faqId4,
+                        i18nId = i18nId4,
+                        intentId = intentId4,
+                        faqName = "FAQ C",
+                        numberOfUtterances = 1,
+                        utteranceText = "utteranceLabelUnexpected"
+                    )
+                ),
+                listOf<I18nLabel>(
+                    mockedI18n.copy(
+                        i18nId2, i18n = linkedSetOf<I18nLocalizedLabel>(
+                            mockedDefaultLocalizedLabel.copy(label = "Answer to find1")
+                        ), defaultLabel = "Answer to find1"
+                    ),
+                    mockedI18n.copy(
+                        i18nId3, i18n = linkedSetOf<I18nLocalizedLabel>(
+                            mockedDefaultLocalizedLabel.copy(label = "Answer also expected1")
+                        ), defaultLabel = "Answer also expected1"
+                    )
+                )
+            )
+
+            val faqSearchRequest = createFaqSearchRequest(enabled = null, search = "Question")
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
+
+            println(faqResult.rows)
+
+            assertEquals(faqResult.total, 2, "There should be two faq found when searching for a label question")
 
         }
 
         private fun initSearchFaqMockWithoutLabelsSearch(
-            faqAdminService: FaqAdminService,
             faqQueryResults: List<FaqQueryResult> = listOf(createFaqQueryResult()),
-//            mockedIntentDefinition: IntentDefinition = existingIntentDefinition,
             mockedI18nLabels: List<I18nLabel> = mockedI18nLabels_2Elements,
-//            mockedFaqDefinition: FaqDefinition = existingFaqDefinition
         ) {
-            every {
-                faqAdminService["findPredicatesFrom18nLabels"](any<ApplicationDefinition>(), any<String>())
-            } returns mockedI18nLabels
-
             val searchResult = Pair(faqQueryResults, faqQueryResults.size.toLong())
 
             every { faqDefinitionDAO.getFaqDetailsWithCount(any(), any(), any()) } returns searchResult
-
-            every {
-                faqAdminService["searchFromTockBotDbWithFoundTextLabels"](
-                    any<List<FaqQueryResult>>(), any<ApplicationDefinition>(), mockedI18nLabels
-                )
-            } returns emptySet<FaqDefinitionRequest>()
 
             every { i18nDAO.getLabelById(i18nId) } returns mockedI18nLabels[0]
             if (mockedI18nLabels.size > 1) {
@@ -687,71 +735,86 @@ class FaqAdminServiceTest : AbstractTest() {
 
         }
 
-    }
+        private fun initSearchFaqMockWithLabelsSearch(
+            faqQueryResults: List<FaqQueryResult> = listOf(createFaqQueryResult()),
+            mockedI18nLabels: List<I18nLabel> = mockedI18nLabels_2Elements,
+        ) {
 
+            val searchedWithLabels =
+                mockedI18nLabels.flatMap { i18n -> faqQueryResults.filter { it.i18nId == i18n._id }.map { it } }
 
-    private fun createFaqSearchRequest(
-        enabled: Boolean? = null,
-        search: String? = null,
-        tags: List<String> = emptyList(),
-        start: Int = 0,
-        size: Int = 10
-    ): FaqSearchRequest {
-        return FaqSearchRequest(tags, search, enabled, userLogin, null)
-    }
+            val searchResult = Pair(searchedWithLabels, searchedWithLabels.size.toLong())
 
-    /**
-     * Create data For Faq Search with associated data for collections in FaqDefinition, IntentDefinition, ClassifiedSentences
-     * With default data for each parameter
-     * @return a Pair <listOf FaqQueryResult and the count>
-     */
-    private fun createFaqQueryResult(
-        faqId: Id<FaqDefinition> = FaqAdminServiceTest.faqId,
-        intentId: Id<IntentDefinition> = FaqAdminServiceTest.intentId,
-        i18nId: Id<I18nLabel> = FaqAdminServiceTest.i18nId,
-        tagList: List<String> = emptyList(),
-        applicationId: Id<ApplicationDefinition> = FaqAdminServiceTest.applicationId,
-        enabled: Boolean = true,
-        faqName: String = "Faq Name",
-        numberOfUtterances: Int = 1,
-        utteranceText: String = "randomText",
-        classifiedSentenceStatus: ClassifiedSentenceStatus = ClassifiedSentenceStatus.validated,
-        instant: Instant = now
-    ): FaqQueryResult {
+            every { i18nDAO.getLabels(namespace, any()) } returns mockedI18nLabels
 
-        val createdIntent = IntentDefinition(
-            faqName,
-            namespace,
-            setOf(applicationId),
-            emptySet(),
-            label = StringUtils.lowerCase(faqName),
-            category = FAQ_CATEGORY,
-            _id = intentId
-        )
+            every { faqDefinitionDAO.getFaqDetailsWithCount(any(), any(), any()) } returns searchResult
 
-        //create utterance according to the number of utterance
-        val utterances = ArrayList<ClassifiedSentence>()
-        for (number: Int in 1..numberOfUtterances) {
-            utterances.add(createUtterance("$utteranceText $number", intentId, classifiedSentenceStatus))
         }
 
-        return FaqQueryResult(
-            faqId, applicationId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent
-        )
+
+        private fun createFaqSearchRequest(
+            enabled: Boolean? = null,
+            search: String? = null,
+            tags: List<String> = emptyList(),
+            start: Int = 0,
+            size: Int = 10
+        ): FaqSearchRequest {
+            return FaqSearchRequest(tags, search, enabled, userLogin, null)
+        }
+
+        /**
+         * Create data For Faq Search with associated data for collections in FaqDefinition, IntentDefinition, ClassifiedSentences
+         * With default data for each parameter
+         * @return a Pair <listOf FaqQueryResult and the count>
+         */
+        private fun createFaqQueryResult(
+            faqId: Id<FaqDefinition> = FaqAdminServiceTest.faqId,
+            intentId: Id<IntentDefinition> = FaqAdminServiceTest.intentId,
+            i18nId: Id<I18nLabel> = FaqAdminServiceTest.i18nId,
+            tagList: List<String> = emptyList(),
+            applicationId: Id<ApplicationDefinition> = FaqAdminServiceTest.applicationId,
+            enabled: Boolean = true,
+            faqName: String = "Faq Name",
+            numberOfUtterances: Int = 1,
+            utteranceText: String = "randomText",
+            classifiedSentenceStatus: ClassifiedSentenceStatus = ClassifiedSentenceStatus.validated,
+            instant: Instant = now
+        ): FaqQueryResult {
+
+            val createdIntent = IntentDefinition(
+                faqName,
+                namespace,
+                setOf(applicationId),
+                emptySet(),
+                label = StringUtils.lowerCase(faqName),
+                category = FAQ_CATEGORY,
+                _id = intentId
+            )
+
+            //create utterance according to the number of utterance
+            val utterances = ArrayList<ClassifiedSentence>()
+            for (number: Int in 1..numberOfUtterances) {
+                utterances.add(createUtterance("$utteranceText$number", intentId, classifiedSentenceStatus))
+            }
+
+            return FaqQueryResult(
+                faqId, applicationId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent
+            )
+        }
+
+        private fun createUtterance(text: String, intentId: Id<IntentDefinition>, status: ClassifiedSentenceStatus) =
+            ClassifiedSentence(
+                text = text,
+                language = Locale.FRENCH,
+                applicationId = applicationId,
+                creationDate = Instant.now(),
+                updateDate = Instant.now(),
+                status = status,
+                classification = Classification(intentId, emptyList()),
+                lastIntentProbability = 1.0,
+                lastEntityProbability = 1.0,
+                qualifier = userLogin
+            )
+
     }
-
-    private fun createUtterance(text: String, intentId: Id<IntentDefinition>, status: ClassifiedSentenceStatus) =
-        ClassifiedSentence(
-            text = text,
-            language = Locale.FRENCH,
-            applicationId = applicationId,
-            creationDate = Instant.now(),
-            updateDate = Instant.now(),
-            status = status,
-            classification = Classification(intentId, emptyList()),
-            lastIntentProbability = 1.0,
-            lastEntityProbability = 1.0,
-            qualifier = userLogin
-        )
-
 }
