@@ -163,7 +163,7 @@ object BotAdminService {
         }
     }
 
-    private fun createOrGetIntent(
+    fun createOrGetIntent(
         namespace: String,
         intentName: String,
         applicationId: Id<ApplicationDefinition>,
@@ -482,7 +482,7 @@ object BotAdminService {
             val fileName = "T${Dice.newId()}.kt"
             val result = KotlinCompilerClient.compile(KotlinFile(this, fileName))
             if (result?.compilationResult == null) {
-                throw badRequest("Compilation error: ${result?.errors?.joinToString()}")
+                badRequest("Compilation error: ${result?.errors?.joinToString()}")
             } else {
                 val c = result.compilationResult!!
                 val newScript = ScriptAnswerVersionedConfiguration(
@@ -825,7 +825,7 @@ object BotAdminService {
         )
     }
 
-    private fun saveSentence(
+    fun saveSentence(
         text: String,
         locale: Locale,
         applicationId: Id<ApplicationDefinition>,

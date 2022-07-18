@@ -1,4 +1,4 @@
-import { saveAs } from 'file-saver';
+import { saveAs } from 'file-saver-es';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { FaqDefinitionExtended } from '../faq-management.component';
