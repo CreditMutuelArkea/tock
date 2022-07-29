@@ -105,24 +105,6 @@ internal object MediaConverter {
         }
     }
 
-    private fun BotBus.fromMediaCard(message: MediaCard): List<ConnectorMessage> {
-        val title: String = translate(message.title).toString()
-        val text: String = translate(message.subTitle).toString()
-
-        val file = message.file
-        val image: Image? = toImage(file)
-
-        val actions = message.actions
-        val quickReply: List<QuickReply> = toQuickReplies(actions)
-        val payloadActions: List<Action> = toActions(actions)
-
-        val payload: Payload = getPayload(title, text, image, payloadActions)
-
-        val iadvizeMessage = IadvizeMessage(payload, quickReply)
-
-        return listOf(iadvizeMessage)
-    }
-
     private fun getPayload(title: String, text: String, image: Image?, actions: List<Action>): Payload {
         return if((title.isNotBlank() xor text.isNotBlank()) && image == null && actions.isEmpty()) {
             //There are only one between title and text, and no image, and no action
