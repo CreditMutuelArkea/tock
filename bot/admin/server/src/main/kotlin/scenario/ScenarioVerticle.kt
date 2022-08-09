@@ -18,7 +18,8 @@ package ai.tock.bot.admin.scenario
 
 import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
-import ai.tock.shared.exception.TockException
+import ai.tock.shared.exception.*
+import ai.tock.shared.exception.rest.ConflictException
 import ai.tock.shared.injector
 import ai.tock.shared.security.TockUserRole.*
 import ai.tock.shared.exception.rest.InternalServerException
@@ -28,6 +29,7 @@ import com.github.salomonbrys.kodein.instance
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
+import kotlin.reflect.jvm.internal.impl.protobuf.Internal
 
 /**
  * ScenarioVerticle contains all the routes and actions associated with the scenarios
@@ -70,7 +72,7 @@ open class ScenarioVerticle {
      */
     protected val getAllScenarios: (RoutingContext) -> List<ScenarioResult> = { context ->
         logger.debug { "request to get all scenario" }
-        catchExternalException {
+        catchException {
             scenarioService
                 .findAll()
                 .map(mapToScenarioResult)
@@ -85,7 +87,7 @@ open class ScenarioVerticle {
         val scenarioId = extractScenarioId(context)
         logger.debug { "request to get scenario id $scenarioId" }
         //return
-        catchExternalException {
+        catchException {
             scenarioService
                 .findById(scenarioId)
                 .mapToScenarioResult()
@@ -100,7 +102,7 @@ open class ScenarioVerticle {
         logger.debug { "request to create scenario name ${request.name}" }
         context.setResponseStatusCode(201)
         //return
-        catchExternalException {
+        catchException {
             scenarioService
                 .create(request.mapToScenario())
                 .mapToScenarioResult()
@@ -116,7 +118,7 @@ open class ScenarioVerticle {
         logger.debug { "request to update scenario id $scenarioId" }
         context.setResponseStatusCode(200)
         //return
-        catchExternalException {
+        catchException {
             scenarioService
                 .update(scenarioId, request.mapToScenario())
                 .mapToScenarioResult()
@@ -135,14 +137,36 @@ open class ScenarioVerticle {
         val scenarioId = extractScenarioId(context)
         logger.debug { "request to delete scenario id $scenarioId" }
         //no return
-        catchExternalException {
+        catchException {
             scenarioService.delete(scenarioId)
         }
     }
 
-    private fun <O> catchExternalException(fallibleSection: () -> O): O {
+    private fun <O> catchException(fallibleSection: () -> O): O {
         try {
             return fallibleSection.invoke()
+        } catch(scenarioNotFoundException : ScenarioNotFoundException) {
+            with(scenarioNotFoundException) {
+                throw NotFoundException("scenario ${id.toDisplay()}not found")
+            }
+        } catch(badScenarioIdException : BadScenarioIdException) {
+            with(badScenarioIdException) {
+                throw ConflictException("scenario id of the uri must be the same as in the body but they are different, $expected ≠ $received")
+            }
+        } catch(scenarioArchivedException : ScenarioArchivedException) {
+            with(scenarioArchivedException) {
+                throw ConflictException("scenario ${id.toDisplay()}state in database is 'ARCHIVE', operation forbidden")
+            }
+        } catch(badScenarioStateException : BadScenarioStateException) {
+            with(badScenarioStateException) {
+                throw ConflictException("scenario state must be $stateExcepted, but is $stateReceived")
+            }
+        } catch(scenarioWithNoIdException : ScenarioWithNoIdException) {
+            throw InternalServerException("scenario from database cannot have id null")
+        } catch(scenarioWithIdException : ScenarioWithIdException) {
+            with(scenarioWithIdException) {
+                throw ConflictException("scenario id must be null, but is $id")
+            }
         } catch (tockException: TockException) {
             logger.error(fallibleSection)
             //TockException use a non-null message,
@@ -162,5 +186,12 @@ open class ScenarioVerticle {
         } else {
             this
         }
+    }
+
+    /**
+     * if value not null, add space after it to correctly display in message
+     */
+    private val toDisplay: String?.() -> String = {
+        this?.let { "$this " } ?: ""
     }
 }

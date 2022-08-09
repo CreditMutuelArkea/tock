@@ -15,6 +15,8 @@
  */
 package ai.tock.bot.admin.scenario
 
+import org.litote.kmongo.Id
+
 /**
  *
  */
@@ -30,6 +32,12 @@ interface ScenarioDAO {
      * @property id of scenario to find.
      */
     fun findById(id: String): Scenario?
+
+    /**
+     * Return a collection of Scenario with the same sagaId.
+     * @property sagaId of scenarios to find.
+     */
+    fun findByRootId(rootId: String): Collection<Scenario>
 
     /**
      * Create Scenario and return it.

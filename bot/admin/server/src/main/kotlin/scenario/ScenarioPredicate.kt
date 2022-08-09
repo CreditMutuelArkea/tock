@@ -16,16 +16,17 @@
 
 package ai.tock.bot.admin.scenario
 
-import ai.tock.shared.exception.rest.ConflictException
-import ai.tock.shared.exception.rest.InternalServerException
-import ai.tock.shared.exception.rest.NotFoundException
+import ai.tock.bot.admin.scenario.ScenarioState.*
+import ai.tock.shared.exception.*
 
 /**
  * Throws RestException if scenario cannot be created in database
  */
 val checkToCreate: Scenario.() -> Scenario = {
     if(id != null && id!!.isNotBlank()) {
-        throw ConflictException("scenario id must be null, but is $id")
+        throw ScenarioWithIdException(id!!, "scenario id is $id")
+    } else if(!DRAFT.equals(state)) {
+        throw BadScenarioStateException(DRAFT.name, state.name, "scenario state must be ${DRAFT.name}, but is ${state.name}")
     } else {
         this
     }
@@ -34,9 +35,13 @@ val checkToCreate: Scenario.() -> Scenario = {
 /**
  * Throws RestException if scenario cannot be created in database
  */
-val checkToUpdate: Scenario.(String) -> Scenario = { scenarioId ->
-    if(scenarioId != id) {
-        throw ConflictException("the scenario id of the uri must be the same as in the body but they are different, $scenarioId ≠ $id")
+val checkToUpdate: Scenario.(Scenario?) -> Scenario = { scenarioDataBase ->
+    if(scenarioDataBase == null) {
+        throw ScenarioNotFoundException(id, "$id not found")
+    } else if(scenarioDataBase.id != id) {
+        throw BadScenarioIdException(scenarioDataBase.id, id, "scenario id ${scenarioDataBase.id} expected, but was $id")
+    } else if(ARCHIVE.equals(scenarioDataBase.state)) {
+        throw ScenarioArchivedException(id, "scenario $id state ARCHIVE cannot be updated")
     } else {
         this
     }
@@ -48,21 +53,7 @@ val checkToUpdate: Scenario.(String) -> Scenario = { scenarioId ->
  */
 val checkIsNotNullForId: Scenario?.(String?) -> Scenario = { id ->
     if(this == null) {
-        //if id not null, add space after id to correctly display id in exception
-        val displayId: String = id?.let { "$id " } ?: ""
-        throw NotFoundException("scenario {$displayId}not found")
-    } else {
-        this
-    }
-}
-
-/**
- * Throws RestException if scenario does not exist in database
- * @properties scenario from database (null if does not exist)
- */
-val mustExist: Scenario.(Scenario?) -> Scenario = { exist ->
-    if(exist == null) {
-        throw NotFoundException("scenario id ${this.id} not found")
+        throw ScenarioNotFoundException(id, "scenario not found")
     } else {
         this
     }
@@ -72,8 +63,8 @@ val mustExist: Scenario.(Scenario?) -> Scenario = { exist ->
  * Throws RestException if id is null
  */
 val checkScenarioFromDatabase: Scenario.() -> Scenario = {
-    if (this.id == null) {
-        throw InternalServerException("scenario id from database cannot be null")
+    if (id == null) {
+        throw ScenarioWithNoIdException("scenario from database cannot have id null")
     } else {
         this
     }

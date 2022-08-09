@@ -19,6 +19,9 @@ internal class ScenarioCol_Serializer : StdSerializer<ScenarioCol>(ScenarioCol::
         gen.writeFieldName("_id")
         val __id_ = value._id
         serializers.defaultSerializeValue(__id_, gen)
+        gen.writeFieldName("rootId")
+        val _rootId_ = value.rootId
+        serializers.defaultSerializeValue(_rootId_, gen)
         gen.writeFieldName("name")
         val _name_ = value.name
         gen.writeString(_name_)
@@ -63,7 +66,7 @@ internal class ScenarioCol_Serializer : StdSerializer<ScenarioCol>(ScenarioCol::
                 }
         gen.writeFieldName("state")
         val _state_ = value.state
-        gen.writeString(_state_)
+        serializers.defaultSerializeValue(_state_, gen)
         gen.writeEndObject()
     }
 }

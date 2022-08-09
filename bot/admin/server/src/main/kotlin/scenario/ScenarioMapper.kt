@@ -30,6 +30,7 @@ val scenarioObjectMapper = ObjectMapper()
 val mapToScenario: ScenarioRequest.() -> Scenario = {
     Scenario(
         id = id,
+        rootId = sagaId,
         name = name,
         category = category,
         tags = tags,
@@ -48,6 +49,7 @@ val mapToScenario: ScenarioRequest.() -> Scenario = {
 val mapToScenarioResult: Scenario.() -> ScenarioResult = {
     ScenarioResult(
         id = id ?: throw InternalServerException("cannot create scenarioResult with id null"),
+        sagaId = rootId ?: throw InternalServerException("cannot create scenarioResult with sagaId null"),
         name = name,
         category = category,
         tags = tags,
@@ -66,6 +68,7 @@ val mapToScenarioResult: Scenario.() -> ScenarioResult = {
 val cloneWithOverridenDates: Scenario.(ZonedDateTime?, ZonedDateTime?) -> Scenario = { createDate, updateDate ->
     Scenario(
         id = this.id,
+        rootId = this.rootId,
         name = this.name,
         category = this.category,
         tags = this.tags,

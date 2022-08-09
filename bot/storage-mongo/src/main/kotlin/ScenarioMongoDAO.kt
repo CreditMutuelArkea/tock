@@ -18,6 +18,7 @@ package ai.tock.bot.mongo
 import ai.tock.bot.admin.scenario.Scenario
 import ai.tock.bot.admin.scenario.ScenarioDAO
 import ai.tock.bot.mongo.ScenarioCol_.Companion.Name
+import ai.tock.bot.mongo.ScenarioCol_.Companion.RootId
 import ai.tock.shared.exception.TockIllegalArgumentException
 import ai.tock.shared.exception.TockNotFound
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,6 +48,13 @@ internal object ScenarioMongoDAO : ScenarioDAO {
      */
     override fun findById(id: String): Scenario? {
         return scenarioDatabase.findOneById(id.toId<Scenario>())?.mapToScenario()
+    }
+
+    override fun findByRootId(rootId: String): Collection<Scenario> {
+        return scenarioDatabase.find(RootId eq rootId.toId<Scenario>())
+                               .ascendingSort(Name)
+                               .toList()
+                               .map(mapToScenario)
     }
 
     /**
@@ -97,6 +105,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     private val mapToScenario: ScenarioCol.() -> Scenario  = {
         Scenario(
             id = _id.toString(),
+            rootId = rootId.toString(),
             name = name,
             category = category,
             tags = tags,
@@ -111,6 +120,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     private val mapToScenarioCol: Scenario.() -> ScenarioCol  = {
         ScenarioCol(
             _id = id?.toId() ?: newId(),
+            rootId = rootId?.toId() ?: newId(),
             name = name,
             category = category,
             tags = tags,

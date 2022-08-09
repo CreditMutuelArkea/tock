@@ -14,20 +14,6 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.scenario
+package ai.tock.shared.exception
 
-import java.time.ZonedDateTime
-
-data class Scenario(
-    val id: String? = null,
-    val rootId: String? = null,
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val applicationId: String,
-    var createDate: ZonedDateTime? = null,
-    var updateDate: ZonedDateTime? = null,
-    val description: String? = null,
-    val data: String? = null,
-    val state: ScenarioState
-)
+class ScenarioWithIdException(val id: String, message : String) : TockException(message)

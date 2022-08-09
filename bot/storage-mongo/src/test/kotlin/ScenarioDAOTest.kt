@@ -17,6 +17,7 @@
 package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.scenario.Scenario
+import ai.tock.bot.admin.scenario.ScenarioState
 import ai.tock.shared.exception.TockIllegalArgumentException
 import ai.tock.shared.exception.TockNotFound
 import org.junit.jupiter.api.BeforeEach
@@ -146,6 +147,6 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     private fun createScenarioForId(id: String?): Scenario {
-        return Scenario(id = id, name = "test", applicationId = "test", state = "test")
+        return Scenario(id = id, rootId = id, name = "test", applicationId = "test", state = ScenarioState.DRAFT)
     }
 }

@@ -90,12 +90,15 @@ class ScenarioServiceImpl : ScenarioService {
             .checkScenarioFromDatabase()
     }
 
+    private fun findScenarioToArchive(rootId: String) {
+
+    }
+
     private fun Scenario.prepareForUpdate(scenarioId: String): Scenario {
         val scenarioInDatabase: Scenario? = scenarioDAO.findById(scenarioId)
         return this
-            .mustExist(scenarioInDatabase)
             .cloneWithOverridenDates(scenarioInDatabase?.createDate, ZonedDateTime.now())
-            .checkToUpdate(scenarioId)
+            .checkToUpdate(scenarioInDatabase)
     }
 
     /**

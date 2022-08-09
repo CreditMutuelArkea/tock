@@ -16,18 +16,8 @@
 
 package ai.tock.bot.admin.scenario
 
-import java.time.ZonedDateTime
-
-data class Scenario(
-    val id: String? = null,
-    val rootId: String? = null,
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val applicationId: String,
-    var createDate: ZonedDateTime? = null,
-    var updateDate: ZonedDateTime? = null,
-    val description: String? = null,
-    val data: String? = null,
-    val state: ScenarioState
-)
+enum class ScenarioState(val value: String) {
+    DRAFT("draft"),
+    CURRENT("current"),
+    ARCHIVE("archive")
+}

@@ -1,6 +1,7 @@
 package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.scenario.Scenario
+import ai.tock.bot.admin.scenario.ScenarioState
 import java.time.ZonedDateTime
 import kotlin.String
 import kotlin.Suppress
@@ -16,6 +17,8 @@ import org.litote.kmongo.property.KPropertyPath
 
 private val ___id: KProperty1<ScenarioCol, Id<Scenario>?>
     get() = ScenarioCol::_id
+private val __RootId: KProperty1<ScenarioCol, Id<Scenario>?>
+    get() = ScenarioCol::rootId
 private val __Name: KProperty1<ScenarioCol, String?>
     get() = ScenarioCol::name
 private val __Category: KProperty1<ScenarioCol, String?>
@@ -32,12 +35,15 @@ private val __Description: KProperty1<ScenarioCol, String?>
     get() = ScenarioCol::description
 private val __Data: KProperty1<ScenarioCol, String?>
     get() = ScenarioCol::data
-private val __State: KProperty1<ScenarioCol, String?>
+private val __State: KProperty1<ScenarioCol, ScenarioState?>
     get() = ScenarioCol::state
 internal class ScenarioCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         ScenarioCol?>) : KPropertyPath<T, ScenarioCol?>(previous,property) {
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
+
+    val rootId: KPropertyPath<T, Id<Scenario>?>
+        get() = KPropertyPath(this,__RootId)
 
     val name_: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Name)
@@ -63,12 +69,14 @@ internal class ScenarioCol_<T>(previous: KPropertyPath<T, *>?, property: KProper
     val data: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Data)
 
-    val state: KPropertyPath<T, String?>
+    val state: KPropertyPath<T, ScenarioState?>
         get() = KPropertyPath(this,__State)
 
     companion object {
         val _id: KProperty1<ScenarioCol, Id<Scenario>?>
             get() = ___id
+        val RootId: KProperty1<ScenarioCol, Id<Scenario>?>
+            get() = __RootId
         val Name: KProperty1<ScenarioCol, String?>
             get() = __Name
         val Category: KProperty1<ScenarioCol, String?>
@@ -85,7 +93,7 @@ internal class ScenarioCol_<T>(previous: KPropertyPath<T, *>?, property: KProper
             get() = __Description
         val Data: KProperty1<ScenarioCol, String?>
             get() = __Data
-        val State: KProperty1<ScenarioCol, String?>
+        val State: KProperty1<ScenarioCol, ScenarioState?>
             get() = __State}
 }
 
@@ -94,6 +102,9 @@ internal class ScenarioCol_Col<T>(previous: KPropertyPath<T, *>?, property: KPro
         ScenarioCol_<T>>(previous,property) {
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
+
+    val rootId: KPropertyPath<T, Id<Scenario>?>
+        get() = KPropertyPath(this,__RootId)
 
     val name_: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Name)
@@ -119,7 +130,7 @@ internal class ScenarioCol_Col<T>(previous: KPropertyPath<T, *>?, property: KPro
     val data: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Data)
 
-    val state: KPropertyPath<T, String?>
+    val state: KPropertyPath<T, ScenarioState?>
         get() = KPropertyPath(this,__State)
 
     @Suppress("UNCHECKED_CAST")
@@ -131,6 +142,9 @@ internal class ScenarioCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: K
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
 
+    val rootId: KPropertyPath<T, Id<Scenario>?>
+        get() = KPropertyPath(this,__RootId)
+
     val name_: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Name)
 
@@ -155,7 +169,7 @@ internal class ScenarioCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: K
     val data: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Data)
 
-    val state: KPropertyPath<T, String?>
+    val state: KPropertyPath<T, ScenarioState?>
         get() = KPropertyPath(this,__State)
 
     @Suppress("UNCHECKED_CAST")

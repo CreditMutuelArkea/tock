@@ -16,9 +16,7 @@
 
 package ai.tock.bot.admin.scenario
 
-import ai.tock.shared.exception.rest.ConflictException
-import ai.tock.shared.exception.rest.InternalServerException
-import ai.tock.shared.exception.rest.NotFoundException
+import ai.tock.shared.exception.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -37,25 +35,42 @@ class ScenarioPredicateTest {
     @Test
     fun `GIVEN scenario with id WHEN checkToCreate THEN exception is thrown`() {
         val scenario = createScenarioForId(ID1)
-        assertThrows<ConflictException> { scenario.checkToCreate() }
+        assertThrows<ScenarioWithIdException> { scenario.checkToCreate() }
     }
 
     @Test
     fun `GIVEN scenario id same as uri WHEN checkToUpdate THEN no exception thrown`() {
         val scenario = createScenarioForId(ID1)
-        assertDoesNotThrow { scenario.checkToUpdate(ID1) }
+        val scenarioFromBdd = createScenarioForId(ID1)
+        assertDoesNotThrow { scenario.checkToUpdate(scenarioFromBdd) }
     }
 
     @Test
     fun `GIVEN scenario id null WHEN checkToUpdate THEN exception is thrown`() {
         val scenario = createScenarioForId(null)
-        assertThrows<ConflictException> { scenario.checkToUpdate(ID1) }
+        val scenarioFromBdd = createScenarioForId(ID1)
+        assertThrows<BadScenarioIdException> { scenario.checkToUpdate(scenarioFromBdd) }
     }
 
     @Test
     fun `GIVEN scenario id different as uri WHEN checkToUpdate THEN exception is thrown`() {
         val scenario = createScenarioForId(ID2)
-        assertThrows<ConflictException> { scenario.checkToUpdate(ID1) }
+        val scenarioFromBdd = createScenarioForId(ID1)
+        assertThrows<BadScenarioIdException> { scenario.checkToUpdate(scenarioFromBdd) }
+    }
+
+    @Test
+    fun `GIVEN scenario does not existe in database WHEN checkToUpdate THEN exception is thrown`() {
+        val scenario = createScenarioForId(ID1)
+        val scenarioFromBdd = null
+        assertThrows<ScenarioNotFoundException> { scenario.checkToUpdate(scenarioFromBdd) }
+    }
+
+    @Test
+    fun `GIVEN scenario state archive WHEN checkToUpdate THEN exception is thrown`() {
+        val scenario = createScenarioForId(ID1)
+        val scenarioFromBdd = createScenarioForId(ID1, ScenarioState.ARCHIVE)
+        assertThrows<ScenarioArchivedException> { scenario.checkToUpdate(scenarioFromBdd) }
     }
 
     @Test
@@ -67,25 +82,7 @@ class ScenarioPredicateTest {
     @Test
     fun `GIVEN scenario is null WHEN checkIsNotNullForId THEN exception is thrown`() {
         val scenario = null
-        assertThrows<NotFoundException> { scenario.checkIsNotNullForId("marcus") }
-    }
-
-    @Test
-    fun `GIVEN scenario is not null WHEN mustExist THEN no exception is thrown`() {
-        val scenario = createScenarioForId(ID1)
-        assertDoesNotThrow { scenario.mustExist(createScenarioForId(ID1)) }
-    }
-
-    @Test
-    fun `GIVEN scenario is null WHEN mustExist THEN exception is thrown`() {
-        val scenario = createScenarioForId(ID1)
-        assertThrows<NotFoundException> { scenario.mustExist(null) }
-    }
-
-    @Test
-    fun `GIVEN scenario is not null with id null WHEN mustExist THEN exception is thrown`() {
-        val scenario = createScenarioForId(null)
-        assertThrows<NotFoundException> { scenario.mustExist(null) }
+        assertThrows<ScenarioNotFoundException> { scenario.checkIsNotNullForId("marcus") }
     }
 
     @Test
@@ -97,10 +94,10 @@ class ScenarioPredicateTest {
     @Test
     fun `GIVEN scenario id is null WHEN checkScenarioFromDatabase THEN exception is thrown`() {
         val scenario = createScenarioForId(null)
-        assertThrows<InternalServerException> { scenario.checkScenarioFromDatabase() }
+        assertThrows<ScenarioWithNoIdException> { scenario.checkScenarioFromDatabase() }
     }
 
-    private fun createScenarioForId(id: String?): Scenario {
-        return Scenario(id = id, name = "test", applicationId = "test", state = "test")
+    private fun createScenarioForId(id: String?, state: ScenarioState = ScenarioState.DRAFT): Scenario {
+        return Scenario(id = id, rootId = id, name = "test", applicationId = "test", state = state)
     }
 }

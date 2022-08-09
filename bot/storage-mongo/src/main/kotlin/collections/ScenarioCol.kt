@@ -17,6 +17,7 @@
 package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.scenario.Scenario
+import ai.tock.bot.admin.scenario.ScenarioState
 import org.litote.jackson.data.JacksonData
 import org.litote.kmongo.Data
 import org.litote.kmongo.Id
@@ -26,6 +27,7 @@ import java.time.ZonedDateTime
 @JacksonData(internal = true)
 internal data class ScenarioCol (
     var _id: Id<Scenario>,
+    var rootId: Id<Scenario>,
     val name: String,
     val category: String? = null,
     val tags: List<String> = emptyList(),
@@ -34,5 +36,5 @@ internal data class ScenarioCol (
     val updateDate: ZonedDateTime? = null,
     val description: String? = null,
     val data: String? = null,
-    val state: String
+    val state: ScenarioState
 )
