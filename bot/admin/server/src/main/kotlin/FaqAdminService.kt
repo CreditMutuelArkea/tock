@@ -90,7 +90,12 @@ object FaqAdminService {
         query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition
     ): FaqDefinitionRequest {
         val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
-        val intent = createOrUpdateIntent(query, application)
+         val intent = if(query.id != null) {
+            findFaqDefinitionIntent(query.id.toId())
+        }else {
+            createOrUpdateIntent(query, application)
+        }
+
         if (intent == null) {
             badRequest("Trouble when creating/updating intent : $intent")
         } else {
@@ -269,7 +274,7 @@ object FaqAdminService {
                 applicationDefinition.namespace,
                 existingStory.mandatoryEntities,
                 existingStory.steps,
-                intent.name,
+                query.title,
                 FAQ_CATEGORY,
                 intent.description!!,
                 query.utterances.first(),
@@ -402,7 +407,7 @@ object FaqAdminService {
     /**
      * Search and find FAQ and their details in database and convert them to FaqDefinitionSearchResult
      */
-    fun searchFAQ(query: FaqSearchRequest, applicationDefinition: ApplicationDefinition): FaqDefinitionSearchResult {
+    fun searchFAQ(query: FaqSearchRequest, applicationDefinition: ApplicationDefinition, botId: String): FaqDefinitionSearchResult {
         //find predicates from i18n answers if search not empty
         val i18nLabels = query.search?.let { findPredicatesFrom18nLabels(applicationDefinition, query.search) }
         val i18nIds = i18nLabels?.map { it._id }?.toList()
@@ -422,10 +427,27 @@ object FaqAdminService {
             searchLabelsFromTockFrontDb(faqDetailsWithCount.first, applicationDefinition)
         } else emptySet()
 
-        val faqResults = if (fromTockBotDb?.isNotEmpty() == true) fromTockBotDb else fromTockFrontDb
+        val faqResultsTmp = if (fromTockBotDb?.isNotEmpty() == true) fromTockBotDb else fromTockFrontDb
+
+        // feed story name
+        val faqResults = feedFaqStoryName(faqResultsTmp, applicationDefinition.namespace, botId)
 
         logger.debug { "faqResults $faqResults" }
         return toFaqDefinitionSearchResult(query.start, faqResults, faqDetailsWithCount.second)
+    }
+
+    /**
+     * Feed faq story name
+     */
+    private fun feedFaqStoryName(faqResults: Set<FaqDefinitionRequest>, namespace: String, botId: String): Set<FaqDefinitionRequest> {
+        val intentNames = faqResults.mapNotNull { it.intentName }
+        val faqStories = BotAdminService.findConfiguredStoriesByBotIdAndIntent(namespace, botId, intentNames)
+
+        return faqResults.map {
+            it.title = faqStories.first { s -> s.intent.name == it.intentName }.name
+            it
+        }.toSet()
+
     }
 
     /**
@@ -573,6 +595,7 @@ object FaqAdminService {
                         unknownI18n(applicationDefinition).i18n.map { it.label }.first()
                     },
                     faqDefinition.enabled,
+                    faqDefinition.faq.name
                 )
             }.toSet()
 

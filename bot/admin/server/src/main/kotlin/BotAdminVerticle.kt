@@ -811,9 +811,11 @@ open class BotAdminVerticle : AdminVerticle() {
             val applicationDefinition =
                 front.getApplicationByNamespaceAndName(request.namespace, request.applicationName)
             if (context.organization == applicationDefinition?.namespace) {
+                val botConf = BotAdminService.getBotConfigurationsByNamespaceAndNlpModel(request.namespace, request.applicationName)
+
                 try {
                     measureTimeMillis(context) {
-                        FaqAdminService.searchFAQ(request, applicationDefinition)
+                        FaqAdminService.searchFAQ(request, applicationDefinition, botConf[0].botId)
                     }
                 } catch (t: NoEncryptionPassException) {
                     logger.error(t)

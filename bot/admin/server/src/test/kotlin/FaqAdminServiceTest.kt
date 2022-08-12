@@ -100,6 +100,9 @@ class FaqAdminServiceTest : AbstractTest() {
             })
         }
 
+        // TODO MASS : MAJ TU, attention, en cas d'update,
+        // TODO MASS : Voir avec JY: MAJ Jira, l'intention ne doit pas etre MAJ, seule la faq + label de la story
+
         private val applicationId = newId<ApplicationDefinition>()
         private val intentId = "idIntent".toId<IntentDefinition>()
         private val intentId2 = "idIntent2".toId<IntentDefinition>()
@@ -126,6 +129,7 @@ class FaqAdminServiceTest : AbstractTest() {
         val applicationDefinition =
             ApplicationDefinition("my App", namespace = namespace, supportedLocales = setOf(Locale.FRENCH))
         val storyId = "storyId".toId<StoryDefinitionConfiguration>()
+        val botId = "botId"
 
         private val firstUterrance = "FAQ utterance A"
         private val secondUterrance = "FAQ utterance B"
@@ -726,7 +730,7 @@ class FaqAdminServiceTest : AbstractTest() {
             )
 
             val faqSearchRequest = createFaqSearchRequest(enabled = null, search = null)
-            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition, botId)
 
             assertEquals(2, faqResult.rows.size, "The expected size of faq Result is not the one expected (2)")
             assertEquals(
@@ -805,7 +809,7 @@ class FaqAdminServiceTest : AbstractTest() {
             )
 
             val faqSearchRequest = createFaqSearchRequest(enabled = null, search = "Question")
-            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition, botId)
 
             assertEquals(faqResult.total, 2, "There should be two faq found when searching for a label question")
 
