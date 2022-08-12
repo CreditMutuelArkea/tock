@@ -1,4 +1,3 @@
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {
@@ -22,7 +21,6 @@ describe('FaqTrainingFiltersComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [FaqTrainingFiltersComponent],
       imports: [
-        BrowserAnimationsModule,
         TestSharedModule,
         NbButtonModule,
         NbCardModule,

@@ -21,13 +21,15 @@
             <small
               class="d-block"
               *ngIf="faq.utterances.length == 1"
-              >Question</small
             >
+              Question
+            </small>
             <small
               class="d-block"
               *ngIf="faq.utterances.length > 1"
-              >First question (out of {{ faq.utterances.length }})</small
             >
+              First question (out of {{ faq.utterances.length }})
+            </small>
             {{ faq.utterances[0] }}
           </div>
         </div>
