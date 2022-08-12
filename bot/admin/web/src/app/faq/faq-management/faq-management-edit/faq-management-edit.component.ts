@@ -13,7 +13,7 @@ import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confi
 import { ChoiceDialogComponent } from '../../../shared/choice-dialog/choice-dialog.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
-enum FaqTabs {
+export enum FaqTabs {
   INFO = 'info',
   QUESTION = 'question',
   ANSWER = 'answer'

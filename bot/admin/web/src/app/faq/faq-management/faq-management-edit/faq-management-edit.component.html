@@ -92,8 +92,7 @@
             placeholder="Enter description"
           ></textarea>
           <small [ngClass]="getControlLengthIndicatorClass('description')">
-            {{ form.controls.description.value.length }} characters out of
-            {{ controlsMaxLength.description }} max
+            {{ form.controls.description.value.length }} characters out of {{ controlsMaxLength.description }} max
           </small>
         </tock-form-control>
 
@@ -296,8 +295,7 @@
             placeholder="Enter answer"
           ></textarea>
           <small [ngClass]="getControlLengthIndicatorClass('answer')">
-            {{ form.controls.answer.value.length }} characters out of
-            {{ controlsMaxLength.answer }} max
+            {{ form.controls.answer.value.length }} characters out of {{ controlsMaxLength.answer }} max
           </small>
         </tock-form-control>
       </div>
