@@ -70,7 +70,7 @@ describe('FaqTrainingFiltersComponent', () => {
     expect(clearButtonElement).toBeTruthy();
   });
 
-  it('should clear search filter when click on clear search button', () => {
+  it('should call the method to clear search filter when click on clear search button', () => {
     spyOn(component, 'clearSearch');
     component.form.patchValue({ search: 'test' });
     fixture.detectChanges();
@@ -80,5 +80,13 @@ describe('FaqTrainingFiltersComponent', () => {
     fixture.detectChanges();
 
     expect(component.clearSearch).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear search when the method is called', () => {
+    component.form.patchValue({ search: 'test' });
+
+    component.clearSearch();
+
+    expect(component.search.value).toBeNull();
   });
 });

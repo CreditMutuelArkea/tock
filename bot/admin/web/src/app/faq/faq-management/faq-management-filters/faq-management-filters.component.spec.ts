@@ -1,3 +1,4 @@
+import { DebugElement } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import {
@@ -98,7 +99,7 @@ describe('FaqManagementFiltersComponent', () => {
     expect(element).toBeTruthy();
   });
 
-  it('should clear form when the clear button is clicked', () => {
+  it('should call the method to clear form when the clear button is clicked', () => {
     const clearFiltersSpy = spyOn(component, 'clearFilters');
     component.form.patchValue({ search: 'test' });
     fixture.detectChanges();
@@ -108,5 +109,30 @@ describe('FaqManagementFiltersComponent', () => {
     fixture.detectChanges();
 
     expect(clearFiltersSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should clear form when the method is called', () => {
+    component.form.patchValue({ search: 'test', enabled: true });
+
+    component.clearFilters();
+
+    expect(component.search.value).toBeNull();
+    expect(component.tags.value).toEqual([]);
+    expect(component.enabled.value).toBeNull();
+  });
+
+  it('should update enabled field when the method is called', () => {
+    // null to true
+    component.enabled.setValue(null);
+    component.enabledCheckChanged();
+    expect(component.enabled.value).toBeTrue();
+
+    // true to false
+    component.enabledCheckChanged();
+    expect(component.enabled.value).toBeFalse();
+
+    // false to null
+    component.enabledCheckChanged();
+    expect(component.enabled.value).toBeNull();
   });
 });
