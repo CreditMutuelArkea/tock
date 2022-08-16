@@ -1,8 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import {
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
+  NbDialogRef,
   NbIconModule,
   NbSelectModule,
   NbSpinnerModule,
@@ -75,7 +77,7 @@ describe('FaqManagementSettingsComponent', () => {
         { provide: BotService, useClass: BotServiceMock },
         { provide: StateService, useClass: StateServiceMock },
         { provide: FaqService, useClass: FaqServiceMock },
-        { provide: DialogService, useValue: {} },
+        { provide: DialogService, useValue: { openDialog: () => ({ onClose: (val: any) => of(val) }) } },
         { provide: NbToastrService, useValue: {} }
       ]
     }).compileComponents();
@@ -126,5 +128,91 @@ describe('FaqManagementSettingsComponent', () => {
     expect(component.satisfactionStoryId.value).toBe(mockStories[0]._id);
     expect(component.satisfactionStoryId.enabled).toBeTrue();
     expect(component.satisfactionStoryId.errors).toBeFalsy();
+  });
+
+  it('should call the close method when the close button in header is clicked', () => {
+    spyOn(component, 'close');
+    const closeElement: HTMLButtonElement = fixture.debugElement.query(By.css('[nbTooltip="Close"]')).nativeElement;
+
+    closeElement.click();
+
+    expect(component.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call the close method when the cancel button in footer is clicked', () => {
+    spyOn(component, 'close');
+    const cancelElement: HTMLButtonElement = fixture.debugElement.query(By.css('nb-card-footer button:first-child')).nativeElement;
+
+    cancelElement.click();
+
+    expect(component.close).toHaveBeenCalledTimes(1);
+  });
+
+  it('should call the onClose method without displaying a confirmation request message', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+    spyOn(component.onClose, 'emit');
+
+    component.close();
+
+    expect(component['dialogService'].openDialog).not.toHaveBeenCalled();
+    expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+  });
+
+  it('should call the onClose method after displaying a confirmation request message and confirm', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+    spyOn(component.onClose, 'emit');
+
+    // To display the confirmation message, the form must have been modified
+    component.form.markAsDirty();
+    component.close();
+
+    expect(component['dialogService'].openDialog).toHaveBeenCalled();
+    expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+  });
+
+  it('should not call the onClose method after displaying a confirmation request message and cancel', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+    spyOn(component.onClose, 'emit');
+
+    // To display the confirmation message, the form must have been modified
+    component.form.markAsDirty();
+    component.close();
+
+    expect(component['dialogService'].openDialog).toHaveBeenCalled();
+    expect(component.onClose.emit).not.toHaveBeenCalled();
+  });
+
+  it('should call the save method after displaying a confirmation request message and confirm if the satisfaction enabled field is false', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+    spyOn(component, 'saveSettings');
+
+    component.satisfactionEnabled.setValue(false);
+    component.save();
+
+    expect(component['dialogService'].openDialog).toHaveBeenCalled();
+    expect(component.saveSettings).toHaveBeenCalledOnceWith(component.form.value);
+  });
+
+  it('should not call the save method after displaying a confirmation request message and cancel if the satisfaction enabled field is false', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+    spyOn(component, 'saveSettings');
+
+    component.satisfactionEnabled.setValue(false);
+    component.save();
+
+    expect(component['dialogService'].openDialog).toHaveBeenCalled();
+    expect(component.saveSettings).not.toHaveBeenCalled();
+  });
+
+  it('should call the save method if the satisfaction enabled field is true', () => {
+    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+    spyOn(component, 'saveSettings');
+
+    component.satisfactionEnabled.setValue(true);
+    component.satisfactionStoryId.setValue('1');
+    component.save();
+
+    expect(component['dialogService'].openDialog).not.toHaveBeenCalled();
+    expect(component.saveSettings).toHaveBeenCalledOnceWith(component.form.value);
   });
 });
