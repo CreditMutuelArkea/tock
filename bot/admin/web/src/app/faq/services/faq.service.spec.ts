@@ -54,7 +54,6 @@ describe('FaqService', () => {
 
       service.getSettings('1').subscribe({
         error: () => {
-          expect(mockedRestApiService.get).toHaveBeenCalled();
           expect(service.getState()).toEqual(initialState);
           done();
         }
@@ -68,7 +67,6 @@ describe('FaqService', () => {
 
       service.saveSettings('1', mockSettings).subscribe(() => {
         const state = service.getState();
-        expect(mockedRestApiService.post).toHaveBeenCalled();
         expect(state.settings).toEqual(mockSettings);
         done();
       });
@@ -82,7 +80,6 @@ describe('FaqService', () => {
       service.saveSettings('1', mockSettings).subscribe({
         error: () => {
           const state = service.getState();
-          expect(mockedRestApiService.post).toHaveBeenCalled();
           expect(state.settings).toEqual(initialState.settings);
           done();
         }

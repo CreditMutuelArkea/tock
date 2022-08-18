@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbButtonModule, NbCardModule, NbDialogRef, NbIconModule, NbTagModule, NbToggleModule, NbTooltipModule } from '@nebular/theme';
+import { of } from 'rxjs';
 
 import { StateService } from '../../../core-nlp/state.service';
 import { TestSharedModule } from '../../../shared/test-shared.module';
 import { FaqManagementListComponent } from './faq-management-list.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
 import { DialogService } from '../../../core-nlp/dialog.service';
-import { of } from 'rxjs';
 
 const mockFaqs: FaqDefinitionExtended[] = [
   {
@@ -94,7 +94,7 @@ describe('FaqManagementListComponent', () => {
     expect(listElement.children).toHaveSize(mockFaqs.length);
 
     Array.from(listElement.children).forEach((child, i) => {
-      const titleElement: HTMLElement = child.querySelector('nb-card-body .font-weight-bold.initial-capitalize');
+      const titleElement: HTMLElement = child.querySelector('[data-testid="title"]');
       expect(titleElement.textContent.trim()).toBe(mockFaqs[i].title);
     });
   });
@@ -110,100 +110,106 @@ describe('FaqManagementListComponent', () => {
     });
   });
 
-  it('should call the method when click on toggle to activate / deactivate faq', () => {
-    spyOn(component, 'toggleEnabled');
-
-    const listElement: HTMLElement = fixture.debugElement.nativeElement;
-    const toggleElement: HTMLElement = Array.from(listElement.children)[0].querySelector('#faqToggle');
-
-    toggleElement.dispatchEvent(new Event('mousedown'));
-
-    expect(component.toggleEnabled).toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should call the method when click on edit faq', () => {
-    spyOn(component, 'editFaq');
-
-    const listElement: HTMLElement = fixture.debugElement.nativeElement;
-    const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[nbTooltip="Edit"]');
-
-    buttonElement.click();
-
-    expect(component.editFaq).toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should emit faq when edit faq method is called', () => {
-    spyOn(component.onEdit, 'emit');
-
-    component.editFaq(mockFaqs[0]);
-
-    expect(component.onEdit.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should call the method when click on delete faq', () => {
-    spyOn(component, 'delete');
-
-    const listElement: HTMLElement = fixture.debugElement.nativeElement;
-    const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[nbTooltip="Delete"]');
-
-    buttonElement.click();
-
-    expect(component.delete).toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should emit faq when faq delete method is called and confirmation message is confirmed', () => {
-    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('delete') } as NbDialogRef<any>);
-    spyOn(component.onDelete, 'emit');
-
-    component.delete(mockFaqs[0]);
-
-    expect(component.onDelete.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should not emit faq when faq delete method is called and confirmation message is not confirmed', () => {
-    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
-    spyOn(component.onDelete, 'emit');
-
-    component.delete(mockFaqs[0]);
-
-    expect(component.onDelete.emit).not.toHaveBeenCalledOnceWith(mockFaqs[0]);
-  });
-
-  it('should call the method when click on download faq', () => {
+  it('should call the method when click on download button', () => {
     spyOn(component, 'download');
 
     const listElement: HTMLElement = fixture.debugElement.nativeElement;
-    const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[nbTooltip="Download"]');
+    const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[data-testid="download"]');
 
     buttonElement.click();
 
     expect(component.download).toHaveBeenCalledOnceWith(mockFaqs[0]);
   });
 
-  it('should emit faq when faq toggle method is called to disable faq and confirmation message is confirmed', () => {
-    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('disable') } as NbDialogRef<any>);
-    spyOn(component.onEnable, 'emit');
+  describe('when edit faq', () => {
+    it('should call the method when click on the button', () => {
+      spyOn(component, 'editFaq');
 
-    component.toggleEnabled(mockFaqs[0]);
+      const listElement: HTMLElement = fixture.debugElement.nativeElement;
+      const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[data-testid="edit"]');
 
-    expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
+      buttonElement.click();
+
+      expect(component.editFaq).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
+
+    it('should emit faq when edit faq method is called', () => {
+      spyOn(component.onEdit, 'emit');
+
+      component.editFaq(mockFaqs[0]);
+
+      expect(component.onEdit.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
   });
 
-  it('should emit faq when faq toggle method is called to enable faq and confirmation message is confirmed', () => {
-    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('enable') } as NbDialogRef<any>);
-    spyOn(component.onEnable, 'emit');
+  describe('when delete faq', () => {
+    it('should call the method when click on the button', () => {
+      spyOn(component, 'delete');
 
-    component.toggleEnabled(mockFaqs[3]);
+      const listElement: HTMLElement = fixture.debugElement.nativeElement;
+      const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[data-testid="delete"]');
 
-    expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[3]);
+      buttonElement.click();
+
+      expect(component.delete).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
+
+    it('should emit faq when faq delete method is called and confirmation message is confirmed', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('delete') } as NbDialogRef<any>);
+      spyOn(component.onDelete, 'emit');
+
+      component.delete(mockFaqs[0]);
+
+      expect(component.onDelete.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
+
+    it('should not emit faq when faq delete method is called and confirmation message is not confirmed', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+      spyOn(component.onDelete, 'emit');
+
+      component.delete(mockFaqs[0]);
+
+      expect(component.onDelete.emit).not.toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
   });
 
-  it('should not emit faq when faq toggle method is called and confirmation message is not confirmed', () => {
-    spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
-    spyOn(component.onEnable, 'emit');
+  describe('when toggle (activate / deactivate) faq', () => {
+    it('should call the method when click on toggle button', () => {
+      spyOn(component, 'toggleEnabled');
 
-    component.toggleEnabled(mockFaqs[0]);
+      const listElement: HTMLElement = fixture.debugElement.nativeElement;
+      const toggleElement: HTMLElement = Array.from(listElement.children)[0].querySelector('[data-testid="toggle"]');
 
-    expect(component.onEnable.emit).not.toHaveBeenCalledOnceWith(mockFaqs[0]);
+      toggleElement.dispatchEvent(new Event('mousedown'));
+
+      expect(component.toggleEnabled).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
+
+    it('should emit faq when the method is called to disable faq and confirmation message is confirmed', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('disable') } as NbDialogRef<any>);
+      spyOn(component.onEnable, 'emit');
+
+      component.toggleEnabled(mockFaqs[0]);
+
+      expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
+
+    it('should emit faq when then method is called to enable faq and confirmation message is confirmed', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('enable') } as NbDialogRef<any>);
+      spyOn(component.onEnable, 'emit');
+
+      component.toggleEnabled(mockFaqs[3]);
+
+      expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[3]);
+    });
+
+    it('should not emit faq when then method is called and confirmation message is not confirmed', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+      spyOn(component.onEnable, 'emit');
+
+      component.toggleEnabled(mockFaqs[0]);
+
+      expect(component.onEnable.emit).not.toHaveBeenCalledOnceWith(mockFaqs[0]);
+    });
   });
 });

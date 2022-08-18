@@ -59,13 +59,13 @@ describe('FaqTrainingFiltersComponent', () => {
   }));
 
   it('should show clear button of search input if the search value is defined', () => {
-    let clearButtonElement = fixture.debugElement.query(By.css('[nbTooltip="Clear"]'));
+    let clearButtonElement = fixture.debugElement.query(By.css('[data-testid="clear-button"]'));
 
     expect(clearButtonElement).toBeFalsy();
 
     component.form.patchValue({ search: 'test' });
     fixture.detectChanges();
-    clearButtonElement = fixture.debugElement.query(By.css('[nbTooltip="Clear"]')).nativeElement;
+    clearButtonElement = fixture.debugElement.query(By.css('[data-testid="clear-button"]')).nativeElement;
 
     expect(clearButtonElement).toBeTruthy();
   });
@@ -74,7 +74,7 @@ describe('FaqTrainingFiltersComponent', () => {
     spyOn(component, 'clearSearch');
     component.form.patchValue({ search: 'test' });
     fixture.detectChanges();
-    const clearButtonElement: HTMLElement = fixture.debugElement.query(By.css('[nbTooltip="Clear"]')).nativeElement;
+    const clearButtonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="clear-button"]')).nativeElement;
 
     clearButtonElement.click();
     fixture.detectChanges();

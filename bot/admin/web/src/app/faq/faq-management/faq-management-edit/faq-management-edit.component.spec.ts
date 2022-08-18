@@ -79,11 +79,11 @@ describe('FaqManagementEditComponent', () => {
 
   describe('new faq', () => {
     it('should initialize the current tab on the info part', () => {
-      const nameElement = fixture.debugElement.query(By.css('[name="name"]'));
-      const descriptionElement = fixture.debugElement.query(By.css('[name="description"]'));
-      const tagsElement = fixture.debugElement.query(By.css('[name="tags"]'));
-      const utterrancesElement = fixture.debugElement.query(By.css('[name="question"]'));
-      const answerElement = fixture.debugElement.query(By.css('[name="anwser"]'));
+      const nameElement = fixture.debugElement.query(By.css('[data-testid="name"]'));
+      const descriptionElement = fixture.debugElement.query(By.css('[data-testid="description"]'));
+      const tagsElement = fixture.debugElement.query(By.css('[data-testid="tags"]'));
+      const utterrancesElement = fixture.debugElement.query(By.css('[data-testid="question"]'));
+      const answerElement = fixture.debugElement.query(By.css('[data-testid="anwser"]'));
 
       expect(component.currentTab).toBe(FaqTabs.INFO);
       expect(nameElement).toBeTruthy();
@@ -109,11 +109,11 @@ describe('FaqManagementEditComponent', () => {
     it('should initialize the current tab on the info part', () => {
       component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
       fixture.detectChanges();
-      const nameElement = fixture.debugElement.query(By.css('[name="name"]'));
-      const descriptionElement = fixture.debugElement.query(By.css('[name="description"]'));
-      const tagsElement = fixture.debugElement.query(By.css('[name="tags"]'));
-      const utterrancesElement = fixture.debugElement.query(By.css('[name="question"]'));
-      const answerElement = fixture.debugElement.query(By.css('[name="anwser"]'));
+      const nameElement = fixture.debugElement.query(By.css('[data-testid="name"]'));
+      const descriptionElement = fixture.debugElement.query(By.css('[data-testid="description"]'));
+      const tagsElement = fixture.debugElement.query(By.css('[data-testid="tags"]'));
+      const utterrancesElement = fixture.debugElement.query(By.css('[data-testid="question"]'));
+      const answerElement = fixture.debugElement.query(By.css('[data-testid="anwser"]'));
 
       expect(component.currentTab).toBe(FaqTabs.INFO);
       expect(nameElement).toBeTruthy();

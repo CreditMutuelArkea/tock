@@ -57,6 +57,7 @@
           [controls]="title"
           [showError]="isSubmitted"
           [required]="true"
+          data-testid="name"
         >
           <input
             #nameInput
@@ -81,6 +82,7 @@
           name="description"
           [controls]="description"
           [showError]="isSubmitted"
+          data-testid="description"
         >
           <textarea
             nbInput
@@ -101,6 +103,7 @@
           name="tags"
           [controls]="tags"
           [showError]="isSubmitted"
+          data-testid="tags"
         >
           <nb-tag-list
             tock-delay
@@ -146,6 +149,7 @@
           [controls]="utterances"
           [showError]="isSubmitted"
           [required]="true"
+          data-testid="question"
         >
           <div class="d-flex">
             <input
@@ -283,6 +287,7 @@
           [controls]="answer"
           [showError]="isSubmitted"
           [required]="true"
+          data-testid="answer"
         >
           <textarea
             #answerInput

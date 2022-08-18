@@ -11,7 +11,7 @@ import {
   NbToastrService,
   NbTooltipModule
 } from '@nebular/theme';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 import { BotService } from '../../../bot/bot-service';
 import { DialogService } from '../../../core-nlp/dialog.service';
@@ -105,7 +105,7 @@ describe('FaqManagementSettingsComponent', () => {
     });
   });
 
-  it('should associate validators to the satisfaction story id field and disable it when the satisfaction enabled field is true', () => {
+  it('should associate validators to the satisfaction story id field and enable it when the satisfaction enabled field is true', () => {
     expect(component.form.value).toEqual(mockSettings);
 
     // set satisfactionEnabled to false
@@ -132,7 +132,7 @@ describe('FaqManagementSettingsComponent', () => {
 
   it('should call the close method when the close button in header is clicked', () => {
     spyOn(component, 'close');
-    const closeElement: HTMLButtonElement = fixture.debugElement.query(By.css('[nbTooltip="Close"]')).nativeElement;
+    const closeElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="close-button"]')).nativeElement;
 
     closeElement.click();
 
@@ -141,14 +141,14 @@ describe('FaqManagementSettingsComponent', () => {
 
   it('should call the close method when the cancel button in footer is clicked', () => {
     spyOn(component, 'close');
-    const cancelElement: HTMLButtonElement = fixture.debugElement.query(By.css('nb-card-footer button:first-child')).nativeElement;
+    const cancelElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="cancel-button"]')).nativeElement;
 
     cancelElement.click();
 
     expect(component.close).toHaveBeenCalledTimes(1);
   });
 
-  it('should call the onClose method without displaying a confirmation request message', () => {
+  it('should call the onClose method without displaying a confirmation request message when the form is not dirty', () => {
     spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
     spyOn(component.onClose, 'emit');
 
@@ -158,7 +158,7 @@ describe('FaqManagementSettingsComponent', () => {
     expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
   });
 
-  it('should call the onClose method after displaying a confirmation request message and confirm', () => {
+  it('should call the onClose method after displaying a confirmation request message and confirm when the form is dirty', () => {
     spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
     spyOn(component.onClose, 'emit');
 
@@ -170,7 +170,7 @@ describe('FaqManagementSettingsComponent', () => {
     expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
   });
 
-  it('should not call the onClose method after displaying a confirmation request message and cancel', () => {
+  it('should not call the onClose method after displaying a confirmation request message and cancel when the form is dirty', () => {
     spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
     spyOn(component.onClose, 'emit');
 
