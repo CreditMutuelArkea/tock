@@ -121,8 +121,8 @@ describe('FaqManagementListComponent', () => {
     expect(component.download).toHaveBeenCalledOnceWith(mockFaqs[0]);
   });
 
-  describe('when edit faq', () => {
-    it('should call the method when click on the button', () => {
+  describe('when click on the button to edit faq', () => {
+    it('should call the method', () => {
       spyOn(component, 'editFaq');
 
       const listElement: HTMLElement = fixture.debugElement.nativeElement;
@@ -133,7 +133,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.editFaq).toHaveBeenCalledOnceWith(mockFaqs[0]);
     });
 
-    it('should emit faq when edit faq method is called', () => {
+    it('should emit faq', () => {
       spyOn(component.onEdit, 'emit');
 
       component.editFaq(mockFaqs[0]);
@@ -142,8 +142,8 @@ describe('FaqManagementListComponent', () => {
     });
   });
 
-  describe('when delete faq', () => {
-    it('should call the method when click on the button', () => {
+  describe('when click on the button delete faq', () => {
+    it('should call the method', () => {
       spyOn(component, 'delete');
 
       const listElement: HTMLElement = fixture.debugElement.nativeElement;
@@ -154,7 +154,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.delete).toHaveBeenCalledOnceWith(mockFaqs[0]);
     });
 
-    it('should emit faq when faq delete method is called and confirmation message is confirmed', () => {
+    it('should emit faq when confirmation message is confirmed', () => {
       spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('delete') } as NbDialogRef<any>);
       spyOn(component.onDelete, 'emit');
 
@@ -163,7 +163,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.onDelete.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
     });
 
-    it('should not emit faq when faq delete method is called and confirmation message is not confirmed', () => {
+    it('should not emit faq when confirmation message is not confirmed', () => {
       spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
       spyOn(component.onDelete, 'emit');
 
@@ -173,8 +173,8 @@ describe('FaqManagementListComponent', () => {
     });
   });
 
-  describe('when toggle (activate / deactivate) faq', () => {
-    it('should call the method when click on toggle button', () => {
+  describe('when click on the toggle button to activate / deactivate faq', () => {
+    it('should call the method', () => {
       spyOn(component, 'toggleEnabled');
 
       const listElement: HTMLElement = fixture.debugElement.nativeElement;
@@ -185,7 +185,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.toggleEnabled).toHaveBeenCalledOnceWith(mockFaqs[0]);
     });
 
-    it('should emit faq when the method is called to disable faq and confirmation message is confirmed', () => {
+    it('should emit faq to disable when confirmation message is confirmed', () => {
       spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('disable') } as NbDialogRef<any>);
       spyOn(component.onEnable, 'emit');
 
@@ -194,7 +194,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
     });
 
-    it('should emit faq when then method is called to enable faq and confirmation message is confirmed', () => {
+    it('should emit faq to enable when confirmation message is confirmed', () => {
       spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('enable') } as NbDialogRef<any>);
       spyOn(component.onEnable, 'emit');
 
@@ -203,7 +203,7 @@ describe('FaqManagementListComponent', () => {
       expect(component.onEnable.emit).toHaveBeenCalledOnceWith(mockFaqs[3]);
     });
 
-    it('should not emit faq when then method is called and confirmation message is not confirmed', () => {
+    it('should not emit faq when confirmation message is not confirmed', () => {
       spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
       spyOn(component.onEnable, 'emit');
 

@@ -75,14 +75,12 @@ describe('FaqManagementFiltersComponent', () => {
   });
 
   describe('should show clear button when at least one filter is active', () => {
-    const parameters = [
+    [
       { description: 'search active', formValue: { search: 'test', tags: [], enabled: null } },
       { description: 'tags active', formValue: { search: '', tags: ['tag1', 'tag2'], enabled: null } },
       { description: 'enabled active', formValue: { search: '', tags: [], enabled: true } },
       { description: 'all field active', formValue: { search: 'test', tags: ['tag1', 'tag2'], enabled: true } }
-    ];
-
-    parameters.forEach((parameter) => {
+    ].forEach((parameter) => {
       it(parameter.description, () => {
         component.form.patchValue(parameter.formValue);
         fixture.detectChanges();
@@ -106,14 +104,12 @@ describe('FaqManagementFiltersComponent', () => {
   });
 
   describe('should clear form when the method is called', () => {
-    const parameters = [
+    [
       { description: 'search active', formValue: { search: 'test', tags: [], enabled: null } },
       { description: 'tags active', formValue: { search: '', tags: ['tag1', 'tag2'], enabled: null } },
       { description: 'enabled active', formValue: { search: '', tags: [], enabled: true } },
       { description: 'all field active', formValue: { search: 'test', tags: ['tag1', 'tag2'], enabled: true } }
-    ];
-
-    parameters.forEach((parameter) => {
+    ].forEach((parameter) => {
       it(parameter.description, () => {
         component.form.patchValue(parameter.formValue);
 
