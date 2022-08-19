@@ -17,7 +17,7 @@ import {
 } from '@nebular/theme';
 import { BehaviorSubject } from 'rxjs';
 
-import { Classification, Intent, IntentsCategory, SentenceStatus } from '../../../model/nlp';
+import { Classification, SentenceStatus } from '../../../model/nlp';
 import { StateService } from '../../../core-nlp/state.service';
 import { Pagination, PaginationComponent } from '../../../shared/pagination/pagination.component';
 import { TestSharedModule } from '../../../shared/test-shared.module';
