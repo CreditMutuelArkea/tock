@@ -177,7 +177,7 @@ describe('FaqManagementEditComponent', () => {
     );
     expect(component.description.errors.maxlength).toBeTruthy();
     expect(component.description.valid).toBeFalse();
-    expect(component.description.errors.maxlength.requiredLength).toBe(component.controlsMaxLength.description);
+    expect(component.description.errors.maxlength.requiredLength).toBe(500);
 
     // set description to something correct
     component.description.setValue('correct value');
@@ -210,7 +210,7 @@ describe('FaqManagementEditComponent', () => {
     );
     expect(component.answer.errors.required).toBeFalsy();
     expect(component.answer.errors.maxlength).toBeTruthy();
-    expect(component.answer.errors.maxlength.requiredLength).toBe(component.controlsMaxLength.answer);
+    expect(component.answer.errors.maxlength.requiredLength).toBe(960);
 
     // set answer to something correct
     component.answer.setValue('correct value');

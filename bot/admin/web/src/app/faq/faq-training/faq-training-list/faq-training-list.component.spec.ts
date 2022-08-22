@@ -169,132 +169,66 @@ describe('FaqTrainingListComponent', () => {
     });
   });
 
-  describe('when click on the button to validate sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'handleAction');
+  it('should emit the sentence when clicking on the validate button of an item', () => {
+    spyOn(component.onAction, 'emit');
+    const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
+    const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="validate"]')).nativeElement;
 
-      const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
-      const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="validate"]')).nativeElement;
+    buttonElement.click();
 
-      buttonElement.click();
-
-      expect(component.handleAction).toHaveBeenCalledOnceWith(Action.VALIDATE, mockSentences[0]);
-    });
-
-    it('should emit sentence', () => {
-      spyOn(component.onAction, 'emit');
-
-      component.handleAction(Action.VALIDATE, mockSentences[0]);
-
-      expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.VALIDATE, sentence: mockSentences[0] });
-    });
+    expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.VALIDATE, sentence: mockSentences[0] });
   });
 
-  describe('when click on the button to unknown sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'handleAction');
+  it('should emit the sentence when clicking on the unknown button of an item', () => {
+    spyOn(component.onAction, 'emit');
+    const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
+    const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="unknown"]')).nativeElement;
 
-      const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
-      const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="unknown"]')).nativeElement;
+    buttonElement.click();
 
-      buttonElement.click();
-
-      expect(component.handleAction).toHaveBeenCalledOnceWith(Action.UNKNOWN, mockSentences[0]);
-    });
-
-    it('should emit sentence', () => {
-      spyOn(component.onAction, 'emit');
-
-      component.handleAction(Action.UNKNOWN, mockSentences[0]);
-
-      expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.UNKNOWN, sentence: mockSentences[0] });
-    });
+    expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.UNKNOWN, sentence: mockSentences[0] });
   });
 
-  describe('when click on the button to delete sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'handleAction');
+  it('should emit the sentence when clicking on the delete button of an item', () => {
+    spyOn(component.onAction, 'emit');
+    const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
+    const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="delete"]')).nativeElement;
 
-      const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
-      const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="delete"]')).nativeElement;
+    buttonElement.click();
 
-      buttonElement.click();
-
-      expect(component.handleAction).toHaveBeenCalledOnceWith(Action.DELETE, mockSentences[0]);
-    });
-
-    it('should emit sentence', () => {
-      spyOn(component.onAction, 'emit');
-
-      component.handleAction(Action.DELETE, mockSentences[0]);
-
-      expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.DELETE, sentence: mockSentences[0] });
-    });
+    expect(component.onAction.emit).toHaveBeenCalledOnceWith({ action: Action.DELETE, sentence: mockSentences[0] });
   });
 
-  describe('when click on the button to show details of sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'showDetails');
+  it('should emit the sentence when clicking on the show details button of an item', () => {
+    spyOn(component.onDetails, 'emit');
+    const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
+    const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="details"]')).nativeElement;
 
-      const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
-      const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="details"]')).nativeElement;
+    buttonElement.click();
 
-      buttonElement.click();
-
-      expect(component.showDetails).toHaveBeenCalledOnceWith(mockSentences[0]);
-    });
-
-    it('should emit sentence', () => {
-      spyOn(component.onDetails, 'emit');
-
-      component.showDetails(mockSentences[0]);
-
-      expect(component.onDetails.emit).toHaveBeenCalledOnceWith(mockSentences[0]);
-    });
+    expect(component.onDetails.emit).toHaveBeenCalledOnceWith(mockSentences[0]);
   });
 
-  describe('when click on the button to create new faq from sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'redirectToFaqManagement');
+  it('should redirect to the faq management page with a question sentence when clicking on the button to create new faq of an item', fakeAsync(() => {
+    const location = TestBed.inject(Location);
+    const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
+    const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="redirectToFaqManagement"]')).nativeElement;
 
-      const listElement = fixture.debugElement.queryAll(By.css('[data-testid="list"]'));
-      const buttonElement: HTMLButtonElement = listElement[0].query(By.css('[data-testid="redirectToFaqManagement"]')).nativeElement;
+    buttonElement.click();
+    tick();
 
-      buttonElement.click();
+    const state = location.getState();
+    expect(location.path()).toBe('/faq/management');
+    expect(state['question']).toBe(mockSentences[0].text);
+  }));
 
-      expect(component.redirectToFaqManagement).toHaveBeenCalledOnceWith(mockSentences[0]);
-    });
+  it('should emit the sort status when clicking on the container to sort the list of sentence', () => {
+    spyOn(component.onSort, 'emit');
+    const buttonElement: HTMLSpanElement = fixture.debugElement.query(By.css('[data-testid="sort"]')).nativeElement;
 
-    it('should redirect to the faq management page with a question sentence', fakeAsync(() => {
-      const location = TestBed.inject(Location);
+    buttonElement.click();
 
-      component.redirectToFaqManagement(mockSentences[0]);
-      tick();
-
-      const state = location.getState();
-      expect(location.path()).toBe('/faq/management');
-      expect(state['question']).toBe(mockSentences[0].text);
-    }));
-  });
-
-  describe('when click on the container to sort the list of sentence', () => {
-    it('should call the method', () => {
-      spyOn(component, 'toggleSort');
-
-      const buttonElement: HTMLSpanElement = fixture.debugElement.query(By.css('[data-testid="sort"]')).nativeElement;
-
-      buttonElement.click();
-
-      expect(component.toggleSort).toHaveBeenCalledTimes(1);
-    });
-
-    it('should emit the sort status', () => {
-      spyOn(component.onSort, 'emit');
-
-      component.toggleSort();
-
-      expect(component.onSort.emit).toHaveBeenCalledOnceWith(component.isSorted);
-    });
+    expect(component.onSort.emit).toHaveBeenCalledOnceWith(component.isSorted);
   });
 
   describe('selection sentences', () => {
@@ -322,70 +256,37 @@ describe('FaqTrainingListComponent', () => {
       expect(batchActionElement).toBeTruthy();
     });
 
-    describe('when click on the button to validate all sentences selected', () => {
-      it('should call the method', () => {
-        spyOn(component, 'handleBatchAction');
-        component.selection.select(mockSentences[0]);
-        fixture.detectChanges();
+    it('should emit validate action when clicking on the button to validate all sentences selected', () => {
+      spyOn(component.onBatchAction, 'emit');
+      component.selection.select(mockSentences[0]);
+      fixture.detectChanges();
+      const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-validate"]')).nativeElement;
 
-        const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-validate"]')).nativeElement;
+      buttonElement.click();
 
-        buttonElement.click();
-
-        expect(component.handleBatchAction).toHaveBeenCalledOnceWith(Action.VALIDATE);
-      });
-
-      it('should emit sentence', () => {
-        spyOn(component.onBatchAction, 'emit');
-
-        component.handleBatchAction(Action.VALIDATE);
-
-        expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.VALIDATE);
-      });
+      expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.VALIDATE);
     });
 
-    describe('when click on the button to unknown all sentences selected', () => {
-      it('should call the method', () => {
-        spyOn(component, 'handleBatchAction');
-        component.selection.select(mockSentences[0]);
-        fixture.detectChanges();
+    it('should emit unknown action when clicking on the button to unknown all sentences selected', () => {
+      spyOn(component.onBatchAction, 'emit');
+      component.selection.select(mockSentences[0]);
+      fixture.detectChanges();
+      const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-unknown"]')).nativeElement;
 
-        const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-unknown"]')).nativeElement;
+      buttonElement.click();
 
-        buttonElement.click();
-
-        expect(component.handleBatchAction).toHaveBeenCalledOnceWith(Action.UNKNOWN);
-      });
-
-      it('should emit sentence', () => {
-        spyOn(component.onBatchAction, 'emit');
-
-        component.handleBatchAction(Action.UNKNOWN);
-
-        expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.UNKNOWN);
-      });
+      expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.UNKNOWN);
     });
 
-    describe('when click on the button to delete all sentences selected', () => {
-      it('should call the method', () => {
-        spyOn(component, 'handleBatchAction');
-        component.selection.select(mockSentences[0]);
-        fixture.detectChanges();
+    it('should emit delete action when clicking on the button to delete all sentences selected', () => {
+      spyOn(component.onBatchAction, 'emit');
+      component.selection.select(mockSentences[0]);
+      fixture.detectChanges();
+      const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-delete"]')).nativeElement;
 
-        const buttonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="batch-action-delete"]')).nativeElement;
+      buttonElement.click();
 
-        buttonElement.click();
-
-        expect(component.handleBatchAction).toHaveBeenCalledOnceWith(Action.DELETE);
-      });
-
-      it('should emit sentence', () => {
-        spyOn(component.onBatchAction, 'emit');
-
-        component.handleBatchAction(Action.DELETE);
-
-        expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.DELETE);
-      });
+      expect(component.onBatchAction.emit).toHaveBeenCalledOnceWith(Action.DELETE);
     });
   });
 

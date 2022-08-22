@@ -98,7 +98,6 @@ describe('FaqManagementFiltersComponent', () => {
     const element = fixture.debugElement.query(By.css('[data-testid="clear-button"]'));
 
     element.triggerEventHandler('click', null);
-    fixture.detectChanges();
 
     expect(clearFiltersSpy).toHaveBeenCalledTimes(1);
   });

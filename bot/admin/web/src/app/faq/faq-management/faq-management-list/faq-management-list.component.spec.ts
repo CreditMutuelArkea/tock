@@ -121,25 +121,14 @@ describe('FaqManagementListComponent', () => {
     expect(component.download).toHaveBeenCalledOnceWith(mockFaqs[0]);
   });
 
-  describe('when click on the button to edit faq', () => {
-    it('should call the method', () => {
-      spyOn(component, 'editFaq');
+  it('should emit the faq when clicking on the edit button of an item', () => {
+    spyOn(component.onEdit, 'emit');
+    const listElement: HTMLElement = fixture.debugElement.nativeElement;
+    const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[data-testid="edit"]');
 
-      const listElement: HTMLElement = fixture.debugElement.nativeElement;
-      const buttonElement: HTMLButtonElement = Array.from(listElement.children)[0].querySelector('[data-testid="edit"]');
+    buttonElement.click();
 
-      buttonElement.click();
-
-      expect(component.editFaq).toHaveBeenCalledOnceWith(mockFaqs[0]);
-    });
-
-    it('should emit faq', () => {
-      spyOn(component.onEdit, 'emit');
-
-      component.editFaq(mockFaqs[0]);
-
-      expect(component.onEdit.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
-    });
+    expect(component.onEdit.emit).toHaveBeenCalledOnceWith(mockFaqs[0]);
   });
 
   describe('when click on the button delete faq', () => {
