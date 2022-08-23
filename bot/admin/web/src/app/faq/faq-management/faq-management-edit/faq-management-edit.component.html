@@ -180,6 +180,7 @@
           status="danger"
           *ngIf="existingUterranceInOtherintent"
           class="closable mt-2"
+          data-testid="existing-uterrance-in-other-intent"
         >
           <button
             type="button"
@@ -189,9 +190,10 @@
           >
             <span>×</span>
           </button>
-
-          Addition cancelled. This Sentence is already associated with the intent :
-          <strong> "{{ existingUterranceInOtherintent }}" </strong>
+          <span data-testid="alert-message">
+            Addition cancelled. This Sentence is already associated with the intent :
+            <strong>"{{ existingUterranceInOtherintent }}" </strong>
+          </span>
         </nb-alert>
 
         <div

@@ -1,8 +1,9 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormControl } from '@angular/forms';
 import {
+  NbAlertModule,
   NbAutocompleteModule,
   NbBadgeModule,
   NbButtonModule,
@@ -24,8 +25,65 @@ import { TestSharedModule } from '../../../shared/test-shared.module';
 import { FaqManagementEditComponent, FaqTabs } from './faq-management-edit.component';
 import { FormControlComponent } from '../../../shared/form-control/form-control.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
+import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from 'src/app/model/nlp';
+import { of } from 'rxjs';
 
-const faq: FaqDefinitionExtended = {
+const mockSentences: Sentence[] = [
+  {
+    text: 'sentence 1',
+    status: SentenceStatus.validated,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 2',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 3',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 4',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence
+];
+
+const mockFaq: FaqDefinitionExtended = {
   id: '1',
   applicationId: '1',
   enabled: true,
@@ -37,6 +95,37 @@ const faq: FaqDefinitionExtended = {
   answer: 'answer'
 };
 
+const mockSentencesPaginatedResult: PaginatedResult<Sentence> = {
+  end: mockSentences.length,
+  rows: mockSentences,
+  start: 0,
+  total: mockSentences.length
+};
+
+class NlpServiceMock {
+  searchSentences() {
+    return of(mockSentencesPaginatedResult);
+  }
+}
+
+class MockState {
+  createPaginatedQuery() {
+    return {
+      namespace: 'app',
+      applicationName: 'app',
+      language: 'fr',
+      start: 0,
+      size: 1000
+    };
+  }
+
+  findIntentById() {
+    return {
+      name: 'intentAssociate'
+    } as Intent;
+  }
+}
+
 describe('FaqManagementEditComponent', () => {
   let component: FaqManagementEditComponent;
   let fixture: ComponentFixture<FaqManagementEditComponent>;
@@ -46,6 +135,7 @@ describe('FaqManagementEditComponent', () => {
       declarations: [FaqManagementEditComponent, FormControlComponent],
       imports: [
         TestSharedModule,
+        NbAlertModule,
         NbAutocompleteModule,
         NbTabsetModule,
         NbTagModule,
@@ -60,9 +150,9 @@ describe('FaqManagementEditComponent', () => {
         NbTooltipModule
       ],
       providers: [
-        { provide: StateService, useValue: {} },
+        { provide: StateService, useClass: MockState },
         { provide: DialogService, useValue: {} },
-        { provide: NlpService, useValue: {} }
+        { provide: NlpService, useClass: NlpServiceMock }
       ]
     }).compileComponents();
   });
@@ -103,11 +193,41 @@ describe('FaqManagementEditComponent', () => {
         answer: ''
       });
     });
+
+    it('should initialize the form when the result comes from the training page', fakeAsync(() => {
+      const faq: FaqDefinitionExtended = {
+        id: undefined,
+        intentId: undefined,
+        title: 'test',
+        description: '',
+        utterances: [],
+        tags: [],
+        answer: '',
+        enabled: true,
+        applicationId: '1',
+        language: 'fr',
+        _initUtterance: 'test'
+      };
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      fixture.whenStable().then(() => {
+        expect(component.form.dirty).toBeTrue();
+        expect(component.form.valid).toBeFalse();
+        expect(component.form.value).toEqual({
+          title: 'test',
+          description: '',
+          tags: [],
+          utterances: ['test'],
+          answer: ''
+        });
+      });
+    }));
   });
 
   describe('edit faq', () => {
     it('should initialize the current tab on the info part', () => {
-      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
       fixture.detectChanges();
       const nameElement = fixture.debugElement.query(By.css('[data-testid="name"]'));
       const descriptionElement = fixture.debugElement.query(By.css('[data-testid="description"]'));
@@ -124,7 +244,7 @@ describe('FaqManagementEditComponent', () => {
     });
 
     it('should initialize a form with the correct value', () => {
-      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
       fixture.detectChanges();
       expect(component.form.valid).toBeFalse();
       expect(component.form.value).toEqual({
@@ -226,5 +346,60 @@ describe('FaqManagementEditComponent', () => {
 
     expect(component.existingUterranceInOtherintent).toBeUndefined();
     expect(component.intentNameExistInApp).toBeUndefined();
+  });
+
+  describe('#addUtterance', () => {
+    it('should add utterance to the list', () => {
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      expect(component.utterances.value).toHaveSize(0);
+
+      component.addUtterance('test');
+
+      expect(component.utterances.value).toHaveSize(1);
+      expect(component.utterances.value).toEqual(['test']);
+    });
+
+    it('should not add utterance to the list when it is already present', () => {
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      const utterances = ['test', 'test 1', 'ok'];
+      utterances.forEach((utterance) => {
+        component.utterances.push(new FormControl(utterance));
+      });
+
+      component.addUtterance('test');
+
+      expect(component.utterances.value).toEqual(utterances);
+    });
+
+    it('should not add utterance to the list when the utterance is already associated with another intent', () => {
+      component.faq = mockFaq;
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      expect(component.utterances.value).toHaveSize(0);
+
+      component.addUtterance('sentence 1');
+
+      expect(component.utterances.value).toHaveSize(0);
+    });
+
+    it('should display an error message when the utterance being added is already associated with another intent', () => {
+      component.faq = mockFaq;
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+
+      component.addUtterance('sentence 1');
+      fixture.detectChanges();
+
+      const alertElement: HTMLElement = fixture.debugElement.query(
+        By.css('[data-testid="existing-uterrance-in-other-intent"]')
+      ).nativeElement;
+      const alertMessageElement: HTMLSpanElement = alertElement.querySelector('[data-testid="alert-message"]');
+      expect(alertElement).toBeTruthy();
+      expect(alertMessageElement.textContent.trim()).toBe(
+        'Addition cancelled. This Sentence is already associated with the intent : "intentAssociate"'
+      );
+    });
   });
 });
