@@ -1,4 +1,4 @@
-import { ComponentFixture, fakeAsync, TestBed } from '@angular/core/testing';
+import { ComponentFixture, discardPeriodicTasks, fakeAsync, flush, TestBed, tick } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormControl } from '@angular/forms';
@@ -184,9 +184,24 @@ describe('FaqManagementEditComponent', () => {
     });
 
     it('should initialize an empty form', () => {
+      const faq: FaqDefinitionExtended = {
+        id: undefined,
+        intentId: undefined,
+        title: '',
+        description: '',
+        utterances: [],
+        tags: [],
+        answer: '',
+        enabled: true,
+        applicationId: '1',
+        language: 'fr'
+      };
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
       expect(component.form.valid).toBeFalse();
       expect(component.form.value).toEqual({
-        title: null,
+        title: '',
         description: '',
         tags: [],
         utterances: [],
@@ -211,16 +226,16 @@ describe('FaqManagementEditComponent', () => {
       component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
       fixture.detectChanges();
 
-      fixture.whenStable().then(() => {
-        expect(component.form.dirty).toBeTrue();
-        expect(component.form.valid).toBeFalse();
-        expect(component.form.value).toEqual({
-          title: 'test',
-          description: '',
-          tags: [],
-          utterances: ['test'],
-          answer: ''
-        });
+      tick(100);
+
+      expect(component.form.dirty).toBeTrue();
+      expect(component.form.valid).toBeFalse();
+      expect(component.form.value).toEqual({
+        title: 'test',
+        description: '',
+        tags: [],
+        utterances: ['test'],
+        answer: ''
       });
     }));
   });
