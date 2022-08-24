@@ -91,6 +91,9 @@ internal object ScenarioMongoDAO : ScenarioDAO {
      * @throws ScenarioWithNoVersionIdException when scenario have version with no id.
      */
     override fun update(scenario: Scenario): Scenario? {
+        if(!isIdPresent(scenario)) {
+            throw ScenarioWithNoIdException("scenario must have id")
+        }
         if(!isVersionPresent(scenario)) {
             throw ScenarioWithNoVersionIdException(scenario.id, "version must have id")
         }
@@ -99,6 +102,10 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     private fun isVersionPresent(scenario: Scenario): Boolean {
         return scenario.data.all{ it.version?.isNotBlank() ?: false }
+    }
+
+    private fun isIdPresent(scenario: Scenario): Boolean {
+        return scenario.id?.isNotBlank() ?: false
     }
 
     private fun save(scenario: ScenarioCol): ScenarioCol? {

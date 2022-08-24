@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import org.litote.jackson.JacksonModuleServiceLoader
 
-internal class ScenarioHistoryCol_Serializer :
+internal class ScenarioVersionCol_Serializer :
         StdSerializer<ScenarioVersionCol>(ScenarioVersionCol::class.java),
         JacksonModuleServiceLoader {
     override fun module() = SimpleModule().addSerializer(ScenarioVersionCol::class.java, this)

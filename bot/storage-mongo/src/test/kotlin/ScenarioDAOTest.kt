@@ -19,8 +19,8 @@ package ai.tock.bot.mongo
 import ai.tock.bot.admin.scenario.Scenario
 import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioState
-import ai.tock.shared.exception.TockIllegalArgumentException
-import ai.tock.shared.exception.TockNotFoundException
+import ai.tock.shared.exception.scenario.ScenarioNotFoundException
+import ai.tock.shared.exception.scenario.ScenarioWithNoIdException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -71,7 +71,7 @@ class ScenarioDAOTest : AbstractTest() {
         ScenarioMongoDAO.update(scenario)
 
         //WHEN
-        val scenarioFound = ScenarioMongoDAO.findByVersion(ID1)
+        val scenarioFound = ScenarioMongoDAO.findByVersion(VERSION)
 
         //THEN
         assertEquals(scenario, scenarioFound)
@@ -93,23 +93,29 @@ class ScenarioDAOTest : AbstractTest() {
     @Test
     fun `create GIVEN scenario with no id THEN add scenario in database`() {
         //GIVEN
-        val scenario = createScenarioForId(null, VERSION)
+        val scenario = createScenarioForId(null, null)
 
         //WHEN
         val scenarioCreated = ScenarioMongoDAO.create(scenario)
 
         //THEN
-        assertTrue(scenarioCreated?.id != null)
-        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.id.toString()))
+        assertNotNull(scenarioCreated?.id)
+        assertNotNull(scenarioCreated?.data?.first()?.version)
+        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.data?.first()?.version.toString()))
     }
 
     @Test
     fun `create GIVEN scenario with id THEN throw TockIllegaleArgumentException`() {
         //GIVEN
-        val scenario = createScenarioForId(ID1, VERSION)
+        val scenario = createScenarioForId(ID1, null)
 
-        //WHEN //THEN
-        assertThrows<TockIllegalArgumentException> {  ScenarioMongoDAO.create(scenario) }
+        //WHEN
+        val scenarioCreated = ScenarioMongoDAO.create(scenario)
+
+        //THEN
+        assertEquals(ID1, scenarioCreated?.id)
+        assertNotNull(scenarioCreated?.data?.first()?.version)
+        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.data?.first()?.version.toString()))
     }
 
     @Test
@@ -122,7 +128,9 @@ class ScenarioDAOTest : AbstractTest() {
 
         //THEN
         assertEquals(ID1, scenarioCreated?.id)
-        assertNotNull(ScenarioMongoDAO.findByVersion(ID1))
+        assertEquals(VERSION, scenarioCreated?.data?.first()?.version)
+        assertNotNull(ScenarioMongoDAO.findById(ID1))
+        assertNotNull(ScenarioMongoDAO.findByVersion(VERSION))
     }
 
     @Test
@@ -131,7 +139,7 @@ class ScenarioDAOTest : AbstractTest() {
         val scenario = createScenarioForId(null, VERSION)
 
         //WHEN //THEN
-        assertThrows<TockIllegalArgumentException> {  ScenarioMongoDAO.update(scenario) }
+        assertThrows<ScenarioWithNoIdException> {  ScenarioMongoDAO.update(scenario) }
     }
 
     @Test
@@ -146,7 +154,7 @@ class ScenarioDAOTest : AbstractTest() {
     @Test
     fun `delete GIVEN scenario does not existe in database THEN throw TockNotFound`() {
         //GIVEN //WHEN //THEN
-        assertThrows<TockNotFoundException> {  ScenarioMongoDAO.delete(ID1) }
+        assertThrows<ScenarioNotFoundException> {  ScenarioMongoDAO.delete(ID1) }
     }
 
     private fun createScenarioForId(id: String?, version: String?): Scenario {

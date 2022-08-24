@@ -20,7 +20,7 @@ import kotlin.reflect.full.primaryConstructor
 import org.litote.jackson.JacksonModuleServiceLoader
 import org.litote.kmongo.Id
 
-internal class ScenarioHistoryCol_Deserializer : JsonDeserializer<ScenarioVersionCol>(),
+internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersionCol>(),
         JacksonModuleServiceLoader {
     override fun module() = SimpleModule().addDeserializer(ScenarioVersionCol::class.java, this)
 

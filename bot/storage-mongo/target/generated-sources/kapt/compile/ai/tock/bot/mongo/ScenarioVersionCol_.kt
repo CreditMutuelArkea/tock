@@ -35,7 +35,7 @@ private val __Data: KProperty1<ScenarioVersionCol, String?>
     get() = ScenarioVersionCol::data
 private val __State: KProperty1<ScenarioVersionCol, ScenarioState?>
     get() = ScenarioVersionCol::state
-internal class ScenarioHistoryCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
+internal class ScenarioVersionCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         ScenarioVersionCol?>) : KPropertyPath<T, ScenarioVersionCol?>(previous,property) {
     val version: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,__Version)
@@ -90,9 +90,9 @@ internal class ScenarioHistoryCol_<T>(previous: KPropertyPath<T, *>?, property: 
             get() = __State}
 }
 
-internal class ScenarioHistoryCol_Col<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
+internal class ScenarioVersionCol_Col<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         Collection<ScenarioVersionCol>?>) : KCollectionPropertyPath<T, ScenarioVersionCol?,
-        ScenarioHistoryCol_<T>>(previous,property) {
+        ScenarioVersionCol_<T>>(previous,property) {
     val version: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,__Version)
 
@@ -124,12 +124,12 @@ internal class ScenarioHistoryCol_Col<T>(previous: KPropertyPath<T, *>?, propert
         get() = KPropertyPath(this,__State)
 
     @Suppress("UNCHECKED_CAST")
-    override fun memberWithAdditionalPath(additionalPath: String): ScenarioHistoryCol_<T> =
-            ScenarioHistoryCol_(this, customProperty(this, additionalPath))}
+    override fun memberWithAdditionalPath(additionalPath: String): ScenarioVersionCol_<T> =
+            ScenarioVersionCol_(this, customProperty(this, additionalPath))}
 
-internal class ScenarioHistoryCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
+internal class ScenarioVersionCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         Map<K, ScenarioVersionCol>?>) : KMapPropertyPath<T, K, ScenarioVersionCol?,
-        ScenarioHistoryCol_<T>>(previous,property) {
+        ScenarioVersionCol_<T>>(previous,property) {
     val version: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,__Version)
 
@@ -161,5 +161,5 @@ internal class ScenarioHistoryCol_Map<T, K>(previous: KPropertyPath<T, *>?, prop
         get() = KPropertyPath(this,__State)
 
     @Suppress("UNCHECKED_CAST")
-    override fun memberWithAdditionalPath(additionalPath: String): ScenarioHistoryCol_<T> =
-            ScenarioHistoryCol_(this, customProperty(this, additionalPath))}
+    override fun memberWithAdditionalPath(additionalPath: String): ScenarioVersionCol_<T> =
+            ScenarioVersionCol_(this, customProperty(this, additionalPath))}
