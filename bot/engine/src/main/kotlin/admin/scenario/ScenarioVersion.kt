@@ -16,7 +16,17 @@
 
 package ai.tock.bot.admin.scenario
 
-data class Scenario(
-    val id: String? = null,
-    val data: List<ScenarioVersion> = emptyList(),
+import java.time.ZonedDateTime
+
+data class ScenarioVersion(
+    val version: String? = null,
+    val name: String, //must be moved in Scenario ?
+    val category: String? = null, //must be moved in Scenario ?
+    val tags: List<String> = emptyList(), //must be moved in Scenario ?
+    val applicationId: String, //must be moved in Scenario ?
+    val createDate: ZonedDateTime? = null,
+    val updateDate: ZonedDateTime? = null,
+    val description: String? = null, //must be moved in Scenario ?
+    val data: String? = null,
+    val state: ScenarioState
 )

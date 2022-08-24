@@ -15,8 +15,6 @@
  */
 package ai.tock.bot.admin.scenario
 
-import org.litote.kmongo.Id
-
 /**
  *
  */
@@ -28,22 +26,29 @@ interface ScenarioDAO {
     fun findAll(): Collection<Scenario>
 
     /**
-     * Return Scenario find by id or null if not exist.
-     * @property id of scenario to find.
+     * Return Scenario find by version id or null if not exist.
+     * @property version of scenario history to find.
      */
-    fun findById(id: String): Scenario?
+    fun findByVersion(version: String): Scenario?
 
     /**
-     * Return a collection of Scenario with the same sagaId.
-     * @property sagaId of scenarios to find.
+     * Return a Scenario find by id or null if not exist.
+     * @property id of scenarios to find.
      */
-    fun findByRootId(rootId: String): Collection<Scenario>
+    fun findById(id: String): Scenario?
 
     /**
      * Create Scenario and return it.
      * @property scenario to create.
      */
     fun create(scenario: Scenario): Scenario?
+
+    /**
+     * Patch Scenario and return it.
+     * (to create new version on existing scenario)
+     * @property scenario to create.
+     */
+    fun patch(scenario: Scenario): Scenario?
 
     /**
      * Update Scenario and return it.

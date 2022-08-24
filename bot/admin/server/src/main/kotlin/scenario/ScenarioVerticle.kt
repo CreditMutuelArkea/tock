@@ -18,18 +18,17 @@ package ai.tock.bot.admin.scenario
 
 import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
-import ai.tock.shared.exception.*
-import ai.tock.shared.exception.rest.ConflictException
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenarioResults
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenario
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
 import ai.tock.shared.injector
 import ai.tock.shared.security.TockUserRole.*
-import ai.tock.shared.exception.rest.InternalServerException
 import ai.tock.shared.exception.rest.NotFoundException
 import ai.tock.shared.vertx.WebVerticle
 import com.github.salomonbrys.kodein.instance
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
-import kotlin.reflect.jvm.internal.impl.protobuf.Internal
 
 /**
  * ScenarioVerticle contains all the routes and actions associated with the scenarios
@@ -38,15 +37,21 @@ open class ScenarioVerticle {
 
     private val logger: KLogger = KotlinLogging.logger {}
 
+    private val exceptionManager = ScenarioExceptionManager(logger)
+
     private val scenarioService: ScenarioService by injector.instance()
 
     private val scenarioId = "scenarioID"
+
+    private val sagaId = "sagaID"
 
     //scenarioBasePath is empty value is necessary so that the scenario URLs are not preceded by
     // the default basePath (/rest/admin) of the BotAdminVerticle on which the routes are added
     private val scenarioBasePath = ""
 
     private val scenariosPath = "/scenarios"
+
+    private val sagaPath = "/sagas"
 
     /**
      * Declaration of routes and association to the appropriate handler
@@ -56,26 +61,66 @@ open class ScenarioVerticle {
         with(webVerticle) {
             blockingJsonGet(scenariosPath, setOf(botUser), handler = getAllScenarios)
 
+            blockingJsonGet("$scenariosPath/active", setOf(botUser), handler = getAllScenariosActive)
+
+            blockingJsonGet("$sagaPath/:$sagaId", setOf(botUser), handler = getAllScenariosFromSaga)
+
             blockingJsonGet("$scenariosPath/:$scenarioId", setOf(botUser), handler = getOneScenario)
+
+            blockingJsonGet("$sagaPath/:$sagaId/current", setOf(botUser), handler = getCurrentScenariosFromSaga)
+
+            blockingJsonGet("$sagaPath/:$sagaId/active", setOf(botUser), handler = getActivesScenariosFromSaga)
 
             blockingJsonPost(scenariosPath, setOf(botUser), handler = createScenario)
 
             blockingJsonPut("$scenariosPath/:$scenarioId", setOf(botUser), handler = updateScenario)
 
-            blockingDeleteEmptyResponse("$scenariosPath/:$scenarioId", setOf(botUser), handler = deleteScenario)
+            blockingDeleteEmptyResponse("$scenariosPath/:$scenarioId", setOf(botUser), handler = deleteVersion)
+
+            blockingDeleteEmptyResponse("$sagaPath/:$sagaId", setOf(botUser), handler = deleteScenario)
         }
     }
 
     /**
-     * Handler to retrieve Scenario, then format the response as a List of ScenarioResult.
+     * Handler to retrieve Scenarios, then format the response as a List of ScenarioResult.
      * when success, return a 200 response.
      */
     protected val getAllScenarios: (RoutingContext) -> List<ScenarioResult> = { context ->
-        logger.debug { "request to get all scenario" }
-        catchException {
+        logger.debug { "request to get all scenarios" }
+        exceptionManager.catch {
             scenarioService
                 .findAll()
-                .map(mapToScenarioResult)
+                .map(toScenarioResults)
+                .flatten()
+        }
+    }
+
+    /**
+     * Handler to retrieve Scenarios draft and current, but no archive,
+     * then format the response as a List of ScenarioResult.
+     * when success, return a 200 response.
+     */
+    protected val getAllScenariosActive: (RoutingContext) -> List<ScenarioResult> = { context ->
+        logger.debug { "request to get all active scenarios" }
+        exceptionManager.catch {
+            scenarioService
+                .findAllActive()
+                .map(toScenarioResults)
+                .flatten()
+        }
+    }
+
+    /**
+     * Handler to retrieve Scenarios of a saga, then format the response as a List of ScenarioResult.
+     * when success, return a 200 response.
+     */
+    protected val getAllScenariosFromSaga: (RoutingContext) -> Collection<ScenarioResult> = { context ->
+        val sagaId = extractSagaId(context)
+        logger.debug { "request to get all scenario from saga $sagaId" }
+        exceptionManager.catch {
+            scenarioService
+                .findById(sagaId)
+                .toScenarioResults()
         }
     }
 
@@ -85,12 +130,44 @@ open class ScenarioVerticle {
      */
     protected val getOneScenario: (RoutingContext) -> ScenarioResult = { context ->
         val scenarioId = extractScenarioId(context)
-        logger.debug { "request to get scenario id $scenarioId" }
+        logger.debug { "request to get scenario $scenarioId" }
         //return
-        catchException {
+        exceptionManager.catch {
             scenarioService
-                .findById(scenarioId)
-                .mapToScenarioResult()
+                .findOnlyVersion(scenarioId)
+                .toScenarioResults()
+                .checkContainsOne()
+        }
+    }
+
+    /**
+     * Handler to find and retrieve current Scenario of a saga ID, then format the response as a ScenarioResult.
+     * when success, return a 200 response.
+     */
+    protected val getCurrentScenariosFromSaga: (RoutingContext) -> ScenarioResult = { context ->
+        val sagaId = extractSagaId(context)
+        logger.debug { "request to get current scenario from saga $sagaId" }
+        //return
+        exceptionManager.catch {
+            scenarioService
+                .findCurrentById(sagaId)
+                .toScenarioResults()
+                .checkContainsOne()
+        }
+    }
+
+    /**
+     * Handler to find and retrieve a Scenario based on it's ID, then format the response as a ScenarioResult.
+     * when success, return a 200 response.
+     */
+    protected val getActivesScenariosFromSaga: (RoutingContext) -> Collection<ScenarioResult>  = { context ->
+        val sagaId = extractSagaId(context)
+        logger.debug { "request to get active scenarios from saga $sagaId" }
+        //return
+        exceptionManager.catch {
+            scenarioService
+                .findActiveById(sagaId)
+                .toScenarioResults()
         }
     }
 
@@ -102,10 +179,11 @@ open class ScenarioVerticle {
         logger.debug { "request to create scenario name ${request.name}" }
         context.setResponseStatusCode(201)
         //return
-        catchException {
+        exceptionManager.catch {
             scenarioService
-                .create(request.mapToScenario())
-                .mapToScenarioResult()
+                .create(request.toScenario())
+                .toScenarioResults()
+                .checkContainsOne()
         }
     }
 
@@ -115,13 +193,14 @@ open class ScenarioVerticle {
      */
     protected val updateScenario: (RoutingContext, ScenarioRequest) -> ScenarioResult = { context, request ->
         val scenarioId = extractScenarioId(context)
-        logger.debug { "request to update scenario id $scenarioId" }
+        logger.debug { "request to update scenario $scenarioId" }
         context.setResponseStatusCode(200)
         //return
-        catchException {
+        exceptionManager.catch {
             scenarioService
-                .update(scenarioId, request.mapToScenario())
-                .mapToScenarioResult()
+                .update(scenarioId, request.toScenario())
+                .toScenarioResults()
+                .checkContainsOne()
         }
     }
 
@@ -133,46 +212,25 @@ open class ScenarioVerticle {
      * Handler to delete a Scenario based on it's ID, then return nothing.
      * when success, produce a 204 response.
      */
-    protected val deleteScenario: (RoutingContext) -> Unit = { context ->
+    protected val deleteVersion: (RoutingContext) -> Unit = { context ->
         val scenarioId = extractScenarioId(context)
-        logger.debug { "request to delete scenario id $scenarioId" }
+        logger.debug { "request to delete scenario $scenarioId" }
         //no return
-        catchException {
-            scenarioService.delete(scenarioId)
+        exceptionManager.catch {
+            scenarioService.deleteByVersion(scenarioId)
         }
     }
 
-    private fun <O> catchException(fallibleSection: () -> O): O {
-        try {
-            return fallibleSection.invoke()
-        } catch(scenarioNotFoundException : ScenarioNotFoundException) {
-            with(scenarioNotFoundException) {
-                throw NotFoundException("scenario ${id.toDisplay()}not found")
-            }
-        } catch(badScenarioIdException : BadScenarioIdException) {
-            with(badScenarioIdException) {
-                throw ConflictException("scenario id of the uri must be the same as in the body but they are different, $expected ≠ $received")
-            }
-        } catch(scenarioArchivedException : ScenarioArchivedException) {
-            with(scenarioArchivedException) {
-                throw ConflictException("scenario ${id.toDisplay()}state in database is 'ARCHIVE', operation forbidden")
-            }
-        } catch(badScenarioStateException : BadScenarioStateException) {
-            with(badScenarioStateException) {
-                throw ConflictException("scenario state must be $stateExcepted, but is $stateReceived")
-            }
-        } catch(scenarioWithNoIdException : ScenarioWithNoIdException) {
-            throw InternalServerException("scenario from database cannot have id null")
-        } catch(scenarioWithIdException : ScenarioWithIdException) {
-            with(scenarioWithIdException) {
-                throw ConflictException("scenario id must be null, but is $id")
-            }
-        } catch (tockException: TockException) {
-            logger.error(fallibleSection)
-            //TockException use a non-null message,
-            // but extends RuntimeException which has nullable message
-            // tockException.message cannot be null
-            throw InternalServerException(tockException.message!!)
+    /**
+     * Handler to delete a Scenario based on it's ID, then return nothing.
+     * when success, produce a 204 response.
+     */
+    protected val deleteScenario: (RoutingContext) -> Unit = { context ->
+        val sagaId = extractSagaId(context)
+        logger.debug { "request to delete all scenario of saga $scenarioId" }
+        //no return
+        exceptionManager.catch {
+            scenarioService.deleteById(sagaId)
         }
     }
 
@@ -180,18 +238,11 @@ open class ScenarioVerticle {
         return context.pathParam(scenarioId).checkParameterExist(scenarioId)
     }
 
-    private val checkParameterExist: String?.(String) -> String = { parameter ->
-        if(this == null) {
-            throw NotFoundException("$parameter uri parameter not found")
-        } else {
-            this
-        }
+    private fun extractSagaId(context: RoutingContext): String {
+        return context.pathParam(sagaId).checkParameterExist(sagaId)
     }
 
-    /**
-     * if value not null, add space after it to correctly display in message
-     */
-    private val toDisplay: String?.() -> String = {
-        this?.let { "$this " } ?: ""
+    private val checkParameterExist: String?.(String) -> String = { parameter ->
+        this ?: throw NotFoundException("$parameter uri parameter not found")
     }
 }

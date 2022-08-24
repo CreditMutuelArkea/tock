@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception
+package ai.tock.shared.exception.scenario
 
-class BadScenarioStateException(val stateExcepted: String, val stateReceived: String, message : String) : TockException(message)
+import ai.tock.shared.exception.TockException
+
+abstract class ScenarioException(message: String) : TockException(message)

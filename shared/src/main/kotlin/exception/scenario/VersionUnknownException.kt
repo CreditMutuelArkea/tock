@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception
+package ai.tock.shared.exception.scenario
 
-class ScenarioWithNoIdException(message : String) : TockException(message)
+class VersionUnknownException(val version: String, message: String) : ScenarioException(message)

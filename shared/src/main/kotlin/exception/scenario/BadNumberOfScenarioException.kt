@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception
+package ai.tock.shared.exception.scenario
 
-class ScenarioWithIdException(val id: String, message : String) : TockException(message)
+
+class BadNumberOfScenarioException(val expected: Int, val received: Int, message: String) : ScenarioException(message)

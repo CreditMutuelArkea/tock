@@ -16,11 +16,28 @@
 
 package ai.tock.bot.admin.scenario
 
-import ai.tock.shared.exception.TockNotFound
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterActive
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterVersions
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.replaceData
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.addVersions
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterExcludeVersions
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.cloneWithOverriddenDates
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.excludeVersion
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.archiveCurrent
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
+
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIdNotNull
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkNotNullForId
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isArchive
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isCurrent
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToCreate
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToUpdate
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsSpecificVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.haveVersion
+
 import ai.tock.shared.injector
-import ai.tock.shared.exception.rest.ConflictException
-import ai.tock.shared.exception.rest.InternalServerException
-import ai.tock.shared.exception.rest.NotFoundException
+import ai.tock.bot.admin.scenario.ScenarioState.*
+import ai.tock.shared.exception.scenario.*
 import com.github.salomonbrys.kodein.instance
 import mu.KLogger
 import mu.KotlinLogging
@@ -37,80 +54,198 @@ class ScenarioServiceImpl : ScenarioService {
 
     /**
      * Returns all scenarios know
+     * @throws ScenarioWithNoIdException when id from database is null
      */
     override fun findAll(): Collection<Scenario> {
-        return scenarioDAO.findAll()
-            .map(checkScenarioFromDatabase)
+        return scenarioDAO.findAll().checkIdNotNull()
+    }
+
+    /**
+     * Returns all scenarios on all versions not archive
+     * @throws ScenarioWithNoIdException when id from database is null
+     */
+    override fun findAllActive(): Collection<Scenario> {
+        return findAll().filterActive()
+    }
+
+    private fun findByVersion(version: String): Scenario {
+        return scenarioDAO.findByVersion(version)
+            .checkNotNullForId(version)
+            .checkIdNotNull()
     }
 
     /**
      * Returns a specific scenario based on it's id
      * @property scenarioId id of scenario to find
-     * @throws NotFoundException when no scenario found
-     * @throws InternalServerException when scenario found is invalid
+     * @throws ScenarioNotFoundException when scenario not found
+     * @throws ScenarioWithNoIdException when id from database is null
      */
-    override fun findById(scenarioId: String): Scenario {
-        return scenarioDAO.findById(scenarioId)
-            .checkIsNotNullForId(scenarioId)
-            .checkScenarioFromDatabase()
+    override fun findOnlyVersion(version: String): Scenario {
+        return findByVersion(version).filterVersions(setOf(version))
     }
 
     /**
-     * Create a new scenario
-     * @property scenario to create
-     * @throws ConflictException when scenario id is not null
-     * @throws InternalServerException when scenario created is invalid
+     * Returns a scenario with all version based on it's id
+     * @property id of scenario to find
+     * @throws ScenarioNotFoundException when scenario not found
+     * @throws ScenarioWithNoIdException when id from database is null
      */
-    override fun create(scenario: Scenario): Scenario {
-        val scenarioToCreate: Scenario = scenario.prepareForCreate()
-        return scenarioDAO.create(scenarioToCreate)
-            .checkIsNotNullForId(scenario.id)
-            .checkScenarioFromDatabase()
+    override fun findById(id: String): Scenario {
+        return scenarioDAO.findById(id)
+            .checkNotNullForId(id)
+            .checkIdNotNull()
     }
 
-    private fun Scenario.prepareForCreate(): Scenario {
-        return this
-            .cloneWithOverridenDates(ZonedDateTime.now(), null)
-            .checkToCreate()
+    /**
+     * Returns the current version of a scenario based on it's id
+     * @property id of scenario to find
+     * @throws ScenarioNotFoundException when scenario not found
+     * @throws ScenarioWithNoIdException when id from database is null
+     */
+    override fun findCurrentById(id: String): Scenario {
+        val scenario: Scenario = findById(id)
+        return scenario
+            .replaceData(scenario.data.filter(isCurrent))
+            .checkNotNullForId(id)
+    }
+
+    /**
+     * Returns scenario with versions not archive based on it's id
+     * @property id of scenario to find
+     * @throws ScenarioNotFoundException when scenario not found
+     * @throws ScenarioWithNoIdException when id from database is null
+     */
+    override fun findActiveById(id: String): Scenario {
+        val scenario: Scenario = findById(id)
+        return scenario.replaceData(scenario.data.filterNot(isArchive))
+    }
+
+    /**
+     * Create a new version on a new scenario or on an existing scenario if id is set
+     * @property scenario to create
+     * @throws ScenarioEmptyException when version is empty
+     * @throws BadScenarioStateException when state is not draft
+     * @throws ScenarioWithVersionException when version id is set
+     * @throws ScenarioNotFoundException when scenario not found
+     * @throws ScenarioWithNoIdException when id from database is null
+     */
+    override fun create(scenario: Scenario): Scenario {
+        val scenarioVersionsInDatabase: List<ScenarioVersion> = findVersionsByIdIfExist(scenario.id)
+        val scenarioToCreate = scenario.changeDateToCreate().checkToCreate()
+        val scenarioCreated = if(scenarioVersionsInDatabase.isNotEmpty()) {
+            // add existing version in database
+            scenarioDAO.patch(scenarioToCreate.addVersions(scenarioVersionsInDatabase))
+        } else {
+            scenarioDAO.create(scenarioToCreate)
+        }
+        return scenarioCreated.checkNotNullForId(scenario.id)
+            .checkIdNotNull()
+            // remove existing version in database before return
+            .filterExcludeVersions(scenarioVersionsInDatabase)
+    }
+
+    private fun Scenario.changeDateToCreate(): Scenario {
+        val changeDates: (ScenarioVersion) -> ScenarioVersion = {
+            it.cloneWithOverriddenDates(ZonedDateTime.now(), null)
+        }
+        return replaceData( data.map(changeDates) )
+    }
+
+    private fun findVersionsByIdIfExist(id: String?): List<ScenarioVersion> {
+        return id?.let { findById(it).data } ?: emptyList()
     }
 
     /**
      * Update an existing scenario
      * @property scenarioId id of URI to update scenario
      * @property scenario to update
-     * @throws NotFoundException when scenarioId don't exist
-     * @throws ConflictException when scenario id is null
-     * @throws ConflictException when scenario id is not the same as scenarioId
-     * @throws InternalServerException when scenario updated is invalid
+     * @throws ScenarioWithNoIdException when scenario id is null
+     * @throws BadNumberException when scenario contains more than one version to update
+     * @throws ScenarioWithNoVersionIdException when scenario contains version with no version sets
+     * @throws DuplicateVersionException when scenario contains duplicate version id
+     * @throws VersionUnknownException when version to update no in scenario
+     * @throws BadScenarioStateException when any version in database or to update is archive
+     * @throws BadScenarioVersionException when version in URI don't correspond to version in scenario
      */
-    override fun update(scenarioId: String, scenario: Scenario): Scenario {
-        val scenarioToUpdate: Scenario = scenario.prepareForUpdate(scenarioId)
+    override fun update(version: String, scenario: Scenario): Scenario {
+        val scenarioFromDatabase: Scenario = findById(scenario.checkIdNotNull().id!!)
+
+        //must be change when API will support multiple update
+        val scenarioVersionToUpdate: ScenarioVersion = scenario.extractVersion(version)
+        scenarioVersionToUpdate.checkContainsSpecificVersion(version)
+
+        val otherExistingVersionFormDatabase =
+            scenarioFromDatabase
+                .excludeVersion(version)
+                .archiveVersionsIfNewIsCurrent(scenarioVersionToUpdate)
+
+        val scenarioToUpdate =
+            scenario
+                .changeDateToUpdate(scenarioFromDatabase)
+                .checkToUpdate(scenarioFromDatabase)
+                .addVersions(otherExistingVersionFormDatabase)
+
         return scenarioDAO.update(scenarioToUpdate)
-            .checkIsNotNullForId(scenario.id)
-            .checkScenarioFromDatabase()
+            .checkNotNullForId(scenario.id)
+            .checkIdNotNull()
     }
 
-    private fun findScenarioToArchive(rootId: String) {
-
+    private fun Scenario.archiveVersionsIfNewIsCurrent(scenarioVersion: ScenarioVersion): List<ScenarioVersion> {
+        return if(scenarioVersion.isCurrent()) {
+            archiveCurrent().data
+        } else {
+            data
+        }
     }
 
-    private fun Scenario.prepareForUpdate(scenarioId: String): Scenario {
-        val scenarioInDatabase: Scenario? = scenarioDAO.findById(scenarioId)
-        return this
-            .cloneWithOverridenDates(scenarioInDatabase?.createDate, ZonedDateTime.now())
-            .checkToUpdate(scenarioInDatabase)
+    private fun Scenario.extractVersion(version: String): ScenarioVersion {
+        return filterVersions(setOf(version)).data.checkContainsOne()
+    }
+
+    /*
+     * Update the UpdateDate but preserved the CreateDate from scenario in parameter (from database)
+     */
+    private fun Scenario.changeDateToUpdate(scenario: Scenario): Scenario {
+        val createDateByVersion = scenario.extractCreateDatesByVersion()
+        val changeDates: (ScenarioVersion) -> ScenarioVersion = {
+            it.cloneWithOverriddenDates(createDateByVersion[it.version], ZonedDateTime.now())
+        }
+        return replaceData( data.map(changeDates) )
+    }
+
+    private fun Scenario.extractCreateDatesByVersion(): Map<String, ZonedDateTime?> {
+        return data.filter(haveVersion).associateBy( { it.version!! }, { it.createDate })
     }
 
     /**
-     * Delete an existing scenario
-     * If the scenario does not already exist, it just logs that it does not exist
-     * @property scenarioId id of scenario to delete
+     * Delete an existing version of scenario
+     * If scenario contains only this version, delete scenario instead
+     * If scenario does not already exist, it just logs that it does not exist
+     * @property version to delete
      */
-    override fun delete(scenarioId: String) {
+    override fun deleteByVersion(version: String) {
         try {
-            scenarioDAO.delete(scenarioId)
-        } catch (notFoundException: TockNotFound) {
-            logger.debug { "scenario id $scenarioId no longer exist and cannot be deleted" }
+            val scenario: Scenario = findByVersion(version).excludeVersion(version)
+            if(scenario.data.isEmpty()) {
+                deleteById(scenario.id!!) //id cannot be null after findByVersion
+            } else {
+                scenarioDAO.update(scenario) //remove only version
+            }
+        } catch (notFoundException: ScenarioNotFoundException) {
+            logger.debug { "scenario version $version no longer exist and cannot be deleted" }
+        }
+    }
+
+    /**
+     * Delete an existing scenario with all this version
+     * If the scenario does not already exist, it just logs that it does not exist
+     * @property id of scenario to delete
+     */
+    override fun deleteById(id: String) {
+        try {
+            scenarioDAO.delete(id)
+        } catch (notFoundException: ScenarioNotFoundException) {
+            logger.debug { "scenario id $id no longer exist and cannot be deleted" }
         }
     }
 }

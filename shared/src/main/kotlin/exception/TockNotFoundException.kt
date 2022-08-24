@@ -16,4 +16,4 @@
 
 package ai.tock.shared.exception
 
-class BadScenarioIdException(val expected: String?, val received: String?, message : String) : TockException(message)
+open class TockNotFoundException(message: String) : TockException(message)
