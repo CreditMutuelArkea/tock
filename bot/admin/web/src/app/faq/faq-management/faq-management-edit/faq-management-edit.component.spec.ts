@@ -9,6 +9,7 @@ import {
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
+  NbDialogRef,
   NbFormFieldModule,
   NbIconModule,
   NbSelectModule,
@@ -151,7 +152,7 @@ describe('FaqManagementEditComponent', () => {
       ],
       providers: [
         { provide: StateService, useClass: MockState },
-        { provide: DialogService, useValue: {} },
+        { provide: DialogService, useValue: { openDialog: () => ({ onClose: (val: any) => of(val) }) } },
         { provide: NlpService, useClass: NlpServiceMock }
       ]
     }).compileComponents();
@@ -415,6 +416,68 @@ describe('FaqManagementEditComponent', () => {
       expect(alertMessageElement.textContent.trim()).toBe(
         'Addition cancelled. This Sentence is already associated with the intent : "intentAssociate"'
       );
+    });
+  });
+
+  it('#removeUtterance should remove utterance from the list', () => {
+    component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
+    fixture.detectChanges();
+
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'question 2']);
+
+    component.removeUtterance('question 1');
+
+    expect(component.utterances.value).toHaveSize(1);
+    expect(component.utterances.value).toEqual(['question 2']);
+  });
+
+  it('#validateEditUtterance should update the value of utterance', () => {
+    component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
+    fixture.detectChanges();
+
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'question 2']);
+
+    component.utteranceEditionValue = 'test';
+    component.validateEditUtterance(Array.from(component.utterances.controls.values())[1] as FormControl);
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'test']);
+  });
+
+  describe('#close', () => {
+    it('should call the onClose method without displaying a confirmation request message when the form is not dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      component.close();
+
+      expect(component['dialogService'].openDialog).not.toHaveBeenCalled();
+      expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('should call the onClose method after displaying a confirmation request message and confirm when the form is dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      // To display the confirmation message, the form must have been modified
+      component.form.markAsDirty();
+      component.close();
+
+      expect(component['dialogService'].openDialog).toHaveBeenCalled();
+      expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('should not call the onClose method after displaying a confirmation request message and cancel when the form is dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      // To display the confirmation message, the form must have been modified
+      component.form.markAsDirty();
+      component.close();
+
+      expect(component['dialogService'].openDialog).toHaveBeenCalled();
+      expect(component.onClose.emit).not.toHaveBeenCalled();
     });
   });
 });
