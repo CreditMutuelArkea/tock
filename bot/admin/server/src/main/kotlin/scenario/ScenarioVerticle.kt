@@ -20,7 +20,9 @@ import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenarioResults
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenario
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainOne
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkDontContainsNothing
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIsNotEmpty
 import ai.tock.shared.injector
 import ai.tock.shared.security.TockUserRole.*
 import ai.tock.shared.exception.rest.NotFoundException
@@ -61,6 +63,8 @@ open class ScenarioVerticle {
         with(webVerticle) {
             blockingJsonGet(scenariosPath, setOf(botUser), handler = getAllScenarios)
 
+            blockingJsonGet(sagaPath, setOf(botUser), handler = getAllScenarios)
+
             blockingJsonGet("$scenariosPath/active", setOf(botUser), handler = getAllScenariosActive)
 
             blockingJsonGet("$sagaPath/:$sagaId", setOf(botUser), handler = getAllScenariosFromSaga)
@@ -90,6 +94,7 @@ open class ScenarioVerticle {
         exceptionManager.catch {
             scenarioService
                 .findAll()
+                .checkIsNotEmpty()
                 .map(toScenarioResults)
                 .flatten()
         }
@@ -136,7 +141,7 @@ open class ScenarioVerticle {
             scenarioService
                 .findOnlyVersion(scenarioId)
                 .toScenarioResults()
-                .checkContainsOne()
+                .checkContainOne()
         }
     }
 
@@ -152,7 +157,8 @@ open class ScenarioVerticle {
             scenarioService
                 .findCurrentById(sagaId)
                 .toScenarioResults()
-                .checkContainsOne()
+                .checkDontContainsNothing()
+                .checkContainOne()
         }
     }
 
@@ -183,7 +189,7 @@ open class ScenarioVerticle {
             scenarioService
                 .create(request.toScenario())
                 .toScenarioResults()
-                .checkContainsOne()
+                .checkContainOne()
         }
     }
 
@@ -200,7 +206,7 @@ open class ScenarioVerticle {
             scenarioService
                 .update(scenarioId, request.toScenario())
                 .toScenarioResults()
-                .checkContainsOne()
+                .checkContainOne()
         }
     }
 

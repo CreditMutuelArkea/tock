@@ -18,10 +18,8 @@ package ai.tock.bot.admin.scenario
 
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isVersionOf
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isArchive
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isCurrent
 import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIsNotEmpty
 import ai.tock.bot.admin.scenario.ScenarioState.*
 import ai.tock.shared.exception.scenario.*
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -35,8 +33,7 @@ class ScenarioMapper {
          * Lambda to map a Scenario to a List of ScenarioResult
          */
         val toScenarioResults: Scenario.() -> List<ScenarioResult> = {
-            checkIsNotEmpty()
-            data.map{
+            data.map {
                 it.toScenarioResult(this)
             }
         }
@@ -156,25 +153,9 @@ class ScenarioMapper {
         }
 
         /**
-         * Create a new scenario with the scenario history at state current is replaced by archive
-         */
-        fun Scenario.archiveCurrent(): Scenario {
-           return Scenario(
-                id,
-                data.map{
-                    if(it.isCurrent()) {
-                        it.archive()
-                    } else {
-                        it
-                    }
-                }
-            )
-        }
-
-        /**
          * Create a new scenario history with state is replace by archive
          */
-        private fun ScenarioVersion.archive(): ScenarioVersion {
+        fun ScenarioVersion.archive(): ScenarioVersion {
             return ScenarioVersion (
                 version = version,
                 name = name,

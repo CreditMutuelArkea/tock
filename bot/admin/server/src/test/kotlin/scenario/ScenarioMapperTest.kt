@@ -14,6 +14,17 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario
+package ai.tock.bot.admin.scenario
 
-class BadScenarioVersionException(val version: String, message: String) : ScenarioException(message)
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+
+class ScenarioMapperTest {
+
+    @Test
+    fun `100 per cent coverage mapper`() {
+        assertDoesNotThrow { ScenarioMapper() }
+    }
+
+    //all other methode are covered by other TU
+}

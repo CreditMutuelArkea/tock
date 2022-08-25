@@ -151,7 +151,7 @@ class ScenarioVerticleTest : ScenarioVerticle() {
 
         //WHEN THEN
         val exceptionThrows = assertThrows<InternalServerException> { getOneScenario.invoke(routingContext) }
-        assertEquals("scenario must not be empty", exceptionThrows.message)
+        assertEquals("1 scenario expected but 0 found", exceptionThrows.message)
     }
 
     @Test
@@ -163,7 +163,7 @@ class ScenarioVerticleTest : ScenarioVerticle() {
 
         //WHEN THEN
         val exceptionThrows = assertThrows<InternalServerException> { getOneScenario.invoke(routingContext) }
-        assertEquals("scenario $ID1 must not be empty", exceptionThrows.message)
+        assertEquals("1 scenario expected but 0 found", exceptionThrows.message)
     }
 
     @Test

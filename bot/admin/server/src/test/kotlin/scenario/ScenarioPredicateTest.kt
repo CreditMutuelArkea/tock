@@ -23,14 +23,16 @@ import ai.tock.bot.admin.scenario.ScenarioAbstractTest.Companion.current
 import ai.tock.bot.admin.scenario.ScenarioAbstractTest.Companion.archive
 import ai.tock.bot.admin.scenario.ScenarioAbstractTest.Companion.createScenarioResult
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsNoVersion
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainOne
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOnlyDraft
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsSpecificVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkDontContainsNothing
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIdNotNull
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIsNotEmpty
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkNotNullForId
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToCreate
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToUpdate
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkUpdateStateIsValideTo
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.extractVersionsAndCheckIsNotEmpty
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.haveVersion
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isDraft
@@ -53,6 +55,11 @@ class ScenarioPredicateTest {
 
     private val VERSION1 = "version_test_1"
     private val VERSION2 = "version_test_2"
+
+    @Test
+    fun `100 per cent coverage`() {
+        assertDoesNotThrow { ScenarioPredicate() }
+    }
 
     @Test
     fun `GIVEN scenarionVersion with version WHEN invoke haveVersion THEN return true`() {
@@ -103,21 +110,21 @@ class ScenarioPredicateTest {
     }
 
     @Test
-    fun `GIVEN scenarioVersion with expected version WHEN checkContainsSpecificVersion THEN no exception thrown`() {
-        val scenarioVersion = draft(VERSION1)
-        assertDoesNotThrow { scenarioVersion.checkContainsSpecificVersion(VERSION1) }
+    fun `GIVEN scenario with expected version WHEN checkContainsSpecificVersion THEN no exception thrown`() {
+        val scenario = createScenario(ID1, draft(VERSION1))
+        assertDoesNotThrow { scenario.checkContainsVersion(VERSION1) }
     }
 
     @Test
-    fun `GIVEN scenarioVersion with no version WHEN checkContainsSpecificVersion THEN exception is thrown`() {
-        val scenarioVersion = draft(null)
-        assertThrows<BadScenarioVersionException> { scenarioVersion.checkContainsSpecificVersion(VERSION1) }
+    fun `GIVEN scenario with no version WHEN checkContainsSpecificVersion THEN exception is thrown`() {
+        val scenario = createScenario(ID1, draft(null))
+        assertThrows<BadScenarioVersionException> { scenario.checkContainsVersion(VERSION1) }
     }
 
     @Test
-    fun `GIVEN scenarioVersion with version not expected WHEN checkContainsSpecificVersion THEN exception is thrown`() {
-        val scenarioVersion = draft(VERSION2)
-        assertThrows<BadScenarioVersionException> { scenarioVersion.checkContainsSpecificVersion(VERSION1) }
+    fun `GIVEN scenario with version not expected WHEN checkContainsSpecificVersion THEN exception is thrown`() {
+        val scenario = createScenario(ID1, draft(VERSION2))
+        assertThrows<BadScenarioVersionException> { scenario.checkContainsVersion(VERSION1) }
     }
 
     @Test
@@ -359,29 +366,86 @@ class ScenarioPredicateTest {
     }
 
     @Test
-    fun `GIVEN list of scenario version contains one verion WHEN checkContainsOneVersion THEN no exception is thrown and return version`() {
+    fun `GIVEN scenario with data WHEN checkIsNotEmpty THEN no exception is thrown`() {
+        val scenario = createScenario(ID1, draft(VERSION1))
+        assertDoesNotThrow { scenario.checkIsNotEmpty() }
+    }
+
+    @Test
+    fun `GIVEN scenario is empty WHEN checkIsNotEmpty THEN exception is thrown`() {
+        val scenario = createScenario(ID1)
+        assertThrows<ScenarioEmptyException> { scenario.checkIsNotEmpty() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario with data WHEN checkIsNotEmpty THEN no exception is thrown`() {
+        val scenarios: List<Scenario> = listOf(createScenario(ID1, draft(VERSION1)))
+        assertDoesNotThrow { scenarios.checkIsNotEmpty() }
+    }
+
+    @Test
+    fun `GIVEN list empty of scenario WHEN checkIsNotEmpty THEN no exception is thrown`() {
+        val scenarios: List<Scenario> = emptyList()
+        assertDoesNotThrow { scenarios.checkIsNotEmpty() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario than one is empty WHEN checkIsNotEmpty THEN exception is thrown`() {
+        val scenarios: List<Scenario> = listOf(createScenario(ID1, draft(VERSION1)), createScenario(ID1))
+        assertThrows<ScenarioEmptyException> { scenarios.checkIsNotEmpty() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario version contains one version WHEN checkContainsOne THEN no exception is thrown and return version`() {
         val versions: List<ScenarioVersion> = listOf(draft(VERSION1))
-        val version: ScenarioVersion = versions.checkContainsOne()
+        val version: ScenarioVersion = versions.checkContainOne()
         assertEquals(VERSION1, version.version)
         assertEquals(DRAFT, version.state)
     }
 
     @Test
-    fun `GIVEN list of scenario version contains multiple verion WHEN checkContainsOneVersion THEN exception is thrown`() {
+    fun `GIVEN list of scenario version contains multiple verion WHEN checkContainsOne THEN exception is thrown`() {
         val versions: List<ScenarioVersion> = listOf(draft(VERSION1), draft(VERSION2))
-        assertThrows<BadNumberException> { versions.checkContainsOne() }
+        assertThrows<BadNumberException> { versions.checkContainOne() }
     }
 
     @Test
-    fun `GIVEN list of scenario version empty WHEN checkContainsOneVersion THEN exception is thrown`() {
+    fun `GIVEN list of scenario version empty WHEN checkContainsOne THEN exception is thrown`() {
         val versions: List<ScenarioVersion> = emptyList()
-        assertThrows<BadNumberException> { versions.checkContainsOne() }
+        assertThrows<BadNumberException> { versions.checkContainOne() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario version contains one version WHEN checkDontContainsNothing THEN no exception is thrown and return version`() {
+        val versions: List<ScenarioVersion> = listOf(draft(VERSION1))
+        val versionsChecked: List<ScenarioVersion> = assertDoesNotThrow { versions.checkDontContainsNothing() }
+        assertEquals(1, versionsChecked.size)
+        assertEquals(VERSION1, versionsChecked.first().version)
+        assertEquals(DRAFT, versionsChecked.first().state)
+    }
+
+    @Test
+    fun `GIVEN list of scenarios contains no version WHEN checkDontContainsNothing THEN exception is thrown`() {
+        val versions: List<Scenario> = listOf(createScenario(ID1))
+        assertThrows<ScenarioNotFoundException> { versions.checkDontContainsNothing() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario result empty WHEN checkDontContainsNothing THEN exception is thrown`() {
+        val versions: List<ScenarioResult> = emptyList()
+        assertThrows<ScenarioNotFoundException> { versions.checkDontContainsNothing() }
+    }
+
+    @Test
+    fun `GIVEN list of scenario version empty WHEN checkDontContainsNothing THEN exception is thrown`() {
+        val versions: List<ScenarioVersion> = emptyList()
+        assertThrows<ScenarioNotFoundException> { versions.checkDontContainsNothing() }
     }
 
     @Test
     fun `GIVEN list of scenario result contains one result WHEN checkContainsOneResult THEN no exception is thrown and return version`() {
         val results: List<ScenarioResult> = listOf(createScenarioResult(ID1, VERSION1, DRAFT))
-        val result: ScenarioResult = results.checkContainsOne()
+        val result: ScenarioResult = results.checkContainOne()
         assertEquals(ID1, result.sagaId)
         assertEquals(VERSION1, result.id)
         assertEquals(DRAFT, result.state)
@@ -391,18 +455,76 @@ class ScenarioPredicateTest {
     fun `GIVEN list of scenario result contains multiple result WHEN checkContainsOneResult THEN exception is thrown`() {
         val results: List<ScenarioResult> =
             listOf(createScenarioResult(ID1, VERSION1, DRAFT), createScenarioResult(ID1, VERSION2, DRAFT))
-        assertThrows<BadNumberException> { results.checkContainsOne() }
+        assertThrows<BadNumberException> { results.checkContainOne() }
     }
 
     @Test
-    fun `GIVEN list of scenario result empty  WHEN checkContainsOneResult THEN exception is thrown`() {
+    fun `GIVEN list of scenario result empty WHEN checkContainsOneResult THEN exception is thrown`() {
         val results: List<ScenarioResult> = emptyList()
-        assertThrows<BadNumberException> { results.checkContainsOne() }
+        assertThrows<BadNumberException> { results.checkContainOne() }
     }
 
     @Test
-    fun `100 per cent coverage`() {
-        assertDoesNotThrow { ScenarioPredicate() }
+    fun `GIVEN draft to draft WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        assertDoesNotThrow { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN draft to current WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        assertDoesNotThrow { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN draft to archive WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        assertDoesNotThrow { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN current to draft WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        assertThrows<BadScenarioStateException> { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN current to current WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        assertDoesNotThrow { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN current to archive WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        assertDoesNotThrow { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN archive to draft WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to DRAFT)
+        assertThrows<ScenarioArchivedException> { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN archive to current WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to CURRENT)
+        assertThrows<ScenarioArchivedException> { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
+    }
+
+    @Test
+    fun `GIVEN archive to archive WHEN checkUpdateStateIsValideTo THEN exception is thrown`() {
+        val beforeUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        val afterUpdate: Map<String, ScenarioState> = mapOf(VERSION1 to ARCHIVE)
+        assertThrows<ScenarioArchivedException> { beforeUpdate.checkUpdateStateIsValideTo(afterUpdate) }
     }
 
 }

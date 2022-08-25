@@ -20,11 +20,11 @@ import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterActive
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterVersions
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.replaceData
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.addVersions
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.archive
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterExcludeVersions
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.cloneWithOverriddenDates
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.excludeVersion
-import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.archiveCurrent
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainOne
 
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIdNotNull
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkNotNullForId
@@ -32,8 +32,10 @@ import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isArchive
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isCurrent
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToCreate
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkToUpdate
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsSpecificVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkDontContainsNothing
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.haveVersion
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isVersionOf
 
 import ai.tock.shared.injector
 import ai.tock.bot.admin.scenario.ScenarioState.*
@@ -57,7 +59,8 @@ class ScenarioServiceImpl : ScenarioService {
      * @throws ScenarioWithNoIdException when id from database is null
      */
     override fun findAll(): Collection<Scenario> {
-        return scenarioDAO.findAll().checkIdNotNull()
+        return scenarioDAO.findAll()
+            .checkIdNotNull()
     }
 
     /**
@@ -72,6 +75,7 @@ class ScenarioServiceImpl : ScenarioService {
         return scenarioDAO.findByVersion(version)
             .checkNotNullForId(version)
             .checkIdNotNull()
+            .checkDontContainsNothing()
     }
 
     /**
@@ -81,7 +85,9 @@ class ScenarioServiceImpl : ScenarioService {
      * @throws ScenarioWithNoIdException when id from database is null
      */
     override fun findOnlyVersion(version: String): Scenario {
-        return findByVersion(version).filterVersions(setOf(version))
+        return findByVersion(version)
+            .filterVersions(setOf(version))
+            .checkDontContainsNothing()
     }
 
     /**
@@ -94,6 +100,7 @@ class ScenarioServiceImpl : ScenarioService {
         return scenarioDAO.findById(id)
             .checkNotNullForId(id)
             .checkIdNotNull()
+            .checkDontContainsNothing()
     }
 
     /**
@@ -106,7 +113,6 @@ class ScenarioServiceImpl : ScenarioService {
         val scenario: Scenario = findById(id)
         return scenario
             .replaceData(scenario.data.filter(isCurrent))
-            .checkNotNullForId(id)
     }
 
     /**
@@ -117,7 +123,8 @@ class ScenarioServiceImpl : ScenarioService {
      */
     override fun findActiveById(id: String): Scenario {
         val scenario: Scenario = findById(id)
-        return scenario.replaceData(scenario.data.filterNot(isArchive))
+        return scenario
+            .replaceData(scenario.data.filterNot(isArchive))
     }
 
     /**
@@ -168,40 +175,49 @@ class ScenarioServiceImpl : ScenarioService {
      * @throws BadScenarioVersionException when version in URI don't correspond to version in scenario
      */
     override fun update(version: String, scenario: Scenario): Scenario {
+        scenario.checkContainsVersion(version)
+
         val scenarioFromDatabase: Scenario = findById(scenario.checkIdNotNull().id!!)
 
-        //must be change when API will support multiple update
-        val scenarioVersionToUpdate: ScenarioVersion = scenario.extractVersion(version)
-        scenarioVersionToUpdate.checkContainsSpecificVersion(version)
-
-        val otherExistingVersionFormDatabase =
-            scenarioFromDatabase
-                .excludeVersion(version)
-                .archiveVersionsIfNewIsCurrent(scenarioVersionToUpdate)
+        val otherVersionFormDatabase: List<ScenarioVersion> =
+            scenarioFromDatabase.prepareOtherVersionToUpdate(scenario.extractVersion(version))
 
         val scenarioToUpdate =
             scenario
                 .changeDateToUpdate(scenarioFromDatabase)
                 .checkToUpdate(scenarioFromDatabase)
-                .addVersions(otherExistingVersionFormDatabase)
+                .addVersions(otherVersionFormDatabase)
 
         return scenarioDAO.update(scenarioToUpdate)
             .checkNotNullForId(scenario.id)
             .checkIdNotNull()
             // remove existing version in database before return
-            .filterExcludeVersions(otherExistingVersionFormDatabase)
-    }
-
-    private fun Scenario.archiveVersionsIfNewIsCurrent(scenarioVersion: ScenarioVersion): List<ScenarioVersion> {
-        return if(scenarioVersion.isCurrent()) {
-            archiveCurrent().data
-        } else {
-            data
-        }
+            .filterExcludeVersions(otherVersionFormDatabase)
+            .checkDontContainsNothing()
     }
 
     private fun Scenario.extractVersion(version: String): ScenarioVersion {
-        return filterVersions(setOf(version)).data.checkContainsOne()
+        return filterVersions(setOf(version)).data.checkContainOne()
+    }
+
+    private fun Scenario.prepareOtherVersionToUpdate(versionToUpdate: ScenarioVersion): List<ScenarioVersion> {
+        val mapIfNotVersionOrElseNull: ScenarioVersion.(ScenarioVersion.() -> ScenarioVersion) -> ScenarioVersion? = { map ->
+            if(!isVersionOf(versionToUpdate.version!!)) {
+                map()
+            } else {
+                null
+            }
+        }
+        val archiveIfVersionToUpdateIsCurrent: (ScenarioVersion) -> ScenarioVersion? = {
+            it.mapIfNotVersionOrElseNull {
+                if(it.isCurrent() && versionToUpdate.isCurrent()) {
+                    it.archive()
+                } else {
+                    it
+                }
+            }
+        }
+        return data.mapNotNull(archiveIfVersionToUpdateIsCurrent)
     }
 
     /*

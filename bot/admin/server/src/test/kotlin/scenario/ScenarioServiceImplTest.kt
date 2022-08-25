@@ -201,66 +201,99 @@ class ScenarioServiceImplTest {
         assertEquals("scenario not found", exceptionThrows.message)
     }
 
-
-
-
-
-
-
     @Test
-    fun `findCurrentById WHEN dao findByVersion return scenario with one version THEN return Scenario`() {
+    fun `findCurrentById WHEN dao findById return scenario with one version THEN return Scenario`() {
         //GIVEN
         val scenario = createScenario(ID1, current(VERSION1))
-        every { scenarioDAO.findByVersion(VERSION1) } returns scenario
+        every { scenarioDAO.findById(ID1) } returns scenario
 
         //WHEN
-        val scenarioFind = scenarioService.findOnlyVersion(VERSION1)
+        val scenarioFind = scenarioService.findCurrentById(ID1)
 
         //THEN
         assertEquals(scenario, scenarioFind)
     }
 
     @Test
-    fun `findCurrentById WHEN dao findByVersion return scenario with two different version THEN return Scenario`() {
+    fun `findCurrentById WHEN dao findById return scenario with two different version THEN return Scenario`() {
         //GIVEN
-        val scenarioExpected = createScenario(ID1, draft(VERSION1))
+        val scenarioExpected = createScenario(ID1, current(VERSION2))
         val scenarioFind = createScenario(ID1, draft(VERSION1), current(VERSION2))
-        every { scenarioDAO.findByVersion(VERSION1) } returns scenarioFind
+        every { scenarioDAO.findById(ID1) } returns scenarioFind
 
         //WHEN
-        val scenarioReturn = scenarioService.findOnlyVersion(VERSION1)
+        val scenarioReturn = scenarioService.findCurrentById(ID1)
 
         //THEN
         assertEquals(scenarioExpected, scenarioReturn)
     }
 
     @Test
-    fun `findCurrentById WHEN dao findByVersion return list of 1 invalid scenario THEN throw ScenarioException`() {
+    fun `findCurrentById WHEN dao findById return 1 invalid scenario THEN throw ScenarioException`() {
         //GIVEN
-        every { scenarioDAO.findByVersion(VERSION1) } returns createScenario(null)
+        every { scenarioDAO.findById(ID1) } returns createScenario(null)
 
         //WHEN //THEN
-        val exceptionThrows = assertThrows<ScenarioWithNoIdException> { scenarioService.findOnlyVersion(VERSION1) }
+        val exceptionThrows = assertThrows<ScenarioWithNoIdException> { scenarioService.findCurrentById(ID1) }
         assertEquals("scenario from database cannot have id null", exceptionThrows.message)
     }
 
     @Test
-    fun `findCurrentById WHEN dao findByVersion return null THEN throw ScenarioException`() {
+    fun `findCurrentById WHEN dao findById return null THEN throw ScenarioException`() {
         //GIVEN
-        every { scenarioDAO.findByVersion(VERSION1) } returns null
+        every { scenarioDAO.findById(ID1) } returns null
 
         //WHEN //THEN
-        val exceptionThrows = assertThrows<ScenarioNotFoundException> { scenarioService.findOnlyVersion(VERSION1) }
+        val exceptionThrows = assertThrows<ScenarioNotFoundException> { scenarioService.findCurrentById(ID1) }
         assertEquals("scenario not found", exceptionThrows.message)
     }
 
+    @Test
+    fun `findActiveById WHEN dao findById return scenario with one version THEN return Scenario`() {
+        //GIVEN
+        val scenario = createScenario(ID1, current(VERSION1))
+        every { scenarioDAO.findById(ID1) } returns scenario
 
+        //WHEN
+        val scenarioFind = scenarioService.findActiveById(ID1)
 
+        //THEN
+        assertEquals(scenario, scenarioFind)
+    }
 
+    @Test
+    fun `findActiveById WHEN dao findById return scenario with tree different version that one is archive THEN return Scenario`() {
+        //GIVEN
+        val scenarioExpected = createScenario(ID1, draft(VERSION1), current(VERSION2))
+        val scenarioFind = createScenario(ID1, draft(VERSION1), current(VERSION2), archive(VERSION3))
+        every { scenarioDAO.findById(ID1) } returns scenarioFind
 
+        //WHEN
+        val scenarioReturn = scenarioService.findActiveById(ID1)
 
+        //THEN
+        assertEquals(scenarioExpected, scenarioReturn)
+    }
 
+    @Test
+    fun `findActiveById WHEN dao findById return 1 invalid scenario THEN throw ScenarioException`() {
+        //GIVEN
+        every { scenarioDAO.findById(ID1) } returns createScenario(null)
 
+        //WHEN //THEN
+        val exceptionThrows = assertThrows<ScenarioWithNoIdException> { scenarioService.findActiveById(ID1) }
+        assertEquals("scenario from database cannot have id null", exceptionThrows.message)
+    }
+
+    @Test
+    fun `findActiveById WHEN dao findById return null THEN throw ScenarioException`() {
+        //GIVEN
+        every { scenarioDAO.findById(ID1) } returns null
+
+        //WHEN //THEN
+        val exceptionThrows = assertThrows<ScenarioNotFoundException> { scenarioService.findActiveById(ID1) }
+        assertEquals("scenario not found", exceptionThrows.message)
+    }
 
     @Test
     fun `create WHEN dao create return a valid scenario THEN return Scenario`() {
@@ -268,8 +301,6 @@ class ScenarioServiceImplTest {
         val scenarioRequest: Scenario = createScenario(null, draft(null))
         val scenarioToCreate: Scenario = createScenario(null, draft(null, dateNow))
         val scenarioCreated: Scenario = createScenario(ID1, draft(VERSION1, dateNow))
-        val scenarioFind: Scenario = createScenario(ID1)
-        every { scenarioDAO.findById(ID1) } returns scenarioFind
         every { scenarioDAO.create(scenarioToCreate) } returns scenarioCreated
 
         //WHEN
@@ -277,6 +308,24 @@ class ScenarioServiceImplTest {
 
         //THEN
         assertEquals(scenarioCreated, scenario)
+    }
+
+    @Test
+    fun `create WHEN existing version in database and dao create return a valid scenario THEN return Scenario`() {
+        //GIVEN
+        val scenarioRequest: Scenario = createScenario(ID1, draft(null))
+        val scenarioFind: Scenario = createScenario(ID1, current(VERSION2, dateNow))
+        val scenarioToCreate: Scenario = createScenario(ID1, current(VERSION2, dateNow), draft(null, dateNow))
+        val scenarioCreated: Scenario = createScenario(ID1, draft(VERSION1, dateNow), current(VERSION2, dateNow))
+        val scenarioExpected: Scenario = createScenario(ID1, draft(VERSION1, dateNow))
+        every { scenarioDAO.findById(ID1) } returns scenarioFind
+        every { scenarioDAO.patch(scenarioToCreate) } returns scenarioCreated
+
+        //WHEN
+        val scenario = scenarioService.create(scenarioRequest)
+
+        //THEN
+        assertEquals(scenarioExpected, scenario)
     }
 
     @Test
@@ -324,6 +373,24 @@ class ScenarioServiceImplTest {
     }
 
     @Test
+    fun `update WHEN new is current and existing a current in saga THEN existing become archive and return Scenario`() {
+        //GIVEN
+        val scenarioRequest: Scenario = createScenario(ID1, current(VERSION1))
+        val scenarioFind: Scenario = createScenario(ID1, draft(VERSION1, datePrevious, null), current(VERSION2), archive(VERSION3))
+        val scenarioUpdated: Scenario = createScenario(ID1, archive(VERSION2), archive(VERSION3), current(VERSION1, datePrevious, dateNow))
+        every { scenarioDAO.findById(ID1) } returns scenarioFind
+        every { scenarioDAO.update(scenarioUpdated) } returns scenarioUpdated // List of version can be inverted so don't check parameter
+
+        val scenarioExpected: Scenario = createScenario(ID1, current(VERSION1, datePrevious, dateNow))
+
+        //WHEN
+        val scenario = scenarioService.update(VERSION1, scenarioRequest)
+
+        //THEN
+        assertEquals(scenarioExpected, scenario)
+    }
+
+    @Test
     fun `update GIVEN scenario with id different than id on database for version THEN throw ScenarioException`() {
         //GIVEN
         val scenarioRequest: Scenario = createScenario(ID1, draft(VERSION1))
@@ -331,8 +398,7 @@ class ScenarioServiceImplTest {
         every { scenarioDAO.findById(ID1) } returns scenarioFind
 
         //WHEN //THEN
-        val exceptionThrows = assertThrows<ScenarioWithNoVersionIdException> { scenarioService.update(VERSION1, scenarioRequest) }
-        assertEquals("scenario $ID1 contains no version", exceptionThrows.message)
+        val exceptionThrows = assertThrows<ScenarioNotFoundException> { scenarioService.update(VERSION1, scenarioRequest) }
     }
 
     @Test
@@ -432,44 +498,4 @@ class ScenarioServiceImplTest {
         //THEN
         verify(exactly = 0) { scenarioDAO.delete(any()) }
     }
-/*
-    private fun draft(version: String?,
-                      createDate: ZonedDateTime? = null,
-                      updateDate: ZonedDateTime? = null): ScenarioVersion {
-        return createScenarioVersion(version, DRAFT, createDate, updateDate)
-    }
-    private fun current(version: String?,
-                        createDate: ZonedDateTime? = null,
-                        updateDate: ZonedDateTime? = null): ScenarioVersion {
-        return createScenarioVersion(version, CURRENT, createDate, updateDate)
-    }
-    private fun archive(version: String?,
-                        createDate: ZonedDateTime? = null,
-                        updateDate: ZonedDateTime? = null): ScenarioVersion {
-        return createScenarioVersion(version, ARCHIVE, createDate, updateDate)
-    }
-
-    private fun createScenarioVersion(
-        version: String?,
-        state: ScenarioState,
-        createDate: ZonedDateTime?,
-        updateDate: ZonedDateTime?
-    ): ScenarioVersion {
-        return ScenarioVersion(
-            version = version,
-            name = "test",
-            applicationId = "test",
-            createDate = createDate,
-            updateDate = updateDate,
-            state = state)
-    }
-
-    private fun createScenario(
-        id: String?, vararg versions: ScenarioVersion
-    ): Scenario {
-        return Scenario(
-            id = id,
-            data = versions.toList()
-        )
-    }*/
 }

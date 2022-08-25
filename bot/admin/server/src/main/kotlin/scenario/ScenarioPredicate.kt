@@ -44,7 +44,7 @@ class ScenarioPredicate {
         /**
          * Throws ScenarioWithVersionException if scenario contains version with version sets
          */
-        fun Scenario.checkContainsNoVersion() {
+        fun Scenario.checkContainsNoVersion(): Scenario {
             if (data.any(haveVersion)) {
                 val firstVersionNotEmpty = data.first(haveVersion).version!!
                 throw ScenarioWithVersionException(
@@ -52,18 +52,24 @@ class ScenarioPredicate {
                     "scenario version must not have version id set when create"
                 )
             }
+            return this
         }
 
-        fun ScenarioVersion.checkContainsSpecificVersion(version: String) {
-            if(version != this.version) {
-                throw BadScenarioVersionException(version, this.version, "scenario $version expected but ${this.version} found")
+        /**
+         * Throws BadScenarioVersionException if scenario don't contain specific version
+         */
+        fun Scenario.checkContainsVersion(versionToCheck: String): Scenario {
+            val haveSameVersion: ScenarioVersion.() -> Boolean = { this.version == versionToCheck }
+            if(!data.any(haveSameVersion)) {
+                throw BadScenarioVersionException(versionToCheck, "scenario $versionToCheck expected")
             }
+            return this
         }
 
         /**
          * Throws BadScenarioStateException if scenario contains history with state not set to draft
          */
-        fun Scenario.checkContainsOnlyDraft() {
+        fun Scenario.checkContainsOnlyDraft(): Scenario {
             if (!data.all(isDraft)) {
                 val firstBadState: String = data.first(isDraft).state.name
                 throw BadScenarioStateException(
@@ -72,15 +78,7 @@ class ScenarioPredicate {
                     "scenario state must be ${DRAFT.name}, but is $firstBadState"
                 )
             }
-        }
-
-        /**
-         * Throws ScenarioEmptyException if scenario contains no version
-         */
-        fun Scenario.checkIsNotEmpty() {
-            if (data.isEmpty()) {
-                throw ScenarioEmptyException(id, "scenario $id is empty")
-            }
+            return this
         }
 
         /**
@@ -111,7 +109,7 @@ class ScenarioPredicate {
             isState(ARCHIVE)
         }
 
-        /**
+        /*
          * Return true when state is the specified state
          */
         private fun ScenarioVersion.isState(stateRequired: ScenarioState): Boolean {
@@ -140,10 +138,14 @@ class ScenarioPredicate {
             return this
         }
 
-        fun Scenario.checkIdMatch(scenario: Scenario) {
+        /**
+         * Throws exception if scenarios ids are différentes
+         */
+        fun Scenario.checkIdMatch(scenario: Scenario): Scenario {
             if(id == null || !id.equals(scenario.id)) {
                 throw MismatchedScenarioException(id, scenario.id, "id to update must be the same that id in database")
             }
+            return this
         }
 
         /**
@@ -169,21 +171,26 @@ class ScenarioPredicate {
             return stateByVersions
         }
 
-        /**
+        /*
          * Throws VersionUnknownException if the set contain a version that is not in the specified set
          */
-        private fun Map<String, ScenarioState>.checkContainsNoUnknownVersion(versionsMustBeIncluded: Map<String, ScenarioState> ) {
+        private fun Map<String, ScenarioState>.checkContainsNoUnknownVersion(
+            versionsMustBeIncluded: Map<String, ScenarioState>
+        ): Map<String, ScenarioState> {
             val versionsForbidden: Set<String> = keys.minus(versionsMustBeIncluded.keys)
             if(versionsForbidden.isNotEmpty()) {
                 val version: String = versionsForbidden.first()
                 throw VersionUnknownException(version, "version $version is unknown and cannot be updated")
             }
+            return this
         }
 
-        /*
+        /**
          * business rules to control the possibility of updating a state present in the database to the new desired state
          */
-        private fun Map<String, ScenarioState>.checkUpdateStateIsValideTo(stateByVersionToUpdate: Map<String, ScenarioState>) {
+        fun Map<String, ScenarioState>.checkUpdateStateIsValideTo(
+            stateByVersionToUpdate: Map<String, ScenarioState>
+        ): Map<String, ScenarioState> {
             forEach {
                 // existing draft in database can be updated to everything
 
@@ -200,6 +207,7 @@ class ScenarioPredicate {
                         "version ${it.key} is archive in database and cannot be updated")
                 }
             }
+            return this
         }
 
         /**
@@ -211,8 +219,8 @@ class ScenarioPredicate {
         }
 
         /*
-        * Throws ScenarioWithNoIdException if id is null
-        */
+         * Throws ScenarioWithNoIdException if id is null
+         */
         private val checkIdNotNull: Scenario.() -> Unit = {
             if(id == null) {
                 throw ScenarioWithNoIdException("scenario from database cannot have id null")
@@ -220,32 +228,78 @@ class ScenarioPredicate {
         }
 
         /*
-        * Throws ScenarioWithNoIdException if id is null
-        * else, return senario
-        */
+         * Throws ScenarioWithNoIdException if id is null
+         * else, return senario
+         */
         fun Scenario.checkIdNotNull(): Scenario {
             checkIdNotNull.invoke(this)
             return this
         }
 
-        /*
-        * Throws ScenarioWithNoIdException if any scenario id is null
-        * else, return collection of scenario
-        */
+        /**
+         * Throws ScenarioWithNoIdException if any scenario id is null
+         * else, return collection of scenario
+         */
         fun Collection<Scenario>.checkIdNotNull(): Collection<Scenario> {
             forEach(checkIdNotNull)
             return this
         }
 
         /*
-        * Throws BadNumberException if more than 1 in list
-        */
-        inline fun <reified T> List<T>.checkContainsOne(): T {
-            return if (size == 1) {
-                first()
-            } else {
-                throw BadNumberException(1, size, "expected exactly 1 ${T::class.java} but found $size")
+         * Throws ScenarioEmptyException if scenario contains no version
+         */
+        private val checkIsNotEmpty: Scenario.() -> Unit = {
+            if (data.isEmpty()) {
+                throw ScenarioEmptyException(id, "scenario $id is empty")
             }
+        }
+
+        /**
+         * Throws ScenarioEmptyException if scenario contains no version
+         * else, return senario
+         */
+        fun Scenario.checkIsNotEmpty(): Scenario {
+            checkIsNotEmpty.invoke(this)
+            return this
+        }
+
+        /**
+         * Throws ScenarioEmptyException if scenario contains no version
+         * else, return collection of scenario
+         */
+        fun Collection<Scenario>.checkIsNotEmpty(): Collection<Scenario> {
+            forEach(checkIsNotEmpty)
+            return this
+        }
+
+        /**
+         * Throws BadNumberException if more than 1 in list
+         */
+        inline fun <reified T> List<T>.checkContainOne(): T {
+            if (size != 1) {
+                throw BadNumberException(1, size, "expected exactly 1 ${T::class.java.name} but found $size")
+            }
+            return first()
+        }
+
+        /**
+         * Throws NotFoundException list is empty
+         */
+        fun <T> List<T>.checkDontContainsNothing(): List<T> {
+            if (isEmpty()) {
+                throw ScenarioNotFoundException(null, "not found")
+            } else if(first() is Scenario) {
+                forEach { (it as Scenario).data.checkDontContainsNothing() }
+            }
+            return this
+        }
+
+        /**
+         * Throws NotFoundException if data is empty
+         */
+        fun Scenario.checkDontContainsNothing(): Scenario{
+            data.checkDontContainsNothing()
+            return this
         }
     }
 }

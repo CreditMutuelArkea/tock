@@ -59,7 +59,7 @@ class ScenarioExceptionManager(private val logger: KLogger) {
 
     private val SAGA_NOT_FOUND = "saga %snot found"
     private val SCENARIO_NOT_FOUND = "scenario %snot found"
-    private val SCENARIO_ID_DIFF_FROM_URI = "scenario id of the uri must be the same as in the body but they are different, %s ≠ %s"
+    private val SCENARIO_ID_DIFF_FROM_URI = "scenario id in the uri must be the same as in the body but they are different"
     private val SCENARIO_IDS_MISMATCH = "scenario id %sto update must be the same in database but it was %s"
     private val SCENARIO_ARCHIVE = "scenario %sstate in database is 'ARCHIVE', operation forbidden"
     private val BAD_STATE = "scenario state must be %s, but is %s"
@@ -85,7 +85,7 @@ class ScenarioExceptionManager(private val logger: KLogger) {
     }
 
     private fun BadScenarioVersionException.toRestException(): RestException {
-        return ConflictException(SCENARIO_ID_DIFF_FROM_URI.format(expected, received))
+        return ConflictException(SCENARIO_ID_DIFF_FROM_URI.format(version))
     }
 
     private fun DuplicateVersionException.toRestException(): RestException {
