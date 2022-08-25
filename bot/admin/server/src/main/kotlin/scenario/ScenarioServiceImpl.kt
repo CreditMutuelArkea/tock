@@ -188,6 +188,8 @@ class ScenarioServiceImpl : ScenarioService {
         return scenarioDAO.update(scenarioToUpdate)
             .checkNotNullForId(scenario.id)
             .checkIdNotNull()
+            // remove existing version in database before return
+            .filterExcludeVersions(otherExistingVersionFormDatabase)
     }
 
     private fun Scenario.archiveVersionsIfNewIsCurrent(scenarioVersion: ScenarioVersion): List<ScenarioVersion> {
