@@ -1,13 +1,15 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { SimpleChange } from '@angular/core';
 import { By } from '@angular/platform-browser';
 import { FormControl } from '@angular/forms';
 import {
+  NbAlertModule,
   NbAutocompleteModule,
   NbBadgeModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
+  NbDialogRef,
   NbFormFieldModule,
   NbIconModule,
   NbSelectModule,
@@ -16,26 +18,120 @@ import {
   NbTagModule,
   NbTooltipModule
 } from '@nebular/theme';
+import { of } from 'rxjs';
 
 import { DialogService } from '../../../core-nlp/dialog.service';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { StateService } from '../../../core-nlp/state.service';
 import { TestSharedModule } from '../../../shared/test-shared.module';
 import { FaqManagementEditComponent, FaqTabs } from './faq-management-edit.component';
-import { FormControlComponent } from '../../../shared/form-control/form-control.component';
+import { FormControlComponent } from '../../../shared/components';
 import { FaqDefinitionExtended } from '../faq-management.component';
+import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../../model/nlp';
 
-const faq: FaqDefinitionExtended = {
+const mockSentences: Sentence[] = [
+  {
+    text: 'sentence 1',
+    status: SentenceStatus.validated,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 2',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 3',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence,
+  {
+    text: 'sentence 4',
+    status: SentenceStatus.inbox,
+    classification: <Classification>{
+      intentId: '1',
+      intentProbability: 1,
+      entitiesProbability: 1
+    },
+    creationDate: new Date('2022-08-03T09:50:24.952Z'),
+    getIntentLabel(_state) {
+      return 'intent label';
+    }
+  } as Sentence
+];
+
+const mockFaq: FaqDefinitionExtended = {
   id: '1',
   applicationId: '1',
   enabled: true,
   language: 'fr',
-  title: 'title',
+  title: 'title faq',
   description: 'description',
   tags: ['tag 1'],
   utterances: ['question 1', 'question 2'],
   answer: 'answer'
 };
+
+const mockSentencesPaginatedResult: PaginatedResult<Sentence> = {
+  end: mockSentences.length,
+  rows: mockSentences,
+  start: 0,
+  total: mockSentences.length
+};
+
+class NlpServiceMock {
+  searchSentences() {
+    return of(mockSentencesPaginatedResult);
+  }
+}
+
+class MockState {
+  createPaginatedQuery() {
+    return {
+      namespace: 'app',
+      applicationName: 'app',
+      language: 'fr',
+      start: 0,
+      size: 1000
+    };
+  }
+
+  findIntentById(): Intent {
+    return {
+      name: 'intentAssociate'
+    } as Intent;
+  }
+
+  intentExists(val: string): boolean {
+    return val === 'titlefaq';
+  }
+
+  intentExistsInOtherApplication() {}
+}
 
 describe('FaqManagementEditComponent', () => {
   let component: FaqManagementEditComponent;
@@ -46,6 +142,7 @@ describe('FaqManagementEditComponent', () => {
       declarations: [FaqManagementEditComponent, FormControlComponent],
       imports: [
         TestSharedModule,
+        NbAlertModule,
         NbAutocompleteModule,
         NbTabsetModule,
         NbTagModule,
@@ -60,18 +157,20 @@ describe('FaqManagementEditComponent', () => {
         NbTooltipModule
       ],
       providers: [
-        { provide: StateService, useValue: {} },
-        { provide: DialogService, useValue: {} },
-        { provide: NlpService, useValue: {} }
+        { provide: StateService, useClass: MockState },
+        { provide: DialogService, useValue: { openDialog: () => ({ onClose: (val: any) => of(val) }) } },
+        { provide: NlpService, useClass: NlpServiceMock }
       ]
     }).compileComponents();
   });
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     fixture = TestBed.createComponent(FaqManagementEditComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  });
+
+    tick(100);
+  }));
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -94,20 +193,65 @@ describe('FaqManagementEditComponent', () => {
     });
 
     it('should initialize an empty form', () => {
+      const faq: FaqDefinitionExtended = {
+        id: undefined,
+        intentId: undefined,
+        title: '',
+        description: '',
+        utterances: [],
+        tags: [],
+        answer: '',
+        enabled: true,
+        applicationId: '1',
+        language: 'fr'
+      };
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
       expect(component.form.valid).toBeFalse();
       expect(component.form.value).toEqual({
-        title: null,
+        title: '',
         description: '',
         tags: [],
         utterances: [],
         answer: ''
       });
     });
+
+    it('should initialize the form when the result comes from the training page', fakeAsync(() => {
+      const faq: FaqDefinitionExtended = {
+        id: undefined,
+        intentId: undefined,
+        title: 'test',
+        description: '',
+        utterances: [],
+        tags: [],
+        answer: '',
+        enabled: true,
+        applicationId: '1',
+        language: 'fr',
+        _initUtterance: 'test'
+      };
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      tick(100);
+
+      expect(component.form.dirty).toBeTrue();
+      expect(component.form.valid).toBeFalse();
+      expect(component.form.value).toEqual({
+        title: 'test',
+        description: '',
+        tags: [],
+        utterances: ['test'],
+        answer: ''
+      });
+    }));
   });
 
   describe('edit faq', () => {
     it('should initialize the current tab on the info part', () => {
-      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
       fixture.detectChanges();
       const nameElement = fixture.debugElement.query(By.css('[data-testid="name"]'));
       const descriptionElement = fixture.debugElement.query(By.css('[data-testid="description"]'));
@@ -124,11 +268,10 @@ describe('FaqManagementEditComponent', () => {
     });
 
     it('should initialize a form with the correct value', () => {
-      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
       fixture.detectChanges();
-      expect(component.form.valid).toBeFalse();
       expect(component.form.value).toEqual({
-        title: 'title',
+        title: 'title faq',
         description: 'description',
         tags: ['tag 1'],
         utterances: ['question 1', 'question 2'],
@@ -226,5 +369,234 @@ describe('FaqManagementEditComponent', () => {
 
     expect(component.existingUterranceInOtherintent).toBeUndefined();
     expect(component.intentNameExistInApp).toBeUndefined();
+  });
+
+  describe('#addUtterance', () => {
+    it('should add utterance to the list', () => {
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      expect(component.utterances.value).toHaveSize(0);
+
+      component.addUtterance('test');
+
+      expect(component.utterances.value).toHaveSize(1);
+      expect(component.utterances.value).toEqual(['test']);
+    });
+
+    it('should not add utterance to the list when it is already present', () => {
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      const utterances = ['test', 'test 1', 'ok'];
+      utterances.forEach((utterance) => {
+        component.utterances.push(new FormControl(utterance));
+      });
+
+      component.addUtterance('test');
+
+      expect(component.utterances.value).toEqual(utterances);
+    });
+
+    it('should not add utterance to the list when the utterance is already associated with another intent', () => {
+      component.faq = mockFaq;
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+      expect(component.utterances.value).toHaveSize(0);
+
+      component.addUtterance('sentence 1');
+
+      expect(component.utterances.value).toHaveSize(0);
+    });
+
+    it('should display an error message when the utterance being added is already associated with another intent', () => {
+      component.faq = mockFaq;
+      component.currentTab = FaqTabs.QUESTION;
+      fixture.detectChanges();
+
+      component.addUtterance('sentence 1');
+      fixture.detectChanges();
+
+      const alertElement: HTMLElement = fixture.debugElement.query(
+        By.css('[data-testid="existing-uterrance-in-other-intent"]')
+      ).nativeElement;
+      const alertMessageElement: HTMLSpanElement = alertElement.querySelector('[data-testid="alert-message"]');
+      expect(alertElement).toBeTruthy();
+      expect(alertMessageElement.textContent.trim()).toBe(
+        'Addition cancelled. This Sentence is already associated with the intent : "intentAssociate"'
+      );
+    });
+  });
+
+  it('#removeUtterance should remove utterance from the list', () => {
+    component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
+    fixture.detectChanges();
+
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'question 2']);
+
+    component.removeUtterance('question 1');
+
+    expect(component.utterances.value).toHaveSize(1);
+    expect(component.utterances.value).toEqual(['question 2']);
+  });
+
+  it('#validateEditUtterance should update the value of utterance', () => {
+    component.ngOnChanges({ faq: new SimpleChange(null, mockFaq, true) });
+    fixture.detectChanges();
+
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'question 2']);
+
+    component.utteranceEditionValue = 'test';
+    component.validateEditUtterance(Array.from(component.utterances.controls.values())[1] as FormControl);
+    expect(component.utterances.value).toHaveSize(2);
+    expect(component.utterances.value).toEqual(['question 1', 'test']);
+  });
+
+  describe('#close', () => {
+    it('should call the onClose method without displaying a confirmation request message when the form is not dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      component.close();
+
+      expect(component['dialogService'].openDialog).not.toHaveBeenCalled();
+      expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('should call the onClose method after displaying a confirmation request message and confirm when the form is dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('yes') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      // To display the confirmation message, the form must have been modified
+      component.form.markAsDirty();
+      component.close();
+
+      expect(component['dialogService'].openDialog).toHaveBeenCalled();
+      expect(component.onClose.emit).toHaveBeenCalledOnceWith(true);
+    });
+
+    it('should not call the onClose method after displaying a confirmation request message and cancel when the form is dirty', () => {
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('cancel') } as NbDialogRef<any>);
+      spyOn(component.onClose, 'emit');
+
+      // To display the confirmation message, the form must have been modified
+      component.form.markAsDirty();
+      component.close();
+
+      expect(component['dialogService'].openDialog).toHaveBeenCalled();
+      expect(component.onClose.emit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('#getFormatedIntentName', () => {
+    [
+      { value: 'test', expected: 'test' },
+      { value: 'testFaq', expected: 'testfaq' },
+      { value: 'test Faq', expected: 'testfaq' },
+      { value: '   test    Faq  ', expected: 'testfaq' },
+      { value: 'test-Faq', expected: 'test-faq' },
+      { value: 'test_Faq', expected: 'test_faq' },
+      { value: 'ABCD', expected: 'abcd' },
+      { value: 'test123456789&é"\'(èçà)=~#{[|`\\^@]}°+$£ê*µù%!:;,?./§€', expected: 'test' }
+    ].forEach((test) => {
+      it(`Should format ${test.value} to ${test.expected}`, () => {
+        const res = component.getFormatedIntentName(test.value);
+
+        expect(res).toBe(test.expected);
+      });
+    });
+  });
+
+  describe('#checkIntentNameAndSave', () => {
+    it('should call save method without change the intent name when is defined', () => {
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.intentName = 'test';
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).toHaveBeenCalledOnceWith(faq);
+    });
+
+    it('should call save method when creating a new faq if the intent does not exists in the current or another application', () => {
+      spyOn(StateService, 'intentExistsInApp').and.returnValue(false);
+      spyOn(component['state'], 'intentExistsInOtherApplication').and.returnValue(false);
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.id = undefined;
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).toHaveBeenCalledOnceWith({ ...faq, intentName: 'titlefaq' } as FaqDefinitionExtended);
+    });
+
+    it('should not call save method when creating a new faq if the intent is already exists in the current application', () => {
+      spyOn(StateService, 'intentExistsInApp').and.returnValue(true);
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.id = undefined;
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).not.toHaveBeenCalled();
+    });
+
+    it('should not call the save method when creating a new faq if the intent already exists in another application after displaying an info message and canceling', () => {
+      spyOn(StateService, 'intentExistsInApp').and.returnValue(false);
+      spyOn(component['state'], 'intentExistsInOtherApplication').and.returnValue(true);
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of(undefined) } as NbDialogRef<any>);
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.id = undefined;
+      faq.intentName = 'test';
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).not.toHaveBeenCalled();
+    });
+
+    it('should call the save method when creating a new faq if the intent already exists in another application after displaying an info message and share intent', () => {
+      spyOn(StateService, 'intentExistsInApp').and.returnValue(false);
+      spyOn(component['state'], 'intentExistsInOtherApplication').and.returnValue(true);
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('Share the intent') } as NbDialogRef<any>);
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.id = undefined;
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).toHaveBeenCalledOnceWith({ ...faq, intentName: 'titlefaq' } as FaqDefinitionExtended);
+    });
+
+    it('should call the save method when creating a new faq if the intent already exists in another application after displaying an info message and create new intent', () => {
+      spyOn(StateService, 'intentExistsInApp').and.returnValue(false);
+      spyOn(component['state'], 'intentExistsInOtherApplication').and.returnValue(true);
+      spyOn(component['dialogService'], 'openDialog').and.returnValue({ onClose: of('Create a new intent') } as NbDialogRef<any>);
+      spyOn(component, 'save');
+      const faq: FaqDefinitionExtended = JSON.parse(JSON.stringify(mockFaq));
+      faq.id = undefined;
+      component.faq = faq;
+      component.ngOnChanges({ faq: new SimpleChange(null, faq, true) });
+      fixture.detectChanges();
+
+      component.checkIntentNameAndSave();
+
+      expect(component.save).toHaveBeenCalledOnceWith({ ...faq, intentName: 'titlefaq1' } as FaqDefinitionExtended);
+    });
   });
 });
