@@ -24,7 +24,7 @@ import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { StateService } from '../../../core-nlp/state.service';
 import { TestSharedModule } from '../../../shared/test-shared.module';
 import { FaqManagementEditComponent, FaqTabs } from './faq-management-edit.component';
-import { FormControlComponent } from '../../../shared/form-control/form-control.component';
+import { FormControlComponent } from '../../../shared/components';
 import { FaqDefinitionExtended } from '../faq-management.component';
 import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from 'src/app/model/nlp';
 import { of } from 'rxjs';

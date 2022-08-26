@@ -13,7 +13,7 @@ import { PaginatedQuery } from '../../model/commons';
 import { FaqDefinition, FaqFilter, FaqSearchQuery, PaginatedFaqResult } from '../models';
 import { FaqManagementEditComponent } from './faq-management-edit/faq-management-edit.component';
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
-import { Pagination } from '../../shared/pagination/pagination.component';
+import { Pagination } from '../../shared/components';
 
 export type FaqDefinitionExtended = FaqDefinition & { _initUtterance?: string };
 
