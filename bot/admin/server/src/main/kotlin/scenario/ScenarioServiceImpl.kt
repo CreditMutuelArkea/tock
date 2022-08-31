@@ -18,7 +18,7 @@ package ai.tock.bot.admin.scenario
 
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterActive
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterVersions
-import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.replaceData
+import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.replaceVersions
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.addVersions
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.archive
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.filterExcludeVersions
@@ -112,7 +112,7 @@ class ScenarioServiceImpl : ScenarioService {
     override fun findCurrentById(id: String): Scenario {
         val scenario: Scenario = findById(id)
         return scenario
-            .replaceData(scenario.data.filter(isCurrent))
+            .replaceVersions(scenario.versions.filter(isCurrent))
     }
 
     /**
@@ -124,7 +124,7 @@ class ScenarioServiceImpl : ScenarioService {
     override fun findActiveById(id: String): Scenario {
         val scenario: Scenario = findById(id)
         return scenario
-            .replaceData(scenario.data.filterNot(isArchive))
+            .replaceVersions(scenario.versions.filterNot(isArchive))
     }
 
     /**
@@ -149,17 +149,18 @@ class ScenarioServiceImpl : ScenarioService {
             .checkIdNotNull()
             // remove existing version in database before return
             .filterExcludeVersions(scenarioVersionsInDatabase)
+            .checkDontContainsNothing()
     }
 
     private fun Scenario.changeDateToCreate(): Scenario {
         val changeDates: (ScenarioVersion) -> ScenarioVersion = {
             it.cloneWithOverriddenDates(ZonedDateTime.now(), null)
         }
-        return replaceData( data.map(changeDates) )
+        return replaceVersions( versions.map(changeDates) )
     }
 
     private fun findVersionsByIdIfExist(id: String?): List<ScenarioVersion> {
-        return id?.let { findById(it).data } ?: emptyList()
+        return id?.let { findById(it).versions } ?: emptyList()
     }
 
     /**
@@ -197,7 +198,7 @@ class ScenarioServiceImpl : ScenarioService {
     }
 
     private fun Scenario.extractVersion(version: String): ScenarioVersion {
-        return filterVersions(setOf(version)).data.checkContainOne()
+        return filterVersions(setOf(version)).versions.checkContainOne()
     }
 
     private fun Scenario.prepareOtherVersionToUpdate(versionToUpdate: ScenarioVersion): List<ScenarioVersion> {
@@ -217,7 +218,7 @@ class ScenarioServiceImpl : ScenarioService {
                 }
             }
         }
-        return data.mapNotNull(archiveIfVersionToUpdateIsCurrent)
+        return versions.mapNotNull(archiveIfVersionToUpdateIsCurrent)
     }
 
     /*
@@ -228,11 +229,11 @@ class ScenarioServiceImpl : ScenarioService {
         val changeDates: (ScenarioVersion) -> ScenarioVersion = {
             it.cloneWithOverriddenDates(createDateByVersion[it.version], ZonedDateTime.now())
         }
-        return replaceData( data.map(changeDates) )
+        return replaceVersions( versions.map(changeDates) )
     }
 
     private fun Scenario.extractCreateDatesByVersion(): Map<String, ZonedDateTime?> {
-        return data.filter(haveVersion).associateBy( { it.version!! }, { it.createDate })
+        return versions.filter(haveVersion).associateBy( { it.version!! }, { it.createDate })
     }
 
     /**
@@ -244,7 +245,7 @@ class ScenarioServiceImpl : ScenarioService {
     override fun deleteByVersion(version: String) {
         try {
             val scenario: Scenario = findByVersion(version).excludeVersion(version)
-            if(scenario.data.isEmpty()) {
+            if(scenario.versions.isEmpty()) {
                 deleteById(scenario.id!!) //id cannot be null after findByVersion
             } else {
                 scenarioDAO.update(scenario) //remove only version

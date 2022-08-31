@@ -14,21 +14,21 @@ import org.litote.kmongo.property.KPropertyPath
 
 private val ___id: KProperty1<ScenarioCol, Id<Scenario>?>
     get() = ScenarioCol::_id
-private val __Data: KProperty1<ScenarioCol, List<ScenarioVersionCol>?>
-    get() = ScenarioCol::data
+private val __Versions: KProperty1<ScenarioCol, List<ScenarioVersionCol>?>
+    get() = ScenarioCol::versions
 internal class ScenarioCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         ScenarioCol?>) : KPropertyPath<T, ScenarioCol?>(previous,property) {
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
 
-    val data: ScenarioVersionCol_Col<T>
-        get() = ScenarioVersionCol_Col(this,ScenarioCol::data)
+    val versions: ScenarioVersionCol_Col<T>
+        get() = ScenarioVersionCol_Col(this,ScenarioCol::versions)
 
     companion object {
         val _id: KProperty1<ScenarioCol, Id<Scenario>?>
             get() = ___id
-        val Data: ScenarioVersionCol_Col<ScenarioCol>
-            get() = ScenarioVersionCol_Col(null,__Data)}
+        val Versions: ScenarioVersionCol_Col<ScenarioCol>
+            get() = ScenarioVersionCol_Col(null,__Versions)}
 }
 
 internal class ScenarioCol_Col<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
@@ -37,8 +37,8 @@ internal class ScenarioCol_Col<T>(previous: KPropertyPath<T, *>?, property: KPro
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
 
-    val data: ScenarioVersionCol_Col<T>
-        get() = ScenarioVersionCol_Col(this,ScenarioCol::data)
+    val versions: ScenarioVersionCol_Col<T>
+        get() = ScenarioVersionCol_Col(this,ScenarioCol::versions)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): ScenarioCol_<T> =
@@ -49,8 +49,8 @@ internal class ScenarioCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: K
     val _id: KPropertyPath<T, Id<Scenario>?>
         get() = KPropertyPath(this,___id)
 
-    val data: ScenarioVersionCol_Col<T>
-        get() = ScenarioVersionCol_Col(this,ScenarioCol::data)
+    val versions: ScenarioVersionCol_Col<T>
+        get() = ScenarioVersionCol_Col(this,ScenarioCol::versions)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): ScenarioCol_<T> =

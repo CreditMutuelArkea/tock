@@ -18,5 +18,5 @@ package ai.tock.bot.admin.scenario
 
 data class Scenario(
     val id: String? = null,
-    val data: List<ScenarioVersion> = emptyList(),
+    val versions: List<ScenarioVersion> = emptyList(),
 )

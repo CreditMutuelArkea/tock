@@ -25,5 +25,5 @@ import org.litote.kmongo.Id
 @JacksonData(internal = true)
 internal data class ScenarioCol (
     var _id: Id<Scenario>,
-    var data: List<ScenarioVersionCol>
+    var versions: List<ScenarioVersionCol>
 )

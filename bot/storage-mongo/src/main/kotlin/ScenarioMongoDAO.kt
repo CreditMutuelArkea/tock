@@ -43,7 +43,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
      */
     override fun findByVersion(version: String): Scenario? {
         val scenarios: List<Scenario> = scenarioDatabase
-            .aggregate<ScenarioCol>(match(Filters.eq("data.version", version)))
+            .aggregate<ScenarioCol>(match(Filters.eq("versions.version", version)))
             .toList()
             .map(toScenario)
 
@@ -69,7 +69,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
      */
     override fun create(scenario: Scenario): Scenario? {
         if(isVersionPresent(scenario)) {
-            val version: String = scenario.data.firstNotNullOf { it.version }
+            val version: String = scenario.versions.firstNotNullOf { it.version }
             throw ScenarioWithVersionException(version, "scenario version must not have version")
         }
         return save(scenario.toScenarioCol())?.toScenario()
@@ -101,7 +101,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     }
 
     private fun isVersionPresent(scenario: Scenario): Boolean {
-        return scenario.data.all{ it.version?.isNotBlank() ?: false }
+        return scenario.versions.all{ it.version?.isNotBlank() ?: false }
     }
 
     private fun isIdPresent(scenario: Scenario): Boolean {
@@ -128,7 +128,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     private val toScenario: ScenarioCol.() -> Scenario = {
         Scenario(
             id = _id.toString(),
-            data = data.map(toScenarioVersion) )
+            versions = versions.map(toScenarioVersion) )
     }
 
     private val toScenarioVersion: ScenarioVersionCol.() -> ScenarioVersion = {
@@ -149,7 +149,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     private fun Scenario.toScenarioCol(): ScenarioCol {
         return ScenarioCol(
             _id = id?.toId() ?: newId(),
-            data = data.map(toScenarioVersionCol) )
+            versions = versions.map(toScenarioVersionCol) )
     }
 
     private val toScenarioVersionCol: ScenarioVersion.() -> ScenarioVersionCol = {

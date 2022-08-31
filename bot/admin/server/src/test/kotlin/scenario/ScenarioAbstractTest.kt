@@ -75,7 +75,7 @@ class ScenarioAbstractTest {
         fun createScenario(id: String?, vararg versions: ScenarioVersion): Scenario {
             return Scenario(
                 id = id,
-                data = versions.toList()
+                versions = versions.toList()
             )
         }
 
@@ -85,7 +85,7 @@ class ScenarioAbstractTest {
                 sagaId = sagaId,
                 name = "test",
                 applicationId = "test",
-                state = ScenarioState.DRAFT
+                state = state
             )
         }
     }

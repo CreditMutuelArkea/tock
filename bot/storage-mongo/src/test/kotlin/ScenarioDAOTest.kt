@@ -100,8 +100,8 @@ class ScenarioDAOTest : AbstractTest() {
 
         //THEN
         assertNotNull(scenarioCreated?.id)
-        assertNotNull(scenarioCreated?.data?.first()?.version)
-        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.data?.first()?.version.toString()))
+        assertNotNull(scenarioCreated?.versions?.first()?.version)
+        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.versions?.first()?.version.toString()))
     }
 
     @Test
@@ -114,8 +114,8 @@ class ScenarioDAOTest : AbstractTest() {
 
         //THEN
         assertEquals(ID1, scenarioCreated?.id)
-        assertNotNull(scenarioCreated?.data?.first()?.version)
-        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.data?.first()?.version.toString()))
+        assertNotNull(scenarioCreated?.versions?.first()?.version)
+        assertNotNull(ScenarioMongoDAO.findByVersion(scenarioCreated?.versions?.first()?.version.toString()))
     }
 
     @Test
@@ -128,7 +128,7 @@ class ScenarioDAOTest : AbstractTest() {
 
         //THEN
         assertEquals(ID1, scenarioCreated?.id)
-        assertEquals(VERSION, scenarioCreated?.data?.first()?.version)
+        assertEquals(VERSION, scenarioCreated?.versions?.first()?.version)
         assertNotNull(ScenarioMongoDAO.findById(ID1))
         assertNotNull(ScenarioMongoDAO.findByVersion(VERSION))
     }
@@ -160,7 +160,7 @@ class ScenarioDAOTest : AbstractTest() {
     private fun createScenarioForId(id: String?, version: String?): Scenario {
         return Scenario(
             id = id,
-            data = listOf(ScenarioVersion(version = version, name = "test", applicationId = "test", state = ScenarioState.DRAFT))
+            versions = listOf(ScenarioVersion(version = version, name = "test", applicationId = "test", state = ScenarioState.DRAFT))
         )
     }
 }

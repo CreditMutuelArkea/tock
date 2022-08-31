@@ -19,8 +19,8 @@ internal class ScenarioCol_Serializer : StdSerializer<ScenarioCol>(ScenarioCol::
         gen.writeFieldName("_id")
         val __id_ = value._id
         serializers.defaultSerializeValue(__id_, gen)
-        gen.writeFieldName("data")
-        val _data_ = value.data
+        gen.writeFieldName("versions")
+        val _versions_ = value.versions
         serializers.findTypedValueSerializer(
                 serializers.config.typeFactory.constructCollectionType(
                 kotlin.collections.List::class.java,
@@ -29,7 +29,7 @@ internal class ScenarioCol_Serializer : StdSerializer<ScenarioCol>(ScenarioCol::
                 true,
                 null
                 )
-                .serialize(_data_, gen, serializers)
+                .serialize(_versions_, gen, serializers)
         gen.writeEndObject()
     }
 }

@@ -26,8 +26,8 @@ internal class ScenarioCol_Deserializer : JsonDeserializer<ScenarioCol>(),
         with(p) {
             var __id_: Id<Scenario>? = null
             var __id_set : Boolean = false
-            var _data_: MutableList<ScenarioVersionCol>? = null
-            var _data_set : Boolean = false
+            var _versions_: MutableList<ScenarioVersionCol>? = null
+            var _versions_set : Boolean = false
             var _token_ : JsonToken? = currentToken
             while (_token_?.isStructEnd != true) { 
                 if(_token_ != JsonToken.FIELD_NAME) {
@@ -43,10 +43,10 @@ internal class ScenarioCol_Deserializer : JsonDeserializer<ScenarioCol>(),
                              else p.readValueAs(__id__reference);
                             __id_set = true
                             }
-                    "data" -> {
-                            _data_ = if(_token_ == JsonToken.VALUE_NULL) null
-                             else p.readValueAs(_data__reference);
-                            _data_set = true
+                    "versions" -> {
+                            _versions_ = if(_token_ == JsonToken.VALUE_NULL) null
+                             else p.readValueAs(_versions__reference);
+                            _versions_set = true
                             }
                     else -> {
                             if (_token_?.isStructStart == true)
@@ -56,14 +56,14 @@ internal class ScenarioCol_Deserializer : JsonDeserializer<ScenarioCol>(),
                     } 
                 _token_ = currentToken
                         } 
-            return if(__id_set && _data_set)
-                    ScenarioCol(_id = __id_!!, data = _data_!!)
+            return if(__id_set && _versions_set)
+                    ScenarioCol(_id = __id_!!, versions = _versions_!!)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
                     if(__id_set)
                     map[parameters.getValue("_id")] = __id_
-                    if(_data_set)
-                    map[parameters.getValue("data")] = _data_ 
+                    if(_versions_set)
+                    map[parameters.getValue("versions")] = _versions_ 
                     primaryConstructor.callBy(map) 
                     }
         } 
@@ -75,12 +75,12 @@ internal class ScenarioCol_Deserializer : JsonDeserializer<ScenarioCol>(),
 
         private val parameters: Map<String, KParameter> by lazy(LazyThreadSafetyMode.PUBLICATION) {
                 kotlin.collections.mapOf("_id" to primaryConstructor.findParameterByName("_id")!!,
-                "data" to primaryConstructor.findParameterByName("data")!!) }
+                "versions" to primaryConstructor.findParameterByName("versions")!!) }
 
         private val __id__reference: TypeReference<Id<Scenario>> = object :
                 TypeReference<Id<Scenario>>() {}
 
-        private val _data__reference: TypeReference<List<ScenarioVersionCol>> = object :
+        private val _versions__reference: TypeReference<List<ScenarioVersionCol>> = object :
                 TypeReference<List<ScenarioVersionCol>>() {}
     }
 }

@@ -45,8 +45,8 @@ class ScenarioPredicate {
          * Throws ScenarioWithVersionException if scenario contains version with version sets
          */
         fun Scenario.checkContainsNoVersion(): Scenario {
-            if (data.any(haveVersion)) {
-                val firstVersionNotEmpty = data.first(haveVersion).version!!
+            if (versions.any(haveVersion)) {
+                val firstVersionNotEmpty = versions.first(haveVersion).version!!
                 throw ScenarioWithVersionException(
                     firstVersionNotEmpty,
                     "scenario version must not have version id set when create"
@@ -60,7 +60,7 @@ class ScenarioPredicate {
          */
         fun Scenario.checkContainsVersion(versionToCheck: String): Scenario {
             val haveSameVersion: ScenarioVersion.() -> Boolean = { this.version == versionToCheck }
-            if(!data.any(haveSameVersion)) {
+            if(!versions.any(haveSameVersion)) {
                 throw BadScenarioVersionException(versionToCheck, "scenario $versionToCheck expected")
             }
             return this
@@ -70,8 +70,8 @@ class ScenarioPredicate {
          * Throws BadScenarioStateException if scenario contains history with state not set to draft
          */
         fun Scenario.checkContainsOnlyDraft(): Scenario {
-            if (!data.all(isDraft)) {
-                val firstBadState: String = data.first(isDraft).state.name
+            if (!versions.all(isDraft)) {
+                val firstBadState: String = versions.first(isDraft).state.name
                 throw BadScenarioStateException(
                     listOf(DRAFT.name),
                     firstBadState,
@@ -154,10 +154,10 @@ class ScenarioPredicate {
          */
         fun Scenario.extractVersionsAndCheckIsNotEmpty(): Map<String, ScenarioState> {
             val stateByVersions: MutableMap<String, ScenarioState> = mutableMapOf()
-            if(data.isEmpty()) {
+            if(versions.isEmpty()) {
                 throw ScenarioWithNoVersionIdException(id, "scenario $id contains no version")
             }
-            data.forEach {
+            versions.forEach {
                 with(it) {
                     if (version.isNullOrEmpty()) {
                         throw ScenarioWithNoVersionIdException(id, "scenario $id contains a version not set")
@@ -249,7 +249,7 @@ class ScenarioPredicate {
          * Throws ScenarioEmptyException if scenario contains no version
          */
         private val checkIsNotEmpty: Scenario.() -> Unit = {
-            if (data.isEmpty()) {
+            if (versions.isEmpty()) {
                 throw ScenarioEmptyException(id, "scenario $id is empty")
             }
         }
@@ -289,7 +289,7 @@ class ScenarioPredicate {
             if (isEmpty()) {
                 throw ScenarioNotFoundException(null, "not found")
             } else if(first() is Scenario) {
-                forEach { (it as Scenario).data.checkDontContainsNothing() }
+                forEach { (it as Scenario).versions.checkDontContainsNothing() }
             }
             return this
         }
@@ -298,7 +298,7 @@ class ScenarioPredicate {
          * Throws NotFoundException if data is empty
          */
         fun Scenario.checkDontContainsNothing(): Scenario{
-            data.checkDontContainsNothing()
+            versions.checkDontContainsNothing()
             return this
         }
     }

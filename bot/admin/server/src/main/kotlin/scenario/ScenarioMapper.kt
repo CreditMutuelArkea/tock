@@ -33,7 +33,7 @@ class ScenarioMapper {
          * Lambda to map a Scenario to a List of ScenarioResult
          */
         val toScenarioResults: Scenario.() -> List<ScenarioResult> = {
-            data.map {
+            versions.map {
                 it.toScenarioResult(this)
             }
         }
@@ -69,7 +69,7 @@ class ScenarioMapper {
         fun ScenarioRequest.toScenario():  Scenario {
             return Scenario(
                 id = sagaId,
-                data = listOf(
+                versions = listOf(
                     ScenarioVersion(
                         version = id,
                         name = name,
@@ -108,48 +108,48 @@ class ScenarioMapper {
         }
 
         /**
+         * Create a new ScenarioHistory form this, with dates passed in parameters
+         */
+        fun Scenario.replaceVersions(versions: List<ScenarioVersion>): Scenario {
+            return Scenario(
+                id = id,
+                versions = versions
+            )
+        }
+
+        /**
          * Create new scenario with data does not contain specified version
          */
         fun Scenario.excludeVersion(version: String): Scenario {
-            return replaceData(data.filterNot { it.isVersionOf(version) })
+            return replaceVersions(versions.filterNot { it.isVersionOf(version) })
         }
 
         /**
          * Create new scenario with data contain only versions specified
          */
         fun Scenario.filterVersions(versions: Set<String>): Scenario {
-            return replaceData(data.filter { versions.contains(it.version) })
+            return replaceVersions(this.versions.filter { versions.contains(it.version) })
         }
 
         /**
          * Create new collection of scenarios with data contain no archived versions
          */
         fun Collection<Scenario>.filterActive(): Collection<Scenario> {
-            return map { it.replaceData(it.data.filterNot(isArchive)) }
+            return map { it.replaceVersions(it.versions.filterNot(isArchive)) }
         }
 
         /**
          * Create new scenario with data contain histories of original and histories passed in parameter
          */
         fun Scenario.addVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
-            return replaceData(listOf(dataInDatabase, data).flatten())
+            return replaceVersions(listOf(dataInDatabase, versions).flatten())
         }
 
         /**
          * Create new scenario with data contain histories of original excluded from those passed in parameters
          */
         fun Scenario.filterExcludeVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
-            return replaceData(data.filterNot { dataInDatabase.contains(it) })
-        }
-
-        /**
-         * Create a new ScenarioHistory form this, with dates passed in parameters
-         */
-        fun Scenario.replaceData(data: List<ScenarioVersion>): Scenario {
-            return Scenario(
-                id = id,
-                data = data
-            )
+            return replaceVersions(versions.filterNot { dataInDatabase.contains(it) })
         }
 
         /**

@@ -117,8 +117,8 @@ class ScenarioServiceImplTest {
 
         //THEN
         assertEquals(2, scenariosFound.size)
-        assertEquals(2, scenariosFound.elementAt(0).data.size)
-        assertEquals(1, scenariosFound.elementAt(1).data.size)
+        assertEquals(2, scenariosFound.elementAt(0).versions.size)
+        assertEquals(1, scenariosFound.elementAt(1).versions.size)
     }
 
     @Test
