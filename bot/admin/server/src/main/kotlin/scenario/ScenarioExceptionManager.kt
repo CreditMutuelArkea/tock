@@ -31,29 +31,33 @@ class ScenarioExceptionManager(private val logger: KLogger) {
             return fallibleSection.invoke()
         } catch(scenarioException : ScenarioException) {
             logger.error(scenarioException.message)
-            throw when(scenarioException) {
-                is BadNumberOfScenarioException -> scenarioException.toRestException()
-                is BadNumberException -> scenarioException.toRestException()
-                is BadScenarioStateException -> scenarioException.toRestException()
-                is BadScenarioVersionException -> scenarioException.toRestException()
-                is DuplicateVersionException -> scenarioException.toRestException()
-                is MismatchedScenarioException -> scenarioException.toRestException()
-                is ScenarioArchivedException -> scenarioException.toRestException()
-                is ScenarioEmptyException -> scenarioException.toRestException()
-                is ScenarioNotFoundException -> scenarioException.toRestException()
-                is ScenarioVersionNotFoundException -> scenarioException.toRestException()
-                is ScenarioWithNoIdException -> scenarioException.toRestException()
-                is ScenarioWithNoVersionIdException -> scenarioException.toRestException()
-                is ScenarioWithVersionException -> scenarioException.toRestException()
-                is VersionUnknownException -> scenarioException.toRestException()
-                else -> InternalServerException("unmanaged exception") // don't expose the real origin of exception
-            }
+            throw scenarioException.toRestException()
         } catch (tockException: TockException) {
             //TockException use a non-null message,
-            // but extends RuntimeException which has nullable message
-            // tockException.message cannot be null
+            // but extends RuntimeException which has nullable message.
+            // "tockException.message" cannot be null
             logger.error(tockException.message!!)
             throw InternalServerException(tockException.message!!)
+        }
+    }
+
+    private fun ScenarioException.toRestException(): RestException {
+        return when(this) {
+            is BadNumberOfScenarioException -> toRestException()
+            is BadNumberException -> toRestException()
+            is BadScenarioStateException -> toRestException()
+            is BadScenarioVersionException -> toRestException()
+            is DuplicateVersionException -> toRestException()
+            is MismatchedScenarioException -> toRestException()
+            is ScenarioArchivedException -> toRestException()
+            is ScenarioEmptyException -> toRestException()
+            is ScenarioNotFoundException -> toRestException()
+            is ScenarioVersionNotFoundException -> toRestException()
+            is ScenarioWithNoIdException -> toRestException()
+            is ScenarioWithNoVersionIdException -> toRestException()
+            is ScenarioWithVersionException -> toRestException()
+            is VersionUnknownException -> toRestException()
+            else -> InternalServerException("unmanaged exception") // don't expose the real origin of exception
         }
     }
 
@@ -71,6 +75,7 @@ class ScenarioExceptionManager(private val logger: KLogger) {
     private val BAD_NUMBER_OF_SAGA = "scenario must appear in %d saga but %d found"
     private val BAD_NUMBER_OF_SCENARIO = "%d scenario expected but %d found"
     private val UNKNOWN_SCENARIO = "cannot update scenario %s that is not in the saga"
+
 
     private fun BadNumberOfScenarioException.toRestException(): RestException {
         return InternalServerException(BAD_NUMBER_OF_SAGA.format(expected, received))
