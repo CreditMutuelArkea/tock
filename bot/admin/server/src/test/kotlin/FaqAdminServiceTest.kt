@@ -35,6 +35,7 @@ import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
+import ai.tock.nlp.front.shared.config.EntityDefinition
 import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.FaqQueryResult
 import ai.tock.nlp.front.shared.config.FaqSettingsQuery
@@ -99,9 +100,6 @@ class FaqAdminServiceTest : AbstractTest() {
                 import(specificModule)
             })
         }
-
-        // TODO MASS : MAJ TU, attention, en cas d'update,
-        // TODO MASS : Voir avec JY: MAJ Jira, l'intention ne doit pas etre MAJ, seule la faq + label de la story
 
         private val applicationId = newId<ApplicationDefinition>()
         private val intentId = "idIntent".toId<IntentDefinition>()
@@ -302,8 +300,8 @@ class FaqAdminServiceTest : AbstractTest() {
 
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["createOrUpdateIntent"](
-                            allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
+                        faqAdminService["findFaqDefinitionIntent"](
+                            allAny<Id<FaqDefinition>>()
                         )
                     } returns null
 
@@ -345,7 +343,7 @@ class FaqAdminServiceTest : AbstractTest() {
                         FaqDefinition(faqId, applicationId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
-                        faqAdminService["createOrUpdateIntent"](
+                        faqAdminService["getFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns theSavedIntent
@@ -409,7 +407,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["createOrUpdateIntent"](
+                        faqAdminService["getFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent
@@ -454,7 +452,7 @@ class FaqAdminServiceTest : AbstractTest() {
                     val faqDefinitionRequestDisabledStory = faqDefinitionRequest.copy(enabled = false)
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["createOrUpdateIntent"](
+                        faqAdminService["getFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent
@@ -580,7 +578,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
                 faqAdminService.saveFAQ(existingFaqQuery, userLogin, applicationDefinition)
 
-                verify(exactly = 1) { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
+                verify(exactly = 0) { faqAdminService["getIntentName"](any<FaqDefinitionRequest>()) }
                 verify(exactly = 1) { faqAdminService["findFaqDefinitionIntent"](any<Id<FaqDefinition>>()) }
             }
 
@@ -721,6 +719,13 @@ class FaqAdminServiceTest : AbstractTest() {
             val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
             val numberOfUtterances = 1
             val expectedUtteranceLabel = "expectedLabel"
+
+            every {
+                storyDefinitionDAO.getConfiguredStoriesDefinitionByNamespaceAndBotIdAndIntent(
+                    any(), any(), any()
+                )
+            } returns emptyList()
+
             initSearchFaqMockWithoutLabelsSearch(
                 listOf(
                     createFaqQueryResult(
@@ -730,7 +735,7 @@ class FaqAdminServiceTest : AbstractTest() {
             )
 
             val faqSearchRequest = createFaqSearchRequest(enabled = null, search = null)
-            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition, botId)
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
 
             assertEquals(2, faqResult.rows.size, "The expected size of faq Result is not the one expected (2)")
             assertEquals(
@@ -808,11 +813,48 @@ class FaqAdminServiceTest : AbstractTest() {
                 )
             )
 
+            every {
+                storyDefinitionDAO.getConfiguredStoriesDefinitionByNamespaceAndBotIdAndIntent(
+                    any(), any(), any()
+                )
+            } returns emptyList()
+
             val faqSearchRequest = createFaqSearchRequest(enabled = null, search = "Question")
-            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition, botId)
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
 
             assertEquals(faqResult.total, 2, "There should be two faq found when searching for a label question")
 
+        }
+
+        @Test
+        fun `GIVEN search faq WHEN faq found THEN faq title and description equals to respectively story name and description`() {
+            val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
+
+            val story1 = generateStory(generateIntentDefinition(intentId.toString()), "storyId-1")
+            val story2 = generateStory(generateIntentDefinition(intentId2.toString()), "storyId-2")
+
+            every {
+                storyDefinitionDAO.getConfiguredStoriesDefinitionByNamespaceAndBotIdAndIntent(
+                    any(), any(), any()
+                )
+            } returns listOf(story1, story2)
+
+            initSearchFaqMockWithoutLabelsSearch(
+                listOf(
+                    createFaqQueryResult(
+                        faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0
+                    ),
+                    createFaqQueryResult(
+                        numberOfUtterances = 1, utteranceText = "testUtteranceText")
+                )
+            )
+
+            val faqSearchRequest = createFaqSearchRequest(enabled = null, search = null)
+            val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
+
+            assertEquals(story1.name, faqResult.rows.first { it.intentId == intentId.toString() }.title)
+            assertEquals(story2.name, faqResult.rows.last() { it.intentId == intentId2.toString() }.title)
+            // TODO MASS
         }
 
         private fun initSearchFaqMockWithoutLabelsSearch(
@@ -873,11 +915,12 @@ class FaqAdminServiceTest : AbstractTest() {
             numberOfUtterances: Int = 1,
             utteranceText: String = "randomText",
             classifiedSentenceStatus: ClassifiedSentenceStatus = ClassifiedSentenceStatus.validated,
-            instant: Instant = now
+            instant: Instant = now,
+            intentName: String = "name-$intentId"
         ): FaqQueryResult {
 
             val createdIntent = IntentDefinition(
-                faqName,
+                intentName,
                 namespace,
                 setOf(applicationId),
                 emptySet(),
@@ -893,7 +936,7 @@ class FaqAdminServiceTest : AbstractTest() {
             }
 
             return FaqQueryResult(
-                faqId, applicationId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent
+                faqId, applicationId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent, intentName
             )
         }
 
@@ -910,6 +953,27 @@ class FaqAdminServiceTest : AbstractTest() {
                 lastEntityProbability = 1.0,
                 qualifier = userLogin
             )
+
+        private fun generateIntentDefinition(intentId: String): IntentDefinition {
+            return IntentDefinition(
+                _id = intentId.toId(),
+                name = "name-$intentId",
+                namespace = "namespace-$intentId",
+                applications = setOf("appId-$intentId".toId()),
+                entities = emptySet<EntityDefinition>()
+            )
+        }
+        private fun generateStory(intent: IntentDefinition, storyId: String): StoryDefinitionConfiguration {
+            return StoryDefinitionConfiguration(
+                _id = storyId.toId(),
+                storyId = storyId,
+                name = "name-$storyId",
+                botId = "bot-$storyId",
+                intent = IntentWithoutNamespace(intent.name),
+                currentType = AnswerConfigurationType.simple,
+                answers = emptyList()
+            )
+        }
 
     }
 

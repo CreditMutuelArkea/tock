@@ -30,7 +30,7 @@ data class FaqDefinitionRequest(
     val updateDate: Instant?,
      // storyName
     var title: String,
-    val description: String = "",
+    var description: String = "",
     val utterances: List<String>,
     val tags: List<String>,
     val answer: String,

@@ -69,7 +69,7 @@ data class FaqDefinitionDetailed(
     /**
      * The [IntentDefinition] identity of the faq
      */
-    val faq: IntentDefinition, // TODO MASS : do not update intent name/label, update story name
+    val faq: IntentDefinition,
 
     /**
      * The [I18nLabel] answer associated to the faq

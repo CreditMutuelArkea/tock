@@ -50,6 +50,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.security.UNKNOWN_USER_LOGIN
 import ai.tock.shared.security.UserLogin
+import ai.tock.shared.vertx.BadRequestException
 import ai.tock.shared.vertx.WebVerticle.Companion.badRequest
 import ai.tock.translator.I18nDAO
 import ai.tock.translator.I18nLabel
@@ -90,46 +91,54 @@ object FaqAdminService {
         query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition
     ): FaqDefinitionRequest {
         val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
-         val intent = if(query.id != null) {
-            findFaqDefinitionIntent(query.id.toId())
-        }else {
-            createOrUpdateIntent(query, application)
-        }
+        val intent = getFaqIntent(query, application)
 
-        if (intent == null) {
-            badRequest("Trouble when creating/updating intent : $intent")
+        createOrUpdateUtterances(query, intent._id, userLogin)
+
+        val existingFaq: FaqDefinition? = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
+        val i18nLabel: I18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
+
+        val faqDefinition: FaqDefinition = prepareCreationOrUpdatingFaqDefinition(
+            query, application, intent, i18nLabel, existingFaq
+        )
+        faqDefinitionDAO.save(faqDefinition)
+
+        // create the story
+        createOrUpdateStory(
+            query, intent, userLogin, i18nLabel, application, faqSettings
+        )
+
+        return FaqDefinitionRequest(
+            faqDefinition._id.toString(),
+            faqDefinition.intentId.toString(),
+            query.language,
+            query.applicationId,
+            faqDefinition.creationDate,
+            faqDefinition.updateDate,
+            intent.label.toString(),
+            intent.description.toString(),
+            query.utterances,
+            query.tags,
+            //get the only answer for the Faq
+            i18nLabel.i18n.first().label,
+            query.enabled,
+            intent.name
+        )
+    }
+
+    /**
+     * Return the FAQ intent.
+     * @throws [BadRequestException] if no intent is found.
+     * @param query FaqDefinitionRequest
+     * @param application ApplicationDefinition
+     */
+    private fun getFaqIntent(query: FaqDefinitionRequest, application: ApplicationDefinition): IntentDefinition {
+        return if (query.id != null) {
+            // Existing FAQ
+            findFaqDefinitionIntent(query.id.toId()) ?: badRequest("Faq (id:${query.id}) intent not found !")
         } else {
-            logger.debug { "Saved intent $intent for FAQ" }
-            createOrUpdateUtterances(query, intent._id, userLogin)
-            val existingFaq: FaqDefinition? = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
-            val i18nLabel: I18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
-
-            val faqDefinition: FaqDefinition = prepareCreationOrUpdatingFaqDefinition(
-                query, application, intent, i18nLabel, existingFaq
-            )
-            faqDefinitionDAO.save(faqDefinition)
-
-            // create the story and intent
-            createOrUpdateStory(
-                query, intent, userLogin, i18nLabel, application, faqSettings
-            )
-
-            return FaqDefinitionRequest(
-                faqDefinition._id.toString(),
-                faqDefinition.intentId.toString(),
-                query.language,
-                query.applicationId,
-                faqDefinition.creationDate,
-                faqDefinition.updateDate,
-                intent.label.toString(),
-                intent.description.toString(),
-                query.utterances,
-                query.tags,
-                //get the only answer for the Faq
-                i18nLabel.i18n.first().label,
-                query.enabled,
-                intent.name
-            )
+            // New FAQ
+            createIntent(query, application) ?: badRequest("Trouble when creating intent : ${query.intentName}")
         }
     }
 
@@ -274,9 +283,9 @@ object FaqAdminService {
                 applicationDefinition.namespace,
                 existingStory.mandatoryEntities,
                 existingStory.steps,
-                query.title,
+                query.title.trim(),
                 FAQ_CATEGORY,
-                intent.description!!,
+                query.description.trim(),
                 query.utterances.first(),
                 i18nLabel.defaultLocale,
                 existingStory.configurationName,
@@ -407,7 +416,7 @@ object FaqAdminService {
     /**
      * Search and find FAQ and their details in database and convert them to FaqDefinitionSearchResult
      */
-    fun searchFAQ(query: FaqSearchRequest, applicationDefinition: ApplicationDefinition, botId: String): FaqDefinitionSearchResult {
+    fun searchFAQ(query: FaqSearchRequest, applicationDefinition: ApplicationDefinition): FaqDefinitionSearchResult {
         //find predicates from i18n answers if search not empty
         val i18nLabels = query.search?.let { findPredicatesFrom18nLabels(applicationDefinition, query.search) }
         val i18nIds = i18nLabels?.map { it._id }?.toList()
@@ -430,24 +439,31 @@ object FaqAdminService {
         val faqResultsTmp = if (fromTockBotDb?.isNotEmpty() == true) fromTockBotDb else fromTockFrontDb
 
         // feed story name
-        val faqResults = feedFaqStoryName(faqResultsTmp, applicationDefinition.namespace, botId)
+        val faqResults = feedFaqDataStory(faqResultsTmp, applicationDefinition)
 
         logger.debug { "faqResults $faqResults" }
         return toFaqDefinitionSearchResult(query.start, faqResults, faqDetailsWithCount.second)
     }
 
     /**
-     * Feed faq story name
+     * Feed faq data story
+     * @param faqs: list of FAQ
+     * @param applicationDefinition: application definition
      */
-    private fun feedFaqStoryName(faqResults: Set<FaqDefinitionRequest>, namespace: String, botId: String): Set<FaqDefinitionRequest> {
-        val intentNames = faqResults.mapNotNull { it.intentName }
-        val faqStories = BotAdminService.findConfiguredStoriesByBotIdAndIntent(namespace, botId, intentNames)
+    private fun feedFaqDataStory(faqs: Set<FaqDefinitionRequest>, applicationDefinition: ApplicationDefinition): Set<FaqDefinitionRequest> {
+        val intentNames = faqs.mapNotNull { it.intentName }
+        val faqStories = BotAdminService.findConfiguredStoriesByBotIdAndIntent(
+            applicationDefinition.namespace,
+            applicationDefinition.name,
+            intentNames)
 
-        return faqResults.map {
-            it.title = faqStories.first { s -> s.intent.name == it.intentName }.name
-            it
+        return faqs.map {faq ->
+            faqStories.firstOrNull { s -> s.intent.name == faq.intentName }?.let {
+                faq.title = it.name
+                faq.description = it.description
+            }
+            faq
         }.toSet()
-
     }
 
     /**
@@ -610,7 +626,7 @@ object FaqAdminService {
         )
     }
 
-    private fun createOrUpdateIntent(
+    private fun createIntent(
         query: FaqDefinitionRequest, applicationDefinition: ApplicationDefinition
     ): IntentDefinition? {
         val name: String =
@@ -626,6 +642,8 @@ object FaqAdminService {
             description = query.description.trim(),
             category = FAQ_CATEGORY
         )
+
+        logger.debug { "Saved intent $intent for FAQ" }
         return AdminService.createOrUpdateIntent(applicationDefinition.namespace, intent)
     }
 
