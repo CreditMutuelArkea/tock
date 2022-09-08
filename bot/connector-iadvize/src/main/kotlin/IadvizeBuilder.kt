@@ -22,6 +22,9 @@ import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer.TransferOptions
+import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.engine.Bus
 
 internal const val IADVIZE_CONNECTOR_TYPE_ID = "iadvize"
@@ -41,6 +44,22 @@ internal fun <T : Bus<T>> T.withIadvize(messageProvider: () -> IadvizeReply): T 
 internal fun <T : Bus<T>> T.iadvizeQuickReply(
     title: CharSequence
 ): QuickReply = QuickReply(translate(title).toString())
+
+
+/**
+ * Creates a iAdvize transfer
+ */
+internal fun <T : Bus<T>> T.iadvizeTransfer(
+    timeoutSeconds: Long
+): IadvizeTransfer = IadvizeTransfer("", TransferOptions(Duration(timeoutSeconds, Duration.TimeUnit.seconds)) )
+
+/**
+ * Creates a iAdvize quickreply sentence
+ */
+internal fun <T : Bus<T>> T.iadvizeTransfer(
+    timeout: Long,
+    unit: Duration.TimeUnit
+): IadvizeTransfer = IadvizeTransfer("", TransferOptions(Duration(timeout, unit)) )
 
 
 /**

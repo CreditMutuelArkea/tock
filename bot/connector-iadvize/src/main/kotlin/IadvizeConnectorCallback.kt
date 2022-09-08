@@ -25,6 +25,7 @@ import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
@@ -39,7 +40,6 @@ import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
@@ -47,8 +47,9 @@ class IadvizeConnectorCallback(override val  applicationId: String,
                                val controller: ConnectorController,
                                val context: RoutingContext,
                                val request: IadvizeRequest,
-                               val actions: MutableList<ActionWithDelay> = CopyOnWriteArrayList()) :
-    ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
+                               val distributionRule: String?,
+                               val actions: MutableList<ActionWithDelay> = mutableListOf()
+) : ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -127,7 +128,10 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private fun toListIadvizeReply(actions: List<ActionWithDelay>): List<IadvizeReply> {
         return actions.map {
             if (it.action is SendSentence) {
-                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterIsInstance<IadvizeReply>()
+                val listIadvizeReply: List<IadvizeReply> =
+                    it.action.messages
+                        .filterIsInstance<IadvizeReply>()
+                        .map(addDistributionRulesOnTransfer)
                 if (it.action.text != null) {
                     //Extract text to a simple TextPayload
                     val message: String = translator.translate(it.action.text).toString()
@@ -142,6 +146,18 @@ class IadvizeConnectorCallback(override val  applicationId: String,
                 emptyList()
             }
         }.flatten()
+    }
+
+    private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
+        if(distributionRule == null) {
+            //TODO préciser l'exception
+            throw Exception()
+        }
+        if(it is IadvizeTransfer) {
+            IadvizeTransfer(distributionRule, it.transferOptions)
+        } else {
+            it
+        }
     }
 
     override fun exceptionThrown(event: Event, throwable: Throwable) {

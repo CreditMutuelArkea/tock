@@ -27,6 +27,7 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
 
     private const val EDITOR_URL = "tock_iadvize_editor_url"
     private const val FIRST_MESSAGE = "tock_iadvize_first_message"
+    private const val DISTRIBUTION_RULE = "tock_iadvize_distribution_rule"
 
     override fun connector(connectorConfiguration: ConnectorConfiguration): Connector {
         with(connectorConfiguration) {
@@ -34,7 +35,8 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
                 connectorId,
                 connectorConfiguration.path,
                 parameters.getValue(EDITOR_URL),
-                parameters.getValue(FIRST_MESSAGE)
+                parameters.getValue(FIRST_MESSAGE),
+                parameters[DISTRIBUTION_RULE],
             )
         }
     }
@@ -51,9 +53,14 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
             FIRST_MESSAGE,
             true
         )
+        val fieldDistributionRule = ConnectorTypeConfigurationField(
+            properties.getProperty(DISTRIBUTION_RULE, DISTRIBUTION_RULE),
+            DISTRIBUTION_RULE,
+            false
+        )
         return ConnectorTypeConfiguration(
             connectorType,
-            listOf(fieldEditorUrl, fieldFirstMessage),
+            listOf(fieldEditorUrl, fieldFirstMessage, fieldDistributionRule),
             resourceAsString("/iadvize.svg")
         )
     }
