@@ -18,13 +18,23 @@ package ai.tock.bot.admin.scenario
 
 import java.time.ZonedDateTime
 
+/**
+ * There was no functional reflection on what should be versioned and what should not be.
+ * As a result, everything has been versioned to be able to provide coherent responses
+ * to the front in relation to their requests.
+ * It seems important to me to take the time to rethink the problem so as not to version everything.
+ * Some elements such as the name, or the description, or the applicationID for example,
+ * are common to all versions of the same scenario and should therefore be saved in the parent object (Scenario).
+ * All variables that appear moveable have a //must be moved comment.
+ * Think about it.
+ */
 data class ScenarioVersion(
     val version: String? = null,
     val name: String, //must be moved in Scenario ?
     val category: String? = null, //must be moved in Scenario ?
     val tags: List<String> = emptyList(), //must be moved in Scenario ?
     val applicationId: String, //must be moved in Scenario ?
-    val createDate: ZonedDateTime? = null,
+    val creationDate: ZonedDateTime? = null,
     val updateDate: ZonedDateTime? = null,
     val description: String? = null, //must be moved in Scenario ?
     val data: String? = null,

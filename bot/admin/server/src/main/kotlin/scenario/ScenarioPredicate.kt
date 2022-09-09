@@ -24,15 +24,16 @@ class ScenarioPredicate {
         /**
          * Predicate is true when scenario history have a version not null and not blank
          */
-        val haveVersion: ScenarioVersion.() -> Boolean = {
+        val hasVersion: ScenarioVersion.() -> Boolean = {
             version != null && version!!.isNotBlank()
         }
 
         /**
          * Throws TockException if scenario cannot be created in database
+         * else, return scenario
          */
         fun Scenario.checkToCreate(): Scenario {
-            checkIsNotEmpty()
+            checkScenarioNotEmpty()
 
             checkContainsOnlyDraft()
 
@@ -43,20 +44,22 @@ class ScenarioPredicate {
 
         /**
          * Throws ScenarioWithVersionException if scenario contains version with version sets
+         * else, return scenario
          */
         fun Scenario.checkContainsNoVersion(): Scenario {
-            if (versions.any(haveVersion)) {
-                val firstVersionNotEmpty = versions.first(haveVersion).version!!
+            if (versions.any(hasVersion)) {
+                val firstVersionNotEmpty = versions.first(hasVersion).version!!
                 throw ScenarioWithVersionException(
                     firstVersionNotEmpty,
-                    "scenario version must not have version id set when create"
+                    "scenario version must not have version id set when created"
                 )
             }
             return this
         }
 
         /**
-         * Throws BadScenarioVersionException if scenario don't contain specific version
+         * Throws BadScenarioVersionException if scenario doesn't contain specific version
+         * else, return scenario
          */
         fun Scenario.checkContainsVersion(versionToCheck: String): Scenario {
             val haveSameVersion: ScenarioVersion.() -> Boolean = { this.version == versionToCheck }
@@ -68,6 +71,7 @@ class ScenarioPredicate {
 
         /**
          * Throws BadScenarioStateException if scenario contains history with state not set to draft
+         * else, return scenario
          */
         fun Scenario.checkContainsOnlyDraft(): Scenario {
             if (!versions.all(isDraft)) {
@@ -103,10 +107,10 @@ class ScenarioPredicate {
         }
 
         /**
-         * Predicate is true when scenario history state is archive
+         * Predicate is true when scenario history state is archived
          */
-        val isArchive: ScenarioVersion.() -> Boolean = {
-            isState(ARCHIVE)
+        val isArchived: ScenarioVersion.() -> Boolean = {
+            isState(ARCHIVED)
         }
 
         /*
@@ -117,7 +121,8 @@ class ScenarioPredicate {
         }
 
         /**
-         * Throws TockException if scenario cannot be update in database
+         * Throws TockException if scenario cannot be updated in database
+         * else, return scenario
          */
         fun Scenario.checkToUpdate(scenarioFromDatabase: Scenario): Scenario {
             checkIdMatch(scenarioFromDatabase)
@@ -130,26 +135,27 @@ class ScenarioPredicate {
                     .extractVersionsAndCheckIsNotEmpty()
                     .filterKeys { versionsToUpdate.keys.contains(it) }
 
-            //check versions to update don't contain version not already in database in the scenario
+            //check that all versions to update already exists in database
             versionsToUpdate.checkContainsNoUnknownVersion(versionsFromDatabaseToUpdate)
 
-            versionsFromDatabaseToUpdate.checkUpdateStateIsValideTo(versionsToUpdate)
+            versionsFromDatabaseToUpdate.checkUpdateStateIsValidTo(versionsToUpdate)
 
             return this
         }
 
         /**
-         * Throws exception if scenarios ids are différentes
+         * Throws exception if scenarios ids are différent
+         * else, return scenario
          */
         fun Scenario.checkIdMatch(scenario: Scenario): Scenario {
             if(id == null || !id.equals(scenario.id)) {
-                throw MismatchedScenarioException(id, scenario.id, "id to update must be the same that id in database")
+                throw MismatchedScenarioException(id, scenario.id, "id to update must be the same than the one in database")
             }
             return this
         }
 
         /**
-         * Create a new valide set of versions of a scenario
+         * Create a new valid set of scenario's versions
          * (checked is not null, and not duplicate)
          */
         fun Scenario.extractVersionsAndCheckIsNotEmpty(): Map<String, ScenarioState> {
@@ -172,7 +178,8 @@ class ScenarioPredicate {
         }
 
         /*
-         * Throws VersionUnknownException if the set contain a version that is not in the specified set
+         * Throws VersionUnknownException if the set contains a version that is not in the specified set
+         * else, return map of scenario state by scenario id
          */
         private fun Map<String, ScenarioState>.checkContainsNoUnknownVersion(
             versionsMustBeIncluded: Map<String, ScenarioState>
@@ -187,24 +194,29 @@ class ScenarioPredicate {
 
         /**
          * business rules to control the possibility of updating a state present in the database to the new desired state
+         * else, return map of scenario state by scenario id
          */
-        fun Map<String, ScenarioState>.checkUpdateStateIsValideTo(
+        fun Map<String, ScenarioState>.checkUpdateStateIsValidTo(
             stateByVersionToUpdate: Map<String, ScenarioState>
         ): Map<String, ScenarioState> {
             forEach {
-                // existing draft in database can be updated to everything
-
-                if(it.value == CURRENT && stateByVersionToUpdate[it.key] == DRAFT) {
-                    // existing current in database cannot be updated to draft
-                    throw BadScenarioStateException(
-                        listOf(CURRENT.name, ARCHIVE.name),
-                        DRAFT.name,
-                        "scenario state must not be update draft")
-                } else if(it.value == ARCHIVE) {
-                    // existing archive in database cannot be updated
-                    throw ScenarioArchivedException(
-                        it.key,
-                        "version ${it.key} is archive in database and cannot be updated")
+                with(it) {
+                    // value == DRAFT -> ok
+                    // existing draft in database can be updated to everything
+                    if (value == CURRENT && stateByVersionToUpdate[key] == DRAFT) {
+                        // existing current in database cannot be updated to draft
+                        throw BadScenarioStateException(
+                            listOf(CURRENT.name, ARCHIVED.name),
+                            DRAFT.name,
+                            "scenario state must not be update draft"
+                        )
+                    } else if (value == ARCHIVED) {
+                        // existing archive in database cannot be updated
+                        throw ScenarioArchivedException(
+                            key,
+                            "version $key is archive in database and cannot be updated"
+                        )
+                    }
                 }
             }
             return this
@@ -232,7 +244,7 @@ class ScenarioPredicate {
          * else, return senario
          */
         fun Scenario.checkIdNotNull(): Scenario {
-            checkIdNotNull.invoke(this)
+            checkIdNotNull(this)
             return this
         }
 
@@ -248,7 +260,7 @@ class ScenarioPredicate {
         /*
          * Throws ScenarioEmptyException if scenario contains no version
          */
-        private val checkIsNotEmpty: Scenario.() -> Unit = {
+        private val checkScenarioNotEmpty: Scenario.() -> Unit = {
             if (versions.isEmpty()) {
                 throw ScenarioEmptyException(id, "scenario $id is empty")
             }
@@ -258,8 +270,8 @@ class ScenarioPredicate {
          * Throws ScenarioEmptyException if scenario contains no version
          * else, return senario
          */
-        fun Scenario.checkIsNotEmpty(): Scenario {
-            checkIsNotEmpty.invoke(this)
+        fun Scenario.checkScenarioNotEmpty(): Scenario {
+            checkScenarioNotEmpty(this)
             return this
         }
 
@@ -267,15 +279,16 @@ class ScenarioPredicate {
          * Throws ScenarioEmptyException if scenario contains no version
          * else, return collection of scenario
          */
-        fun Collection<Scenario>.checkIsNotEmpty(): Collection<Scenario> {
-            forEach(checkIsNotEmpty)
+        fun Collection<Scenario>.checkScenarioNotEmpty(): Collection<Scenario> {
+            forEach(checkScenarioNotEmpty)
             return this
         }
 
         /**
          * Throws BadNumberException if more than 1 in list
+         * else, return first
          */
-        inline fun <reified T> List<T>.checkContainOne(): T {
+        inline fun <reified T> Collection<T>.checkContainsOne(): T {
             if (size != 1) {
                 throw BadNumberException(1, size, "expected exactly 1 ${T::class.java.name} but found $size")
             }
@@ -284,21 +297,14 @@ class ScenarioPredicate {
 
         /**
          * Throws NotFoundException list is empty
+         * else, return list
          */
-        fun <T> List<T>.checkDontContainsNothing(): List<T> {
+        fun <T> Collection<T>.checkNotEmpty(): Collection<T> {
             if (isEmpty()) {
                 throw ScenarioNotFoundException(null, "not found")
             } else if(first() is Scenario) {
-                forEach { (it as Scenario).versions.checkDontContainsNothing() }
+                (this as Collection<Scenario>).checkScenarioNotEmpty()
             }
-            return this
-        }
-
-        /**
-         * Throws NotFoundException if data is empty
-         */
-        fun Scenario.checkDontContainsNothing(): Scenario{
-            versions.checkDontContainsNothing()
             return this
         }
     }

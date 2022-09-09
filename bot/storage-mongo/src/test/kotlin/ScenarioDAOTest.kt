@@ -52,10 +52,10 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `findAll WHEN 2 scenario existe THEN return list of 2 scenario`() {
+    fun `findAll WHEN 2 scenarios exists THEN returns list of 2 scenario`() {
         //GIVEN
-        ScenarioMongoDAO.update(createScenarioForId(ID1, VERSION))
-        ScenarioMongoDAO.update(createScenarioForId(ID2, VERSION))
+        ScenarioMongoDAO.update(createScenario(ID1, VERSION))
+        ScenarioMongoDAO.update(createScenario(ID2, VERSION))
 
         //WHEN
         val scenarioFound = ScenarioMongoDAO.findAll()
@@ -65,9 +65,9 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `findById WHEN id exist in database THEN return scenario`() {
+    fun `findById WHEN id exists in database THEN returns scenario`() {
         //GIVEN
-        val scenario = createScenarioForId(ID1, VERSION)
+        val scenario = createScenario(ID1, VERSION)
         ScenarioMongoDAO.update(scenario)
 
         //WHEN
@@ -78,9 +78,9 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `findById WHEN id does not exist in database THEN return null`() {
+    fun `findById WHEN id does not exists in database THEN return null`() {
         //GIVEN
-        val scenario = createScenarioForId(ID1, VERSION)
+        val scenario = createScenario(ID1, VERSION)
         ScenarioMongoDAO.update(scenario)
 
         //WHEN
@@ -91,9 +91,9 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `create GIVEN scenario with no id THEN add scenario in database`() {
+    fun `create GIVEN scenario without an id THEN add scenario in database`() {
         //GIVEN
-        val scenario = createScenarioForId(null, null)
+        val scenario = createScenario(null, null)
 
         //WHEN
         val scenarioCreated = ScenarioMongoDAO.create(scenario)
@@ -105,9 +105,9 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `create GIVEN scenario with id THEN throw TockIllegaleArgumentException`() {
+    fun `create GIVEN scenario with id THEN throws TockIllegaleArgumentException`() {
         //GIVEN
-        val scenario = createScenarioForId(ID1, null)
+        val scenario = createScenario(ID1, null)
 
         //WHEN
         val scenarioCreated = ScenarioMongoDAO.create(scenario)
@@ -121,7 +121,7 @@ class ScenarioDAOTest : AbstractTest() {
     @Test
     fun `update GIVEN scenario with id THEN update scenario in database`() {
         //GIVEN
-        val scenario = createScenarioForId(ID1, VERSION)
+        val scenario = createScenario(ID1, VERSION)
 
         //WHEN
         val scenarioCreated = ScenarioMongoDAO.update(scenario)
@@ -134,30 +134,30 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `update GIVEN scenario with no id THEN throw TockIllegalArgumentException`() {
+    fun `update GIVEN scenario without an id THEN throws TockIllegalArgumentException`() {
         //GIVEN
-        val scenario = createScenarioForId(null, VERSION)
+        val scenario = createScenario(null, VERSION)
 
         //WHEN //THEN
         assertThrows<ScenarioWithNoIdException> {  ScenarioMongoDAO.update(scenario) }
     }
 
     @Test
-    fun `delete GIVEN scenario existe in database THEN is deleted`() {
+    fun `delete GIVEN scenario exists in database THEN is deleted`() {
         //GIVEN
-        ScenarioMongoDAO.update(createScenarioForId(ID1, VERSION))
+        ScenarioMongoDAO.update(createScenario(ID1, VERSION))
 
         //WHEN //THEN
         ScenarioMongoDAO.delete(ID1)
     }
 
     @Test
-    fun `delete GIVEN scenario does not existe in database THEN throw TockNotFound`() {
+    fun `delete GIVEN scenario does not exiss in database THEN throws TockNotFound`() {
         //GIVEN //WHEN //THEN
         assertThrows<ScenarioNotFoundException> {  ScenarioMongoDAO.delete(ID1) }
     }
 
-    private fun createScenarioForId(id: String?, version: String?): Scenario {
+    private fun createScenario(id: String?, version: String?): Scenario {
         return Scenario(
             id = id,
             versions = listOf(ScenarioVersion(version = version, name = "test", applicationId = "test", state = ScenarioState.DRAFT))

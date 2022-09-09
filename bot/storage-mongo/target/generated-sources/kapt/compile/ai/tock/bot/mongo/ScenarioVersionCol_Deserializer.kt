@@ -119,7 +119,7 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
                     _state_set)
                     ScenarioVersionCol(version = _version_!!, name = _name_!!, category =
                             _category_, tags = _tags_!!, applicationId = _applicationId_!!,
-                            createDate = _createDate_, updateDate = _updateDate_, description =
+                            creationDate = _createDate_, updateDate = _updateDate_, description =
                             _description_, data = _data_, state = _state_!!)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()

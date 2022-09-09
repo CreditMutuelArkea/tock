@@ -38,15 +38,15 @@ class ScenarioAbstractTest {
             return createScenarioVersion(version, ScenarioState.CURRENT, createDate, updateDate)
         }
 
-        fun archive(
+        fun archived(
             version: String?,
             createDate: ZonedDateTime? = null,
             updateDate: ZonedDateTime? = null
         ): ScenarioVersion {
-            return createScenarioVersion(version, ScenarioState.ARCHIVE, createDate, updateDate)
+            return createScenarioVersion(version, ScenarioState.ARCHIVED, createDate, updateDate)
         }
 
-        fun createScenarioVersion(
+        private fun createScenarioVersion(
             version: String?,
             state: ScenarioState,
             createDate: ZonedDateTime?,
@@ -56,7 +56,7 @@ class ScenarioAbstractTest {
                 version = version,
                 name = "test",
                 applicationId = "test",
-                createDate = createDate,
+                creationDate = createDate,
                 updateDate = updateDate,
                 state = state
             )
@@ -68,7 +68,7 @@ class ScenarioAbstractTest {
                 id = id,
                 name = "test",
                 applicationId = "test",
-                state = state
+                state = state.value.uppercase()
             )
         }
 
@@ -85,7 +85,7 @@ class ScenarioAbstractTest {
                 sagaId = sagaId,
                 name = "test",
                 applicationId = "test",
-                state = state
+                state = state.value
             )
         }
     }

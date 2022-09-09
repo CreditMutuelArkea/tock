@@ -20,9 +20,9 @@ import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenarioResults
 import ai.tock.bot.admin.scenario.ScenarioMapper.Companion.toScenario
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainOne
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkDontContainsNothing
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkIsNotEmpty
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkContainsOne
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkNotEmpty
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.checkScenarioNotEmpty
 import ai.tock.shared.injector
 import ai.tock.shared.security.TockUserRole.*
 import ai.tock.shared.exception.rest.NotFoundException
@@ -47,7 +47,7 @@ open class ScenarioVerticle {
 
     private val sagaId = "sagaID"
 
-    //scenarioBasePath is empty value is necessary so that the scenario URLs are not preceded by
+    // scenarioBasePath is empty value is necessary so that the scenario URLs are not preceded by
     // the default basePath (/rest/admin) of the BotAdminVerticle on which the routes are added
     private val scenarioBasePath = ""
 
@@ -92,22 +92,25 @@ open class ScenarioVerticle {
     protected val getAllScenarios: (RoutingContext) -> List<ScenarioResult> = { context ->
         logger.debug { "request to get all scenarios" }
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findAll()
-                .checkIsNotEmpty()
+                .checkScenarioNotEmpty()
                 .map(toScenarioResults)
                 .flatten()
         }
     }
 
     /**
-     * Handler to retrieve Scenarios draft and current, but no archive,
+     * Handler to retrieve Scenarios "DRAFT" and "CURRENT", but not "ARCHIVE",
      * then format the response as a List of ScenarioResult.
      * when success, return a 200 response.
+     * @see ScenarioState
      */
     protected val getAllScenariosActive: (RoutingContext) -> List<ScenarioResult> = { context ->
         logger.debug { "request to get all active scenarios" }
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findAllActive()
                 .map(toScenarioResults)
@@ -123,6 +126,7 @@ open class ScenarioVerticle {
         val sagaId = extractSagaId(context)
         logger.debug { "request to get all scenario from saga $sagaId" }
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findById(sagaId)
                 .toScenarioResults()
@@ -130,47 +134,49 @@ open class ScenarioVerticle {
     }
 
     /**
-     * Handler to find and retrieve a Scenario based on it's ID, then format the response as a ScenarioResult.
+     * Handler to find and retrieve a Scenario based on its ID, then format the response as a ScenarioResult.
      * when success, return a 200 response.
      */
     protected val getOneScenario: (RoutingContext) -> ScenarioResult = { context ->
         val scenarioId = extractScenarioId(context)
         logger.debug { "request to get scenario $scenarioId" }
-        //return
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findOnlyVersion(scenarioId)
                 .toScenarioResults()
-                .checkContainOne()
+                .checkContainsOne()
         }
     }
 
     /**
-     * Handler to find and retrieve current Scenario of a saga ID, then format the response as a ScenarioResult.
+     * Handler to find and retrieve "CURRENT" Scenario of a saga ID, then format the response as a ScenarioResult.
      * when success, return a 200 response.
+     * @see ScenarioState
      */
     protected val getCurrentScenariosFromSaga: (RoutingContext) -> ScenarioResult = { context ->
         val sagaId = extractSagaId(context)
         logger.debug { "request to get current scenario from saga $sagaId" }
-        //return
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findCurrentById(sagaId)
                 .toScenarioResults()
-                .checkDontContainsNothing()
-                .checkContainOne()
+                .checkNotEmpty()
+                .checkContainsOne()
         }
     }
 
     /**
-     * Handler to find and retrieve a Scenario based on it's ID, then format the response as a ScenarioResult.
+     * Handler to find and retrieve a Scenario based on its ID, then format the response as a ScenarioResult.
      * when success, return a 200 response.
+     * @see ScenarioState
      */
     protected val getActivesScenariosFromSaga: (RoutingContext) -> Collection<ScenarioResult>  = { context ->
         val sagaId = extractSagaId(context)
         logger.debug { "request to get active scenarios from saga $sagaId" }
-        //return
         exceptionManager.catch {
+            //return :
             scenarioService
                 .findActiveById(sagaId)
                 .toScenarioResults()
@@ -184,12 +190,12 @@ open class ScenarioVerticle {
     protected val createScenario: (RoutingContext, ScenarioRequest) -> ScenarioResult = { context, request ->
         logger.debug { "request to create scenario name ${request.name}" }
         context.setResponseStatusCode(201)
-        //return
         exceptionManager.catch {
+            //return :
             scenarioService
                 .create(request.toScenario())
                 .toScenarioResults()
-                .checkContainOne()
+                .checkContainsOne()
         }
     }
 
@@ -201,12 +207,12 @@ open class ScenarioVerticle {
         val scenarioId = extractScenarioId(context)
         logger.debug { "request to update scenario $scenarioId" }
         context.setResponseStatusCode(200)
-        //return
         exceptionManager.catch {
+            //return :
             scenarioService
                 .update(scenarioId, request.toScenario())
                 .toScenarioResults()
-                .checkContainOne()
+                .checkContainsOne()
         }
     }
 
@@ -215,40 +221,40 @@ open class ScenarioVerticle {
     }
 
     /**
-     * Handler to delete a Scenario based on it's ID, then return nothing.
+     * Handler to delete a Scenario based on its ID, then return nothing.
      * when success, produce a 204 response.
      */
     protected val deleteVersion: (RoutingContext) -> Unit = { context ->
         val scenarioId = extractScenarioId(context)
         logger.debug { "request to delete scenario $scenarioId" }
-        //no return
         exceptionManager.catch {
             scenarioService.deleteByVersion(scenarioId)
+            //no return
         }
     }
 
     /**
-     * Handler to delete a Scenario based on it's ID, then return nothing.
+     * Handler to delete a Scenario based on its ID, then return nothing.
      * when success, produce a 204 response.
      */
     protected val deleteScenario: (RoutingContext) -> Unit = { context ->
         val sagaId = extractSagaId(context)
         logger.debug { "request to delete all scenario of saga $scenarioId" }
-        //no return
         exceptionManager.catch {
             scenarioService.deleteById(sagaId)
+            //no return
         }
     }
 
     private fun extractScenarioId(context: RoutingContext): String {
-        return context.pathParam(scenarioId).checkParameterExist(scenarioId)
+        return context.pathParam(scenarioId).checkParameterExists(scenarioId)
     }
 
     private fun extractSagaId(context: RoutingContext): String {
-        return context.pathParam(sagaId).checkParameterExist(sagaId)
+        return context.pathParam(sagaId).checkParameterExists(sagaId)
     }
 
-    private val checkParameterExist: String?.(String) -> String = { parameter ->
+    private val checkParameterExists: String?.(String) -> String = { parameter ->
         this ?: throw NotFoundException("$parameter uri parameter not found")
     }
 }

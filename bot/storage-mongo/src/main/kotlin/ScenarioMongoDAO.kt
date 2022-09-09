@@ -39,7 +39,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     /**
      * Return Scenario find by version or null if not exist.
-     * @property version of scenario to find.
+     * @param version of scenario to find.
      */
     override fun findByVersion(version: String): Scenario? {
         val scenarios: List<Scenario> = scenarioDatabase
@@ -56,7 +56,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     /**
      * Return Scenario find by id or null if not exist.
-     * @property id of scenario to find.
+     * @param id of scenario to find.
      */
     override fun findById(id: String): Scenario? {
         return scenarioDatabase.findOneById(id)?.toScenario()
@@ -65,7 +65,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     /**
      * Create Scenario and return it.
      * @property scenario with versions to create.
-     * @throws ScenarioWithVersionException when scenario have version with id sets.
+     * @throws ScenarioWithVersionException when scenario has a version with id sets.
      */
     override fun create(scenario: Scenario): Scenario? {
         if(isVersionPresent(scenario)) {
@@ -78,8 +78,8 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     /**
      * Patch Scenario and return it.
      * (to create new version on existing scenario with no check)
-     * @property scenario with versions to create.
-     * @throws ScenarioWithVersionException when scenario have version with id sets.
+     * @param scenario with versions to create.
+     * @throws ScenarioWithVersionException when scenario has a version with id sets.
      */
     override fun patch(scenario: Scenario): Scenario? {
         return save(scenario.toScenarioCol())?.toScenario()
@@ -87,15 +87,15 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     /**
      * Update Scenario and return it.
-     * @property scenario with versions to update.
-     * @throws ScenarioWithNoVersionIdException when scenario have version with no id.
+     * @param scenario with versions to update.
+     * @throws ScenarioWithNoVersionIdException when scenario has a version without an id.
      */
     override fun update(scenario: Scenario): Scenario? {
         if(!isIdPresent(scenario)) {
-            throw ScenarioWithNoIdException("scenario must have id")
+            throw ScenarioWithNoIdException("scenario must have an id")
         }
         if(!isVersionPresent(scenario)) {
-            throw ScenarioWithNoVersionIdException(scenario.id, "version must have id")
+            throw ScenarioWithNoVersionIdException(scenario.id, "version must have an id")
         }
         return save(scenario.toScenarioCol())?.toScenario()
     }
@@ -115,7 +115,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     /**
      * Delete Scenario by id.
-     * @property id of scenario to delete
+     * @param id of scenario to delete
      * @throws ScenarioNotFoundException when no delete process of id
      */
     override fun delete(id: String) {
@@ -138,7 +138,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
             category = category,
             tags = tags,
             applicationId = applicationId,
-            createDate = createDate,
+            creationDate = creationDate,
             updateDate = updateDate,
             description = description,
             data = data,
@@ -159,7 +159,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
             category = category,
             tags = tags,
             applicationId = applicationId,
-            createDate = createDate,
+            creationDate = creationDate,
             updateDate = updateDate,
             description = description,
             data = data,

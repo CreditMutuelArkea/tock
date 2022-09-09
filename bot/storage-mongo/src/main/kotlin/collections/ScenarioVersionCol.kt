@@ -31,7 +31,7 @@ internal data class ScenarioVersionCol (
     val category: String? = null, //must be moved in ScenarioCol ?
     val tags: List<String> = emptyList(), //must be moved in ScenarioCol ?
     val applicationId: String, //must be moved in ScenarioCol ?
-    val createDate: ZonedDateTime? = null,
+    val creationDate: ZonedDateTime? = null,
     val updateDate: ZonedDateTime? = null,
     val description: String? = null, //must be moved in ScenarioCol ?
     val data: String? = null,

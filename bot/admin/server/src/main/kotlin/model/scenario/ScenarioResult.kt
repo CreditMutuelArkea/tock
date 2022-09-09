@@ -33,5 +33,5 @@ data class ScenarioResult(
     val updateDate: ZonedDateTime? = null,
     val description: String? = null,
     val data: JsonNode? = null,
-    val state: ScenarioState
+    val state: String
 )

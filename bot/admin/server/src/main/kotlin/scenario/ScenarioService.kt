@@ -23,56 +23,56 @@ interface ScenarioService {
     fun findAll(): Collection<Scenario>
 
     /**
-     * Returns all scenarios on all versions not archive
+     * Returns all scenarios that are active and not in the state ARCHIVE {@see ScenarioState}
      */
     fun findAllActive(): Collection<Scenario>
 
     /**
      * Returns a scenario with only the version requested
-     * @property version of scenario to find
+     * @param version of scenario to find
      */
     fun findOnlyVersion(version: String): Scenario
 
     /**
-     * Returns a scenario with all version based on it's id
-     * @property id of scenario to find
+     * Returns a scenario with all version based on its id
+     * @param id of scenario to find
      */
     fun findById(id: String): Scenario
 
     /**
-     * Returns the current version of a scenario based on it's id
-     * @property id of scenario to find
+     * Returns the current version of a scenario based on its id
+     * @param id of scenario to find
      */
     fun findCurrentById(id: String): Scenario
 
     /**
-     * Returns scenario with versions not archive based on it's id
-     * @property id of scenario to find
+     * Returns scenario with versions not archive based on its id
+     * @param id of scenario to find
      */
     fun findActiveById(id: String): Scenario
 
     /**
      * Create a new version on a new scenario or on an existing scenario if id is set
-     * @property scenario to create
+     * @param scenario to create
      */
     fun create(scenario: Scenario): Scenario
 
     /**
      * Update an existing version on an existing scenario
-     * @property scenarioId id of URI to update scenario
-     * @property scenario to update
+     * @param scenarioId id of URI to update scenario
+     * @param scenario to update
      */
     fun update(version: String, scenario: Scenario): Scenario
 
     /**
      * Delete an existing version of a scenario
-     * @property version of scenario to delete
+     * @param version of scenario to delete
      */
     fun deleteByVersion(version: String)
 
     /**
      * Delete all versions of an existing scenario
-     * @property id of scenario to delete
+     * @param id of scenario to delete
      */
     fun deleteById(id: String)
 }

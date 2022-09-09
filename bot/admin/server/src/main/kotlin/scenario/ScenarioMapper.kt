@@ -17,7 +17,7 @@
 package ai.tock.bot.admin.scenario
 
 import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isVersionOf
-import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isArchive
+import ai.tock.bot.admin.scenario.ScenarioPredicate.Companion.isArchived
 import ai.tock.bot.admin.model.scenario.ScenarioRequest
 import ai.tock.bot.admin.model.scenario.ScenarioResult
 import ai.tock.bot.admin.scenario.ScenarioState.*
@@ -44,6 +44,7 @@ class ScenarioMapper {
         fun Scenario.toScenarioResults(): List<ScenarioResult> {
             return toScenarioResults.invoke(this)
         }
+
         /**
          * Map a Scenario to a new ScenarioRequest
          */
@@ -55,18 +56,18 @@ class ScenarioMapper {
                 category = category,
                 tags = tags,
                 applicationId = applicationId,
-                createDate = createDate,
+                createDate = creationDate,
                 updateDate = updateDate,
                 description = description,
                 data = data?.let { scenarioObjectMapper.readTree(it) },
-                state = state
+                state = state.value.uppercase()
             )
         }
 
         /**
          * Map a ScenarioRequest to a new Scenario
          */
-        fun ScenarioRequest.toScenario():  Scenario {
+        fun ScenarioRequest.toScenario(): Scenario {
             return Scenario(
                 id = sagaId,
                 versions = listOf(
@@ -76,11 +77,11 @@ class ScenarioMapper {
                         category = category,
                         tags = tags,
                         applicationId = applicationId,
-                        createDate = createDate,
+                        creationDate = createDate,
                         updateDate = updateDate,
                         description = description,
                         data =  data?.let { scenarioObjectMapper.writeValueAsString(it) },
-                        state = state
+                        state = ScenarioState.find(state.lowercase())
                     )
                 )
             )
@@ -89,85 +90,59 @@ class ScenarioMapper {
         /**
          * Create a new ScenarioHistory duplicated with dates changed by those passed in parameters
          */
-        fun ScenarioVersion.cloneWithOverriddenDates(
+        fun ScenarioVersion.withDates(
             newCreateDate: ZonedDateTime?,
             newUpdateDate: ZonedDateTime?): ScenarioVersion {
-
-            return ScenarioVersion(
-                version = version,
-                name = name,
-                category = category,
-                tags = tags,
-                applicationId = applicationId,
-                createDate = newCreateDate,
-                updateDate = newUpdateDate,
-                description = description,
-                data = data,
-                state = state
-            )
+            return copy(creationDate = newCreateDate, updateDate = newUpdateDate)
         }
 
         /**
-         * Create a new ScenarioHistory form this, with dates passed in parameters
+         * Create a new scenario from this, with new list of version passed in parameters
          */
-        fun Scenario.replaceVersions(versions: List<ScenarioVersion>): Scenario {
-            return Scenario(
-                id = id,
-                versions = versions
-            )
+        fun Scenario.withVersions(versions: List<ScenarioVersion>): Scenario {
+            return copy(versions = versions)
         }
 
         /**
-         * Create new scenario with data does not contain specified version
+         * Create new scenario with versions that does not contain specified version
          */
         fun Scenario.excludeVersion(version: String): Scenario {
-            return replaceVersions(versions.filterNot { it.isVersionOf(version) })
+            return withVersions(versions.filterNot { it.isVersionOf(version) })
         }
 
         /**
-         * Create new scenario with data contain only versions specified
+         * Create new scenario with versions that contains only version specified
          */
         fun Scenario.filterVersions(versions: Set<String>): Scenario {
-            return replaceVersions(this.versions.filter { versions.contains(it.version) })
+            return withVersions(this.versions.filter { versions.contains(it.version) })
         }
 
         /**
-         * Create new collection of scenarios with data contain no archived versions
+         * Create new collection of scenarios with versions that contain no archived version
          */
         fun Collection<Scenario>.filterActive(): Collection<Scenario> {
-            return map { it.replaceVersions(it.versions.filterNot(isArchive)) }
+            return map { it.withVersions(it.versions.filterNot(isArchived)) }
         }
 
         /**
-         * Create new scenario with data contain histories of original and histories passed in parameter
+         * Create new scenario with versions that contain histories of original and histories passed in parameter
          */
         fun Scenario.addVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
-            return replaceVersions(listOf(dataInDatabase, versions).flatten())
+            return withVersions(listOf(dataInDatabase, versions).flatten())
         }
 
         /**
-         * Create new scenario with data contain histories of original excluded from those passed in parameters
+         * Create new scenario with versions that contain histories of original excluded from those passed in parameters
          */
         fun Scenario.filterExcludeVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
-            return replaceVersions(versions.filterNot { dataInDatabase.contains(it) })
+            return withVersions(versions.filterNot { dataInDatabase.contains(it) })
         }
 
         /**
-         * Create a new scenario history with state is replace by archive
+         * Create a new scenario history with a state replace by archive
          */
         fun ScenarioVersion.archive(): ScenarioVersion {
-            return ScenarioVersion (
-                version = version,
-                name = name,
-                category = category,
-                tags = tags,
-                applicationId = applicationId,
-                createDate = createDate,
-                updateDate = updateDate,
-                description = description,
-                data = data,
-                state = ARCHIVE
-            )
+            return copy(state = ARCHIVED)
         }
     }
 }

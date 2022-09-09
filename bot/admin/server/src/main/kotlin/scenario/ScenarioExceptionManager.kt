@@ -33,7 +33,7 @@ class ScenarioExceptionManager(private val logger: KLogger) {
             logger.error(scenarioException.message)
             throw scenarioException.toRestException()
         } catch (tockException: TockException) {
-            //TockException use a non-null message,
+            // TockException use a non-null message,
             // but extends RuntimeException which has nullable message.
             // "tockException.message" cannot be null
             logger.error(tockException.message!!)
@@ -67,10 +67,10 @@ class ScenarioExceptionManager(private val logger: KLogger) {
     private val SCENARIO_IDS_MISMATCH = "scenario id %sto update must be the same in database but it was %s"
     private val SCENARIO_ARCHIVE = "scenario %sstate in database is 'ARCHIVE', operation forbidden"
     private val BAD_STATE = "scenario state must be %s, but is %s"
-    private val SCENARIO_MUST_HAVE_SAGA_ID = "scenario must have saga id but it's null"
-    private val SCENARIO_MUST_HAVE_ID = "scenario must have id but it's null"
+    private val SCENARIO_MUST_HAVE_SAGA_ID = "scenario must have saga id but is null"
+    private val SCENARIO_MUST_HAVE_ID = "scenario must have id but is null"
     private val DUPLICATE_VERSION = "duplicate scenario %s cannot be updated"
-    private val EMPTY_SCENARIO = "scenario %smust not be empty"
+    private val EMPTY_SCENARIO = "scenario %smust be not empty"
     private val SCENARIO_MUST_NOT_HAVE_ID = "scenario must not have id to create but it's %s"
     private val BAD_NUMBER_OF_SAGA = "scenario must appear in %d saga but %d found"
     private val BAD_NUMBER_OF_SCENARIO = "%d scenario expected but %d found"

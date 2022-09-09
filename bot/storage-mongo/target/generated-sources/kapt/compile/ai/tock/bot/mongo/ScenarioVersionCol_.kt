@@ -26,7 +26,7 @@ private val __Tags: KProperty1<ScenarioVersionCol, List<String>?>
 private val __ApplicationId: KProperty1<ScenarioVersionCol, String?>
     get() = ScenarioVersionCol::applicationId
 private val __CreateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
-    get() = ScenarioVersionCol::createDate
+    get() = ScenarioVersionCol::creationDate
 private val __UpdateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
     get() = ScenarioVersionCol::updateDate
 private val __Description: KProperty1<ScenarioVersionCol, String?>
