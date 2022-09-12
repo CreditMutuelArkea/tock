@@ -18,16 +18,29 @@ package ai.tock.bot.mongo
 import ai.tock.bot.admin.scenario.Scenario
 import ai.tock.bot.admin.scenario.ScenarioDAO
 import ai.tock.bot.admin.scenario.ScenarioVersion
+import ai.tock.bot.mongo.ScenarioVersionCol_.Companion.Version
+import ai.tock.bot.mongo.ScenarioCol_.Companion.Versions
+import ai.tock.shared.ensureUniqueIndex
 import ai.tock.shared.exception.scenario.*
-import com.mongodb.client.model.Filters
+import ai.tock.shared.warn
 import com.mongodb.client.result.DeleteResult
+import mu.KotlinLogging
 import org.litote.kmongo.*
 
 internal object ScenarioMongoDAO : ScenarioDAO {
 
+    private val logger = KotlinLogging.logger {}
+
     internal val scenarioDatabase =
         MongoBotConfiguration.database.getCollection<ScenarioCol>("scenario")
 
+    init {
+        try {
+            scenarioDatabase.ensureUniqueIndex(Scenario::versions / ScenarioVersion::version)
+        } catch (e: Exception) {
+            logger.warn(e)
+        }
+    }
     /**
      * Return a collection of all Scenario.
      */
@@ -43,7 +56,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
      */
     override fun findByVersion(version: String): Scenario? {
         val scenarios: List<Scenario> = scenarioDatabase
-            .aggregate<ScenarioCol>(match(Filters.eq("versions.version", version)))
+            .aggregate<ScenarioCol>(match(Scenario::versions / ScenarioVersion::version eq version))
             .toList()
             .map(toScenario)
 
@@ -88,6 +101,7 @@ internal object ScenarioMongoDAO : ScenarioDAO {
     /**
      * Update Scenario and return it.
      * @param scenario with versions to update.
+     * @throws ScenarioWithNoIdException when scenario has no id.
      * @throws ScenarioWithNoVersionIdException when scenario has a version without an id.
      */
     override fun update(scenario: Scenario): Scenario? {
@@ -115,8 +129,8 @@ internal object ScenarioMongoDAO : ScenarioDAO {
 
     /**
      * Delete Scenario by id.
-     * @param id of scenario to delete
-     * @throws ScenarioNotFoundException when no delete process of id
+     * @param id of scenario to delete.
+     * @throws ScenarioNotFoundException when no delete process of id.
      */
     override fun delete(id: String) {
         val result: DeleteResult = scenarioDatabase.deleteOneById(id.toId<Scenario>())

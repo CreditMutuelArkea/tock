@@ -36,8 +36,8 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
             var _tags_set : Boolean = false
             var _applicationId_: String? = null
             var _applicationId_set : Boolean = false
-            var _createDate_: ZonedDateTime? = null
-            var _createDate_set : Boolean = false
+            var _creationDate_: ZonedDateTime? = null
+            var _creationDate_set : Boolean = false
             var _updateDate_: ZonedDateTime? = null
             var _updateDate_set : Boolean = false
             var _description_: String? = null
@@ -81,10 +81,10 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
                              else p.text;
                             _applicationId_set = true
                             }
-                    "createDate" -> {
-                            _createDate_ = if(_token_ == JsonToken.VALUE_NULL) null
+                    "creationDate" -> {
+                            _creationDate_ = if(_token_ == JsonToken.VALUE_NULL) null
                              else p.readValueAs(ZonedDateTime::class.java);
-                            _createDate_set = true
+                            _creationDate_set = true
                             }
                     "updateDate" -> {
                             _updateDate_ = if(_token_ == JsonToken.VALUE_NULL) null
@@ -115,11 +115,11 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
                 _token_ = currentToken
                         } 
             return if(_version_set && _name_set && _category_set && _tags_set && _applicationId_set
-                    && _createDate_set && _updateDate_set && _description_set && _data_set &&
+                    && _creationDate_set && _updateDate_set && _description_set && _data_set &&
                     _state_set)
                     ScenarioVersionCol(version = _version_!!, name = _name_!!, category =
                             _category_, tags = _tags_!!, applicationId = _applicationId_!!,
-                            creationDate = _createDate_, updateDate = _updateDate_, description =
+                            creationDate = _creationDate_, updateDate = _updateDate_, description =
                             _description_, data = _data_, state = _state_!!)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
@@ -133,8 +133,8 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
                     map[parameters.getValue("tags")] = _tags_
                     if(_applicationId_set)
                     map[parameters.getValue("applicationId")] = _applicationId_
-                    if(_createDate_set)
-                    map[parameters.getValue("createDate")] = _createDate_
+                    if(_creationDate_set)
+                    map[parameters.getValue("creationDate")] = _creationDate_
                     if(_updateDate_set)
                     map[parameters.getValue("updateDate")] = _updateDate_
                     if(_description_set)
@@ -159,8 +159,8 @@ internal class ScenarioVersionCol_Deserializer : JsonDeserializer<ScenarioVersio
                 primaryConstructor.findParameterByName("name")!!, "category" to
                 primaryConstructor.findParameterByName("category")!!, "tags" to
                 primaryConstructor.findParameterByName("tags")!!, "applicationId" to
-                primaryConstructor.findParameterByName("applicationId")!!, "createDate" to
-                primaryConstructor.findParameterByName("createDate")!!, "updateDate" to
+                primaryConstructor.findParameterByName("applicationId")!!, "creationDate" to
+                primaryConstructor.findParameterByName("creationDate")!!, "updateDate" to
                 primaryConstructor.findParameterByName("updateDate")!!, "description" to
                 primaryConstructor.findParameterByName("description")!!, "data" to
                 primaryConstructor.findParameterByName("data")!!, "state" to

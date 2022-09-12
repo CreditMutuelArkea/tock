@@ -42,10 +42,10 @@ internal class ScenarioVersionCol_Serializer :
         gen.writeFieldName("applicationId")
         val _applicationId_ = value.applicationId
         gen.writeString(_applicationId_)
-        gen.writeFieldName("createDate")
-        val _createDate_ = value.creationDate
-        if(_createDate_ == null) { gen.writeNull() } else {
-                serializers.defaultSerializeValue(_createDate_, gen)
+        gen.writeFieldName("creationDate")
+        val _creationDate_ = value.creationDate
+        if(_creationDate_ == null) { gen.writeNull() } else {
+                serializers.defaultSerializeValue(_creationDate_, gen)
                 }
         gen.writeFieldName("updateDate")
         val _updateDate_ = value.updateDate

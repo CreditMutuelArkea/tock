@@ -25,7 +25,7 @@ private val __Tags: KProperty1<ScenarioVersionCol, List<String>?>
     get() = ScenarioVersionCol::tags
 private val __ApplicationId: KProperty1<ScenarioVersionCol, String?>
     get() = ScenarioVersionCol::applicationId
-private val __CreateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
+private val __CreationDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
     get() = ScenarioVersionCol::creationDate
 private val __UpdateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
     get() = ScenarioVersionCol::updateDate
@@ -52,8 +52,8 @@ internal class ScenarioVersionCol_<T>(previous: KPropertyPath<T, *>?, property: 
     val applicationId: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApplicationId)
 
-    val createDate: KPropertyPath<T, ZonedDateTime?>
-        get() = KPropertyPath(this,__CreateDate)
+    val creationDate: KPropertyPath<T, ZonedDateTime?>
+        get() = KPropertyPath(this,__CreationDate)
 
     val updateDate: KPropertyPath<T, ZonedDateTime?>
         get() = KPropertyPath(this,__UpdateDate)
@@ -78,8 +78,8 @@ internal class ScenarioVersionCol_<T>(previous: KPropertyPath<T, *>?, property: 
             get() = KCollectionSimplePropertyPath(null, __Tags)
         val ApplicationId: KProperty1<ScenarioVersionCol, String?>
             get() = __ApplicationId
-        val CreateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
-            get() = __CreateDate
+        val CreationDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
+            get() = __CreationDate
         val UpdateDate: KProperty1<ScenarioVersionCol, ZonedDateTime?>
             get() = __UpdateDate
         val Description: KProperty1<ScenarioVersionCol, String?>
@@ -108,8 +108,8 @@ internal class ScenarioVersionCol_Col<T>(previous: KPropertyPath<T, *>?, propert
     val applicationId: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApplicationId)
 
-    val createDate: KPropertyPath<T, ZonedDateTime?>
-        get() = KPropertyPath(this,__CreateDate)
+    val creationDate: KPropertyPath<T, ZonedDateTime?>
+        get() = KPropertyPath(this,__CreationDate)
 
     val updateDate: KPropertyPath<T, ZonedDateTime?>
         get() = KPropertyPath(this,__UpdateDate)
@@ -145,8 +145,8 @@ internal class ScenarioVersionCol_Map<T, K>(previous: KPropertyPath<T, *>?, prop
     val applicationId: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApplicationId)
 
-    val createDate: KPropertyPath<T, ZonedDateTime?>
-        get() = KPropertyPath(this,__CreateDate)
+    val creationDate: KPropertyPath<T, ZonedDateTime?>
+        get() = KPropertyPath(this,__CreationDate)
 
     val updateDate: KPropertyPath<T, ZonedDateTime?>
         get() = KPropertyPath(this,__UpdateDate)
