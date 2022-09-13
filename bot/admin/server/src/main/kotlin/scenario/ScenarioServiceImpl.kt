@@ -254,7 +254,7 @@ class ScenarioServiceImpl : ScenarioService {
     }
 
     /**
-     * Delete an existing scenario with all this version
+     * Delete an existing scenario with all its versions
      * If the scenario does not already exist, it just logs that it does not exist
      * @param id of scenario to delete
      */

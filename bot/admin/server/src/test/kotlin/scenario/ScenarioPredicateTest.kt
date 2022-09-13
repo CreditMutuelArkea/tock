@@ -404,7 +404,7 @@ class ScenarioPredicateTest {
     }
 
     @Test
-    fun `GIVEN list of scenario version contains multiple verion WHEN checkContainsOne THEN exception is thrown`() {
+    fun `GIVEN list of scenario version contains multiple version WHEN checkContainsOne THEN exception is thrown`() {
         val versions: List<ScenarioVersion> = listOf(draft(VERSION1), draft(VERSION2))
         assertThrows<BadNumberException> { versions.checkContainsOne() }
     }

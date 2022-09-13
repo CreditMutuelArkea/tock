@@ -118,21 +118,21 @@ class ScenarioMapper {
         }
 
         /**
-         * Create new collection of scenarios with versions that contain no archived version
+         * Create new collection of scenarios with versions that contains no archived version
          */
         fun Collection<Scenario>.filterActive(): Collection<Scenario> {
             return map { it.withVersions(it.versions.filterNot(isArchived)) }
         }
 
         /**
-         * Create new scenario with versions that contain histories of original and histories passed in parameter
+         * Create new scenario with versions that contains histories of original and histories passed in parameter
          */
         fun Scenario.addVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
             return withVersions(listOf(dataInDatabase, versions).flatten())
         }
 
         /**
-         * Create new scenario with versions that contain histories of original excluded from those passed in parameters
+         * Create new scenario with versions that contains histories of original excluded from those passed in parameters
          */
         fun Scenario.filterExcludeVersions(dataInDatabase: List<ScenarioVersion>): Scenario {
             return withVersions(versions.filterNot { dataInDatabase.contains(it) })

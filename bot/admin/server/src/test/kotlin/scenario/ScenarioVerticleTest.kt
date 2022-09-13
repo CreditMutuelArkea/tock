@@ -74,7 +74,7 @@ class ScenarioVerticleTest : ScenarioVerticle() {
     }
 
     @Test
-    fun `getAllScenarios WHEN findAll returns a list of valide scenario THEN returns a list of ScenarioResult`() {
+    fun `getAllScenarios WHEN findAll returns a list of valid scenario THEN returns a list of ScenarioResult`() {
         //GIVEN
         val ids = listOf(ID1, ID2)
         val versions = listOf(VERSION1, VERSION2)

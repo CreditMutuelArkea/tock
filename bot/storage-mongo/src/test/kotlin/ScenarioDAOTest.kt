@@ -152,7 +152,7 @@ class ScenarioDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `delete GIVEN scenario does not exiss in database THEN throws TockNotFound`() {
+    fun `delete GIVEN scenario does not exists in database THEN throws TockNotFound`() {
         //GIVEN //WHEN //THEN
         assertThrows<ScenarioNotFoundException> {  ScenarioMongoDAO.delete(ID1) }
     }

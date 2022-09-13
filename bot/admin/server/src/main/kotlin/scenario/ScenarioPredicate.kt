@@ -144,7 +144,7 @@ class ScenarioPredicate {
         }
 
         /**
-         * Throws exception if scenarios ids are différent
+         * Throws exception if scenarios ids are different
          * else, return scenario
          */
         fun Scenario.checkIdMatch(scenario: Scenario): Scenario {
