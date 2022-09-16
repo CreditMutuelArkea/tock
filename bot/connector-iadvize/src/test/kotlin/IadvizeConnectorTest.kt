@@ -139,7 +139,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageMarcus() {
+    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = Resources.toString(resource("/response_message_transfer.json"), Charsets.UTF_8)
 
@@ -167,7 +167,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMarcus() {
+    fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = Resources.toString(resource("/response_message_multipart_transfer.json"), Charsets.UTF_8)
 
