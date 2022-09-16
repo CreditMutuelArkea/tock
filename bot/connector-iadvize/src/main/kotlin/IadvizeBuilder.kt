@@ -20,12 +20,14 @@ package ai.tock.bot.connector.iadvize
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer.TransferOptions
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
 import ai.tock.bot.engine.Bus
+
+val millis: Duration.TimeUnit = Duration.TimeUnit.millis
+val seconds: Duration.TimeUnit = Duration.TimeUnit.seconds
+val minutes: Duration.TimeUnit = Duration.TimeUnit.minutes
 
 internal const val IADVIZE_CONNECTOR_TYPE_ID = "iadvize"
 
@@ -34,45 +36,70 @@ internal const val IADVIZE_CONNECTOR_TYPE_ID = "iadvize"
  */
 internal val iadvizeConnectorType = ConnectorType(IADVIZE_CONNECTOR_TYPE_ID)
 
-internal fun <T : Bus<T>> T.withIadvize(messageProvider: () -> IadvizeReply): T {
+fun <T : Bus<T>> T.withIadvize(messageProvider: () -> IadvizeReply): T {
     return withMessage(iadvizeConnectorType, messageProvider)
 }
 
 /**
+ * Creates a iAdvize multipart replies sentence
+ */
+fun <T : Bus<T>> T.iadvizeMultipartReplies(
+    vararg replies : IadvizeReply
+): IadvizeMultipartReply = IadvizeMultipartReply(replies.toList())
+
+/**
  * Creates a iAdvize quickreply sentence
  */
-internal fun <T : Bus<T>> T.iadvizeQuickReply(
+fun <T : Bus<T>> T.iadvizeQuickReply(
     title: CharSequence
 ): QuickReply = QuickReply(translate(title).toString())
 
+/**
+ * Creates a iAdvize instant transfer
+ */
+fun <T : Bus<T>> T.iadvizeTransfer(): IadvizeTransfer = IadvizeTransfer(0)
 
 /**
  * Creates a iAdvize transfer
  */
-internal fun <T : Bus<T>> T.iadvizeTransfer(
+fun <T : Bus<T>> T.iadvizeTransfer(
     timeoutSeconds: Long
-): IadvizeTransfer = IadvizeTransfer("", TransferOptions(Duration(timeoutSeconds, Duration.TimeUnit.seconds)) )
+): IadvizeTransfer = IadvizeTransfer(timeoutSeconds)
 
 /**
  * Creates a iAdvize quickreply sentence
  */
-internal fun <T : Bus<T>> T.iadvizeTransfer(
+fun <T : Bus<T>> T.iadvizeTransfer(
     timeout: Long,
     unit: Duration.TimeUnit
-): IadvizeTransfer = IadvizeTransfer("", TransferOptions(Duration(timeout, unit)) )
-
+): IadvizeTransfer = IadvizeTransfer(Duration(timeout, unit))
 
 /**
  * Creates a iAdvize message sentence
  */
-internal fun <T : Bus<T>> T.iadvizeMessage(
+fun <T : Bus<T>> T.iadvizeMessage(
     title: CharSequence
-): IadvizeReply = IadvizeMessage(translate(title).toString())
+): IadvizeMessage = IadvizeMessage(translate(title).toString())
 
 /**
  * Creates a iAdvize message with quickreplies sentence
  */
-internal fun <T : Bus<T>> T.iadvizeMessage(
+fun <T : Bus<T>> T.iadvizeMessage(
     title: CharSequence,
-    quickReplies: MutableList<QuickReply>
-): IadvizeReply = IadvizeMessage(TextPayload(translate(title).toString()), quickReplies)
+    vararg quickReplies: QuickReply
+): IadvizeMessage = IadvizeMessage(TextPayload(translate(title).toString()), quickReplies.toMutableList())
+
+
+/**
+ * Creates a iAdvize await
+ */
+fun <T : Bus<T>> T.iadvizeAwait(
+    timeout: Long,
+    unit: Duration.TimeUnit
+): IadvizeAwait = IadvizeAwait(Duration(timeout, unit))
+
+/**
+ * Creates a iAdvize await
+ */
+fun <T : Bus<T>> T.iadvizeClose(
+): IadvizeClose = IadvizeClose()

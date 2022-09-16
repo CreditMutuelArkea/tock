@@ -25,4 +25,10 @@ data class IadvizeTransfer(
     override val type: ReplyType = ReplyType.transfer
 
     data class TransferOptions(val timeout: Duration)
+
+    constructor(timeoutInSeconds: Long)
+            : this(null, TransferOptions(Duration(timeoutInSeconds, Duration.TimeUnit.seconds)))
+
+    constructor(timout: Duration)
+            : this(null, TransferOptions(timout))
 }

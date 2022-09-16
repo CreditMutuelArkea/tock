@@ -17,6 +17,7 @@
 package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorCallbackBase
+import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
@@ -24,6 +25,7 @@ import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMultipartReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
 import ai.tock.bot.engine.ConnectorController
@@ -128,18 +130,14 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private fun toListIadvizeReply(actions: List<ActionWithDelay>): List<IadvizeReply> {
         return actions.map {
             if (it.action is SendSentence) {
-                val listIadvizeReply: List<IadvizeReply> =
-                    it.action.messages
-                        .filterIsInstance<IadvizeReply>()
-                        .map(addDistributionRulesOnTransfer)
+                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhancedIadvizeReply()
+
                 if (it.action.text != null) {
-                    //Extract text to a simple TextPayload
-                    val message: String = translator.translate(it.action.text).toString()
-                    val simpleTextPayload = IadvizeMessage(TextPayload(message))
-                    //Combine 1 TextPayload with messages IadvizeReply
+                    val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
+                    //Combine 1 MessageTextPayload with messages IadvizeReply enhanced
                     listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
                 } else {
-                    //No simple TextPayload, juste return IadvizeReply
+                    //No simple MessageTextPayload, juste return IadvizeReply enhanced
                     listIadvizeReply
                 }
             } else {
@@ -148,16 +146,42 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         }.flatten()
     }
 
+    private fun List<ConnectorMessage>.filterAndEnhancedIadvizeReply(): List<IadvizeReply> {
+        // Filter Message not IadvizeReply for other connector
+        return filterIsInstance<IadvizeReply>()
+            .map(ungroupMultipartIadvizeReplies)
+            .flatten()
+            .map(addDistributionRulesOnTransfer)
+    }
+
+    /*
+     * For IadvizeReply instance of IadvizeTransfer
+     * return new IadvizeTransfer with distribution rule configured on connector
+     */
     private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
-        if(distributionRule == null) {
-            //TODO préciser l'exception
-            throw Exception()
-        }
         if(it is IadvizeTransfer) {
+            if(distributionRule == null) {
+                //TODO préciser l'exception
+                throw Exception()
+            }
             IadvizeTransfer(distributionRule, it.transferOptions)
         } else {
             it
         }
+    }
+
+    private val ungroupMultipartIadvizeReplies: (IadvizeReply) -> List<IadvizeReply> = {
+        if(it is IadvizeMultipartReply) {
+            it
+        } else {
+            listOf(it)
+        }
+    }
+
+    private fun mapToMessageTextPayload(text: CharSequence): IadvizeMessage {
+        //Extract text to a simple TextPayload
+        val message: String = translator.translate(text).toString()
+        return IadvizeMessage(TextPayload(message))
     }
 
     override fun exceptionThrown(event: Event, throwable: Throwable) {
