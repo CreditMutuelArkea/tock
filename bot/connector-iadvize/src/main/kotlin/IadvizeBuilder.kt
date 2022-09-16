@@ -20,11 +20,11 @@ package ai.tock.bot.connector.iadvize
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer.TransferOptions
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
 import ai.tock.bot.engine.Bus
 
+// Used by bot api, and story script
 val millis: Duration.TimeUnit = Duration.TimeUnit.millis
 val seconds: Duration.TimeUnit = Duration.TimeUnit.seconds
 val minutes: Duration.TimeUnit = Duration.TimeUnit.minutes
@@ -36,38 +36,47 @@ internal const val IADVIZE_CONNECTOR_TYPE_ID = "iadvize"
  */
 internal val iadvizeConnectorType = ConnectorType(IADVIZE_CONNECTOR_TYPE_ID)
 
+/**
+ * Create an iadvize message's provider
+ * Used by Story script and bot api (external use)
+ */
 fun <T : Bus<T>> T.withIadvize(messageProvider: () -> IadvizeReply): T {
     return withMessage(iadvizeConnectorType, messageProvider)
 }
 
 /**
- * Creates a iAdvize multipart replies sentence
+ * Creates an iAdvize multipart replies sentence
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeMultipartReplies(
     vararg replies : IadvizeReply
 ): IadvizeMultipartReply = IadvizeMultipartReply(replies.toList())
 
 /**
- * Creates a iAdvize quickreply sentence
+ * Creates an iAdvize quickreply sentence
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeQuickReply(
     title: CharSequence
 ): QuickReply = QuickReply(translate(title).toString())
 
 /**
- * Creates a iAdvize instant transfer
+ * Creates an iAdvize instant transfer
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeTransfer(): IadvizeTransfer = IadvizeTransfer(0)
 
 /**
- * Creates a iAdvize transfer
+ * Creates an iAdvize transfer
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeTransfer(
     timeoutSeconds: Long
 ): IadvizeTransfer = IadvizeTransfer(timeoutSeconds)
 
 /**
- * Creates a iAdvize quickreply sentence
+ * Creates an iAdvize quickreply sentence
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeTransfer(
     timeout: Long,
@@ -76,6 +85,7 @@ fun <T : Bus<T>> T.iadvizeTransfer(
 
 /**
  * Creates a iAdvize message sentence
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeMessage(
     title: CharSequence
@@ -83,6 +93,7 @@ fun <T : Bus<T>> T.iadvizeMessage(
 
 /**
  * Creates a iAdvize message with quickreplies sentence
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeMessage(
     title: CharSequence,
@@ -92,6 +103,7 @@ fun <T : Bus<T>> T.iadvizeMessage(
 
 /**
  * Creates a iAdvize await
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeAwait(
     timeout: Long,
@@ -99,7 +111,8 @@ fun <T : Bus<T>> T.iadvizeAwait(
 ): IadvizeAwait = IadvizeAwait(Duration(timeout, unit))
 
 /**
- * Creates a iAdvize await
+ * Creates an iAdvize close dialog
+ * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeClose(
 ): IadvizeClose = IadvizeClose()

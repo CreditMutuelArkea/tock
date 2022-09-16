@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector.iadvize.model.response.conversation
 
-data class Duration( val value: Long, val unit: TimeUnit) {
+data class Duration(val value: Long, val unit: TimeUnit) {
     enum class TimeUnit() {
         millis, seconds, minutes
     }
