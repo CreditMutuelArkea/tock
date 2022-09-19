@@ -43,24 +43,24 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
 
     override fun configuration(): ConnectorTypeConfiguration {
         val properties: Properties = loadProperties("/iadvize.properties")
-        val fieldEditorUrl = ConnectorTypeConfigurationField(
+        val editorUrlField = ConnectorTypeConfigurationField(
             properties.getProperty(EDITOR_URL, EDITOR_URL),
             EDITOR_URL,
             true
         )
-        val fieldFirstMessage = ConnectorTypeConfigurationField(
+        val firstMessageField = ConnectorTypeConfigurationField(
             properties.getProperty(FIRST_MESSAGE, FIRST_MESSAGE),
             FIRST_MESSAGE,
             true
         )
-        val fieldDistributionRule = ConnectorTypeConfigurationField(
+        val distributionRuleField = ConnectorTypeConfigurationField(
             properties.getProperty(DISTRIBUTION_RULE, DISTRIBUTION_RULE),
             DISTRIBUTION_RULE,
             false
         )
         return ConnectorTypeConfiguration(
             connectorType,
-            listOf(fieldEditorUrl, fieldFirstMessage, fieldDistributionRule),
+            listOf(editorUrlField, firstMessageField, distributionRuleField),
             resourceAsString("/iadvize.svg")
         )
     }

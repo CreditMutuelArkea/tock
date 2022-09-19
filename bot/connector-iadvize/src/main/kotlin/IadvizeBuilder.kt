@@ -84,7 +84,7 @@ fun <T : Bus<T>> T.iadvizeTransfer(
 ): IadvizeTransfer = IadvizeTransfer(Duration(timeout, unit))
 
 /**
- * Creates a iAdvize message sentence
+ * Creates an iAdvize message sentence
  * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeMessage(
@@ -92,7 +92,7 @@ fun <T : Bus<T>> T.iadvizeMessage(
 ): IadvizeMessage = IadvizeMessage(translate(title).toString())
 
 /**
- * Creates a iAdvize message with quickreplies sentence
+ * Creates an iAdvize message with quickreplies sentence
  * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeMessage(
@@ -102,7 +102,7 @@ fun <T : Bus<T>> T.iadvizeMessage(
 
 
 /**
- * Creates a iAdvize await
+ * Creates an iAdvize await
  * Used by Story script and bot api (external use)
  */
 fun <T : Bus<T>> T.iadvizeAwait(

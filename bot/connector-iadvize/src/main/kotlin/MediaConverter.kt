@@ -23,15 +23,12 @@ import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPay
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.genericjson.Action
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.genericjson.Image
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
 import ai.tock.bot.connector.media.MediaAction
 import ai.tock.bot.connector.media.MediaCard
 import ai.tock.bot.connector.media.MediaFile
 import ai.tock.bot.connector.media.MediaMessage
-import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.SendAttachment.AttachmentType.image
-import java.util.Collections
 
 internal object MediaConverter {
 

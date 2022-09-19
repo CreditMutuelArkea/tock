@@ -26,9 +26,17 @@ data class IadvizeTransfer(
 
     data class TransferOptions(val timeout: Duration)
 
+    /**
+     * When an IadvizeTransfer is created on a story, distribution rule is not known.
+     * Distribution rule is added when response is built.
+     */
     constructor(timeoutInSeconds: Long)
             : this(null, TransferOptions(Duration(timeoutInSeconds, Duration.TimeUnit.seconds)))
 
+    /**
+     * When an IadvizeTransfer is created on a story, distribution rule is not known.
+     * Distribution rule is added when response is built.
+     */
     constructor(timout: Duration)
             : this(null, TransferOptions(timout))
 }

@@ -37,6 +37,7 @@ import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
+import ai.tock.shared.vertx.RestException
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
@@ -130,14 +131,14 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private fun toListIadvizeReply(actions: List<ActionWithDelay>): List<IadvizeReply> {
         return actions.map {
             if (it.action is SendSentence) {
-                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhancedIadvizeReply()
+                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhanceIadvizeReply()
 
                 if (it.action.text != null) {
                     val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
-                    //Combine 1 MessageTextPayload with messages IadvizeReply enhanced
+                    //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
                     listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
                 } else {
-                    //No simple MessageTextPayload, juste return IadvizeReply enhanced
+                    //No simple MessageTextPayload, just return enhanced IadvizeReply
                     listIadvizeReply
                 }
             } else {
@@ -146,7 +147,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         }.flatten()
     }
 
-    private fun List<ConnectorMessage>.filterAndEnhancedIadvizeReply(): List<IadvizeReply> {
+    private fun List<ConnectorMessage>.filterAndEnhanceIadvizeReply(): List<IadvizeReply> {
         // Filter Message not IadvizeReply for other connector
         return filterIsInstance<IadvizeReply>()
             .map(ungroupMultipartIadvizeReplies)
@@ -161,8 +162,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
         if(it is IadvizeTransfer) {
             if(distributionRule == null) {
-                //TODO préciser l'exception
-                throw Exception()
+                throw RestException("Distribution rule is not configured in connector, transfer to human is impossible")
             }
             IadvizeTransfer(distributionRule, it.transferOptions)
         } else {
