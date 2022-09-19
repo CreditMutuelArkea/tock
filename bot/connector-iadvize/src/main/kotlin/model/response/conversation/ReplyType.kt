@@ -17,5 +17,5 @@
 package ai.tock.bot.connector.iadvize.model.response.conversation
 
 enum class ReplyType {
-    await, message, transfer, close
+    await, message, transfer, close, multipart
 }
