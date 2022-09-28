@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.Unsupporte
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
+import ai.tock.bot.connector.iadvize.model.request.RequestIds
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
@@ -216,6 +217,8 @@ class IadvizeConnector internal constructor(
         }
     }
 
+
+    // internal for tests
     internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,

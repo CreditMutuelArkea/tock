@@ -43,7 +43,8 @@ import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
 import java.time.LocalDateTime
-import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.stream.Collectors
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
