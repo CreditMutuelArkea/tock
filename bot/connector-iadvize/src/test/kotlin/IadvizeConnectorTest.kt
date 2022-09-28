@@ -20,7 +20,6 @@ import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
-import ai.tock.bot.connector.iadvize.model.response.conversation.Duration.TimeUnit.*
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
@@ -193,103 +192,6 @@ class IadvizeConnectorTest {
             PlayerId("recipientId"),
             text = null,
             messages = mutableListOf(iadvizeConnectorMessage)
-        )
-
-        val connectorData = slot<ConnectorData>()
-        every { controller.handle(any(), capture(connectorData)) } answers {
-            val callback = connectorData.captured.callback as IadvizeConnectorCallback
-            callback.addAction(action, 0)
-            callback.eventAnswered(action)
-        }
-
-        connector.handleRequest(
-            controller,
-            context,
-            iAdvizeRequest
-        )
-
-        verify { controller.handle(any(), any()) }
-
-        val messageResponse = slot<String>()
-        verify { response.end(capture(messageResponse)) }
-        assertEquals(expectedResponse, messageResponse.captured)
-    }
-
-    @Test
-    fun handleRequestWithQuickReply_shouldHandleWell_MessageMarcus() {
-        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_quickreply.json"), Charsets.UTF_8)
-
-        val iadvizeReply: IadvizeReply = IadvizeMessage(TextPayload("MARCUS"), mutableListOf(QuickReply("MARCUS_YES"), QuickReply("MARCUS_NO")))
-
-        val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeReply))
-        val connectorData = slot<ConnectorData>()
-        every { controller.handle(any(), capture(connectorData)) } answers {
-            val callback = connectorData.captured.callback as IadvizeConnectorCallback
-            callback.addAction(action, 0)
-            callback.eventAnswered(action)
-        }
-
-        connector.handleRequest(
-            controller,
-            context,
-            iAdvizeRequest
-        )
-
-        verify { controller.handle(any(), any()) }
-
-        val messageResponse = slot<String>()
-        verify { response.end(capture(messageResponse)) }
-        assertEquals(expectedResponse, messageResponse.captured)
-    }
-
-    @Test
-    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageTransfer() {
-        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_transfer.json"), Charsets.UTF_8)
-
-        val iadvizeTransfer: IadvizeReply = IadvizeTransfer(0)
-
-        val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeTransfer))
-        val connectorData = slot<ConnectorData>()
-        every { controller.handle(any(), capture(connectorData)) } answers {
-            val callback = connectorData.captured.callback as IadvizeConnectorCallback
-            callback.addAction(action, 0)
-            callback.eventAnswered(action)
-        }
-
-        connector.handleRequest(
-            controller,
-            context,
-            iAdvizeRequest
-        )
-
-        verify { controller.handle(any(), any()) }
-
-        val messageResponse = slot<String>()
-        verify { response.end(capture(messageResponse)) }
-        assertEquals(expectedResponse, messageResponse.captured)
-    }
-
-    @Test
-    fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
-        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_multipart_transfer.json"), Charsets.UTF_8)
-
-        val iadvizeMultipartReply = IadvizeMultipartReply(
-            IadvizeAwait(Duration(100, millis)),
-            IadvizeMessage("message info"),
-            IadvizeTransfer(Duration(20, seconds)),
-            IadvizeMessage("message after timeout"),
-            IadvizeClose()
-        )
-
-        val action = SendSentence(
-            PlayerId("MockPlayerId"),
-            "applicationId",
-            PlayerId("recipientId"),
-            text = null,
-            messages = mutableListOf(iadvizeMultipartReply)
         )
 
         val connectorData = slot<ConnectorData>()
