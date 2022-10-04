@@ -343,7 +343,7 @@ class FaqAdminServiceTest : AbstractTest() {
                         FaqDefinition(faqId, applicationId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns theSavedIntent
@@ -407,35 +407,15 @@ class FaqAdminServiceTest : AbstractTest() {
 
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent
 
                     faqAdminService.saveFAQ(faqDefinitionRequest, userLogin, applicationDefinition)
 
-                    val botAdminService = spyk<BotAdminService>()
-                    every {
-                        botAdminService["getBotConfigurationsByNamespaceAndBotId"](
-                            any<String>(), any<String>()
-                        )
-                    } answers { listOf(aApplication) }
-                    every {
-                        botAdminService.saveStory(
-                            any<String>(),
-                            any<BotStoryDefinitionConfiguration>(),
-                            any<UserLogin>(),
-                            any<IntentDefinition>()
-                        )
-                    } returns existingMessageStory
-
                     val slotStory = slot<StoryDefinitionConfiguration>()
 
-                    verify(exactly = 0) {
-                        botAdminService["createOrGetIntent"](
-                            any<String>(), any<String>(), any<Id<ApplicationDefinition>>(), any<String>()
-                        )
-                    }
                     verify(exactly = 1) { faqDefinitionDAO.save(any()) }
                     verify(exactly = 1) { i18nDAO.save(listOf(mockedI18n)) }
                     verify(exactly = 1) { storyDefinitionDAO.save(capture(slotStory)) }
@@ -452,7 +432,7 @@ class FaqAdminServiceTest : AbstractTest() {
                     val faqDefinitionRequestDisabledStory = faqDefinitionRequest.copy(enabled = false)
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent

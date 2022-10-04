@@ -91,7 +91,7 @@ object FaqAdminService {
         query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition
     ): FaqDefinitionRequest {
         val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
-        val intent = getFaqIntent(query, application)
+        val intent = createOrUpdateFaqIntent(query, application)
 
         createOrUpdateUtterances(query, intent._id, userLogin)
 
@@ -132,10 +132,13 @@ object FaqAdminService {
      * @param query FaqDefinitionRequest
      * @param application ApplicationDefinition
      */
-    private fun getFaqIntent(query: FaqDefinitionRequest, application: ApplicationDefinition): IntentDefinition {
+    private fun createOrUpdateFaqIntent(query: FaqDefinitionRequest, application: ApplicationDefinition): IntentDefinition {
         return if (query.id != null) {
             // Existing FAQ
-            findFaqDefinitionIntent(query.id.toId()) ?: badRequest("Faq (id:${query.id}) intent not found !")
+            val intent = findFaqDefinitionIntent(query.id.toId())
+            intent ?: badRequest("Faq (id:${query.id}) intent not found !")
+            // Update intent label when updating FAQ title
+            AdminService.createOrUpdateIntent(application.namespace, intent.copy(label = query.title))!!
         } else {
             // New FAQ
             createIntent(query, application) ?: badRequest("Trouble when creating intent : ${query.intentName}")
