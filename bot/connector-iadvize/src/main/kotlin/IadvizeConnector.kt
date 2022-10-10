@@ -204,9 +204,9 @@ class IadvizeConnector internal constructor(
     }
 
     private fun <T> HttpServerResponse.endWithJson(response: T) {
-        val response: String = mapper.writeValueAsString(response)
-        logger.info { "response : $response" }
-        return putHeader("Content-Type", "application/json").end(response)
+        val responseValue: String = mapper.writeValueAsString(response)
+        logger.info { "response : $responseValue" }
+        return putHeader("Content-Type", "application/json").end(responseValue)
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
@@ -247,8 +247,10 @@ class IadvizeConnector internal constructor(
         message: ConnectorMessage,
         suggestions: List<CharSequence>
     ): BotBus.() -> ConnectorMessage? = {
-        (message as? IadvizeMessage)?.let {
-            message.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
+        //TODO add logger
+        (message as? IadvizeConnectorMessage)?.let {
+            val iadvizeMessage = message.replies.last { it is IadvizeMessage } as IadvizeMessage
+            iadvizeMessage.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
         }
         message
     }

@@ -70,6 +70,8 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
+    private val iadvizeAuthenticationClient = IadvizeAuthenticationClient()
+
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
     fun addAction(event: Event, delayInMs: Long) {
@@ -133,19 +135,15 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private fun toListIadvizeReply(actions: List<ActionWithDelay>): List<IadvizeReply> {
         return actions.map {
             if (it.action is SendSentence) {
-                 try{
-                    val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhanceIadvizeReply()
+                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhanceIadvizeReply()
 
-                    if (it.action.text != null) {
-                        val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
-                        //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
-                        listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
-                    } else {
-                        //No simple MessageTextPayload, just return enhanced IadvizeReply
-                        listIadvizeReply
-                    }
-                } catch (exception: RestException) {
-                     listOf()
+                if (it.action.text != null) {
+                    val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
+                    //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
+                    listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
+                } else {
+                    //No simple MessageTextPayload, just return enhanced IadvizeReply
+                    listIadvizeReply
                 }
             } else {
                 emptyList()
@@ -166,6 +164,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
      * return new IadvizeTransfer with distribution rule configured on connector
      */
     private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
+        val token: String = iadvizeAuthenticationClient.createToken()
         if(it is IadvizeTransfer) {
             if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))

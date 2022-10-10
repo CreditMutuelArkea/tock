@@ -1,16 +1,18 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="BotApi" type="JetRunConfigurationType" factoryName="Kotlin">
-    <module name="tock-bot-api-service" />
-    <option name="VM_PARAMETERS" value="" />
-    <option name="PROGRAM_PARAMETERS" value="" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-    <option name="ALTERNATIVE_JRE_PATH" />
-    <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="MAIN_CLASS_NAME" value="ai.tock.bot.api.service.StartBotApiKt" />
-    <option name="WORKING_DIRECTORY" value="" />
+  <configuration default="false" name="BotApi" type="JetRunConfigurationType">
     <envs>
       <env name="tock_websocket_enabled" value="true" />
+      <env name="iadvize_username_authentication" value="benjamin.bernard+developer@arkea.com" />
+      <env name="iadvize_password_authentication" value="ntr64II4#fHm" />
     </envs>
+    <option name="MAIN_CLASS_NAME" value="ai.tock.bot.api.service.StartBotApiKt" />
+    <module name="tock-bot-api-service" />
+    <shortenClasspath name="NONE" />
+    <extension name="software.aws.toolkits.jetbrains.core.execution.JavaAwsConnectionExtension">
+      <option name="credential" />
+      <option name="region" />
+      <option name="useCurrentConnection" value="false" />
+    </extension>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

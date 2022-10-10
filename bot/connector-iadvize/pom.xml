@@ -90,5 +90,40 @@
             <version>${vertx}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.expediagroup</groupId>
+            <artifactId>graphql-kotlin-client</artifactId>
+            <version>6.2.5</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api.grpc</groupId>
+            <artifactId>proto-google-common-protos</artifactId>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.expediagroup</groupId>
+                <artifactId>graphql-kotlin-maven-plugin</artifactId>
+                <version>6.2.5</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <id>graphql-iadvize</id>
+                        <goals>
+                            <goal>introspect-schema</goal>
+                            <goal>generate-client</goal>
+                        </goals>
+                        <configuration>
+                            <endpoint>https://api.iadvize.com/graphql</endpoint>
+                            <packageName>ai.tock.bot.connector.iadvize.graphql</packageName>
+                            <schemaFile>iadvizeSchema.graphql</schemaFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

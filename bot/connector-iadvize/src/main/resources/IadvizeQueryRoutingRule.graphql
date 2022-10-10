@@ -1,0 +1,9 @@
+query RoutingRule($id: UUID!) {
+    routingRule(id: $id) {
+        availability {
+            chat {
+                isAvailable
+            }
+        }
+    }
+}

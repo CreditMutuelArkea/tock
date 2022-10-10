@@ -1,0 +1,5604 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"Marks the field, argument, input field or enum value as deprecated"
+directive @deprecated(
+    "The reason for the deprecation"
+    reason: String = "No longer supported"
+  ) on FIELD_DEFINITION | ARGUMENT_DEFINITION | ENUM_VALUE | INPUT_FIELD_DEFINITION
+
+"Directs the executor to include this field or fragment only when the `if` argument is true"
+directive @include(
+    "Included when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Directs the executor to skip this field or fragment when the `if` argument is true."
+directive @skip(
+    "Skipped when true."
+    if: Boolean!
+  ) on FIELD | FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"Exposes a URL that specifies the behaviour of this scalar."
+directive @specifiedBy(
+    "The URL that specifies the behaviour of this scalar."
+    url: String!
+  ) on SCALAR
+
+"Generic conversation message interface"
+interface ConversationMessage {
+  "Creation date"
+  createdAt: DateTime!
+}
+
+interface RoutingSegment {
+  "The operator determines if any, all, or none of the values of the segment must match."
+  logicalOperator: RoutingSegmentLogicalOperator!
+}
+
+interface User {
+  "User avatar url"
+  avatarUrl: URL
+  "User creation datetime"
+  createdAt: DateTime
+  "User email"
+  email: String
+  "User first name"
+  firstName: String
+  "User id"
+  id: LegacyId!
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale
+  "User last name"
+  lastName: String!
+  "Projects assigned to the user, determining which projects the user can handle conversations for"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserProjectConnection
+  "The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile."
+  pseudo: String
+  """
+  Skills of the user.
+  The user's skills can be used to determine which routing group the user will be a member of.
+  For more information regarding how to create and use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skills: [Skill!]
+  "Languages in which the user is able to accept a chat"
+  spokenLanguages: [Language!]!
+}
+
+"Represents an error in the input of a mutation"
+interface UserError {
+  "Error message describing the reason of the failure"
+  message: String!
+}
+
+union ConnectorVersionParameterValue = ConnectorVersionParameterValueText
+
+"Represents a conversation status"
+union ConversationDistributionStatus = ConversationClosedStatus | ConversationPendingStatus | ConversationPushedStatus | ConversationSnoozedStatus
+
+"A message attachment"
+union ConversationMessageAttachment = AppleBusinessChatMessageExtensionAttachment | ApplePayPaymentRequestedAttachment | AuthenticationRequestedAttachment | CardAttachment | CardBundleAttachment | ContextualInfosAttachment | ConversationBlockedAttachment | EscalationAcceptedAttachment | EscalationEndedAttachment | EscalationInvitationSentAttachment | FailedApplePayPaymentResponseAttachment | FailedAuthenticationResponseAttachment | FileAttachment | FileBundleAttachment | HungUpAttachment | ImageAttachment | LinkAttachment | ListPickerAttachment | ListPickerResponseAttachment | LiveAgentRequestedAttachment | OfferAttachment | PickedUpAttachment | ProductAttachment | ProductOfferAttachment | ProductOfferBundleAttachment | QuickReplyMenuAttachment | SuccessfulApplePayPaymentResponseAttachment | SuccessfulAuthenticationResponseAttachment | TimePickerAttachment | TimePickerResponseAttachment | UnsupportedAttachment
+
+"Conversation action type"
+union ConversationMessageAttachmentAction = ConversationMessageAttachmentLinkAction | ConversationMessageAttachmentSelectAction
+
+"Conversation participant"
+union ConversationParticipant = Bot | Expert | IbbuManager | Professional | ThirdPartyAccount | Visitor
+
+"Represents the possible errors in the professionalCreate mutation input"
+union ProfessionalCreateUserError = EmailAlreadyUsedProfessionalCreateUserError | ExternalIdIsEmptyProfessionalCreateUserError | FirstNameIsEmptyProfessionalCreateUserError | InvalidAvatarURLProfessionalCreateUserError | InvalidEmailProfessionalCreateUserError | InvalidGroupIdProfessionalCreateUserError | InvalidInterfaceLanguageProfessionalCreateUserError | InvalidPasswordProfessionalCreateUserError | InvalidProjectIdProfessionalCreateUserError | InvalidRoleProfessionalCreateUserError | InvalidSkillIdProfessionalCreateUserError | InvalidSpokenLanguageProfessionalCreateUserError | LastNameIsEmptyProfessionalCreateUserError | PasswordNotSetProfessionalCreateUserError | PseudoIsEmptyProfessionalCreateUserError | SAMLUserIdAlreadyUsedProfessionalCreateUserError | SAMLUserIdIsEmptyProfessionalCreateUserError
+
+"Represents the possible errors in the professionalSetExternalId mutation input."
+union ProfessionalSetExternalIdUserError = ExternalIdIsEmptyProfessionalSetExternalIdUserError | NotAProfessionalUserIdProfessionalSetExternalIdUserError
+
+"Represents the possible errors in the professionalSetGroup mutation input."
+union ProfessionalSetGroupUserError = InvalidGroupIdProfessionalSetGroupUserError | NotAProfessionalUserIdProfessionalSetGroupUserError
+
+"Represents the possible errors in the professionalSetProjects mutation input."
+union ProfessionalSetProjectsUserError = InvalidProjectIdProfessionalSetProjectsUserError | NotAProfessionalUserIdProfessionalSetProjectsUserError
+
+"Represents the possible errors in the professionalSetSkills mutation input."
+union ProfessionalSetSkillsUserError = InvalidSkillIdProfessionalSetSkillsUserError | NotAProfessionalUserIdProfessionalSetSkillsUserError
+
+"Represents the possible errors in the professionalUnsetExternalId mutation input."
+union ProfessionalUnsetExternalIdUserError = NotAProfessionalUserIdProfessionalUnsetExternalIdUserError
+
+"Represents the possible errors in the professionalUnsetGroup mutation input."
+union ProfessionalUnsetGroupUserError = NotAProfessionalUserIdProfessionalUnsetGroupUserError
+
+"Represents the possible errors in the professionalUpdate mutation input"
+union ProfessionalUpdateUserError = CannotChangeOwnRoleProfessionalUpdateUserError | EmailAlreadyUsedProfessionalUpdateUserError | FirstNameIsEmptyProfessionalUpdateUserError | InvalidEmailProfessionalUpdateUserError | InvalidInterfaceLanguageProfessionalUpdateUserError | InvalidPasswordProfessionalUpdateUserError | InvalidRoleProfessionalUpdateUserError | InvalidSpokenLanguageProfessionalUpdateUserError | LastNameIsEmptyProfessionalUpdateUserError | NotAProfessionalUserIdProfessionalUpdateUserError | PseudoIsEmptyProfessionalUpdateUserError
+
+"Routing modes determine how conversations are distributed to the routing groups assigned to a routing rule."
+union RoutingMode = RoutingModeCustom | RoutingModeDynamic | RoutingModeEscalation | RoutingModeFair
+
+"A system conversation message attachment"
+union SystemConversationMessageAttachment = AutomaticMessageSentSystemAttachment | ConversationClosedSystemAttachment | ConversationPushedSystemAttachment | ConversationReleasedSystemAttachment | ConversationSnoozedSystemAttachment | EngagementRuleTriggeredSystemAttachment | NavigationChangedSystemAttachment | OutboundMessageSentSystemAttachment | ResumeMessageSentSystemAttachment | SupervisorCommentSentSystemAttachment | SurveyMessageSystemAttachment | SurveyMultiChoiceQuestionSystemAttachment | SurveyQuestionSystemAttachment | TransferredToRoutingRuleSystemAttachment | TransferredToUserSystemAttachment | UnsupportedSystemMessageAttachment | VisitorBlockedSystemAttachment | VisitorLeftSystemAttachment | VisitorNotificationSettingsRequestedSystemAttachment | VisitorNotificationSettingsSetSystemAttachment | VisitorReturnedSystemAttachment
+
+"Represents an error that may be returned as a result of the `userDelete` mutation."
+union UserDeleteError = UserHasOngoingConversationsUserDeleteError
+
+"A typed visitor custom data for a conversation"
+union VisitorConversationCustomDataEntry = VisitorConversationCustomDataEntryBoolean | VisitorConversationCustomDataEntryFloat | VisitorConversationCustomDataEntryInt | VisitorConversationCustomDataEntryString
+
+"A typed visitor custom data"
+union VisitorCustomData = VisitorCustomDataBoolean | VisitorCustomDataFloat | VisitorCustomDataInt | VisitorCustomDataString
+
+"Answers assistance settings"
+type AnswersAssistanceSettings {
+  "Defines the order canned answer categories are displayed in the desktop conversation panel"
+  cannedAnswersCategoryOrder: CannedAnswersCategorySortingOrder!
+  "Defines the order canned answers are displayed in the desktop conversation panel"
+  cannedAnswersOrder: CannedAnswersSortingOrder!
+  "A list of translations for the end message"
+  i18nEndMessage: [MessageTranslation!]!
+  "A list of translations for the end message visio"
+  i18nEndMessageVisio: [MessageTranslation!]!
+  "A list of translations for the start message"
+  i18nStartMessage: [MessageTranslation!]!
+  "A list of translations for the start message visio"
+  i18nStartMessageVisio: [MessageTranslation!]!
+  "Set to true if the autocomplete is enabled for canned answers as the operator types"
+  isCannedAnswersAutocompleteEnabled: Boolean!
+  "Set to true to automatically send a message when the conversation ends"
+  isEndMessageEnabled: Boolean!
+  "Set to true to automatically send a message when the video conversation ends"
+  isEndMessageVisioEnabled: Boolean!
+  "Set to true is smart answers are enabled for this project"
+  isSmartAnswersEnabled: Boolean!
+  "Set to true to automatically send a message on conversation starts"
+  isStartMessageEnabled: Boolean!
+  "Set to true to automatically send a message on video conversation starts"
+  isStartMessageVisioEnabled: Boolean!
+}
+
+"An Apple Business Chat iMessage extension attachment"
+type AppleBusinessChatMessageExtensionAttachment {
+  "App image icon of the iMessage extension. The Messages app displays the icon when a visitor's device receives a custom interactive message that uses an iMessage extension not installed on the device"
+  appIcon: ConversationMessageAttachmentImageLink
+  "The App Store identifier of the iMessage extension"
+  appId: String
+  "The name of the iMessage extension"
+  appName: String
+  "Bundle identifier of the iMessage extension that the customer interacts with while using Messages"
+  bid: String!
+  "A URI containing data that the Messages app sends to the iMessage extension"
+  dataUri: URI!
+  "Displayed message when the visitor receives the event"
+  receivedMessage: CardAttachment!
+  "Displayed message when the visitor replies to the event"
+  replyMessage: CardAttachment
+  "Determines whether the Messages app should use Live Layout to display the custom interactive message. Live layout is required to represent your message on devices that don’t have the iMessage app installed, or on devices that aren’t running iOS 11"
+  useLiveLayout: Boolean
+}
+
+"An apple pay line item that explains recurring payments and additional charges and discounts attachment"
+type ApplePayLineItemAttachmentType {
+  "Monetary amount of the line item"
+  amount: Float!
+  "A short, localized description of the line item"
+  label: String!
+  "Value that indicates whether the line item is final or pending"
+  type: ApplePayLineItemType
+}
+
+"An Apple Pay payment attachment"
+type ApplePayPaymentAttachment {
+  "Billing information required from the user to process the transaction"
+  billingContactFields: [ApplePayContactField!]!
+  "Merchant’s two-letter ISO 3166 country code"
+  currencyCode: String!
+  "Set of line items that explain recurring payments and additional charges and discounts"
+  lineItems: [ApplePayLineItemAttachmentType!]!
+  "Shipping information required from the user to process the transaction"
+  shippingContactFields: [ApplePayContactField!]!
+  "Available shipping methods. The Apple Pay payment sheet displays the first shipping method from the array as the default shipping method"
+  shippingMethods: [ApplePayShippingMethodAttachmentType!]!
+  "Line item representing the total for the payment"
+  total: ApplePayLineItemAttachmentType!
+}
+
+"An Apple Pay payment request attachment"
+type ApplePayPaymentRequestedAttachment {
+  "Identifier of the event"
+  correlationId: UUID!
+  "Payment details"
+  payment: ApplePayPaymentAttachment!
+  "Displayed message when the visitor receives the event"
+  receivedMessage: CardAttachment!
+}
+
+"An Apple Pay shipping method for delivering physical goods attachment"
+type ApplePayShippingMethodAttachmentType {
+  "Non negative cost associated with this shipping method"
+  amount: Float!
+  "Additional description of the shipping method"
+  detail: String!
+  "Identifier of the shipping method"
+  identifier: String!
+  "A short description of the shipping method"
+  label: String!
+}
+
+"An visitor authentication request attachment"
+type AuthenticationRequestedAttachment {
+  "Identifier of the event"
+  correlationId: UUID!
+  "Displayed message when the visitor receives the event"
+  receivedMessage: CardAttachment!
+  "Displayed message when the visitor replies to the event"
+  replyMessage: CardAttachment
+}
+
+"Participant returned event"
+type AutomaticMessageSentSystemAttachment {
+  "Participant who sent the automatic message"
+  participant: ConversationParticipant
+  "Text of the automatic message"
+  text: String!
+}
+
+type Bot implements User {
+  "User avatar url"
+  avatarUrl: URL
+  "Creation date"
+  createdAt: DateTime!
+  "User email"
+  email: String
+  "User first name"
+  firstName: String
+  "Bot id"
+  id: LegacyId!
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale
+  "User last name"
+  lastName: String!
+  "Projects assigned to the user, determining which projects the user can handle conversations for"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserProjectConnection
+  "The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile."
+  pseudo: String
+  """
+  Skills of the user.
+  The user's skills can be used to determine which routing group the user will be a member of.
+  For more information regarding how to create and use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skills: [Skill!]
+  "Languages in which the user is able to accept a chat"
+  spokenLanguages: [Language!]!
+}
+
+"Error returned by the professionalUpdate mutation when the calling user attempts to change their own role."
+type CannotChangeOwnRoleProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Card type"
+type CardAttachment {
+  "Actions of the card"
+  actions: [ConversationMessageAttachmentAction!]!
+  "Image of the card"
+  image: ConversationMessageAttachmentImageLink
+  "Style of the card"
+  style: String
+  "Text of the card"
+  text: String
+  "Title of the card"
+  title: String
+  "Video content of the card"
+  video: VideoAttachment
+}
+
+"A cardBundle attachment"
+type CardBundleAttachment {
+  "Infered type for the actions of every cards"
+  actionType: CardBundleAttachmentActionType!
+  "List of cards"
+  cards: [CardAttachment!]!
+  "Optional title for the bundle"
+  title: String
+}
+
+type Category {
+  "Category unique id"
+  id: Int!
+  "Category name"
+  name: String!
+}
+
+"Number of connected users for chat availability status"
+type ChannelGroupAvailabilityStatus {
+  "Number of users currently available on chat channel"
+  available: Int!
+  "Number of users currently busy on chat channel"
+  busy: Int!
+  "Number of users currently toggled off on chat channel"
+  toggleOff: Int!
+}
+
+type Client {
+  id: LegacyId!
+  name: String!
+}
+
+"A connection to a list of items."
+type ClientConnection {
+  "A list of edges."
+  edges: [ClientEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ClientEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Client!
+}
+
+"Community settings"
+type CommunitySettings {
+  "The url used for the community FAQ"
+  communityFaqUrl: String
+  "True if the community is enabled for this project"
+  isCommunityEnabled: Boolean!
+  "Set to true to automatically send a message on conversation starts"
+  isCommunityStartMessageEnabled: Boolean!
+}
+
+"Global connected users indicators"
+type ConnectedUsersIndicator {
+  "Number of users currently connected to the desk"
+  connectedUsersCount: Int!
+  "Number of users currently connected and available on by availability"
+  countByChatAvailabilityStatus: ChannelGroupAvailabilityStatus
+  "Average chat occupancy for users currently in production"
+  usersInProductionChatOccupancy: UsersInProductionOccupancy
+}
+
+"Connector"
+type Connector {
+  "Client details"
+  client: Client
+  "The id of the client where connector could be installed. Useful if connector is private"
+  clientId: LegacyId
+  "Client details"
+  connectorVersions: [ConnectorVersion!]
+  "The creation date"
+  createdAt: DateTime!
+  "The id of the developer who created the connector"
+  creatorId: LegacyId!
+  "Last published version for this connector"
+  currentVersion: ConnectorVersion
+  "The id of the connector"
+  id: UUID!
+  isPremium: Boolean!
+  "Is connector private or public"
+  isPrivate: Boolean!
+  isShowcase: Boolean!
+  "The name of the connector, used for display in marketplace"
+  name: String!
+  "Last updated date"
+  updatedAt: DateTime
+}
+
+"A connection to a list of items."
+type ConnectorConnection {
+  "A list of edges."
+  edges: [ConnectorEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"Conversation closing form value type"
+type ConnectorConversationClosingFormValue {
+  "The connector version this closing form value belongs to"
+  connectorVersion: ConnectorVersion
+  "The id of the conversation"
+  conversationId: LegacyId!
+  "The field name in the form"
+  fieldId: String!
+  "The field value in the form"
+  value: String!
+}
+
+"An edge in a connection."
+type ConnectorEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Connector!
+}
+
+"Screenshots for connector version. Displayed in marketplace"
+type ConnectorScreenshot {
+  "Url of the connector version screenshot"
+  url: URL!
+}
+
+"Connector version"
+type ConnectorVersion {
+  "The description of the changes for this version. Equivalent to a changelog"
+  changes: String
+  "The connector this version belongs to"
+  connector: Connector
+  "The creation date"
+  createdAt: DateTime!
+  "The description of the version"
+  description: String
+  "The id of the connector version"
+  id: UUID!
+  "Privacy of the version. Private version will be only available for the client identifier defined in the connector"
+  isPrivate: Boolean!
+  "The logo of this version"
+  logo: URL
+  "The name of this version"
+  name: String!
+  "List of the parameters"
+  parameters: [ConnectorVersionParameter!]
+  "The publication date"
+  publishedAt: DateTime
+  "List of the screenshots. See ConnectorScreenshot type"
+  screenshots: [ConnectorScreenshot!]!
+  "The status of the connector version. Could be SANDBOX, REVIEW or PUBLISHED. See ConnectorVersionStatus enum"
+  status: ConnectorVersionStatus!
+  "The submission date by the developer"
+  submittedAt: DateTime
+  "Last updated date"
+  updatedAt: DateTime
+  "The Semver version, e.g. 1.1.3"
+  version: String
+}
+
+"A connection to a list of items."
+type ConnectorVersionConnection {
+  "A list of edges."
+  edges: [ConnectorVersionEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ConnectorVersionEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ConnectorVersion!
+}
+
+"ConnectorVersionInstallation"
+type ConnectorVersionInstallation {
+  "Connector details"
+  connectorVersion: ConnectorVersion
+  "The id of the installation"
+  installationId: UUID!
+  "Date of installation"
+  installationValidatedAt: DateTime
+  "Project details"
+  project: Project
+}
+
+"A connection to a list of items."
+type ConnectorVersionInstallationConnection {
+  "A list of edges."
+  edges: [ConnectorVersionInstallationEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ConnectorVersionInstallationEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ConnectorVersionInstallation!
+}
+
+"Parameter for connector version"
+type ConnectorVersionParameter {
+  "Get the Connector Version of the parameter"
+  connectorVersion: ConnectorVersion
+  "The creation date"
+  createdAt: DateTime!
+  "Is the parameter mandatory or optional"
+  isMandatory: Boolean!
+  "The key of the parameter"
+  key: String!
+  "The name of the parameter"
+  name: String!
+  "The type of the parameter. Could be setting or authentication. See ConnectorVersionParameterType"
+  type: ConnectorVersionParameterType!
+  "Get the value of the parameter"
+  value(
+    "Id of the website"
+    websiteId: LegacyId!
+  ): ConnectorVersionParameterValue
+  "The type of value. Currently, only TEXT is supported"
+  valueType: String!
+}
+
+"Parameter value for a connector version"
+type ConnectorVersionParameterValueText {
+  "The value of the parameter"
+  stringValue: String!
+}
+
+"A contexualInfos attachment"
+type ContextualInfosAttachment {
+  "Apple Business Chat group"
+  abcGroup: String
+  "Apple Business Chat intent"
+  abcIntent: String
+  "Id of the campaign of the outbound message"
+  outboundCampaignId: String
+  "Id of the outbound message"
+  outboundMessageId: String
+}
+
+type Conversation {
+  "Conversation channel"
+  channel: String!
+  "Conversation closing date"
+  closedAt: DateTime
+  "List of visitors who participated to this conversation"
+  conversationVisitors: [ConversationVisitor!] @deprecated(reason : "Please use the visitor field instead")
+  "Conversions associated to the conversation"
+  conversions: Conversions
+  "Conversation creation date"
+  createdAt: DateTime!
+  "Represents the current status of the conversation, with extra information depending on the status"
+  distributionStatus: ConversationDistributionStatus
+  "Conversation duration in seconds from visitor initiation time to user closing time using iso 8601 format"
+  duration: String
+  "Conversation unique id"
+  id: UUID!
+  "Language of the conversation"
+  language: Language
+  "Legacy conversation id"
+  legacyId: LegacyId
+  "Messages of the conversation"
+  messages(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ConversationMessageConnection
+  "The project details"
+  project: Project
+  "Timeline of the conversation represented by the routing events that took place"
+  routingEvents: [RoutingEvent!]!
+  "Satisfaction survey answered by visitor"
+  satisfactionSurvey: SatisfactionSurvey
+  "Tags of the conversation"
+  tags: [ConversationTag!]!
+  "Targeting Rule of the conversation. This data is not consistent, we recommend not to use this information"
+  targetingRule: TargetingRule
+  "Users who participated to the conversation. This data is not consistent, we recommend not to use this information"
+  users: [User!]
+  "The visitor who participated to this conversation"
+  visitor: Visitor
+  "List of visitors who participated to this conversation"
+  visitors(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ConversationVisitorConnection @deprecated(reason : "Please use the visitor field instead")
+}
+
+"An assigned conversation can only be pushed to the agent it is assigned to"
+type ConversationAssignment {
+  "The date the conversation has been assigned at"
+  assignedAt: DateTime!
+  "The agent the conversation has been assigned to"
+  assignedTo: User
+}
+
+"A conversation blocked attachment. The visitor has blocked conversation."
+type ConversationBlockedAttachment {
+  "This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean
+}
+
+"A closed conversation has been closed by an agent after being handled"
+type ConversationClosedStatus {
+  "The date the conversation has been closed at"
+  closedAt: DateTime!
+  "The agent that closed the conversation"
+  closedBy: User
+}
+
+"Conversation closed event"
+type ConversationClosedSystemAttachment {
+  "User who closed the conversation"
+  byUser: User
+}
+
+"Simple image type"
+type ConversationMessageAttachmentImageLink {
+  "Description of the image"
+  description: String!
+  "Url of the image"
+  url: URL!
+}
+
+"Conversation Link Action type"
+type ConversationMessageAttachmentLinkAction {
+  "Title of the link"
+  title: String!
+  "Url of the link"
+  url: URI!
+}
+
+"Conversation Select Action type"
+type ConversationMessageAttachmentSelectAction {
+  "Title of the select"
+  title: String!
+}
+
+"A connection to a list of items."
+type ConversationMessageConnection {
+  "A list of edges."
+  edges: [ConversationMessageEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ConversationMessageEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ConversationMessage!
+}
+
+"A pending conversation is ready to be pushed as soon as there is an agent available on its routing group"
+type ConversationPendingStatus {
+  "Valued when the conversation is assigned to a specific agent"
+  assignment: ConversationAssignment
+  "The date the conversation has been pending since"
+  pendingSince: DateTime!
+}
+
+"A pushed conversation is currently being handled by an agent"
+type ConversationPushedStatus {
+  "The date the conversation has been pushed at"
+  pushedAt: DateTime!
+  "The agent te conversation has been pushed to"
+  pushedTo: User
+}
+
+"Conversation pushed event"
+type ConversationPushedSystemAttachment {
+  "Participant who the conversation is pushed to"
+  toUser: User
+}
+
+"Conversation released event"
+type ConversationReleasedSystemAttachment {
+  "Participant who released the conversation"
+  byUser: User
+}
+
+"A snoozed conversation will not be pushed before the visitor sends a new message, or the snoozed delay expires"
+type ConversationSnoozedStatus {
+  "Valued when the agent that snoozed the conversation wants to get the conversation back after the snooze ends"
+  assignment: ConversationAssignment
+  "The date the conversation was snoozed"
+  snoozedAt: DateTime!
+  "The agent the conversation has been snoozed by"
+  snoozedBy: User
+  "Maximum date after which the snooze will automatically expire"
+  snoozedUntil: DateTime!
+}
+
+"Conversation snoozed event"
+type ConversationSnoozedSystemAttachment {
+  "Participant who snoozed the conversation"
+  byUser: User
+  "Conversation snoozed until"
+  until: DateTime!
+}
+
+type ConversationTag {
+  availableFor: [ConversationTagUserType!]!
+  "Category details"
+  category: Category
+  "Tag unique id"
+  id: Int!
+  "Tag name"
+  name: String!
+  "Project details"
+  project: Project
+}
+
+"A connection to a list of items."
+type ConversationTagConnection {
+  "A list of edges."
+  edges: [ConversationTagEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ConversationTagEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: ConversationTag!
+}
+
+type ConversationTagSettings {
+  "Whether a user can create a tag"
+  userCanCreateTag: Boolean!
+  "Whether a user is allowed to tag a conversation or not"
+  userCanTag: Boolean!
+  "Whether a user must tag a conversation or not"
+  userMustTag: Boolean!
+}
+
+type ConversationVisitor {
+  "Visitor id"
+  id: UUID!
+  "Legacy visitor id"
+  legacyVisitorId: String
+}
+
+"A connection to a list of items."
+type ConversationVisitorConnection {
+  "A list of edges."
+  edges: [ConversationVisitorEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ConversationVisitorEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Visitor!
+}
+
+"A Conversion attributed to a conversation"
+type Conversions {
+  "List of transactions"
+  transactions: [Transaction!]!
+}
+
+"Error returned by the professionalCreate mutation when the provided email is already used by another user."
+type EmailAlreadyUsedProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided email is already used by another user."
+type EmailAlreadyUsedProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Engagement rule triggered event"
+type EngagementRuleTriggeredSystemAttachment {
+  "Name of the engagement rule"
+  ruleName: String!
+}
+
+"Accepted escalation message"
+type EscalationAcceptedAttachment {
+  "Correlation Id that allows to link escalation events from the invitation to the end"
+  correlationId: UUID!
+  "Type of escalation"
+  type: EscalationType!
+}
+
+"Ended escalation message"
+type EscalationEndedAttachment {
+  "Correlation Id that allows to link escalation events from the invitation to the end"
+  correlationId: UUID!
+  "Reason of the end of the call"
+  reason: EscalationEndReason!
+  "Type of escalation"
+  type: EscalationType!
+}
+
+"Invitation escalation message"
+type EscalationInvitationSentAttachment {
+  "Correlation Id that allows to link escalation events from the invitation to the end"
+  correlationId: UUID!
+  "Type of escalation"
+  type: EscalationType!
+}
+
+type Expert implements User {
+  "User avatar url"
+  avatarUrl: URL
+  "The expert's biography"
+  biography: String
+  "The expert city"
+  city: String
+  "The expert country"
+  country: String
+  "Creation date"
+  createdAt: DateTime!
+  "User email"
+  email: String
+  "User first name"
+  firstName: String
+  "Expert id"
+  id: LegacyId!
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale
+  "User last name"
+  lastName: String!
+  "The expert's phone number"
+  phoneNumber: PhoneNumber
+  "Projects assigned to the user, determining which projects the user can handle conversations for"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserProjectConnection
+  "The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile."
+  pseudo: String
+  """
+  Skills of the user.
+  The user's skills can be used to determine which routing group the user will be a member of.
+  For more information regarding how to create and use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skills: [Skill!]
+  "Languages in which the user is able to accept a chat"
+  spokenLanguages: [Language!]!
+}
+
+"Error returned by the professionalCreate mutation when the provided external id is empty."
+type ExternalIdIsEmptyProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetExternalId mutation when the provided group id is invalid."
+type ExternalIdIsEmptyProfessionalSetExternalIdUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"A failed Apple Pay payment response attachment"
+type FailedApplePayPaymentResponseAttachment {
+  "Identifier of the Apple Pay payment request event"
+  correlationId: UUID!
+}
+
+"A failed visitor authentication response attachment"
+type FailedAuthenticationResponseAttachment {
+  "Identifier of the authentication request event"
+  correlationId: UUID!
+}
+
+"A file attachment"
+type FileAttachment {
+  "Name of the file"
+  fileName: String!
+  "Mime Type of the file"
+  mimeType: String!
+  "Url of the file"
+  url: URI!
+}
+
+"A fileBundle attachment"
+type FileBundleAttachment {
+  "List of files"
+  attachments: [FileAttachment!]!
+}
+
+"Error returned by the professionalCreate mutation when the provided first name is empty."
+type FirstNameIsEmptyProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided first name is empty."
+type FirstNameIsEmptyProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Hung up session"
+type HungUpAttachment {
+  "Correlation Id that allows to link PickedUp and HungUp events"
+  correlationId: UUID!
+  "Type of session"
+  type: ConversationSessionType!
+}
+
+"An Ibbu manager user internal to iAdvize"
+type IbbuManager implements User {
+  "User avatar url"
+  avatarUrl: URL
+  "Creation date"
+  createdAt: DateTime!
+  "User email"
+  email: String
+  "User first name"
+  firstName: String
+  "User id"
+  id: LegacyId!
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale
+  "User last name"
+  lastName: String!
+  "Projects assigned to the user, determining which projects the user can handle conversations for"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserProjectConnection
+  "The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile."
+  pseudo: String
+  """
+  Skills of the user.
+  The user's skills can be used to determine which routing group the user will be a member of.
+  For more information regarding how to create and use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skills: [Skill!]
+  "Languages in which the user is able to accept a chat"
+  spokenLanguages: [Language!]!
+}
+
+"An image attachment"
+type ImageAttachment {
+  "Name of the image"
+  fileName: String!
+  "Mime Type of the image"
+  mimeType: String!
+  "Url of the image"
+  url: URI!
+}
+
+"Error returned by the professionalCreate mutation when the provided avatar URL is invalid."
+type InvalidAvatarURLProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided email is invalid."
+type InvalidEmailProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided email is invalid."
+type InvalidEmailProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided group id is invalid."
+type InvalidGroupIdProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetGroup mutation when the provided group id is invalid."
+type InvalidGroupIdProfessionalSetGroupUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided interface language is invalid."
+type InvalidInterfaceLanguageProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided interface language is invalid."
+type InvalidInterfaceLanguageProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided password is invalid."
+type InvalidPasswordProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided password is invalid."
+type InvalidPasswordProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when a provided project id is invalid."
+type InvalidProjectIdProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetProjects mutation when a provided project id is invalid."
+type InvalidProjectIdProfessionalSetProjectsUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided role name is invalid."
+type InvalidRoleProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided role name is invalid."
+type InvalidRoleProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when a provided skill id is invalid."
+type InvalidSkillIdProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetSkills mutation when a provided skill id is invalid."
+type InvalidSkillIdProfessionalSetSkillsUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when a provided spoken language is invalid."
+type InvalidSpokenLanguageProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when a provided spoken language is invalid."
+type InvalidSpokenLanguageProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided last name is empty."
+type LastNameIsEmptyProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided last name is empty."
+type LastNameIsEmptyProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"A link attachment"
+type LinkAttachment {
+  "Title of the link"
+  title: String!
+  "Url of the link"
+  url: URI!
+}
+
+"Link settings"
+type LinkSettings {
+  "Defines the order link categories are displayed in the desktop conversation panel"
+  linkCategoryOrder: LinkCategorySortingOrder!
+  "Defines the order links are displayed in the desktop conversation panel"
+  linkOrder: LinkSortingOrder!
+}
+
+"A list picker attachment"
+type ListPickerAttachment {
+  "Identifier of the event"
+  correlationId: UUID!
+  "Displayed message when the visitor receives the picker"
+  receivedMessage: CardAttachment!
+  "Displayed message when the visitor submits the picker"
+  replyMessage: CardAttachment!
+  "Sections of the picker"
+  sections: [ListPickerAttachmentSection!]!
+}
+
+"A list picker item"
+type ListPickerAttachmentItem {
+  "Identifier of the item"
+  id: UUID!
+  "Image of the item"
+  image: ConversationMessageAttachmentImageLink
+  "Ordinal position of the item"
+  order: Int
+  "Item display style"
+  style: String
+  "Subtitle of the item"
+  subtitle: String
+  "Title of the item"
+  title: String!
+}
+
+"A list picker section"
+type ListPickerAttachmentSection {
+  "Section selection items"
+  items: [ListPickerAttachmentItem!]!
+  "Determines if the visitor can make multiple selections within the section"
+  multipleSelection: Boolean!
+  "Ordinal position of the section"
+  order: Int
+  "Title of the section"
+  title: String!
+}
+
+"A list picker response attachment"
+type ListPickerResponseAttachment {
+  "Identifier of the list picker event"
+  correlationId: UUID!
+  "Items of the list picker not selected by the visitor"
+  notSelectedItems: [ListPickerAttachmentItem!]!
+  "Items of the list picker selected by the visitor"
+  selectedItems: [ListPickerAttachmentItem!]!
+}
+
+"Request a live agent"
+type LiveAgentRequestedAttachment {
+  "Routing rule to transfer the conversation"
+  routingRuleId: UUID!
+}
+
+"Location"
+type Location {
+  "Location address"
+  address: String!
+  "Created date"
+  createdAt: DateTime!
+  "Location identifier"
+  id: UUID!
+  "Location latitude"
+  lat: Float!
+  "Location longitude"
+  long: Float!
+  "Updated date"
+  updatedAt: DateTime!
+}
+
+"A geographical location"
+type LocationAttachment {
+  "Latitude of the location"
+  latitude: Float
+  "Longitude of the location"
+  longitude: Float
+  "Location radius in meters"
+  radius: Float
+  "Location title"
+  title: String
+}
+
+"Message translation entry"
+type MessageTranslation {
+  "The language for this translation"
+  language: String!
+  "The message for this translation"
+  message: String!
+}
+
+"A font used for notification or chatbox"
+type MessengerFont {
+  "FontFamily used for notification or chatbox"
+  fontFamily: String!
+  "Url of the css of the font"
+  url: String
+}
+
+"A connection to a list of items."
+type MessengerFontConnection {
+  "A list of edges."
+  edges: [MessengerFontEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type MessengerFontEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: MessengerFont!
+}
+
+"Mirroring settings"
+type MirroringSettings {
+  "Set to true to enable cobrowsing with operator inputs, otherwise the operator can only scroll and point areas on the visitor page"
+  isCobrowsingClickEnabled: Boolean!
+  "Set to true to enable the cobrowsing"
+  isCobrowsingEnabled: Boolean!
+  "Set to true to enable the mirroring"
+  isMirroringEnabled: Boolean!
+}
+
+type Mutation {
+  conversationTagCreate(conversationTagInput: ConversationTagInput!): ConversationTag
+  "Create a professional user"
+  professionalCreate(
+    "Input data required to create a professional user"
+    input: ProfessionalCreateInput!
+  ): ProfessionalCreatePayload
+  "Set a professional user's external id"
+  professionalSetExternalId(
+    "Input data used to set the professional user's external id"
+    input: ProfessionalSetExternalIdInput!
+  ): ProfessionalSetExternalIdPayload
+  """
+  Set a professional user's group.
+  User groups allow information and user exchanges to be compartmentalised in the iAdvize administration.
+  For more information regarding user groups, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203280696-Use-the-user-groups.
+  """
+  professionalSetGroup(
+    "Input data used to set the professional user's group"
+    input: ProfessionalSetGroupInput!
+  ): ProfessionalSetGroupPayload
+  "Set a professional user's projects"
+  professionalSetProjects(
+    "Input data used to set the professional user's projects"
+    input: ProfessionalSetProjectsInput!
+  ): ProfessionalSetProjectsPayload
+  """
+  Set a professional user's skills
+  Users can be organised by skill in order to automatically direct visitors towards the right agent.
+  For in-depth documentation, please check the following page: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  professionalSetSkills(
+    "Input data used to set the professional user's skills"
+    input: ProfessionalSetSkillsInput!
+  ): ProfessionalSetSkillsPayload
+  "Unset a professional user's external id"
+  professionalUnsetExternalId(
+    "Input data used to unset the professional user's external id"
+    input: ProfessionalUnsetExternalIdInput!
+  ): ProfessionalUnsetExternalIdPayload
+  """
+  Unset a professional user's group.
+  User groups allow information and user exchanges to be compartmentalised in the iAdvize administration.
+  For more information regarding user groups, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203280696-Use-the-user-groups.
+  """
+  professionalUnsetGroup(
+    "Input data used to unset the professional user's group"
+    input: ProfessionalUnsetGroupInput!
+  ): ProfessionalUnsetGroupPayload
+  "Update a professional user"
+  professionalUpdate(
+    "Input data used to update the professional"
+    input: ProfessionalUpdateInput!
+  ): ProfessionalUpdatePayload
+  "Remove the online extension duration and make the authenticated user offline"
+  userCancelExtendedPresence: UserCancelExtendedPresencePayload
+  "Delete a user"
+  userDelete(
+    "Input data used to delete the user"
+    input: UserDeleteInput!
+  ): UserDeletePayload
+}
+
+"Navigation changed event"
+type NavigationChangedSystemAttachment {
+  "Visitor navigation url"
+  url: URI!
+}
+
+"Error returned by the professionalSetExternalId mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalSetExternalIdUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetGroup mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalSetGroupUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetProjects mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalSetProjectsUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalSetSkills mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalSetSkillsUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUnsetExternalId mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalUnsetExternalIdUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUnsetGroup mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalUnsetGroupUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided user id targets a user who is not a professional user."
+type NotAProfessionalUserIdProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Notification settings"
+type NotificationSettings {
+  "Set to true to enable visual notification for new call conversation"
+  isCallVisualNotificationEnabled: Boolean!
+  "Set to true to enable visual notification for new chat conversation"
+  isChatVisualNotificationEnabled: Boolean!
+  "Set to true to enable visual notification for new video conversation"
+  isVideoVisualNotificationEnable: Boolean!
+  "The sound file to play when a conversation is received"
+  notificationSoundFile: String
+}
+
+"An offer attachment"
+type OfferAttachment {
+  "Offer description"
+  description: String!
+  "Url of the image from the offer"
+  imageUrl: URL!
+  "Title of the offer"
+  title: String!
+  "Url of the offer"
+  url: URI!
+}
+
+"Offer settings"
+type OfferSettings {
+  "Defines the order offer categories are displayed in the desktop conversation panel"
+  offerCategoryOrder: OfferCategorySortingOrder!
+  "Defines the order offers are displayed in the desktop conversation panel"
+  offerOrder: OfferSortingOrder!
+}
+
+"Outbound message sent to the visitor"
+type OutboundMessageSentSystemAttachment {
+  "SentAs describes which Profile author sent the message"
+  sentAs: ConversationParticipant
+  "Text of the message"
+  text: String!
+}
+
+"Information about pagination in a connection."
+type PageInfo {
+  "When paginating forwards, the cursor to continue."
+  endCursor: String
+  "When paginating forwards, are there more items?"
+  hasNextPage: Boolean!
+  "When paginating backwards, are there more items?"
+  hasPreviousPage: Boolean!
+  "When paginating backwards, the cursor to continue."
+  startCursor: String
+}
+
+"Participant conversation's message"
+type ParticipantConversationMessage implements ConversationMessage {
+  "Message attachments"
+  attachments: [ConversationMessageAttachment!]!
+  "Author describes who really sent the message"
+  author: ConversationParticipant
+  "Creation date"
+  createdAt: DateTime!
+  "Id of the message"
+  messageId: String!
+  "SentAs describes what is shown to the visitor"
+  sentAs: ConversationParticipant
+  "Text of the message"
+  text: String
+}
+
+"Error returned by the professionalCreate mutation when no password or samlUserId is provided."
+type PasswordNotSetProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"PhoneNumber with country code and national number"
+type PhoneNumber {
+  "Country code with the '+' prefix, ex: +33"
+  countryCode: PhoneNumberCountryCode!
+  "National number, ex : 0102030405"
+  nationalNumber: String!
+}
+
+"Picked up session"
+type PickedUpAttachment {
+  "Correlation Id that allows to link PickedUp and hungUp events"
+  correlationId: UUID!
+  "Type of session"
+  type: ConversationSessionType!
+}
+
+"A product attachment"
+type ProductAttachment {
+  "Url of the product image"
+  imageUrl: URL!
+  "Availability of the product"
+  isAvailable: Boolean!
+  "Price of the product"
+  priceText: String!
+  "Url of the product"
+  productUrl: URI!
+  "Promotion price of the product"
+  promotionPriceText: String
+  "Title of the product"
+  title: String!
+}
+
+"A product offer attachment"
+type ProductOfferAttachment {
+  "Actions of the card"
+  actions: [ConversationMessageAttachmentAction!]!
+  "Description of the offer"
+  description: String
+  "Image of the product"
+  image: ConversationMessageAttachmentImageLink
+  "Availability of the product"
+  isAvailable: Boolean!
+  "Price of the offer"
+  offerPriceText: String
+  "Price of the product"
+  priceText: String!
+  "Title of the product"
+  title: String!
+}
+
+"A productOfferBundle attachment"
+type ProductOfferBundleAttachment {
+  "List of productOffers"
+  productOffers: [ProductOfferAttachment!]!
+}
+
+type ProductionIndicator {
+  "Number of users currently connected to the desk"
+  connectedUsersCount: Int @deprecated(reason : "Use connectedUsersIndicator.connectedUsersCount instead")
+  "Number of ongoing conversations"
+  onGoingConversationsCount: Int
+  "Number of pending conversations"
+  pendingConversationsCount: Int
+  "Number of snoozed conversations"
+  snoozedConversationsCount: Int
+}
+
+"A professional agent employed by a brand"
+type Professional implements User {
+  "Specifies if the operator should be prompt for a click to call phone number"
+  askForClickToCallPhoneNumber: Boolean!
+  "User avatar url"
+  avatarUrl: URL
+  "The phone number used to call the operator or a voip identifier"
+  clickToCallPhoneNumber: String
+  "Creation date"
+  createdAt: DateTime!
+  "User email"
+  email: String
+  "The external id is an identifier representing the user in another system."
+  externalId: String
+  "User first name"
+  firstName: String
+  """
+  Group this user is a member of.
+  For more information, see https://help.iadvize.com/hc/en-gb/articles/203280696-Use-the-user-groups.
+  """
+  group: UserGroup
+  "Professional id"
+  id: LegacyId!
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale
+  "User last name"
+  lastName: String!
+  "Projects assigned to the user, determining which projects the user can handle conversations for"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserProjectConnection
+  "The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile."
+  pseudo: String
+  "Role name, e.g. \"admin\", \"manager\", \"operator\""
+  roleName: String!
+  "Id used to bind a user from a SAML identity provider to an iAdvize user"
+  samlUserId: String
+  """
+  Skills of the user.
+  The user's skills can be used to determine which routing group the user will be a member of.
+  For more information regarding how to create and use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skills: [Skill!]
+  "Languages in which the user is able to accept a chat"
+  spokenLanguages: [Language!]!
+}
+
+"Result of the professionalCreate mutation"
+type ProfessionalCreatePayload {
+  """
+  If set, contains the successfully created professional user.
+  If null, the user could not be created because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the user could not be created."
+  userErrors: [ProfessionalCreateUserError!]!
+}
+
+"Return type of the `professionalSetExternalId` mutation."
+type ProfessionalSetExternalIdPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the external id could not be set because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the external id could not be set."
+  userErrors: [ProfessionalSetExternalIdUserError!]!
+}
+
+"Return type of the `professionalSetGroup` mutation."
+type ProfessionalSetGroupPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the group could not be set because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the group could not be set."
+  userErrors: [ProfessionalSetGroupUserError!]!
+}
+
+"Return type of the `professionalSetProjects` mutation."
+type ProfessionalSetProjectsPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the projects could not be set because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the projects could not be set."
+  userErrors: [ProfessionalSetProjectsUserError!]!
+}
+
+"Return type of the `professionalSetSkills` mutation."
+type ProfessionalSetSkillsPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the skills could not be set because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the skills could not be set."
+  userErrors: [ProfessionalSetSkillsUserError!]!
+}
+
+"Return type of the `professionalUnsetExternalId` mutation."
+type ProfessionalUnsetExternalIdPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the external id could not be unset because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the external id could not be unset."
+  userErrors: [ProfessionalUnsetExternalIdUserError!]!
+}
+
+"Return type of the `professionalUnsetGroup` mutation."
+type ProfessionalUnsetGroupPayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the group could not be unset because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the group could not be unset."
+  userErrors: [ProfessionalUnsetGroupUserError!]!
+}
+
+"Result of the professionalUpdate mutation"
+type ProfessionalUpdatePayload {
+  """
+  If set, contains the successfully updated professional user.
+  If null, the user could not be updated because the input data was invalid. Please use the `userErrors` field to get more details regarding the errors that occurred.
+  """
+  professional: Professional
+  "List of errors describing why the input data was invalid and the user could not be created."
+  userErrors: [ProfessionalUpdateUserError!]!
+}
+
+type Project {
+  "Answers assistance settings"
+  answersAssistanceSettings: AnswersAssistanceSettings
+  "Community settings"
+  communitySettings: CommunitySettings
+  "Project currency"
+  currency: Currency
+  "Project identifier used in the desk stateboxes"
+  deskIdentifier: String
+  "Project unique id"
+  id: LegacyId!
+  "Link settings"
+  linkSettings: LinkSettings
+  "Get list of fonts available for notification and chatbox"
+  messengerFonts(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): MessengerFontConnection
+  "Mirroring settings"
+  mirroringSettings: MirroringSettings
+  "Project name"
+  name: String!
+  "Notification settings"
+  notificationSettings: NotificationSettings
+  "Offer settings"
+  offerSettings: OfferSettings
+  "Project settings"
+  settings: ProjectSettings
+  "Tags settings"
+  tagSettings: ConversationTagSettings
+  "Project url"
+  url: String
+}
+
+"A connection to a list of items."
+type ProjectConnection {
+  "A list of edges."
+  edges: [ProjectEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type ProjectEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Project!
+}
+
+"Project settings"
+type ProjectSettings {
+  "When this option is enabled, closing of a conversation will trigger a satisfaction survey, sent to the visitor of the conversation, on compatible channels."
+  isSatisfactionSurveyEnabled: Boolean!
+}
+
+"Error returned by the professionalCreate mutation when the provided pseudo is empty."
+type PseudoIsEmptyProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalUpdate mutation when the provided pseudo is empty."
+type PseudoIsEmptyProfessionalUpdateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+type Query {
+  "Client details"
+  client(
+    "Id of the client"
+    clientId: LegacyId!
+  ): Client
+  "List the clients"
+  clients(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Filter to get clients by ids"
+    clientIds: [LegacyId!],
+    "Returns the first n elements from the list."
+    first: Int,
+    "Filter to get clients with Community feature enabled"
+    hasCommunityEnabled: Boolean,
+    "Filter to get clients with Ibbü feature enabled"
+    hasIbbuEnabled: Boolean,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ClientConnection
+  "Connected users KPI"
+  connectedUsersIndicator(
+    "Parameters used to filter the set of connected users"
+    resourceFilters: ConnectedUserFilters
+  ): ConnectedUsersIndicator
+  "The basic information of a connector"
+  connector(
+    "Id of the connector"
+    id: UUID!
+  ): Connector
+  "Get conversation closing form values by conversation and connector version"
+  connectorConversationClosingFormValues(
+    "Id of the version of the connector"
+    connectorVersionId: UUID!,
+    "Id of the iAdvize conversation"
+    conversationId: LegacyId!
+  ): [ConnectorConversationClosingFormValue!]
+  "The details of the version of a connector"
+  connectorVersion(
+    "Id of the version of the connector"
+    id: UUID!
+  ): ConnectorVersion
+  "List installations which can be filtered by ids, by plugin type and by installation state"
+  connectorVersionInstallations(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Filter by plugin type"
+    connectorPluginType: ConnectorPluginType,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Filter by installation state"
+    installationValidated: Boolean,
+    "Returns the last n elements from the list."
+    last: Int,
+    "Ids of the iAdvize project"
+    projectIds: [LegacyId!]
+  ): ConnectorVersionInstallationConnection
+  "List connector version parameters for a connector version"
+  connectorVersionParameters(
+    "Id of the version of the connector"
+    connectorVersionId: UUID
+  ): [ConnectorVersionParameter!]
+  "List connector versions"
+  connectorVersions(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Filter to get connectors by ids"
+    connectorVersionIds: [UUID!],
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ConnectorVersionConnection
+  "List connectors which can be filtered by ids"
+  connectors(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Filter to get connectors by ids"
+    connectorIds: [UUID!],
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ConnectorConnection
+  "Retrieve conversation by its id"
+  conversation(
+    "Id of the conversation"
+    id: UUID!
+  ): Conversation
+  "Conversation tag details"
+  conversationTag(tagId: Int!): ConversationTag
+  "List the tags"
+  conversationTags(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int,
+    "Filter to get tags by ids"
+    tagIds: [Int!]
+  ): ConversationTagConnection
+  "Production KPI"
+  productionIndicator(
+    "Filters conversations by channel"
+    channels: [Channel!],
+    "Ids of the iAdvize project"
+    projectIds: [LegacyId!]! = [],
+    "Parameters used to filter the set of open conversations (not closed)"
+    resourceFilters: OpenConversationFilters
+  ): ProductionIndicator
+  "The project details"
+  project(
+    "Id of the project"
+    projectId: LegacyId!
+  ): Project
+  "List the projects"
+  projects(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): ProjectConnection
+  "Look up a routing group given its identifier."
+  routingGroup(
+    "Identifier of the routing group."
+    id: UUID!
+  ): RoutingGroup
+  "Look up routing groups."
+  routingGroups(
+    "Optional list of website identifiers to filter on."
+    websiteIds: [LegacyId!]
+  ): [RoutingGroup!]
+  "Look up a routing rule given its identifier."
+  routingRule(
+    "Identifier of the routing rule."
+    id: UUID!
+  ): RoutingRule
+  "Look up routing rules."
+  routingRules(
+    "Optional routing rule name segment to search on."
+    name: String,
+    "Optional list of website identifiers to filter on."
+    websiteIds: [LegacyId!]
+  ): [RoutingRule!]
+  "Look up routing rules."
+  routingRulesConnection(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Channel used"
+    channel: Channel,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int,
+    "Optional routing rule name segment to search on."
+    name: String,
+    "Optional list of project identifiers to filter on."
+    projectIds: [LegacyId!]
+  ): RoutingRuleConnection
+  "List satisfaction survey responses for a given period"
+  satisfactionSurveyResponses(
+    "Page start cursor"
+    cursor: String,
+    "Time interval"
+    interval: Interval!,
+    "Ids of the iAdvize project"
+    projectIds: [LegacyId!]
+  ): SatisfactionSurveyResponses
+  "List conversations matching search filters"
+  searchClosedConversations(
+    "To get next page of result"
+    after: String,
+    "To get previous page of result"
+    before: String,
+    "Filters to limit search results"
+    filters: SearchClosedConversationsFilters,
+    "Conversation closing time interval"
+    interval: Interval!,
+    "Order of search results"
+    orderBy: OrderBy,
+    "WARNING: This is a work in progress, please do not rely on this argument yet, as it may be removed in future versions. Filters to limit search results"
+    resourceFilters: ClosedConversationFilters
+  ): SearchClosedConversationsResultConnection
+  """
+  If a `userId` is passed, look up the given user.
+  If no `userId` is passed, fetch the currently authenticated user.
+  """
+  user(
+    "Id of the user"
+    userId: LegacyId
+  ): User
+  "Look up users"
+  users(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Look up users having specific email addresses"
+    emails: [String!]! = [],
+    "List users whose externalId match any of the given values"
+    externalIds: [String!]! = [],
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int,
+    "List users whose last name or first name contain the given string"
+    name: String,
+    "List users belonging to a group that is a direct or indirect child of the given group"
+    parentGroupId: LegacyId,
+    "Look up users able to handle conversations for any of the given projects"
+    projectIds: [LegacyId!]! = [],
+    "List users who have been assigned any of the given skills"
+    skillIds: [LegacyId!]! = [],
+    "Look up users having any of the given ids"
+    userIds: [LegacyId!]! = []
+  ): UserConnection
+  "Retrieve visitor"
+  visitor(
+    "Id of the visitor"
+    visitorId: UUID!
+  ): Visitor
+  "Get the custom data of a visitor for a conversation"
+  visitorConversationCustomData(
+    "Id of the conversation"
+    conversationId: UUID!
+  ): VisitorConversationCustomData
+  "Get the custom data of a visitor on a given project and communication channel"
+  visitorCustomData(
+    "Channel used"
+    channel: Channel!,
+    "Id of the visitor"
+    legacyVisitorId: String!,
+    "Id of the iAdvize project"
+    projectId: Int!
+  ): [VisitorCustomData!]
+}
+
+"A quick reply menu attachment"
+type QuickReplyMenuAttachment {
+  "Choice of answers"
+  choices: [String!]!
+  "Text of the message"
+  message: String!
+}
+
+"Resume message sent event"
+type ResumeMessageSentSystemAttachment {
+  "Author describes who really sent the message"
+  author: ConversationParticipant
+  "SentAs describes what is shown to the visitor"
+  sentAs: ConversationParticipant
+  "Text of the resume message sent attachment"
+  text: String!
+}
+
+"A routing-event in the timeline of the conversation"
+type RoutingEvent {
+  "Date and time of the event"
+  createdAt: DateTime!
+  "Group of operators the conversation was routed to"
+  routingGroup: RoutingGroup
+  "The routing-rule applied for the conversation transfer/assignment"
+  routingRule: RoutingRule
+}
+
+"""
+Thanks to the routing groups, you can organise your teams in a flexible way by grouping your agents according
+to their role (agent, supervisor or administrator), group (i.e: contact centre) or skills (i.e: mobile, photography).
+A routing group is given a name and a set of segments defining which agents to include in the group.
+"""
+type RoutingGroup {
+  "The date and time when the group was created."
+  createdAt: DateTime!
+  "The identifier of the group."
+  id: UUID!
+  "The name given to the group."
+  name: String!
+  "Project of the routing group"
+  project: Project
+  "The list of segments defining which agents are included in the group."
+  segments: [RoutingSegment!]!
+  "The date and time when the group was last updated."
+  updatedAt: DateTime!
+  "The identifiers of the agents currently matching all segments of the group."
+  userIds: [LegacyId!]!
+  "Agents assigned to the routing group"
+  users(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): UserConnection
+  """
+  Identifies the website to which the routing group is attached.
+  The routing group may only be used by routing rules attached to the same website and appears in report charts of this website only.
+  """
+  websiteId: LegacyId! @deprecated(reason : "Use 'project' instead")
+}
+
+"When a routing rule is using the custom mode, conversations are distributed between the routing groups according to a ratio per group."
+type RoutingModeCustom {
+  "Distribution ratio for each routing group."
+  percents: [RoutingModeCustomPercentage!]!
+}
+
+"Distribution ratio of a routing group, for a routing rule using custom distribution mode."
+type RoutingModeCustomPercentage {
+  "The identifier of the routing group."
+  id: UUID!
+  "The distribution ratio of the routing group, expressed as a percentage."
+  percent: Int!
+}
+
+"When a routing rule is using the dynamic mode, conversations are distributed dynamically according to the skills of its users."
+type RoutingModeDynamic {
+  "GraphQL objects must contain at least one field. Returning the type of this routingMode."
+  type: String!
+}
+
+"When a routing rule is using the escalation mode, conversations are distributed to the next routing group, in order, only if agents of the previous group have reached their maximum occupancy."
+type RoutingModeEscalation {
+  "The order of the routing group identifiers in this list determines the escalation order, the first group being the one with highest priority."
+  order: [UUID!]!
+}
+
+"When a routing rule is using the fair mode, conversations are distributed evenly between the routing groups."
+type RoutingModeFair {
+  "This field is unused and is only present for the technical reason that GraphQL objects must contain at least one field."
+  _unusedField: Boolean!
+}
+
+"Routing rules determine how to distribute conversations from a set of targeting rules to a set of routing groups, according to a routing mode."
+type RoutingRule {
+  """
+  Channel availabilities for the RoutingRule.
+  Note that due to performance limitations, only one `availability` field can be resolved by query,
+  which means listing RoutingRules while requiring availability will cause empty field with error.
+  """
+  availability(
+    "Language used to compute availability"
+    lang: Language
+  ): RoutingRuleAvailability
+  "True if this rule is allowed to receive transferred conversations."
+  canReceiveTransferredConversations: Boolean!
+  "The date and time when the rule was created."
+  createdAt: DateTime!
+  "Conversations handled by the routing rule will be distributed to these routing groups."
+  groups: [RoutingGroup!] @deprecated(reason : "Use routingGroups field instead")
+  "The identifier of the rule."
+  id: UUID!
+  "The name of the rule."
+  name: String!
+  "Conversations handled by the routing rule will be distributed to these routing groups."
+  routingGroups(
+    "Returns the elements in the list that come after the specified cursor."
+    after: String,
+    "Returns the elements in the list that come before the specified cursor."
+    before: String,
+    "Returns the first n elements from the list."
+    first: Int,
+    "Returns the last n elements from the list."
+    last: Int
+  ): RoutingRuleRoutingGroupConnection
+  "The routing mode determines how conversations will be distributed to the groups assigned to this rule."
+  routingMode: RoutingMode!
+  "Total number of slots in conversation queues for the routing rule"
+  totalConversationQueueSlots: Int!
+  "The date and time when the rule was last updated."
+  updatedAt: DateTime!
+  "Identifies the website to which the routing rule is attached."
+  websiteId: LegacyId!
+}
+
+"Contains all channel's availabilities for the RoutingRule. Each field is a channel"
+type RoutingRuleAvailability {
+  call: RoutingRuleChannelAvailability!
+  chat: RoutingRuleChannelAvailability!
+  mobileApp: RoutingRuleChannelAvailability!
+  thirdParties: RoutingRuleChannelAvailability!
+  video: RoutingRuleChannelAvailability!
+}
+
+"Contains availability for a Channel for a RoutingRule. See fields for more details."
+type RoutingRuleChannelAvailability {
+  "A RoutingRule's channel is available if it has at least one operator online and available"
+  isAvailable: Boolean!
+}
+
+"A connection to a list of items."
+type RoutingRuleConnection {
+  "A list of edges."
+  edges: [RoutingRuleEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type RoutingRuleEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: RoutingRule!
+}
+
+"A connection to a list of items."
+type RoutingRuleRoutingGroupConnection {
+  "A list of edges."
+  edges: [RoutingRuleRoutingGroupEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type RoutingRuleRoutingGroupEdge {
+  "Slots in conversation queue"
+  conversationQueueSlots: Int!
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: RoutingGroup!
+}
+
+"Routing group segment used to dynamically match agents based on their skills."
+type RoutingSegmentUserDynamic implements RoutingSegment {
+  "Match agents based on these location skill."
+  geoSkill: LegacyId!
+  "The operator determines if any, all, or none of the values of the segment must match."
+  logicalOperator: RoutingSegmentLogicalOperator!
+  "Match agents based on these skills."
+  skills: [LegacyId!]!
+}
+
+"Routing group segment used to match agents based on their groups."
+type RoutingSegmentUserGroups implements RoutingSegment {
+  "Match agents based on these groups."
+  groupIds: [LegacyId!]!
+  logicalOperator: RoutingSegmentLogicalOperator!
+}
+
+"Routing group segment used to match agents based on their identifier."
+type RoutingSegmentUserIds implements RoutingSegment {
+  logicalOperator: RoutingSegmentLogicalOperator!
+  "Match agents based on these identifiers."
+  userIds: [LegacyId!]!
+}
+
+"Routing group segment used to match agents based on their role."
+type RoutingSegmentUserRoles implements RoutingSegment {
+  logicalOperator: RoutingSegmentLogicalOperator!
+  "Match agents based on these roles."
+  roles: [RoutingUserRole!]!
+}
+
+"Routing group segment used to match agents based on their skills."
+type RoutingSegmentUserSkills implements RoutingSegment {
+  logicalOperator: RoutingSegmentLogicalOperator!
+  "Match agents based on these skills."
+  skillIds: [LegacyId!]!
+}
+
+"Error returned by the professionalCreate mutation when the provided SAML user id is already used by another user."
+type SAMLUserIdAlreadyUsedProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+"Error returned by the professionalCreate mutation when the provided SAML user id is empty."
+type SAMLUserIdIsEmptyProfessionalCreateUserError implements UserError {
+  "Error message providing more details about the error."
+  message: String!
+}
+
+type SatisfactionConversation {
+  "Agents who took part in the conversation"
+  agents: [User!]!
+  "Date when the conversation was closed"
+  closedAt: DateTime!
+  "Date when the conversation was initiated"
+  createdAt: DateTime!
+  "Conversation unique id"
+  id: String!
+  "The project which the conversation belongs to"
+  project: Project
+}
+
+type SatisfactionSurvey {
+  "Visitor's conversation comment"
+  comment: String
+  "Response to customer satisfaction question between 1 to 5"
+  customerSatisfaction: Int
+  "Response to net promoter score question between 0 to 10"
+  netPromoterScore: Int
+}
+
+type SatisfactionSurveyResponse {
+  "Related conversation"
+  conversation: SatisfactionConversation!
+  "Responses of customer satisfaction question"
+  customerSatisfaction: Int
+  "Responses of net promoter score question"
+  netPromoterScore: Int
+  "Responses of free comment question"
+  satisfactionComment: String
+}
+
+type SatisfactionSurveyResponseNode {
+  "Responses of a satisfaction survey"
+  node: SatisfactionSurveyResponse!
+}
+
+type SatisfactionSurveyResponses {
+  "Page of satisfaction survey responses"
+  edges: [SatisfactionSurveyResponseNode!]!
+  pageInfo: SatisfactionSurveyResponsesPageInfo!
+}
+
+type SatisfactionSurveyResponsesPageInfo {
+  "Cursor to fetch the next page"
+  endCursor: String
+  "True if there is more pages"
+  hasNextPage: Boolean!
+}
+
+"An item of search closed conversations response"
+type SearchClosedConversationsResult {
+  "Conversation matching search"
+  conversation: Conversation!
+}
+
+"Pagination for search closed conversations response"
+type SearchClosedConversationsResultConnection {
+  "Page of search results"
+  edges: [SearchClosedConversationsResultEdge!]!
+  filteredConversationsCount: Int!
+  pageInfo: PageInfo!
+}
+
+"Pagination wrapper"
+type SearchClosedConversationsResultEdge {
+  "A single search result"
+  node: SearchClosedConversationsResult!
+}
+
+"""
+Users can be organized by skills in order to automatically direct visitors to the right users.
+For more information regarding how to use skills, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+"""
+type Skill {
+  "Created date"
+  createdAt: DateTime!
+  "Skill identifier"
+  id: Long!
+  "Location of the skill"
+  location: Location
+  "Skill name"
+  name: String!
+  "The parent of this skill"
+  parent: Skill
+  "The root of this skill"
+  root: Skill
+  "Telephone number"
+  telephoneNumber: String
+  "Updated date"
+  updatedAt: DateTime!
+  "Number of users that have the given skill"
+  userCount: Int!
+}
+
+"A successful Apple pay payment response attachment"
+type SuccessfulApplePayPaymentResponseAttachment {
+  "Identifier of the Apple Pay payment request event"
+  correlationId: UUID!
+}
+
+"A successful visitor authentication response attachment"
+type SuccessfulAuthenticationResponseAttachment {
+  "Identifier of the authentication request event"
+  correlationId: UUID!
+}
+
+"Supervisor comment sent event"
+type SupervisorCommentSentSystemAttachment {
+  "Supervisor comment"
+  text: String!
+}
+
+"Conversation survey message"
+type SurveyMessageSystemAttachment {
+  "Message of the survey"
+  message: String!
+}
+
+"Conversation survey multiple choices question"
+type SurveyMultiChoiceQuestionSystemAttachment {
+  "Choices of answers"
+  choices: [String!]!
+  "Question of the survey"
+  question: String!
+}
+
+"Conversation survey question"
+type SurveyQuestionSystemAttachment {
+  "Question of the survey"
+  question: String!
+}
+
+"System message"
+type SystemMessage implements ConversationMessage {
+  "System message attachments"
+  attachments: [SystemConversationMessageAttachment!]!
+  "Creation date"
+  createdAt: DateTime!
+  "Id of the message"
+  systemMessageId: UUID!
+}
+
+type TargetingRule {
+  externalId: String!
+  id: UUID!
+  name: String!
+}
+
+"Account from third party messaging channels"
+type ThirdPartyAccount {
+  "Avatar url of the account"
+  avatarUrl: URL
+  "Name of the account"
+  name: String!
+  "Id of the account"
+  thirdPartyAccountId: String!
+  "Username of the account"
+  username: String
+}
+
+"A time picker attachment"
+type TimePickerAttachment {
+  "Identifier of the event"
+  correlationId: UUID!
+  "Image of the event"
+  image: ConversationMessageAttachmentImageLink
+  "Location of the event"
+  location: LocationAttachment
+  "Displayed message when the visitor receives the picker"
+  receivedMessage: CardAttachment!
+  "Displayed message when the visitor submits the picker"
+  replyMessage: CardAttachment!
+  "Time slots of the event"
+  timeSlots: [TimeSlotAttachment!]!
+  "Number of minutes from GMT specifying the timezone of the event's location"
+  timezoneOffset: Int!
+  "Title of the event"
+  title: String!
+}
+
+"A time picker response attachment"
+type TimePickerResponseAttachment {
+  "Identifier of the time picker event"
+  correlationId: UUID!
+  "Image of the event"
+  image: ConversationMessageAttachmentImageLink
+  "Location of the event"
+  location: LocationAttachment
+  "Selected time slot"
+  timeSlot: TimeSlotAttachment!
+  "Number of minutes from GMT specifying the timezone of the event's location"
+  timezoneOffset: Int!
+  "Title of the event"
+  title: String!
+}
+
+"A time slot"
+type TimeSlotAttachment {
+  "Duration of the time slot, in seconds"
+  duration: Duration!
+  "Identifier of the time slot"
+  id: UUID!
+  "UTC start date of the time slot"
+  startTime: DateTime!
+}
+
+"A transaction such as a purchase"
+type Transaction {
+  "Amount of the transaction"
+  amount: Float!
+  "Id of the conversation linked to the transaction, if any"
+  conversationId: UUID
+  "Date and time of the registration of the transaction in iAdvize's system"
+  createdAt: DateTime!
+  "ISO Code of the currency used for the payment"
+  currency: String!
+  "Date and time of the event"
+  eventDate: DateTime!
+  "Client-side id for the transaction"
+  externalConversionId: String!
+  "Id of the transaction"
+  id: UUID!
+  "Flag that indicates whether or not the transaction was concluded by an authenticated visitor"
+  isAuthenticated: Boolean
+  "The transaction's platform (HA or SD)"
+  platformId: String!
+  "Engagement campaign project"
+  project: Project
+  "DEPRECATED (use visitorDate): Date and time of the transaction in the website"
+  receivedAt: DateTime!
+  "Source of the transaction (ONSITE for example)"
+  source: ConversionSource!
+  "Visitor id linked to the source (vuid for example)"
+  sourceVisitorId: String!
+  "Date and time of the update of the transaction in iAdvize's system"
+  updatedAt: DateTime!
+  "Date and time of the transaction in the website"
+  visitorDate: DateTime!
+}
+
+"Conversation transferred to routing rule event"
+type TransferredToRoutingRuleSystemAttachment {
+  "Participant who transferred the message"
+  fromUser: User
+  "Reason of the transfer"
+  reason: String
+  "Transferred skills"
+  skills: [Int!]
+  "Routing rule receiving the transferred message"
+  toRoutingRule: RoutingRule
+}
+
+"Conversation transferred to user event"
+type TransferredToUserSystemAttachment {
+  "Participant who transferred the message"
+  fromUser: User
+  "Reason of the transfer"
+  reason: String
+  "Participant who is receiving the transferred message"
+  toUser: User
+}
+
+"Fallback attachment type"
+type UnsupportedAttachment {
+  "This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean
+}
+
+"Fallback attachment type"
+type UnsupportedSystemMessageAttachment {
+  "This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean
+}
+
+"Successful payload response for the use cancel extended presence mutation"
+type UserCancelExtendedPresencePayload {
+  "An unused field to avoid empty objects"
+  _unusedField: Boolean!
+}
+
+"A connection to a list of items."
+type UserConnection {
+  "A list of edges."
+  edges: [UserEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"Return type of the `userDelete` mutation."
+type UserDeletePayload {
+  "Errors which prevented the user from being deleted."
+  userErrors: [UserDeleteError!]
+  "Id of the deleted user."
+  userId: LegacyId
+}
+
+"An edge in a connection."
+type UserEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: User!
+}
+
+"""
+User groups allow information and user exchanges to be compartmentalised in the iAdvize administration.
+For more information regarding user groups, please see the following documentation: https://help.iadvize.com/hc/en-gb/articles/203280696-Use-the-user-groups.
+"""
+type UserGroup {
+  "Group id"
+  id: LegacyId!
+  "Group name"
+  label: String @deprecated(reason : "Please use the `name` field instead.")
+  "Group name"
+  name: String
+}
+
+"""
+This error is returned by the `userDelete` mutation when the user to be deleted has ongoing conversations, and therefore cannot be deleted.
+To delete this user, the ongoing conversations must first be transferred to another user, or closed.
+"""
+type UserHasOngoingConversationsUserDeleteError {
+  "Error message"
+  message: String!
+}
+
+"A connection to a list of items."
+type UserProjectConnection {
+  "A list of edges."
+  edges: [UserProjectEdge]
+  "Information to aid in pagination."
+  pageInfo: PageInfo!
+}
+
+"An edge in a connection."
+type UserProjectEdge {
+  "A cursor for use in pagination."
+  cursor: String!
+  "The item at the end of the edge."
+  node: Project!
+}
+
+"Average chat occupancy for users currently in production"
+type UsersInProductionOccupancy {
+  "Average maximum simultaneous conversation number for users currently in production"
+  maximumSimultaneousConversationAverage: Float
+  "Occupancy rate for users currently connected to the desk"
+  occupancyRate: Float
+  "Average simultaneous conversations number for users currently in production"
+  simultaneousConversationAverage: Float
+}
+
+"Video type"
+type VideoAttachment {
+  "Description of the video"
+  description: String!
+  "Url of the video"
+  url: URL!
+}
+
+"A visitor is a user who has participated at least once in an iAdvize conversation from his browser, a mobile application or one of the third-party channels supported by iAdvize."
+type Visitor {
+  "Please do not include this field in your query. This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean @deprecated(reason : "Please do not include this field in your query.")
+  "Address of the visitor."
+  address: String
+  "City of the visitor."
+  city: String
+  "Country of the visitor."
+  country: String
+  "Date at which the visitor was created. This is usually when the visitor started their first conversation."
+  createdAt: DateTime!
+  "Email of the visitor."
+  email: String
+  "External identifier of the visitor used for conversation continuity: is deprecated and replaced by the externalUserId field."
+  externalId: String @deprecated(reason : "This field should not be used, please use the externalUserId field.")
+  "This field allows you to link an iAdvize visitor and your own customer record in your internal tools (databases, CRM, etc.) allowing confidentiality and continuity of conversation for this visitor. This field is filled in thanks to the visitor authentication mechanism offered by iAdvize."
+  externalUserId: String
+  "First name of the visitor."
+  firstName: String
+  "Last name of the visitor."
+  lastName: String
+  "Phone number of the visitor."
+  phoneNumber: String
+  "Project of the visitor domain."
+  project: Project
+  "Source of the visitor from where the conversation was started (e.g. ONSITE, MOBILE_APP)."
+  source: Source!
+  "Last updated date of the visitor."
+  updatedAt: DateTime!
+  "Unique cross channel identifier of an iAdvize visitor."
+  visitorId: UUID!
+  "ZipCode of the visitor."
+  zipCode: String
+}
+
+"Visitor blocked event"
+type VisitorBlockedSystemAttachment {
+  "User who blocked the visitor"
+  byUser: User
+}
+
+type VisitorConversationCustomData {
+  conversationId: UUID!
+  customData: [VisitorConversationCustomDataEntry!]!
+  id: UUID!
+}
+
+"A visitor custom data of type Boolean"
+type VisitorConversationCustomDataEntryBoolean {
+  booleanValue: Boolean!
+  key: String!
+}
+
+"A visitor custom data of type Float"
+type VisitorConversationCustomDataEntryFloat {
+  floatValue: Float!
+  key: String!
+}
+
+"A visitor custom data of type Int (32 bits)"
+type VisitorConversationCustomDataEntryInt {
+  intValue: Int!
+  key: String!
+}
+
+"A visitor custom data of type String"
+type VisitorConversationCustomDataEntryString {
+  key: String!
+  stringValue: String!
+}
+
+"A visitor custom data of type Boolean"
+type VisitorCustomDataBoolean {
+  booleanValue: Boolean!
+  key: String!
+}
+
+"A visitor custom data of type Float"
+type VisitorCustomDataFloat {
+  floatValue: Float!
+  key: String!
+}
+
+"A visitor custom data of type Int (32 bits)"
+type VisitorCustomDataInt {
+  intValue: Int!
+  key: String!
+}
+
+"A visitor custom data of type String"
+type VisitorCustomDataString {
+  key: String!
+  stringValue: String!
+}
+
+"Visitor left event"
+type VisitorLeftSystemAttachment {
+  "This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean
+}
+
+"Visitor notification settings requested event"
+type VisitorNotificationSettingsRequestedSystemAttachment {
+  "Id of the event"
+  correlationId: UUID!
+}
+
+"Visitor notification settings set event"
+type VisitorNotificationSettingsSetSystemAttachment {
+  "Id of the event"
+  correlationId: UUID!
+}
+
+"Visitor returned event"
+type VisitorReturnedSystemAttachment {
+  "This field is only present for the technical reason that GraphQL object types must contain at least one field. Its value is always `null`."
+  _unusedField: Boolean
+}
+
+"Possible Apple Pay contact fields"
+enum ApplePayContactField {
+  "Email address of the Apple Pay contact"
+  EMAIL
+  "Full name of the Apple Pay contact"
+  NAME
+  "Phonetic spelling of the contact's given name"
+  PHONETIC_NAME
+  "Postal address of the Apple Pay contact"
+  POSTAL_ADDRESS
+}
+
+"Possible Apple Pay line item type"
+enum ApplePayLineItemType {
+  "Final payment type"
+  FINAL
+  "Pending payment type"
+  PENDING
+}
+
+"Level of automation of a conversation"
+enum AutomationLevel {
+  FULLY_AUTOMATED
+  NOT_AUTOMATED
+  PARTIALLY_AUTOMATED
+}
+
+"Canned answers category sorting order"
+enum CannedAnswersCategorySortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_CATEGORY_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_CATEGORY_ORDER
+  "Manual order"
+  MANUAL_CATEGORY_ORDER
+}
+
+"Canned answers sorting order"
+enum CannedAnswersSortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_ORDER
+}
+
+"Type of action in a card bundle"
+enum CardBundleAttachmentActionType {
+  "Link action type"
+  LINK
+  "Select action type"
+  SELECT
+}
+
+"Communication channels supported by iAdvize. (to be replaced by high granularity Channel type)"
+enum Channel {
+  "Apple Business Chat channel"
+  APPLE_BUSINESS_CHAT
+  "Call channel"
+  CALL
+  "Chat channel"
+  CHAT
+  "Facebook channel"
+  FACEBOOK
+  "Facebook Business On Messenger channel"
+  FACEBOOK_BUSINESS_ON_MESSENGER
+  "Google Business Messages channel"
+  GOOGLE_BUSINESS_MESSAGES
+  "Facebook channel"
+  INSTAGRAM
+  "Mobile App  channel"
+  MOBILE_APP
+  "SMS channel"
+  SMS
+  "Twitter channel"
+  TWITTER
+  "Video channel"
+  VIDEO
+  "WhatsApp channel"
+  WHATSAPP
+}
+
+"Plugin type, see the plugins documentation: https://developers.iadvize.com/documentation/build-apps#app-plugins"
+enum ConnectorPluginType {
+  "CHATBOT"
+  CHATBOT
+  "CONVERSATION_CLOSING_FORM"
+  CONVERSATION_CLOSING_FORM
+  "CONVERSATION_PANEL_APP"
+  CONVERSATION_PANEL_APP
+  "CUSTOMER_INFORMATION"
+  CUSTOMER_INFORMATION
+  "PRODUCT_LIST"
+  PRODUCT_LIST
+}
+
+"Type of connector version parameter"
+enum ConnectorVersionParameterType {
+  "Used by authentication step. Allows to specify all parameters needed for authentication, like token or password"
+  AUTHENTICATION
+  "Used by settings step. Allow you to specify settings field for this connector version"
+  SETTING
+}
+
+"Status of the connector version"
+enum ConnectorVersionStatus {
+  "Version is available on the marketplace"
+  PUBLISHED
+  "Version is awaiting review from iAdvize. If review is validated, status is updated to PUBLISHED"
+  REVIEW
+  "Draft mode. Only visible for the client linked to the developer user. When a SANDBOX is submitted, its status is updated to REVIEW"
+  SANDBOX
+}
+
+"Type of session"
+enum ConversationSessionType {
+  "Video session"
+  VIDEO
+}
+
+"Possible user types assigned to a tag."
+enum ConversationTagUserType {
+  EXPERT
+  PROFESSIONAL
+}
+
+"The source of the conversion"
+enum ConversionSource {
+  "The conversion comes from a mobile app"
+  MOBILE_APP
+  "The conversion comes from a browser"
+  ONSITE
+}
+
+"ISO4217 currency code"
+enum Currency {
+  "Andorran Peseta (ADP ADP)"
+  ADP
+  "United Arab Emirates Dirham (AED AED)"
+  AED
+  "Afghan Afghani (1927–2002) (AFA AFA)"
+  AFA
+  "Afghan Afghani (AFN AFN)"
+  AFN
+  "Albanian Lek (ALL ALL)"
+  ALL
+  "Armenian Dram (AMD AMD)"
+  AMD
+  "Netherlands Antillean Guilder (ANG ANG)"
+  ANG
+  "Angolan Kwanza (AOA AOA)"
+  AOA
+  "Argentine Peso (ARS ARS)"
+  ARS
+  "Austrian Schilling (ATS ATS)"
+  ATS
+  "Australian Dollar (AUD A$)"
+  AUD
+  "Aruban Florin (AWG AWG)"
+  AWG
+  "AYM (AYM AYM)"
+  AYM
+  "Azerbaijani Manat (1993–2006) (AZM AZM)"
+  AZM
+  "Azerbaijani Manat (AZN AZN)"
+  AZN
+  "Bosnia-Herzegovina Convertible Mark (BAM BAM)"
+  BAM
+  "Barbadian Dollar (BBD BBD)"
+  BBD
+  "Bangladeshi Taka (BDT BDT)"
+  BDT
+  "Belgian Franc (BEF BEF)"
+  BEF
+  "Bulgarian Hard Lev (BGL BGL)"
+  BGL
+  "Bulgarian Lev (BGN BGN)"
+  BGN
+  "Bahraini Dinar (BHD BHD)"
+  BHD
+  "Burundian Franc (BIF BIF)"
+  BIF
+  "Bermudan Dollar (BMD BMD)"
+  BMD
+  "Brunei Dollar (BND BND)"
+  BND
+  "Bolivian Boliviano (BOB BOB)"
+  BOB
+  "Bolivian Mvdol (BOV BOV)"
+  BOV
+  "Brazilian Real (BRL R$)"
+  BRL
+  "Bahamian Dollar (BSD BSD)"
+  BSD
+  "Bhutanese Ngultrum (BTN BTN)"
+  BTN
+  "Botswanan Pula (BWP BWP)"
+  BWP
+  "Belarusian Ruble (1994–1999) (BYB BYB)"
+  BYB
+  "Belarusian Ruble (BYN BYN)"
+  BYN
+  "Belarusian Ruble (2000–2016) (BYR BYR)"
+  BYR
+  "Belize Dollar (BZD BZD)"
+  BZD
+  "Canadian Dollar (CAD CA$)"
+  CAD
+  "Congolese Franc (CDF CDF)"
+  CDF
+  "WIR Euro (CHE CHE)"
+  CHE
+  "Swiss Franc (CHF CHF)"
+  CHF
+  "WIR Franc (CHW CHW)"
+  CHW
+  "Chilean Unit of Account (UF) (CLF CLF)"
+  CLF
+  "Chilean Peso (CLP CLP)"
+  CLP
+  "Chinese Yuan (CNY CN¥)"
+  CNY
+  "Colombian Peso (COP COP)"
+  COP
+  "Colombian Real Value Unit (COU COU)"
+  COU
+  "Costa Rican Colón (CRC CRC)"
+  CRC
+  "Serbian Dinar (2002–2006) (CSD CSD)"
+  CSD
+  "Cuban Convertible Peso (CUC CUC)"
+  CUC
+  "Cuban Peso (CUP CUP)"
+  CUP
+  "Cape Verdean Escudo (CVE CVE)"
+  CVE
+  "Cypriot Pound (CYP CYP)"
+  CYP
+  "Czech Koruna (CZK CZK)"
+  CZK
+  "German Mark (DEM DEM)"
+  DEM
+  "Djiboutian Franc (DJF DJF)"
+  DJF
+  "Danish Krone (DKK DKK)"
+  DKK
+  "Dominican Peso (DOP DOP)"
+  DOP
+  "Algerian Dinar (DZD DZD)"
+  DZD
+  "Estonian Kroon (EEK EEK)"
+  EEK
+  "Egyptian Pound (EGP EGP)"
+  EGP
+  "Eritrean Nakfa (ERN ERN)"
+  ERN
+  "Spanish Peseta (ESP ESP)"
+  ESP
+  "Ethiopian Birr (ETB ETB)"
+  ETB
+  "Euro (EUR €)"
+  EUR
+  "Finnish Markka (FIM FIM)"
+  FIM
+  "Fijian Dollar (FJD FJD)"
+  FJD
+  "Falkland Islands Pound (FKP FKP)"
+  FKP
+  "French Franc (FRF FRF)"
+  FRF
+  "British Pound (GBP £)"
+  GBP
+  "Georgian Lari (GEL GEL)"
+  GEL
+  "Ghanaian Cedi (1979–2007) (GHC GHC)"
+  GHC
+  "Ghanaian Cedi (GHS GHS)"
+  GHS
+  "Gibraltar Pound (GIP GIP)"
+  GIP
+  "Gambian Dalasi (GMD GMD)"
+  GMD
+  "Guinean Franc (GNF GNF)"
+  GNF
+  "Greek Drachma (GRD GRD)"
+  GRD
+  "Guatemalan Quetzal (GTQ GTQ)"
+  GTQ
+  "Guinea-Bissau Peso (GWP GWP)"
+  GWP
+  "Guyanaese Dollar (GYD GYD)"
+  GYD
+  "Hong Kong Dollar (HKD HK$)"
+  HKD
+  "Honduran Lempira (HNL HNL)"
+  HNL
+  "Croatian Kuna (HRK HRK)"
+  HRK
+  "Haitian Gourde (HTG HTG)"
+  HTG
+  "Hungarian Forint (HUF HUF)"
+  HUF
+  "Indonesian Rupiah (IDR IDR)"
+  IDR
+  "Irish Pound (IEP IEP)"
+  IEP
+  "Israeli New Shekel (ILS ₪)"
+  ILS
+  "Indian Rupee (INR ₹)"
+  INR
+  "Iraqi Dinar (IQD IQD)"
+  IQD
+  "Iranian Rial (IRR IRR)"
+  IRR
+  "Icelandic Króna (ISK ISK)"
+  ISK
+  "Italian Lira (ITL ITL)"
+  ITL
+  "Jamaican Dollar (JMD JMD)"
+  JMD
+  "Jordanian Dinar (JOD JOD)"
+  JOD
+  "Japanese Yen (JPY ¥)"
+  JPY
+  "Kenyan Shilling (KES KES)"
+  KES
+  "Kyrgystani Som (KGS KGS)"
+  KGS
+  "Cambodian Riel (KHR KHR)"
+  KHR
+  "Comorian Franc (KMF KMF)"
+  KMF
+  "North Korean Won (KPW KPW)"
+  KPW
+  "South Korean Won (KRW ₩)"
+  KRW
+  "Kuwaiti Dinar (KWD KWD)"
+  KWD
+  "Cayman Islands Dollar (KYD KYD)"
+  KYD
+  "Kazakhstani Tenge (KZT KZT)"
+  KZT
+  "Laotian Kip (LAK LAK)"
+  LAK
+  "Lebanese Pound (LBP LBP)"
+  LBP
+  "Sri Lankan Rupee (LKR LKR)"
+  LKR
+  "Liberian Dollar (LRD LRD)"
+  LRD
+  "Lesotho Loti (LSL LSL)"
+  LSL
+  "Lithuanian Litas (LTL LTL)"
+  LTL
+  "Luxembourgian Franc (LUF LUF)"
+  LUF
+  "Latvian Lats (LVL LVL)"
+  LVL
+  "Libyan Dinar (LYD LYD)"
+  LYD
+  "Moroccan Dirham (MAD MAD)"
+  MAD
+  "Moldovan Leu (MDL MDL)"
+  MDL
+  "Malagasy Ariary (MGA MGA)"
+  MGA
+  "Malagasy Franc (MGF MGF)"
+  MGF
+  "Macedonian Denar (MKD MKD)"
+  MKD
+  "Myanmar Kyat (MMK MMK)"
+  MMK
+  "Mongolian Tugrik (MNT MNT)"
+  MNT
+  "Macanese Pataca (MOP MOP)"
+  MOP
+  "Mauritanian Ouguiya (1973–2017) (MRO MRO)"
+  MRO
+  "Mauritanian Ouguiya (MRU MRU)"
+  MRU
+  "Maltese Lira (MTL MTL)"
+  MTL
+  "Mauritian Rupee (MUR MUR)"
+  MUR
+  "Maldivian Rufiyaa (MVR MVR)"
+  MVR
+  "Malawian Kwacha (MWK MWK)"
+  MWK
+  "Mexican Peso (MXN MX$)"
+  MXN
+  "Mexican Investment Unit (MXV MXV)"
+  MXV
+  "Malaysian Ringgit (MYR MYR)"
+  MYR
+  "Mozambican Metical (1980–2006) (MZM MZM)"
+  MZM
+  "Mozambican Metical (MZN MZN)"
+  MZN
+  "Namibian Dollar (NAD NAD)"
+  NAD
+  "Nigerian Naira (NGN NGN)"
+  NGN
+  "Nicaraguan Córdoba (NIO NIO)"
+  NIO
+  "Dutch Guilder (NLG NLG)"
+  NLG
+  "Norwegian Krone (NOK NOK)"
+  NOK
+  "Nepalese Rupee (NPR NPR)"
+  NPR
+  "New Zealand Dollar (NZD NZ$)"
+  NZD
+  "Omani Rial (OMR OMR)"
+  OMR
+  "Panamanian Balboa (PAB PAB)"
+  PAB
+  "Peruvian Sol (PEN PEN)"
+  PEN
+  "Papua New Guinean Kina (PGK PGK)"
+  PGK
+  "Philippine Piso (PHP PHP)"
+  PHP
+  "Pakistani Rupee (PKR PKR)"
+  PKR
+  "Polish Zloty (PLN PLN)"
+  PLN
+  "Portuguese Escudo (PTE PTE)"
+  PTE
+  "Paraguayan Guarani (PYG PYG)"
+  PYG
+  "Qatari Rial (QAR QAR)"
+  QAR
+  "Romanian Leu (1952–2006) (ROL ROL)"
+  ROL
+  "Romanian Leu (RON RON)"
+  RON
+  "Serbian Dinar (RSD RSD)"
+  RSD
+  "Russian Ruble (RUB RUB)"
+  RUB
+  "Russian Ruble (1991–1998) (RUR RUR)"
+  RUR
+  "Rwandan Franc (RWF RWF)"
+  RWF
+  "Saudi Riyal (SAR SAR)"
+  SAR
+  "Solomon Islands Dollar (SBD SBD)"
+  SBD
+  "Seychellois Rupee (SCR SCR)"
+  SCR
+  "Sudanese Dinar (1992–2007) (SDD SDD)"
+  SDD
+  "Sudanese Pound (SDG SDG)"
+  SDG
+  "Swedish Krona (SEK SEK)"
+  SEK
+  "Singapore Dollar (SGD SGD)"
+  SGD
+  "St. Helena Pound (SHP SHP)"
+  SHP
+  "Slovenian Tolar (SIT SIT)"
+  SIT
+  "Slovak Koruna (SKK SKK)"
+  SKK
+  "Sierra Leonean Leone (SLL SLL)"
+  SLL
+  "Somali Shilling (SOS SOS)"
+  SOS
+  "Surinamese Dollar (SRD SRD)"
+  SRD
+  "Surinamese Guilder (SRG SRG)"
+  SRG
+  "South Sudanese Pound (SSP SSP)"
+  SSP
+  "São Tomé & Príncipe Dobra (1977–2017) (STD STD)"
+  STD
+  "São Tomé & Príncipe Dobra (STN STN)"
+  STN
+  "Salvadoran Colón (SVC SVC)"
+  SVC
+  "Syrian Pound (SYP SYP)"
+  SYP
+  "Swazi Lilangeni (SZL SZL)"
+  SZL
+  "Thai Baht (THB THB)"
+  THB
+  "Tajikistani Somoni (TJS TJS)"
+  TJS
+  "Turkmenistani Manat (1993–2009) (TMM TMM)"
+  TMM
+  "Turkmenistani Manat (TMT TMT)"
+  TMT
+  "Tunisian Dinar (TND TND)"
+  TND
+  "Tongan Paʻanga (TOP TOP)"
+  TOP
+  "Timorese Escudo (TPE TPE)"
+  TPE
+  "Turkish Lira (1922–2005) (TRL TRL)"
+  TRL
+  "Turkish Lira (TRY TRY)"
+  TRY
+  "Trinidad & Tobago Dollar (TTD TTD)"
+  TTD
+  "New Taiwan Dollar (TWD NT$)"
+  TWD
+  "Tanzanian Shilling (TZS TZS)"
+  TZS
+  "Ukrainian Hryvnia (UAH UAH)"
+  UAH
+  "Ugandan Shilling (UGX UGX)"
+  UGX
+  "US Dollar (USD $)"
+  USD
+  "US Dollar (Next day) (USN USN)"
+  USN
+  "US Dollar (Same day) (USS USS)"
+  USS
+  "Uruguayan Peso (Indexed Units) (UYI UYI)"
+  UYI
+  "Uruguayan Peso (UYU UYU)"
+  UYU
+  "Uzbekistani Som (UZS UZS)"
+  UZS
+  "Venezuelan Bolívar (1871–2008) (VEB VEB)"
+  VEB
+  "Venezuelan Bolívar Soberano (VED VED)"
+  VED
+  "Venezuelan Bolívar (VEF VEF)"
+  VEF
+  "Venezuelan Bolívar Soberano (VES VES)"
+  VES
+  "Vietnamese Dong (VND ₫)"
+  VND
+  "Vanuatu Vatu (VUV VUV)"
+  VUV
+  "Samoan Tala (WST WST)"
+  WST
+  "Central African CFA Franc (XAF FCFA)"
+  XAF
+  "Silver (XAG XAG)"
+  XAG
+  "Gold (XAU XAU)"
+  XAU
+  "European Composite Unit (XBA XBA)"
+  XBA
+  "European Monetary Unit (XBB XBB)"
+  XBB
+  "European Unit of Account (XBC) (XBC XBC)"
+  XBC
+  "European Unit of Account (XBD) (XBD XBD)"
+  XBD
+  "East Caribbean Dollar (XCD EC$)"
+  XCD
+  "Special Drawing Rights (XDR XDR)"
+  XDR
+  "French Gold Franc (XFO XFO)"
+  XFO
+  "French UIC-Franc (XFU XFU)"
+  XFU
+  "West African CFA Franc (XOF CFA)"
+  XOF
+  "Palladium (XPD XPD)"
+  XPD
+  "CFP Franc (XPF CFPF)"
+  XPF
+  "Platinum (XPT XPT)"
+  XPT
+  "Sucre (XSU XSU)"
+  XSU
+  "Testing Currency Code (XTS XTS)"
+  XTS
+  "ADB Unit of Account (XUA XUA)"
+  XUA
+  "Unknown Currency (XXX XXX)"
+  XXX
+  "Yemeni Rial (YER YER)"
+  YER
+  "Yugoslavian New Dinar (1994–2002) (YUM YUM)"
+  YUM
+  "South African Rand (ZAR ZAR)"
+  ZAR
+  "Zambian Kwacha (1968–2012) (ZMK ZMK)"
+  ZMK
+  "Zambian Kwacha (ZMW ZMW)"
+  ZMW
+  "Zimbabwean Dollar (1980–2008) (ZWD ZWD)"
+  ZWD
+  "Zimbabwean Dollar (2009) (ZWL ZWL)"
+  ZWL
+  "ZWN (ZWN ZWN)"
+  ZWN
+  "Zimbabwean Dollar (2008) (ZWR ZWR)"
+  ZWR
+}
+
+"Reason why the escalation end"
+enum EscalationEndReason {
+  "Video call"
+  DECLINED
+  "Voice call"
+  HUNG_UP
+}
+
+"Type of escalation"
+enum EscalationType {
+  "Video call"
+  VIDEO
+  "Voice call"
+  VOICE
+}
+
+"ISO639-1 language"
+enum Language {
+  "Afar (aa)"
+  aa
+  "Abkhazian (ab)"
+  ab
+  "Avestan (ae)"
+  ae
+  "Afrikaans (af)"
+  af
+  "Akan (ak)"
+  ak
+  "Amharic (am)"
+  am
+  "Aragonese (an)"
+  an
+  "Arabic (ar)"
+  ar
+  "Assamese (as)"
+  as
+  "Avaric (av)"
+  av
+  "Aymara (ay)"
+  ay
+  "Azerbaijani (az)"
+  az
+  "Bashkir (ba)"
+  ba
+  "Belarusian (be)"
+  be
+  "Bulgarian (bg)"
+  bg
+  "Bihari (bh)"
+  bh
+  "Bislama (bi)"
+  bi
+  "Bambara (bm)"
+  bm
+  "Bangla (bn)"
+  bn
+  "Tibetan (bo)"
+  bo
+  "Breton (br)"
+  br
+  "Bosnian (bs)"
+  bs
+  "Catalan (ca)"
+  ca
+  "Chechen (ce)"
+  ce
+  "Chamorro (ch)"
+  ch
+  "Corsican (co)"
+  co
+  "Cree (cr)"
+  cr
+  "Czech (cs)"
+  cs
+  "Church Slavic (cu)"
+  cu
+  "Chuvash (cv)"
+  cv
+  "Welsh (cy)"
+  cy
+  "Danish (da)"
+  da
+  "German (de)"
+  de
+  "Divehi (dv)"
+  dv
+  "Dzongkha (dz)"
+  dz
+  "Ewe (ee)"
+  ee
+  "Greek (el)"
+  el
+  "English (en)"
+  en
+  "Esperanto (eo)"
+  eo
+  "Spanish (es)"
+  es
+  "Estonian (et)"
+  et
+  "Basque (eu)"
+  eu
+  "Persian (fa)"
+  fa
+  "Fulah (ff)"
+  ff
+  "Finnish (fi)"
+  fi
+  "Fijian (fj)"
+  fj
+  "Faroese (fo)"
+  fo
+  "French (fr)"
+  fr
+  "Western Frisian (fy)"
+  fy
+  "Irish (ga)"
+  ga
+  "Scottish Gaelic (gd)"
+  gd
+  "Galician (gl)"
+  gl
+  "Guarani (gn)"
+  gn
+  "Gujarati (gu)"
+  gu
+  "Manx (gv)"
+  gv
+  "Hausa (ha)"
+  ha
+  "Hebrew (he)"
+  he
+  "Hindi (hi)"
+  hi
+  "Hiri Motu (ho)"
+  ho
+  "Croatian (hr)"
+  hr
+  "Haitian Creole (ht)"
+  ht
+  "Hungarian (hu)"
+  hu
+  "Armenian (hy)"
+  hy
+  "Herero (hz)"
+  hz
+  "Interlingua (ia)"
+  ia
+  "Indonesian (id)"
+  id
+  "Interlingue (ie)"
+  ie
+  "Igbo (ig)"
+  ig
+  "Sichuan Yi (ii)"
+  ii
+  "Inupiaq (ik)"
+  ik
+  "Indonesian (in)"
+  in
+  "Ido (io)"
+  io
+  "Icelandic (is)"
+  is
+  "Italian (it)"
+  it
+  "Inuktitut (iu)"
+  iu
+  "Hebrew (iw)"
+  iw
+  "Japanese (ja)"
+  ja
+  "Yiddish (ji)"
+  ji
+  "Javanese (jv)"
+  jv
+  "Georgian (ka)"
+  ka
+  "Kongo (kg)"
+  kg
+  "Kikuyu (ki)"
+  ki
+  "Kuanyama (kj)"
+  kj
+  "Kazakh (kk)"
+  kk
+  "Kalaallisut (kl)"
+  kl
+  "Khmer (km)"
+  km
+  "Kannada (kn)"
+  kn
+  "Korean (ko)"
+  ko
+  "Kanuri (kr)"
+  kr
+  "Kashmiri (ks)"
+  ks
+  "Kurdish (ku)"
+  ku
+  "Komi (kv)"
+  kv
+  "Cornish (kw)"
+  kw
+  "Kyrgyz (ky)"
+  ky
+  "Latin (la)"
+  la
+  "Luxembourgish (lb)"
+  lb
+  "Ganda (lg)"
+  lg
+  "Limburgish (li)"
+  li
+  "Lingala (ln)"
+  ln
+  "Lao (lo)"
+  lo
+  "Lithuanian (lt)"
+  lt
+  "Luba-Katanga (lu)"
+  lu
+  "Latvian (lv)"
+  lv
+  "Malagasy (mg)"
+  mg
+  "Marshallese (mh)"
+  mh
+  "Maori (mi)"
+  mi
+  "Macedonian (mk)"
+  mk
+  "Malayalam (ml)"
+  ml
+  "Mongolian (mn)"
+  mn
+  "Moldavian (mo)"
+  mo
+  "Marathi (mr)"
+  mr
+  "Malay (ms)"
+  ms
+  "Maltese (mt)"
+  mt
+  "Burmese (my)"
+  my
+  "Nauru (na)"
+  na
+  "Norwegian Bokmål (nb)"
+  nb
+  "North Ndebele (nd)"
+  nd
+  "Nepali (ne)"
+  ne
+  "Ndonga (ng)"
+  ng
+  "Dutch (nl)"
+  nl
+  "Norwegian Nynorsk (nn)"
+  nn
+  "Norwegian (no)"
+  no
+  "South Ndebele (nr)"
+  nr
+  "Navajo (nv)"
+  nv
+  "Nyanja (ny)"
+  ny
+  "Occitan (oc)"
+  oc
+  "Ojibwa (oj)"
+  oj
+  "Oromo (om)"
+  om
+  "Odia (or)"
+  or
+  "Ossetic (os)"
+  os
+  "Punjabi (pa)"
+  pa
+  "Pali (pi)"
+  pi
+  "Polish (pl)"
+  pl
+  "Pashto (ps)"
+  ps
+  "Portuguese (pt)"
+  pt
+  "Quechua (qu)"
+  qu
+  "Romansh (rm)"
+  rm
+  "Rundi (rn)"
+  rn
+  "Romanian (ro)"
+  ro
+  "Russian (ru)"
+  ru
+  "Kinyarwanda (rw)"
+  rw
+  "Sanskrit (sa)"
+  sa
+  "Sardinian (sc)"
+  sc
+  "Sindhi (sd)"
+  sd
+  "Northern Sami (se)"
+  se
+  "Sango (sg)"
+  sg
+  "Sinhala (si)"
+  si
+  "Slovak (sk)"
+  sk
+  "Slovenian (sl)"
+  sl
+  "Samoan (sm)"
+  sm
+  "Shona (sn)"
+  sn
+  "Somali (so)"
+  so
+  "Albanian (sq)"
+  sq
+  "Serbian (sr)"
+  sr
+  "Swati (ss)"
+  ss
+  "Southern Sotho (st)"
+  st
+  "Sundanese (su)"
+  su
+  "Swedish (sv)"
+  sv
+  "Swahili (sw)"
+  sw
+  "Tamil (ta)"
+  ta
+  "Telugu (te)"
+  te
+  "Tajik (tg)"
+  tg
+  "Thai (th)"
+  th
+  "Tigrinya (ti)"
+  ti
+  "Turkmen (tk)"
+  tk
+  "Tagalog (tl)"
+  tl
+  "Tswana (tn)"
+  tn
+  "Tongan (to)"
+  to
+  "Turkish (tr)"
+  tr
+  "Tsonga (ts)"
+  ts
+  "Tatar (tt)"
+  tt
+  "Twi (tw)"
+  tw
+  "Tahitian (ty)"
+  ty
+  "Uyghur (ug)"
+  ug
+  "Ukrainian (uk)"
+  uk
+  "Urdu (ur)"
+  ur
+  "Uzbek (uz)"
+  uz
+  "Venda (ve)"
+  ve
+  "Vietnamese (vi)"
+  vi
+  "Volapük (vo)"
+  vo
+  "Walloon (wa)"
+  wa
+  "Wolof (wo)"
+  wo
+  "Xhosa (xh)"
+  xh
+  "Yiddish (yi)"
+  yi
+  "Yoruba (yo)"
+  yo
+  "Zhuang (za)"
+  za
+  "Chinese (zh)"
+  zh
+  "Zulu (zu)"
+  zu
+}
+
+"Link category sorting order"
+enum LinkCategorySortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_CATEGORY_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_CATEGORY_ORDER
+  "Manual order"
+  MANUAL_CATEGORY_ORDER
+}
+
+"Link sorting order"
+enum LinkSortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_ORDER
+}
+
+"BCP47 language tags (with underscores)"
+enum Locale {
+  "Afrikaans (af)"
+  af
+  "Afrikaans (Namibia) (af-NA)"
+  af_NA
+  "Afrikaans (South Africa) (af-ZA)"
+  af_ZA
+  "Aghem (agq)"
+  agq
+  "Aghem (Cameroon) (agq-CM)"
+  agq_CM
+  "Akan (ak)"
+  ak
+  "Akan (Ghana) (ak-GH)"
+  ak_GH
+  "Amharic (am)"
+  am
+  "Amharic (Ethiopia) (am-ET)"
+  am_ET
+  "Arabic (ar)"
+  ar
+  "Arabic (World) (ar-001)"
+  ar_001
+  "Arabic (United Arab Emirates) (ar-AE)"
+  ar_AE
+  "Arabic (Bahrain) (ar-BH)"
+  ar_BH
+  "Arabic (Djibouti) (ar-DJ)"
+  ar_DJ
+  "Arabic (Algeria) (ar-DZ)"
+  ar_DZ
+  "Arabic (Egypt) (ar-EG)"
+  ar_EG
+  "Arabic (Western Sahara) (ar-EH)"
+  ar_EH
+  "Arabic (Eritrea) (ar-ER)"
+  ar_ER
+  "Arabic (Israel) (ar-IL)"
+  ar_IL
+  "Arabic (Iraq) (ar-IQ)"
+  ar_IQ
+  "Arabic (Jordan) (ar-JO)"
+  ar_JO
+  "Arabic (Comoros) (ar-KM)"
+  ar_KM
+  "Arabic (Kuwait) (ar-KW)"
+  ar_KW
+  "Arabic (Lebanon) (ar-LB)"
+  ar_LB
+  "Arabic (Libya) (ar-LY)"
+  ar_LY
+  "Arabic (Morocco) (ar-MA)"
+  ar_MA
+  "Arabic (Mauritania) (ar-MR)"
+  ar_MR
+  "Arabic (Oman) (ar-OM)"
+  ar_OM
+  "Arabic (Palestinian Territories) (ar-PS)"
+  ar_PS
+  "Arabic (Qatar) (ar-QA)"
+  ar_QA
+  "Arabic (Saudi Arabia) (ar-SA)"
+  ar_SA
+  "Arabic (Sudan) (ar-SD)"
+  ar_SD
+  "Arabic (Somalia) (ar-SO)"
+  ar_SO
+  "Arabic (South Sudan) (ar-SS)"
+  ar_SS
+  "Arabic (Syria) (ar-SY)"
+  ar_SY
+  "Arabic (Chad) (ar-TD)"
+  ar_TD
+  "Arabic (Tunisia) (ar-TN)"
+  ar_TN
+  "Arabic (Yemen) (ar-YE)"
+  ar_YE
+  "Assamese (as)"
+  as
+  "Assamese (India) (as-IN)"
+  as_IN
+  "Asu (asa)"
+  asa
+  "Asu (Tanzania) (asa-TZ)"
+  asa_TZ
+  "Asturian (ast)"
+  ast
+  "Asturian (Spain) (ast-ES)"
+  ast_ES
+  "Azerbaijani (az)"
+  az
+  "Azerbaijani (Cyrillic) (az-Cyrl)"
+  az_Cyrl
+  "Azerbaijani (Cyrillic, Azerbaijan) (az-Cyrl-AZ)"
+  az_Cyrl_AZ
+  "Azerbaijani (Latin) (az-Latn)"
+  az_Latn
+  "Azerbaijani (Latin, Azerbaijan) (az-Latn-AZ)"
+  az_Latn_AZ
+  "Basaa (bas)"
+  bas
+  "Basaa (Cameroon) (bas-CM)"
+  bas_CM
+  "Belarusian (be)"
+  be
+  "Belarusian (Belarus) (be-BY)"
+  be_BY
+  "Bemba (bem)"
+  bem
+  "Bemba (Zambia) (bem-ZM)"
+  bem_ZM
+  "Bena (bez)"
+  bez
+  "Bena (Tanzania) (bez-TZ)"
+  bez_TZ
+  "Bulgarian (bg)"
+  bg
+  "Bulgarian (Bulgaria) (bg-BG)"
+  bg_BG
+  "Bambara (bm)"
+  bm
+  "Bambara (Mali) (bm-ML)"
+  bm_ML
+  "Bangla (bn)"
+  bn
+  "Bangla (Bangladesh) (bn-BD)"
+  bn_BD
+  "Bangla (India) (bn-IN)"
+  bn_IN
+  "Tibetan (bo)"
+  bo
+  "Tibetan (China) (bo-CN)"
+  bo_CN
+  "Tibetan (India) (bo-IN)"
+  bo_IN
+  "Breton (br)"
+  br
+  "Breton (France) (br-FR)"
+  br_FR
+  "Bodo (brx)"
+  brx
+  "Bodo (India) (brx-IN)"
+  brx_IN
+  "Bosnian (bs)"
+  bs
+  "Bosnian (Cyrillic) (bs-Cyrl)"
+  bs_Cyrl
+  "Bosnian (Cyrillic, Bosnia & Herzegovina) (bs-Cyrl-BA)"
+  bs_Cyrl_BA
+  "Bosnian (Latin) (bs-Latn)"
+  bs_Latn
+  "Bosnian (Latin, Bosnia & Herzegovina) (bs-Latn-BA)"
+  bs_Latn_BA
+  "Catalan (ca)"
+  ca
+  "Catalan (Andorra) (ca-AD)"
+  ca_AD
+  "Catalan (Spain) (ca-ES)"
+  ca_ES
+  "Catalan (Spain, Valencian) (ca-ES-VALENCIA)"
+  ca_ES_VALENCIA
+  "Catalan (France) (ca-FR)"
+  ca_FR
+  "Catalan (Italy) (ca-IT)"
+  ca_IT
+  "Chakma (ccp)"
+  ccp
+  "Chakma (Bangladesh) (ccp-BD)"
+  ccp_BD
+  "Chakma (India) (ccp-IN)"
+  ccp_IN
+  "Chechen (ce)"
+  ce
+  "Chechen (Russia) (ce-RU)"
+  ce_RU
+  "Chiga (cgg)"
+  cgg
+  "Chiga (Uganda) (cgg-UG)"
+  cgg_UG
+  "Cherokee (chr)"
+  chr
+  "Cherokee (United States) (chr-US)"
+  chr_US
+  "Central Kurdish (ckb)"
+  ckb
+  "Central Kurdish (Iraq) (ckb-IQ)"
+  ckb_IQ
+  "Central Kurdish (Iran) (ckb-IR)"
+  ckb_IR
+  "Czech (cs)"
+  cs
+  "Czech (Czechia) (cs-CZ)"
+  cs_CZ
+  "Church Slavic (cu)"
+  cu
+  "Church Slavic (Russia) (cu-RU)"
+  cu_RU
+  "Welsh (cy)"
+  cy
+  "Welsh (United Kingdom) (cy-GB)"
+  cy_GB
+  "Danish (da)"
+  da
+  "Danish (Denmark) (da-DK)"
+  da_DK
+  "Danish (Greenland) (da-GL)"
+  da_GL
+  "Taita (dav)"
+  dav
+  "Taita (Kenya) (dav-KE)"
+  dav_KE
+  "German (de)"
+  de
+  "German (Austria) (de-AT)"
+  de_AT
+  "German (Belgium) (de-BE)"
+  de_BE
+  "German (Switzerland) (de-CH)"
+  de_CH
+  "German (Germany) (de-DE)"
+  de_DE
+  "German (Italy) (de-IT)"
+  de_IT
+  "German (Liechtenstein) (de-LI)"
+  de_LI
+  "German (Luxembourg) (de-LU)"
+  de_LU
+  "Zarma (dje)"
+  dje
+  "Zarma (Niger) (dje-NE)"
+  dje_NE
+  "Lower Sorbian (dsb)"
+  dsb
+  "Lower Sorbian (Germany) (dsb-DE)"
+  dsb_DE
+  "Duala (dua)"
+  dua
+  "Duala (Cameroon) (dua-CM)"
+  dua_CM
+  "Jola-Fonyi (dyo)"
+  dyo
+  "Jola-Fonyi (Senegal) (dyo-SN)"
+  dyo_SN
+  "Dzongkha (dz)"
+  dz
+  "Dzongkha (Bhutan) (dz-BT)"
+  dz_BT
+  "Embu (ebu)"
+  ebu
+  "Embu (Kenya) (ebu-KE)"
+  ebu_KE
+  "Ewe (ee)"
+  ee
+  "Ewe (Ghana) (ee-GH)"
+  ee_GH
+  "Ewe (Togo) (ee-TG)"
+  ee_TG
+  "Greek (el)"
+  el
+  "Greek (Cyprus) (el-CY)"
+  el_CY
+  "Greek (Greece) (el-GR)"
+  el_GR
+  "English (en)"
+  en
+  "English (World) (en-001)"
+  en_001
+  "English (Europe) (en-150)"
+  en_150
+  "English (Antigua & Barbuda) (en-AG)"
+  en_AG
+  "English (Anguilla) (en-AI)"
+  en_AI
+  "English (American Samoa) (en-AS)"
+  en_AS
+  "English (Austria) (en-AT)"
+  en_AT
+  "English (Australia) (en-AU)"
+  en_AU
+  "English (Barbados) (en-BB)"
+  en_BB
+  "English (Belgium) (en-BE)"
+  en_BE
+  "English (Burundi) (en-BI)"
+  en_BI
+  "English (Bermuda) (en-BM)"
+  en_BM
+  "English (Bahamas) (en-BS)"
+  en_BS
+  "English (Botswana) (en-BW)"
+  en_BW
+  "English (Belize) (en-BZ)"
+  en_BZ
+  "English (Canada) (en-CA)"
+  en_CA
+  "English (Cocos (Keeling) Islands) (en-CC)"
+  en_CC
+  "English (Switzerland) (en-CH)"
+  en_CH
+  "English (Cook Islands) (en-CK)"
+  en_CK
+  "English (Cameroon) (en-CM)"
+  en_CM
+  "English (Christmas Island) (en-CX)"
+  en_CX
+  "English (Cyprus) (en-CY)"
+  en_CY
+  "English (Germany) (en-DE)"
+  en_DE
+  "English (Diego Garcia) (en-DG)"
+  en_DG
+  "English (Denmark) (en-DK)"
+  en_DK
+  "English (Dominica) (en-DM)"
+  en_DM
+  "English (Eritrea) (en-ER)"
+  en_ER
+  "English (Finland) (en-FI)"
+  en_FI
+  "English (Fiji) (en-FJ)"
+  en_FJ
+  "English (Falkland Islands) (en-FK)"
+  en_FK
+  "English (Micronesia) (en-FM)"
+  en_FM
+  "English (United Kingdom) (en-GB)"
+  en_GB
+  "English (Grenada) (en-GD)"
+  en_GD
+  "English (Guernsey) (en-GG)"
+  en_GG
+  "English (Ghana) (en-GH)"
+  en_GH
+  "English (Gibraltar) (en-GI)"
+  en_GI
+  "English (Gambia) (en-GM)"
+  en_GM
+  "English (Guam) (en-GU)"
+  en_GU
+  "English (Guyana) (en-GY)"
+  en_GY
+  "English (Hong Kong SAR China) (en-HK)"
+  en_HK
+  "English (Ireland) (en-IE)"
+  en_IE
+  "English (Israel) (en-IL)"
+  en_IL
+  "English (Isle of Man) (en-IM)"
+  en_IM
+  "English (India) (en-IN)"
+  en_IN
+  "English (British Indian Ocean Territory) (en-IO)"
+  en_IO
+  "English (Jersey) (en-JE)"
+  en_JE
+  "English (Jamaica) (en-JM)"
+  en_JM
+  "English (Kenya) (en-KE)"
+  en_KE
+  "English (Kiribati) (en-KI)"
+  en_KI
+  "English (St. Kitts & Nevis) (en-KN)"
+  en_KN
+  "English (Cayman Islands) (en-KY)"
+  en_KY
+  "English (St. Lucia) (en-LC)"
+  en_LC
+  "English (Liberia) (en-LR)"
+  en_LR
+  "English (Lesotho) (en-LS)"
+  en_LS
+  "English (Madagascar) (en-MG)"
+  en_MG
+  "English (Marshall Islands) (en-MH)"
+  en_MH
+  "English (Macau SAR China) (en-MO)"
+  en_MO
+  "English (Northern Mariana Islands) (en-MP)"
+  en_MP
+  "English (Montserrat) (en-MS)"
+  en_MS
+  "English (Malta) (en-MT)"
+  en_MT
+  "English (Mauritius) (en-MU)"
+  en_MU
+  "English (Malawi) (en-MW)"
+  en_MW
+  "English (Malaysia) (en-MY)"
+  en_MY
+  "English (Namibia) (en-NA)"
+  en_NA
+  "English (Norfolk Island) (en-NF)"
+  en_NF
+  "English (Nigeria) (en-NG)"
+  en_NG
+  "English (Netherlands) (en-NL)"
+  en_NL
+  "English (Nauru) (en-NR)"
+  en_NR
+  "English (Niue) (en-NU)"
+  en_NU
+  "English (New Zealand) (en-NZ)"
+  en_NZ
+  "English (Papua New Guinea) (en-PG)"
+  en_PG
+  "English (Philippines) (en-PH)"
+  en_PH
+  "English (Pakistan) (en-PK)"
+  en_PK
+  "English (Pitcairn Islands) (en-PN)"
+  en_PN
+  "English (Puerto Rico) (en-PR)"
+  en_PR
+  "English (Palau) (en-PW)"
+  en_PW
+  "English (Rwanda) (en-RW)"
+  en_RW
+  "English (Solomon Islands) (en-SB)"
+  en_SB
+  "English (Seychelles) (en-SC)"
+  en_SC
+  "English (Sudan) (en-SD)"
+  en_SD
+  "English (Sweden) (en-SE)"
+  en_SE
+  "English (Singapore) (en-SG)"
+  en_SG
+  "English (St. Helena) (en-SH)"
+  en_SH
+  "English (Slovenia) (en-SI)"
+  en_SI
+  "English (Sierra Leone) (en-SL)"
+  en_SL
+  "English (South Sudan) (en-SS)"
+  en_SS
+  "English (Sint Maarten) (en-SX)"
+  en_SX
+  "English (Swaziland) (en-SZ)"
+  en_SZ
+  "English (Turks & Caicos Islands) (en-TC)"
+  en_TC
+  "English (Tokelau) (en-TK)"
+  en_TK
+  "English (Tonga) (en-TO)"
+  en_TO
+  "English (Trinidad & Tobago) (en-TT)"
+  en_TT
+  "English (Tuvalu) (en-TV)"
+  en_TV
+  "English (Tanzania) (en-TZ)"
+  en_TZ
+  "English (Uganda) (en-UG)"
+  en_UG
+  "English (U.S. Outlying Islands) (en-UM)"
+  en_UM
+  "English (United States) (en-US)"
+  en_US
+  "English (United States, Computer) (en-US-POSIX)"
+  en_US_POSIX
+  "English (St. Vincent & Grenadines) (en-VC)"
+  en_VC
+  "English (British Virgin Islands) (en-VG)"
+  en_VG
+  "English (U.S. Virgin Islands) (en-VI)"
+  en_VI
+  "English (Vanuatu) (en-VU)"
+  en_VU
+  "English (Samoa) (en-WS)"
+  en_WS
+  "English (South Africa) (en-ZA)"
+  en_ZA
+  "English (Zambia) (en-ZM)"
+  en_ZM
+  "English (Zimbabwe) (en-ZW)"
+  en_ZW
+  "Esperanto (eo)"
+  eo
+  "Esperanto (World) (eo-001)"
+  eo_001
+  "Spanish (es)"
+  es
+  "Spanish (Latin America) (es-419)"
+  es_419
+  "Spanish (Argentina) (es-AR)"
+  es_AR
+  "Spanish (Bolivia) (es-BO)"
+  es_BO
+  "Spanish (Brazil) (es-BR)"
+  es_BR
+  "Spanish (Belize) (es-BZ)"
+  es_BZ
+  "Spanish (Chile) (es-CL)"
+  es_CL
+  "Spanish (Colombia) (es-CO)"
+  es_CO
+  "Spanish (Costa Rica) (es-CR)"
+  es_CR
+  "Spanish (Cuba) (es-CU)"
+  es_CU
+  "Spanish (Dominican Republic) (es-DO)"
+  es_DO
+  "Spanish (Ceuta & Melilla) (es-EA)"
+  es_EA
+  "Spanish (Ecuador) (es-EC)"
+  es_EC
+  "Spanish (Spain) (es-ES)"
+  es_ES
+  "Spanish (Equatorial Guinea) (es-GQ)"
+  es_GQ
+  "Spanish (Guatemala) (es-GT)"
+  es_GT
+  "Spanish (Honduras) (es-HN)"
+  es_HN
+  "Spanish (Canary Islands) (es-IC)"
+  es_IC
+  "Spanish (Mexico) (es-MX)"
+  es_MX
+  "Spanish (Nicaragua) (es-NI)"
+  es_NI
+  "Spanish (Panama) (es-PA)"
+  es_PA
+  "Spanish (Peru) (es-PE)"
+  es_PE
+  "Spanish (Philippines) (es-PH)"
+  es_PH
+  "Spanish (Puerto Rico) (es-PR)"
+  es_PR
+  "Spanish (Paraguay) (es-PY)"
+  es_PY
+  "Spanish (El Salvador) (es-SV)"
+  es_SV
+  "Spanish (United States) (es-US)"
+  es_US
+  "Spanish (Uruguay) (es-UY)"
+  es_UY
+  "Spanish (Venezuela) (es-VE)"
+  es_VE
+  "Estonian (et)"
+  et
+  "Estonian (Estonia) (et-EE)"
+  et_EE
+  "Basque (eu)"
+  eu
+  "Basque (Spain) (eu-ES)"
+  eu_ES
+  "Ewondo (ewo)"
+  ewo
+  "Ewondo (Cameroon) (ewo-CM)"
+  ewo_CM
+  "Persian (fa)"
+  fa
+  "Persian (Afghanistan) (fa-AF)"
+  fa_AF
+  "Persian (Iran) (fa-IR)"
+  fa_IR
+  "Fulah (ff)"
+  ff
+  "Fulah (Cameroon) (ff-CM)"
+  ff_CM
+  "Fulah (Guinea) (ff-GN)"
+  ff_GN
+  "Fulah (Mauritania) (ff-MR)"
+  ff_MR
+  "Fulah (Senegal) (ff-SN)"
+  ff_SN
+  "Finnish (fi)"
+  fi
+  "Finnish (Finland) (fi-FI)"
+  fi_FI
+  "Filipino (fil)"
+  fil
+  "Filipino (Philippines) (fil-PH)"
+  fil_PH
+  "Faroese (fo)"
+  fo
+  "Faroese (Denmark) (fo-DK)"
+  fo_DK
+  "Faroese (Faroe Islands) (fo-FO)"
+  fo_FO
+  "French (fr)"
+  fr
+  "French (Belgium) (fr-BE)"
+  fr_BE
+  "French (Burkina Faso) (fr-BF)"
+  fr_BF
+  "French (Burundi) (fr-BI)"
+  fr_BI
+  "French (Benin) (fr-BJ)"
+  fr_BJ
+  "French (St. Barthélemy) (fr-BL)"
+  fr_BL
+  "French (Canada) (fr-CA)"
+  fr_CA
+  "French (Congo - Kinshasa) (fr-CD)"
+  fr_CD
+  "French (Central African Republic) (fr-CF)"
+  fr_CF
+  "French (Congo - Brazzaville) (fr-CG)"
+  fr_CG
+  "French (Switzerland) (fr-CH)"
+  fr_CH
+  "French (Côte d’Ivoire) (fr-CI)"
+  fr_CI
+  "French (Cameroon) (fr-CM)"
+  fr_CM
+  "French (Djibouti) (fr-DJ)"
+  fr_DJ
+  "French (Algeria) (fr-DZ)"
+  fr_DZ
+  "French (France) (fr-FR)"
+  fr_FR
+  "French (Gabon) (fr-GA)"
+  fr_GA
+  "French (French Guiana) (fr-GF)"
+  fr_GF
+  "French (Guinea) (fr-GN)"
+  fr_GN
+  "French (Guadeloupe) (fr-GP)"
+  fr_GP
+  "French (Equatorial Guinea) (fr-GQ)"
+  fr_GQ
+  "French (Haiti) (fr-HT)"
+  fr_HT
+  "French (Comoros) (fr-KM)"
+  fr_KM
+  "French (Luxembourg) (fr-LU)"
+  fr_LU
+  "French (Morocco) (fr-MA)"
+  fr_MA
+  "French (Monaco) (fr-MC)"
+  fr_MC
+  "French (St. Martin) (fr-MF)"
+  fr_MF
+  "French (Madagascar) (fr-MG)"
+  fr_MG
+  "French (Mali) (fr-ML)"
+  fr_ML
+  "French (Martinique) (fr-MQ)"
+  fr_MQ
+  "French (Mauritania) (fr-MR)"
+  fr_MR
+  "French (Mauritius) (fr-MU)"
+  fr_MU
+  "French (New Caledonia) (fr-NC)"
+  fr_NC
+  "French (Niger) (fr-NE)"
+  fr_NE
+  "French (French Polynesia) (fr-PF)"
+  fr_PF
+  "French (St. Pierre & Miquelon) (fr-PM)"
+  fr_PM
+  "French (Réunion) (fr-RE)"
+  fr_RE
+  "French (Rwanda) (fr-RW)"
+  fr_RW
+  "French (Seychelles) (fr-SC)"
+  fr_SC
+  "French (Senegal) (fr-SN)"
+  fr_SN
+  "French (Syria) (fr-SY)"
+  fr_SY
+  "French (Chad) (fr-TD)"
+  fr_TD
+  "French (Togo) (fr-TG)"
+  fr_TG
+  "French (Tunisia) (fr-TN)"
+  fr_TN
+  "French (Vanuatu) (fr-VU)"
+  fr_VU
+  "French (Wallis & Futuna) (fr-WF)"
+  fr_WF
+  "French (Mayotte) (fr-YT)"
+  fr_YT
+  "Friulian (fur)"
+  fur
+  "Friulian (Italy) (fur-IT)"
+  fur_IT
+  "Western Frisian (fy)"
+  fy
+  "Western Frisian (Netherlands) (fy-NL)"
+  fy_NL
+  "Irish (ga)"
+  ga
+  "Irish (Ireland) (ga-IE)"
+  ga_IE
+  "Scottish Gaelic (gd)"
+  gd
+  "Scottish Gaelic (United Kingdom) (gd-GB)"
+  gd_GB
+  "Galician (gl)"
+  gl
+  "Galician (Spain) (gl-ES)"
+  gl_ES
+  "Swiss German (gsw)"
+  gsw
+  "Swiss German (Switzerland) (gsw-CH)"
+  gsw_CH
+  "Swiss German (France) (gsw-FR)"
+  gsw_FR
+  "Swiss German (Liechtenstein) (gsw-LI)"
+  gsw_LI
+  "Gujarati (gu)"
+  gu
+  "Gujarati (India) (gu-IN)"
+  gu_IN
+  "Gusii (guz)"
+  guz
+  "Gusii (Kenya) (guz-KE)"
+  guz_KE
+  "Manx (gv)"
+  gv
+  "Manx (Isle of Man) (gv-IM)"
+  gv_IM
+  "Hausa (ha)"
+  ha
+  "Hausa (Ghana) (ha-GH)"
+  ha_GH
+  "Hausa (Niger) (ha-NE)"
+  ha_NE
+  "Hausa (Nigeria) (ha-NG)"
+  ha_NG
+  "Hawaiian (haw)"
+  haw
+  "Hawaiian (United States) (haw-US)"
+  haw_US
+  "Hebrew (he)"
+  he
+  "Hebrew (Israel) (he-IL)"
+  he_IL
+  "Hindi (hi)"
+  hi
+  "Hindi (India) (hi-IN)"
+  hi_IN
+  "Croatian (hr)"
+  hr
+  "Croatian (Bosnia & Herzegovina) (hr-BA)"
+  hr_BA
+  "Croatian (Croatia) (hr-HR)"
+  hr_HR
+  "Upper Sorbian (hsb)"
+  hsb
+  "Upper Sorbian (Germany) (hsb-DE)"
+  hsb_DE
+  "Hungarian (hu)"
+  hu
+  "Hungarian (Hungary) (hu-HU)"
+  hu_HU
+  "Armenian (hy)"
+  hy
+  "Armenian (Armenia) (hy-AM)"
+  hy_AM
+  "Indonesian (id)"
+  id
+  "Indonesian (Indonesia) (id-ID)"
+  id_ID
+  "Igbo (ig)"
+  ig
+  "Igbo (Nigeria) (ig-NG)"
+  ig_NG
+  "Sichuan Yi (ii)"
+  ii
+  "Sichuan Yi (China) (ii-CN)"
+  ii_CN
+  "Icelandic (is)"
+  is
+  "Icelandic (Iceland) (is-IS)"
+  is_IS
+  "Italian (it)"
+  it
+  "Italian (Switzerland) (it-CH)"
+  it_CH
+  "Italian (Italy) (it-IT)"
+  it_IT
+  "Italian (San Marino) (it-SM)"
+  it_SM
+  "Italian (Vatican City) (it-VA)"
+  it_VA
+  "Japanese (ja)"
+  ja
+  "Japanese (Japan) (ja-JP)"
+  ja_JP
+  "Japanese (Japan, JP, Japanese Calendar) (ja-JP-u-ca-japanese-x-lvariant-JP)"
+  ja_JP_u_ca_japanese_x_lvariant_JP
+  "Ngomba (jgo)"
+  jgo
+  "Ngomba (Cameroon) (jgo-CM)"
+  jgo_CM
+  "Machame (jmc)"
+  jmc
+  "Machame (Tanzania) (jmc-TZ)"
+  jmc_TZ
+  "Georgian (ka)"
+  ka
+  "Georgian (Georgia) (ka-GE)"
+  ka_GE
+  "Kabyle (kab)"
+  kab
+  "Kabyle (Algeria) (kab-DZ)"
+  kab_DZ
+  "Kamba (kam)"
+  kam
+  "Kamba (Kenya) (kam-KE)"
+  kam_KE
+  "Makonde (kde)"
+  kde
+  "Makonde (Tanzania) (kde-TZ)"
+  kde_TZ
+  "Kabuverdianu (kea)"
+  kea
+  "Kabuverdianu (Cape Verde) (kea-CV)"
+  kea_CV
+  "Koyra Chiini (khq)"
+  khq
+  "Koyra Chiini (Mali) (khq-ML)"
+  khq_ML
+  "Kikuyu (ki)"
+  ki
+  "Kikuyu (Kenya) (ki-KE)"
+  ki_KE
+  "Kazakh (kk)"
+  kk
+  "Kazakh (Kazakhstan) (kk-KZ)"
+  kk_KZ
+  "Kako (kkj)"
+  kkj
+  "Kako (Cameroon) (kkj-CM)"
+  kkj_CM
+  "Kalaallisut (kl)"
+  kl
+  "Kalaallisut (Greenland) (kl-GL)"
+  kl_GL
+  "Kalenjin (kln)"
+  kln
+  "Kalenjin (Kenya) (kln-KE)"
+  kln_KE
+  "Khmer (km)"
+  km
+  "Khmer (Cambodia) (km-KH)"
+  km_KH
+  "Kannada (kn)"
+  kn
+  "Kannada (India) (kn-IN)"
+  kn_IN
+  "Korean (ko)"
+  ko
+  "Korean (North Korea) (ko-KP)"
+  ko_KP
+  "Korean (South Korea) (ko-KR)"
+  ko_KR
+  "Konkani (kok)"
+  kok
+  "Konkani (India) (kok-IN)"
+  kok_IN
+  "Kashmiri (ks)"
+  ks
+  "Kashmiri (India) (ks-IN)"
+  ks_IN
+  "Shambala (ksb)"
+  ksb
+  "Shambala (Tanzania) (ksb-TZ)"
+  ksb_TZ
+  "Bafia (ksf)"
+  ksf
+  "Bafia (Cameroon) (ksf-CM)"
+  ksf_CM
+  "Colognian (ksh)"
+  ksh
+  "Colognian (Germany) (ksh-DE)"
+  ksh_DE
+  "Cornish (kw)"
+  kw
+  "Cornish (United Kingdom) (kw-GB)"
+  kw_GB
+  "Kyrgyz (ky)"
+  ky
+  "Kyrgyz (Kyrgyzstan) (ky-KG)"
+  ky_KG
+  "Langi (lag)"
+  lag
+  "Langi (Tanzania) (lag-TZ)"
+  lag_TZ
+  "Luxembourgish (lb)"
+  lb
+  "Luxembourgish (Luxembourg) (lb-LU)"
+  lb_LU
+  "Ganda (lg)"
+  lg
+  "Ganda (Uganda) (lg-UG)"
+  lg_UG
+  "Lakota (lkt)"
+  lkt
+  "Lakota (United States) (lkt-US)"
+  lkt_US
+  "Lingala (ln)"
+  ln
+  "Lingala (Angola) (ln-AO)"
+  ln_AO
+  "Lingala (Congo - Kinshasa) (ln-CD)"
+  ln_CD
+  "Lingala (Central African Republic) (ln-CF)"
+  ln_CF
+  "Lingala (Congo - Brazzaville) (ln-CG)"
+  ln_CG
+  "Lao (lo)"
+  lo
+  "Lao (Laos) (lo-LA)"
+  lo_LA
+  "Northern Luri (lrc)"
+  lrc
+  "Northern Luri (Iraq) (lrc-IQ)"
+  lrc_IQ
+  "Northern Luri (Iran) (lrc-IR)"
+  lrc_IR
+  "Lithuanian (lt)"
+  lt
+  "Lithuanian (Lithuania) (lt-LT)"
+  lt_LT
+  "Luba-Katanga (lu)"
+  lu
+  "Luba-Katanga (Congo - Kinshasa) (lu-CD)"
+  lu_CD
+  "Luo (luo)"
+  luo
+  "Luo (Kenya) (luo-KE)"
+  luo_KE
+  "Luyia (luy)"
+  luy
+  "Luyia (Kenya) (luy-KE)"
+  luy_KE
+  "Latvian (lv)"
+  lv
+  "Latvian (Latvia) (lv-LV)"
+  lv_LV
+  "Masai (mas)"
+  mas
+  "Masai (Kenya) (mas-KE)"
+  mas_KE
+  "Masai (Tanzania) (mas-TZ)"
+  mas_TZ
+  "Meru (mer)"
+  mer
+  "Meru (Kenya) (mer-KE)"
+  mer_KE
+  "Morisyen (mfe)"
+  mfe
+  "Morisyen (Mauritius) (mfe-MU)"
+  mfe_MU
+  "Malagasy (mg)"
+  mg
+  "Malagasy (Madagascar) (mg-MG)"
+  mg_MG
+  "Makhuwa-Meetto (mgh)"
+  mgh
+  "Makhuwa-Meetto (Mozambique) (mgh-MZ)"
+  mgh_MZ
+  "Metaʼ (mgo)"
+  mgo
+  "Metaʼ (Cameroon) (mgo-CM)"
+  mgo_CM
+  "Macedonian (mk)"
+  mk
+  "Macedonian (Macedonia) (mk-MK)"
+  mk_MK
+  "Malayalam (ml)"
+  ml
+  "Malayalam (India) (ml-IN)"
+  ml_IN
+  "Mongolian (mn)"
+  mn
+  "Mongolian (Mongolia) (mn-MN)"
+  mn_MN
+  "Marathi (mr)"
+  mr
+  "Marathi (India) (mr-IN)"
+  mr_IN
+  "Malay (ms)"
+  ms
+  "Malay (Brunei) (ms-BN)"
+  ms_BN
+  "Malay (Malaysia) (ms-MY)"
+  ms_MY
+  "Malay (Singapore) (ms-SG)"
+  ms_SG
+  "Maltese (mt)"
+  mt
+  "Maltese (Malta) (mt-MT)"
+  mt_MT
+  "Mundang (mua)"
+  mua
+  "Mundang (Cameroon) (mua-CM)"
+  mua_CM
+  "Burmese (my)"
+  my
+  "Burmese (Myanmar (Burma)) (my-MM)"
+  my_MM
+  "Mazanderani (mzn)"
+  mzn
+  "Mazanderani (Iran) (mzn-IR)"
+  mzn_IR
+  "Nama (naq)"
+  naq
+  "Nama (Namibia) (naq-NA)"
+  naq_NA
+  "Norwegian Bokmål (nb)"
+  nb
+  "Norwegian Bokmål (Norway) (nb-NO)"
+  nb_NO
+  "Norwegian Bokmål (Svalbard & Jan Mayen) (nb-SJ)"
+  nb_SJ
+  "North Ndebele (nd)"
+  nd
+  "North Ndebele (Zimbabwe) (nd-ZW)"
+  nd_ZW
+  "Low German (nds)"
+  nds
+  "Low German (Germany) (nds-DE)"
+  nds_DE
+  "Low German (Netherlands) (nds-NL)"
+  nds_NL
+  "Nepali (ne)"
+  ne
+  "Nepali (India) (ne-IN)"
+  ne_IN
+  "Nepali (Nepal) (ne-NP)"
+  ne_NP
+  "Dutch (nl)"
+  nl
+  "Dutch (Aruba) (nl-AW)"
+  nl_AW
+  "Dutch (Belgium) (nl-BE)"
+  nl_BE
+  "Dutch (Caribbean Netherlands) (nl-BQ)"
+  nl_BQ
+  "Dutch (Curaçao) (nl-CW)"
+  nl_CW
+  "Dutch (Netherlands) (nl-NL)"
+  nl_NL
+  "Dutch (Suriname) (nl-SR)"
+  nl_SR
+  "Dutch (Sint Maarten) (nl-SX)"
+  nl_SX
+  "Kwasio (nmg)"
+  nmg
+  "Kwasio (Cameroon) (nmg-CM)"
+  nmg_CM
+  "Norwegian Nynorsk (nn)"
+  nn
+  "Norwegian Nynorsk (Norway) (nn-NO)"
+  nn_NO
+  "Ngiemboon (nnh)"
+  nnh
+  "Ngiemboon (Cameroon) (nnh-CM)"
+  nnh_CM
+  "Norwegian (no)"
+  no
+  "Norwegian (Norway) (no-NO)"
+  no_NO
+  "Nuer (nus)"
+  nus
+  "Nuer (South Sudan) (nus-SS)"
+  nus_SS
+  "Nyankole (nyn)"
+  nyn
+  "Nyankole (Uganda) (nyn-UG)"
+  nyn_UG
+  "Oromo (om)"
+  om
+  "Oromo (Ethiopia) (om-ET)"
+  om_ET
+  "Oromo (Kenya) (om-KE)"
+  om_KE
+  "Odia (or)"
+  or
+  "Odia (India) (or-IN)"
+  or_IN
+  "Ossetic (os)"
+  os
+  "Ossetic (Georgia) (os-GE)"
+  os_GE
+  "Ossetic (Russia) (os-RU)"
+  os_RU
+  "Punjabi (pa)"
+  pa
+  "Punjabi (Arabic) (pa-Arab)"
+  pa_Arab
+  "Punjabi (Arabic, Pakistan) (pa-Arab-PK)"
+  pa_Arab_PK
+  "Punjabi (Gurmukhi) (pa-Guru)"
+  pa_Guru
+  "Punjabi (Gurmukhi, India) (pa-Guru-IN)"
+  pa_Guru_IN
+  "Polish (pl)"
+  pl
+  "Polish (Poland) (pl-PL)"
+  pl_PL
+  "Prussian (prg)"
+  prg
+  "Prussian (World) (prg-001)"
+  prg_001
+  "Pashto (ps)"
+  ps
+  "Pashto (Afghanistan) (ps-AF)"
+  ps_AF
+  "Portuguese (pt)"
+  pt
+  "Portuguese (Angola) (pt-AO)"
+  pt_AO
+  "Portuguese (Brazil) (pt-BR)"
+  pt_BR
+  "Portuguese (Switzerland) (pt-CH)"
+  pt_CH
+  "Portuguese (Cape Verde) (pt-CV)"
+  pt_CV
+  "Portuguese (Equatorial Guinea) (pt-GQ)"
+  pt_GQ
+  "Portuguese (Guinea-Bissau) (pt-GW)"
+  pt_GW
+  "Portuguese (Luxembourg) (pt-LU)"
+  pt_LU
+  "Portuguese (Macau SAR China) (pt-MO)"
+  pt_MO
+  "Portuguese (Mozambique) (pt-MZ)"
+  pt_MZ
+  "Portuguese (Portugal) (pt-PT)"
+  pt_PT
+  "Portuguese (São Tomé & Príncipe) (pt-ST)"
+  pt_ST
+  "Portuguese (Timor-Leste) (pt-TL)"
+  pt_TL
+  "Quechua (qu)"
+  qu
+  "Quechua (Bolivia) (qu-BO)"
+  qu_BO
+  "Quechua (Ecuador) (qu-EC)"
+  qu_EC
+  "Quechua (Peru) (qu-PE)"
+  qu_PE
+  "Romansh (rm)"
+  rm
+  "Romansh (Switzerland) (rm-CH)"
+  rm_CH
+  "Rundi (rn)"
+  rn
+  "Rundi (Burundi) (rn-BI)"
+  rn_BI
+  "Romanian (ro)"
+  ro
+  "Romanian (Moldova) (ro-MD)"
+  ro_MD
+  "Romanian (Romania) (ro-RO)"
+  ro_RO
+  "Rombo (rof)"
+  rof
+  "Rombo (Tanzania) (rof-TZ)"
+  rof_TZ
+  "Russian (ru)"
+  ru
+  "Russian (Belarus) (ru-BY)"
+  ru_BY
+  "Russian (Kyrgyzstan) (ru-KG)"
+  ru_KG
+  "Russian (Kazakhstan) (ru-KZ)"
+  ru_KZ
+  "Russian (Moldova) (ru-MD)"
+  ru_MD
+  "Russian (Russia) (ru-RU)"
+  ru_RU
+  "Russian (Ukraine) (ru-UA)"
+  ru_UA
+  "Kinyarwanda (rw)"
+  rw
+  "Kinyarwanda (Rwanda) (rw-RW)"
+  rw_RW
+  "Rwa (rwk)"
+  rwk
+  "Rwa (Tanzania) (rwk-TZ)"
+  rwk_TZ
+  "Sakha (sah)"
+  sah
+  "Sakha (Russia) (sah-RU)"
+  sah_RU
+  "Samburu (saq)"
+  saq
+  "Samburu (Kenya) (saq-KE)"
+  saq_KE
+  "Sangu (sbp)"
+  sbp
+  "Sangu (Tanzania) (sbp-TZ)"
+  sbp_TZ
+  "Sindhi (sd)"
+  sd
+  "Sindhi (Pakistan) (sd-PK)"
+  sd_PK
+  "Northern Sami (se)"
+  se
+  "Northern Sami (Finland) (se-FI)"
+  se_FI
+  "Northern Sami (Norway) (se-NO)"
+  se_NO
+  "Northern Sami (Sweden) (se-SE)"
+  se_SE
+  "Sena (seh)"
+  seh
+  "Sena (Mozambique) (seh-MZ)"
+  seh_MZ
+  "Koyraboro Senni (ses)"
+  ses
+  "Koyraboro Senni (Mali) (ses-ML)"
+  ses_ML
+  "Sango (sg)"
+  sg
+  "Sango (Central African Republic) (sg-CF)"
+  sg_CF
+  "Tachelhit (shi)"
+  shi
+  "Tachelhit (Latin) (shi-Latn)"
+  shi_Latn
+  "Tachelhit (Latin, Morocco) (shi-Latn-MA)"
+  shi_Latn_MA
+  "Tachelhit (Tifinagh) (shi-Tfng)"
+  shi_Tfng
+  "Tachelhit (Tifinagh, Morocco) (shi-Tfng-MA)"
+  shi_Tfng_MA
+  "Sinhala (si)"
+  si
+  "Sinhala (Sri Lanka) (si-LK)"
+  si_LK
+  "Slovak (sk)"
+  sk
+  "Slovak (Slovakia) (sk-SK)"
+  sk_SK
+  "Slovenian (sl)"
+  sl
+  "Slovenian (Slovenia) (sl-SI)"
+  sl_SI
+  "Inari Sami (smn)"
+  smn
+  "Inari Sami (Finland) (smn-FI)"
+  smn_FI
+  "Shona (sn)"
+  sn
+  "Shona (Zimbabwe) (sn-ZW)"
+  sn_ZW
+  "Somali (so)"
+  so
+  "Somali (Djibouti) (so-DJ)"
+  so_DJ
+  "Somali (Ethiopia) (so-ET)"
+  so_ET
+  "Somali (Kenya) (so-KE)"
+  so_KE
+  "Somali (Somalia) (so-SO)"
+  so_SO
+  "Albanian (sq)"
+  sq
+  "Albanian (Albania) (sq-AL)"
+  sq_AL
+  "Albanian (Macedonia) (sq-MK)"
+  sq_MK
+  "Albanian (Kosovo) (sq-XK)"
+  sq_XK
+  "Serbian (sr)"
+  sr
+  "Serbian (Bosnia & Herzegovina) (sr-BA)"
+  sr_BA
+  "Serbian (Serbia and Montenegro) (sr-CS)"
+  sr_CS
+  "Serbian (Cyrillic) (sr-Cyrl)"
+  sr_Cyrl
+  "Serbian (Cyrillic, Bosnia & Herzegovina) (sr-Cyrl-BA)"
+  sr_Cyrl_BA
+  "Serbian (Cyrillic, Montenegro) (sr-Cyrl-ME)"
+  sr_Cyrl_ME
+  "Serbian (Cyrillic, Serbia) (sr-Cyrl-RS)"
+  sr_Cyrl_RS
+  "Serbian (Cyrillic, Kosovo) (sr-Cyrl-XK)"
+  sr_Cyrl_XK
+  "Serbian (Latin) (sr-Latn)"
+  sr_Latn
+  "Serbian (Latin, Bosnia & Herzegovina) (sr-Latn-BA)"
+  sr_Latn_BA
+  "Serbian (Latin, Montenegro) (sr-Latn-ME)"
+  sr_Latn_ME
+  "Serbian (Latin, Serbia) (sr-Latn-RS)"
+  sr_Latn_RS
+  "Serbian (Latin, Kosovo) (sr-Latn-XK)"
+  sr_Latn_XK
+  "Serbian (Montenegro) (sr-ME)"
+  sr_ME
+  "Serbian (Serbia) (sr-RS)"
+  sr_RS
+  "Swedish (sv)"
+  sv
+  "Swedish (Åland Islands) (sv-AX)"
+  sv_AX
+  "Swedish (Finland) (sv-FI)"
+  sv_FI
+  "Swedish (Sweden) (sv-SE)"
+  sv_SE
+  "Swahili (sw)"
+  sw
+  "Swahili (Congo - Kinshasa) (sw-CD)"
+  sw_CD
+  "Swahili (Kenya) (sw-KE)"
+  sw_KE
+  "Swahili (Tanzania) (sw-TZ)"
+  sw_TZ
+  "Swahili (Uganda) (sw-UG)"
+  sw_UG
+  "Tamil (ta)"
+  ta
+  "Tamil (India) (ta-IN)"
+  ta_IN
+  "Tamil (Sri Lanka) (ta-LK)"
+  ta_LK
+  "Tamil (Malaysia) (ta-MY)"
+  ta_MY
+  "Tamil (Singapore) (ta-SG)"
+  ta_SG
+  "Telugu (te)"
+  te
+  "Telugu (India) (te-IN)"
+  te_IN
+  "Teso (teo)"
+  teo
+  "Teso (Kenya) (teo-KE)"
+  teo_KE
+  "Teso (Uganda) (teo-UG)"
+  teo_UG
+  "Tajik (tg)"
+  tg
+  "Tajik (Tajikistan) (tg-TJ)"
+  tg_TJ
+  "Thai (th)"
+  th
+  "Thai (Thailand) (th-TH)"
+  th_TH
+  "Thai (Thailand, TH, Thai Digits) (th-TH-u-nu-thai-x-lvariant-TH)"
+  th_TH_u_nu_thai_x_lvariant_TH
+  "Tigrinya (ti)"
+  ti
+  "Tigrinya (Eritrea) (ti-ER)"
+  ti_ER
+  "Tigrinya (Ethiopia) (ti-ET)"
+  ti_ET
+  "Turkmen (tk)"
+  tk
+  "Turkmen (Turkmenistan) (tk-TM)"
+  tk_TM
+  "Tongan (to)"
+  to
+  "Tongan (Tonga) (to-TO)"
+  to_TO
+  "Turkish (tr)"
+  tr
+  "Turkish (Cyprus) (tr-CY)"
+  tr_CY
+  "Turkish (Turkey) (tr-TR)"
+  tr_TR
+  "Tatar (tt)"
+  tt
+  "Tatar (Russia) (tt-RU)"
+  tt_RU
+  "Tasawaq (twq)"
+  twq
+  "Tasawaq (Niger) (twq-NE)"
+  twq_NE
+  "Central Atlas Tamazight (tzm)"
+  tzm
+  "Central Atlas Tamazight (Morocco) (tzm-MA)"
+  tzm_MA
+  "Uyghur (ug)"
+  ug
+  "Uyghur (China) (ug-CN)"
+  ug_CN
+  "Ukrainian (uk)"
+  uk
+  "Ukrainian (Ukraine) (uk-UA)"
+  uk_UA
+  " (und)"
+  und
+  "Urdu (ur)"
+  ur
+  "Urdu (India) (ur-IN)"
+  ur_IN
+  "Urdu (Pakistan) (ur-PK)"
+  ur_PK
+  "Uzbek (uz)"
+  uz
+  "Uzbek (Arabic) (uz-Arab)"
+  uz_Arab
+  "Uzbek (Arabic, Afghanistan) (uz-Arab-AF)"
+  uz_Arab_AF
+  "Uzbek (Cyrillic) (uz-Cyrl)"
+  uz_Cyrl
+  "Uzbek (Cyrillic, Uzbekistan) (uz-Cyrl-UZ)"
+  uz_Cyrl_UZ
+  "Uzbek (Latin) (uz-Latn)"
+  uz_Latn
+  "Uzbek (Latin, Uzbekistan) (uz-Latn-UZ)"
+  uz_Latn_UZ
+  "Vai (vai)"
+  vai
+  "Vai (Latin) (vai-Latn)"
+  vai_Latn
+  "Vai (Latin, Liberia) (vai-Latn-LR)"
+  vai_Latn_LR
+  "Vai (Vai) (vai-Vaii)"
+  vai_Vaii
+  "Vai (Vai, Liberia) (vai-Vaii-LR)"
+  vai_Vaii_LR
+  "Vietnamese (vi)"
+  vi
+  "Vietnamese (Vietnam) (vi-VN)"
+  vi_VN
+  "Volapük (vo)"
+  vo
+  "Volapük (World) (vo-001)"
+  vo_001
+  "Vunjo (vun)"
+  vun
+  "Vunjo (Tanzania) (vun-TZ)"
+  vun_TZ
+  "Walser (wae)"
+  wae
+  "Walser (Switzerland) (wae-CH)"
+  wae_CH
+  "Wolof (wo)"
+  wo
+  "Wolof (Senegal) (wo-SN)"
+  wo_SN
+  "Soga (xog)"
+  xog
+  "Soga (Uganda) (xog-UG)"
+  xog_UG
+  "Yangben (yav)"
+  yav
+  "Yangben (Cameroon) (yav-CM)"
+  yav_CM
+  "Yiddish (yi)"
+  yi
+  "Yiddish (World) (yi-001)"
+  yi_001
+  "Yoruba (yo)"
+  yo
+  "Yoruba (Benin) (yo-BJ)"
+  yo_BJ
+  "Yoruba (Nigeria) (yo-NG)"
+  yo_NG
+  "Cantonese (yue)"
+  yue
+  "Cantonese (Simplified) (yue-Hans)"
+  yue_Hans
+  "Cantonese (Simplified, China) (yue-Hans-CN)"
+  yue_Hans_CN
+  "Cantonese (Traditional) (yue-Hant)"
+  yue_Hant
+  "Cantonese (Traditional, Hong Kong SAR China) (yue-Hant-HK)"
+  yue_Hant_HK
+  "Standard Moroccan Tamazight (zgh)"
+  zgh
+  "Standard Moroccan Tamazight (Morocco) (zgh-MA)"
+  zgh_MA
+  "Chinese (zh)"
+  zh
+  "Chinese (China) (zh-CN)"
+  zh_CN
+  "Chinese (Hong Kong SAR China) (zh-HK)"
+  zh_HK
+  "Chinese (Simplified) (zh-Hans)"
+  zh_Hans
+  "Chinese (Simplified, China) (zh-Hans-CN)"
+  zh_Hans_CN
+  "Chinese (Simplified, Hong Kong SAR China) (zh-Hans-HK)"
+  zh_Hans_HK
+  "Chinese (Simplified, Macau SAR China) (zh-Hans-MO)"
+  zh_Hans_MO
+  "Chinese (Simplified, Singapore) (zh-Hans-SG)"
+  zh_Hans_SG
+  "Chinese (Traditional) (zh-Hant)"
+  zh_Hant
+  "Chinese (Traditional, Hong Kong SAR China) (zh-Hant-HK)"
+  zh_Hant_HK
+  "Chinese (Traditional, Macau SAR China) (zh-Hant-MO)"
+  zh_Hant_MO
+  "Chinese (Traditional, Taiwan) (zh-Hant-TW)"
+  zh_Hant_TW
+  "Chinese (Singapore) (zh-SG)"
+  zh_SG
+  "Chinese (Taiwan) (zh-TW)"
+  zh_TW
+  "Zulu (zu)"
+  zu
+  "Zulu (South Africa) (zu-ZA)"
+  zu_ZA
+}
+
+"Offer category sorting order"
+enum OfferCategorySortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_CATEGORY_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_CATEGORY_ORDER
+  "Manual order"
+  MANUAL_CATEGORY_ORDER
+}
+
+"Offer sorting order"
+enum OfferSortingOrder {
+  "Alphabetical order"
+  ALPHABETICAL_ORDER
+  "Date of creation order"
+  DATE_OF_CREATION_ORDER
+}
+
+"Order of search results"
+enum OrderBy {
+  ClosedAtAscending
+  ClosedAtDescending
+  CustomerSatisfactionAscending
+  CustomerSatisfactionDescending
+  DurationAscending
+  DurationDescending
+  NetPromoterScoreAscending
+  NetPromoterScoreDescending
+}
+
+"Logical operator used in routing group segments to determine if any, all, or none of the values of the segment must match."
+enum RoutingSegmentLogicalOperator {
+  "All the values of the segment must match."
+  AND
+  "None of the values of the segment must match."
+  NOT
+  "Any value of the segment must match."
+  OR
+}
+
+"Roles a user may have."
+enum RoutingUserRole {
+  "The user is an administrator."
+  ADMIN
+  "The user is an agent."
+  AGENT
+  "The user is a bot."
+  BOT
+  "The user is a community or ibbü expert."
+  EXPERT
+  "The user is a manager."
+  MANAGER
+}
+
+"Sources supported by iAdvize."
+enum Source {
+  "Apple Business Chat source"
+  APPLE_BUSINESS_CHAT
+  "Facebook source"
+  FACEBOOK
+  "Facebook Business On Messenger source"
+  FACEBOOK_BUSINESS_ON_MESSENGER
+  "Google Business Messages source"
+  GOOGLE_BUSINESS_MESSAGES
+  "Mobile App source"
+  MOBILE_APP
+  "Onsite source"
+  ONSITE
+  "SMS source"
+  SMS
+  "Twitter source"
+  TWITTER
+  "WhatsApp source"
+  WHATSAPP
+}
+
+"User availability"
+enum StatsAvailabilityStatus {
+  "Agent online and available (green)."
+  AVAILABLE
+  "Agent online but busy (orange)."
+  BUSY
+  "Agent unavailable (red)."
+  TOGGLE_OFF
+}
+
+"ISO-8601 compliant datetime format"
+scalar DateTime
+
+"""
+The `Duration` type represents a time duration expressed as a string.
+The formats accepted are based on the ISO-8601 duration format `PnDTnHnMn.nS` with days considered to be exactly 24 hours.
+For example, `P4DT11H9M8.2S` means 4 days, 11 hours, 9 minutes, 8 seconds and 200,000,000 nano seconds
+"""
+scalar Duration
+
+"Legacy iAdvize identifier, encoded as an integer."
+scalar LegacyId
+
+"The `Long` scalar type represents non-fractional signed whole numeric values. Long can represent values between -(2^63) and 2^63 - 1."
+scalar Long
+
+"Country code of the phone number, ex : +33"
+scalar PhoneNumberCountryCode
+
+"A Uniform Resource Identifier (URI) is a compact sequence of characters that identifies an abstract or physical resource. See https://www.ietf.org/rfc/rfc3986.txt for more details."
+scalar URI
+
+scalar URL
+
+scalar UUID
+
+"Filters on the ClosedConversation resource (indexed conversation)"
+input ClosedConversationFilters {
+  "Filter by answered conversations"
+  answered: Boolean
+  "Filter by human answered conversations"
+  answeredByHuman: Boolean
+  "Filter by automation level"
+  automationLevels: [AutomationLevel!]
+  "Filter by category ids"
+  categoryIds: [LegacyId!]
+  "Filter on conversation channels"
+  channels: [Channel!]
+  "Filter on conversation id"
+  conversationId: UUID
+  "Filter on conversation visitor ids"
+  conversationVisitorIds: [UUID!]
+  "Filter on customer satisfaction"
+  customerSatisfaction: [Int!]
+  "Filter by engagement campaign"
+  engagementCampaignIds: [UUID!]
+  "Filter on accepted escalations types"
+  escalationsAccepted: [EscalationType!]
+  "Filter on groups of operators who participated in conversation"
+  groupIds: [LegacyId!]
+  "Filter on a maximum human handling time in seconds"
+  humanHandlingTimeUpperLimit: Int
+  "Filter on legacy conversation ids"
+  legacyConversationIds: [LegacyId!]
+  "Filter by keywords on message content"
+  messagesSearches: [String!]
+  "Filter on NPS"
+  netPromoterScore: [Int!]
+  "Filter on iAdvize projects"
+  projectIds: [LegacyId!]
+  "Filter on roles (operator, manager, admin, expert, bot)"
+  roles: [String!]
+  "Filter on conversation routing group ids"
+  routingGroupIds: [UUID!]
+  "Filter on tag ids"
+  tagIds: [LegacyId!]
+  "Filter on legacy user ids"
+  userIds: [LegacyId!]
+  "Filter with terms on conversation visitor messages"
+  visitorMessagesSearches: [String!]
+}
+
+"Criteria available to filter a list of connected users."
+input ConnectedUserFilters {
+  "User chat availability"
+  chatAvailability: [StatsAvailabilityStatus!]
+  "Filter by users group ids"
+  groupIds: [LegacyId!]
+  "Project ids to search into."
+  projectIds: [LegacyId!]
+  "Filter by role (operator, manager, admin, expert, bot)"
+  roles: [String!]
+  "Filter by routing group ids"
+  routingGroupIds: [UUID!]
+  "Filter by users ids"
+  userIds: [LegacyId!]
+}
+
+input ConversationTagInput {
+  availableFor: [ConversationTagUserType!]
+  categoryId: Int
+  name: String!
+  projectId: LegacyId!
+}
+
+input Interval {
+  from: DateTime!
+  to: DateTime!
+}
+
+"Filters on the open conversation resource (indexed conversation)"
+input OpenConversationFilters {
+  "Filter by assigned conversations"
+  assigned: Boolean
+  "Filter on conversation channels"
+  channels: [Channel!]
+  "Filter by user group ids"
+  groupIds: [LegacyId!]
+  "Filter on iAdvize projects"
+  projectIds: [LegacyId!]
+  "Filter by routing group ids"
+  routingGroupIds: [UUID!]
+  "Filter by user ids"
+  userIds: [LegacyId!]
+}
+
+"Contains input data for the professionalCreate mutation to create a professional user"
+input ProfessionalCreateInput {
+  "Email address of the new professional user"
+  email: String!
+  "External id of the new professional user. The external id is an identifier representing the user in another system."
+  externalId: String
+  "First name of the new professional user"
+  firstName: String
+  "Group the new professional user will be a member of"
+  groupId: LegacyId
+  "Language in which to display the platform interface"
+  interfaceLanguage: Locale!
+  "Last name of the new professional user"
+  lastName: String!
+  """
+  Password of the new professional user.
+  The `password` and `samlUserId` fields are mutually exclusive: only of them can be set, because only one authentication method can be used.
+  """
+  password: String
+  """
+  Ids of the projects to assign to the user.
+  The project ids determine which projects the professional user will be able to handle conversations for
+  """
+  projectIds: [LegacyId!]! = []
+  """
+  Pseudo of the new professional user.
+  The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile.
+  """
+  pseudo: String!
+  "Role name of the new professional user, must be either \"operator\", \"manager\" or \"admin\""
+  roleName: String!
+  """
+  Id used to bind a user from a SAML identity provider to an iAdvize user.
+  The `password` and `samlUserId` fields are mutually exclusive: only of them can be set, because only one authentication method can be used.
+  """
+  samlUserId: String
+  """
+  Ids of the skills to assign to the user.
+  Users can be organised by skill in order to automatically direct visitors towards the right agent.
+  For in-depth documentation, please check the following page: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skillIds: [LegacyId!]! = []
+  """
+  Languages spoken by the professional user.
+  This field determines in which languages the user will be able to handle conversations.
+  """
+  spokenLanguages: [Language!]! = []
+}
+
+"Input for the `professionalSetExternalId` mutation."
+input ProfessionalSetExternalIdInput {
+  """
+  Set the user's external id to the given value.
+  The external id is an identifier representing the user in another system.
+  """
+  externalId: String!
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalSetGroup` mutation."
+input ProfessionalSetGroupInput {
+  """
+  Set the user's group id to the given value.
+  Groups allow information and user exchanges to be compartmentalised in the iAdvize administration.
+  For in-depth documentation, please check the following page: https://help.iadvize.com/hc/en-gb/articles/203280696-Use-the-user-groups.
+  """
+  groupId: LegacyId!
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalSetProjects` mutation."
+input ProfessionalSetProjectsInput {
+  """
+  Ids of the projects to assign to the user.
+  The project ids determine which projects the professional user will be able to handle conversations for
+  """
+  projectIds: [LegacyId!]!
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalSetSkills` mutation."
+input ProfessionalSetSkillsInput {
+  """
+  Ids of the skills to assign to the user.
+  Users can be organised by skill in order to automatically direct visitors towards the right agent.
+  For in-depth documentation, please check the following page: https://help.iadvize.com/hc/en-gb/articles/203444283-Use-the-skills.
+  """
+  skillIds: [LegacyId!]!
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalUnsetExternalId` mutation."
+input ProfessionalUnsetExternalIdInput {
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalUnsetGroup` mutation."
+input ProfessionalUnsetGroupInput {
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Input for the `professionalUpdate` mutation. Besides `userId`, all fields are optional, which allows updating only the desired user information."
+input ProfessionalUpdateInput {
+  "Set the user's click to call phone number"
+  clickToCallPhoneNumber: String
+  """
+  Set the user's email address to the given value.
+  If omitted or `null`, the user's email won't be changed.
+  """
+  email: String
+  """
+  Set the user's first name to the given value.
+  If `null`, the user's first name will be unset.
+  If omitted, the user's first name will not be changed.
+  """
+  firstName: String
+  """
+  Set the user's interface language to the given value.
+  If omitted or `null`, the user's interface language won't be changed.
+  """
+  interfaceLanguage: Locale
+  """
+  Set the user's last name to the given value.
+  If omitted or `null`, the user's last name won't be changed.
+  """
+  lastName: String
+  """
+  Set the user's password to the given value.
+  The password must be at least 10 characters long.
+  If omitted or `null`, the user's password won't be changed.
+  """
+  password: String
+  """
+  Set the user's pseudo to the given value.
+  The user pseudo will be displayed under the avatar in the chatbox. It can be used to keep the real identity of agents secret and to attribute a nickname to the user profile.
+  If omitted or `null`, the user's pseudo won't be changed.
+  """
+  pseudo: String
+  """
+  Set the user's role to the given value.
+  The role name must be either "operator", "manager", or "admin".
+  If omitted or `null`, the user's role won't be changed.
+  """
+  roleName: String
+  """
+  Set the user's spoken languages to the given values.
+  This field determines in which languages the user will be able to handle conversations.
+  If omitted or `null`, the user's spoken languages won't be changed.
+  """
+  spokenLanguages: [Language!]
+  "Id of the professional user to update."
+  userId: LegacyId!
+}
+
+"Filters for search closed conversations query"
+input SearchClosedConversationsFilters {
+  "Filter by answered conversations"
+  answered: Boolean
+  "Filter by automation level"
+  automationLevels: [AutomationLevel!]
+  "Filter by category ids"
+  categoryIds: [LegacyId!]
+  "Filter on conversation channels"
+  channels: [String!]
+  "Filter on conversation id"
+  conversationId: UUID
+  "Filter on conversation visitor ids"
+  conversationVisitorIds: [UUID!]
+  "Filter on customer satisfaction"
+  customerSatisfaction: [Int!]
+  "Filter by engagement campaign"
+  engagementCampaignIds: [UUID!]
+  "Filter on accepted escalations types"
+  escalationsAccepted: [EscalationType!]
+  "Filter on legacy conversation ids"
+  legacyConversationIds: [LegacyId!]
+  "Filter by keywords"
+  messagesSearches: [String!]
+  "Filter on NPS"
+  netPromoterScore: [Int!]
+  "Filter on iAdvize projects"
+  projectIds: [LegacyId!]
+  "Filter on tag ids"
+  tagIds: [LegacyId!]
+  "Filter on legacy user ids"
+  userIds: [LegacyId!]
+}
+
+"Input for the `userDelete` mutation."
+input UserDeleteInput {
+  "Id of the user to delete."
+  userId: LegacyId!
+}
