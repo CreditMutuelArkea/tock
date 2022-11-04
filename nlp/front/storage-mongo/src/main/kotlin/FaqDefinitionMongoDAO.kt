@@ -290,13 +290,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     }
 
     private fun FaqQuery.filterTextSearchOnFaqName() =
-        if (search == null) null else FaqQueryResult::faq / IntentDefinition::name regex search!!
+        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::name).regex(pattern = search!!, options = "i")
 
     private fun FaqQuery.filterTextSearchOnFaqDescription() =
-        if (search == null) null else FaqQueryResult::faq / IntentDefinition::description regex search!!
+        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::description).regex(pattern = search!!, options = "i")
 
     private fun FaqQuery.filterTextSearchOnClassifiedSentence() =
-        if (search == null) null else FaqQueryResult::utterances.allPosOp / ClassifiedSentence::text regex search!!
+        if (search == null) null else (FaqQueryResult::utterances.allPosOp / ClassifiedSentence::text).regex(pattern = search!!, options = "i")
 
     /**
      *  add the filter on deleted Classified Sentences if cannot use aggegration pipeline with documentDB

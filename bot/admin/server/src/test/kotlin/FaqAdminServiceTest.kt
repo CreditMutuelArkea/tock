@@ -52,6 +52,7 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.provider
+import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -736,6 +737,9 @@ class FaqAdminServiceTest : AbstractTest() {
             val searchResult = Pair(searchedWithLabels, searchedWithLabels.size.toLong())
 
             every { i18nDAO.getLabels(namespace, any()) } returns mockedI18nLabels
+
+            val i18nLabelId: CapturingSlot<Id<I18nLabel>> = slot()
+            every { i18nDAO.getLabelById(capture(i18nLabelId))} answers { mockedI18nLabels.firstOrNull { it._id == i18nLabelId.captured } }
 
             every { faqDefinitionDAO.getFaqDetailsWithCount(any(), any(), any()) } returns searchResult
 

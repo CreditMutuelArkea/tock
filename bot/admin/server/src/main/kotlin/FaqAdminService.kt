@@ -138,7 +138,8 @@ object FaqAdminService {
             val intent = findFaqDefinitionIntent(query.id.toId())
             intent ?: badRequest("Faq (id:${query.id}) intent not found !")
             // Update intent label when updating FAQ title
-            AdminService.createOrUpdateIntent(application.namespace, intent.copy(label = query.title))!!
+            val intentUpdated = AdminService.createOrUpdateIntent(application.namespace, intent.copy(label = query.title))
+            intentUpdated ?: badRequest("Trouble when updating intent : ${query.intentName}")
         } else {
             // New FAQ
             createIntent(query, application) ?: badRequest("Trouble when creating intent : ${query.intentName}")
@@ -508,7 +509,7 @@ object FaqAdminService {
         if (i18nLabels.isNotEmpty()) {
             val fromTockBotDb = faqQuery.map { faqQueryResult ->
                 faqQueryResult.toFaqDefinitionDetailed(faqQueryResult,
-                    i18nLabels.firstOrNull { it._id == faqQueryResult.i18nId }
+                    i18nDao.getLabelById(faqQueryResult.i18nId)
                         ?: unknownI18n(applicationDefinition).also { logger.warn { WARN_CANNOT_FIND_LABEL } })
             }.toSet()
 
