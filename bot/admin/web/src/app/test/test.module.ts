@@ -34,7 +34,8 @@ import {
   NbRouteTabsetModule,
   NbSelectModule,
   NbTooltipModule,
-  NbInputModule
+  NbInputModule,
+  NbSpinnerModule
 } from '@nebular/theme';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ScenariosModule } from '../scenarios/scenarios.module';
@@ -86,7 +87,8 @@ export class BotTestRoutingModule {}
     NbAccordionModule,
     NbInputModule,
     ReactiveFormsModule,
-    ScenariosModule
+    ScenariosModule,
+    NbSpinnerModule
   ],
   declarations: [TestTabsComponent, BotDialogComponent, TestPlanComponent, DisplayNlpStatsComponent],
   exports: [],

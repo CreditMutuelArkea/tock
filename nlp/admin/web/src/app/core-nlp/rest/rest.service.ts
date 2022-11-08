@@ -89,11 +89,19 @@ export class RestService {
     );
   }
 
-  post<I, O>(path: string, value?: I, parseFunction?: (value: any) => O, baseUrl?: string, returnErrorOn400 = false): Observable<O> {
+  post<I, O>(
+    path: string,
+    value?: I,
+    parseFunction?: (value: any) => O,
+    baseUrl?: string,
+    returnErrorOn400 = false,
+    params = {}
+  ): Observable<O> {
     return this.http
       .post(`${baseUrl ? baseUrl : this.url}${path}`, JsonUtils.stringify(value), {
         headers: this.headers(),
-        withCredentials: true
+        withCredentials: true,
+        params: params
       })
       .pipe(
         map((res: string) => (parseFunction ? parseFunction(res || {}) : ((res || {}) as O))),

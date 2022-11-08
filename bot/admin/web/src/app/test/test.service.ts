@@ -33,8 +33,10 @@ import { Observable } from 'rxjs';
 export class TestService {
   constructor(private rest: RestService, private state: StateService) {}
 
-  talk(query: BotDialogRequest): Observable<BotDialogResponse> {
-    return this.rest.post('/test/talk', query, BotDialogResponse.fromJSON);
+  talk(query: BotDialogRequest, debug = false): Observable<BotDialogResponse> {
+    let params = {};
+    if (debug) params = { debug: true };
+    return this.rest.post('/test/talk', query, BotDialogResponse.fromJSON, null, false, params);
   }
 
   getDebugLog(namespace: String, botApplicationConfigurationId: String): Observable<ScenarioDebug> {
