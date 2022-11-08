@@ -775,7 +775,9 @@ open class BotAdminVerticle : AdminVerticle() {
             if (query.utterances.isEmpty() && query.title.isBlank() && query.answer.isBlank()) {
                 badRequest("Missing argument or trouble in query: $query")
             } else {
-                val applicationDefinition = front.getApplicationById(query.applicationId)
+
+                val applicationDefinition = front.getApplicationByNamespaceAndName(namespace = context.organization, name = query.applicationName)
+
                 if (context.organization == applicationDefinition?.namespace) {
                     return@blockingJsonPost FaqAdminService.saveFAQ(query, context.userLogin, applicationDefinition)
                 } else {

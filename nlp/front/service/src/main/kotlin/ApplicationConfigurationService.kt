@@ -94,7 +94,7 @@ object ApplicationConfigurationService :
         intentDAO.getIntentsByApplicationId(id).forEach { intent ->
             removeIntentFromApplication(app, intent._id)
         }
-        faqDefinitionDAO.deleteFaqDefinitionByApplicationId(id)
+        faqDefinitionDAO.deleteFaqDefinitionByBotId(app.name)
         applicationDAO.deleteApplicationById(id)
     }
 
@@ -318,7 +318,7 @@ object ApplicationConfigurationService :
         ConfigurationRepository.entityTypeByName(name)?.obfuscated ?: true
 
     override fun getFaqsDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition>
-            = faqDefinitionDAO.getFaqDefinitionByApplicationId(id)
+            = getApplicationById(id)?.let { faqDefinitionDAO.getFaqDefinitionByBotId(it.name) } ?: arrayListOf()
 
     override fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition?
             = faqDefinitionDAO.getFaqDefinitionByIntentId(id)
