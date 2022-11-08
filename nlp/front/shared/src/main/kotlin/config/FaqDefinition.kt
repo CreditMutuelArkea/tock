@@ -31,7 +31,12 @@ data class FaqDefinition(
     /**
      * The application id.
      */
-    val applicationId: Id<ApplicationDefinition>,
+    //val applicationId: Id<ApplicationDefinition>,
+
+    /**
+     * The bot id (that corresponds to the application name).
+     */
+    val botId: String,
 
     /**
      * The intent id.

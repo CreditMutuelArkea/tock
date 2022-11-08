@@ -102,6 +102,7 @@ class FaqAdminServiceTest : AbstractTest() {
         }
 
         private val applicationId = newId<ApplicationDefinition>()
+        private val botId ="botId"
         private val intentId = "idIntent".toId<IntentDefinition>()
         private val intentId2 = "idIntent2".toId<IntentDefinition>()
         private val intentId3 = "idIntent3".toId<IntentDefinition>()
@@ -122,7 +123,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
         private const val userLogin: UserLogin = "userLogin"
 
-        private val faqDefinition = FaqDefinition(faqId, applicationId, intentId, i18nId, tagList, true, now, now)
+        private val faqDefinition = FaqDefinition(faqId, "", intentId, i18nId, tagList, true, now, now)
 
         val applicationDefinition =
             ApplicationDefinition("my App", namespace = namespace, supportedLocales = setOf(Locale.FRENCH))
@@ -135,7 +136,8 @@ class FaqAdminServiceTest : AbstractTest() {
             faqId.toString(),
             intentId.toString(),
             Locale.FRENCH,
-            applicationId,
+            // applicationId,
+            "",
             now,
             now,
             "FAQ TITLE",
@@ -340,7 +342,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 fun `GIVEN save faq WHEN and saving the same story THEN update the story`() {
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     val savedFaqDefinition =
-                        FaqDefinition(faqId, applicationId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
+                        FaqDefinition(faqId, "", intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
                         faqAdminService["getFaqIntent"](
@@ -626,7 +628,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
             verify(exactly = 1) {
                 faqDefinitionDAO.getFaqDetailsWithCount(
-                    any(), applicationDefinition._id.toString(), null
+                    any(), applicationDefinition.name, null
                 )
             }
             verify(exactly = 0) {
@@ -787,7 +789,7 @@ class FaqAdminServiceTest : AbstractTest() {
             intentId: Id<IntentDefinition> = FaqAdminServiceTest.intentId,
             i18nId: Id<I18nLabel> = FaqAdminServiceTest.i18nId,
             tagList: List<String> = emptyList(),
-            applicationId: Id<ApplicationDefinition> = FaqAdminServiceTest.applicationId,
+            botId: String = FaqAdminServiceTest.botId,
             enabled: Boolean = true,
             faqName: String = "Faq Name",
             numberOfUtterances: Int = 1,
@@ -814,7 +816,7 @@ class FaqAdminServiceTest : AbstractTest() {
             }
 
             return FaqQueryResult(
-                faqId, applicationId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent, intentName
+                faqId, botId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent, intentName
             )
         }
 

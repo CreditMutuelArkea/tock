@@ -93,7 +93,7 @@ object FaqAdminService {
         val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
         val intent = getFaqIntent(query, application)
 
-        createOrUpdateUtterances(query, intent._id, userLogin)
+        createOrUpdateUtterances(query, application, intent._id, userLogin)
 
         val existingFaq: FaqDefinition? = faqDefinitionDAO.getFaqDefinitionByIntentId(intent._id)
         val i18nLabel: I18nLabel = manageI18nLabelUpdate(query, application.namespace, existingFaq)
@@ -112,7 +112,8 @@ object FaqAdminService {
             faqDefinition._id.toString(),
             faqDefinition.intentId.toString(),
             query.language,
-            query.applicationId,
+            // query.applicationId,
+            query.applicationName,
             faqDefinition.creationDate,
             faqDefinition.updateDate,
             intent.label.toString(),
@@ -157,7 +158,7 @@ object FaqAdminService {
             logger.info { "Updating FAQ \"${intent.label}\"" }
             FaqDefinition(
                 _id = existingFaq._id,
-                applicationId = existingFaq.applicationId,
+                botId = existingFaq.botId,
                 intentId = existingFaq.intentId,
                 i18nId = existingFaq.i18nId,
                 tags = query.tags,
@@ -168,7 +169,7 @@ object FaqAdminService {
         } else {
             logger.info { "Creating FAQ \"${intent.label}\"" }
             FaqDefinition(
-                applicationId = application._id,
+                botId = application.name,
                 intentId = intent._id,
                 i18nId = i18nLabel._id,
                 tags = query.tags,
@@ -217,7 +218,7 @@ object FaqAdminService {
         applicationDefinition: ApplicationDefinition, faqSettings: FaqSettings
     ) {
 
-        val listFaq = faqDefinitionDAO.getFaqDefinitionByApplicationId(applicationDefinition._id)
+        val listFaq = faqDefinitionDAO.getFaqDefinitionByBotId(applicationDefinition.name)
 
         listFaq.forEach {
             val currentIntent = it.intentId.let {
@@ -346,15 +347,16 @@ object FaqAdminService {
      * Create or updates questions uterrances for the specified intent
      */
     private fun createOrUpdateUtterances(
-        query: FaqDefinitionRequest, intentId: Id<IntentDefinition>, userLogin: UserLogin
+        query: FaqDefinitionRequest, app: ApplicationDefinition, intentId: Id<IntentDefinition>, userLogin: UserLogin
     ) {
         val sentences: Pair<List<String>, List<ClassifiedSentence>> =
-            checkSentencesToAddOrDelete(query.utterances, query.language, query.applicationId, intentId)
+            checkSentencesToAddOrDelete(query.utterances, query.language, app._id, intentId)
 
         val notYetPresentSentences: List<String> = sentences.first
         notYetPresentSentences.forEach { utterance ->
+            //TODO("check necessary usage of runBlocking{}")
             runBlocking {
-                BotAdminService.saveSentence(utterance, query.language, query.applicationId, intentId, userLogin)
+                BotAdminService.saveSentence(utterance, query.language, app._id, intentId, userLogin)
                     .also { logger.info { "Saving classified sentence $it" } }
             }
         }
@@ -424,7 +426,7 @@ object FaqAdminService {
         //first is the List<FaqQueryResult>
         //second is the total count
         val faqDetailsWithCount = faqDefinitionDAO.getFaqDetailsWithCount(
-            query.toFaqQuery(), applicationDefinition._id.toString(), i18nIds
+            query.toFaqQuery(), applicationDefinition.name.toString(), i18nIds
         )
 
         //search from tock bot Db with labels if some are found
@@ -623,7 +625,8 @@ object FaqAdminService {
                     faqDefinition._id.toString(),
                     faqDefinition.intentId.toString(),
                     currentLanguage,
-                    applicationDefinition._id,
+                    //applicationDefinition._id,
+                    applicationDefinition.name,
                     faqDefinition.creationDate,
                     faqDefinition.updateDate,
                     faqDefinition.faq.label.orEmpty(),

@@ -17,7 +17,6 @@
 package ai.tock.nlp.front.storage.mongo
 
 import ai.tock.nlp.front.service.storage.FaqDefinitionDAO
-import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.Classification
 import ai.tock.nlp.front.shared.config.ClassifiedSentence
 import ai.tock.nlp.front.shared.config.ClassifiedSentenceStatus
@@ -36,43 +35,11 @@ import com.mongodb.client.model.UnwindOptions
 import com.mongodb.client.model.Variable
 import mu.KotlinLogging
 import org.bson.conversions.Bson
-import org.litote.kmongo.Id
+import org.litote.kmongo.*
 import org.litote.kmongo.MongoOperator.and
 import org.litote.kmongo.MongoOperator.eq
 import org.litote.kmongo.MongoOperator.ne
-import org.litote.kmongo.addToSet
-import org.litote.kmongo.aggregate
-import org.litote.kmongo.allPosOp
-import org.litote.kmongo.and
-import org.litote.kmongo.ascending
-import org.litote.kmongo.deleteOneById
-import org.litote.kmongo.descending
-import org.litote.kmongo.div
-import org.litote.kmongo.document
-import org.litote.kmongo.ensureUniqueIndex
-import org.litote.kmongo.eq
-import org.litote.kmongo.excludeId
-import org.litote.kmongo.expr
-import org.litote.kmongo.findOne
-import org.litote.kmongo.findOneById
-import org.litote.kmongo.first
-import org.litote.kmongo.from
-import org.litote.kmongo.getCollection
-import org.litote.kmongo.group
-import org.litote.kmongo.`in`
-import org.litote.kmongo.json
-import org.litote.kmongo.limit
-import org.litote.kmongo.lookup
-import org.litote.kmongo.match
-import org.litote.kmongo.ne
-import org.litote.kmongo.or
-import org.litote.kmongo.project
 import org.litote.kmongo.reactivestreams.getCollection
-import org.litote.kmongo.regex
-import org.litote.kmongo.replaceOneWithFilter
-import org.litote.kmongo.skip
-import org.litote.kmongo.sort
-import org.litote.kmongo.unwind
 import kotlin.reflect.KProperty
 
 object FaqDefinitionMongoDAO : FaqDefinitionDAO {
@@ -88,8 +55,8 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 FaqDefinition::tags,
                 FaqDefinition::updateDate
             )
-            ensureIndex(FaqDefinition::intentId, FaqDefinition::i18nId, FaqDefinition::applicationId)
-            ensureIndex(FaqDefinition::intentId, FaqDefinition::creationDate, FaqDefinition::applicationId)
+            ensureIndex(FaqDefinition::intentId, FaqDefinition::i18nId, FaqDefinition::botId)
+            ensureIndex(FaqDefinition::intentId, FaqDefinition::creationDate, FaqDefinition::botId)
         }
         c
     }
@@ -106,16 +73,24 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.deleteOneById(id)
     }
 
-    override fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>) {
-        col.deleteMany(FaqDefinition::applicationId eq id)
+    //override fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>) {
+    //    col.deleteMany(FaqDefinition::applicationId eq id)
+    //}
+
+    override fun deleteFaqDefinitionByBotId(id: String) {
+        col.deleteMany(FaqDefinition::botId eq id)
     }
 
     override fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition? {
         return col.findOneById(id)
     }
 
-    override fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition> {
-        return col.find(FaqDefinition::applicationId eq id).into(ArrayList())
+    //override fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition> {
+    //    return col.find(FaqDefinition::applicationId eq id).into(ArrayList())
+    //}
+
+    override fun getFaqDefinitionByBotId(id: String): List<FaqDefinition> {
+        return col.find(FaqDefinition::botId eq id).into(ArrayList())
     }
 
     override fun getFaqDefinitionByIntentId(id: Id<IntentDefinition>): FaqDefinition? {
@@ -142,7 +117,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.replaceOneWithFilter(
             and(
                 FaqDefinition::_id eq faqDefinition._id,
-                FaqDefinition::applicationId eq faqDefinition.applicationId,
+                //FaqDefinition::applicationId eq faqDefinition.applicationId,
                 FaqDefinition::intentId eq faqDefinition.intentId,
                 FaqDefinition::i18nId eq faqDefinition.i18nId,
             ),
@@ -159,15 +134,15 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      */
     override fun getFaqDetailsWithCount(
         query: FaqQuery,
-        applicationId: String,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): Pair<List<FaqQueryResult>, Long> {
         with(query) {
             //prepare aggregation without skip and limit to know the total number of faq available
             val baseAggregation = if (isDocumentDB()) {
-                prepareFaqDetailBaseAggregationDocumentDb(query, applicationId, i18nIds)
+                prepareFaqDetailBaseAggregationDocumentDb(query, botId, i18nIds)
             } else {
-                prepareFaqDetailBaseAggregation(query, applicationId, i18nIds)
+                prepareFaqDetailBaseAggregation(query, botId, i18nIds)
             }
 
             logger.debug { baseAggregation.map { it.json } }
@@ -207,7 +182,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      */
     private fun prepareFaqDetailBaseAggregation(
         query: FaqQuery,
-        applicationId: String,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
@@ -229,7 +204,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                             filterI18nIds(i18nIds)
                         ),
                         andNotNull(
-                            filterOnApplicationId(applicationId),
+                            filterOnBotId(botId),
                             filterTags(),
                             filterEnabled(),
                         )
@@ -249,7 +224,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      */
     private fun prepareFaqDetailBaseAggregationDocumentDb(
         query: FaqQuery,
-        applicationId: String,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
@@ -270,7 +245,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 match(
                     andNotNull(
                         andNotNull(
-                            filterOnApplicationId(applicationId),
+                            filterOnBotId(botId),
                             filterTags(),
                             filterEnabled(),
                             filterNotDeletedClassifiedSentencesStatus()
@@ -325,9 +300,11 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     /**
      * Filter on th applicationId
      */
-    private fun filterOnApplicationId(applicationId: String): Bson =
-        FaqDefinition::applicationId `in` applicationId
+    //private fun filterOnApplicationId(applicationId: String): Bson =
+    //    FaqDefinition::applicationId `in` applicationId
 
+    private fun filterOnBotId(botId: String): Bson =
+        FaqDefinition::botId eq  botId
 
     /**
      * Group aggregation pipeline to recompose and group data after multiple unwind especially due to utterances unwind
@@ -336,7 +313,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         group(
             FaqQueryResult::_id,
             listOf(
-                FaqQueryResult::applicationId first FaqQueryResult::applicationId,
+                FaqQueryResult::botId first FaqQueryResult::botId,
                 FaqQueryResult::intentId first FaqQueryResult::intentId,
                 FaqQueryResult::i18nId first FaqQueryResult::i18nId,
                 FaqQueryResult::tags first FaqQueryResult::tags,
@@ -403,15 +380,15 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
     /**
      * Retrieve tags according to the applicationId present in IntentDefinition with aggregation
-     * @param applicationId : the applicationId
+     * @param botId : the applicationId
      * @return a string list of tags
      */
-    override fun getTags(applicationId: String): List<String> {
+    override fun getTags(botId: String): List<String> {
         return col.aggregate<FaqDefinitionTag>(
             joinOnIntentDefinition(),
             match(
                 andNotNull(
-                    filterOnApplicationId(applicationId)
+                    filterOnBotId(botId)
                 )
             ),
             // unwind : to flat tags array into an object
