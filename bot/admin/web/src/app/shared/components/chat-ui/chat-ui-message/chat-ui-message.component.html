@@ -5,7 +5,10 @@
 
 <div class="message">
   <div class="message-text">
-    <p class="sender">
+    <p
+      class="sender"
+      *ngIf="sender || date"
+    >
       {{ sender }} <time>{{ date | date: 'HH:mm:ss y/MM/dd' }}</time>
     </p>
     <p class="text">{{ message }}</p>

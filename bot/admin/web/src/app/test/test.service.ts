@@ -32,8 +32,10 @@ import { Observable } from 'rxjs';
 export class TestService {
   constructor(private rest: RestService, private state: StateService) {}
 
-  talk(query: BotDialogRequest): Observable<BotDialogResponse> {
-    return this.rest.post('/test/talk', query, BotDialogResponse.fromJSON);
+  talk(query: BotDialogRequest, debug = false): Observable<BotDialogResponse> {
+    let params = {};
+    if (debug) params = { debug: true };
+    return this.rest.post('/test/talk', query, BotDialogResponse.fromJSON, null, false, params);
   }
 
   getTestPlans(): Observable<TestPlan[]> {
@@ -49,10 +51,7 @@ export class TestService {
   }
 
   getTestPlanExecutionStatus(planId: string, executionId: string): Observable<TestPlanExecution> {
-    return this.rest.get(
-      `/test/plan/${planId}/executions/${executionId}`,
-      TestPlanExecution.fromJSON
-    );
+    return this.rest.get(`/test/plan/${planId}/executions/${executionId}`, TestPlanExecution.fromJSON);
   }
 
   saveTestPlan(plan: TestPlan): Observable<boolean> {
@@ -69,10 +68,7 @@ export class TestService {
   }
 
   removeDialogFromTestPlan(planId: string, dialogId: string): Observable<boolean> {
-    return this.rest.post(
-      `/test/plan/${planId}/dialog/delete/${dialogId}`,
-      this.state.createApplicationScopedQuery()
-    );
+    return this.rest.post(`/test/plan/${planId}/dialog/delete/${dialogId}`, this.state.createApplicationScopedQuery());
   }
 
   executeXRay(conf: XRayPlanExecutionConfiguration): Observable<XRayPlanExecutionResult> {

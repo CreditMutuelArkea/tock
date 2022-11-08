@@ -30,17 +30,20 @@ import { NbToastrService } from '@nebular/theme';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { APP_BASE_HREF } from '@angular/common';
 import { ScenarioService } from 'src/app/scenarios/services/scenario.service';
+import { EventType } from '../../core/model/configuration';
 
 @Component({
   selector: 'tock-bot-dialog',
   templateUrl: './bot-dialog.component.html',
-  styleUrls: ['./bot-dialog.component.css']
+  styleUrls: ['./bot-dialog.component.scss']
 })
 export class BotDialogComponent implements OnInit, OnDestroy {
   currentConfigurationId: string;
 
   userMessage: string = '';
   messages: TestMessage[] = [];
+
+  debug: boolean = false;
 
   xrayAvailable: boolean = false;
   xrayTestName: string = '';
@@ -128,7 +131,8 @@ export class BotDialogComponent implements OnInit, OnDestroy {
           this.state.currentApplication.name,
           this.state.currentLocale,
           this.userModifierId
-        )
+        ),
+        this.debug
       )
       .subscribe((r) => {
         this.loading = false;
@@ -136,17 +140,26 @@ export class BotDialogComponent implements OnInit, OnDestroy {
         userAction.hasNlpStats = r.hasNlpStats;
         userAction.actionId = r.userActionId;
         r.messages.forEach((m) => {
-          this.messages.push(new TestMessage(true, m));
+          let testMssg = new TestMessage(true, m);
+          if (testMssg.message.isSentence()) {
+            let message = testMssg.message as Sentence;
+            if (message.text.indexOf('[DEBUG] ') === 0) {
+              console.log('[DEBUG] found');
+            } else {
+              this.messages.push(testMssg);
+            }
+          }
+
+          // this.messages.push(new TestMessage(true, m));
         });
 
         // TODO MASS : FIX ME !
         (async () => {
-          await new Promise( resolve => setTimeout(resolve, 500) )
+          await new Promise((resolve) => setTimeout(resolve, 500));
           this.scenarioService.getScenarioDebug().subscribe((response) => {
             this.imgBase64 = response.imgBase64;
           });
         })();
-
       });
   }
 
@@ -215,6 +228,16 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     this.xrayTestName = '';
     this.isXrayTestNameFilled = false;
   }
+
+  getUserAvatar(isBot: boolean): string {
+    if (isBot) return this.userIdentities.bot.avatar;
+    return this.userIdentities.client.avatar;
+  }
+
+  userIdentities = {
+    client: { name: 'Human', avatar: 'assets/images/scenario-client.svg' },
+    bot: { name: 'Bot', avatar: 'assets/images/scenario-bot.svg' }
+  };
 }
 
 @Component({
@@ -237,8 +260,5 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     </div>`
 })
 export class DisplayNlpStatsComponent {
-  constructor(
-    public dialogRef: MatDialogRef<DisplayNlpStatsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
+  constructor(public dialogRef: MatDialogRef<DisplayNlpStatsComponent>, @Inject(MAT_DIALOG_DATA) public data: any) {}
 }
