@@ -111,7 +111,6 @@ class FaqAdminServiceSettingsTest : AbstractTest() {
     private fun generateFAQ(intent: IntentDefinition, faqId: String): FaqDefinition {
         return FaqDefinition(
             _id = faqId.toId(),
-            //applicationId = "appId-$faqId".toId(),
             "botId",
             intentId = intent._id,
             i18nId = "i18nId-$faqId".toId(),

@@ -35,11 +35,43 @@ import com.mongodb.client.model.UnwindOptions
 import com.mongodb.client.model.Variable
 import mu.KotlinLogging
 import org.bson.conversions.Bson
-import org.litote.kmongo.*
+import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator.and
 import org.litote.kmongo.MongoOperator.eq
 import org.litote.kmongo.MongoOperator.ne
+import org.litote.kmongo.addToSet
+import org.litote.kmongo.aggregate
+import org.litote.kmongo.allPosOp
+import org.litote.kmongo.and
+import org.litote.kmongo.ascending
+import org.litote.kmongo.deleteOneById
+import org.litote.kmongo.descending
+import org.litote.kmongo.div
+import org.litote.kmongo.document
+import org.litote.kmongo.ensureUniqueIndex
+import org.litote.kmongo.eq
+import org.litote.kmongo.excludeId
+import org.litote.kmongo.expr
+import org.litote.kmongo.findOne
+import org.litote.kmongo.findOneById
+import org.litote.kmongo.first
+import org.litote.kmongo.from
+import org.litote.kmongo.getCollection
+import org.litote.kmongo.group
+import org.litote.kmongo.`in`
+import org.litote.kmongo.json
+import org.litote.kmongo.limit
+import org.litote.kmongo.lookup
+import org.litote.kmongo.match
+import org.litote.kmongo.ne
+import org.litote.kmongo.or
+import org.litote.kmongo.project
 import org.litote.kmongo.reactivestreams.getCollection
+import org.litote.kmongo.regex
+import org.litote.kmongo.replaceOneWithFilter
+import org.litote.kmongo.skip
+import org.litote.kmongo.sort
+import org.litote.kmongo.unwind
 import kotlin.reflect.KProperty
 
 object FaqDefinitionMongoDAO : FaqDefinitionDAO {
@@ -73,10 +105,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.deleteOneById(id)
     }
 
-    //override fun deleteFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>) {
-    //    col.deleteMany(FaqDefinition::applicationId eq id)
-    //}
-
     override fun deleteFaqDefinitionByBotId(id: String) {
         col.deleteMany(FaqDefinition::botId eq id)
     }
@@ -84,10 +112,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     override fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition? {
         return col.findOneById(id)
     }
-
-    //override fun getFaqDefinitionByApplicationId(id: Id<ApplicationDefinition>): List<FaqDefinition> {
-    //    return col.find(FaqDefinition::applicationId eq id).into(ArrayList())
-    //}
 
     override fun getFaqDefinitionByBotId(id: String): List<FaqDefinition> {
         return col.find(FaqDefinition::botId eq id).into(ArrayList())
@@ -117,7 +141,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         col.replaceOneWithFilter(
             and(
                 FaqDefinition::_id eq faqDefinition._id,
-                //FaqDefinition::applicationId eq faqDefinition.applicationId,
                 FaqDefinition::intentId eq faqDefinition.intentId,
                 FaqDefinition::i18nId eq faqDefinition.i18nId,
             ),
@@ -298,11 +321,8 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     private fun FaqQuery.filterEnabled(): Bson? = if (enabled == null) null else FaqQueryResult::enabled eq enabled
 
     /**
-     * Filter on th applicationId
+     * Filter on the botId
      */
-    //private fun filterOnApplicationId(applicationId: String): Bson =
-    //    FaqDefinition::applicationId `in` applicationId
-
     private fun filterOnBotId(botId: String): Bson =
         FaqDefinition::botId eq  botId
 

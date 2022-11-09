@@ -298,7 +298,6 @@ internal object ApplicationCodecService : ApplicationCodec {
                 if(faq == null) {
                     val newFaq = it.copy(
                         _id = newId(),
-                        //applicationId = appId,
                         botId =  botId,
                         intentId = intentDB._id
                     )

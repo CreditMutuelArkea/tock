@@ -136,8 +136,7 @@ class FaqAdminServiceTest : AbstractTest() {
             faqId.toString(),
             intentId.toString(),
             Locale.FRENCH,
-            // applicationId,
-            "",
+            botId,
             now,
             now,
             "FAQ TITLE",
@@ -342,7 +341,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 fun `GIVEN save faq WHEN and saving the same story THEN update the story`() {
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     val savedFaqDefinition =
-                        FaqDefinition(faqId, "", intentId, i18nId, listOf("NEW TAG"), true, now, now)
+                        FaqDefinition(faqId, botId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
                         faqAdminService["getFaqIntent"](

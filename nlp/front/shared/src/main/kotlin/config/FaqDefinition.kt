@@ -29,11 +29,6 @@ data class FaqDefinition(
     val _id: Id<FaqDefinition> = newId(),
 
     /**
-     * The application id.
-     */
-    //val applicationId: Id<ApplicationDefinition>,
-
-    /**
      * The bot id (that corresponds to the application name).
      */
     val botId: String,

@@ -117,7 +117,6 @@ class ApplicationCodecServiceTest : AbstractTest() {
     fun `importing existing app with a new faq`() {
 
         val faq = FaqDefinition(
-            //applicationId= app._id,
             botId = app.name,
             intentId= defaultIntentDefinition._id,
             i18nId= newId<I18nLabel>(),
