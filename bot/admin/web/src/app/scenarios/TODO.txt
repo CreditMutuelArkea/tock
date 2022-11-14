@@ -14,6 +14,10 @@ Shared
 
         Import: faut-il préciser les erreurs correspondantes à un mauvais contenu du fichier ? (A voir à l'usage)
 
+Test    
+        
+        C'est quoi sentence.userInterface ?
+
 Scenarios list
 
         Proposer l'option d'inclure l'entrainement des intents (sentences) dans l'export des scenarios

@@ -30,9 +30,8 @@
           >
           </tock-select-bot>
 
-          <div>
+          <div *ngIf="xrayAvailable">
             <button
-              *ngIf="xrayAvailable"
               [nbTooltip]="testContext ? 'Disable test context' : 'Enable test context'"
               nbTooltipStatus="info"
               nbButton
@@ -153,72 +152,90 @@
       </nb-accordion>
     </nb-card-body>
 
-    <nb-card-body>
-      <br />
-      <div [nbSpinner]="loading">
-        <!-- <br /><br /><br />
-            <table
-              *ngIf="messages.length !== 0"
-              class="messages"
-            >
-              <tr *ngFor="let m of messages">
-                <td *ngIf="m.bot">&nbsp;</td>
-                <td
-                  *ngIf="!m.bot"
-                  style="min-width: 200px"
-                >
-                  <span
-                    *ngIf="m.locale"
-                    class="stats"
-                  >
-                    [{{ m.locale }}]
-                    <button
-                      *ngIf="m.hasNlpStats"
-                      mat-icon-button
-                      (click)="displayNlpStats(m)"
-                      matTooltip="View Nlp Stats"
-                      color="primary"
-                    >
-                      <mat-icon>poll</mat-icon>
-                    </button>
-                  </span>
-                  <tock-bot-message
-                    [message]="m.message"
-                    (user)="(true)"
-                  ></tock-bot-message>
-                </td>
-                <td style="width: 30px"></td>
-                <td *ngIf="m.bot">
-                  <tock-bot-message
-                    [message]="m.message"
-                    (reply)="onNewMessage($event)"
-                  ></tock-bot-message>
-                </td>
-              </tr>
-              <tr *ngIf="loading">
-                <td colspan="2"></td>
-                <td>
-                  <img
-                    src="{{ baseHref }}assets/images/loading.gif"
-                    width="40px"
-                    height="40px"
-                  />
-                </td>
-              </tr>
-            </table> -->
-
-        <tock-chat-ui>
-          <tock-chat-ui-message
-            *ngFor="let m of messages"
-            [message]="m.message.text"
-            [reply]="m.bot"
-            [avatar]="getUserAvatar(m.bot)"
+    <nb-card-body [nbSpinner]="loading">
+      <!-- <br />
+      <br /><br /><br />
+      <table
+        *ngIf="messages.length !== 0"
+        class="messages"
+      >
+        <tr *ngFor="let m of messages">
+          <td *ngIf="m.bot">&nbsp;</td>
+          <td
+            *ngIf="!m.bot"
+            style="min-width: 200px"
           >
-          </tock-chat-ui-message>
-        </tock-chat-ui>
+            <span
+              *ngIf="m.locale"
+              class="stats"
+            >
+              [{{ m.locale }}]
+              <button
+                *ngIf="m.hasNlpStats"
+                mat-icon-button
+                (click)="displayNlpStats(m)"
+                matTooltip="View Nlp Stats"
+                color="primary"
+              >
+                <mat-icon>poll</mat-icon>
+              </button>
+            </span>
+            <tock-bot-message
+              [message]="m.message"
+              (user)="(true)"
+            ></tock-bot-message>
+          </td>
+          <td style="width: 30px"></td>
+          <td *ngIf="m.bot">
+            <tock-bot-message
+              [message]="m.message"
+              (reply)="onNewMessage($event)"
+            ></tock-bot-message>
+          </td>
+        </tr>
+        <tr *ngIf="loading">
+          <td colspan="2"></td>
+          <td>
+            <img
+              src="{{ baseHref }}assets/images/loading.gif"
+              width="40px"
+              height="40px"
+            />
+          </td>
+        </tr>
+      </table> -->
 
-        <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
-          <div class="d-flex gap-1 flex-grow-1">
+      <tock-chat-ui
+        height="calc(100vh - 450px)"
+        #chatUi
+      >
+        <tock-chat-ui-message
+          *ngFor="let m of messages"
+          [message]="m.message.text"
+          [reply]="m.bot"
+          [avatar]="getUserAvatar(m.bot)"
+        >
+          <span
+            *ngIf="m.locale"
+            class="stats"
+          >
+            [{{ m.locale }}]
+            <button
+              *ngIf="m.hasNlpStats"
+              mat-icon-button
+              (click)="displayNlpStats(m)"
+              matTooltip="View Nlp Stats"
+              color="primary"
+            >
+              <mat-icon>poll</mat-icon>
+            </button>
+          </span>
+        </tock-chat-ui-message>
+      </tock-chat-ui>
+
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-1 mt-3">
+        <div class="d-flex gap-1 flex-grow-1">
+          <div class="w-100">
             <input
               nbInput
               fullWidth
@@ -227,45 +244,55 @@
               placeholder="Type some text"
               [(ngModel)]="userMessage"
               (keyup.enter)="submit()"
+              autocomplete="off"
+              [nbAutocomplete]="userMessageAutocomplete"
+              (click)="updateUserMessageAutocompleteValues()"
+              (keyup)="updateUserMessageAutocompleteValues($event)"
             />
-            <button
-              nbButton
-              outline
-              status="primary"
-              size="medium"
-              (click)="submit()"
+            <nb-autocomplete
+              #userMessageAutocomplete
+              size="tiny"
             >
-              GO
-            </button>
+              <nb-option
+                *ngFor="let option of userMessageAutocompleteValues | async"
+                [value]="option"
+              >
+                {{ option }}
+              </nb-option>
+            </nb-autocomplete>
           </div>
 
-          <div>
-            <button
-              *ngIf="messages.length !== 0"
-              nbTooltip="Clear conversation"
-              nbTooltipStatus="info"
-              nbButton
-              outline
-              status="danger"
-              size="medium"
-              (click)="clear()"
-            >
-              <nb-icon icon="trash-2-outline"></nb-icon>
-            </button>
-          </div>
+          <button
+            nbButton
+            outline
+            status="primary"
+            size="medium"
+            (click)="submit()"
+          >
+            GO
+          </button>
         </div>
+
+        <button
+          *ngIf="messages.length !== 0"
+          nbTooltip="Clear conversation"
+          nbTooltipStatus="info"
+          nbButton
+          outline
+          status="danger"
+          size="medium"
+          (click)="clear()"
+        >
+          <nb-icon icon="trash-2-outline"></nb-icon>
+        </button>
       </div>
     </nb-card-body>
   </nb-card>
-  <!-- 
+
   <div
     class="graph"
     *ngIf="imgBase64"
   >
-    <img
-      src="data:image/png;base64,{{ imgBase64 }}"
-      style="position: fixed; width: 400px"
-    />
+    <img src="data:image/png;base64,{{ imgBase64 }}" />
   </div>
-</div> -->
 </div>

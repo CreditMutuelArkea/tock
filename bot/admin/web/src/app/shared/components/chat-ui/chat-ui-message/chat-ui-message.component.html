@@ -1,16 +1,19 @@
-<div
-  class="avatar"
-  [style.background-image]="avatarStyle"
-></div>
+<div class="wrapper">
+  <div
+    class="avatar"
+    [style.background-image]="avatarStyle"
+  ></div>
 
-<div class="message">
-  <div class="message-text">
-    <p
-      class="sender"
-      *ngIf="sender || date"
-    >
-      {{ sender }} <time>{{ date | date: 'HH:mm:ss y/MM/dd' }}</time>
-    </p>
-    <p class="text">{{ message }}</p>
+  <div class="message">
+    <div class="message-text">
+      <p
+        class="sender"
+        *ngIf="sender || date"
+      >
+        {{ sender }} <time>{{ date | date: 'HH:mm:ss y/MM/dd' }}</time>
+      </p>
+      <p class="text">{{ message }}</p>
+    </div>
   </div>
 </div>
+<ng-content></ng-content>
