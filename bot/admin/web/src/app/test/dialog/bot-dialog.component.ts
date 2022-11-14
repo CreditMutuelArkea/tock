@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TestService } from '../test.service';
 import { StateService } from '../../core-nlp/state.service';
 import { RestService } from '../../core-nlp/rest/rest.service';
@@ -22,8 +22,8 @@ import { BotDialogRequest, TestMessage, XRayTestPlan } from '../model/test';
 import { BotMessage, Sentence } from '../../shared/model/dialog-data';
 import { BotSharedService } from '../../shared/bot-shared.service';
 import { SelectBotEvent } from '../../shared/select-bot/select-bot.component';
-import { randomString } from '../../model/commons';
-import { Subscription } from 'rxjs';
+import { PaginatedQuery, randomString } from '../../model/commons';
+import { Observable, of, Subscription } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SentenceFilter } from '../../sentences-scroll/sentences-scroll.component';
 import { NbToastrService } from '@nebular/theme';
@@ -31,6 +31,10 @@ import { AnalyticsService } from '../../analytics/analytics.service';
 import { APP_BASE_HREF } from '@angular/common';
 import { ScenarioService } from 'src/app/scenarios/services/scenario.service';
 import { EventType } from '../../core/model/configuration';
+import { take } from 'rxjs-compat/operator/take';
+import { NlpService } from '../../nlp-tabs/nlp.service';
+import { SearchQuery } from '../../model/nlp';
+import { ChatUiComponent } from '../../shared/components';
 
 @Component({
   selector: 'tock-bot-dialog',
@@ -63,6 +67,8 @@ export class BotDialogComponent implements OnInit, OnDestroy {
   private subscription: Subscription;
   testContext = false;
 
+  @ViewChild('chatUi') private chatUi: ChatUiComponent;
+
   imgBase64: String;
 
   constructor(
@@ -72,6 +78,9 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     private shared: BotSharedService,
     private toastrService: NbToastrService,
     private dialog: MatDialog,
+    private nlp: NlpService,
+
+    private scenarioService: ScenarioService, // TODO MASS : FIX ME !
     @Inject(APP_BASE_HREF) public baseHref: string
   ) {}
 
@@ -79,6 +88,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     this.errorUnsuscriber = this.rest.errorEmitter.subscribe((e) => (this.loading = false));
     this.subscription = this.state.configurationChange.subscribe((_) => this.clear());
     this.fillTestPlanFilter();
+    this.getRecentSentences();
   }
 
   private fillTestPlanFilter() {
@@ -117,6 +127,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
   }
 
   private talk(message: BotMessage) {
+    this.userMessageAutocompleteValues = of([]);
     const userAction = new TestMessage(false, message);
     this.messages.push(userAction);
     this.userMessage = '';
@@ -139,22 +150,28 @@ export class BotDialogComponent implements OnInit, OnDestroy {
         userAction.hasNlpStats = r.hasNlpStats;
         userAction.actionId = r.userActionId;
         r.messages.forEach((m) => {
+          console.log(m);
           let testMssg = new TestMessage(true, m);
+          console.log(testMssg);
           if (testMssg.message.isSentence()) {
             let message = testMssg.message as Sentence;
-            if (message.text.indexOf('[DEBUG] ') === 0) {
-              console.log('[DEBUG] found');
+            if (message.text) {
+              if (message.text.startsWith('[DEBUG]') || message.text == '---') {
+                console.log('[DEBUG] found');
+              } else if (message.text.trim().length) {
+                this.messages.push(testMssg);
+              }
             } else {
               this.messages.push(testMssg);
             }
           }
 
-          // this.messages.push(new TestMessage(true, m));
+          setTimeout(() => this.chatUi.scrollToBottom());
         });
 
         // FIXME (WITH DERCBOT-321)
         (async () => {
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          await new Promise((resolve) => setTimeout(resolve, 250));
           this.scenarioService.getScenarioDebug().subscribe((response) => {
             this.imgBase64 = response.imgBase64;
           });
@@ -237,6 +254,40 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     client: { name: 'Human', avatar: 'assets/images/scenario-client.svg' },
     bot: { name: 'Bot', avatar: 'assets/images/scenario-bot.svg' }
   };
+
+  recentSentences: string[];
+  userMessageAutocompleteValues: Observable<string[]>;
+
+  getRecentSentences() {
+    const cursor: number = 0;
+    const pageSize: number = 50;
+    const mark = null;
+    const paginatedQuery: PaginatedQuery = this.state.createPaginatedQuery(cursor, pageSize, mark);
+    const searchQuery = new SearchQuery(
+      paginatedQuery.namespace,
+      paginatedQuery.applicationName,
+      paginatedQuery.language,
+      paginatedQuery.start,
+      paginatedQuery.size,
+      paginatedQuery.searchMark
+    );
+    this.nlp.searchSentences(searchQuery).subscribe((res) => {
+      this.recentSentences = res.rows.map((r) => r.text);
+    });
+  }
+
+  updateUserMessageAutocompleteValues(event?: KeyboardEvent) {
+    if (this.loading) return;
+
+    let results = this.recentSentences;
+
+    if (event) {
+      const targetEvent = event.target as HTMLInputElement;
+      results = results.filter((sentence: string) => sentence.toLowerCase().includes(targetEvent.value.trim().toLowerCase()));
+    }
+
+    this.userMessageAutocompleteValues = of(results);
+  }
 }
 
 @Component({

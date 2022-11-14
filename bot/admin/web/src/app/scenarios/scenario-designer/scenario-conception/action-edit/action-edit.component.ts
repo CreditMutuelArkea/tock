@@ -253,6 +253,19 @@ export class ActionEditComponent implements OnInit {
     this.form.markAsDirty();
   }
 
+  handlersAutocompleteValues: Observable<string[]>;
+
+  updateHandlersAutocompleteValues(event?: KeyboardEvent): void {
+    let results = this.avalaibleHandlers;
+
+    if (event) {
+      const targetEvent = event.target as HTMLInputElement;
+      results = results.filter((handlerName: string) => handlerName.toLowerCase().includes(targetEvent.value.trim().toLowerCase()));
+    }
+
+    this.handlersAutocompleteValues = of(results);
+  }
+
   contextsAutocompleteValues: Observable<string[]>;
 
   updateContextsAutocompleteValues(event?: KeyboardEvent): void {
