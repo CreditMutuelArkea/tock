@@ -23,7 +23,6 @@ data class FaqDefinitionRequest(
     val id: String?,
     val intentId: String?,
     val language: Locale,
-    // val applicationId: Id<ApplicationDefinition>,
     val applicationName: String,
     val creationDate: Instant?,
     val updateDate: Instant?,

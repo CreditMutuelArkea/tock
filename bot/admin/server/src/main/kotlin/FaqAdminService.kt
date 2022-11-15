@@ -84,6 +84,9 @@ object FaqAdminService {
     private const val WARN_CANNOT_FIND_LABEL = "Could not found an associated i18nLabel"
     private const val WARN_CANNOT_FIND_UTTERANCE = "Could not found an associated ClassifiedSentence"
 
+    /**
+     * Make migration
+     */
     fun makeMigration(){
         faqDefinitionDAO.makeMigration {
              applicationDAO.getApplicationById(it)?.name ?: ""
@@ -431,7 +434,7 @@ object FaqAdminService {
         //first is the List<FaqQueryResult>
         //second is the total count
         val faqDetailsWithCount = faqDefinitionDAO.getFaqDetailsWithCount(
-            query.toFaqQuery(), applicationDefinition.name.toString(), i18nIds
+            query.toFaqQuery(), applicationDefinition.name, i18nIds
         )
 
         //search from tock bot Db with labels if some are found
