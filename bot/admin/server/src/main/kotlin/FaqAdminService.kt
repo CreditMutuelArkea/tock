@@ -100,7 +100,7 @@ object FaqAdminService {
         query: FaqDefinitionRequest, userLogin: UserLogin, application: ApplicationDefinition
     ): FaqDefinitionRequest {
         val faqSettings = faqSettingsDAO.getFaqSettingsByApplicationId(application._id)?.toFaqSettingsQuery()
-        val intent = getFaqIntent(query, application)
+        val intent = createOrUpdateFaqIntent(query, application)
 
         createOrUpdateUtterances(query, application, intent._id, userLogin)
 
@@ -141,10 +141,14 @@ object FaqAdminService {
      * @param query FaqDefinitionRequest
      * @param application ApplicationDefinition
      */
-    private fun getFaqIntent(query: FaqDefinitionRequest, application: ApplicationDefinition): IntentDefinition {
+    private fun createOrUpdateFaqIntent(query: FaqDefinitionRequest, application: ApplicationDefinition): IntentDefinition {
         return if (query.id != null) {
             // Existing FAQ
-            findFaqDefinitionIntent(query.id.toId()) ?: badRequest("Faq (id:${query.id}) intent not found !")
+            val intent = findFaqDefinitionIntent(query.id.toId())
+            intent ?: badRequest("Faq (id:${query.id}) intent not found !")
+            // Update intent label when updating FAQ title
+            val intentUpdated = AdminService.createOrUpdateIntent(application.namespace, intent.copy(label = query.title, description = query.description))
+            intentUpdated ?: badRequest("Trouble when updating intent : ${query.intentName}")
         } else {
             // New FAQ
             createIntent(query, application) ?: badRequest("Trouble when creating intent : ${query.intentName}")
@@ -437,10 +441,9 @@ object FaqAdminService {
             query.toFaqQuery(), applicationDefinition.name, i18nIds
         )
 
-        //search from tock bot Db with labels if some are found
-        val fromTockBotDb = i18nLabels?.let {
-            searchFromTockBotDbWithFoundTextLabels(faqDetailsWithCount.first, applicationDefinition, it)
-        }
+        // Set the i18Label associated with the Faq if exists. Else, set the UNKNOWN_ANSWER.
+        val fromTockBotDb = mapI18LabelFaqAndConvertToFaqDefinitionRequest(faqDetailsWithCount.first, applicationDefinition)
+
         // if no data search from tock front Db
         val fromTockFrontDb = if (fromTockBotDb.isNullOrEmpty()) {
             searchLabelsFromTockFrontDb(faqDetailsWithCount.first, applicationDefinition)
@@ -501,31 +504,24 @@ object FaqAdminService {
         }
 
     /**
-     * Search from the faqQuery the i18Labels associated with the Faq
-     * The search begin from Tock bot database because i18nLabels collection is located inside the database
-     * and there is a search on the text on the label
-     * @param faqQuery: the faq query result from the database query
+     * Set the i18Label associated with the Faq if exists. Else, set the UNKNOWN_ANSWER.
+     * Then convert FaqQueryResult to FaqDefinitionRequest
+     * @param faqQueryResults: the faq query result from the database query
      * @param applicationDefinition: application definition
-     * @param i18nLabels: list of found labels to check from search text
      */
-    private fun searchFromTockBotDbWithFoundTextLabels(
-        faqQuery: List<FaqQueryResult>, applicationDefinition: ApplicationDefinition, i18nLabels: List<I18nLabel>
+    private fun mapI18LabelFaqAndConvertToFaqDefinitionRequest(
+        faqQueryResults: List<FaqQueryResult>,
+        applicationDefinition: ApplicationDefinition
     ): Set<FaqDefinitionRequest> {
-        val faqDetailedResults = LinkedHashSet<FaqDefinitionRequest>()
-        if (i18nLabels.isNotEmpty()) {
-            val fromTockBotDb = faqQuery.map { faqQueryResult ->
-                faqQueryResult.toFaqDefinitionDetailed(faqQueryResult,
-                    i18nLabels.firstOrNull { it._id == faqQueryResult.i18nId }
-                        ?: unknownI18n(applicationDefinition).also { logger.warn { WARN_CANNOT_FIND_LABEL } })
-            }.toSet()
+        val fromTockBotDb = faqQueryResults.map { faqQueryResult ->
+            faqQueryResult.toFaqDefinitionDetailed(faqQueryResult,
+                i18nDao.getLabelById(faqQueryResult.i18nId)
+                    ?: unknownI18n(applicationDefinition).also { logger.warn { WARN_CANNOT_FIND_LABEL } })
+        }.toSet()
 
-            faqDetailedResults.addAll(
-                convertFaqDefinitionDetailedToFaqDefinitionRequest(
-                    fromTockBotDb, applicationDefinition
-                )
-            )
-        }
-        return faqDetailedResults
+        return convertFaqDefinitionDetailedToFaqDefinitionRequest(
+            fromTockBotDb, applicationDefinition
+        )
     }
 
     /**

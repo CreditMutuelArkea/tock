@@ -52,6 +52,7 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.provider
+import io.mockk.CapturingSlot
 import io.mockk.Runs
 import io.mockk.every
 import io.mockk.just
@@ -344,7 +345,7 @@ class FaqAdminServiceTest : AbstractTest() {
                         FaqDefinition(faqId, botId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns theSavedIntent
@@ -408,35 +409,15 @@ class FaqAdminServiceTest : AbstractTest() {
 
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent
 
                     faqAdminService.saveFAQ(faqDefinitionRequest, userLogin, applicationDefinition)
 
-                    val botAdminService = spyk<BotAdminService>()
-                    every {
-                        botAdminService["getBotConfigurationsByNamespaceAndBotId"](
-                            any<String>(), any<String>()
-                        )
-                    } answers { listOf(aApplication) }
-                    every {
-                        botAdminService.saveStory(
-                            any<String>(),
-                            any<BotStoryDefinitionConfiguration>(),
-                            any<UserLogin>(),
-                            any<IntentDefinition>()
-                        )
-                    } returns existingMessageStory
-
                     val slotStory = slot<StoryDefinitionConfiguration>()
 
-                    verify(exactly = 0) {
-                        botAdminService["createOrGetIntent"](
-                            any<String>(), any<String>(), any<Id<ApplicationDefinition>>(), any<String>()
-                        )
-                    }
                     verify(exactly = 1) { faqDefinitionDAO.save(any()) }
                     verify(exactly = 1) { i18nDAO.save(listOf(mockedI18n)) }
                     verify(exactly = 1) { storyDefinitionDAO.save(capture(slotStory)) }
@@ -453,7 +434,7 @@ class FaqAdminServiceTest : AbstractTest() {
                     val faqDefinitionRequestDisabledStory = faqDefinitionRequest.copy(enabled = false)
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     every {
-                        faqAdminService["getFaqIntent"](
+                        faqAdminService["createOrUpdateFaqIntent"](
                             allAny<FaqDefinitionRequest>(), allAny<ApplicationDefinition>()
                         )
                     } returns existingIntent
@@ -602,9 +583,8 @@ class FaqAdminServiceTest : AbstractTest() {
 
             initSearchFaqMockWithoutLabelsSearch(
                 listOf(
-                    createFaqQueryResult(
-                        faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0
-                    ), createFaqQueryResult(numberOfUtterances = 1, utteranceText = expectedUtteranceLabel)
+                    createFaqQueryResult(faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0),
+                    createFaqQueryResult(numberOfUtterances = 1, utteranceText = expectedUtteranceLabel)
                 )
             )
 
@@ -630,12 +610,12 @@ class FaqAdminServiceTest : AbstractTest() {
                     any(), applicationDefinition.name, null
                 )
             }
-            verify(exactly = 0) {
-                faqAdminService["searchFromTockBotDbWithFoundTextLabels"](
-                    any<List<FaqQueryResult>>(), any<ApplicationDefinition>(), any<List<I18nLabel>>()
+            verify(exactly = 1) {
+                faqAdminService["mapI18LabelFaqAndConvertToFaqDefinitionRequest"](
+                    any<List<FaqQueryResult>>(), any<ApplicationDefinition>()
                 )
             }
-            verify(exactly = 1) {
+            verify(exactly = 0) {
                 faqAdminService["searchLabelsFromTockFrontDb"](
                     any<List<FaqQueryResult>>(), any<ApplicationDefinition>()
                 )
@@ -757,6 +737,9 @@ class FaqAdminServiceTest : AbstractTest() {
             val searchResult = Pair(searchedWithLabels, searchedWithLabels.size.toLong())
 
             every { i18nDAO.getLabels(namespace, any()) } returns mockedI18nLabels
+
+            val i18nLabelId: CapturingSlot<Id<I18nLabel>> = slot()
+            every { i18nDAO.getLabelById(capture(i18nLabelId))} answers { mockedI18nLabels.firstOrNull { it._id == i18nLabelId.captured } }
 
             every { faqDefinitionDAO.getFaqDetailsWithCount(any(), any(), any()) } returns searchResult
 
