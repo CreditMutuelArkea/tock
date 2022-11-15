@@ -190,6 +190,12 @@ abstract class WebVerticle : AbstractVerticle() {
     }
 
     override fun start(promise: Promise<Void>) {
+        // Handle server started event by emitting an eventbus message to address 'server.started'
+        promise.future()
+            .onComplete {
+                vertx.eventBus().request<Void>(ServerStatus.SERVER_STARTED, it.succeeded())
+            }
+
         vertx.executeBlocking<Unit>(
             {
                 try {
@@ -600,7 +606,7 @@ abstract class WebVerticle : AbstractVerticle() {
         logger: RequestLogger = defaultRequestLogger,
         handler: (RoutingContext) -> Unit
     ) {
-        blockingDelete(path, role?.let { setOf(role) }, logger, handler)
+        blockingDelete(path, setOf(role), logger, handler)
     }
 
     fun blockingDelete(

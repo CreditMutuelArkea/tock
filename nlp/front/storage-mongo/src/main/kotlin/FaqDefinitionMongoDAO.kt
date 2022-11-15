@@ -25,6 +25,7 @@ import ai.tock.nlp.front.shared.config.FaqDefinitionTag
 import ai.tock.nlp.front.shared.config.FaqQuery
 import ai.tock.nlp.front.shared.config.FaqQueryResult
 import ai.tock.nlp.front.shared.config.IntentDefinition
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.shared.ensureIndex
 import ai.tock.shared.isDocumentDB
 import ai.tock.shared.watch
@@ -49,6 +50,9 @@ import org.litote.kmongo.descending
 import org.litote.kmongo.div
 import org.litote.kmongo.document
 import org.litote.kmongo.ensureUniqueIndex
+import org.litote.kmongo.newId
+import org.litote.kmongo.exists
+import org.litote.kmongo.save
 import org.litote.kmongo.eq
 import org.litote.kmongo.excludeId
 import org.litote.kmongo.expr
@@ -72,6 +76,8 @@ import org.litote.kmongo.replaceOneWithFilter
 import org.litote.kmongo.skip
 import org.litote.kmongo.sort
 import org.litote.kmongo.unwind
+import java.time.Instant
+import kotlin.concurrent.thread
 import kotlin.reflect.KProperty
 
 object FaqDefinitionMongoDAO : FaqDefinitionDAO {
@@ -400,7 +406,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
     /**
      * Retrieve tags according to the applicationId present in IntentDefinition with aggregation
-     * @param botId : the applicationId
+     * @param botId : the botId
      * @return a string list of tags
      */
     override fun getTags(botId: String): List<String> {
@@ -472,4 +478,43 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         return sort(descending(properties.asList()))
     }
 
+    override fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String) {
+
+
+        data class FaqProjection(
+                                 val _id: Id<FaqDefinition> = newId(),
+                                 val applicationId: Id<ApplicationDefinition>,
+                                 val intentId: Id<IntentDefinition>,
+                                 val i18nId: Id<I18nLabel>,
+                                 val tags: List<String>,
+                                 val enabled: Boolean,
+                                 val creationDate: Instant,
+                                 val updateDate: Instant
+        )
+
+        val whereBotIdNotExists = match(FaqDefinition::botId exists false)
+
+        col.aggregate<FaqProjection>(whereBotIdNotExists).forEach {
+            thread(true) {
+                logger.info { "Migrate FaqDefinition with applicationId ${it.applicationId}" }
+
+                val faq = with(it){
+                    FaqDefinition(
+                        _id,
+                        botId = botIdSupplier.invoke(it.applicationId),
+                        intentId,
+                        i18nId,
+                        tags,
+                        enabled,
+                        creationDate,
+                        updateDate
+                    )
+                }
+
+                col.save(faq)
+
+            }
+
+        }
+    }
 }

@@ -123,7 +123,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
         private const val userLogin: UserLogin = "userLogin"
 
-        private val faqDefinition = FaqDefinition(faqId, "", intentId, i18nId, tagList, true, now, now)
+        private val faqDefinition = FaqDefinition(faqId, botId, intentId, i18nId, tagList, true, now, now)
 
         val applicationDefinition =
             ApplicationDefinition("my App", namespace = namespace, supportedLocales = setOf(Locale.FRENCH))

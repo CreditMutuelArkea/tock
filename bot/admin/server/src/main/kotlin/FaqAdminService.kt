@@ -84,6 +84,12 @@ object FaqAdminService {
     private const val WARN_CANNOT_FIND_LABEL = "Could not found an associated i18nLabel"
     private const val WARN_CANNOT_FIND_UTTERANCE = "Could not found an associated ClassifiedSentence"
 
+    fun makeMigration(){
+        faqDefinitionDAO.makeMigration {
+             applicationDAO.getApplicationById(it)?.name ?: ""
+        }
+    }
+
     /**
      * Save the Frequently asked question into database
      */

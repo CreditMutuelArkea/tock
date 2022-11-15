@@ -20,6 +20,7 @@ import ai.tock.nlp.front.shared.config.FaqDefinition
 import ai.tock.nlp.front.shared.config.FaqQuery
 import ai.tock.nlp.front.shared.config.FaqQueryResult
 import ai.tock.nlp.front.shared.config.IntentDefinition
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.translator.I18nLabel
 import org.litote.kmongo.Id
 
@@ -58,5 +59,8 @@ interface FaqDefinitionDAO {
 
     fun getTags(applicationId: String): List<String>
 
-
+    /**
+     * Make database migration
+     */
+    fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String)
 }

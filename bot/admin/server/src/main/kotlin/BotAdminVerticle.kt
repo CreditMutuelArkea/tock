@@ -23,6 +23,7 @@ import ai.tock.bot.admin.BotAdminService.getBotConfigurationsByNamespaceAndBotId
 import ai.tock.bot.admin.BotAdminService.importStories
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotConfiguration
+import ai.tock.bot.admin.constants.Properties
 import ai.tock.bot.admin.dialog.DialogReportQuery
 import ai.tock.bot.admin.model.BotAdminConfiguration
 import ai.tock.bot.admin.model.BotConnectorConfiguration
@@ -55,6 +56,7 @@ import ai.tock.nlp.admin.model.TranslateReport
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.FaqSettingsQuery
+import ai.tock.shared.booleanProperty
 import ai.tock.shared.error
 import ai.tock.shared.injector
 import ai.tock.shared.jackson.mapper
@@ -64,6 +66,7 @@ import ai.tock.shared.security.TockUserRole.admin
 import ai.tock.shared.security.TockUserRole.botUser
 import ai.tock.shared.security.TockUserRole.faqBotUser
 import ai.tock.shared.security.TockUserRole.faqNlpUser
+import ai.tock.shared.vertx.ServerStatus
 import ai.tock.translator.I18nDAO
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.Translator
@@ -95,6 +98,11 @@ open class BotAdminVerticle : AdminVerticle() {
     override val supportCreateNamespace: Boolean = !botAdminConfiguration.botApiSupport
 
     override fun configureServices() {
+        vertx.eventBus().consumer<Boolean>(ServerStatus.SERVER_STARTED) {
+            if (it.body() && booleanProperty(Properties.FAQ_MIGRATION_ENABLED, false)) {
+                FaqAdminService.makeMigration()
+            }
+        }
         initTranslator()
         dialogFlowDAO.initFlowStatCrawl()
         super.configureServices()
