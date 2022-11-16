@@ -12,7 +12,47 @@
       >
         {{ sender }} <time>{{ date | date: 'HH:mm:ss y/MM/dd' }}</time>
       </p>
-      <p class="text">{{ message }}</p>
+
+      <p class="text">
+        <tock-chat-ui-message-sentence
+          *ngIf="message.isSentence()"
+          [sentence]="message"
+          [replay]="replay"
+          [reply]="reply"
+          (sendMessage)="replyMessage($event)"
+        ></tock-chat-ui-message-sentence>
+
+        <!-- <tock-bot-message-choice
+          *ngIf="message.isChoice()"
+          [choice]="message"
+          [user]="user"
+          (sendMessage)="sendReply($event)"
+        ></tock-bot-message-choice> -->
+        <tock-chat-ui-message-choice
+          *ngIf="message.isChoice()"
+          [choice]="message"
+          [replay]="true"
+          [reply]="reply"
+          (sendMessage)="sendReply($event)"
+        ></tock-chat-ui-message-choice>
+
+        <tock-chat-ui-message-attachment
+          *ngIf="message.isAttachment()"
+          [attachment]="message"
+        ></tock-chat-ui-message-attachment>
+
+        <tock-chat-ui-message-location
+          *ngIf="message.isLocation()"
+          [location]="l"
+        ></tock-chat-ui-message-location>
+      </p>
+
+      <!-- <div *ngIf="message.isAttachment()">
+        <tock-bot-message-attachment [attachment]="message"></tock-bot-message-attachment>
+      </div> -->
+      <!-- <div *ngIf="message.isLocation()">
+        <tock-bot-message-location [location]="message"></tock-bot-message-location>
+      </div> -->
     </div>
   </div>
 </div>

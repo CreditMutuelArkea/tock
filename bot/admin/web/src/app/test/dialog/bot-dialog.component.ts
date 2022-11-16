@@ -150,9 +150,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
         userAction.hasNlpStats = r.hasNlpStats;
         userAction.actionId = r.userActionId;
         r.messages.forEach((m) => {
-          console.log(m);
           let testMssg = new TestMessage(true, m);
-          console.log(testMssg);
           if (testMssg.message.isSentence()) {
             let message = testMssg.message as Sentence;
             if (message.text) {

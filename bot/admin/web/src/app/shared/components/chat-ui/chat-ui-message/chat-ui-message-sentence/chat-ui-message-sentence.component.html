@@ -1,0 +1,45 @@
+<ng-container *ngIf="sentence.text">
+  <img
+    *ngIf="sentence.userInterface"
+    src="/assets/images/{{ sentence.userInterface }}.svg"
+    class="userInterface"
+    nbTooltip="{{ sentence.userInterface }}"
+  />
+  {{ sentence.text }}
+</ng-container>
+
+<ng-container *ngIf="!sentence.text">
+  <ng-container *ngIf="sentence.messages.length === 1">
+    <!-- <tock-sentence-element
+      [element]="sentence.messages[0]"
+      [user]="user"
+      (sendMessage)="reply($event)"
+    ></tock-sentence-element> -->
+
+    <tock-chat-ui-message-sentence-element
+      [element]="sentence.messages[0]"
+      [replay]="replay"
+      [reply]="reply"
+      (sendMessage)="replyMessage($event)"
+    ></tock-chat-ui-message-sentence-element>
+  </ng-container>
+
+  <ng-container *ngIf="sentence.messages.length > 1">
+    MULTIPLE MESSAGES !
+    <ul>
+      <li *ngFor="let e of sentence.messages">
+        ({{ e.connectorType.id }})
+        <!-- <tock-sentence-element
+          [element]="e"
+          [user]="user"
+          (sendMessage)="reply($event)"
+        ></tock-sentence-element> -->
+        <tock-chat-ui-message-sentence-element
+          [element]="e"
+          [replay]="replay"
+          [reply]="reply"
+        ></tock-chat-ui-message-sentence-element>
+      </li>
+    </ul>
+  </ng-container>
+</ng-container>
