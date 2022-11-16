@@ -85,11 +85,12 @@ object FaqAdminService {
     private const val WARN_CANNOT_FIND_UTTERANCE = "Could not found an associated ClassifiedSentence"
 
     /**
-     * Make migration
+     * Make migration:
+     * replace applicationId attribute (referred to Application's _id) by botId attribute (referred to Application's name)
      */
     fun makeMigration(){
         faqDefinitionDAO.makeMigration {
-             applicationDAO.getApplicationById(it)?.name ?: ""
+             applicationDAO.getApplicationById(it)?.name
         }
     }
 

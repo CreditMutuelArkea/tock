@@ -42,7 +42,6 @@ import org.litote.kmongo.MongoOperator.eq
 import org.litote.kmongo.MongoOperator.ne
 import org.litote.kmongo.addToSet
 import org.litote.kmongo.aggregate
-import org.litote.kmongo.allPosOp
 import org.litote.kmongo.and
 import org.litote.kmongo.ascending
 import org.litote.kmongo.deleteOneById
@@ -193,6 +192,70 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
             } else {
                 Pair(emptyList(), 0)
             }
+        }
+    }
+
+    /**
+     * Retrieve tags according to the applicationId present in IntentDefinition with aggregation
+     * @param botId : the botId
+     * @return a string list of tags
+     */
+    override fun getTags(botId: String): List<String> {
+        return col.aggregate<FaqDefinitionTag>(
+            joinOnIntentDefinition(),
+            match(
+                andNotNull(
+                    filterOnBotId(botId)
+                )
+            ),
+            // unwind : to flat tags array into an object
+            FaqDefinition::tags.unwind(),
+            groupByTag(),
+            projectByTag(),
+            sortAscending(FaqDefinitionTag::tag),
+        ).map { it.tag }.toList()
+    }
+
+    /**
+     * @see FaqDefinitionDAO.makeMigration
+     */
+    override fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String?) {
+
+        data class FaqProjection(
+            val _id: Id<FaqDefinition> = newId(),
+            val applicationId: Id<ApplicationDefinition>,
+            val intentId: Id<IntentDefinition>,
+            val i18nId: Id<I18nLabel>,
+            val tags: List<String>,
+            val enabled: Boolean,
+            val creationDate: Instant,
+            val updateDate: Instant
+        )
+
+        col.aggregate<FaqProjection>(match(FaqDefinition::botId exists false)).forEach { projection ->
+
+            thread(true) {
+
+                with(projection){
+
+                    logger.info { "Migrate FaqDefinition with applicationId $applicationId ans intendId $intentId" }
+
+                    val botId = botIdSupplier.invoke(applicationId) ?: throw Exception("Fail to migrate Faq with intent $intentId  due to Application not found with id $applicationId")
+
+                    FaqDefinition(
+                        _id,
+                        botId,
+                        intentId,
+                        i18nId,
+                        tags,
+                        enabled,
+                        creationDate,
+                        updateDate
+                    )
+                }.let { faq  -> col.save(faq) }
+
+            }
+
         }
     }
 
@@ -404,26 +467,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
             )
         )
 
-    /**
-     * Retrieve tags according to the applicationId present in IntentDefinition with aggregation
-     * @param botId : the botId
-     * @return a string list of tags
-     */
-    override fun getTags(botId: String): List<String> {
-        return col.aggregate<FaqDefinitionTag>(
-            joinOnIntentDefinition(),
-            match(
-                andNotNull(
-                    filterOnBotId(botId)
-                )
-            ),
-            // unwind : to flat tags array into an object
-            FaqDefinition::tags.unwind(),
-            groupByTag(),
-            projectByTag(),
-            sortAscending(FaqDefinitionTag::tag),
-        ).map { it.tag }.toList()
-    }
 
     /**
      * Create group by tag name
@@ -478,43 +521,4 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         return sort(descending(properties.asList()))
     }
 
-    override fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String) {
-
-
-        data class FaqProjection(
-                                 val _id: Id<FaqDefinition> = newId(),
-                                 val applicationId: Id<ApplicationDefinition>,
-                                 val intentId: Id<IntentDefinition>,
-                                 val i18nId: Id<I18nLabel>,
-                                 val tags: List<String>,
-                                 val enabled: Boolean,
-                                 val creationDate: Instant,
-                                 val updateDate: Instant
-        )
-
-        val whereBotIdNotExists = match(FaqDefinition::botId exists false)
-
-        col.aggregate<FaqProjection>(whereBotIdNotExists).forEach {
-            thread(true) {
-                logger.info { "Migrate FaqDefinition with applicationId ${it.applicationId}" }
-
-                val faq = with(it){
-                    FaqDefinition(
-                        _id,
-                        botId = botIdSupplier.invoke(it.applicationId),
-                        intentId,
-                        i18nId,
-                        tags,
-                        enabled,
-                        creationDate,
-                        updateDate
-                    )
-                }
-
-                col.save(faq)
-
-            }
-
-        }
-    }
 }

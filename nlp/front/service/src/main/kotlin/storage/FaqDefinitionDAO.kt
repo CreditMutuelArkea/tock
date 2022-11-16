@@ -57,10 +57,11 @@ interface FaqDefinitionDAO {
         i18nIds: List<Id<I18nLabel>>? = null
     ): Pair<List<FaqQueryResult>, Long>
 
-    fun getTags(applicationId: String): List<String>
+    fun getTags(botId: String): List<String>
 
     /**
-     * Make database migration
+     * Make migration
+     * @param botIdSupplier : function that return a string (the botId) with a given Id<>
      */
-    fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String)
+    fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String?)
 }
