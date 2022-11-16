@@ -46,6 +46,8 @@ internal class BotApiDefinitionProvider(private val configuration: BotConfigurat
     private val nlpClient: NlpClient get() = injector.provide()
 
     init {
+        //devrait être null la première fois sinon rechercher si handler existant ?
+        // lastconfiguration == handler.configuration
         lastConfiguration = handler.configuration()
         bot = BotApiDefinition(configuration, lastConfiguration, handler)
     }
@@ -62,9 +64,20 @@ internal class BotApiDefinitionProvider(private val configuration: BotConfigurat
         }
     }
 
+    fun registerBotApiBuiltinProvider(botConfiguration: BotConfiguration){
+        configurationUpdated = true
+        val botApiprovider = BotApiDefinitionProvider(botConfiguration)
+        BotRepository.registerBotProvider(botApiprovider)
+        botApiprovider.registerBuiltinStoryIntents()
+        BotRepository.registerBuiltInStoryDefinitions(botApiprovider)
+        BotRepository.checkBotConfigurations()
+        BotRepository.registerBotProvider(botApiprovider)
+    }
+
     private fun registerBuiltinStoryIntents() {
         executor.executeBlocking {
             with(botDefinition()) {
+                logger.debug { "registering builtin Stories Intents in ${botDefinition().botId}"}
                 val applicationId = FrontClient.getApplicationByNamespaceAndName(namespace, nlpModelName)!!._id
                 val intents = nlpClient.getIntentsByNamespaceAndName(namespace, botId)
                 this.stories.filter { it.mainIntent() != Intent.unknown }.map { it.mainIntent().name.withoutNamespace() }.forEach {

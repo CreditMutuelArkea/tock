@@ -32,15 +32,17 @@ fun main() {
     val dao: BotApplicationConfigurationDAO = injector.provide()
     dao.getBotConfigurations().forEach {
         logger.info("register configuration ${it.name}")
-        BotRepository.registerBotProvider(BotApiDefinitionProvider(it))
+        val provider = BotApiDefinitionProvider(it)
+        BotRepository.registerBotProvider(provider)
+        provider.registerBotApiBuiltinProvider(it)
     }
     BotRepository.installBots(emptyList())
     dao.listenBotChanges {
         logger.info("reload bot configurations")
-        dao.getBotConfigurations().forEach {
+        dao.getBotConfigurations().forEach { it ->
             val provider = BotApiDefinitionProvider(it)
-            BotRepository.registerBotProvider(provider)
+            provider.registerBotApiBuiltinProvider(it)
         }
-        BotRepository.checkBotConfigurations()
+//        BotRepository.checkBotConfigurations()
     }
 }

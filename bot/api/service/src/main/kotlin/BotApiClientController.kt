@@ -108,7 +108,7 @@ internal class BotApiClientController(
     fun send(userRequest: UserRequest): ResponseData? {
         val request = RequestData(userRequest)
         return if (client != null) {
-            client.send(request)
+            client.send(request.copy(request.botRequest))
         } else {
             sendWithWebSocket(request) ?: error("no webhook set and no response from websocket")
         }
