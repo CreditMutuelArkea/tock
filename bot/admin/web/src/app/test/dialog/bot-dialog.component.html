@@ -153,9 +153,7 @@
     </nb-card-body>
 
     <nb-card-body [nbSpinner]="loading">
-      <!-- <br />
-      <br /><br /><br />
-      <table
+      <!-- <table
         *ngIf="messages.length !== 0"
         class="messages"
       >
@@ -203,7 +201,8 @@
             />
           </td>
         </tr>
-      </table> -->
+      </table>
+      <hr /> -->
 
       <tock-chat-ui
         height="calc(100vh - 450px)"
@@ -211,9 +210,10 @@
       >
         <tock-chat-ui-message
           *ngFor="let m of messages"
-          [message]="m.message.text"
+          [message]="m.message"
           [reply]="m.bot"
           [avatar]="getUserAvatar(m.bot)"
+          (sendMessage)="onNewMessage($event)"
         >
           <span
             *ngIf="m.locale"

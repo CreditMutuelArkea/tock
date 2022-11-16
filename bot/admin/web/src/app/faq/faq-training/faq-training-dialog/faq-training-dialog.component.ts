@@ -1,13 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output,
-  SimpleChanges
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -29,11 +20,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
   @Output() onClose = new EventEmitter();
   @Output() onSearchSentence = new EventEmitter();
 
-  constructor(
-    private state: StateService,
-    private readonly analyticsService: AnalyticsService,
-    private readonly elementRef: ElementRef
-  ) {}
+  constructor(private state: StateService, private readonly analyticsService: AnalyticsService, private readonly elementRef: ElementRef) {}
 
   dialogs: DialogReport[] = [];
   displayedDialog: DialogReport;
@@ -52,8 +39,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
   ngOnChanges(changes: SimpleChanges): void {
     if (
       !changes.sentence?.previousValue ||
-      (changes.sentence?.currentValue &&
-        changes.sentence.currentValue.text != changes.sentence.previousValue.text)
+      (changes.sentence?.currentValue && changes.sentence.currentValue.text != changes.sentence.previousValue.text)
     ) {
       this.sentence = changes.sentence.currentValue;
 
@@ -91,17 +77,7 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
   private buildDialogQuery(sentenceText: string): DialogReportQuery {
     const app = this.state.currentApplication;
     const language = this.state.currentLocale;
-    return new DialogReportQuery(
-      app.namespace,
-      app.name,
-      language,
-      0,
-      99999,
-      true,
-      null,
-      null,
-      sentenceText
-    );
+    return new DialogReportQuery(app.namespace, app.name, language, 0, 99999, true, null, null, sentenceText);
   }
 
   isCurrentSentence(action: ActionReport): boolean {
@@ -129,19 +105,19 @@ export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
     bot: { name: 'Bot', avatar: 'assets/images/scenario-bot.svg' }
   };
 
-  getActionMessageText(action: ActionReport): string {
-    let msg = action.message as unknown as Sentence;
+  // getActionMessageText(action: ActionReport): string {
+  //   let msg = action.message as unknown as Sentence;
 
-    if (msg.text) {
-      return msg.text;
-    }
+  //   if (msg.text) {
+  //     return msg.text;
+  //   }
 
-    return msg.messages
-      .map((msg) => {
-        return msg.texts.get('text');
-      })
-      .join(' ');
-  }
+  //   return msg.messages
+  //     .map((msg) => {
+  //       return msg.texts.get('text');
+  //     })
+  //     .join(' ');
+  // }
 
   searchSentence(action: ActionReport): void {
     if (action.isBot()) return;

@@ -61,6 +61,12 @@ import {
 
 import { AutofocusDirective, DelayDirective, FullscreenDirective, MouseWheelListnerDirective } from './directives';
 
+import { ChatUiMessageSentenceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence/chat-ui-message-sentence.component';
+import { ChatUiMessageSentenceElementComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence-element/chat-ui-message-sentence-element.component';
+import { ChatUiMessageChoiceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-choice/chat-ui-message-choice.component';
+import { ChatUiMessageAttachmentComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-attachment/chat-ui-message-attachment.component';
+import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-location/chat-ui-message-location';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -97,6 +103,7 @@ import { AutofocusDirective, DelayDirective, FullscreenDirective, MouseWheelList
     FormControlComponent,
     ChatUiComponent,
     ChatUiMessageComponent,
+    ChatUiMessageSentenceComponent,
     ChoiceDialogComponent,
     JsonPreviewerComponent,
     FileUploadComponent,
@@ -105,7 +112,11 @@ import { AutofocusDirective, DelayDirective, FullscreenDirective, MouseWheelList
     AutofocusDirective,
     DelayDirective,
     FullscreenDirective,
-    MouseWheelListnerDirective
+    MouseWheelListnerDirective,
+    ChatUiMessageSentenceElementComponent,
+    ChatUiMessageChoiceComponent,
+    ChatUiMessageAttachmentComponent,
+    ChatUiMessageLocationComponent
   ],
   exports: [
     AutocompleteInputComponent,
