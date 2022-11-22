@@ -221,6 +221,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      */
     override fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String?) {
 
+        // Faq projection represents the old structure of FaqDefinition
         data class FaqProjection(
             val _id: Id<FaqDefinition> = newId(),
             val applicationId: Id<ApplicationDefinition>,

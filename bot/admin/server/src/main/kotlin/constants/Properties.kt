@@ -17,5 +17,5 @@
 package ai.tock.bot.admin.constants
 
 object Properties {
-    const val FAQ_MIGRATION_ENABLED = "faq_migration_enabled"
+    const val FAQ_MIGRATION_ENABLED = "tock_faq_migration_enabled"
 }
