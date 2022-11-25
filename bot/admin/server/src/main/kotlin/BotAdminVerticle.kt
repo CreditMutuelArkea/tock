@@ -24,6 +24,7 @@ import ai.tock.bot.admin.BotAdminService.importStories
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.admin.dialog.DialogReportQuery
+import ai.tock.bot.admin.migration.performDatabaseMigrations
 import ai.tock.bot.admin.model.BotAdminConfiguration
 import ai.tock.bot.admin.model.BotConnectorConfiguration
 import ai.tock.bot.admin.model.BotI18nLabel
@@ -95,6 +96,7 @@ open class BotAdminVerticle : AdminVerticle() {
     override val supportCreateNamespace: Boolean = !botAdminConfiguration.botApiSupport
 
     override fun configureServices() {
+        performDatabaseMigrations.invoke(vertx)
         initTranslator()
         dialogFlowDAO.initFlowStatCrawl()
         super.configureServices()

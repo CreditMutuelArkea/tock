@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin
+package ai.tock.shared.vertx
 
-import ai.tock.bot.BotIoc
-import ai.tock.nlp.front.ioc.FrontIoc
-import ai.tock.shared.vertx.vertx
-import com.github.salomonbrys.kodein.Kodein
-
-fun main() {
-    startAdminServer(botAdminModule)
-}
-
-fun startAdminServer(vararg modules: Kodein.Module) {
-    // setup ioc
-    FrontIoc.setup(BotIoc.coreModules + modules.toList())
-    // deploy verticle
-    vertx.deployVerticle(BotAdminVerticle())
-}
+const val SERVER_STARTED = "SERVER_STARTED"
+const val SERVER_STOPPED = "SERVER_STOPPED"

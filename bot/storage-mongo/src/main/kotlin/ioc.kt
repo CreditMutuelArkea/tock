@@ -36,6 +36,8 @@ import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.provider
 import com.github.salomonbrys.kodein.singleton
 import com.mongodb.client.MongoDatabase
+import migration.MigrationDAO
+import migration.MigrationMongoDAO
 import org.litote.kmongo.getCollection
 
 const val MONGO_DATABASE: String = TOCK_BOT_DATABASE
@@ -58,4 +60,5 @@ val botMongoModule = Kodein.Module {
     bind<FeatureCache>() with singleton { MongoFeatureCache() }
     bind<FeatureDAO>() with singleton { FeatureMongoDAO(instance(), MongoBotConfiguration.database.getCollection()) }
     bind<DialogFlowDAO>() with provider { DialogFlowMongoDAO }
+    bind<MigrationDAO>() with provider { MigrationMongoDAO }
 }

@@ -16,18 +16,12 @@
 
 package ai.tock.bot.admin
 
-import ai.tock.bot.BotIoc
-import ai.tock.nlp.front.ioc.FrontIoc
-import ai.tock.shared.vertx.vertx
+import ai.tock.bot.admin.migration.BotAdminMigrationsProvider
 import com.github.salomonbrys.kodein.Kodein
+import com.github.salomonbrys.kodein.bind
+import com.github.salomonbrys.kodein.provider
+import migration.MigrationsProvider
 
-fun main() {
-    startAdminServer(botAdminModule)
-}
-
-fun startAdminServer(vararg modules: Kodein.Module) {
-    // setup ioc
-    FrontIoc.setup(BotIoc.coreModules + modules.toList())
-    // deploy verticle
-    vertx.deployVerticle(BotAdminVerticle())
+val botAdminModule = Kodein.Module {
+    bind<MigrationsProvider>() with provider { BotAdminMigrationsProvider() }
 }

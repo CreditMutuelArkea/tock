@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin
+package ai.tock.bot.admin.migration
 
-import ai.tock.bot.BotIoc
-import ai.tock.nlp.front.ioc.FrontIoc
-import ai.tock.shared.vertx.vertx
-import com.github.salomonbrys.kodein.Kodein
+import ai.tock.shared.vertx.SERVER_STARTED
+import io.vertx.core.Vertx
+import migration.Migrator
 
-fun main() {
-    startAdminServer(botAdminModule)
-}
 
-fun startAdminServer(vararg modules: Kodein.Module) {
-    // setup ioc
-    FrontIoc.setup(BotIoc.coreModules + modules.toList())
-    // deploy verticle
-    vertx.deployVerticle(BotAdminVerticle())
+val performDatabaseMigrations: (Vertx) -> Unit = {
+    it.eventBus().consumer(SERVER_STARTED) { msg ->
+        if (msg.body()) {
+            Migrator.migrate()
+        }
+    }
 }

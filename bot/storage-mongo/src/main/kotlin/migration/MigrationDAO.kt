@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin
+package migration
 
-import ai.tock.bot.BotIoc
-import ai.tock.nlp.front.ioc.FrontIoc
-import ai.tock.shared.vertx.vertx
-import com.github.salomonbrys.kodein.Kodein
+/**
+ * Data Access Object for database migration entities/documents
+ */
+interface MigrationDAO {
+    /**
+     * check if a migration exists by a given name and collectionName
+     * @param name the name of migration
+     * @param collectionName the name of the collection affected by the migration
+     * @return true if a migration
+     */
+    fun existsByNameAndCollectionName(name: String, collectionName: String): Boolean
 
-fun main() {
-    startAdminServer(botAdminModule)
-}
-
-fun startAdminServer(vararg modules: Kodein.Module) {
-    // setup ioc
-    FrontIoc.setup(BotIoc.coreModules + modules.toList())
-    // deploy verticle
-    vertx.deployVerticle(BotAdminVerticle())
+    /**
+     * Persist a migration
+     * @param migration the migration to persist
+     */
+    fun save(migration: Migration)
 }

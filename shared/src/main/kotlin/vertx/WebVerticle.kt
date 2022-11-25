@@ -190,6 +190,11 @@ abstract class WebVerticle : AbstractVerticle() {
     }
 
     override fun start(promise: Promise<Void>) {
+        promise.future()
+            .onComplete {
+                vertx.eventBus().request<Boolean>(SERVER_STARTED, it.succeeded())
+            }
+
         vertx.executeBlocking<Unit>(
             {
                 try {
