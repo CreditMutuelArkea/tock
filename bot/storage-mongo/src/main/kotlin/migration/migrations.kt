@@ -90,4 +90,15 @@ data class Migration(
  */
 interface MigrationsProvider : Supplier<Set<MigrationHandler>>
 
-class MigrationException(message: String): Exception(message)
+/**
+ * Migrations Exceptions
+ */
+sealed class MigrationException(message: String): Exception(message){
+    companion object {
+        val DUPLICATE_MIGRATIONS_MESSAGE = "Duplicate names found for migrations :\n"
+        val PERSISTED_MIGRATIONS_CHANGES_MESSAGE = "Following persisted migrations have been changed or deleted :\n"
+    }
+
+}
+class MigrationUnexpectedChangesError(migrations: String): MigrationException("$PERSISTED_MIGRATIONS_CHANGES_MESSAGE$migrations")
+class DuplicateMigrationsError(migrations: String): MigrationException("$DUPLICATE_MIGRATIONS_MESSAGE$migrations")

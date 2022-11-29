@@ -31,8 +31,6 @@ object Migrator {
     internal const val SEPARATOR = "//"
     internal const val BACK_TO_LINE = "\n"
     internal const val PREFIX = "  * "
-    internal const val DUPLICATE_MIGRATIONS_MESSAGE = "Duplicate names found for migrations :$BACK_TO_LINE"
-    internal const val PERSISTED_MIGRATIONS_CHANGES_MESSAGE = "Following persisted migrations have been changed or deleted:$BACK_TO_LINE"
 
     /**
      * Injected dependencies
@@ -55,13 +53,6 @@ object Migrator {
     }
 }
 
-/**
- * String extension function that execute the function
- * passed in parameter if the string is not blank
- */
-fun String.ifNotBlank(fn: (String) -> Unit) {
-    if (this.isNotBlank()) fn.invoke(this)
-}
 
 /**
  * Validate a migration handlers and return them if valid
@@ -75,16 +66,20 @@ fun MigrationsProvider.validate(migrations: List<Migration>): Set<MigrationHandl
                 .filter { migrationHandler -> migrationHandler isLike migration }
                 .none { migrationHandler -> migrationHandler isSame migration }
         }
-        .joinToString(Migrator.BACK_TO_LINE) { m ->
-            "- { name: ${m.name} , collectionName: ${m.collectionName} }"
-        }
-        .ifNotBlank { s ->
-            throw MigrationException("${Migrator.PERSISTED_MIGRATIONS_CHANGES_MESSAGE} $s")
-        }
+        .joinToString(Migrator.BACK_TO_LINE) { m -> "${Migrator.PREFIX} ${m.name} : ${m.collectionName}" }
+        .ifNotBlank { s -> throw MigrationUnexpectedChangesError(s) }
 
     handlers.groupBy { m -> Migrator.PREFIX + m.name + Migrator.SEPARATOR + m.collectionName }
         .filter { entry -> entry.value.size > 1 }
         .keys
         .joinToString(Migrator.BACK_TO_LINE)
-        .ifNotBlank { key -> throw MigrationException(" ${Migrator.DUPLICATE_MIGRATIONS_MESSAGE} ${key.split(Migrator.SEPARATOR)[0]}") }
+        .ifNotBlank { key -> throw DuplicateMigrationsError(key.split(Migrator.SEPARATOR)[0]) }
+}
+
+/**
+ * String extension function that execute the function
+ * passed in parameter if the string is not blank
+ */
+fun String.ifNotBlank(fn: (String) -> Unit) {
+    if (this.isNotBlank()) fn.invoke(this)
 }
