@@ -17,9 +17,11 @@
 package migration
 
 import org.litote.kmongo.Id
+import org.litote.kmongo.json
 import org.litote.kmongo.newId
 import java.time.LocalDateTime
 import java.util.function.Supplier
+import java.util.zip.CRC32
 
 /**
  * MigrationFn represents the suspend function
@@ -48,13 +50,25 @@ data class MigrationHandler(
         Migration(
             name = name,
             description = description,
-            collectionName = collectionName
+            collectionName = collectionName,
+            checksum = checksum()
         )
     }
+
+    private fun checksum(): Long {
+        val crC32 = CRC32()
+        crC32.update(this.migrateFn.json.toByteArray())
+        return crC32.value
+    }
+
+    infix fun isLike(migration: Migration): Boolean = name == migration.name && collectionName == migration.collectionName
+
+    infix fun isSame(migration: Migration): Boolean = migration.checksum == checksum()
+
 }
 
 /**
- * Migration represents a DB document representing a DB migration
+ * Migration represents a DB document/entity representing a DB migration
  * @param _id the DB document identifier
  * @param name the migration name
  * @param description the migration description
@@ -67,6 +81,7 @@ data class Migration(
     val name: String,
     val description: String,
     val collectionName: String,
+    val checksum: Long,
     val executedAt: LocalDateTime = LocalDateTime.now()
 )
 
@@ -74,3 +89,5 @@ data class Migration(
  * MigrationHandlers provider
  */
 interface MigrationsProvider : Supplier<Set<MigrationHandler>>
+
+class MigrationException(message: String): Exception(message)

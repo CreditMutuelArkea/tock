@@ -18,6 +18,7 @@ package migration
 
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
+import org.litote.kmongo.json
 
 /**
  * Migrator is responsible to perform migrations declared in migrationProvider
@@ -27,10 +28,11 @@ object Migrator {
     /**
      * Constants
      */
-    private const val SEPARATOR = "//"
-    private const val BACK_TO_LINE ="\n"
-    private const val PREFIX = "  * "
-    private const val MESSAGE="Duplicate names found for migrations :$BACK_TO_LINE"
+    internal const val SEPARATOR = "//"
+    internal const val BACK_TO_LINE = "\n"
+    internal const val PREFIX = "  * "
+    internal const val DUPLICATE_MIGRATIONS_MESSAGE = "Duplicate names found for migrations :$BACK_TO_LINE"
+    internal const val PERSISTED_MIGRATIONS_CHANGES_MESSAGE = "Following persisted migrations have been changed or deleted:$BACK_TO_LINE"
 
     /**
      * Injected dependencies
@@ -43,14 +45,8 @@ object Migrator {
      * that are not already persisted in database
      */
     fun migrate() = with(migrationDao) {
-        migrationProvider.get()
-            .also {
-                it.groupBy { m -> PREFIX + m.name + SEPARATOR + m.collectionName}
-                    .filter { entry -> entry.value.size > 1 }
-                    .keys
-                    .joinToString(BACK_TO_LINE)
-                    .ifNotBlank { key -> error(" $MESSAGE ${key.split(SEPARATOR)[0]}") }
-            }
+        migrationProvider
+            .validate(migrationDao.findAll())
             .filterNot { existsByNameAndCollectionName(it.name, it.collectionName) }
             .forEach {
                 it.migrateFn.invoke()
@@ -65,4 +61,30 @@ object Migrator {
  */
 fun String.ifNotBlank(fn: (String) -> Unit) {
     if (this.isNotBlank()) fn.invoke(this)
+}
+
+/**
+ * Validate a migration handlers and return them if valid
+ * @param migrations persisted migrations
+ * @return list of migration handlers
+ */
+fun MigrationsProvider.validate(migrations: List<Migration>): Set<MigrationHandler> = get().also { handlers ->
+    migrations
+        .filter { migration ->
+            handlers
+                .filter { migrationHandler -> migrationHandler isLike migration }
+                .none { migrationHandler -> migrationHandler isSame migration }
+        }
+        .joinToString(Migrator.BACK_TO_LINE) { m ->
+            "- { name: ${m.name} , collectionName: ${m.collectionName} }"
+        }
+        .ifNotBlank { s ->
+            throw MigrationException("${Migrator.PERSISTED_MIGRATIONS_CHANGES_MESSAGE} $s")
+        }
+
+    handlers.groupBy { m -> Migrator.PREFIX + m.name + Migrator.SEPARATOR + m.collectionName }
+        .filter { entry -> entry.value.size > 1 }
+        .keys
+        .joinToString(Migrator.BACK_TO_LINE)
+        .ifNotBlank { key -> throw MigrationException(" ${Migrator.DUPLICATE_MIGRATIONS_MESSAGE} ${key.split(Migrator.SEPARATOR)[0]}") }
 }

@@ -50,4 +50,9 @@ object MigrationMongoDAO: MigrationDAO {
      * @see MigrationDAO.save
      */
     override fun save(migration: Migration) = collection.save(migration)
+
+    /**
+     * @see MigrationDAO.findAll
+     */
+    override fun findAll(): List<Migration>  = collection.find().toList()
 }

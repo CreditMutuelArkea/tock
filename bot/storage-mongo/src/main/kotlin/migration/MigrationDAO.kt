@@ -33,4 +33,9 @@ interface MigrationDAO {
      * @param migration the migration to persist
      */
     fun save(migration: Migration)
+
+    /**
+     * Retrieve all persisted migrations
+     */
+    fun findAll(): List<Migration>
 }
