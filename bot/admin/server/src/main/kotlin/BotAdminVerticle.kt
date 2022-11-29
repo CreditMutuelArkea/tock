@@ -74,6 +74,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.salomonbrys.kodein.instance
 import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
+import liquibase.Liquibase
+import liquibase.resource.ClassLoaderResourceAccessor
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.toId
@@ -95,8 +97,12 @@ open class BotAdminVerticle : AdminVerticle() {
 
     override val supportCreateNamespace: Boolean = !botAdminConfiguration.botApiSupport
 
+    private val database by injector.instance<liquibase.database.Database>()
+
     override fun configureServices() {
         performDatabaseMigrations.invoke(vertx)
+        Liquibase("db/changelog.xml", ClassLoaderResourceAccessor(), database)
+            .update()
         initTranslator()
         dialogFlowDAO.initFlowStatCrawl()
         super.configureServices()

@@ -252,6 +252,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.liquibase.ext</groupId>
+            <artifactId>liquibase-mongodb</artifactId>
+            <version>4.17.2</version>
+        </dependency>
+
         <!--******************************* SVG **********************************-->
         <dependency>
             <groupId>org.apache.xmlgraphics</groupId>

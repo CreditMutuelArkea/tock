@@ -67,6 +67,7 @@ import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
 import kotlin.reflect.KClass
+import liquibase.database.DatabaseFactory
 
 private val logger = KotlinLogging.logger {}
 
@@ -337,3 +338,14 @@ private const val DocumentDBIndexReducedSize = 3
  * By default, do not count more than 1000000 documents (for large databases)
  */
 val defaultCountOptions : CountOptions = CountOptions().limit(1000000)
+
+internal val liquibaseDatabase: liquibase.database.Database  by lazy {
+    if (mongoUrl.credential == null) {
+        credentialsProvider.getCredentials()?.let {
+            DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, it.userName, it.password?.let { p -> String(p) }, null, null)
+        } ?: DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, null, null, null, null)
+
+    } else {
+        DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, null, null, null, null)
+    }
+}
