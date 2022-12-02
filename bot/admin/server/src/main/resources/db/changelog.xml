@@ -21,7 +21,12 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet id="1" author="hjs">
-        <ext:createCollection></ext:createCollection>
-    </changeSet>
+    <!--
+        ChangeSet examples can be found here 👇
+        https://github.com/alexandru-slobodcicov/liquibase-nosql-quickstart/tree/main/liquibase-mongodb-quickstart/src/main/resources/liquibase
+    -->
+    <!--
+    <changeSet id="1" author="">
+     </changeSet>
+    -->
 </databaseChangeLog>

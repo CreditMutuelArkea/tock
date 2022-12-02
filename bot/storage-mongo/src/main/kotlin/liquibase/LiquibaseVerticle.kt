@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin
+package liquibase
 
-import ai.tock.bot.admin.migration.BotAdminMigrationsProvider
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.bind
-import com.github.salomonbrys.kodein.provider
-import migration.MigrationsProvider
+import ai.tock.bot.mongo.MongoBotConfiguration
+import io.vertx.core.AbstractVerticle
+import liquibase.resource.ClassLoaderResourceAccessor
 
-val botAdminModule = Kodein.Module {
-    bind<MigrationsProvider>() with provider { BotAdminMigrationsProvider() }
+private const val DB_CHANGELOG_XML = "db/changelog.xml"
+
+class LiquibaseVerticle : AbstractVerticle() {
+    override fun start() {
+        MongoBotConfiguration.liquibaseDatabase.let {
+            Liquibase(DB_CHANGELOG_XML, ClassLoaderResourceAccessor(), it)
+                .update()
+        }
+    }
 }

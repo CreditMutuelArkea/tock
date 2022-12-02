@@ -22,7 +22,7 @@ import ai.tock.shared.vertx.vertx
 import com.github.salomonbrys.kodein.Kodein
 
 fun main() {
-    startAdminServer(botAdminModule)
+    startAdminServer()
 }
 
 fun startAdminServer(vararg modules: Kodein.Module) {

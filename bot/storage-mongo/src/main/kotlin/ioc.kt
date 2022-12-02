@@ -29,6 +29,7 @@ import ai.tock.bot.mongo.ai.tock.bot.mongo.FeatureCache
 import ai.tock.shared.TOCK_BOT_DATABASE
 import ai.tock.shared.getAsyncDatabase
 import ai.tock.shared.getDatabase
+import ai.tock.shared.getLiquibaseDatabase
 import ai.tock.translator.I18nDAO
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
@@ -36,8 +37,6 @@ import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.provider
 import com.github.salomonbrys.kodein.singleton
 import com.mongodb.client.MongoDatabase
-import migration.MigrationDAO
-import migration.MigrationMongoDAO
 import org.litote.kmongo.getCollection
 
 const val MONGO_DATABASE: String = TOCK_BOT_DATABASE
@@ -60,5 +59,5 @@ val botMongoModule = Kodein.Module {
     bind<FeatureCache>() with singleton { MongoFeatureCache() }
     bind<FeatureDAO>() with singleton { FeatureMongoDAO(instance(), MongoBotConfiguration.database.getCollection()) }
     bind<DialogFlowDAO>() with provider { DialogFlowMongoDAO }
-    bind<MigrationDAO>() with provider { MigrationMongoDAO }
+    bind<liquibase.database.Database>(MONGO_DATABASE) with provider { getLiquibaseDatabase(MONGO_DATABASE) }
 }

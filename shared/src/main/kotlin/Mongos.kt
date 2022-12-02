@@ -339,13 +339,24 @@ private const val DocumentDBIndexReducedSize = 3
  */
 val defaultCountOptions : CountOptions = CountOptions().limit(1000000)
 
-internal val liquibaseDatabase: liquibase.database.Database  by lazy {
-    if (mongoUrl.credential == null) {
-        credentialsProvider.getCredentials()?.let {
-            DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, it.userName, it.password?.let { p -> String(p) }, null, null)
-        } ?: DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, null, null, null, null)
 
-    } else {
-        DatabaseFactory.getInstance().openDatabase( defaultMongoUrl, null, null, null, null)
+/**
+ * Get database for liquibase migrations
+ * @param databaseName the name of database
+ */
+fun getLiquibaseDatabase(databaseName: String) : liquibase.database.Database =
+    with(mongoUrl) {
+        val db = formatDatabase(databaseName)
+        val url = if (database != null)
+            connectionString
+        else
+            connectionString.split("?").let {
+                val baseUrl = it[0].let { hh -> if (hh.endsWith("/")) hh else "$hh/" }
+                if (it.size == 1) "$baseUrl$db"
+                else "$baseUrl$db?${it[1]}"
+            }
+        val password = (credential?.password ?: credentialsProvider.getCredentials()?.password)?.let { String(it) }
+        val username = username ?: credentialsProvider.getCredentials()?.userName
+
+        DatabaseFactory.getInstance().openDatabase( url, username, password, null, null)
     }
-}

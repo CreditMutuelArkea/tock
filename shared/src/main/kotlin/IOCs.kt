@@ -83,10 +83,4 @@ val sharedModule = Kodein.Module {
     } catch (e: Exception) {
         logger.warn { e.message }
     }
-
-    try {
-        bind<liquibase.database.Database>() with singleton { liquibaseDatabase }
-    } catch (e: Exception) {
-        logger.warn { e.message }
-    }
 }

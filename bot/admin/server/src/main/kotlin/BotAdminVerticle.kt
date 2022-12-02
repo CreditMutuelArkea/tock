@@ -24,7 +24,6 @@ import ai.tock.bot.admin.BotAdminService.importStories
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.admin.dialog.DialogReportQuery
-import ai.tock.bot.admin.migration.performDatabaseMigrations
 import ai.tock.bot.admin.model.BotAdminConfiguration
 import ai.tock.bot.admin.model.BotConnectorConfiguration
 import ai.tock.bot.admin.model.BotI18nLabel
@@ -65,6 +64,7 @@ import ai.tock.shared.security.TockUserRole.admin
 import ai.tock.shared.security.TockUserRole.botUser
 import ai.tock.shared.security.TockUserRole.faqBotUser
 import ai.tock.shared.security.TockUserRole.faqNlpUser
+import ai.tock.shared.vertx.SERVER_STARTED
 import ai.tock.translator.I18nDAO
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.Translator
@@ -74,8 +74,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.salomonbrys.kodein.instance
 import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
-import liquibase.Liquibase
-import liquibase.resource.ClassLoaderResourceAccessor
+import liquibase.LiquibaseVerticle
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.toId
@@ -97,12 +96,12 @@ open class BotAdminVerticle : AdminVerticle() {
 
     override val supportCreateNamespace: Boolean = !botAdminConfiguration.botApiSupport
 
-    private val database by injector.instance<liquibase.database.Database>()
-
     override fun configureServices() {
-        performDatabaseMigrations.invoke(vertx)
-        Liquibase("db/changelog.xml", ClassLoaderResourceAccessor(), database)
-            .update()
+        vertx.eventBus().consumer(SERVER_STARTED) { msg ->
+            if (msg.body()) {
+                vertx.deployVerticle(LiquibaseVerticle())
+            }
+        }
         initTranslator()
         dialogFlowDAO.initFlowStatCrawl()
         super.configureServices()
