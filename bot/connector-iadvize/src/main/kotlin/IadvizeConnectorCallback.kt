@@ -25,10 +25,10 @@ import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
@@ -38,13 +38,11 @@ import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
-import ai.tock.shared.vertx.RestException
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
 import java.time.LocalDateTime
-import java.util.Locale
-import java.util.Properties
+import java.util.*
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
@@ -75,6 +73,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
     fun addAction(event: Event, delayInMs: Long) {
+
         if (event is Action) {
             actions.add(ActionWithDelay(event, delayInMs))
         } else {
