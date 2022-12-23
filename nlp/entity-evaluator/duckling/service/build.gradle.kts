@@ -12,8 +12,18 @@ plugins {
 
 dependencies {
     api("io.vertx:vertx-web:4.3.4")
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.7.20")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.9.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.1")
+
 //    system("wit:duckling:0.4.23")
-    "duckling-standalone"(fileTree("lib") { include("duckling-*-standalone.jar") })
+    //TODO
+    // must look on : https://www.baeldung.com/gradle-dependencies-local-jar
+    implementation((fileTree("./lib") {include("duckling-*-standalone.jar")}))
+    compileOnly("ai:tock:tock-shared:22.9.3-SNAPSHOT")
+    testImplementation("io.mockkk:mockk-jvm:1.13.2")
 }
+
 
 description = "Tock Duckling Entities Service"
