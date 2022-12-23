@@ -42,3 +42,5 @@ travis
 
 #ngrok
 scripts/connector-messenger/ngrok.exe
+/buildSrc/*
+/.gradle/*
