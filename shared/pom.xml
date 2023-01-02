@@ -168,6 +168,10 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
             <artifactId>vertx-auth-common</artifactId>
         </dependency>
         <dependency>
@@ -184,6 +188,10 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-codegen</artifactId>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.expediagroup</groupId>
+            <artifactId>graphql-kotlin-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.litote.kmongo</groupId>

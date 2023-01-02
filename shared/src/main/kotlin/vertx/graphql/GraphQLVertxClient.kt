@@ -14,58 +14,21 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql
+package ai.tock.shared.vertx.graphql
 
-/*
-import com.expediagroup.graphql.client.serializer.defaultGraphQLSerializer
 import com.expediagroup.graphql.client.types.GraphQLClientRequest
-import com.expediagroup.graphql.client.types.GraphQLClientResponse
 import io.vertx.core.Vertx
-import io.vertx.core.json.Json
 import io.vertx.ext.web.client.HttpRequest
 import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.WebClientOptions
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.util.regex.Pattern
-import kotlin.reflect.KClass
 
 private const val GRAPHQL_ENDPOINT = "/graphql"
-private const val HTTPS_PORT = 443
-private const val HTTP = "http"
-private const val HTTPS = "https"
-
-class GraphQLVertxSerializer {
-
-    private val serializer = defaultGraphQLSerializer()
-    fun <T:Any>deserialize(rawResponse: String, responseType: KClass<T>): GraphQLClientResponse<T> =
-        serializer.deserialize(rawResponse, responseType)
-
-    fun serialize(request: GraphQLClientRequest<*>): Map<*, *> =
-        Json.decodeValue(serializer.serialize(request), Map::class.java)
-}
-
-sealed class GraphQLVertxResult<T>
-sealed class SucceedResult<T> : GraphQLVertxResult<T>()
-data class OK<T>(val data: T?) : SucceedResult<T>()
-data class KO<T>(val statusCode: Int): SucceedResult<T>()
-data class FailedResult<T>(val error: Throwable): GraphQLVertxResult<T>()
-
-sealed class GraphQLVertxUrl(open val baseUrl: String, open val port: Int, val ssl: Boolean)
-data class SecuredUrl(override val baseUrl: String) : GraphQLVertxUrl(baseUrl.replace("$HTTPS://", ""), HTTPS_PORT,  true) {
-    init {
-        require(baseUrl.startsWith("$HTTPS://") || !baseUrl.contains("$HTTPS://"))
-    }
-}
-data class UnSecuredUrl(override val baseUrl: String, override val port: Int) : GraphQLVertxUrl(baseUrl.replace("$HTTP://", ""), port, false) {
-    init {
-        require(baseUrl.startsWith("$HTTP://") || !baseUrl.contains("$HTTP://"))
-    }
-}
-
 data class GraphQLVertxClient(val vertx: Vertx, val url: GraphQLVertxUrl)  {
 
     private val logger = KotlinLogging.logger { }
@@ -109,7 +72,7 @@ data class GraphQLVertxClient(val vertx: Vertx, val url: GraphQLVertxUrl)  {
     suspend fun <T : Any> execute(
         request: GraphQLClientRequest<T>,
         requestCustomizer: HttpRequest<*>.() -> Unit
-    ): ReceiveChannel<GraphQLVertxResult<T>>  = with( Channel<GraphQLVertxResult<T>>()) {
+    ): ReceiveChannel<GraphQLVertxResult<T>> = with( Channel<GraphQLVertxResult<T>>()) {
         execute(request, requestCustomizer){ send(it) }
         this
     }
@@ -119,4 +82,3 @@ fun Int.isSuccess() : Boolean {
     val regex = Pattern.compile("^2\\d{2}")
     return regex.matcher("$this").matches()
 }
-*/

@@ -18,24 +18,21 @@ package ai.tock.bot.connector.iadvize.graphql
 
 import ai.tock.bot.connector.iadvize.IadvizeAuthenticationClient
 import ai.tock.shared.property
-import com.expediagroup.graphql.client.GraphQLClient
+import ai.tock.shared.vertx.graphql.*
+import ai.tock.shared.vertx.vertx
 import com.expediagroup.graphql.client.serializer.defaultGraphQLSerializer
-import com.expediagroup.graphql.client.spring.GraphQLWebClient
-import com.expediagroup.graphql.client.types.GraphQLClientRequest
-import com.expediagroup.graphql.client.types.GraphQLClientResponse
-import com.fasterxml.jackson.databind.ObjectMapper
+
 import io.vertx.core.json.Json
-import io.vertx.core.json.JsonObject
 
 
 class IadvizeGraphQLClient  {
 
-    private val client: GraphQLWebClient = GraphQLWebClient(property(IADVIZE_GRAPHQL_BASE_URL, DEFAULT_BASE_URL))
+    private val client: GraphQLVertxClient = GraphQLVertxClient(vertx, SecuredUrl(property(IADVIZE_GRAPHQL_BASE_URL, DEFAULT_BASE_URL)))
     private val authenticationClient = IadvizeAuthenticationClient()
 
     companion object {
         const val IADVIZE_GRAPHQL_BASE_URL = "tock_iadvize_grapql_baseurl"
-        const val DEFAULT_BASE_URL = "https://api.iadvize.com/graphql"
+        const val DEFAULT_BASE_URL = "api.iadvize.com"
         const val CONTENT_TYPE = "content-type"
         const val APPLICATION_JSON = "application/json"
         const val AUTHORIZATION = "Authorization"
@@ -56,11 +53,24 @@ class IadvizeGraphQLClient  {
                     !! Do not forget to enhance the request headers !!
                     * */
                     client.execute(it) {
-                        header(CONTENT_TYPE, APPLICATION_JSON)
-                        header(AUTHORIZATION, "$BEARER $jwt")
+                        putHeader(CONTENT_TYPE, APPLICATION_JSON)
+                        putHeader(AUTHORIZATION, "$BEARER $jwt")
                     }
-                }.data?.routingRule?.availability?.chat?.isAvailable ?: false
-
+                }.let { channel ->
+                    channel.receive().let {
+                        when (it) {
+                            is SucceededResult -> {
+                                when(it) {
+                                    is OK -> it.data?.routingRule?.availability?.chat?.isAvailable ?: error("")
+                                    is KO -> error("")
+                                }
+                            }
+                            is FailedResult ->
+                                error("")
+                            else -> error("")
+                        }
+                    }
+                }
         }
 }
 
