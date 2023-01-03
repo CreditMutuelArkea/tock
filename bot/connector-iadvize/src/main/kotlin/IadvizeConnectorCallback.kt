@@ -212,7 +212,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         context.fail(throwable)
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T?): Void? {
+    private fun <T> HttpServerResponse.endWithJson(response: T?) {
         if(response != null) {
             logger.debug { "iAdvize response : $response" }
 
@@ -220,9 +220,9 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
             logger.debug { "iAdvize json response: $writeValueAsString" }
 
-            return putHeader("Content-Type", "application/json").end(writeValueAsString).result()
+             putHeader("Content-Type", "application/json").end(writeValueAsString)
         } else {
-            return end().result()
+           end()
         }
     }
 }

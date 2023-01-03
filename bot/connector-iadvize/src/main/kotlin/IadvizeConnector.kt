@@ -202,10 +202,10 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T): Void? {
+    private fun <T> HttpServerResponse.endWithJson(response: T) {
         val responseValue: String = mapper.writeValueAsString(response)
         logger.info { "response : $responseValue" }
-        return putHeader("Content-Type", "application/json").end(responseValue).result()
+        putHeader("Content-Type", "application/json").end(responseValue)
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
