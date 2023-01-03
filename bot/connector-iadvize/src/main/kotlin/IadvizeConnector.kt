@@ -30,7 +30,6 @@ import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.Unsupporte
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
-import ai.tock.bot.connector.iadvize.model.request.RequestIds
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
@@ -43,7 +42,6 @@ import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.shared.jackson.mapper
-import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.RoutingContext
@@ -120,13 +118,13 @@ class IadvizeConnector internal constructor(
 
     internal var handlerGetBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("GET", "/bots/$idOperator", context.getBodyAsString())
+        logRequest("GET", "/bots/$idOperator", context.body().asString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
     internal var handlerUpdateBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("PUT", "/bots/$idOperator", context.getBodyAsString())
+        logRequest("PUT", "/bots/$idOperator", context.body().asString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
@@ -152,9 +150,9 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerStartConversation: IadvizeHandler = { context, controller ->
-        logger.info { "request : POST /conversations\nbody : ${context.getBodyAsString()}" }
+        logger.info { "request : POST /conversations\nbody : ${context.body().asString()}" }
         val conversationRequest: ConversationsRequest =
-            mapper.readValue(context.getBodyAsString(), ConversationsRequest::class.java)
+            mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
         val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule)
         callback.sendResponse()
     }
@@ -163,13 +161,13 @@ class IadvizeConnector internal constructor(
         val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
         val iadvizeRequest: IadvizeRequest = mapRequest(idConversation, context)
         if (!isOperator(iadvizeRequest)) {
-            logger.info { "request : POST /conversations/$idConversation/messages\nbody : ${context.getBodyAsString()}" }
-            logger.info { context.normalisedPath() }
+            logger.info { "request : POST /conversations/$idConversation/messages\nbody : ${context.body().asString()}" }
+            logger.info { context.normalizedPath() }
             logger.info { "body parsed : $iadvizeRequest" }
             handleRequest(controller, context, iadvizeRequest)
         } else {
             //ignore message from operator
-            logger.info { "request echo : POST /conversations/$idConversation/messages ${context.getBodyAsString()}" }
+            logger.info { "request echo : POST /conversations/$idConversation/messages ${context.body().asString()}" }
             context.response().end()
         }
     }
@@ -187,27 +185,27 @@ class IadvizeConnector internal constructor(
     }
 
     private fun mapRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
-        val typeMessage: TypeMessage = mapper.readValue(context.getBodyAsString(), TypeMessage::class.java)
+        val typeMessage: TypeMessage = mapper.readValue(context.body().asString(), TypeMessage::class.java)
         return when (typeMessage.type) {
             //json doesn't contain idConversation, to prevent null pointer,
             // we use the inner class MessageRequestJson to enhance the json.
             TYPE_TEXT -> {
                 val messageRequestJson: MessageRequestJson =
-                    mapper.readValue(context.getBodyAsString(), MessageRequestJson::class.java)
+                    mapper.readValue(context.body().asString(), MessageRequestJson::class.java)
                 MessageRequest(messageRequestJson, idConversation)
             }
             else -> {
                 val unsupportedRequestJson: UnsupportedRequestJson =
-                    mapper.readValue(context.getBodyAsString(), UnsupportedRequestJson::class.java)
+                    mapper.readValue(context.body().asString(), UnsupportedRequestJson::class.java)
                 UnsupportedRequest(unsupportedRequestJson, idConversation, typeMessage.type)
             }
         }
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T) {
+    private fun <T> HttpServerResponse.endWithJson(response: T): Void? {
         val responseValue: String = mapper.writeValueAsString(response)
         logger.info { "response : $responseValue" }
-        return putHeader("Content-Type", "application/json").end(responseValue)
+        return putHeader("Content-Type", "application/json").end(responseValue).result()
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
