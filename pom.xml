@@ -72,8 +72,8 @@
         <aws-sdk>1.12.331</aws-sdk>
         <pac4j>5.7.0</pac4j>
         <vertx-pac4j>6.0.1</vertx-pac4j>
-
-        <junit-jupiter>5.9.1</junit-jupiter>
+        <graphql-kotlin>6.3.0</graphql-kotlin>
+        <junit-jupiter>5.9.0</junit-jupiter>
 
         <mockk>1.13.2</mockk>
         <assertj>3.22.0</assertj>
@@ -294,6 +294,11 @@
             </dependency>
             <dependency>
                 <groupId>io.vertx</groupId>
+                <artifactId>vertx-web-client</artifactId>
+                <version>${vertx}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
                 <artifactId>vertx-auth-common</artifactId>
                 <version>${vertx}</version>
             </dependency>
@@ -313,7 +318,16 @@
                 <version>${vertx}</version>
                 <scope>test</scope>
             </dependency>
-
+            <dependency>
+                <groupId>com.expediagroup</groupId>
+                <artifactId>graphql-kotlin-client</artifactId>
+                <version>${graphql-kotlin}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.expediagroup</groupId>
+                <artifactId>graphql-kotlin-client-jackson</artifactId>
+                <version>${graphql-kotlin}</version>
+            </dependency>
             <dependency>
                 <groupId>org.litote.kmongo</groupId>
                 <artifactId>kmongo</artifactId>

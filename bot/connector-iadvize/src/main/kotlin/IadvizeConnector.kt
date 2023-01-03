@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.Unsupporte
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
+import ai.tock.bot.connector.iadvize.model.request.RequestIds
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
@@ -203,10 +204,10 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T) : Future<Void> {
-        val response: String = mapper.writeValueAsString(response)
-        logger.info { "response : $response" }
-        return putHeader("Content-Type", "application/json").end(response)
+    private fun <T> HttpServerResponse.endWithJson(response: T) {
+        val responseValue: String = mapper.writeValueAsString(response)
+        logger.info { "response : $responseValue" }
+        return putHeader("Content-Type", "application/json").end(responseValue)
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
@@ -217,6 +218,8 @@ class IadvizeConnector internal constructor(
         }
     }
 
+
+    // internal for tests
     internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,
@@ -245,8 +248,10 @@ class IadvizeConnector internal constructor(
         message: ConnectorMessage,
         suggestions: List<CharSequence>
     ): BotBus.() -> ConnectorMessage? = {
-        (message as? IadvizeMessage)?.let {
-            message.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
+        //TODO add logger
+        (message as? IadvizeConnectorMessage)?.let {
+            val iadvizeMessage = message.replies.last { it is IadvizeMessage } as IadvizeMessage
+            iadvizeMessage.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
         }
         message
     }
