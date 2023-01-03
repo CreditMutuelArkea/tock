@@ -18,6 +18,7 @@ package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.ConnectorMessage
+import ai.tock.bot.connector.iadvize.graphql.IadvizeGraphQLClient
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
@@ -40,22 +41,34 @@ import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Locale
+import java.util.Properties
+
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
 class IadvizeConnectorCallback(override val  applicationId: String,
-                               val controller: ConnectorController,
+                               controller: ConnectorController,
                                val context: RoutingContext,
                                val request: IadvizeRequest,
-                               val distributionRule: String?,
+                               distributionRule: String?,
                                val actions: MutableList<ActionWithDelay> = mutableListOf()
 ) : ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
+        const val TRANSFER_RULE_UNAVAILABLE_MESSAGE = """
+            Nous ne pouvons pas répondre favorablement à votre demande de mise en relation.
+
+            Nos conseillers sont disponibles (hors jours fériés) :
+                - Du lundi au vendredi, de 8h30 à 19h00
+                - Le samedi, de 8h30 à 17h00
+
+            Sinon, merci de [prendre rendez-vous](./rendez-vous/saisie/) avec votre conseiller habituel depuis le menu "MON CONSEILLER". 
+        """
     }
 
     @Volatile
@@ -68,7 +81,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
-    private val iadvizeAuthenticationClient = IadvizeAuthenticationClient()
+    private val iadvizeGraphQLClient = IadvizeGraphQLClient()
 
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
@@ -163,12 +176,20 @@ class IadvizeConnectorCallback(override val  applicationId: String,
      * return new IadvizeTransfer with distribution rule configured on connector
      */
     private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
-        val token: String = iadvizeAuthenticationClient.createToken()
+
         if(it is IadvizeTransfer) {
             if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))
             } else {
-                IadvizeTransfer(distributionRule, it.transferOptions)
+                val available = runBlocking {
+                    iadvizeGraphQLClient.isRuleAvailable {
+                        distributionRule
+                    }
+                }
+                if (available)
+                    IadvizeTransfer(distributionRule, it.transferOptions)
+                else
+                    IadvizeMessage(TRANSFER_RULE_UNAVAILABLE_MESSAGE)
             }
         } else {
             it

@@ -325,6 +325,11 @@
                 <version>${graphql-kotlin}</version>
             </dependency>
             <dependency>
+                <groupId>com.expediagroup</groupId>
+                <artifactId>graphql-kotlin-client-jackson</artifactId>
+                <version>${graphql-kotlin}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.litote.kmongo</groupId>
                 <artifactId>kmongo</artifactId>
                 <version>${kmongo}</version>

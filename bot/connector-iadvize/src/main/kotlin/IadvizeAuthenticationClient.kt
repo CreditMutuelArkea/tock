@@ -18,44 +18,85 @@ package ai.tock.bot.connector.iadvize
 
 import ai.tock.shared.property
 import ai.tock.shared.retrofitBuilderWithTimeoutAndLogger
+import com.fasterxml.jackson.annotation.JsonProperty
 import mu.KotlinLogging
 import retrofit2.Call
+import retrofit2.converter.jackson.JacksonConverterFactory
 import retrofit2.create
-import retrofit2.http.Body
-import retrofit2.http.Headers
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import java.time.LocalDateTime
+import java.util.concurrent.atomic.AtomicReference
+
 
 class IadvizeAuthenticationClient {
 
-    private val logger = KotlinLogging.logger { }
+    companion object {
+        val logger = KotlinLogging.logger { }
 
-    private val BASE_URL = "https://api.iadvize.com"
-    private val AUTHENTICATION_PATERN = "username=%s&password=%s&grant_type=password"
-    private val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
-    private val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
+        const val BASE_URL = "https://api.iadvize.com"
+        const val GRANT_TYPE = "password"
+        const val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
+        const val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
+        var token = AtomicReference<Token?>()
+    }
 
-    private val iadvizeAuthenticationApi: IadvizeAuthenticationApi
-    private val authenticationBody: String
+    private val iadvizeAuthenticationApi: IadvizeAuthenticationApi = retrofitBuilderWithTimeoutAndLogger(30000, logger)
+        .baseUrl(BASE_URL)
+        .addConverterFactory(JacksonConverterFactory.create())
+        .build()
+        .create()
+
+    private val username: String = property(IADVIZE_USERNAME_AUTHENTICATION, "")
+    private val password: String = property(IADVIZE_PASSWORD_AUTHENTICATION, "")
+
+    data class IadvizeAuthResponse(
+        @JsonProperty("refresh_token")
+        val refreshToken:String? = null,
+        @JsonProperty("token_type")
+        val tokenType: String? = null,
+        @JsonProperty("access_token")
+        val accessToken: String?=null,
+        @JsonProperty("expires_in")
+        val expiresIn: Number? = null )
+
+    data class Token(val value: String, val expireAt: LocalDateTime?)
 
     interface IadvizeAuthenticationApi {
-        @Headers("Content-Type: application/x-www-form-urlencoded")
+
+        @FormUrlEncoded
         @POST("/oauth2/token")
-        fun createToken(@Body authentication: String): Call<String>
+        fun createToken(@Field("username") username: String,
+                        @Field("password") password: String,
+                        @Field("grant_type") grantType: String
+        ): Call<IadvizeAuthResponse>
     }
 
-    init {
-        iadvizeAuthenticationApi = retrofitBuilderWithTimeoutAndLogger(30000, logger)
-            .baseUrl(BASE_URL)
-            .build()
-            .create()
-        authenticationBody = AUTHENTICATION_PATERN.format(
-            property(IADVIZE_USERNAME_AUTHENTICATION, ""),
-            property(IADVIZE_PASSWORD_AUTHENTICATION, "")
-        )
+    class AuthenticationFailedError : Exception("Fail to retrieve a non null access token")
+
+    private fun getToken(): Token {
+        return iadvizeAuthenticationApi.createToken(username, password, GRANT_TYPE).execute().body()
+            ?.let {
+                val value = it.accessToken ?: throw AuthenticationFailedError()
+                val time = it.expiresIn?.let { s -> LocalDateTime.now().plusSeconds(s.toLong()) }
+
+                Token(value, time)
+                    .also { tok ->
+                        token.set(tok)
+                    }
+            }
+            ?: throw AuthenticationFailedError()
     }
 
-    fun createToken(): String {
-        //TODO corriger l'exception par une autre plus spécifique et plus approprié
-        return iadvizeAuthenticationApi.createToken(authenticationBody).execute().body() ?: throw Exception("no token")
+    fun getAccessToken() : String {
+
+        var t = token.get()
+
+        if (t == null || (t.expireAt?.isBefore(LocalDateTime.now()) == true)) {
+            t = getToken()
+        }
+
+        return t.value
     }
 }

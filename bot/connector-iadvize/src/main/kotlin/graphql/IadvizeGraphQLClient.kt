@@ -18,11 +18,14 @@ package ai.tock.bot.connector.iadvize.graphql
 
 import ai.tock.bot.connector.iadvize.IadvizeAuthenticationClient
 import ai.tock.shared.property
-import ai.tock.shared.vertx.graphql.*
-import ai.tock.shared.vertx.vertx
-import com.expediagroup.graphql.client.serializer.defaultGraphQLSerializer
+import ai.tock.shared.vertx.graphql.GraphQLVertxClient
+import ai.tock.shared.vertx.graphql.SecuredUrl
+import ai.tock.shared.vertx.graphql.SucceededResult
+import ai.tock.shared.vertx.graphql.FailedResult
+import ai.tock.shared.vertx.graphql.OK
+import ai.tock.shared.vertx.graphql.KO
 
-import io.vertx.core.json.Json
+import ai.tock.shared.vertx.vertx
 
 
 class IadvizeGraphQLClient  {
@@ -39,9 +42,9 @@ class IadvizeGraphQLClient  {
         const val BEARER = "Bearer"
     }
 
-    suspend fun isRuleAvailable(jwtProvider: () -> String, ruleIdGetter: () -> String): Boolean =
-        /* Start by creating a jwt token */
-        jwtProvider.invoke().let { jwt ->
+    suspend fun isRuleAvailable(ruleIdGetter: () -> String): Boolean =
+        /* Start by creating a access token */
+        authenticationClient.getAccessToken().let { jwt ->
             /*
             With the Iadvize ID retrived from the env variable,
             build the Routuing rule request
@@ -57,29 +60,20 @@ class IadvizeGraphQLClient  {
                         putHeader(AUTHORIZATION, "$BEARER $jwt")
                     }
                 }.let { channel ->
+                    /*
+                    Wait for receiving result
+                    */
                     channel.receive().let {
                         when (it) {
                             is SucceededResult -> {
                                 when(it) {
-                                    is OK -> it.data?.routingRule?.availability?.chat?.isAvailable ?: error("")
-                                    is KO -> error("")
+                                    is OK -> it.data?.routingRule?.availability?.chat?.isAvailable ?: dataNotFoundError()
+                                    is KO -> notSuccessResponseError(it.statusCode)
                                 }
                             }
-                            is FailedResult ->
-                                error("")
-                            else -> error("")
+                            is FailedResult -> requestFailedError(it.error.message)
                         }
                     }
                 }
         }
-}
-
-fun main() {
-
-    Json.decodeValue(
-        defaultGraphQLSerializer()
-            .serialize(RoutingRule(RoutingRule.Variables("id"))),
-        Map::class.java
-    ).let { println(it) }
-
 }
