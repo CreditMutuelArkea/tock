@@ -59,7 +59,8 @@ class IadvizeConnector internal constructor(
     val path: String,
     val editorUrl: String,
     val firstMessage: String,
-    val distributionRule: String?
+    val distributionRule: String?,
+    val distributionRuleUnvailableMessage: String,
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
@@ -153,7 +154,9 @@ class IadvizeConnector internal constructor(
         logger.info { "request : POST /conversations\nbody : ${context.body().asString()}" }
         val conversationRequest: ConversationsRequest =
             mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule)
+
+        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule, distributionRuleUnvailableMessage)
+
         callback.sendResponse()
     }
 
@@ -223,7 +226,8 @@ class IadvizeConnector internal constructor(
         context: RoutingContext,
         iadvizeRequest: IadvizeRequest
     ) {
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule)
+
+        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)

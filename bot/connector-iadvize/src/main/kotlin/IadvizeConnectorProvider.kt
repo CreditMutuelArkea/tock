@@ -33,6 +33,8 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
     private const val EDITOR_URL = "tock_iadvize_editor_url"
     private const val FIRST_MESSAGE = "tock_iadvize_first_message"
     private const val DISTRIBUTION_RULE = "tock_iadvize_distribution_rule"
+    private const val DISTRIBUTION_RULE_UNVAILABLE_MESSAGE = "tock_iadvize_distribution_rule_unavailable"
+
 
     override fun connector(connectorConfiguration: ConnectorConfiguration): Connector {
         with(connectorConfiguration) {
@@ -41,7 +43,8 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
                 connectorConfiguration.path,
                 parameters.getValue(EDITOR_URL),
                 parameters.getValue(FIRST_MESSAGE),
-                parameters.getValue(DISTRIBUTION_RULE)
+                parameters.getValue(DISTRIBUTION_RULE),
+                parameters.getValue(DISTRIBUTION_RULE_UNVAILABLE_MESSAGE)
             )
         }
     }
@@ -63,14 +66,21 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
             DISTRIBUTION_RULE,
             false
         )
+
+        val distributionRuleUnvailableMessageField = ConnectorTypeConfigurationField(
+            properties.getProperty(DISTRIBUTION_RULE_UNVAILABLE_MESSAGE, DISTRIBUTION_RULE_UNVAILABLE_MESSAGE),
+            DISTRIBUTION_RULE_UNVAILABLE_MESSAGE,
+            true
+        )
         return ConnectorTypeConfiguration(
             connectorType,
-            listOf(editorUrlField, firstMessageField, distributionRuleField),
+            listOf(editorUrlField, firstMessageField, distributionRuleField, distributionRuleUnvailableMessageField),
             resourceAsString("/iadvize.svg")
         )
     }
 
     override val supportedResponseConnectorMessageTypes: Set<KClass<out ConnectorMessage>> = setOf(IadvizeConnectorMessage::class)
+
 }
 
 internal class IadvizeConnectorProviderService : ConnectorProvider by IadvizeConnectorProvider

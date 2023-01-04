@@ -16,6 +16,7 @@
 package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorData
+import ai.tock.bot.connector.iadvize.graphql.IadvizeGraphQLClient
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
@@ -47,26 +48,31 @@ import kotlin.test.assertEquals
  */
 class IadvizeConnectorTest {
 
-    val applicationId = "appId"
-    val path = "/path"
-    val editorURL = "/editorUrl"
-    val firstMessage = "firstMessage"
-    val distributionRule = "distributionRuleId"
-    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule)
-    val controller: ConnectorController = mockk(relaxed = true)
-    val context: RoutingContext = mockk(relaxed = true)
-    val response: HttpServerResponse = mockk(relaxed = true)
-    val translator: I18nTranslator = mockk()
-    val botName = "botName"
-    val botId = "botId"
-    val operateurId = "operateurId"
-    val conversationId = "conversationId"
+    private val applicationId = "appId"
+    private val path = "/path"
+    private val editorURL = "/editorUrl"
+    private val firstMessage = "firstMessage"
+    private val distributionRule = "distributionRuleId"
+    private val distributionRuleUnavailableMessage = "distributionRuleUnavailableMessage"
+    private val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, distributionRuleUnavailableMessage)
+    private val controller: ConnectorController = mockk(relaxed = true)
+    private val context: RoutingContext = mockk(relaxed = true)
+    private val response: HttpServerResponse = mockk(relaxed = true)
 
-    val marcus1: String = "MARCUS1"
-    val marcus2: String = "MARCUS2"
+    private val iadvizeGraphQLClient: IadvizeGraphQLClient = mockk(relaxed = true)
+
+    private val translator: I18nTranslator = mockk()
+    private val botName = "botName"
+    private val botId = "botId"
+    private val operateurId = "operateurId"
+    private val conversationId = "conversationId"
+
+    private val marcus1: String = "MARCUS1"
+    private val marcus2: String = "MARCUS2"
 
     @BeforeEach
     fun before() {
+
         every { context.response() } returns response
         every { response.putHeader("Content-Type", "application/json") } returns response
         every { controller.botConfiguration.name } returns botName
@@ -75,10 +81,17 @@ class IadvizeConnectorTest {
         every { context.pathParam("idConversation") } returns conversationId
 
         every { controller.botDefinition.i18nTranslator(any(), any(), any(), any()) } returns translator
+
+        every {  iadvizeGraphQLClient.isRuleAvailable(distributionRule) } answers {
+            println("********************************************* YES ****************************************")
+            true
+        }
+
         val marcusAnswer1 = I18nLabelValue("", "", "", marcus1)
         every { translator.translate(marcus1) } returns marcusAnswer1.raw
         val marcusAnswer2 = I18nLabelValue("", "", "", marcus2)
         every { translator.translate(marcus2) } returns marcusAnswer2.raw
+
 
         // Force date to expected date
         mockkStatic(LocalDateTime::class)
@@ -155,8 +168,10 @@ class IadvizeConnectorTest {
         val connectorData = slot<ConnectorData>()
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
             callback.addAction(action, 0)
             callback.eventAnswered(action)
+
         }
 
         connector.handleRequest(
@@ -195,8 +210,10 @@ class IadvizeConnectorTest {
         )
 
         val connectorData = slot<ConnectorData>()
+
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
             callback.addAction(action, 0)
             callback.eventAnswered(action)
         }
@@ -273,7 +290,7 @@ class IadvizeConnectorTest {
     fun handlerStartConversation_shouldHandleWell_TockBot() {
         val request: String = Resources.toString(resource("/request_history.json"), Charsets.UTF_8)
         val expectedResponse: String = Resources.toString(resource("/response_start_conversation.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        every { context.body().asString() } returns request
 
         connector.handlerStartConversation(context, controller)
 
@@ -286,7 +303,7 @@ class IadvizeConnectorTest {
     fun handlerConversation_shouldHandleWell_TockBot() {
         val request: String = Resources.toString(resource("/request_message_text.json"), Charsets.UTF_8)
         val expectedResponse: String = Resources.toString(resource("/response_message_marcus.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        every { context.body().asString() } returns request
 
         val action1 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS1")
         val action2 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS2")
@@ -311,7 +328,7 @@ class IadvizeConnectorTest {
         val requestEchoMarcus1: String = Resources.toString(resource("/request_echo_marcus1.json"), Charsets.UTF_8)
         val requestEchoMarcus2: String = Resources.toString(resource("/request_echo_marcus2.json"), Charsets.UTF_8)
         val expectedResponse: String = Resources.toString(resource("/response_message_marcus.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        every { context.body().asString() } returns request
 
         val action1 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS1")
         val action2 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS2")
@@ -330,12 +347,12 @@ class IadvizeConnectorTest {
         assertEquals(expectedResponse, messageResponse.captured)
 
         //echo1
-        every { context.getBodyAsString() } returns requestEchoMarcus1
+        every { context.body().asString() } returns requestEchoMarcus1
         connector.handlerConversation(context, controller)
         verify { response.end() }
 
         //echo2
-        every { context.getBodyAsString() } returns requestEchoMarcus2
+        every { context.body().asString() } returns requestEchoMarcus2
         connector.handlerConversation(context, controller)
         verify { response.end() }
     }
@@ -344,7 +361,7 @@ class IadvizeConnectorTest {
     fun handlerConversationUnsupport_shouldDontCrash_TockBot() {
         val request: String = Resources.toString(resource("/request_message_unsupport.json"), Charsets.UTF_8)
         val expectedResponse: String = Resources.toString(resource("/response_message_unsupport.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        every { context.body().asString() } returns request
 
         val properties: Properties = loadProperties("/iadvize.properties")
         val messageUnsupported: String = properties.getProperty("tock_iadvize_unsupported_message_request")

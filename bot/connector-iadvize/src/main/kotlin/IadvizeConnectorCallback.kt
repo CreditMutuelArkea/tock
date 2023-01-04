@@ -41,7 +41,6 @@ import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.Locale
@@ -55,20 +54,12 @@ class IadvizeConnectorCallback(override val  applicationId: String,
                                val context: RoutingContext,
                                val request: IadvizeRequest,
                                distributionRule: String?,
+                               distributionRuleUnvailableMessage: String,
                                val actions: MutableList<ActionWithDelay> = mutableListOf()
 ) : ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
-        const val TRANSFER_RULE_UNAVAILABLE_MESSAGE = """
-            Nous ne pouvons pas répondre favorablement à votre demande de mise en relation.
-
-            Nos conseillers sont disponibles (hors jours fériés) :
-                - Du lundi au vendredi, de 8h30 à 19h00
-                - Le samedi, de 8h30 à 17h00
-
-            Sinon, merci de [prendre rendez-vous](./rendez-vous/saisie/) avec votre conseiller habituel depuis le menu "MON CONSEILLER". 
-        """
     }
 
     @Volatile
@@ -81,7 +72,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
-    private val iadvizeGraphQLClient = IadvizeGraphQLClient()
+    var iadvizeGraphQLClient = IadvizeGraphQLClient()
 
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
@@ -181,15 +172,11 @@ class IadvizeConnectorCallback(override val  applicationId: String,
             if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))
             } else {
-                val available = runBlocking {
-                    iadvizeGraphQLClient.isRuleAvailable {
-                        distributionRule
-                    }
-                }
+                val available =   iadvizeGraphQLClient.isRuleAvailable(distributionRule)
                 if (available)
                     IadvizeTransfer(distributionRule, it.transferOptions)
                 else
-                    IadvizeMessage(TRANSFER_RULE_UNAVAILABLE_MESSAGE)
+                    IadvizeMessage(distributionRuleUnvailableMessage)
             }
         } else {
             it

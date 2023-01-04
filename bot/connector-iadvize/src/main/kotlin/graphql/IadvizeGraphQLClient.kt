@@ -26,6 +26,7 @@ import ai.tock.shared.vertx.graphql.OK
 import ai.tock.shared.vertx.graphql.KO
 
 import ai.tock.shared.vertx.vertx
+import kotlinx.coroutines.runBlocking
 
 
 class IadvizeGraphQLClient  {
@@ -42,14 +43,14 @@ class IadvizeGraphQLClient  {
         const val BEARER = "Bearer"
     }
 
-    suspend fun isRuleAvailable(ruleIdGetter: () -> String): Boolean =
-        /* Start by creating a access token */
+    fun isRuleAvailable(distributionRule: String): Boolean = runBlocking {
+        /* Start by creating an access token */
         authenticationClient.getAccessToken().let { jwt ->
             /*
             With the Iadvize ID retrived from the env variable,
             build the Routuing rule request
             */
-            RoutingRule(RoutingRule.Variables(ruleIdGetter.invoke()))
+            RoutingRule(RoutingRule.Variables(distributionRule))
                 .let {
                     /*
                     Then perform the graphQl request.
@@ -76,4 +77,6 @@ class IadvizeGraphQLClient  {
                     }
                 }
         }
+    }
+
 }
