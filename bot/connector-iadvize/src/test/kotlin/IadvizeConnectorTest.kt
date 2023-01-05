@@ -82,10 +82,7 @@ class IadvizeConnectorTest {
 
         every { controller.botDefinition.i18nTranslator(any(), any(), any(), any()) } returns translator
 
-        every {  iadvizeGraphQLClient.isRuleAvailable(distributionRule) } answers {
-            println("********************************************* YES ****************************************")
-            true
-        }
+        every {  iadvizeGraphQLClient.isRuleAvailable(distributionRule) } returns true
 
         val marcusAnswer1 = I18nLabelValue("", "", "", marcus1)
         every { translator.translate(marcus1) } returns marcusAnswer1.raw

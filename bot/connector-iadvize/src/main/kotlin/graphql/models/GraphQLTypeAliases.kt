@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql
+package ai.tock.bot.connector.iadvize.graphql.models
 
 import kotlin.String
 
 /**
  * Legacy iAdvize identifier, encoded as an integer.
  */
-public typealias LegacyId = String
+typealias LegacyId = String
 
-public typealias UUID = String
+typealias UUID = String

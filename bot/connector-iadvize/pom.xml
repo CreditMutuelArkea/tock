@@ -100,7 +100,7 @@
 
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>com.expediagroup</groupId>
                 <artifactId>graphql-kotlin-maven-plugin</artifactId>
                 <version>6.2.5</version>
@@ -119,7 +119,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
         </plugins>
     </build>
 </project>

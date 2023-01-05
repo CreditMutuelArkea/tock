@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql.routingrule
-
-import com.expediagroup.graphql.client.Generated
-import kotlin.Boolean
+package ai.tock.bot.connector.iadvize.graphql.models.routingrule
 
 /**
- * Contains availability for a Channel for a RoutingRule. See fields for more details.
+ * Routing rules determine how to distribute conversations from a set of targeting rules to a set of
+ * routing groups, according to a routing mode.
  */
-@Generated
-public data class RoutingRuleChannelAvailability(
-  /**
-   * A RoutingRule's channel is available if it has at least one operator online and available
-   */
-  public val isAvailable: Boolean,
-)
+
+data class RoutingRule(val availability: RoutingRuleAvailability? = null)
+
+data class RoutingRuleAvailability(val chat: RoutingRuleChannelAvailability)
+data class RoutingRuleChannelAvailability(val isAvailable: Boolean)

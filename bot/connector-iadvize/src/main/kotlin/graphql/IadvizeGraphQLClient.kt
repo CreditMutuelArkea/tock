@@ -17,6 +17,7 @@
 package ai.tock.bot.connector.iadvize.graphql
 
 import ai.tock.bot.connector.iadvize.IadvizeAuthenticationClient
+import ai.tock.bot.connector.iadvize.graphql.models.RoutingRule
 import ai.tock.shared.property
 import ai.tock.shared.vertx.graphql.GraphQLVertxClient
 import ai.tock.shared.vertx.graphql.SecuredUrl
