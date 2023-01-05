@@ -20,7 +20,6 @@ import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
-import ai.tock.bot.connector.iadvize.model.response.conversation.Duration.TimeUnit.*
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
@@ -30,10 +29,11 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
-import ai.tock.shared.resource
+import ai.tock.shared.resourceAsString
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.raw
-import com.google.common.io.Resources
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.*
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
@@ -53,7 +53,7 @@ class IadvizeConnectorTest {
     val editorURL = "/editorUrl"
     val firstMessage = "firstMessage"
     val distributionRule = "distributionRuleId"
-    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule)
+    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, null)
     val controller: ConnectorController = mockk(relaxed = true)
     val context: RoutingContext = mockk(relaxed = true)
     val response: HttpServerResponse = mockk(relaxed = true)
@@ -90,7 +90,7 @@ class IadvizeConnectorTest {
     @Test
     fun handleRequestWithoutQuickReply_shouldHandleWell_MessageMarcus() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_marcus.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_message_marcus.json")
 
         val action1 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS1")
         val action2 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS2")
@@ -118,7 +118,7 @@ class IadvizeConnectorTest {
     @Test
     fun handleRequestWithQuickReply_shouldHandleWell_MessageMarcus() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_quickreply.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_message_quickreply.json")
 
         val iadvizeReply: IadvizeReply = IadvizeMessage(TextPayload("MARCUS"), mutableListOf(QuickReply("MARCUS_YES"), QuickReply("MARCUS_NO")))
         val iadvizeConnectorMessage = IadvizeConnectorMessage(iadvizeReply)
@@ -147,7 +147,7 @@ class IadvizeConnectorTest {
     @Test
     fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_transfer.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_message_transfer.json")
 
         val iadvizeTransfer: IadvizeReply = IadvizeTransfer(0)
         val iadvizeConnectorMessage = IadvizeConnectorMessage(iadvizeTransfer)
@@ -176,7 +176,7 @@ class IadvizeConnectorTest {
     @Test
     fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
-        val expectedResponse: String = Resources.toString(resource("/response_message_multipart_transfer.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_message_multipart_transfer.json")
 
         val iadvizeMultipartReply = IadvizeMultipartReply(
             IadvizeAwait(Duration(100, millis)),
@@ -217,7 +217,7 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerGetBots_shouldHandleWell_TockBot() {
-        val expectedResponse: String = Resources.toString(resource("/response_get_bots.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_get_bots.json")
 
         connector.handlerGetBots(context, controller)
 
@@ -228,7 +228,7 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerGetBot_shouldHandleWell_TockBot() {
-        val expectedResponse: String = Resources.toString(resource("/response_get_bot.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_get_bot.json")
 
         connector.handlerGetBot(context, controller)
 
@@ -239,7 +239,7 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerUpdateBot_shouldHandleWell_TockBot() {
-        val expectedResponse: String = Resources.toString(resource("/response_get_bot.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_get_bot.json")
 
         connector.handlerUpdateBot(context, controller)
 
@@ -250,7 +250,7 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerStrategies_shouldHandleWell_TockBot() {
-        val expectedResponse: String = Resources.toString(resource("/response_strategy.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_strategy.json")
 
         connector.handlerStrategies(context, controller)
 
@@ -261,7 +261,7 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerFirstMessage_shouldHandleWell_TockBot() {
-        val expectedResponse: String = Resources.toString(resource("/response_first_message.json"), Charsets.UTF_8)
+        val expectedResponse: String = resourceAsStringMinified("/response_first_message.json")
 
         connector.handlerFirstMessage(context, controller)
 
@@ -272,9 +272,9 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerStartConversation_shouldHandleWell_TockBot() {
-        val request: String = Resources.toString(resource("/request_history.json"), Charsets.UTF_8)
-        val expectedResponse: String = Resources.toString(resource("/response_start_conversation.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        val request: String = resourceAsStringMinified("/request_history.json")
+        val expectedResponse: String = resourceAsStringMinified("/response_start_conversation.json")
+        every { context.body().asString() } returns request
 
         connector.handlerStartConversation(context, controller)
 
@@ -285,9 +285,9 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerConversation_shouldHandleWell_TockBot() {
-        val request: String = Resources.toString(resource("/request_message_text.json"), Charsets.UTF_8)
-        val expectedResponse: String = Resources.toString(resource("/response_message_marcus.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        val request: String = resourceAsStringMinified("/request_message_text.json")
+        val expectedResponse: String = resourceAsStringMinified("/response_message_marcus.json")
+        every { context.body().asString() } returns request
 
         val action1 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS1")
         val action2 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS2")
@@ -308,11 +308,11 @@ class IadvizeConnectorTest {
 
     @Test
     fun handlerEchoConversation_shouldHandleWell_TockBot() {
-        val request: String = Resources.toString(resource("/request_message_text.json"), Charsets.UTF_8)
-        val requestEchoMarcus1: String = Resources.toString(resource("/request_echo_marcus1.json"), Charsets.UTF_8)
-        val requestEchoMarcus2: String = Resources.toString(resource("/request_echo_marcus2.json"), Charsets.UTF_8)
-        val expectedResponse: String = Resources.toString(resource("/response_message_marcus.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        val request: String = resourceAsStringMinified("/request_message_text.json")
+        val requestEchoMarcus1: String = resourceAsStringMinified("/request_echo_marcus1.json")
+        val requestEchoMarcus2: String = resourceAsStringMinified("/request_echo_marcus2.json")
+        val expectedResponse: String = resourceAsStringMinified("/response_message_marcus.json")
+        every { context.body().asString() } returns request
 
         val action1 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS1")
         val action2 = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), "MARCUS2")
@@ -331,21 +331,21 @@ class IadvizeConnectorTest {
         assertEquals(expectedResponse, messageResponse.captured)
 
         //echo1
-        every { context.getBodyAsString() } returns requestEchoMarcus1
+        every { context.body().asString() } returns requestEchoMarcus1
         connector.handlerConversation(context, controller)
         verify { response.end() }
 
         //echo2
-        every { context.getBodyAsString() } returns requestEchoMarcus2
+        every { context.body().asString() } returns requestEchoMarcus2
         connector.handlerConversation(context, controller)
         verify { response.end() }
     }
 
     @Test
     fun handlerConversationUnsupport_shouldDontCrash_TockBot() {
-        val request: String = Resources.toString(resource("/request_message_unsupport.json"), Charsets.UTF_8)
-        val expectedResponse: String = Resources.toString(resource("/response_message_unsupport.json"), Charsets.UTF_8)
-        every { context.getBodyAsString() } returns request
+        val request: String = resourceAsStringMinified("/request_message_unsupport.json")
+        val expectedResponse: String = resourceAsStringMinified("/response_message_unsupport.json")
+        every { context.body().asString() } returns request
 
         val properties: Properties = loadProperties("/iadvize.properties")
         val messageUnsupported: String = properties.getProperty("tock_iadvize_unsupported_message_request")
@@ -362,9 +362,14 @@ class IadvizeConnectorTest {
 
     private fun getIadvizeRequestMessage(json: String, idConversation: String): IadvizeRequest {
         val messageRequestJson : MessageRequestJson = mapper.readValue(
-            Resources.toString(resource(json), Charsets.UTF_8),
+            resourceAsString(json),
             MessageRequestJson::class.java)
         return MessageRequest(messageRequestJson, idConversation)
+    }
+
+    private fun resourceAsStringMinified(path: String): String {
+        val text  = resourceAsString(path)
+        return (ObjectMapper().readTree(text) as JsonNode).toString()
     }
 
 }

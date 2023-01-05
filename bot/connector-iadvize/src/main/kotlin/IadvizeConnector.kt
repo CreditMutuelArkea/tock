@@ -20,37 +20,38 @@ import ai.tock.bot.connector.ConnectorBase
 import ai.tock.bot.connector.ConnectorCallback
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
-import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
-import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
-import ai.tock.bot.connector.iadvize.model.request.MessageRequest
+import ai.tock.bot.connector.iadvize.model.request.*
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
-import ai.tock.bot.connector.iadvize.model.request.TypeMessage
-import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.UnsupportedRequestJson
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
+import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strategy.customAvailability
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
-import ai.tock.bot.engine.ConnectorController
-import ai.tock.bot.engine.event.Event
-import ai.tock.shared.error
-import mu.KotlinLogging
-import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strategy.customAvailability
+import ai.tock.bot.connector.iadvize.model.response.Healthcheck
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.action.Action
+import ai.tock.bot.engine.event.Event
+import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
+import ai.tock.shared.vertx.BadRequestException
+import com.fasterxml.jackson.annotation.JsonInclude
 import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.RoutingContext
+import mu.KotlinLogging
 import java.time.LocalDateTime
 
 private const val QUERY_ID_OPERATOR: String = "idOperator"
 private const val QUERY_ID_CONVERSATION: String = "idConversation"
 private const val TYPE_TEXT: String = "text"
+private const val ROLE_OPERATOR: String = "operator"
 
 /**
  *
@@ -60,14 +61,13 @@ class IadvizeConnector internal constructor(
     val path: String,
     val editorUrl: String,
     val firstMessage: String,
-    val distributionRule: String?
+    val distributionRule: String?,
+    val secretToken: String?
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
-
-    private val ROLE_OPERATOR: String = "operator"
 
     override fun register(controller: ConnectorController) {
         controller.registerServices(path) { router ->
@@ -91,6 +91,9 @@ class IadvizeConnector internal constructor(
 
             router.post("$path/conversations/:idConversation/messages")
                 .handleAndCatchException(controller, handlerConversation)
+
+            router.get("$path/healthcheck")
+                .handleAndCatchException(controller, handlerHealthcheck)
         }
     }
 
@@ -104,7 +107,17 @@ class IadvizeConnector internal constructor(
     private fun Route.handleAndCatchException(controller: ConnectorController, iadvizeHandler: IadvizeHandler) {
         handler { context ->
             try {
+                context?.let { logContextRequest(context) }
+
+                // Check payloads signature
+                if(!secretToken.isNullOrBlank()) {
+                    IadvizeSecurity(secretToken).validatePayloads(context)
+                }
+                // Invoke handler
                 iadvizeHandler.invoke(context, controller)
+            } catch (error: BadRequestException){
+                logger.error(error)
+                context.fail(400)
             } catch (error: Throwable) {
                 logger.error(error)
                 context.fail(500)
@@ -112,21 +125,84 @@ class IadvizeConnector internal constructor(
         }
     }
 
+    /**
+     * Trace the iadvize query
+     */
+    private fun logContextRequest(context: RoutingContext) {
+        val requestAsString: String =
+            with(context) {
+                mapper.writeValueAsString(
+                    CustomRequest(
+                        request().method().name(),
+                        request().path(),
+                        request().query(),
+                        body().asJsonObject(),
+                        // Get only iAdvize headers
+                        request().headers()
+                            .filter { it.key.startsWith("X-") }
+                            .associate { it.key to it.value }
+                    )
+                )
+            }
+
+        logger.debug { "request : $requestAsString" }
+    }
+
+
+    private var handlerHealthcheck: IadvizeHandler = { context, _ ->
+        context.response().endWithJson(Healthcheck())
+    }
+
     internal var handlerGetBots: IadvizeHandler = { context, controller ->
-        logRequest("GET", "/external-bots")
         context.response().endWithJson(listOf(getBot(controller)))
     }
 
     internal var handlerGetBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("GET", "/bots/$idOperator", context.getBodyAsString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
     internal var handlerUpdateBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("PUT", "/bots/$idOperator", context.getBodyAsString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
+    }
+
+
+
+    internal var handlerStrategies: IadvizeHandler = { context, _ ->
+        context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
+    }
+
+    internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
+        val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
+        context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
+    }
+
+    internal var handlerStartConversation: IadvizeHandler = { context, controller ->
+        val conversationRequest: ConversationsRequest =
+            mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
+        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule)
+        callback.sendResponse()
+    }
+
+    internal var handlerConversation: IadvizeHandler = { context, controller ->
+        val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
+        val iadvizeRequest: IadvizeRequest = mapRequest(idConversation, context)
+        if (!isOperator(iadvizeRequest)) {
+            handleRequest(controller, context, iadvizeRequest)
+        } else {
+            //ignore message from operator
+            context.response().end()
+        }
+    }
+
+    /*
+     * If request is a MessageRequest and the author of message have role "operator" : do not treat request.
+     * in many case it's an echo, but it can be a human operator
+     */
+    private fun isOperator(iadvizeRequest: IadvizeRequest): Boolean {
+        return iadvizeRequest is MessageRequest
+                && iadvizeRequest.message.author.role == ROLE_OPERATOR
     }
 
     private fun getBotUpdate(idOperator: String, controller: ConnectorController): BotUpdated {
@@ -139,74 +215,28 @@ class IadvizeConnector internal constructor(
         return Bot(idBot = botId, name = botName, editorUrl = editorUrl)
     }
 
-    internal var handlerStrategies: IadvizeHandler = { context, controller ->
-        logRequest("GET", "/availability-strategies")
-        context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
-    }
-
-    internal var handlerFirstMessage: IadvizeHandler = { context, controller ->
-        val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("GET", "/bots/$idOperator/conversation-first-messages")
-        context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
-    }
-
-    internal var handlerStartConversation: IadvizeHandler = { context, controller ->
-        logger.info { "request : POST /conversations\nbody : ${context.getBodyAsString()}" }
-        val conversationRequest: ConversationsRequest =
-            mapper.readValue(context.getBodyAsString(), ConversationsRequest::class.java)
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule)
-        callback.sendResponse()
-    }
-
-    internal var handlerConversation: IadvizeHandler = { context, controller ->
-        val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
-        val iadvizeRequest: IadvizeRequest = mapRequest(idConversation, context)
-        if (!isOperator(iadvizeRequest)) {
-            logger.info { "request : POST /conversations/$idConversation/messages\nbody : ${context.getBodyAsString()}" }
-            logger.info { context.normalisedPath() }
-            logger.info { "body parsed : $iadvizeRequest" }
-            handleRequest(controller, context, iadvizeRequest)
-        } else {
-            //ignore message from operator
-            logger.info { "request echo : POST /conversations/$idConversation/messages ${context.getBodyAsString()}" }
-            context.response().end()
-        }
-    }
-
-    /*
-     * If request is a MessageRequest and the author of message have role "operator" : do not treat request.
-     * in many case it's an echo, but it can be a human operator
-     */
-    private fun isOperator(iadvizeRequest: IadvizeRequest): Boolean {
-        return if(iadvizeRequest is MessageRequest) {
-            iadvizeRequest.message.author.role.equals(ROLE_OPERATOR)
-        } else {
-            false
-        }
-    }
-
     private fun mapRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
-        val typeMessage: TypeMessage = mapper.readValue(context.getBodyAsString(), TypeMessage::class.java)
+        val typeMessage: TypeMessage = mapper.readValue(context.body().asString(), TypeMessage::class.java)
         return when (typeMessage.type) {
             //json doesn't contain idConversation, to prevent null pointer,
             // we use the inner class MessageRequestJson to enhance the json.
             TYPE_TEXT -> {
                 val messageRequestJson: MessageRequestJson =
-                    mapper.readValue(context.getBodyAsString(), MessageRequestJson::class.java)
+                    mapper.readValue(context.body().asString(), MessageRequestJson::class.java)
                 MessageRequest(messageRequestJson, idConversation)
             }
             else -> {
                 val unsupportedRequestJson: UnsupportedRequestJson =
-                    mapper.readValue(context.getBodyAsString(), UnsupportedRequestJson::class.java)
+                    mapper.readValue(context.body().asString(), UnsupportedRequestJson::class.java)
                 UnsupportedRequest(unsupportedRequestJson, idConversation, typeMessage.type)
             }
         }
     }
 
     private fun <T> HttpServerResponse.endWithJson(response: T) : Future<Void> {
-        val response: String = mapper.writeValueAsString(response)
-        logger.info { "response : $response" }
-        return putHeader("Content-Type", "application/json").end(response)
+        val responseAsString: String = mapper.writeValueAsString(response)
+        logger.debug { "response : $responseAsString" }
+        return putHeader("Content-Type", "application/json").end(responseAsString)
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
@@ -229,8 +259,8 @@ class IadvizeConnector internal constructor(
                 controller.handle(event, ConnectorData(callback))
             }
 
-            //Only MessageRequest are supported, other messages are UnsupportedMessage
-            // and UnsupportedResponse can be send immediatly
+            // Only MessageRequest are supported, other messages are UnsupportedMessage
+            // and UnsupportedResponse can be sent immediately
             else -> callback.sendResponse()
         }
     }
@@ -254,12 +284,12 @@ class IadvizeConnector internal constructor(
     override fun toConnectorMessage(message: MediaMessage): BotBus.() -> List<ConnectorMessage> =
         MediaConverter.toConnectorMessage(message)
 
-    private fun logRequest(verb: String, uri: String) {
-        logger.info { "request : $verb $uri}" }
-    }
-
-    private fun logRequest(verb: String, uri: String, body: String) {
-        logRequest(verb, uri)
-        logger.info { "body : $body" }
-    }
 }
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
+data class CustomRequest(
+    val method: String,
+    val path: String?,
+    val query: String?,
+    val body: JsonObject?,
+    val headers: Map<String, String>)

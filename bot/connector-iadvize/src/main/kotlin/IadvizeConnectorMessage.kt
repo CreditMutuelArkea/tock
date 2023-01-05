@@ -44,7 +44,8 @@ data class IadvizeConnectorMessage(val replies: List<IadvizeReply>) : ConnectorM
                 .slice(0..indexOfFirst)
         } else {
             replies
-        }).filterIsInstance<IadvizeMessage>()
+        })
+            .filterIsInstance<IadvizeMessage>()
             .map { message ->
                 GenericMessage(
                     connectorType = connectorType,
