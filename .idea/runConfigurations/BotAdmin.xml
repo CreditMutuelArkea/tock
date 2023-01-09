@@ -3,8 +3,6 @@
     <envs>
       <env name="botadminverticle_body_limit" value="-1" />
       <env name="botadminverticle_port" value="7999" />
-      <env name="iadvize_password_authentication" value="JL697;27x^-c&lt;fBZNbY38q{p+" />
-      <env name="iadvize_username_authentication" value="jean-yves.ganivet@arkea.com" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="ai.tock.bot.admin.StartBotAdminServerKt" />
     <module name="tock-bot-admin-server" />
