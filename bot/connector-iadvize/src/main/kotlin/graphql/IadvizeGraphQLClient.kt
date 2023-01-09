@@ -18,58 +18,47 @@ package ai.tock.bot.connector.iadvize.graphql
 
 import ai.tock.bot.connector.iadvize.IadvizeAuthenticationClient
 import ai.tock.bot.connector.iadvize.graphql.models.RoutingRule
-import ai.tock.shared.property
-import ai.tock.shared.vertx.graphql.*
-
-import ai.tock.shared.vertx.vertx
-
+import ai.tock.shared.retrofitBuilderWithTimeoutAndLogger
+import ai.tock.shared.tokenAuthenticationInterceptor
+import com.expediagroup.graphql.client.serializer.defaultGraphQLSerializer
+import com.fasterxml.jackson.annotation.JsonProperty
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import retrofit2.Call
+import retrofit2.converter.jackson.JacksonConverterFactory
+import retrofit2.create
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 
 class IadvizeGraphQLClient  {
 
-    private val client: GraphQLVertxClient = GraphQLVertxClient(vertx, SecuredUrl(property(IADVIZE_GRAPHQL_BASE_URL, DEFAULT_BASE_URL)))
-    private val authenticationClient = IadvizeAuthenticationClient()
-
-    companion object {
-        const val IADVIZE_GRAPHQL_BASE_URL = "tock_iadvize_grapql_baseurl"
-        const val DEFAULT_BASE_URL = "api.iadvize.com"
-        const val CONTENT_TYPE = "content-type"
-        const val APPLICATION_JSON = "application/json"
-        const val AUTHORIZATION = "Authorization"
-        const val BEARER = "Bearer"
+    data class GraphQLResponse<T> (@JsonProperty("data") val data: T)
+    interface IadvizeGraphQLApi {
+        @POST("/graphql")
+        fun checkAvailability(@Body body:RequestBody) : Call<GraphQLResponse<RoutingRule.Result>>
     }
 
-    suspend fun isRuleAvailable(distributionRule: String): Boolean =
-        /* Start by creating an access token */
-        authenticationClient.getAccessToken().let { jwt ->
-            /*
-            With the Iadvize ID retrived from the env variable,
-            build the Routuing rule request
-            */
-           RoutingRule(RoutingRule.Variables(distributionRule))
-                .let {
-                    /*
-                    Then perform the graphQl request.
-                    !! Do not forget to enhance the request headers !!
-                    * */
-                    client.execute(it) {
-                        putHeader(CONTENT_TYPE, APPLICATION_JSON)
-                        putHeader(AUTHORIZATION, "$BEARER $jwt")
-                    }
-                }.let { channel ->
-                    with(channel.receive().body()) {
-                        when (this) {
-                            is SucceededResult -> {
-                                when (this) {
-                                    is OK -> data?.routingRule?.availability?.chat?.isAvailable ?: dataNotFoundError()
-                                    is KO -> notSuccessResponseError(statusCode)
-                                }
-                            }
+    companion object {
+        private val authenticationClient = IadvizeAuthenticationClient()
+        const val DEFAULT_BASE_URL = "https://api.iadvize.com"
+        const val APPLICATION_JSON = "application/json"
+    }
 
-                            is FailedResult -> requestFailedError(error.message)
-                        }
-                    }
-               }
+    private val iadvizeGraphQLApi: IadvizeGraphQLApi = retrofitBuilderWithTimeoutAndLogger(30000, IadvizeAuthenticationClient.logger,
+        interceptors = listOf(tokenAuthenticationInterceptor { authenticationClient.getAccessToken() }))
+        .baseUrl(DEFAULT_BASE_URL)
+        .addConverterFactory(JacksonConverterFactory.create())
+        .build()
+        .create()
 
-        }
+    fun available(distributionRule: String): Boolean = RoutingRule(RoutingRule.Variables(distributionRule))
+            .let { rule ->
+                iadvizeGraphQLApi.checkAvailability(
+                    defaultGraphQLSerializer().serialize(rule).toRequestBody(APPLICATION_JSON.toMediaTypeOrNull())
+                ).execute().let {
+                    it.body()?.data?.routingRule?.availability?.chat?.isAvailable
+                } ?: dataNotFoundError()
+            }
 }

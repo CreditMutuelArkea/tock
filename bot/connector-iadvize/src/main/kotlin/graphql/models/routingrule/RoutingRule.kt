@@ -16,12 +16,14 @@
 
 package ai.tock.bot.connector.iadvize.graphql.models.routingrule
 
+import com.fasterxml.jackson.annotation.JsonProperty
+
 /**
  * Routing rules determine how to distribute conversations from a set of targeting rules to a set of
  * routing groups, according to a routing mode.
  */
 
-data class RoutingRule(val availability: RoutingRuleAvailability? = null)
+data class RoutingRule(@JsonProperty("availability")  val availability: RoutingRuleAvailability? = null)
 
-data class RoutingRuleAvailability(val chat: RoutingRuleChannelAvailability)
-data class RoutingRuleChannelAvailability(val isAvailable: Boolean)
+data class RoutingRuleAvailability( @JsonProperty("chat") val chat: RoutingRuleChannelAvailability)
+data class RoutingRuleChannelAvailability(@JsonProperty("isAvailable") val isAvailable: Boolean)

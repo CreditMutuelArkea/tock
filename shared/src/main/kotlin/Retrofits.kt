@@ -144,6 +144,7 @@ fun tokenAuthenticationInterceptor(token: String): Interceptor {
     }
 }
 
+fun tokenAuthenticationInterceptor(token: () -> String): Interceptor  = tokenAuthenticationInterceptor(token.invoke())
 /**
  * Encode basic credential header.
  */

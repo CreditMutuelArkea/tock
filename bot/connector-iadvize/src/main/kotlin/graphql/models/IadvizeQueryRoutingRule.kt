@@ -17,6 +17,7 @@
 package ai.tock.bot.connector.iadvize.graphql.models
 
 import com.expediagroup.graphql.client.types.GraphQLClientRequest
+import com.fasterxml.jackson.annotation.JsonProperty
 import kotlin.String
 import kotlin.reflect.KClass
 
@@ -34,6 +35,7 @@ class RoutingRule(override val variables: Variables) : GraphQLClientRequest<Rout
     /**
      * Look up a routing rule given its identifier.
      */
+    @JsonProperty("routingRule")
     val routingRule: ai.tock.bot.connector.iadvize.graphql.models.routingrule.RoutingRule? = null,
   )
 }
