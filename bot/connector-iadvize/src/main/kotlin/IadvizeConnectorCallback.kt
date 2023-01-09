@@ -39,8 +39,10 @@ import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
+import ai.tock.shared.vertx.vertx
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.Locale
@@ -159,20 +161,22 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         return filterIsInstance<IadvizeConnectorMessage>()
             .map{ connectorMessage -> connectorMessage.replies }
             .flatten()
-            .map(addDistributionRulesOnTransfer)
+            .map (addDistributionRulesOnTransfer)
+
     }
 
     /*
      * For IadvizeReply instance of IadvizeTransfer
      * return new IadvizeTransfer with distribution rule configured on connector
      */
-    private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
+     private val addDistributionRulesOnTransfer:  (IadvizeReply) -> IadvizeReply = {
 
         if(it is IadvizeTransfer) {
             if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))
             } else {
-                val available =   iadvizeGraphQLClient.isRuleAvailable(distributionRule)
+                val available = runBlocking{ iadvizeGraphQLClient.isRuleAvailable(distributionRule) }
+
                 if (available)
                     IadvizeTransfer(distributionRule, it.transferOptions)
                 else

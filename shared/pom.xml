@@ -190,6 +190,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-lang-kotlin-coroutines</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>com.expediagroup</groupId>
             <artifactId>graphql-kotlin-client</artifactId>
         </dependency>

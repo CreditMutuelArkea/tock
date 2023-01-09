@@ -21,15 +21,14 @@ import io.vertx.core.Vertx
 import io.vertx.ext.web.client.HttpRequest
 import io.vertx.ext.web.client.WebClient
 import io.vertx.ext.web.client.WebClientOptions
-import kotlinx.coroutines.channels.Channel
+import io.vertx.kotlin.coroutines.toReceiveChannel
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.util.regex.Pattern
 
 private const val GRAPHQL_ENDPOINT = "/graphql"
-data class GraphQLVertxClient(val vertx: Vertx, val url: GraphQLVertxUrl)  {
+
+data class GraphQLVertxClient(val vertx: Vertx, val url: GraphQLVertxUrl) {
 
     private val logger = KotlinLogging.logger { }
     private val serializer: GraphQLVertxSerializer = GraphQLVertxSerializer()
@@ -42,43 +41,49 @@ data class GraphQLVertxClient(val vertx: Vertx, val url: GraphQLVertxUrl)  {
 
     private val client: WebClient = WebClient.create(vertx, options)
 
-    suspend fun <T : Any> execute(
-        request: GraphQLClientRequest<T>,
-        requestCustomizer: HttpRequest<*>.() -> Unit,
-        responseHandler: suspend (GraphQLVertxResult<T>) -> Unit,
-    ) = coroutineScope {
-        client
+     fun <T : Any> execute(
+         request: GraphQLClientRequest<T>,
+         requestCustomizer: HttpRequest<*>.() -> Unit,
+         responseHandler: (GraphQLVertxResult<T>) -> Unit,
+    ) = client
             .post(GRAPHQL_ENDPOINT)
             .apply { requestCustomizer.invoke(this) }
             .sendJson(serializer.serialize(request)) {
-                runBlocking {
-                    if (it.succeeded()) {
-                        with(it.result()) {
-                            with(statusCode()) {
-                                if (isSuccess()) {
-                                    responseHandler(OK(serializer.deserialize(bodyAsString(), request.responseType()).data))
-                                } else {
-                                    responseHandler(KO(this))
-                                }
+
+                if (it.succeeded()) {
+                    with(it.result()) {
+                        with(statusCode()) {
+                            if (isSuccess()) {
+                                responseHandler(OK(serializer.deserialize(bodyAsString(), request.responseType()).data))
+                            } else {
+                                responseHandler(KO(this))
                             }
                         }
-                    } else {
-                        responseHandler(FailedResult(it.cause()))
                     }
+                } else {
+                    responseHandler(FailedResult(it.cause()))
                 }
-            }
-    }
 
-    suspend fun <T : Any> execute(
+            }
+
+
+    fun <T : Any> execute(
         request: GraphQLClientRequest<T>,
         requestCustomizer: HttpRequest<*>.() -> Unit
-    ): ReceiveChannel<GraphQLVertxResult<T>> = with( Channel<GraphQLVertxResult<T>>()) {
-        execute(request, requestCustomizer){ send(it) }
-        this
+    ) : ReceiveChannel<io.vertx.core.eventbus.Message<GraphQLVertxResult<T>>> {
+
+         val consumer = vertx.eventBus().consumer<GraphQLVertxResult<T>>("test")
+
+         execute(request, requestCustomizer) {
+            vertx.eventBus().request<GraphQLVertxResult<T>>("test", it)
+         }
+
+         return consumer.toReceiveChannel(vertx)
     }
+
 }
 
-fun Int.isSuccess() : Boolean {
+fun Int.isSuccess(): Boolean {
     val regex = Pattern.compile("^2\\d{2}")
     return regex.matcher("$this").matches()
 }

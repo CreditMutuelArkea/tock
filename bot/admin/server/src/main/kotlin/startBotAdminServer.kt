@@ -17,11 +17,17 @@
 package ai.tock.bot.admin
 
 import ai.tock.bot.BotIoc
+import ai.tock.bot.connector.iadvize.graphql.IadvizeGraphQLClient
 import ai.tock.nlp.front.ioc.FrontIoc
 import ai.tock.shared.vertx.vertx
 import com.github.salomonbrys.kodein.Kodein
+import kotlinx.coroutines.runBlocking
 
 fun main() {
+    runBlocking {
+        IadvizeGraphQLClient().isRuleAvailable("7eb4f902-e6e8-4dee-aae1-0e6bef30bdc0")
+    }.let { println(it) }
+
     startAdminServer()
 }
 

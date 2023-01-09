@@ -19,15 +19,10 @@ package ai.tock.bot.connector.iadvize.graphql
 import ai.tock.bot.connector.iadvize.IadvizeAuthenticationClient
 import ai.tock.bot.connector.iadvize.graphql.models.RoutingRule
 import ai.tock.shared.property
-import ai.tock.shared.vertx.graphql.GraphQLVertxClient
-import ai.tock.shared.vertx.graphql.SecuredUrl
-import ai.tock.shared.vertx.graphql.SucceededResult
-import ai.tock.shared.vertx.graphql.FailedResult
-import ai.tock.shared.vertx.graphql.OK
-import ai.tock.shared.vertx.graphql.KO
+import ai.tock.shared.vertx.graphql.*
 
 import ai.tock.shared.vertx.vertx
-import kotlinx.coroutines.runBlocking
+
 
 
 class IadvizeGraphQLClient  {
@@ -44,14 +39,14 @@ class IadvizeGraphQLClient  {
         const val BEARER = "Bearer"
     }
 
-    fun isRuleAvailable(distributionRule: String): Boolean = runBlocking {
+    suspend fun isRuleAvailable(distributionRule: String): Boolean =
         /* Start by creating an access token */
         authenticationClient.getAccessToken().let { jwt ->
             /*
             With the Iadvize ID retrived from the env variable,
             build the Routuing rule request
             */
-            RoutingRule(RoutingRule.Variables(distributionRule))
+           RoutingRule(RoutingRule.Variables(distributionRule))
                 .let {
                     /*
                     Then perform the graphQl request.
@@ -62,22 +57,19 @@ class IadvizeGraphQLClient  {
                         putHeader(AUTHORIZATION, "$BEARER $jwt")
                     }
                 }.let { channel ->
-                    /*
-                    Wait for receiving result
-                    */
-                    channel.receive().let {
-                        when (it) {
+                    with(channel.receive().body()) {
+                        when (this) {
                             is SucceededResult -> {
-                                when(it) {
-                                    is OK -> it.data?.routingRule?.availability?.chat?.isAvailable ?: dataNotFoundError()
-                                    is KO -> notSuccessResponseError(it.statusCode)
+                                when (this) {
+                                    is OK -> data?.routingRule?.availability?.chat?.isAvailable ?: dataNotFoundError()
+                                    is KO -> notSuccessResponseError(statusCode)
                                 }
                             }
-                            is FailedResult -> requestFailedError(it.error.message)
+
+                            is FailedResult -> requestFailedError(error.message)
                         }
                     }
-                }
-        }
-    }
+               }
 
+        }
 }
