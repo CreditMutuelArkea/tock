@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql.models
+package ai.tock.bot.connector.iadvize.clients.models.routingrule
 
-import kotlin.String
+import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Legacy iAdvize identifier, encoded as an integer.
+ * Routing rules determine how to distribute conversations from a set of targeting rules to a set of
+ * routing groups, according to a routing mode.
  */
-typealias LegacyId = String
 
-typealias UUID = String
+data class RoutingRule(@JsonProperty("availability")  val availability: RoutingRuleAvailability? = null)
+
+data class RoutingRuleAvailability( @JsonProperty("chat") val chat: RoutingRuleChannelAvailability)
+data class RoutingRuleChannelAvailability(@JsonProperty("isAvailable") val isAvailable: Boolean)

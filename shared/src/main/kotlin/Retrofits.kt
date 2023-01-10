@@ -144,7 +144,17 @@ fun tokenAuthenticationInterceptor(token: String): Interceptor {
     }
 }
 
-fun tokenAuthenticationInterceptor(token: () -> String): Interceptor  = tokenAuthenticationInterceptor(token.invoke())
+fun tokenAuthenticationInterceptor(token: () -> String):  Interceptor {
+    return Interceptor { chain ->
+        val original = chain.request()
+
+        val requestBuilder = original.newBuilder()
+            .header("Authorization", "Bearer ${token.invoke()}]")
+
+        val request = requestBuilder.build()
+        chain.proceed(request)
+    }
+}
 /**
  * Encode basic credential header.
  */

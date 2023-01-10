@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql
+package ai.tock.bot.connector.iadvize.clients
+
 
 sealed class IadvizeGraphQLError(override val message: String): Error(message)
-
+class AuthenticationFailedError : Exception("Fail to retrieve a non null access token")
 class DataNotFoundError : IadvizeGraphQLError("Data not found")
 class NotSuccessResponseError(statusCode: Int) : IadvizeGraphQLError("GraphQL request sent successfully but returns an unsuccessful response with status code [$statusCode]")
-class RequestFailedError(message: String?): IadvizeGraphQLError(message?.let{ "GraphQL request fails with following message : [ $it ]" } ?: "GraphQL request fails")
-
-fun dataNotFoundError(): Nothing = throw DataNotFoundError()
-fun notSuccessResponseError(statusCode: Int): Nothing = throw NotSuccessResponseError(statusCode)
-fun requestFailedError(message: String?): Nothing = throw RequestFailedError(message)
+fun graphQlDataNotFoundError(): Nothing = throw DataNotFoundError()
+fun graphQlNotSuccessResponseError(statusCode: Int): Nothing = throw NotSuccessResponseError(statusCode)
+fun authenticationFailedError(): Nothing = throw AuthenticationFailedError()

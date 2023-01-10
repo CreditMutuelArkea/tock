@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.graphql.models.routingrule
+package ai.tock.bot.connector.iadvize.clients
 
-import com.fasterxml.jackson.annotation.JsonProperty
+const val BASE_URL = "https://api.iadvize.com"
+const val TOKEN_ENDPOINT = "/oauth2/token"
+const val GRAPHQL_ENDPOINT = "/graphql"
 
-/**
- * Routing rules determine how to distribute conversations from a set of targeting rules to a set of
- * routing groups, according to a routing mode.
- */
+const val USERNAME = "username"
+const val PASSWORD = "password"
+const val GRANT_TYPE = "grant_type"
 
-data class RoutingRule(@JsonProperty("availability")  val availability: RoutingRuleAvailability? = null)
+const val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
+const val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
 
-data class RoutingRuleAvailability( @JsonProperty("chat") val chat: RoutingRuleChannelAvailability)
-data class RoutingRuleChannelAvailability(@JsonProperty("isAvailable") val isAvailable: Boolean)
+const val APPLICATION_JSON = "application/json"
+
+
+

@@ -16,7 +16,7 @@
 package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorData
-import ai.tock.bot.connector.iadvize.graphql.IadvizeGraphQLClient
+import ai.tock.bot.connector.iadvize.clients.graphql.IadvizeGraphQLClient
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
