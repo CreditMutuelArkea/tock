@@ -82,8 +82,6 @@ class IadvizeConnectorTest {
 
         every { controller.botDefinition.i18nTranslator(any(), any(), any(), any()) } returns translator
 
-        every {  iadvizeGraphQLClient.available(distributionRule)  } returns true
-
         val marcusAnswer1 = I18nLabelValue("", "", "", marcus1)
         every { translator.translate(marcus1) } returns marcusAnswer1.raw
         val marcusAnswer2 = I18nLabelValue("", "", "", marcus2)
@@ -163,6 +161,8 @@ class IadvizeConnectorTest {
 
         val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
         val connectorData = slot<ConnectorData>()
+
+        every {  iadvizeGraphQLClient.available(distributionRule)  } returns true
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
             callback.iadvizeGraphQLClient = iadvizeGraphQLClient
@@ -183,6 +183,41 @@ class IadvizeConnectorTest {
         verify { response.end(capture(messageResponse)) }
         assertEquals(expectedResponse, messageResponse.captured)
     }
+
+    @Test
+    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageUnavailable() {
+        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
+        val expectedResponse: String = Resources.toString(resource("/response_message_unavailable.json"), Charsets.UTF_8)
+
+        val iadvizeTransfer: IadvizeReply = IadvizeTransfer(0)
+        val iadvizeConnectorMessage = IadvizeConnectorMessage(iadvizeTransfer)
+
+        val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
+        val connectorData = slot<ConnectorData>()
+        every {  iadvizeGraphQLClient.available(distributionRule)  } returns false
+
+        every { controller.handle(any(), capture(connectorData)) } answers {
+            val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
+            callback.addAction(action, 0)
+            callback.eventAnswered(action)
+
+        }
+
+        connector.handleRequest(
+            controller,
+            context,
+            iAdvizeRequest
+        )
+
+        verify { controller.handle(any(), any()) }
+
+        val messageResponse = slot<String>()
+        verify { response.end(capture(messageResponse)) }
+        assertEquals(expectedResponse, messageResponse.captured)
+    }
+
+
 
     @Test
     fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
@@ -207,6 +242,8 @@ class IadvizeConnectorTest {
         )
 
         val connectorData = slot<ConnectorData>()
+
+        every {  iadvizeGraphQLClient.available(distributionRule)  } returns true
 
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback

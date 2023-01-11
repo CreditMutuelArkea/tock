@@ -30,7 +30,7 @@ class IadvizeGraphQLClient {
         val logger = KotlinLogging.logger { }
     }
 
-    private val iadvizeApi: IadvizeApi = createSecuredApi(logger){
+    internal var iadvizeApi: IadvizeApi = createSecuredApi(logger){
         authenticationClient.getAccessToken()
     }
 

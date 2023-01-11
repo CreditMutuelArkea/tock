@@ -32,10 +32,11 @@ class IadvizeAuthenticationClient {
 
     companion object {
         val logger = KotlinLogging.logger { }
-        var token = AtomicReference<Token?>()
+        val token = AtomicReference<Token?>()
+        const val DELAY_SECONDS = 5
     }
 
-    private val iadvizeApi: IadvizeApi = createApi(logger)
+    internal var iadvizeApi: IadvizeApi = createApi(logger)
     private val username: String = property(IADVIZE_USERNAME_AUTHENTICATION, "")
     private val password: String = property(IADVIZE_PASSWORD_AUTHENTICATION, "")
 
@@ -56,12 +57,9 @@ class IadvizeAuthenticationClient {
         return iadvizeApi.createToken(username, password, grantType = PASSWORD).execute().body()
             ?.let {
                 val value = it.accessToken ?: authenticationFailedError()
-                val time = it.expiresIn?.let { s -> LocalDateTime.now().plusSeconds(s.toLong()) }
+                val time = it.expiresIn?.let { s -> LocalDateTime.now().plusSeconds(s.toLong() - DELAY_SECONDS) }
 
-                Token(value, time)
-                    .also { tok ->
-                        token.set(tok)
-                    }
+                Token(value, time).also { t -> token.set(t) }
             }
             ?: authenticationFailedError()
     }
