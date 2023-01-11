@@ -185,15 +185,6 @@
             <artifactId>vertx-codegen</artifactId>
             <scope>provided</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.expediagroup</groupId>
-            <artifactId>graphql-kotlin-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.expediagroup</groupId>
-            <artifactId>graphql-kotlin-client-jackson</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.litote.kmongo</groupId>
             <artifactId>kmongo</artifactId>
