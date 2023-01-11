@@ -1,15 +1,16 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="BotApi" type="JetRunConfigurationType" factoryName="Kotlin">
-    <module name="tock-bot-api-service" />
+  <configuration default="false" name="BotAdmin" type="JetRunConfigurationType" factoryName="Kotlin">
+    <module name="tock-bot-admin-server" />
     <option name="VM_PARAMETERS" value="" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PASS_PARENT_ENVS" value="true" />
-    <option name="MAIN_CLASS_NAME" value="ai.tock.bot.api.service.StartBotApiKt" />
+    <option name="MAIN_CLASS_NAME" value="ai.tock.bot.admin.StartBotAdminServerKt" />
     <option name="WORKING_DIRECTORY" value="" />
     <envs>
-      <env name="tock_websocket_enabled" value="true" />
+      <env name="botadminverticle_port" value="7999" />
+      <env name="botadminverticle_body_limit" value="-1" />
     </envs>
     <method v="2">
       <option name="Make" enabled="true" />
