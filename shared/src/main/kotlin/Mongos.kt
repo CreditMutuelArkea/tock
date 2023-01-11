@@ -35,6 +35,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.JSR310StringParsableDeseriali
 import com.fasterxml.jackson.datatype.jsr310.ser.DurationSerializer
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
+import com.mongodb.client.AggregateIterable
 import com.mongodb.client.FindIterable
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoDatabase
@@ -332,6 +333,13 @@ fun pingMongoDatabase(databaseName: String): Boolean {
  * Set collation if database supports it (ie not with DocumentDB)
  */
 fun <T> FindIterable<T>.safeCollation(collation: Collation): FindIterable<T> =
+    if (isDocumentDB()) {
+        this
+    } else {
+        collation(collation)
+    }
+
+fun <T> AggregateIterable<T>.safeCollation(collation: Collation): AggregateIterable<T> =
     if (isDocumentDB()) {
         this
     } else {

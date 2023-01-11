@@ -33,8 +33,8 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
     private const val EDITOR_URL = "tock_iadvize_editor_url"
     private const val FIRST_MESSAGE = "tock_iadvize_first_message"
     private const val DISTRIBUTION_RULE = "tock_iadvize_distribution_rule"
+    private const val SECRET_TOKEN = "tock_iadvize_secret_token"
     private const val DISTRIBUTION_RULE_UNVAILABLE_MESSAGE = "tock_iadvize_distribution_rule_unavailable"
-
 
     override fun connector(connectorConfiguration: ConnectorConfiguration): Connector {
         with(connectorConfiguration) {
@@ -43,7 +43,8 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
                 connectorConfiguration.path,
                 parameters.getValue(EDITOR_URL),
                 parameters.getValue(FIRST_MESSAGE),
-                parameters.getValue(DISTRIBUTION_RULE),
+                parameters.getOrDefault(DISTRIBUTION_RULE, null),
+                parameters.getOrDefault(SECRET_TOKEN, null),
                 parameters.getValue(DISTRIBUTION_RULE_UNVAILABLE_MESSAGE)
             )
         }
@@ -52,35 +53,38 @@ internal object IadvizeConnectorProvider : ConnectorProvider {
     override fun configuration(): ConnectorTypeConfiguration {
         val properties: Properties = loadProperties("/iadvize.properties")
         val editorUrlField = ConnectorTypeConfigurationField(
-            properties.getProperty(EDITOR_URL, EDITOR_URL),
+            properties.getProperty(EDITOR_URL),
             EDITOR_URL,
             true
         )
         val firstMessageField = ConnectorTypeConfigurationField(
-            properties.getProperty(FIRST_MESSAGE, FIRST_MESSAGE),
+            properties.getProperty(FIRST_MESSAGE),
             FIRST_MESSAGE,
             true
         )
         val distributionRuleField = ConnectorTypeConfigurationField(
-            properties.getProperty(DISTRIBUTION_RULE, DISTRIBUTION_RULE),
+            properties.getProperty(DISTRIBUTION_RULE),
             DISTRIBUTION_RULE,
             false
         )
-
+        val secretToken = ConnectorTypeConfigurationField(
+            properties.getProperty(SECRET_TOKEN),
+            SECRET_TOKEN,
+            false
+        )
         val distributionRuleUnvailableMessageField = ConnectorTypeConfigurationField(
-            properties.getProperty(DISTRIBUTION_RULE_UNVAILABLE_MESSAGE, DISTRIBUTION_RULE_UNVAILABLE_MESSAGE),
+            properties.getProperty(DISTRIBUTION_RULE_UNVAILABLE_MESSAGE),
             DISTRIBUTION_RULE_UNVAILABLE_MESSAGE,
             true
         )
         return ConnectorTypeConfiguration(
             connectorType,
-            listOf(editorUrlField, firstMessageField, distributionRuleField, distributionRuleUnvailableMessageField),
+            listOf(editorUrlField, firstMessageField, distributionRuleField, secretToken, distributionRuleUnvailableMessageField),
             resourceAsString("/iadvize.svg")
         )
     }
 
     override val supportedResponseConnectorMessageTypes: Set<KClass<out ConnectorMessage>> = setOf(IadvizeConnectorMessage::class)
-
 }
 
 internal class IadvizeConnectorProviderService : ConnectorProvider by IadvizeConnectorProvider

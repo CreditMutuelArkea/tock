@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.model
+package ai.tock.bot.connector.whatsapp.model.send
 
-import java.time.Instant
-import java.util.Locale
+data class WhatsAppBotMessageInteractiveMessage(
+    val interactive: WhatsAppBotInteractive,
+    override val recipientType: WhatsAppBotRecipientType,
+    override val userId: String? = null
+) : WhatsAppBotMessage(WhatsAppBotMessageType.interactive, userId) {
 
-data class FaqDefinitionRequest(
-    val id: String?,
-    val intentId: String?,
-    val language: Locale,
-    val applicationName: String,
-    val creationDate: Instant?,
-    val updateDate: Instant?,
-    // storyName
-    val title: String,
-    val description: String = "",
-    val utterances: List<String>,
-    val tags: List<String>,
-    val answer: String,
-    val enabled: Boolean,
-    val intentName: String
-)
+    override fun toSendBotMessage(recipientId: String): WhatsAppSendBotMessage =
+        WhatsAppSendBotMessageInteractiveMessage(
+            interactive,
+            recipientType,
+            recipientId
+        )
+}

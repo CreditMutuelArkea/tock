@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,28 +28,36 @@ import ai.tock.bot.connector.iadvize.model.request.TypeMessage
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.UnsupportedRequestJson
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
+import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strategy.customAvailability
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
+import ai.tock.bot.connector.iadvize.model.response.Healthcheck
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
-import mu.KotlinLogging
-import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strategy.customAvailability
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
+
 import ai.tock.bot.engine.action.Action
+
 import ai.tock.shared.jackson.mapper
+import ai.tock.shared.vertx.BadRequestException
+import com.fasterxml.jackson.annotation.JsonInclude
+import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
+import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.RoutingContext
+import mu.KotlinLogging
 import java.time.LocalDateTime
 
 private const val QUERY_ID_OPERATOR: String = "idOperator"
 private const val QUERY_ID_CONVERSATION: String = "idConversation"
 private const val TYPE_TEXT: String = "text"
+private const val ROLE_OPERATOR: String = "operator"
 
 /**
  *
@@ -60,14 +68,13 @@ class IadvizeConnector internal constructor(
     val editorUrl: String,
     val firstMessage: String,
     val distributionRule: String?,
+    val secretToken: String?,
     val distributionRuleUnvailableMessage: String,
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
-
-    private val ROLE_OPERATOR: String = "operator"
 
     override fun register(controller: ConnectorController) {
         controller.registerServices(path) { router ->
@@ -91,6 +98,9 @@ class IadvizeConnector internal constructor(
 
             router.post("$path/conversations/:idConversation/messages")
                 .handleAndCatchException(controller, handlerConversation)
+
+            router.get("$path/healthcheck")
+                .handleAndCatchException(controller, handlerHealthcheck)
         }
     }
 
@@ -104,12 +114,50 @@ class IadvizeConnector internal constructor(
     private fun Route.handleAndCatchException(controller: ConnectorController, iadvizeHandler: IadvizeHandler) {
         handler { context ->
             try {
+                context?.let { logContextRequest(context) }
+
+                // Check payloads signature
+                if(!secretToken.isNullOrBlank()) {
+                    IadvizeSecurity(secretToken).validatePayloads(context)
+                }
+                // Invoke handler
                 iadvizeHandler.invoke(context, controller)
+            } catch (error: BadRequestException){
+                logger.error(error)
+                context.fail(400)
             } catch (error: Throwable) {
                 logger.error(error)
                 context.fail(500)
             }
         }
+    }
+
+    /**
+     * Trace the iadvize query
+     */
+    private fun logContextRequest(context: RoutingContext) {
+        val requestAsString: String =
+            with(context) {
+                mapper.writeValueAsString(
+                    CustomRequest(
+                        request().method().name(),
+                        request().path(),
+                        request().query(),
+                        body().asJsonObject(),
+                        // Get only iAdvize headers
+                        request().headers()
+                            .filter { it.key.startsWith("X-") }
+                            .associate { it.key to it.value }
+                    )
+                )
+            }
+
+        logger.debug { "request : $requestAsString" }
+    }
+
+
+    private var handlerHealthcheck: IadvizeHandler = { context, _ ->
+        context.response().endWithJson(Healthcheck())
     }
 
     internal var handlerGetBots: IadvizeHandler = { context, controller ->
@@ -139,12 +187,12 @@ class IadvizeConnector internal constructor(
         return Bot(idBot = botId, name = botName, editorUrl = editorUrl)
     }
 
-    internal var handlerStrategies: IadvizeHandler = { context, controller ->
+    internal var handlerStrategies: IadvizeHandler = { context, _ ->
         logRequest("GET", "/availability-strategies")
         context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
-    internal var handlerFirstMessage: IadvizeHandler = { context, controller ->
+    internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
         logRequest("GET", "/bots/$idOperator/conversation-first-messages")
         context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
@@ -180,11 +228,8 @@ class IadvizeConnector internal constructor(
      * in many case it's an echo, but it can be a human operator
      */
     private fun isOperator(iadvizeRequest: IadvizeRequest): Boolean {
-        return if(iadvizeRequest is MessageRequest) {
-            iadvizeRequest.message.author.role.equals(ROLE_OPERATOR)
-        } else {
-            false
-        }
+        return iadvizeRequest is MessageRequest
+                && iadvizeRequest.message.author.role == ROLE_OPERATOR
     }
 
     private fun mapRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
@@ -205,10 +250,10 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T) {
-        val responseValue: String = mapper.writeValueAsString(response)
-        logger.info { "response : $responseValue" }
-        putHeader("Content-Type", "application/json").end(responseValue)
+    private fun <T> HttpServerResponse.endWithJson(response: T) : Future<Void> {
+        val responseAsString: String = mapper.writeValueAsString(response)
+        logger.debug { "response : $responseAsString" }
+        return putHeader("Content-Type", "application/json").end(responseAsString)
     }
 
     override fun send(event: Event, callback: ConnectorCallback, delayInMs: Long) {
@@ -219,8 +264,6 @@ class IadvizeConnector internal constructor(
         }
     }
 
-
-    // internal for tests
     internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,
@@ -234,8 +277,8 @@ class IadvizeConnector internal constructor(
                 controller.handle(event, ConnectorData(callback))
             }
 
-            //Only MessageRequest are supported, other messages are UnsupportedMessage
-            // and UnsupportedResponse can be send immediatly
+            // Only MessageRequest are supported, other messages are UnsupportedMessage
+            // and UnsupportedResponse can be sent immediately
             else -> callback.sendResponse()
         }
     }
@@ -270,3 +313,11 @@ class IadvizeConnector internal constructor(
         logger.info { "body : $body" }
     }
 }
+
+@JsonInclude(JsonInclude.Include.ALWAYS)
+data class CustomRequest(
+    val method: String,
+    val path: String?,
+    val query: String?,
+    val body: JsonObject?,
+    val headers: Map<String, String>)

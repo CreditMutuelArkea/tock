@@ -207,11 +207,15 @@ internal class TockConnectorController constructor(
 
     override fun registerServices(serviceIdentifier: String, installer: (Router) -> Unit) {
         verticle.registerServices(serviceIdentifier) { router ->
-            // healthcheck
-            router.get("$serviceIdentifier/healthcheck").handler {
-                it.response().end()
-            }
             installer(router)
+            // add a healthcheck path if it doesn't exist
+            val fullPath = "$serviceIdentifier/healthcheck"
+            if(!router.routes.map { it.path }.contains(fullPath)) {
+                router.get(fullPath).handler {
+                    it.response().end()
+                }
+                installer(router)
+            }
         }.also { serviceInstallers.add(it) }
     }
 
