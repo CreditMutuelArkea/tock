@@ -20,6 +20,9 @@ import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionState
 import ai.tock.bot.admin.service.impl.ScenarioServiceImpl
+import ai.tock.bot.admin.service.impl.ScenarioSettingsServiceImpl
+import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
+import ai.tock.nlp.front.storage.mongo.ScenarioSettingsMongoDAO
 import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
@@ -60,7 +63,6 @@ class ScenarioServiceTest {
 
     private val groupId1 = "groupId1"
     private val groupId2 = "groupId2"
-    private val groupId3 = "groupId3"
     private val versionId1 = "versionId1"
     private val versionId2 = "versionId2"
     private val versionId3 = "versionId3"
@@ -103,6 +105,8 @@ class ScenarioServiceTest {
                 bind<ScenarioVersionService>() with singleton { scenarioVersionService }
                 bind<ScenarioService>() with singleton { ScenarioServiceImpl() }
                 bind<StoryService>() with singleton { storyService }
+                bind<ScenarioSettingsDAO>() with singleton { ScenarioSettingsMongoDAO }
+                bind<ScenarioSettingsService>() with singleton { ScenarioSettingsServiceImpl() }
             }
             tockInternalInjector.inject(
                 Kodein {
@@ -167,7 +171,7 @@ class ScenarioServiceTest {
         // WHEN
         val result = scenarioService.importOneScenarioGroup(scenarioGroup1)
         // THEN
-        assertEquals(result, scenarioGroup1)
+        assertEquals(result, scenarioGroup1.copy(enabled = false))
         verify(exactly = 1) { scenarioGroupService.createOne(scenarioGroup1) }
         verify(exactly = 1) { scenarioVersionService.createMany(scenarioGroup1.versions)}
     }
@@ -218,7 +222,7 @@ class ScenarioServiceTest {
         // assert not equals because result (created scenario group) has an initial version
         assertNotEquals(scenarioGroupWithoutVersions, result)
         // assert equals without comparing versions
-        assertEquals(scenarioGroupWithoutVersions, result.copy(versions = emptyList()))
+        assertEquals(scenarioGroupWithoutVersions.copy(enabled = false), result.copy(versions = emptyList()))
         assertEquals(1, result.versions.size)
         assertEquals(ScenarioVersionState.DRAFT, result.versions.first().state)
         verify(exactly = 1) { scenarioGroupService.createOne(scenarioGroupWithoutVersions) }

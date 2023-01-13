@@ -16,10 +16,11 @@
 
 package ai.tock.bot.processor
 
+import ai.tock.bot.bean.TickStorySettings
+import ai.tock.bot.bean.UnknownHandlingStep
 import ai.tock.bot.bean.unknown.ConfigMismatchedError
 import ai.tock.bot.bean.unknown.RetryExceededError
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
-import ai.tock.bot.bean.unknown.UnknownHandlingStep
 import ai.tock.bot.sender.TickSender
 
 /**
@@ -29,14 +30,15 @@ object TickUnknownHandler {
 
     data class UnknownHandleResult(
         val handlingStep: UnknownHandlingStep? = null,
-        val exitAction: String? = null
+        val redirectStoryId: String? = null
     )
 
     fun handle(
         lastExecutedActionName: String,
         unknownConfiguration: TickUnknownConfiguration,
         sender: TickSender,
-        unknownHandlingStep: UnknownHandlingStep?
+        unknownHandlingStep: UnknownHandlingStep?,
+        storySettings: TickStorySettings
     ): UnknownHandleResult =
         /*
         Get the unknownAnswerConfig for the lastExecutedAction name
@@ -60,10 +62,10 @@ object TickUnknownHandler {
                                 increment the repeated property of the step by calling the again() method on it
                             Else set the step to null and return the exitAction of the answerConfig
                             */
-                            if (answerConfig.retryNb > step.repeated)
-                                UnknownHandleResult(handlingStep = step.increment())
+                            if (storySettings.repetitionNb > step.repeated)
+                                UnknownHandleResult(handlingStep = step.next() as UnknownHandlingStep)
                             else
-                                answerConfig.exitAction?.let { UnknownHandleResult(exitAction = it) } ?: throw RetryExceededError()
+                                storySettings.redirectStory?.let { UnknownHandleResult(redirectStoryId = it) } ?: throw RetryExceededError()
 
                         } ?:
                         /*

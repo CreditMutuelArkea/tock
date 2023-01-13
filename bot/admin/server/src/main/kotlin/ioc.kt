@@ -19,9 +19,11 @@ package ai.tock.bot.admin
 import ai.tock.bot.admin.service.ScenarioGroupService
 import ai.tock.bot.admin.service.ScenarioService
 import ai.tock.bot.admin.service.ScenarioVersionService
+import ai.tock.bot.admin.service.ScenarioSettingsService
 import ai.tock.bot.admin.service.StoryService
 import ai.tock.bot.admin.service.impl.ScenarioGroupServiceImpl
 import ai.tock.bot.admin.service.impl.ScenarioServiceImpl
+import ai.tock.bot.admin.service.impl.ScenarioSettingsServiceImpl
 import ai.tock.bot.admin.service.impl.ScenarioVersionServiceImpl
 import ai.tock.bot.admin.service.impl.StoryServiceImpl
 import com.github.salomonbrys.kodein.Kodein
@@ -34,4 +36,5 @@ val botAdminServiceModule = Kodein.Module {
     bind<ScenarioVersionService>() with singleton { ScenarioVersionServiceImpl() }
     bind<ScenarioService>() with singleton { ScenarioServiceImpl() }
     bind<StoryService>() with singleton { StoryServiceImpl() }
+    bind<ScenarioSettingsService>() with singleton { ScenarioSettingsServiceImpl() }
 }

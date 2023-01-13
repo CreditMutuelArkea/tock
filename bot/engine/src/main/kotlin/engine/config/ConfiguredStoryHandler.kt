@@ -253,9 +253,15 @@ internal class ConfiguredStoryHandler(
      * A tick story handler
      */
     private fun BotBus.handleTickAnswer(container: StoryDefinitionAnswersContainer, configuration: TickAnswerConfiguration) {
-        TickAnswerHandler.handle(this, container, configuration)
-    }
+        TickAnswerHandler.handle(this, container, configuration) {
 
+            val storyDefinition = botDefinition.stories.first { def ->
+                (def as ConfiguredStoryDefinition).storyId == it
+            }
+
+            switchStory(storyDefinition, storyDefinition.mainIntent())
+        }
+    }
 
     private fun BotBus.fillCarousel(simple: SimpleAnswerConfiguration): List<SimpleAnswer> {
         val transformedAnswers = mutableListOf<SimpleAnswer>()
