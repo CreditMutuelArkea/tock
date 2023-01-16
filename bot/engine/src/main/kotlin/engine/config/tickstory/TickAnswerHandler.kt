@@ -39,7 +39,7 @@ object TickAnswerHandler {
         redirectFn : (String) -> Unit,
     ) {
         with(botBus) {
-            val intentName = botBus.intent?.intentWithoutNamespace()?.name!!
+            val intentName = botBus.currentIntent?.intentWithoutNamespace()?.name!!
             val story = container as StoryDefinitionConfiguration
             val endingStoryRuleExists = story.findEnabledEndWithStoryId(applicationId) != null
 
@@ -60,12 +60,7 @@ object TickAnswerHandler {
                 )
 
             when (result) {
-
-                is SuccessProcessingResult -> {
-                    // Manage tick state
-                    updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
-                }
-
+                is SuccessProcessingResult -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
                 is RedirectProcessingResult -> result.storyId?.let { redirectFn(it) }
             }
 

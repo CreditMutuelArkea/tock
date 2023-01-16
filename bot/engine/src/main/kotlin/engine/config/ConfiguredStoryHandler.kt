@@ -252,14 +252,16 @@ internal class ConfiguredStoryHandler(
     /**
      * A tick story handler
      */
-    private fun BotBus.handleTickAnswer(container: StoryDefinitionAnswersContainer, configuration: TickAnswerConfiguration) {
+    private fun BotBus.handleTickAnswer(
+        container: StoryDefinitionAnswersContainer,
+        configuration: TickAnswerConfiguration
+    ) {
         TickAnswerHandler.handle(this, container, configuration) {
-
-            val storyDefinition = botDefinition.stories.first { def ->
+            botDefinition.stories.first { def ->
                 (def as ConfiguredStoryDefinition).storyId == it
+            }.let {
+                switchConfiguredStory(it, it.mainIntent().name)
             }
-
-            switchStory(storyDefinition, storyDefinition.mainIntent())
         }
     }
 
