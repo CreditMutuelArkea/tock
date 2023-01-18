@@ -18,6 +18,9 @@ package ai.tock.bot.connector.iadvize.clients.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * Representation of iadvize's authentication response
+ */
 data class AuthResponse(
     @JsonProperty("refresh_token")
     val refreshToken:String? = null,

@@ -18,4 +18,7 @@ package ai.tock.bot.connector.iadvize.clients.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
+/**
+ * Representation of a graphql response
+ */
 data class GraphQLResponse<T> (@JsonProperty("data") val data: T)

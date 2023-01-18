@@ -31,6 +31,12 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
 
+/**
+ * Iadvize API.
+ * client implementation used to make REST and GRAPHQL calls to Iadvize apis.
+ *
+ * @author Henri-Joel SEDJAME
+ */
 interface IadvizeApi {
     @FormUrlEncoded
     @POST(TOKEN_ENDPOINT)

@@ -114,7 +114,7 @@ class IadvizeConnector internal constructor(
     private fun Route.handleAndCatchException(controller: ConnectorController, iadvizeHandler: IadvizeHandler) {
         handler { context ->
             try {
-                context?.let { logContextRequest(context) }
+                logContextRequest(context)
 
                 // Check payloads signature
                 if(!secretToken.isNullOrBlank()) {
