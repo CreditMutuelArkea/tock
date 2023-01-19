@@ -55,8 +55,8 @@ class TickStoryProcessor(
 
         // Handle unknown intent
         handleUnknown(tickUserAction)?.let {(session, redirectStoryId) ->
-            if (session != null) return SuccessProcessingResult(session, false)
-            if (redirectStoryId != null) return RedirectProcessingResult(redirectStoryId)
+            if (session != null) return Success(session, false)
+            if (redirectStoryId != null) return Redirect(redirectStoryId)
         }
 
         val primaryObjective: String = if(tickUserAction != null) {
@@ -83,11 +83,18 @@ class TickStoryProcessor(
             ranHandlers.toSet()
         ).random()
 
+        /*
+        Sets the current handling step
+            If the current handling step has the same linked action as the secondary objective,
+                then the current handling step is incremented
+                    If the action is repeated more than the maximum number of repetitions
+                        then a redirection is required
+            Else, the current handling step is set to a new handling step with the secondary objective as linked action
+        */
         handlingStep = if (handlingStep.action == secondaryObjective) {
-
             with(configuration.storySettings) {
                 if (handlingStep.repeated > repetitionNb) {
-                    return RedirectProcessingResult(redirectStory)
+                    return Redirect(redirectStory)
                 }
             }
             handlingStep.next() as TickActionHandlingStep
@@ -121,7 +128,7 @@ class TickStoryProcessor(
         } else  if(executedAction.isSilent()){
             process(null)
         } else {
-            SuccessProcessingResult(
+            Success(
                 TickSession(currentState, contextNames, ranHandlers, objectivesStack.toList(), handlingStep = handlingStep),
                 executedAction.final)
         }

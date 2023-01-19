@@ -20,11 +20,11 @@ import ai.tock.bot.bean.TickSession
 
 /**
  * Result of Tick processing that can be
- * - [SuccessProcessingResult] if the processing is successful
- * - [RedirectProcessingResult] if a redirection is required
+ * - [Success] if the processing is successful
+ * - [Redirect] if a redirection is required
  */
 sealed class ProcessingResult
 
-data class SuccessProcessingResult(val session: TickSession, val isFinal: Boolean) : ProcessingResult()
+data class Success(val session: TickSession, val isFinal: Boolean) : ProcessingResult()
 
-data class RedirectProcessingResult(val storyId: String?) : ProcessingResult()
+data class Redirect(val storyId: String?) : ProcessingResult()

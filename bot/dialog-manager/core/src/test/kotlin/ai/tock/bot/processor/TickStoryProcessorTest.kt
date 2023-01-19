@@ -156,7 +156,7 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            assert(it is RedirectProcessingResult)
+            assert(it is Redirect)
 
         }
 
@@ -247,9 +247,9 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            assert(it is SuccessProcessingResult)
+            assert(it is Success)
 
-            val result = it as SuccessProcessingResult
+            val result = it as Success
 
             with(result.session.handlingStep) {
                 assertNotNull(this)
@@ -337,9 +337,9 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            assert(it is SuccessProcessingResult)
+            assert(it is Success)
 
-            val result = it as SuccessProcessingResult
+            val result = it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_3.value, currentState)
                 assertEquals(1, ranHandlers.size)
@@ -437,7 +437,7 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            val result = it as SuccessProcessingResult
+            val result = it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_1.value, currentState)
                 assertEquals(2, ranHandlers.size)
@@ -535,7 +535,7 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            val result = it as SuccessProcessingResult
+            val result = it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_2.value, currentState)
                 assertEquals(2, ranHandlers.size)
@@ -647,7 +647,7 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            val result= it as SuccessProcessingResult
+            val result= it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_2.value, currentState)
                 assertEquals(2, ranHandlers.size)
@@ -770,7 +770,7 @@ internal class TickStoryProcessorTest {
 
             assertNotNull(it)
 
-            val result =  it as SuccessProcessingResult
+            val result =  it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_3.value, currentState)
                 assertEquals(3, ranHandlers.size)
@@ -891,7 +891,7 @@ internal class TickStoryProcessorTest {
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
-            val result = it as SuccessProcessingResult
+            val result = it as Success
             with(result.session) {
                 assertEquals(StateIds.STATE_2.value, currentState)
                 assertEquals(2, ranHandlers.size)
@@ -1104,7 +1104,7 @@ internal class TickStoryProcessorTest {
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assert(it is RedirectProcessingResult)
+            assert(it is Redirect)
         }
 
         TestCase<TickStoryProcessor,ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is provided, retryNb is exceeded and redirectStoryId is provided")

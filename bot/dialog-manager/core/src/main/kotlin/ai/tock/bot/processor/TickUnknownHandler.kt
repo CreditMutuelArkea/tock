@@ -69,9 +69,9 @@ object TickUnknownHandler {
 
                         } ?:
                         /*
-                        If no unknowHandlingStep has provided, create a new Step
+                        If no unknownHandlingStep has provided, create a new Step
                         */
-                        UnknownHandleResult(handlingStep = UnknownHandlingStep(1, answerConfig))
+                        UnknownHandleResult(handlingStep = UnknownHandlingStep(answerConfig =  answerConfig))
                         )
                     .also { result ->
                         result.handlingStep?.let { step -> sender.endById(step.answerConfig.answerId) }

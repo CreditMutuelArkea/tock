@@ -24,7 +24,7 @@ import ai.tock.bot.bean.TickStoryValidation
 import ai.tock.bot.bean.TickUserAction
 import ai.tock.bot.bean.TickStorySettings
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
-import ai.tock.bot.processor.SuccessProcessingResult
+import ai.tock.bot.processor.Success
 import ai.tock.bot.processor.TickStoryProcessor
 import ai.tock.bot.sender.TickSenderDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -86,7 +86,7 @@ class TickStoryExecutorTest {
             ),
             sender,
             false
-        ).process(tickUserAction) as SuccessProcessingResult
+        ).process(tickUserAction) as Success
 
 
 

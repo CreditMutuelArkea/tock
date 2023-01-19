@@ -25,8 +25,8 @@ import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.TickState
-import ai.tock.bot.processor.RedirectProcessingResult
-import ai.tock.bot.processor.SuccessProcessingResult
+import ai.tock.bot.processor.Redirect
+import ai.tock.bot.processor.Success
 import ai.tock.bot.processor.TickStoryProcessor
 import java.time.Instant
 
@@ -60,8 +60,8 @@ object TickAnswerHandler {
                 )
 
             when (result) {
-                is SuccessProcessingResult -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
-                is RedirectProcessingResult -> result.storyId?.let { redirectFn(it) }
+                is Success -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
+                is Redirect -> result.storyId?.let { redirectFn(it) }
             }
 
         }
