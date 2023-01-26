@@ -18,7 +18,6 @@ package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.ConnectorMessage
-import ai.tock.bot.connector.iadvize.clients.graphql.IadvizeGraphQLClient
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
@@ -35,6 +34,7 @@ import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
@@ -72,7 +72,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
-    var iadvizeGraphQLClient = IadvizeGraphQLClient()
+    internal var iadvizeGraphQLClient = IadvizeGraphQLClient()
 
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
@@ -173,7 +173,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
             if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))
             } else {
-                val available = iadvizeGraphQLClient.available(distributionRule)
+                val available = iadvizeGraphQLClient.isAvailable(distributionRule)
 
                 if (available)
                     IadvizeTransfer(distributionRule, it.transferOptions)

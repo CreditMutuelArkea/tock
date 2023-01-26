@@ -36,11 +36,6 @@
             <artifactId>tock-bot-engine-jackson</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-lang-kotlin-coroutines</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
         </dependency>
@@ -57,7 +52,11 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-bot-iadvize-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-shared</artifactId>
@@ -96,44 +95,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.expediagroup</groupId>
-            <artifactId>graphql-kotlin-client</artifactId>
-            <version>${graphql-kotlin}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.expediagroup</groupId>
-            <artifactId>graphql-kotlin-client-jackson</artifactId>
-            <version>${graphql-kotlin}</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.api.grpc</groupId>
             <artifactId>proto-google-common-protos</artifactId>
         </dependency>
 
     </dependencies>
-
-    <build>
-        <plugins>
-            <!--<plugin>
-                <groupId>com.expediagroup</groupId>
-                <artifactId>graphql-kotlin-maven-plugin</artifactId>
-                <version>6.2.5</version>
-                <executions>
-                    <execution>
-                        <phase>compile</phase>
-                        <id>graphql-iadvize</id>
-                        <goals>
-                            <goal>introspect-schema</goal>
-                            <goal>generate-client</goal>
-                        </goals>
-                        <configuration>
-                            <endpoint>https://api.iadvize.com/graphql</endpoint>
-                            <packageName>ai.tock.bot.connector.iadvize.graphql</packageName>
-                            <schemaFile>iadvizeSchema.graphql</schemaFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin> -->
-        </plugins>
-    </build>
 </project>

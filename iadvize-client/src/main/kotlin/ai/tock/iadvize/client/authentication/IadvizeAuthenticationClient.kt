@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients.authentication
+package ai.tock.iadvize.client.authentication
 
-import ai.tock.bot.connector.iadvize.clients.IadvizeApi
-import ai.tock.bot.connector.iadvize.clients.createApi
-import ai.tock.bot.connector.iadvize.clients.IADVIZE_USERNAME_AUTHENTICATION
-import ai.tock.bot.connector.iadvize.clients.IADVIZE_PASSWORD_AUTHENTICATION
-import ai.tock.bot.connector.iadvize.clients.PASSWORD
-import ai.tock.bot.connector.iadvize.clients.authenticationFailedError
-import ai.tock.shared.property
+import ai.tock.iadvize.client.*
+import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
+
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicReference
 
+val credentialsProvider = EnvCredentialsProvider()
 
+/**
+ * Authentication client.
+ */
 class IadvizeAuthenticationClient {
 
     companion object {
@@ -37,11 +37,19 @@ class IadvizeAuthenticationClient {
     }
 
     internal var iadvizeApi: IadvizeApi = createApi(logger)
-    private val username: String = property(IADVIZE_USERNAME_AUTHENTICATION, "")
-    private val password: String = property(IADVIZE_PASSWORD_AUTHENTICATION, "")
 
-    data class Token(val value: String, val expireAt: LocalDateTime?)
+    private val username: String by lazy {
+        credentialsProvider.getCredentials().username
+    }
 
+    private val password: String by lazy {
+        credentialsProvider.getCredentials().password
+    }
+
+    /**
+     * Get the stored access token.
+     * if the access token is expired, a new one is requested and stored.
+     */
     fun getAccessToken() : String {
 
         var t = token.get()
@@ -53,6 +61,9 @@ class IadvizeAuthenticationClient {
         return t.value
     }
 
+    /**
+     * Request a new access token.
+     */
     private fun getToken(): Token {
         return iadvizeApi.createToken(username, password, grantType = PASSWORD).execute().body()
             ?.let {
@@ -63,4 +74,9 @@ class IadvizeAuthenticationClient {
             }
             ?: authenticationFailedError()
     }
+
+    /**
+     * Stored Token representation.
+     */
+    data class Token(val value: String, val expireAt: LocalDateTime?)
 }

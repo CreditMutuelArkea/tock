@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients.models
+package ai.tock.iadvize.client.graphql.models
 
-import com.fasterxml.jackson.annotation.JsonProperty
+import kotlin.String
 
-/**
- * Representation of a graphql response
- */
-data class GraphQLResponse<T> (@JsonProperty("data") val data: T)
+typealias UUID = String

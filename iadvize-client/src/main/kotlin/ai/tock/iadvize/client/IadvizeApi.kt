@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients
+package ai.tock.iadvize.client
 
-import ai.tock.bot.connector.iadvize.clients.models.AuthResponse
-import ai.tock.bot.connector.iadvize.clients.models.GraphQLResponse
-import ai.tock.bot.connector.iadvize.clients.models.RoutingRule
-import ai.tock.shared.retrofitBuilderWithTimeoutAndLogger
-import ai.tock.shared.tokenAuthenticationInterceptor
+
+import ai.tock.iadvize.client.authentication.models.AuthResponse
+import ai.tock.iadvize.client.graphql.models.GraphQLResponse
+import ai.tock.iadvize.client.graphql.models.customData.CustomDataResult
+import ai.tock.iadvize.client.graphql.models.routingrule.RoutingRuleResult
 import mu.KLogger
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -46,18 +46,36 @@ interface IadvizeApi {
     ): Call<AuthResponse>
 
     @POST(GRAPHQL_ENDPOINT)
-    fun checkAvailability(@Body body: RequestBody) : Call<GraphQLResponse<RoutingRule.Result>>
+    fun checkAvailability(@Body body: RequestBody) : Call<GraphQLResponse<RoutingRuleResult>>
+
+    @POST(GRAPHQL_ENDPOINT)
+    fun getCustomData(@Body body: RequestBody) : Call<GraphQLResponse<CustomDataResult>>
 
 }
 
-fun createApi(logger: KLogger): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(30000, logger)
+
+private const val TIMEOUT = 30000L
+
+/**
+ * Create a new Iadvize api client.
+ *
+ * @param logger the logger
+ * @return the new client
+ */
+fun createApi(logger: KLogger): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(TIMEOUT, logger)
         .baseUrl(BASE_URL)
         .addConverterFactory(JacksonConverterFactory.create())
         .build()
         .create()
 
-fun createSecuredApi(logger: KLogger, tokenProvider: () -> String): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(30000, logger,
-    interceptors = listOf(tokenAuthenticationInterceptor(tokenProvider)))
+/**
+ * Create a new Iadvize API client.
+ * @param logger the logger
+ * @param tokenProvider the token provider
+ * @return the new client
+ */
+fun createSecuredApi(logger: KLogger, tokenProvider: () -> String): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(
+    TIMEOUT, logger, interceptors = listOf(tokenAuthenticationInterceptor(tokenProvider)))
     .baseUrl(BASE_URL)
     .addConverterFactory(JacksonConverterFactory.create())
     .build()

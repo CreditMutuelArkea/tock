@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients.models
+package ai.tock.iadvize.client.graphql.models.customData
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-/**
- * Representation of iadvize's authentication response
- */
-data class AuthResponse(
-    @JsonProperty("refresh_token")
-    val refreshToken:String? = null,
-    @JsonProperty("token_type")
-    val tokenType: String? = null,
-    @JsonProperty("access_token")
-    val accessToken: String?=null,
-    @JsonProperty("expires_in")
-    val expiresIn: Number? = null )
+data class CustomDataResult(
+    @JsonProperty("visitorConversationCustomData")
+    val visitorConversationCustomData: VisitorConversationCustomData?,
+)
+
+data class VisitorConversationCustomData(
+    @JsonProperty("customData")
+    val customData: List<CustomData> = emptyList(),
+)
+data class CustomData(
+    @JsonProperty("key")
+    val key: String?,
+    @JsonProperty("label")
+    val label: String?,
+    @JsonProperty("stringValue")
+    val value: String?,
+)

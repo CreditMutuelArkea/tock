@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients.models
+package ai.tock.iadvize.client.authentication.credentials
 
-import kotlin.String
-
-typealias UUID = String
+data class Credentials(val username: String, val password: String)

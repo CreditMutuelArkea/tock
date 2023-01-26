@@ -16,7 +16,6 @@
 package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorData
-import ai.tock.bot.connector.iadvize.clients.graphql.IadvizeGraphQLClient
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
@@ -28,6 +27,7 @@ import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
 import ai.tock.shared.resourceAsString
@@ -159,7 +159,7 @@ class IadvizeConnectorTest {
         val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
         val connectorData = slot<ConnectorData>()
 
-        every {  iadvizeGraphQLClient.available(distributionRule)  } returns true
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns true
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
             callback.iadvizeGraphQLClient = iadvizeGraphQLClient
@@ -191,7 +191,7 @@ class IadvizeConnectorTest {
 
         val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
         val connectorData = slot<ConnectorData>()
-        every {  iadvizeGraphQLClient.available(distributionRule)  } returns false
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns false
 
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
@@ -237,7 +237,7 @@ class IadvizeConnectorTest {
 
         val connectorData = slot<ConnectorData>()
 
-        every {  iadvizeGraphQLClient.available(distributionRule)  } returns true
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns true
 
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback

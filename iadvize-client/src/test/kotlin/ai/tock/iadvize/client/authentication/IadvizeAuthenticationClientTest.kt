@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package clients.authentication
+package ai.tock.iadvize.client.authentication
 
-import ai.tock.bot.connector.iadvize.clients.AuthenticationFailedError
-import ai.tock.bot.connector.iadvize.clients.IadvizeApi
-import ai.tock.bot.connector.iadvize.clients.authentication.IadvizeAuthenticationClient
-import ai.tock.bot.connector.iadvize.clients.models.AuthResponse
+
+import ai.tock.iadvize.client.AuthenticationFailedError
+import ai.tock.iadvize.client.IadvizeApi
+import ai.tock.iadvize.client.authentication.models.AuthResponse
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic

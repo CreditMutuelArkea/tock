@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients
+package ai.tock.iadvize.client
 
 const val BASE_URL = "https://api.iadvize.com"
 const val TOKEN_ENDPOINT = "/oauth2/token"
@@ -28,6 +28,8 @@ const val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
 const val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
 
 const val APPLICATION_JSON = "application/json"
+const val AUTHORIZATION = "Authorization"
+const val BEARER = "Bearer"
 
 
 

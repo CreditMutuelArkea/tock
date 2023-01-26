@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients
+package ai.tock.iadvize.client
 
-
+const val NOT_SUCEESS_MSG = "GraphQL request sent successfully but returns an unsuccessful response with status code"
 sealed class IadvizeGraphQLError(override val message: String): Error(message)
 class AuthenticationFailedError : Exception("Fail to retrieve a non null access token")
 class DataNotFoundError : IadvizeGraphQLError("Data not found")
-class NotSuccessResponseError(statusCode: Int) : IadvizeGraphQLError("GraphQL request sent successfully but returns an unsuccessful response with status code [$statusCode]")
+class NotSuccessResponseError(msg: String?, statusCode: Int) : IadvizeGraphQLError(msg?.let { "code : $statusCode \nerrors:[\n $it \n]"  } ?: "$NOT_SUCEESS_MSG [$statusCode]")
 fun graphQlDataNotFoundError(): Nothing = throw DataNotFoundError()
-fun graphQlNotSuccessResponseError(statusCode: Int): Nothing = throw NotSuccessResponseError(statusCode)
+fun graphQlNotSuccessResponseError(message: String?, statusCode: Int): Nothing = throw NotSuccessResponseError(message, statusCode)
 fun authenticationFailedError(): Nothing = throw AuthenticationFailedError()

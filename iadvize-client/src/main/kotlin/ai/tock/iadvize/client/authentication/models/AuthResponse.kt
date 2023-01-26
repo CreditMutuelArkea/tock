@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.iadvize.clients.models.routingrule
+package ai.tock.iadvize.client.authentication.models
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
 /**
- * Routing rules determine how to distribute conversations from a set of targeting rules to a set of
- * routing groups, according to a routing mode.
+ * Representation of iadvize's authentication response
  */
-
-data class RoutingRule(@JsonProperty("availability")  val availability: RoutingRuleAvailability? = null)
-
-data class RoutingRuleAvailability( @JsonProperty("chat") val chat: RoutingRuleChannelAvailability)
-data class RoutingRuleChannelAvailability(@JsonProperty("isAvailable") val isAvailable: Boolean)
+data class AuthResponse(
+    @JsonProperty("refresh_token")
+    val refreshToken:String? = null,
+    @JsonProperty("token_type")
+    val tokenType: String? = null,
+    @JsonProperty("access_token")
+    val accessToken: String?=null,
+    @JsonProperty("expires_in")
+    val expiresIn: Number? = null )
