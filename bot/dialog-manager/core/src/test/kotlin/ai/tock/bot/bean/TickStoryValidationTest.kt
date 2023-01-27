@@ -32,6 +32,10 @@ class TickStoryValidationTest : DialogManagerTest() {
         val errors = TickStoryValidation.validateTickStory(tickStory)
 
         assertTrue { errors.isEmpty() }
+        // TODO MASS
+        // Action handler joignabilite:check_service_available not found in handlers repository
+        // Action handler joignabilite:check_transfer not found in handlers repository
+        // Action handler joignabilite:service_unavailable_redirect not found in handlers repository
     }
 
     @Nested inner class ConsistencyBetweenDeclaredIntentsAndStateMachineTransitions {
