@@ -37,6 +37,8 @@ class ScenarioSettingsVerticle {
 
     fun configure(webVerticle: WebVerticle, front: FrontClient) {
 
+        val authorizedRoles = setOf(TockUserRole.botUser, TockUserRole.admin, TockUserRole.technicalAdmin)
+
         with(webVerticle) {
 
             val handlePost = { context: RoutingContext, query: ScenarioSettingsQuery ->
@@ -58,9 +60,9 @@ class ScenarioSettingsVerticle {
                 }
             }
 
-            blockingJsonPost(PATH,  setOf(TockUserRole.botUser), handler = handlePost)
+            blockingJsonPost(PATH, authorizedRoles, handler = handlePost)
 
-            blockingJsonGet(PATH, setOf(TockUserRole.botUser), handler = handleGet)
+            blockingJsonGet(PATH, authorizedRoles, handler = handleGet)
         }
     }
 
