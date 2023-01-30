@@ -23,3 +23,5 @@ package ai.tock.iadvize.client
  * @param defaultValue the default value
  */
 fun property(name: String, defaultValue: String = ""): String = System.getProperty(name) ?: System.getenv(name) ?: defaultValue
+
+fun booleanProperty(name: String, defaultValue: Boolean = false): Boolean = property(name, defaultValue.toString()).toBoolean()

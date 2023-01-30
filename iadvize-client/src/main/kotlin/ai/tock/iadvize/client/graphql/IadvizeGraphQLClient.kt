@@ -18,8 +18,6 @@ package ai.tock.iadvize.client.graphql
 
 import ai.tock.iadvize.client.*
 import ai.tock.iadvize.client.authentication.IadvizeAuthenticationClient
-import ai.tock.iadvize.client.authentication.credentials.CredentialsProvider
-import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
 import ai.tock.iadvize.client.graphql.models.GraphQLResponse
 import ai.tock.iadvize.client.graphql.models.customData.CustomDataRequest
 import ai.tock.iadvize.client.graphql.models.routingrule.RoutingRuleRequest
@@ -34,15 +32,13 @@ import retrofit2.Call
 /**
  * GraphQL client for iAdvize.
  */
-class IadvizeGraphQLClient(credentialsProvider: CredentialsProvider = EnvCredentialsProvider()) {
+class IadvizeGraphQLClient {
 
     companion object {
         val logger = KotlinLogging.logger { }
-        const val CUSTOM_DATA_KEY = "isChatBotEnabled"
-        const val CUSTOM_DATA_VALUE = "ENABLED"
     }
 
-    private val authenticationClient = IadvizeAuthenticationClient(credentialsProvider )
+    private val authenticationClient = IadvizeAuthenticationClient()
     internal var iadvizeApi: IadvizeApi = createSecuredApi(logger) { authenticationClient.getAccessToken() }
 
     /**
@@ -55,17 +51,19 @@ class IadvizeGraphQLClient(credentialsProvider: CredentialsProvider = EnvCredent
         { it.routingRule?.availability?.chat?.isAvailable }
     )
 
+
     /**
-     * Check if a client is connected for a given conversation
+     * Check if a custom data (key/value) exist for a given conversation
      * @param conversationId the conversation identifier
+     * @param customData the looked for custom data key/value pair
      */
-    fun isClientConnected(conversationId: String): Boolean = this.execute(
+    fun isCustomDataExist(conversationId: String, customData: Pair<String, String>): Boolean = this.execute(
         CustomDataRequest(CustomDataRequest.Variables(conversationId)),
         { getCustomData(it) },
         {
             it.visitorConversationCustomData?.customData
-                ?.find { data -> data.key == CUSTOM_DATA_KEY }
-                ?.value == CUSTOM_DATA_VALUE
+                ?.find { data -> data.key == customData.first }
+                ?.value == customData.second
         },
         false
     )

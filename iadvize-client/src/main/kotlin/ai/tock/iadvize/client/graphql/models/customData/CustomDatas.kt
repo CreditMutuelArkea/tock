@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.iadvize.client.authentication.credentials
+package ai.tock.iadvize.client.graphql.models.customData
 
-import ai.tock.iadvize.client.IADVIZE_PASSWORD_AUTHENTICATION
-import ai.tock.iadvize.client.IADVIZE_USERNAME_AUTHENTICATION
-import ai.tock.iadvize.client.property
-
-class EnvCredentialsProvider : CredentialsProvider {
-    override fun getCredentials(): Credentials {
-        val username = property(IADVIZE_USERNAME_AUTHENTICATION)
-        val password = property(IADVIZE_PASSWORD_AUTHENTICATION)
-        return Credentials(username, password)
-    }
+object CustomDatas {
+    val CHAT_ENABLED = "isChatBotEnabled" to "ENABLED"
 }

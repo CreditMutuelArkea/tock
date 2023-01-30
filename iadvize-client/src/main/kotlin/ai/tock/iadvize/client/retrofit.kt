@@ -48,7 +48,7 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
 
         logger.info("--> ${request.method} ${request.url} $protocol")
 
-        val requestHeaders = request.headers.onEach{ logger.info("${it.first}: ${it.second}") }
+        val requestHeaders = request.headers.onEach{ logger.debug("${it.first}: ${it.second}") }
         val requestBody = request.body
         when {
             requestBody == null -> logger.info("--> END ${request.method}")
@@ -62,7 +62,7 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
                     if (isPlaintext(buffer)) {
 
                         (contentType()?.charset(StandardCharsets.UTF_8) ?: StandardCharsets.UTF_8).let {
-                            logger.info(buffer.readString(it))
+                            logger.debug(buffer.readString(it))
                         }
 
                         logger.info("--> END ${request.method} (${contentLength()}-byte body)")
@@ -73,7 +73,6 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
                 }
             }
         }
-
 
         val response: Response
         val responseBody: ResponseBody?
@@ -92,7 +91,7 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
             throw e
         }
 
-        val responseHeaders = response.headers.onEach{ logger.info { "${it.first} : ${it.second}" }}
+        val responseHeaders = response.headers.onEach{ logger.debug { "${it.first} : ${it.second}" }}
 
         when {
             !response.promisesBody() ->  logger.info("<-- END HTTP")
@@ -112,7 +111,7 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
                     val charset = contentType()?.charset(StandardCharsets.UTF_8)
                     if (contentLength() != 0L) {
                         logger.info("")
-                        logger.info(buffer.clone().readString(charset!!))
+                        logger.debug(buffer.clone().readString(charset!!))
                     }
 
                     logger.info("<-- END HTTP (${buffer.size}-byte body)")
