@@ -19,6 +19,7 @@ package ai.tock.iadvize.client.graphql
 import ai.tock.iadvize.client.*
 import ai.tock.iadvize.client.authentication.IadvizeAuthenticationClient
 import ai.tock.iadvize.client.authentication.credentials.CredentialsProvider
+import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
 import ai.tock.iadvize.client.graphql.models.GraphQLResponse
 import ai.tock.iadvize.client.graphql.models.customData.CustomDataRequest
 import ai.tock.iadvize.client.graphql.models.routingrule.RoutingRuleRequest
@@ -33,7 +34,8 @@ import retrofit2.Call
 /**
  * GraphQL client for iAdvize.
  */
-class IadvizeGraphQLClient(credentialsProvider: CredentialsProvider) {
+class IadvizeGraphQLClient(credentialsProvider: CredentialsProvider = EnvCredentialsProvider()) {
+
     companion object {
         val logger = KotlinLogging.logger { }
         const val CUSTOM_DATA_KEY = "isChatBotEnabled"

@@ -73,7 +73,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
-    internal var iadvizeGraphQLClient = IadvizeGraphQLClient(EnvCredentialsProvider())
+    internal var iadvizeGraphQLClient = IadvizeGraphQLClient()
 
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
