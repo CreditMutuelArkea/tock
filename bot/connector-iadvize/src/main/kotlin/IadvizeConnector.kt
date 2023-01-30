@@ -189,12 +189,11 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
-        val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
         context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
     }
 
     internal var handlerStartConversation: IadvizeHandler = { context, controller ->
-        logger.info { "request : POST /conversations\nbody : ${context.body().asString()}" }
+
         val conversationRequest: ConversationsRequest =
             mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
 
@@ -207,13 +206,9 @@ class IadvizeConnector internal constructor(
         val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
         val iadvizeRequest: IadvizeRequest = mapRequest(idConversation, context)
         if (!isOperator(iadvizeRequest)) {
-            logger.info { "request : POST /conversations/$idConversation/messages\nbody : ${context.body().asString()}" }
-            logger.info { context.normalizedPath() }
-            logger.info { "body parsed : $iadvizeRequest" }
             handleRequest(controller, context, iadvizeRequest)
         } else {
             //ignore message from operator
-            logger.info { "request echo : POST /conversations/$idConversation/messages ${context.body().asString()}" }
             context.response().end()
         }
     }
@@ -288,7 +283,6 @@ class IadvizeConnector internal constructor(
         message: ConnectorMessage,
         suggestions: List<CharSequence>
     ): BotBus.() -> ConnectorMessage? = {
-        //TODO add logger
         (message as? IadvizeConnectorMessage)?.let {
             val iadvizeMessage = message.replies.last { it is IadvizeMessage } as IadvizeMessage
             iadvizeMessage.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
