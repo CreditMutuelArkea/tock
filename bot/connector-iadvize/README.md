@@ -11,7 +11,6 @@ To use Iadvize connector with Tock bot, you need to have:
 
 ## Steps To follow :
 
-* Deactivate your vpn
 * In your local machine, launch your apps (Tock-bot-admin, Tock-Bot-api, etc...)
 * To link your Iadvize app with your local Tock-Bot-Api app you need to use <strong style="color: cyan">ngrok</strong>
   run :
