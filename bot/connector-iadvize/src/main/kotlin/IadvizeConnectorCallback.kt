@@ -34,6 +34,7 @@ import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
+import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
 import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
@@ -72,7 +73,7 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
-    internal var iadvizeGraphQLClient = IadvizeGraphQLClient()
+    internal var iadvizeGraphQLClient = IadvizeGraphQLClient(EnvCredentialsProvider())
 
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 

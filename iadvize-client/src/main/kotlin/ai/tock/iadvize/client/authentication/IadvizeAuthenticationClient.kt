@@ -16,19 +16,20 @@
 
 package ai.tock.iadvize.client.authentication
 
-import ai.tock.iadvize.client.*
-import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
-
+import ai.tock.iadvize.client.IadvizeApi
+import ai.tock.iadvize.client.createApi
+import ai.tock.iadvize.client.PASSWORD
+import ai.tock.iadvize.client.authenticationFailedError
+import ai.tock.iadvize.client.authentication.credentials.CredentialsProvider
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicReference
 
-val credentialsProvider = EnvCredentialsProvider()
 
 /**
  * Authentication client.
  */
-class IadvizeAuthenticationClient {
+class IadvizeAuthenticationClient(private val credentialsProvider: CredentialsProvider) {
 
     companion object {
         val logger = KotlinLogging.logger { }

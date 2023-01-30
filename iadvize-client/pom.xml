@@ -6,7 +6,7 @@
         <artifactId>tock-root</artifactId>
         <version>22.9.3-SNAPSHOT</version>
     </parent>
-    <artifactId>tock-bot-iadvize-client</artifactId>
+    <artifactId>tock-iadvize-client</artifactId>
     <name>Archetype - tock-bot-iadvize-client</name>
     <url>http://maven.apache.org</url>
 

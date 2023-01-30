@@ -161,19 +161,16 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerGetBots: IadvizeHandler = { context, controller ->
-        logRequest("GET", "/external-bots")
         context.response().endWithJson(listOf(getBot(controller)))
     }
 
     internal var handlerGetBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("GET", "/bots/$idOperator", context.body().asString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
     internal var handlerUpdateBot: IadvizeHandler = { context, controller ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("PUT", "/bots/$idOperator", context.body().asString())
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
@@ -188,13 +185,11 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerStrategies: IadvizeHandler = { context, _ ->
-        logRequest("GET", "/availability-strategies")
         context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
     internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
         val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
-        logRequest("GET", "/bots/$idOperator/conversation-first-messages")
         context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
     }
 
@@ -303,15 +298,6 @@ class IadvizeConnector internal constructor(
 
     override fun toConnectorMessage(message: MediaMessage): BotBus.() -> List<ConnectorMessage> =
         MediaConverter.toConnectorMessage(message)
-
-    private fun logRequest(verb: String, uri: String) {
-        logger.info { "request : $verb $uri}" }
-    }
-
-    private fun logRequest(verb: String, uri: String, body: String) {
-        logRequest(verb, uri)
-        logger.info { "body : $body" }
-    }
 }
 
 @JsonInclude(JsonInclude.Include.ALWAYS)

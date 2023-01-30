@@ -54,7 +54,7 @@
         </dependency>
         <dependency>
             <groupId>ai.tock</groupId>
-            <artifactId>tock-bot-iadvize-client</artifactId>
+            <artifactId>tock-iadvize-client</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
