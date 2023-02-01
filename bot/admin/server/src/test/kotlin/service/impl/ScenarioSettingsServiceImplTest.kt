@@ -143,7 +143,7 @@ class ScenarioSettingsServiceImplTest {
             }
         }
 
-        TestCase<Pair<ApplicationDefinition, ScenarioSettingsQuery>, Unit>("save already existing settings")
+        TestCase<Pair<ApplicationDefinition, ScenarioSettingsQuery>, Unit>("save non existing settings")
             .given("the provided applicationDefinition and query", args)
             .and("""
                 - dao return a null scenarioSettings with the applicationId
