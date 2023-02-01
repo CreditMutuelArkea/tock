@@ -18,7 +18,7 @@ jobs:
           distribution: 'corretto'
           java-version: 11
           cache: maven
-
+      - name: Build with Maven
         run: mvn --batch-mode --update-snapshots -DskipTests clean install
       - name: Run bot/admin/server tests
         run: cd bot/admin/server && mvn -B test
