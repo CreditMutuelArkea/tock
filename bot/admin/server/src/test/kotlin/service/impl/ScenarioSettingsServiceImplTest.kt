@@ -202,7 +202,7 @@ class ScenarioSettingsServiceImplTest {
             assertNull(it)
         }
 
-        TestCase<String, ScenarioSettings?>("get existing scenario settings by application id")
+        TestCase<String, ScenarioSettings?>("try to get non existing scenario settings by application id")
             .given("the provided application id is APP_ID", appId)
             .and("dao returns a null result when the application id is APP_ID", mockBehaviours)
             .`when`("getScenarioSettingsByApplicationId method is called", callService)

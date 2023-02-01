@@ -43,12 +43,12 @@ data class ScenarioSettings (
     val redirectStoryId: String?=  null,
 
     /**
-     * Faq creation date
+     * Settings creation date
      */
     val creationDate: Instant,
 
     /**
-     * Faq update date
+     * Settings update date
      */
     val updateDate: Instant,
 

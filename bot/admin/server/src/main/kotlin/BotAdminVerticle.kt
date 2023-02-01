@@ -131,7 +131,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         scenarioVerticle.configureScenario(this)
         storyVerticle.configure(this)
-        scenarioSettingsVerticle.configure(this, front)
+        scenarioSettingsVerticle.configure(this)
 
         blockingJsonPost("/users/search", botUser) { context, query: UserSearchQuery ->
             if (context.organization == query.namespace) {

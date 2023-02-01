@@ -34,8 +34,9 @@ class ScenarioSettingsVerticle {
     }
 
     private val service: ScenarioSettingsService by injector.instance()
+    private val front = FrontClient
 
-    fun configure(webVerticle: WebVerticle, front: FrontClient) {
+    fun configure(webVerticle: WebVerticle) {
 
         val authorizedRoles = setOf(TockUserRole.botUser, TockUserRole.admin, TockUserRole.technicalAdmin)
 

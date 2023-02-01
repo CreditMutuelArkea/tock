@@ -59,8 +59,8 @@ object TickUnknownHandler {
 
                             /*
                             When the answer's retryNb is not exceeded,
-                                increment the repeated property of the step by calling the again() method on it
-                            Else set the step to null and return the exitAction of the answerConfig
+                                increment the repeated property of the step by calling the next() method on it
+                            Else set the step to null and return the redirectStoryId
                             */
                             if (storySettings.repetitionNb > step.repeated)
                                 UnknownHandleResult(handlingStep = step.next() as UnknownHandlingStep)

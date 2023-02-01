@@ -259,7 +259,7 @@ internal class TickStoryProcessorTest {
 
         }
 
-        TestCase<TickStoryProcessor, ProcessingResult>("process when action is ")
+        TestCase<TickStoryProcessor, ProcessingResult>("process when action is repeated")
 
             .given("""
     - user intent "intent1" leads to a primary objective "State1"
@@ -940,7 +940,7 @@ internal class TickStoryProcessorTest {
     }
 
     @Test
-    fun `process when unknown intent is detected and unknownAnswerConfig is provided and retryNb is exceeded`() {
+    fun `process when unknown intent is detected and unknownAnswerConfig is provided and repetitionNb is exceeded`() {
 
         val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
@@ -1030,7 +1030,7 @@ internal class TickStoryProcessorTest {
     }
 
     @Test
-    fun `process when unknown intent is detected and unknownAnswerConfig is provided, retryNb is exceeded and redirectStoryId is provided`() {
+    fun `process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided`() {
 
         val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
@@ -1038,7 +1038,6 @@ internal class TickStoryProcessorTest {
         )
         val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
-            // exitAction = StateIds.STATE_3.value,
             answerId ="unknown 2"
         )
         val produceProcessor: TSupplier<TickStoryProcessor> = {
@@ -1107,7 +1106,7 @@ internal class TickStoryProcessorTest {
             assert(it is Redirect)
         }
 
-        TestCase<TickStoryProcessor,ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is provided, retryNb is exceeded and redirectStoryId is provided")
+        TestCase<TickStoryProcessor,ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided")
 
             .given("""
     - current state is "state2"
