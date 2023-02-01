@@ -48,7 +48,7 @@ private class LoggingInterceptor(val logger: KLogger) : Interceptor {
 
         logger.info("--> ${request.method} ${request.url} $protocol")
 
-        val requestHeaders = request.headers.onEach{ logger.debug("${it.first}: ${it.second}") }
+        val requestHeaders = request.headers.onEach{ logger.debug {"${it.first}: ${it.second}"} }
         val requestBody = request.body
         when {
             requestBody == null -> logger.info("--> END ${request.method}")

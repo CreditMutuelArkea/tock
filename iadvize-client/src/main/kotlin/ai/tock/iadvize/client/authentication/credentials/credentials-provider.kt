@@ -17,6 +17,7 @@
 package ai.tock.iadvize.client.authentication.credentials
 
 import ai.tock.iadvize.client.*
+import java.util.ServiceLoader
 
 
 sealed interface CredentialsProvider {
@@ -27,11 +28,10 @@ sealed interface CredentialsProvider {
          * Get an instance of credentials provider .
          */
         fun instance(): CredentialsProvider {
-            return if (booleanProperty(IADVIZE_ENV_CREDENTIALS_STORED, true)){
-                EnvCredentialsProvider
-            } else {
-                ExternalCredentialsProvider
-            }
+            return ServiceLoader.load(CredentialsProvider::class.java)
+                .findFirst()
+                .orElse(EnvCredentialsProvider)
+
         }
     }
 
@@ -42,11 +42,5 @@ object EnvCredentialsProvider : CredentialsProvider {
         val username = property(IADVIZE_USERNAME_AUTHENTICATION)
         val password = property(IADVIZE_PASSWORD_AUTHENTICATION)
         return Credentials(username, password)
-    }
-}
-
-object ExternalCredentialsProvider : CredentialsProvider {
-    override fun getCredentials(): Credentials {
-        TODO("Add implementation for external credentials provider")
     }
 }

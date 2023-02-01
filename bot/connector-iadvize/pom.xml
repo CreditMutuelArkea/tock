@@ -94,10 +94,7 @@
             <version>${vertx}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.google.api.grpc</groupId>
-            <artifactId>proto-google-common-protos</artifactId>
-        </dependency>
+
 
     </dependencies>
 </project>
