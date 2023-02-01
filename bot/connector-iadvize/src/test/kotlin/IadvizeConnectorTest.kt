@@ -27,6 +27,7 @@ import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
 import ai.tock.shared.resourceAsString
@@ -53,7 +54,8 @@ class IadvizeConnectorTest {
     val editorURL = "/editorUrl"
     val firstMessage = "firstMessage"
     val distributionRule = "distributionRuleId"
-    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, null)
+    val distributionRuleUnavailableMessage = "distributionRuleUnavailableMessage"
+    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, null, distributionRuleUnavailableMessage)
     val controller: ConnectorController = mockk(relaxed = true)
     val context: RoutingContext = mockk(relaxed = true)
     val response: HttpServerResponse = mockk(relaxed = true)
@@ -63,9 +65,11 @@ class IadvizeConnectorTest {
     val operateurId = "operateurId"
     val conversationId = "conversationId"
 
-    val marcus1: String = "MARCUS1"
-    val marcus2: String = "MARCUS2"
 
+    private val marcus1: String = "MARCUS1"
+    private val marcus2: String = "MARCUS2"
+
+    private val iadvizeGraphQLClient: IadvizeGraphQLClient = mockk(relaxed = true)
     @BeforeEach
     fun before() {
         every { context.response() } returns response
@@ -154,8 +158,44 @@ class IadvizeConnectorTest {
 
         val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
         val connectorData = slot<ConnectorData>()
+
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns true
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
+            callback.addAction(action, 0)
+            callback.eventAnswered(action)
+
+        }
+
+        connector.handleRequest(
+            controller,
+            context,
+            iAdvizeRequest
+        )
+
+        verify { controller.handle(any(), any()) }
+
+        val messageResponse = slot<String>()
+        verify { response.end(capture(messageResponse)) }
+        assertEquals(expectedResponse, messageResponse.captured)
+    }
+
+    @Test
+    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageUnavailable() {
+        val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
+        val expectedResponse: String = resourceAsStringMinified("/response_message_unavailable.json")
+
+        val iadvizeTransfer: IadvizeReply = IadvizeTransfer(0)
+        val iadvizeConnectorMessage = IadvizeConnectorMessage(iadvizeTransfer)
+
+        val action = SendSentence(PlayerId("MockPlayerId"), "applicationId", PlayerId("recipientId"), text = null, messages = mutableListOf(iadvizeConnectorMessage))
+        val connectorData = slot<ConnectorData>()
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns false
+
+        every { controller.handle(any(), capture(connectorData)) } answers {
+            val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
             callback.addAction(action, 0)
             callback.eventAnswered(action)
         }
@@ -196,8 +236,12 @@ class IadvizeConnectorTest {
         )
 
         val connectorData = slot<ConnectorData>()
+
+        every {  iadvizeGraphQLClient.isAvailable(distributionRule)  } returns true
+
         every { controller.handle(any(), capture(connectorData)) } answers {
             val callback = connectorData.captured.callback as IadvizeConnectorCallback
+            callback.iadvizeGraphQLClient = iadvizeGraphQLClient
             callback.addAction(action, 0)
             callback.eventAnswered(action)
         }

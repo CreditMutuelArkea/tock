@@ -6,7 +6,7 @@
   "replies": [
     {
       "payload": {
-        "value": "Désolé, je ne sais pas répondre à cette demande",
+        "value": "Sorry, I don't know how to respond to this request.",
         "contentType": "text"
       },
       "quickReplies": [],

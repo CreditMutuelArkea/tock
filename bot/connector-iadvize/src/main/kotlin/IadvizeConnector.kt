@@ -20,23 +20,29 @@ import ai.tock.bot.connector.ConnectorBase
 import ai.tock.bot.connector.ConnectorCallback
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
-import ai.tock.bot.connector.iadvize.model.request.*
+import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
+import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
+import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
+import ai.tock.bot.connector.iadvize.model.request.TypeMessage
+import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest.UnsupportedRequestJson
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies
 import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strategy.customAvailability
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
 import ai.tock.bot.connector.iadvize.model.response.Healthcheck
+import ai.tock.bot.engine.ConnectorController
+import ai.tock.bot.engine.event.Event
+import ai.tock.shared.error
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
-import ai.tock.bot.engine.ConnectorController
+
 import ai.tock.bot.engine.action.Action
-import ai.tock.bot.engine.event.Event
-import ai.tock.shared.error
+
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.vertx.BadRequestException
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -62,7 +68,8 @@ class IadvizeConnector internal constructor(
     val editorUrl: String,
     val firstMessage: String,
     val distributionRule: String?,
-    val secretToken: String?
+    val secretToken: String?,
+    val distributionRuleUnvailableMessage: String,
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
@@ -107,7 +114,7 @@ class IadvizeConnector internal constructor(
     private fun Route.handleAndCatchException(controller: ConnectorController, iadvizeHandler: IadvizeHandler) {
         handler { context ->
             try {
-                context?.let { logContextRequest(context) }
+                logContextRequest(context)
 
                 // Check payloads signature
                 if(!secretToken.isNullOrBlank()) {
@@ -167,21 +174,31 @@ class IadvizeConnector internal constructor(
         context.response().endWithJson(getBotUpdate(idOperator, controller))
     }
 
+    private fun getBotUpdate(idOperator: String, controller: ConnectorController): BotUpdated {
+        return BotUpdated(idOperator, getBot(controller), LocalDateTime.now(), LocalDateTime.now())
+    }
 
+    private fun getBot(controller: ConnectorController): Bot {
+        val botId: String = controller.botDefinition.botId
+        val botName: String = controller.botConfiguration.name
+        return Bot(idBot = botId, name = botName, editorUrl = editorUrl)
+    }
 
     internal var handlerStrategies: IadvizeHandler = { context, _ ->
         context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
     internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
-        val idOperator: String = context.pathParam(QUERY_ID_OPERATOR)
         context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
     }
 
     internal var handlerStartConversation: IadvizeHandler = { context, controller ->
+
         val conversationRequest: ConversationsRequest =
             mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule)
+
+        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule, distributionRuleUnvailableMessage)
+
         callback.sendResponse()
     }
 
@@ -203,16 +220,6 @@ class IadvizeConnector internal constructor(
     private fun isOperator(iadvizeRequest: IadvizeRequest): Boolean {
         return iadvizeRequest is MessageRequest
                 && iadvizeRequest.message.author.role == ROLE_OPERATOR
-    }
-
-    private fun getBotUpdate(idOperator: String, controller: ConnectorController): BotUpdated {
-        return BotUpdated(idOperator, getBot(controller), LocalDateTime.now(), LocalDateTime.now())
-    }
-
-    private fun getBot(controller: ConnectorController): Bot {
-        val botId: String = controller.botDefinition.botId
-        val botName: String = controller.botConfiguration.name
-        return Bot(idBot = botId, name = botName, editorUrl = editorUrl)
     }
 
     private fun mapRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
@@ -252,7 +259,8 @@ class IadvizeConnector internal constructor(
         context: RoutingContext,
         iadvizeRequest: IadvizeRequest
     ) {
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule)
+
+        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
@@ -275,15 +283,15 @@ class IadvizeConnector internal constructor(
         message: ConnectorMessage,
         suggestions: List<CharSequence>
     ): BotBus.() -> ConnectorMessage? = {
-        (message as? IadvizeMessage)?.let {
-            message.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
+        (message as? IadvizeConnectorMessage)?.let {
+            val iadvizeMessage = message.replies.last { it is IadvizeMessage } as IadvizeMessage
+            iadvizeMessage.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
         }
         message
     }
 
     override fun toConnectorMessage(message: MediaMessage): BotBus.() -> List<ConnectorMessage> =
         MediaConverter.toConnectorMessage(message)
-
 }
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
