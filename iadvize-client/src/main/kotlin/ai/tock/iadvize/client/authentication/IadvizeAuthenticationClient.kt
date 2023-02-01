@@ -17,10 +17,10 @@
 package ai.tock.iadvize.client.authentication
 
 import ai.tock.iadvize.client.IadvizeApi
-import ai.tock.iadvize.client.createApi
 import ai.tock.iadvize.client.PASSWORD
+import ai.tock.iadvize.client.authentication.credentials.credentialProviderInstance
 import ai.tock.iadvize.client.authenticationFailedError
-import ai.tock.iadvize.client.authentication.credentials.CredentialsProvider
+import ai.tock.iadvize.client.createApi
 import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicReference
@@ -37,7 +37,7 @@ class IadvizeAuthenticationClient {
         const val DELAY_SECONDS = 5
     }
 
-    private val credentialsProvider = CredentialsProvider.instance()
+    private val credentialsProvider = credentialProviderInstance()
 
     internal var iadvizeApi: IadvizeApi = createApi(logger)
 

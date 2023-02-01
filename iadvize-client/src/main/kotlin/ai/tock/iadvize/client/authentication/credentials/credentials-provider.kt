@@ -20,27 +20,20 @@ import ai.tock.iadvize.client.*
 import java.util.ServiceLoader
 
 
-sealed interface CredentialsProvider {
+interface CredentialsProvider {
     fun getCredentials(): Credentials
-
-    companion object {
-        /**
-         * Get an instance of credentials provider .
-         */
-        fun instance(): CredentialsProvider {
-            return ServiceLoader.load(CredentialsProvider::class.java)
-                .findFirst()
-                .orElse(EnvCredentialsProvider)
-
-        }
-    }
-
 }
 
-object EnvCredentialsProvider : CredentialsProvider {
+class EnvCredentialsProvider : CredentialsProvider {
     override fun getCredentials(): Credentials {
         val username = property(IADVIZE_USERNAME_AUTHENTICATION)
         val password = property(IADVIZE_PASSWORD_AUTHENTICATION)
         return Credentials(username, password)
     }
+}
+fun credentialProviderInstance(): CredentialsProvider {
+    return ServiceLoader.load(CredentialsProvider::class.java)
+        .findFirst()
+        .orElse(EnvCredentialsProvider())
+
 }
