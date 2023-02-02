@@ -18,11 +18,10 @@ env:
   TEST: bot/test-base,bot/test
   COMPILER: bot/admin/kotlin-compiler/shared,bot/admin/kotlin-compiler/core,bot/admin/kotlin-compiler/client,bot/admin/kotlin-compiler/server
   ADMIN: bot/admin/test/core,bot/admin/server
-
-  MODULES: $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
+  API: bot/api/model,bot/api/service,bot/api/client,bot/api/webhook-base,bot/api/webhook,bot/api/websocket-base,bot/api/websocket,bot/api/retrofit-jackson-client
 
 jobs:
-  tests:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +31,7 @@ jobs:
           distribution: 'corretto'
           java-version: 11
           cache: maven
-      - name: Build with Maven
+      - name: Build
         run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
-      - name: Run bot/admin/server tests
+      - name: Test
         run:  mvn -B test -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
