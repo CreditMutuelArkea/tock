@@ -35,4 +35,4 @@ jobs:
       - name: Build with Maven
         run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
       - name: Run bot/admin/server tests
-        run:  mvn -B test -p $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
+        run:  mvn -B test -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
