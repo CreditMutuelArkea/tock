@@ -6,6 +6,20 @@ on:
           - master
           - contribution/*
           - feature/*
+env:
+  SHARED: shared
+  STT: stt/core,stt/noop,stt/google-speech
+  TRANSLATOR: translator/core,translator/noop,translator/google-translate
+  ENGINE: bot/engine,bot/engine-jackson
+  ORCHESTRATION: bot/orchestration
+  CONNECTOR: bot/connector-rest,bot/connector-rest-client,bot/connector-messenger,bot/connector-alcmeon,bot/connector-ga,bot/connector-slack,bot/connector-alexa,bot/connector-rocketchat,bot/connector-twitter,bot/connector-whatsapp,bot/connector-teams,bot/connector-businesschat,bot/connector-web,bot/connector-web-model,bot/connector-google-chat,bot/connector-iadvize
+  STORAGE: bot/storage-mongo
+  TOOLKIT: bot/toolkit-base,bot/toolkit
+  TEST: bot/test-base,bot/test
+  COMPILER: bot/admin/kotlin-compiler/shared,bot/admin/kotlin-compiler/core,bot/admin/kotlin-compiler/client,bot/admin/kotlin-compiler/server
+  ADMIN: bot/admin/test/core,$COMPILER,bot/admin/server
+
+  MODULES: $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
 
 jobs:
   tests:
@@ -19,6 +33,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots -DskipTests clean install
+        run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $MODULES
       - name: Run bot/admin/server tests
-        run: cd bot/admin/server && mvn -B test
+        run:  mvn -B test -p $MODULES
