@@ -33,6 +33,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $MODULES
+        run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
       - name: Run bot/admin/server tests
-        run:  mvn -B test -p $MODULES
+        run:  mvn -B test -p $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
