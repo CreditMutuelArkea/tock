@@ -17,7 +17,7 @@ env:
   TOOLKIT: bot/toolkit-base,bot/toolkit
   TEST: bot/test-base,bot/test
   COMPILER: bot/admin/kotlin-compiler/shared,bot/admin/kotlin-compiler/core,bot/admin/kotlin-compiler/client,bot/admin/kotlin-compiler/server
-  ADMIN: bot/admin/test/core,$COMPILER,bot/admin/server
+  ADMIN: bot/admin/test/core,bot/admin/server
 
   MODULES: $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
 
@@ -33,6 +33,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
+        run: mvn --batch-mode --update-snapshots -DskipTests clean install -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
       - name: Run bot/admin/server tests
-        run:  mvn -B test -p $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$ADMIN
+        run:  mvn -B test -p $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN
