@@ -33,6 +33,7 @@
         <module>test</module>
         <module>kotlin-compiler</module>
         <module>server</module>
+        <!-- TODO MASS -->
         <!--module>web</module-->
     </modules>
 
