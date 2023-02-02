@@ -34,28 +34,28 @@ import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
-import ai.tock.shared.exception.rest.RestException
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
-import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.ext.web.RoutingContext
+import mu.KotlinLogging
 import java.time.LocalDateTime
 import java.util.Locale
 import java.util.Properties
-import mu.KotlinLogging
+
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
-class IadvizeConnectorCallback(
-    override val applicationId: String,
-    val controller: ConnectorController,
-    val context: RoutingContext,
-    val request: IadvizeRequest,
-    val distributionRule: String?,
-    val actions: MutableList<ActionWithDelay> = mutableListOf()
+class IadvizeConnectorCallback(override val  applicationId: String,
+                               controller: ConnectorController,
+                               val context: RoutingContext,
+                               val request: IadvizeRequest,
+                               distributionRule: String?,
+                               distributionRuleUnvailableMessage: String,
+                               val actions: MutableList<ActionWithDelay> = mutableListOf()
 ) : ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
 
     companion object {
@@ -72,9 +72,12 @@ class IadvizeConnectorCallback(
 
     private val properties: Properties = loadProperties("/iadvize.properties")
 
+    internal var iadvizeGraphQLClient = IadvizeGraphQLClient()
+
     data class ActionWithDelay(val action: Action, val delayInMs: Long = 0)
 
     fun addAction(event: Event, delayInMs: Long) {
+
         if (event is Action) {
             actions.add(ActionWithDelay(event, delayInMs))
         } else {
@@ -137,19 +140,15 @@ class IadvizeConnectorCallback(
     private fun toListIadvizeReply(actions: List<ActionWithDelay>): List<IadvizeReply> {
         return actions.map {
             if (it.action is SendSentence) {
-                try {
-                    val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhanceIadvizeReply()
+                val listIadvizeReply: List<IadvizeReply> = it.action.messages.filterAndEnhanceIadvizeReply()
 
-                    if (it.action.text != null) {
-                        val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
-                        //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
-                        listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
-                    } else {
-                        //No simple MessageTextPayload, just return enhanced IadvizeReply
-                        listIadvizeReply
-                    }
-                } catch (exception: RestException) {
-                    listOf()
+                if (it.action.text != null) {
+                    val simpleTextPayload = mapToMessageTextPayload(it.action.text!!)
+                    //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
+                    listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
+                } else {
+                    //No simple MessageTextPayload, just return enhanced IadvizeReply
+                    listIadvizeReply
                 }
             } else {
                 emptyList()
@@ -169,12 +168,18 @@ class IadvizeConnectorCallback(
      * For IadvizeReply instance of IadvizeTransfer
      * return new IadvizeTransfer with distribution rule configured on connector
      */
-    private val addDistributionRulesOnTransfer: (IadvizeReply) -> IadvizeReply = {
-        if (it is IadvizeTransfer) {
-            if (distributionRule == null) {
+     private val addDistributionRulesOnTransfer:  (IadvizeReply) -> IadvizeReply = {
+
+        if(it is IadvizeTransfer) {
+            if(distributionRule == null) {
                 IadvizeAwait(Duration(3, seconds))
             } else {
-                IadvizeTransfer(distributionRule, it.transferOptions)
+                val available = iadvizeGraphQLClient.isAvailable(distributionRule)
+
+                if (available)
+                    IadvizeTransfer(distributionRule, it.transferOptions)
+                else
+                    IadvizeMessage(distributionRuleUnvailableMessage)
             }
         } else {
             it
@@ -197,17 +202,17 @@ class IadvizeConnectorCallback(
         context.fail(throwable)
     }
 
-    private fun <T> HttpServerResponse.endWithJson(response: T?): Future<Void> {
-        if (response != null) {
+    private fun <T> HttpServerResponse.endWithJson(response: T?) {
+        if(response != null) {
             logger.debug { "iAdvize response : $response" }
 
             val writeValueAsString = mapper.writeValueAsString(response)
 
             logger.debug { "iAdvize json response: $writeValueAsString" }
 
-            return putHeader("Content-Type", "application/json").end(writeValueAsString)
+             putHeader("Content-Type", "application/json").end(writeValueAsString)
         } else {
-            return end()
+           end()
         }
     }
 }
