@@ -638,9 +638,7 @@ internal class TickStoryProcessorTest {
         }
 
         val mockBehaviours: TRunnable = {
-            every { sender.endById(capture(msgCapture)) } answers {
-                println(msgCapture.captured)
-            }
+            every { sender.endById(capture(msgCapture)) } answers {}
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
@@ -758,9 +756,9 @@ internal class TickStoryProcessorTest {
         }
 
         val mockBehaviours: TRunnable = {
-            every { sender.sendById(capture(msgCapture)) } answers {
-                println(msgCapture.captured)
-            }
+            every { sender.sendById(capture(msgCapture)) } answers {}
+            every { sender.sendPlainText(any()) } answers {}
+            every { sender.endPlainText(any()) } answers {}
             every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
             every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
 
@@ -882,9 +880,7 @@ internal class TickStoryProcessorTest {
         }
 
         val mockBehaviours: TRunnable = {
-            every { sender.endById(capture(msgCapture)) } answers {
-                println(msgCapture.captured)
-            }
+            every { sender.endById(capture(msgCapture)) } answers {}
 
         }
         val checkResult: TConsumer<ProcessingResult?> = {
