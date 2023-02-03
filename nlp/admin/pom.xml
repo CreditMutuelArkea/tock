@@ -31,8 +31,7 @@
 
   <modules>
     <module>server</module>
-    <!-- TODO MASS -->
-    <!--module>web</module-->
+    <module>web</module>
   </modules>
 
 </project>
