@@ -31,6 +31,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.test.*
 
+private const val TARGET_STORY = "targetStory"
+
 internal class TickStoryProcessorTest {
 
     enum class StateIds(val value: String) {
@@ -153,10 +155,8 @@ internal class TickStoryProcessorTest {
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
-
             assertNotNull(it)
             assert(it is Redirect)
-
         }
 
         TestCase<TickStoryProcessor, ProcessingResult>("process when action is repeated more than the max number of repetitions")
@@ -169,6 +169,97 @@ internal class TickStoryProcessorTest {
             .and("""
     - graph resolver find a secondary objective "State3"
     - secondary objective has no handler and no trigger
+                    """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "intent1"
+                 """, processCall)
+
+            .then("result should be a redirect", checkResult)
+
+            .run()
+    }
+
+    @Test
+    fun `process when action executed has a target story`() {
+
+        val produceProcessor: TSupplier<TickStoryProcessor> = {
+            TickStoryProcessor(
+                session = session.copy(
+                    handlingStep = TickActionHandlingStep(
+                        action = StateIds.STATE_3.value,
+                        repeated = 1
+                    )
+                ),
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        on = mapOf(
+                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
+                        )
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            handler = HandlerNames.HANDLER_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false,
+                            targetStory = TARGET_STORY
+                        )
+                    ),
+                    storySettings = TickStorySettings(
+                        2,
+                        "storyId"
+                    )
+                ),
+                TickSenderDefault(),
+                false
+            )
+        }
+
+        val mockBehaviours: TRunnable = {
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
+        }
+
+        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
+            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
+        }
+
+        val checkResult: TConsumer<ProcessingResult?> = {
+            assertNotNull(it)
+            assert(it is Redirect)
+            ((it as Redirect).storyId == TARGET_STORY).let { assertTrue { it } }
+        }
+
+        TestCase<TickStoryProcessor, ProcessingResult>("process when action executed has a target story")
+
+            .given("""
+    - user intent "intent1" leads to a primary objective "State1"
+    - secondary objective is an action with a target story
+                   """, produceProcessor)
+
+            .and("""
+    - graph resolver find a secondary objective "State3"
+    - Action "State3" has a target story
                     """, mockBehaviours)
 
             .`when`("""

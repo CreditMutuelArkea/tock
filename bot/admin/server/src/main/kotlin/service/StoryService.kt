@@ -101,7 +101,14 @@ object StoryService {
         namespace: String,
         tickStory: TickStory
     ) {
-        val errors = TickStoryValidation.validateTickStory(tickStory)
+        val errors = TickStoryValidation.validateTickStory(tickStory){
+            storyDefinitionDAO.getStoryDefinitionByNamespaceAndBotIdAndStoryId(
+                namespace,
+                tickStory.botId,
+                it
+            ) != null
+        }
+
         if(errors.isEmpty()) {
             saveTickStory(namespace, tickStory)
         } else {
