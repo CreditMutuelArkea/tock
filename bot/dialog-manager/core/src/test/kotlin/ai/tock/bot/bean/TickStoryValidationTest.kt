@@ -23,13 +23,14 @@ import io.mockk.mockkObject
 import org.junit.jupiter.api.Nested
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TickStoryValidationTest : DialogManagerTest() {
 
     @Test fun tickStoryWithoutValidationErrors() {
         val tickStory = getTickStoryFromFile("validation", "tickStory-valid")
-        val errors = TickStoryValidation.validateTickStory(tickStory)
+        val errors = TickStoryValidation.validateTickStory(tickStory){ true }
 
         assertTrue { errors.isEmpty() }
     }
@@ -348,6 +349,28 @@ class TickStoryValidationTest : DialogManagerTest() {
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
+
+    }
+
+    @Nested inner class ConsistencyOfTargetStory {
+        @Test
+        fun validTickAction() {
+            val tickStory = getTickStoryFromFile("validation", "tickStory-with-target-story")
+            val errors = TickStoryValidation.validateTargetStory(tickStory){ true }
+
+            assertTrue { errors.isEmpty() }
+        }
+
+        @Test
+        fun invalidTickAction() {
+            val tickStory = getTickStoryFromFile("validation", "tickStory-with-target-story")
+            val errors = TickStoryValidation.validateTargetStory(tickStory){ false }
+
+            assertFalse { errors.isEmpty() }
+            assertEquals(1, errors.size)
+            assertEquals (TickStoryValidation.MessageProvider.ACTION_TARGET_STORY_NOT_FOUND("HELLO" to "targetStory"), errors[0] )
+        }
+
 
     }
 }
