@@ -61,7 +61,10 @@ object TickAnswerHandler {
 
             when (result) {
                 is Success -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
-                is Redirect -> result.storyId?.let { redirectFn(it) }
+                is Redirect -> {
+                    dialog.tickStates.remove(story._id.toString())
+                    result.storyId?.let { redirectFn(it) }
+                }
             }
 
         }

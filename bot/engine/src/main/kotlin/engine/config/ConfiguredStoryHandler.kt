@@ -174,7 +174,7 @@ internal class ConfiguredStoryHandler(
         isTickAnswerConfiguration: Boolean  = false
     ) {
         if (!isTickAnswerConfiguration && (!isMissingMandatoryEntities(bus) && bus.story.definition.steps.isEmpty() || step?.hasNoChildren == true)
-            || (isTickAnswerConfiguration && bus.dialog.tickStates[bus.story.definition.id]!!.finished)) { // TODO !!
+            || (isTickAnswerConfiguration && bus.dialog.tickStates[bus.story.definition.id]?.finished == true)) { // TODO !!
             configuration.findEnabledEndWithStoryId(bus.applicationId)
                 ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
                 ?.let {
