@@ -100,11 +100,6 @@
             <artifactId>tock-bot-dialog-manager-handlers-provider-dev-tools</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>ai.tock</groupId>
-            <artifactId>tock-bot-dialog-manager-handlers-provider-iadvize</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- TODO MASS : Add to patchs-->
         <!--dependency>
             <groupId>ai.tock</groupId>

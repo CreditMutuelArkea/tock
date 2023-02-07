@@ -33,6 +33,12 @@
             <artifactId>tock-bot-dialog-manager-handlers-provider</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-iadvize-client</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>
