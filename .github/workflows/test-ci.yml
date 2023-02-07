@@ -32,6 +32,6 @@ jobs:
           java-version: 11
           cache: maven
       - name: Build
-        run: mvn --batch-mode --update-snapshots clean install -Dskip.npm -Dassembly.skipAssembly=true -DskipTests
+        run: mvn --batch-mode --update-snapshots -Dskip.npm -Dassembly.skipAssembly=true -DskipTests clean install
       - name: Test
-        run:  mvn -B test -pl $SHARED,$STT,$ENGINE,$ORCHESTRATION,$CONNECTOR,$STORAGE,$TOOLKIT,$TEST,$COMPILER,$ADMIN,$API
+        run:  mvn  --batch-mode --update-snapshots -Dskip.npm -Dassembly.skipAssembly=true test
