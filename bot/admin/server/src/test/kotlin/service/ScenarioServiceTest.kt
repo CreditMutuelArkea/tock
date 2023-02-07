@@ -20,6 +20,7 @@ package ai.tock.bot.admin.service
 import ai.tock.bot.admin.AbstractTest
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
+import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
 import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionDAO
 import ai.tock.bot.admin.scenario.ScenarioVersionState
