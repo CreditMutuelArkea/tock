@@ -167,6 +167,7 @@ internal class TockConnectorController constructor(
                         userTimelineDAO.save(userTimeline, bot.botDefinition)
                     }
                 } catch (t: Throwable) {
+                    logger.error { "error while handling action $action : ${t.message}" }
                     send(data, action, errorMessage(action.recipientId, action.applicationId, action.playerId))
                     callback.exceptionThrown(action, t)
                 } finally {
