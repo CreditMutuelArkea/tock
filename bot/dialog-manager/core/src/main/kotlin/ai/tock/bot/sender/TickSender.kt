@@ -28,4 +28,9 @@ interface TickSender {
     fun sendPlainText(text: String = "")
 
     fun endPlainText(text: String = "")
+
+    /**
+     * Give control back to the user without any message text
+     */
+    fun end()
 }

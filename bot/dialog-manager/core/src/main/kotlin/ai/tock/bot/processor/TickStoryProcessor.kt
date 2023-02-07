@@ -127,9 +127,13 @@ class TickStoryProcessor(
         // Else If the action is silent or if it should proceed, then we restart the processing again, otherwise we send the results
         return  if (executedAction.trigger != null) {
             process(TickUserAction(intentName = executedAction.trigger, emptyMap()))
-        } else  if(executedAction.isSilent()){
+        } else  if(executedAction.isSilent() && objectivesStack.isNotEmpty()){
             process(null)
         } else {
+            // If the executedAction is silent but the objective stack is empty
+            // give control back to the user by calling the end() function on the sender
+            if (objectivesStack.isEmpty()) sender.end()
+
             Success(
                 TickSession(currentState, contextNames, ranHandlers, objectivesStack.toList(), handlingStep = handlingStep),
                 executedAction.final)

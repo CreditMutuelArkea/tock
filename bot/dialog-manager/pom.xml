@@ -32,6 +32,7 @@
         <module>core</module>
         <module>handlers-provider</module>
         <module>handlers-provider-dev-tools</module>
+        <module>handlers-provider-iadvize</module>
     </modules>
 
 </project>

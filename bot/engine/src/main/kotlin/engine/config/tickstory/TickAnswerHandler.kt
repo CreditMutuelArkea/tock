@@ -44,7 +44,7 @@ object TickAnswerHandler {
             val endingStoryRuleExists = story.findEnabledEndWithStoryId(applicationId) != null
 
             // Get a stored tick state. Start a new session if it doesn't exist
-            val tickSession = initTickSession(dialog, story._id.toString())
+            val tickSession = initTickSession(dialog, story._id.toString(), connectorData.conversationData)
 
             // Call the tick story processor
             val result =
@@ -87,15 +87,20 @@ object TickAnswerHandler {
     /**
      * Initialize a tick session
      */
-    private fun initTickSession(dialog: Dialog, storyId: String): TickSession {
+    private fun initTickSession(dialog: Dialog, storyId: String, conversationData: Map<String, String>): TickSession {
         val tickState = dialog.tickStates[storyId]
         return with(tickState) {
             if (this == null) {
-                TickSession(init = dialog.lastDateUpdate)
+                TickSession(init = dialog.lastDateUpdate, contexts = conversationData)
             } else if (finished) {
-                TickSession(init = dialog.lastDateUpdate)
+                TickSession(init = dialog.lastDateUpdate, contexts = conversationData)
             } else {
-                TickSession(currentState, contexts, ranHandlers, objectivesStack, init, unknownHandlingStep, handlingStep)
+                var sessionCtx = contexts
+                conversationData.forEach { (t, u) ->
+                    if (!contexts.containsKey(t))
+                        sessionCtx = contexts + (t to u)
+                }
+                TickSession(currentState, sessionCtx, ranHandlers, objectivesStack, init, unknownHandlingStep, handlingStep)
             }
         }
     }

@@ -36,6 +36,10 @@ class TickSenderBotBus(private val botBus: BotBus): TickSender {
 
     override fun endPlainText(text: String) { botBus.end(text) }
 
+    override fun end() {
+        botBus.end { null }
+    }
+
     private fun translateId(id: String,): ActionWrappedMessage {
         val label = Translator.getLabel(id)
         label ?: throw IllegalStateException("Label $id not found")

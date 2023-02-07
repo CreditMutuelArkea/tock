@@ -42,6 +42,10 @@ class TickSenderDefault: TickSender {
         addMessage(END, text, TEXT)
     }
 
+    override fun end() {
+        addMessage(END, "", TEXT)
+    }
+
     private fun addMessage(operation: String, element: String, type: String) {
         history.add("$operation message [$type : $element]")
     }
