@@ -109,18 +109,32 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
         });
       }
 
+      // We get rid of the empty locale answers
       actionDef.unknownAnswers = actionDef.unknownAnswers.filter(
         (scenarioUnknownAnswer) => scenarioUnknownAnswer.answer?.trim().length > 0
       );
+
+      // We check the necessary updates if answers already existed
       if (actionDef.unknownAnswerId) {
+        let stillHasAnswers = false;
         actionDef.unknownAnswers.forEach((scenarioUnknownAnswer) => {
-          const storedAnswer = this.item.actionDefinition.unknownAnswers?.find(
-            (storedScenarioUnknownAnswer) => storedScenarioUnknownAnswer.locale === scenarioUnknownAnswer.locale
-          );
-          if (storedAnswer && storedAnswer.answer !== scenarioUnknownAnswer.answer) {
-            scenarioUnknownAnswer.answerUpdate = true;
-          }
+          if (scenarioUnknownAnswer.answer.trim().length) stillHasAnswers = true;
         });
+
+        if (!stillHasAnswers) {
+          // No more answer is defined, we delete the unknownAnswerId
+          delete actionDef.unknownAnswerId;
+        } else {
+          // We check if answers have changed to flag them in update
+          actionDef.unknownAnswers.forEach((scenarioUnknownAnswer) => {
+            const storedAnswer = this.item.actionDefinition.unknownAnswers?.find(
+              (storedScenarioUnknownAnswer) => storedScenarioUnknownAnswer.locale === scenarioUnknownAnswer.locale
+            );
+            if (storedAnswer && storedAnswer.answer !== scenarioUnknownAnswer.answer) {
+              scenarioUnknownAnswer.answerUpdate = true;
+            }
+          });
+        }
       }
 
       this.item.actionDefinition = actionDef;
