@@ -37,7 +37,7 @@ import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
 import java.util.Locale
 import mu.KotlinLogging
-import kotlin.time.Duration
+
 
 /**
  *
@@ -80,7 +80,7 @@ internal class Bot(botDefinitionBase: BotDefinition, val configuration: BotAppli
     /**
      * Handle the user action.
      */
-    fun handle(action: Action, userTimeline: UserTimeline, connector: ConnectorController, connectorData: ConnectorData) {
+    fun handle(action: Action, userTimeline: UserTimeline, connector: ConnectorController, connectorData: ConnectorData, doOnSwitchStory: () -> Unit) {
         connector as TockConnectorController
 
         loadProfileIfNotSet(connectorData, action, userTimeline, connector)
@@ -122,7 +122,7 @@ internal class Bot(botDefinitionBase: BotDefinition, val configuration: BotAppli
 
             try {
                 currentBus.set(bus)
-                story.handle(bus)
+                story.handle(bus, doOnSwitchStory)
                 if (shouldRespondBeforeDisabling) {
                     userTimeline.userState.botDisabled = true
                 }

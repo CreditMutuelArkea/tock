@@ -59,7 +59,7 @@ internal class ConfiguredStoryHandler(
         private const val VIEWED_STORIES_BUS_KEY = "_viewed_stories_tock_switch"
     }
 
-    override fun handle(bus: BotBus) {
+    override fun handle(bus: BotBus, doOnSwitchStory: () -> Unit) {
 
         configuration.mandatoryEntities.forEach { entity ->
             // fallback from "generic" entity if the role is not present
@@ -83,8 +83,8 @@ internal class ConfiguredStoryHandler(
                 // if the role is generic and there is an other role in the entity list: skip
                 if (role != entityTypeName || bus.entities.none { entity.entityType == it.value.value?.entity?.entityType?.name }) {
                     // else send entity question
-                    entity.send(bus)
-                    switchStoryIfEnding(null, bus)
+                    entity.send(bus, doOnSwitchStory)
+                    switchStoryIfEnding(null, bus, doOnSwitchStory)
                     return@handle
                 }
             }
@@ -94,7 +94,7 @@ internal class ConfiguredStoryHandler(
         busStep?.configuration
             ?.also { step ->
                 if (step.hasCurrentAnswer()) {
-                    step.send(bus)
+                    step.send(bus, doOnSwitchStory)
                 }
                 val targetIntent = step.targetIntent?.name
                     ?: (bus.intent.takeIf { !step.hasCurrentAnswer() }?.wrappedIntent()?.name)
@@ -104,11 +104,11 @@ internal class ConfiguredStoryHandler(
                     ?.takeUnless { it == bus.botDefinition.unknownStory }
                     ?.takeUnless { bus.viewedStories.contains(it) }
                     ?.apply {
-                        bus.switchConfiguredStory(this, targetIntent ?: error("targetIntent is null??"))
+                        bus.switchConfiguredStory(this, targetIntent ?: error("targetIntent is null??"), doOnSwitchStory)
                         return@handle
                     }
                 if (step.hasCurrentAnswer()) {
-                    switchStoryIfEnding(step, bus)
+                    switchStoryIfEnding(step, bus, doOnSwitchStory)
                     return@handle
                 }
             }
@@ -120,12 +120,12 @@ internal class ConfiguredStoryHandler(
         removeAskAgainProcess(bus)
 
         // When sending the answer, a redirection (switch to another type of story) to  can be performed
-        answerContainer.send(bus)
+        answerContainer.send(bus, doOnSwitchStory)
 
         // check if the current story handled by the bot is a TickStory
         val isCurrentTickStory = bus.story.definition is TickStoryDefinition
 
-        switchStoryIfEnding(null, bus, isCurrentTickStory)
+        switchStoryIfEnding(null, bus, doOnSwitchStory, isCurrentTickStory)
 
         // Restrict next intents if defined in story settings:
 
@@ -177,6 +177,7 @@ internal class ConfiguredStoryHandler(
     private fun switchStoryIfEnding(
         step: StoryDefinitionConfigurationStep?,
         bus: BotBus,
+        doOnSwitchStory: () -> Unit,
         isCurrentTickStory: Boolean  = false
     ) {
 
@@ -185,7 +186,7 @@ internal class ConfiguredStoryHandler(
             configuration.findEnabledEndWithStoryId(bus.applicationId)
                 ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
                 ?.let {
-                    bus.switchConfiguredStory(it, it.mainIntent().name)
+                    bus.switchConfiguredStory(it, it.mainIntent().name, doOnSwitchStory)
                 }
         }
     }
@@ -194,22 +195,22 @@ internal class ConfiguredStoryHandler(
         get() =
             getBusContextValue<Set<StoryDefinition>>(VIEWED_STORIES_BUS_KEY) ?: emptySet()
 
-    private fun BotBus.switchConfiguredStory(target: StoryDefinition, newIntent: String) {
+    private fun BotBus.switchConfiguredStory(target: StoryDefinition, newIntent: String, doOnSwitchStory: () -> Unit,) {
         step = step?.takeUnless { story.definition == target }
         setBusContextValue(VIEWED_STORIES_BUS_KEY, viewedStories + target)
-        handleAndSwitchStory(target, Intent(newIntent))
+        handleAndSwitchStory(target, Intent(newIntent), doOnSwitchStory)
     }
 
-    private fun StoryDefinitionAnswersContainer.send(bus: BotBus) {
+    private fun StoryDefinitionAnswersContainer.send(bus: BotBus, doOnSwitchStory: () -> Unit) {
         findCurrentAnswer().apply {
             when (this) {
-                null -> bus.fallbackAnswer()
-                is SimpleAnswerConfiguration -> bus.handleSimpleAnswer(this@send, this)
-                is ScriptAnswerConfiguration -> bus.handleScriptAnswer(this@send)
+                null -> bus.fallbackAnswer(doOnSwitchStory)
+                is SimpleAnswerConfiguration -> bus.handleSimpleAnswer(this@send, this, doOnSwitchStory)
+                is ScriptAnswerConfiguration -> bus.handleScriptAnswer(this@send, doOnSwitchStory)
                 is BuiltInAnswerConfiguration ->
                     (bus.botDefinition as BotDefinitionWrapper).builtInStory(configuration.storyId)
-                        .storyHandler.handle(bus)
-                is TickAnswerConfiguration -> bus.handleTickAnswer(this@send, this)
+                        .storyHandler.handle(bus, doOnSwitchStory)
+                is TickAnswerConfiguration -> bus.handleTickAnswer(this@send, this, doOnSwitchStory)
                 else -> error("type not supported for now: $this")
             }
         }
@@ -217,15 +218,16 @@ internal class ConfiguredStoryHandler(
 
     override fun support(bus: BotBus): Double = 1.0
 
-    private fun BotBus.fallbackAnswer() =
-        botDefinition.unknownStory.storyHandler.handle(this)
+    private fun BotBus.fallbackAnswer(doOnSwitchStory: () -> Unit) =
+        botDefinition.unknownStory.storyHandler.handle(this, doOnSwitchStory)
 
     private fun BotBus.handleSimpleAnswer(
         container: StoryDefinitionAnswersContainer,
-        simple: SimpleAnswerConfiguration?
+        simple: SimpleAnswerConfiguration?,
+        doOnSwitchStory: () -> Unit
     ) {
         if (simple == null) {
-            fallbackAnswer()
+            fallbackAnswer(doOnSwitchStory)
         } else {
             val isMissingMandatoryEntities = isMissingMandatoryEntities(this)
             val steps = story.definition.steps.isNotEmpty()
@@ -261,14 +263,15 @@ internal class ConfiguredStoryHandler(
      */
     private fun BotBus.handleTickAnswer(
         container: StoryDefinitionAnswersContainer,
-        configuration: TickAnswerConfiguration
+        configuration: TickAnswerConfiguration,
+        doOnSwitchStory: () -> Unit
     ) {
         TickAnswerHandler.handle(this, container, configuration) {
             botDefinition.stories.first { def ->
                 (def as ConfiguredStoryDefinition).storyId == it
             }.let {
                 // Switch to the redirect configured story when redirection is required
-                switchConfiguredStory(it, it.mainIntent().name)
+                switchConfiguredStory(it, it.mainIntent().name, doOnSwitchStory)
             }
         }
     }
@@ -378,13 +381,13 @@ internal class ConfiguredStoryHandler(
         }
     }
 
-    private fun BotBus.handleScriptAnswer(container: StoryDefinitionAnswersContainer) {
+    private fun BotBus.handleScriptAnswer(container: StoryDefinitionAnswersContainer, doOnSwitchStory: () -> Unit) {
         container.storyDefinition(definition, configuration)
             ?.storyHandler
-            ?.handle(this)
+            ?.handle(this, doOnSwitchStory)
             ?: run {
                 logger.warn { "no story definition for configured script for $container - use unknown" }
-                handleSimpleAnswer(container, container.findAnswer(simple) as? SimpleAnswerConfiguration)
+                handleSimpleAnswer(container, container.findAnswer(simple) as? SimpleAnswerConfiguration, doOnSwitchStory)
             }
     }
 
