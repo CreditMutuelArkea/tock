@@ -119,7 +119,7 @@ internal class ConfiguredStoryHandler(
                 ?: configuration
         removeAskAgainProcess(bus)
 
-        // When sending the answer, a redirection (switch to another type of story) to  can be performed
+        // When sending the answer, a redirection (switch to another type of story) can be performed
         answerContainer.send(bus)
 
         // check if the current story handled by the bot is a TickStory
