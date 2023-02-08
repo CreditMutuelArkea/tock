@@ -8,6 +8,7 @@ import { ScenarioVersion, ScenarioItem, ScenarioContext, Handler, ACTION_OR_CONT
 import { getContrastYIQ, getScenarioActionDefinitions, getScenarioActions, normalizedSnakeCaseUpper } from '../../../commons/utils';
 import { entityColor, qualifiedName, qualifiedRole } from '../../../../model/nlp';
 import { UserInterfaceType } from '../../../../core/model/configuration';
+import { deepCopy } from '../../../../shared/utils';
 
 type InputOrOutputContext = 'input' | 'output';
 
@@ -124,11 +125,11 @@ export class ActionEditComponent implements OnInit {
     this.triggers = this.scenario.data.triggers || [];
 
     this.item.actionDefinition?.answers?.forEach((ua) => {
-      this.answers.push(new FormControl(ua));
+      this.answers.push(new FormControl(deepCopy(ua)));
     });
 
     this.item.actionDefinition?.unknownAnswers?.forEach((ua) => {
-      this.unknownAnswers.push(new FormControl(ua));
+      this.unknownAnswers.push(new FormControl(deepCopy(ua)));
     });
 
     this.supportedLocales.forEach((sl) => {
@@ -147,6 +148,15 @@ export class ActionEditComponent implements OnInit {
       locale: locale,
       interfaceType: UserInterfaceType.textChat
     });
+  }
+
+  removeLocaleAnswerDef(localeAnswerDef) {
+    const unknownAnswers = this.unknownAnswers.value;
+    const index = unknownAnswers.findIndex((al) => {
+      return al.locale === localeAnswerDef.locale && al.answer === localeAnswerDef.answer;
+    });
+    unknownAnswers[index].answer = '';
+    this.unknownAnswers.patchValue(unknownAnswers);
   }
 
   private isActionNameUnic(): ValidatorFn {
