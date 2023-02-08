@@ -265,6 +265,10 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
   }
 
   postNewSentence(task: DependencyUpdateJob, intent: Intent, tempSentence: TempSentence): void {
+    const app = this.stateService.currentApplication;
+    tempSentence.applicationName = app.name;
+    tempSentence.namespace = app.namespace;
+
     this.nlp.parse(tempSentence).subscribe(
       (sentence) => {
         sentence.classification.intentId = intent._id;
@@ -340,11 +344,11 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
     }
   }
 
-  postAnswer(answerTask: DependencyUpdateJob, unknown = false): void {
+  postAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
     let request = new CreateI18nLabelRequest('scenario', answerTask.answer.answer, answerTask.answer.locale);
     this.botService.createI18nLabel(request).subscribe(
       (answer) => {
-        if (unknown) {
+        if (unknownAnswer) {
           answerTask.item.actionDefinition.unknownAnswerId = answer._id;
         } else {
           answerTask.item.actionDefinition.answerId = answer._id;
@@ -360,9 +364,9 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
     );
   }
 
-  patchAnswer(answerTask: DependencyUpdateJob, unknown = false): void {
+  patchAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
     let existingId = answerTask.item.actionDefinition.answerId;
-    if (unknown) {
+    if (unknownAnswer) {
       existingId = answerTask.item.actionDefinition.unknownAnswerId;
     }
 
