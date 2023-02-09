@@ -43,7 +43,7 @@ internal class FallbackStoryHandler(
             handler.send(bus)
         } catch (e: Exception) {
             logger.error(e)
-            defaultUnknown.storyHandler.handle(bus)
+            defaultUnknown.storyHandler.handle(bus){}
         }
     }
 }
