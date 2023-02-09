@@ -161,11 +161,18 @@ internal class TockConnectorController constructor(
 
                     val transformedAction = tryToParseVoiceAudio(action, userTimeline)
 
-                    bot.handle(transformedAction, userTimeline, this, data)
-
-                    if (data.saveTimeline) {
-                        userTimelineDAO.save(userTimeline, bot.botDefinition)
+                    val doSaveTimeLine = {
+                        if (data.saveTimeline) {
+                            userTimelineDAO.save(userTimeline, bot.botDefinition)
+                        }
                     }
+
+                    bot.handle(transformedAction, userTimeline, this, data){
+                        doSaveTimeLine()
+                    }
+
+                    doSaveTimeLine()
+
                 } catch (t: Throwable) {
                     send(data, action, errorMessage(action.recipientId, action.applicationId, action.playerId))
                     callback.exceptionThrown(action, t)

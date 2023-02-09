@@ -106,11 +106,11 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
         return null
     }
 
-    final override fun handle(bus: BotBus) {
+    final override fun handle(bus: BotBus, doOnSwitchStory: () -> Unit) {
         val storyDefinition = findStoryDefinition(bus)
         // if not supported user interface, use unknown
         if (storyDefinition?.unsupportedUserInterfaces?.contains(bus.userInterfaceType) == true) {
-            bus.botDefinition.unknownStory.storyHandler.handle(bus)
+            bus.botDefinition.unknownStory.storyHandler.handle(bus, doOnSwitchStory)
         } else {
             // set current i18n provider
             bus.i18nProvider = this
@@ -171,14 +171,14 @@ abstract class StoryHandlerBase<out T : StoryHandlerDefinition>(
     /**
      * Handles the action and switches the context to the underlying story definition.
      */
-    fun handleAndSwitchStory(bus: BotBus) {
+    fun handleAndSwitchStory(bus: BotBus, doOnSwitchStory: () -> Unit = {}) {
         findStoryDefinition(bus)
             ?.apply {
-                bus.switchStory(this)
+                bus.switchStory(this, doOnSwitchStory=doOnSwitchStory)
             }
             ?: error("no story found for handler")
 
-        handle(bus)
+        handle(bus, doOnSwitchStory)
     }
 
     /**

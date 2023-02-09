@@ -143,12 +143,14 @@ data class Story(
 
     /**
      * Handles a request.
+     * @param bus the bot bus
+     * @param doOnSwitchStory: a function to call when a switch to another story is performed
      */
-    fun handle(bus: BotBus) {
+    fun handle(bus: BotBus, doOnSwitchStory: ()-> Unit) {
         definition.storyHandler.apply {
             try {
                 if (sendStartEvent(bus)) {
-                    handle(bus)
+                    handle(bus, doOnSwitchStory)
                 }
             } finally {
                 sendEndEvent(bus)

@@ -49,7 +49,7 @@ open class StoryDefinitionBase(
     override val intents: Set<Intent> =
         setOf(Intent(name)) + (otherStarterIntents + secondaryIntents).map { it.wrappedIntent() }.toSet()
 
-    open fun handle(bus: BotBus) = storyHandler.handle(bus)
+    open fun handle(bus: BotBus, doOnSwitchStory: () -> Unit) = storyHandler.handle(bus, doOnSwitchStory)
 
     override fun toString(): String = "Story[$name]"
 }
