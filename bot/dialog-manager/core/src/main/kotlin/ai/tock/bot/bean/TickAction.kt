@@ -25,7 +25,6 @@ data class TickAction(
     val trigger: String? = null,
     val inputContextNames: Set<String>,
     val outputContextNames: Set<String>,
-    val proceed: Boolean = false,
     val final: Boolean,
     val targetStory: String? = null,
 ){
@@ -33,7 +32,7 @@ data class TickAction(
      * The action is silent only if a handler or a trigger is provided
      */
     @java.beans.Transient
-    fun isSilent() = !handler.isNullOrBlank() || trigger != null || proceed
+    fun isSilent() = !handler.isNullOrBlank() || !trigger.isNullOrBlank()
 
     /**
      * The action is valid only if the targetStory exists if it is provided
