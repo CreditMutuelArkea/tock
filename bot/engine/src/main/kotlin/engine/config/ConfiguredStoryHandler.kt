@@ -89,6 +89,7 @@ internal class ConfiguredStoryHandler(
             }
         }
 
+
         val busStep = bus.step as? Step
         busStep?.configuration
             ?.also { step ->
