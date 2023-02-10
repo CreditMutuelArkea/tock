@@ -99,7 +99,7 @@ object ScenarioService {
         // Create versions
         val scenarioVersions = ScenarioVersionService.createMany(scenarioGroup.versions)
         // Associate the versions to the group
-        return scenarioGroup.copy(versions = scenarioVersions, enabled = false)
+        return scenarioGroup.copy(versions = scenarioVersions)
     }
 
     /**
