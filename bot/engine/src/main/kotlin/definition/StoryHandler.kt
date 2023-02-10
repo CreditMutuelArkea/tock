@@ -31,7 +31,7 @@ interface StoryHandler {
      * @param bus the bus used to get the message and send the answer
      * @param doOnSwitchStory: a function to call when a switch to another story is performed
      */
-    fun handle(bus: BotBus, doOnSwitchStory: () -> Unit)
+    fun handle(bus: BotBus, doOnSwitchStory: () -> Unit = {})
 
     /**
      * What is the probability of bot support for the current request?

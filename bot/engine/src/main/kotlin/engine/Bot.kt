@@ -79,7 +79,7 @@ internal class Bot(botDefinitionBase: BotDefinition, val configuration: BotAppli
     /**
      * Handle the user action.
      */
-    fun handle(action: Action, userTimeline: UserTimeline, connector: ConnectorController, connectorData: ConnectorData, doOnSwitchStory: () -> Unit) {
+    fun handle(action: Action, userTimeline: UserTimeline, connector: ConnectorController, connectorData: ConnectorData, doOnSwitchStory: () -> Unit = {}) {
         connector as TockConnectorController
 
         loadProfileIfNotSet(connectorData, action, userTimeline, connector)

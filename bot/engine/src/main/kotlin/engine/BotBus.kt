@@ -426,7 +426,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Switches the context to the specified story definition (start a new [Story]).
      */
-    fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent(), doOnSwitchStory: () -> Unit) {
+    fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent(), doOnSwitchStory: () -> Unit = {})  {
         doOnSwitchStory()
         story = Story(storyDefinition, starterIntent, story.step)
         hasCurrentSwitchStoryProcess = true
@@ -437,7 +437,7 @@ interface BotBus : Bus<BotBus> {
     /**
      * Handles the action and switches the context to the specified story definition.
      */
-    fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent(), doOnSwitchStory: () -> Unit) {
+    fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent(), doOnSwitchStory: () -> Unit = {}) {
         switchStory(storyDefinition, starterIntent, doOnSwitchStory)
         hasCurrentSwitchStoryProcess = false
         @Suppress("UNCHECKED_CAST")
