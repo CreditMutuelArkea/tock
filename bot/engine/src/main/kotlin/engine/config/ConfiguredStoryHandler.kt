@@ -32,6 +32,7 @@ import ai.tock.bot.connector.media.MediaCardDescriptor
 import ai.tock.bot.connector.media.MediaCarouselDescriptor
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.StoryDefinition
+import ai.tock.bot.definition.TickStoryDefinition
 import ai.tock.bot.definition.StoryHandler
 import ai.tock.bot.definition.StoryTag
 import ai.tock.bot.engine.BotBus
@@ -117,9 +118,14 @@ internal class ConfiguredStoryHandler(
             configurationName?.let { name -> configuration.configuredAnswers.firstOrNull { it.botConfiguration == name } }
                 ?: configuration
         removeAskAgainProcess(bus)
+
+        // When sending the answer, a redirection (switch to another type of story) can be performed
         answerContainer.send(bus, doOnSwitchStory)
 
-        switchStoryIfEnding(null, bus, doOnSwitchStory, answerContainer.findCurrentAnswer() is TickAnswerConfiguration)
+        // check if the current story handled by the bot is a TickStory
+        val isCurrentTickStory = bus.story.definition is TickStoryDefinition
+
+        switchStoryIfEnding(null, bus, doOnSwitchStory, isCurrentTickStory)
 
         // Restrict next intents if defined in story settings:
 
@@ -172,10 +178,11 @@ internal class ConfiguredStoryHandler(
         step: StoryDefinitionConfigurationStep?,
         bus: BotBus,
         doOnSwitchStory: () -> Unit,
-        isTickAnswerConfiguration: Boolean  = false
+        isCurrentTickStory: Boolean  = false
     ) {
-        if (!isTickAnswerConfiguration && (!isMissingMandatoryEntities(bus) && bus.story.definition.steps.isEmpty() || step?.hasNoChildren == true)
-            || (isTickAnswerConfiguration && bus.dialog.tickStates[bus.story.definition.id]!!.finished)) { // TODO !!
+
+        if (!isCurrentTickStory && (!isMissingMandatoryEntities(bus) && bus.story.definition.steps.isEmpty() || step?.hasNoChildren == true)
+            || (isCurrentTickStory && bus.dialog.tickStates[bus.story.definition.id]?.finished == true)) {
             configuration.findEnabledEndWithStoryId(bus.applicationId)
                 ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
                 ?.let {
