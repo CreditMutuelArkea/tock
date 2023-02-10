@@ -93,7 +93,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithoutQuickReply_shouldHandleWell_MessageMarcus() {
+    fun handleVisitorRequestWithoutQuickReply_shouldHandleWell_MessageMarcus() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = resourceAsStringMinified("/response_message_marcus.json")
 
@@ -107,7 +107,7 @@ class IadvizeConnectorTest {
             callback.eventAnswered(action2)
         }
 
-        connector.handleRequest(
+        connector.handleVisitorRequest(
             controller,
             context,
             iAdvizeRequest
@@ -121,7 +121,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithQuickReply_shouldHandleWell_MessageMarcus() {
+    fun handleVisitorRequestWithQuickReply_shouldHandleWell_MessageMarcus() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = resourceAsStringMinified("/response_message_quickreply.json")
 
@@ -136,7 +136,7 @@ class IadvizeConnectorTest {
             callback.eventAnswered(action)
         }
 
-        connector.handleRequest(
+        connector.handleVisitorRequest(
             controller,
             context,
             iAdvizeRequest
@@ -150,7 +150,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageTransfer() {
+    fun handleVisitorRequestWithIadvizeTransfer_shouldHandleWell_MessageTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = resourceAsStringMinified("/response_message_transfer.json")
 
@@ -169,7 +169,7 @@ class IadvizeConnectorTest {
 
         }
 
-        connector.handleRequest(
+        connector.handleVisitorRequest(
             controller,
             context,
             iAdvizeRequest
@@ -183,7 +183,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithIadvizeTransfer_shouldHandleWell_MessageUnavailable() {
+    fun handleVisitorRequestWithIadvizeTransfer_shouldHandleWell_MessageUnavailable() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = resourceAsStringMinified("/response_message_unavailable.json")
 
@@ -201,7 +201,7 @@ class IadvizeConnectorTest {
             callback.eventAnswered(action)
         }
 
-        connector.handleRequest(
+        connector.handleVisitorRequest(
             controller,
             context,
             iAdvizeRequest
@@ -215,7 +215,7 @@ class IadvizeConnectorTest {
     }
 
     @Test
-    fun handleRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
+    fun handleVisitorRequestWithIadvizeMultipartMessage_shouldHandleWell_MessageMultipartTransfer() {
         val iAdvizeRequest: IadvizeRequest = getIadvizeRequestMessage("/request_message_text.json", conversationId)
         val expectedResponse: String = resourceAsStringMinified("/response_message_multipart_transfer.json")
 
@@ -247,7 +247,7 @@ class IadvizeConnectorTest {
             callback.eventAnswered(action)
         }
 
-        connector.handleRequest(
+        connector.handleVisitorRequest(
             controller,
             context,
             iAdvizeRequest

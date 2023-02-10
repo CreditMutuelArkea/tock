@@ -218,6 +218,7 @@ class IadvizeConnector internal constructor(
         val callback = IadvizeConnectorCallback(
             applicationId,
             controller,
+            localeCode?.let{ getLocale(localeCode) } ?: defaultLocale,
             context,
             iadvizeRequest,
             distributionRule,
