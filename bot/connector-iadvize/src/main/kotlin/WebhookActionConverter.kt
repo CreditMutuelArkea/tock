@@ -16,28 +16,46 @@
 
 package ai.tock.bot.connector.iadvize
 
+import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
+import ai.tock.bot.connector.iadvize.model.request.TransferRequest
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
+import ai.tock.bot.engine.event.NoInputEvent
+import ai.tock.bot.engine.event.PassThreadControlEvent
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
+import mu.KotlinLogging
 
 /**
  *
  */
 internal object WebhookActionConverter {
 
+    private val logger = KotlinLogging.logger {}
+
     fun toEvent(
-        request: MessageRequest,
+        request: IadvizeRequest,
         applicationId: String
     ): Event {
         val playerId = PlayerId(request.idConversation, PlayerType.user)
         val recipientId = PlayerId(request.idConversation, PlayerType.bot)
-        return SendSentence(
-            playerId,
-            applicationId,
-            recipientId,
-            request.message.payload.value
-        )
+
+        return when (request) {
+            is MessageRequest ->
+                SendSentence(
+                    playerId,
+                    applicationId,
+                    recipientId,
+                    request.message.payload.value
+                )
+
+            is TransferRequest -> PassThreadControlEvent(playerId, recipientId, request.idOperator, applicationId)
+            else -> NoInputEvent(
+                playerId,
+                recipientId,
+                applicationId
+            ).also { logger.warn("Cannot parse the type of event encountered : $request") }
+        }
     }
 }
