@@ -446,6 +446,21 @@
                 [(ngModel)]="localeAnswerDef.answer"
                 [ngModelOptions]="{ standalone: true }"
               ></textarea>
+
+              <button
+                type="button"
+                nbSuffix
+                nbButton
+                ghost
+                (click)="removeLocaleAnswerDef(localeAnswerDef)"
+                [disabled]="!localeAnswerDef.answer?.length"
+              >
+                <nb-icon
+                  icon="trash-2-outline"
+                  [status]="localeAnswerDef.answer?.length ? 'danger' : ''"
+                >
+                </nb-icon>
+              </button>
             </nb-form-field>
 
             <span
