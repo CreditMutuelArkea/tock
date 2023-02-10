@@ -128,12 +128,12 @@ class IadvizeConnector internal constructor(
                 logContextRequest(context)
 
                 // Check payloads signature
-                if(!secretToken.isNullOrBlank()) {
+                if (!secretToken.isNullOrBlank()) {
                     IadvizeSecurity(secretToken).validatePayloads(context)
                 }
                 // Invoke handler
                 iadvizeHandler.invoke(context, controller)
-            } catch (error: BadRequestException){
+            } catch (error: BadRequestException) {
                 logger.error(error)
                 context.fail(400)
             } catch (error: Throwable) {
@@ -196,7 +196,8 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerStrategies: IadvizeHandler = { context, _ ->
-        context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
+        context.response()
+            .endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
     internal var handlerFirstMessage: IadvizeHandler = { context, controller ->
@@ -241,12 +242,11 @@ class IadvizeConnector internal constructor(
         val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
         val iadvizeRequest: IadvizeRequest = mapConversationMessageRequest(idConversation, context)
         if (!isOperator(iadvizeRequest)) {
-            handleRequest(controller, context, iadvizeRequest)
+                handleVisitorRequest(controller,context, iadvizeRequest)
         } else {
-            //ignore message from operator
-            context.response().end()
+                handleOperatorRequest(controller, context, iadvizeRequest)
+            }
         }
-    }
 
     /*
      * If request is a MessageRequest and the author of message have role "operator" : do not treat request.
@@ -314,10 +314,13 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    internal fun handleRequest(
+    /**
+     * handle visitor request
+     */
+    internal fun handleVisitorRequest(
         controller: ConnectorController,
         context: RoutingContext,
-        iadvizeRequest: IadvizeRequest
+        iadvizeRequest: IadvizeRequest,
     ) {
 
         val callback = IadvizeConnectorCallback(
@@ -337,10 +340,31 @@ class IadvizeConnector internal constructor(
                     ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
                 )))
             }
-
-            // Only MessageRequest are supported, other messages are UnsupportedMessage
+            // Only TransferRequest are supported, other messages are UnsupportedMessage
             // and UnsupportedResponse can be sent immediately
             else -> callback.sendResponse()
+        }
+    }
+
+
+    /**
+     * handle operator request
+     */
+    internal fun handleOperatorRequest(
+        controller: ConnectorController,
+        context: RoutingContext,
+        iadvizeRequest: IadvizeRequest,
+    ) {
+        when (iadvizeRequest) {
+            is TransferRequest -> {
+                // callback is used only on transfer request
+                val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
+                val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
+                controller.handle(event, ConnectorData(callback))
+            }
+
+            //ignore message from operator
+            else -> context.response().end()
         }
     }
 
