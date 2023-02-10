@@ -1,0 +1,185 @@
+<div
+  *ngIf="closable || closable === ''"
+  class="d-flex justify-content-between align-items-center font-weight-bold mb-3"
+>
+  Sentences generation
+  <button
+    nbButton
+    type="button"
+    nbTooltip="Close generate sentences"
+    ghost
+    shape="round"
+    (click)="close()"
+  >
+    <nb-icon icon="close-outline"></nb-icon>
+  </button>
+</div>
+
+<nb-alert
+  *ngIf="alert"
+  outline="warning"
+  closable
+  (close)="closeAlert()"
+>
+  <div class="d-flex align-items-center gap-1">
+    <nb-icon
+      icon="alert-triangle-outline"
+      status="warning"
+    ></nb-icon>
+    Message d'alerte à définir
+  </div>
+</nb-alert>
+
+<section>
+  <form
+    *ngIf="!generatedSentences.length"
+    [formGroup]="form"
+  >
+    <div class="mb-3">
+      <input
+        class="mb-2"
+        autofocusElement
+        nbInput
+        formControlName="sentenceExample"
+        id="sentence"
+        fullWidth
+        type="text"
+        placeholder="Enter an example"
+      />
+      <nb-select
+        *ngIf="sentences.length"
+        class="mb-1"
+        multiple
+        placeholder="Choose among the existing sentences"
+        fullWidth
+        optionsListClass="option-list--break-word"
+        formControlName="sentencesExample"
+      >
+        <nb-option
+          *ngFor="let sentence of sentences"
+          value="{{ sentence }}"
+        >
+          <span class="initial-capitalize">{{ sentence }}</span>
+        </nb-option>
+      </nb-select>
+      <small
+        *ngIf="sentencesExample.errors?.maxlength"
+        class="text-danger"
+      >
+        The model can only take 5 sentences as examples
+      </small>
+    </div>
+
+    <div class="d-flex flex-column gap-1">
+      <nb-toggle formControlName="spellingMistakes">Inlude spellings mistakes</nb-toggle>
+      <nb-toggle formControlName="smsLanguage">Inlude SMS language</nb-toggle>
+      <nb-toggle formControlName="abbreviatedLanguage">Inlude abbreviated language</nb-toggle>
+      <div class="form-group">
+        <label for="temperature"
+          >Temperature
+          <nb-icon
+            icon="info-outline"
+            nbTooltip="Controls the randomness: a temperature close to 0 leads to a more deterministic and repetitive generation by the model. A temperature close to 1 makes the model more creative"
+          ></nb-icon
+        ></label>
+        <div class="d-flex flex-column">
+          <input
+            formControlName="temperature"
+            type="range"
+            class="form-control-range"
+            id="temperature"
+            name="temperature"
+            min="0"
+            max="1"
+            step="0.01"
+          />
+          <small class="align-self-end">{{ temperature.value }} / 1</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer-actions mt-4">
+      <button
+        type="submit"
+        nbButton
+        status="primary"
+        size="small"
+        [disabled]="!form.valid"
+        (click)="generate()"
+      >
+        Generate
+      </button>
+    </div>
+  </form>
+
+  <section
+    *ngIf="generatedSentences.length"
+    class="list"
+  >
+    <header class="list--header d-flex align-items-center gap-1 pl-3 py-2">
+      <nb-checkbox
+        class="lineHeight-0 checkbox-all"
+        [checked]="isAllSelectedGeneratedSentences()"
+        [indeterminate]="isSelectedGeneratedSentences()"
+        (checkedChange)="toggleAllSelectGeneratedSentences($event)"
+      ></nb-checkbox>
+      <div class="d-flex w-100">
+        <button
+          *ngIf="isSelectedGeneratedSentences() || isAllSelectedGeneratedSentences()"
+          nbButton
+          nbTooltip="Validate all selected sentences"
+          class="text-success"
+          ghost
+          shape="round"
+          (click)="validateSelection()"
+        >
+          <nb-icon icon="checkmark-circle-2"></nb-icon>
+        </button>
+        <button
+          class="ml-auto"
+          nbButton
+          nbTooltip="Regenerate"
+          ghost
+          shape="round"
+          (click)="generate()"
+        >
+          <nb-icon icon="refresh-outline"></nb-icon>
+        </button>
+        <button
+          nbButton
+          nbTooltip="Options"
+          ghost
+          shape="round"
+          (click)="backOptions()"
+        >
+          <nb-icon icon="options-2-outline"></nb-icon>
+        </button>
+      </div>
+    </header>
+    <nb-list>
+      <nb-list-item
+        *ngFor="let generatedSentence of generatedSentences"
+        class="d-flex flex-wrap align-items-center gap-1"
+      >
+        <nb-checkbox
+          *ngIf="generatedSentence.distinct"
+          class="lineHeight-0"
+          [(ngModel)]="generatedSentence.selected"
+        ></nb-checkbox>
+        <nb-icon
+          *ngIf="!generatedSentence.distinct"
+          icon="checkmark-circle-2-outline"
+          nbTooltip="Already present"
+        ></nb-icon>
+        <span
+          *ngIf="generatedSentence.distinct"
+          class="pointer"
+          (click)="toggleSelectGeneratedSentence(generatedSentence)"
+        >
+          {{ generatedSentence.sentence }}
+        </span>
+        <span *ngIf="!generatedSentence.distinct">{{ generatedSentence.sentence }}</span>
+      </nb-list-item>
+    </nb-list>
+  </section>
+</section>
