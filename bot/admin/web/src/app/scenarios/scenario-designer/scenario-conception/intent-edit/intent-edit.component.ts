@@ -53,6 +53,8 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   @ViewChild('addSentenceInput') addSentenceInput: ElementRef;
   @ViewChild('addContextInput') addContextInput: ElementRef;
 
+  loading: boolean = false;
+
   private qualifiedName = qualifiedName;
 
   constructor(private dialogRef: NbDialogRef<IntentEditComponent>, private stateService: StateService) {}
@@ -314,5 +316,22 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy.next();
     this.destroy.complete();
+  }
+
+  showGenerateSentences = false;
+  generateSentences(): void {
+    this.showGenerateSentences = true;
+  }
+
+  closeGenerateSentences(): void {
+    this.showGenerateSentences = false;
+  }
+
+  addGeneratedSentences(generatedSentences: string[]): void {
+    generatedSentences.forEach((generatedSentence: string) => this.addSentence(generatedSentence));
+  }
+
+  loadingGeneratedSentences(loading: boolean): void {
+    this.loading = loading;
   }
 }

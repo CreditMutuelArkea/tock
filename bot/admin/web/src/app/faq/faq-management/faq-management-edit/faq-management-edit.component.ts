@@ -2,13 +2,14 @@ import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleCh
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbTabComponent, NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
 import { Observable, of } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 
 import { StateService } from '../../../core-nlp/state.service';
 import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ChoiceDialogComponent } from '../../../shared/components';
+import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/sentences-generation-wrapper/sentences-generation-wrapper.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
 export enum FaqTabs {
@@ -232,8 +233,9 @@ export class FaqManagementEditComponent implements OnChanges {
                 this.utterances.push(new FormControl(utterance));
                 this.form.markAsDirty();
                 setTimeout(() => {
-                  this.addUtteranceInput?.nativeElement.focus();
-                  this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
+                  this.addUtteranceInput?.nativeElement?.focus();
+                  if (this.utterancesListWrapper?.nativeElement)
+                    this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
                 });
               }
               this.lookingForSameUterranceInOtherInent = false;
@@ -243,7 +245,7 @@ export class FaqManagementEditComponent implements OnChanges {
             }
           });
       }
-      this.addUtteranceInput.nativeElement.value = '';
+      if (this.addUtteranceInput?.nativeElement) this.addUtteranceInput.nativeElement.value = '';
     }
   }
 
@@ -385,5 +387,34 @@ export class FaqManagementEditComponent implements OnChanges {
   save(faqDFata): void {
     this.onSave.emit(faqDFata);
     if (!this.faq.id) this.onClose.emit(true);
+  }
+
+  generateSentences(): void {
+    const dialogRef = this.nbDialogService.open(SentencesGenerationWrapperComponent, {
+      context: {
+        sentences: this.utterances.value
+      }
+    });
+
+    dialogRef.componentRef.instance.onGeneratedSentences.subscribe((generatedSentences: string[]) => {
+      generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
+    });
+  }
+
+  showGenerateSentencesV2 = false;
+  generateSentencesV2(): void {
+    this.showGenerateSentencesV2 = true;
+  }
+
+  closeGenerateSentences(): void {
+    this.showGenerateSentencesV2 = false;
+  }
+
+  addGeneratedSentences(generatedSentences: string[]): void {
+    generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
+  }
+
+  loadingGeneratedSentences(loading: boolean): void {
+    this.loading = loading;
   }
 }

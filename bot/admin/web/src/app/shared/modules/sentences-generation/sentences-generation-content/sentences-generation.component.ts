@@ -114,7 +114,7 @@ export class SentencesGenerationComponent implements OnChanges {
     };
 
     const headers = {
-      Authorization: 'Bearer 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'
+      Authorization: 'Bearer '
     };
 
     const request = this.http.post<any>('https://api.openai.com/v1/completions', body, {
