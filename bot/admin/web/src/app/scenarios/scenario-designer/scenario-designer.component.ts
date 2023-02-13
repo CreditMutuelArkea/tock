@@ -237,9 +237,9 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
   }
 
   private reflectExternalChangesInAnswer(item: ScenarioItem, unknownAnswer: boolean, deletedAnswersList: string[]): void {
-    let answerId = item.actionDefinition.answerId;
+    let storedAnswerId = item.actionDefinition.answerId;
     if (unknownAnswer) {
-      answerId = item.actionDefinition.unknownAnswerId;
+      storedAnswerId = item.actionDefinition.unknownAnswerId;
     }
 
     let answersArray = item.actionDefinition.answers;
@@ -247,12 +247,12 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
       answersArray = item.actionDefinition.unknownAnswers;
     }
 
-    let existingAnswer = this.i18n.labels.find((ans) => {
-      return ans._id === answerId;
+    let existingI18nLabel = this.i18n.labels.find((ans) => {
+      return ans._id === storedAnswerId;
     });
 
-    if (!existingAnswer) {
-      // The answer has been removed. We delete the lapsed answerId
+    if (!existingI18nLabel) {
+      // The answer has been removed. We delete the lapsed answer id
       if (unknownAnswer) {
         delete item.actionDefinition.unknownAnswerId;
       } else {
@@ -267,11 +267,11 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
       if (scenarioAnswer) deletedAnswersList.push(scenarioAnswer.answer);
     } else {
       // We update the answers of the item to reflect any changes made from outside the designer
-      existingAnswer.i18n.forEach((i18n) => {
-        // if (i18n.interfaceType === UserInterfaceType.textChat) {
-        const existingLocale = answersArray.find((la) => la.locale === i18n.locale && la.interfaceType === i18n.interfaceType);
-        if (existingLocale) {
-          existingLocale.answer = i18n.label;
+      existingI18nLabel.i18n.forEach((i18n) => {
+        const existingLabelLocale = answersArray.find((la) => la.locale === i18n.locale && la.interfaceType === i18n.interfaceType);
+        // We update thee locale answer with the version stored on database (if any) if the locale answer has not been modifief inside the designer
+        if (existingLabelLocale) {
+          if (!existingLabelLocale.answerUpdate) existingLabelLocale.answer = i18n.label;
         } else {
           answersArray.push({
             locale: i18n.locale,
@@ -279,7 +279,6 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
             answer: i18n.label
           });
         }
-        // }
       });
     }
   }
