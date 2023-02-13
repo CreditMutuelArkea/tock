@@ -327,7 +327,7 @@
           </span>
         </tock-form-control>
 
-        <div>
+        <div *ngIf="!targetStory.value">
           <tock-form-control
             *ngIf="!isReadonly"
             label="Output contexts"
@@ -385,7 +385,10 @@
             Output contexts
           </label>
 
-          <nb-list class="contexts-list">
+          <nb-list
+            class="contexts-list"
+            *ngIf="!targetStory.value"
+          >
             <nb-list-item
               *ngFor="let outputContext of outputContextNames.value"
               class="p-2 d-flex justify-content-between"
@@ -419,7 +422,51 @@
         </div>
       </div>
 
-      <div id="formBottomSection">
+      <div>
+        <tock-form-control
+          label="Target story"
+          name="targetStory"
+          [controls]="targetStory"
+          [showError]="isSubmitted"
+        >
+          <nb-select
+            id="targetStory"
+            placeholder="Select a story to redirect to"
+            formControlName="targetStory"
+            [fullWidth]="true"
+            [optionsListClass]="'option-list--break-word'"
+            [status]="targetStoryWasDeleted() ? 'danger' : 'basic'"
+          >
+            <nb-option class="text-muted">
+              <nb-icon
+                icon="close-circle-outline"
+                class="text-muted mr-1"
+                style="margin: 0.14rem 0px 0px -0.15rem"
+              ></nb-icon>
+              No redirection</nb-option
+            >
+            <nb-option
+              *ngFor="let story of availableStories"
+              [value]="story.storyId"
+            >
+              {{ story.name }}
+            </nb-option>
+          </nb-select>
+        </tock-form-control>
+
+        <div
+          *ngIf="targetStoryWasDeleted()"
+          class="text-danger"
+        >
+          <nb-icon icon="alert-triangle-outline"></nb-icon> Attention, the target story "{{ targetStory.value }}" no longer exists! This
+          scenario will not be publishable.
+        </div>
+      </div>
+
+      <div
+        id="formBottomSection"
+        *ngIf="!targetStory.value"
+      >
         <label class="font-weight-bold text-mitigated"> Question for unknown answer </label>
 
         <small class="d-block text-muted mb-2">Enter the question to ask the user if their answer was not understood.</small>

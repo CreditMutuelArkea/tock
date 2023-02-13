@@ -28,6 +28,7 @@ import { ContextsGraphComponent } from '../contexts-graph/contexts-graph.compone
 import { TriggerCreateComponent } from './trigger-create/trigger-create.component';
 import { ChoiceDialogComponent } from '../../../shared/components';
 import { OffsetPosition } from '../../../shared/canvas/models';
+import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 
 const CANVAS_TRANSITION_TIMING: number = 300;
 
@@ -43,6 +44,7 @@ export class ScenarioConceptionComponent implements OnInit, OnDestroy {
   @Input() isReadonly: boolean;
   @Input() isFullscreen: boolean = false;
   @Input() readonly avalaibleHandlers: Handler[];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   @Output() requestFullscreen = new EventEmitter();
 
