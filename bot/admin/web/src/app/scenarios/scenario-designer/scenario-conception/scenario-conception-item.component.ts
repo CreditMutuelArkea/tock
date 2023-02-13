@@ -2,6 +2,7 @@ import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChil
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { takeUntil, take } from 'rxjs/operators';
+import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 
 import { StateService } from '../../../core-nlp/state.service';
 import { Intent } from '../../../model/nlp';
@@ -49,6 +50,7 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
   @Input() scenario: ScenarioVersionExtended;
   @Input() isReadonly: boolean = false;
   @Input() readonly avalaibleHandlers: Handler[];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   @ViewChild('itemCard', { read: ElementRef }) itemCard: ElementRef<HTMLInputElement>;
   @ViewChild('itemTextarea', { read: ElementRef }) itemTextarea: ElementRef<HTMLInputElement>;
@@ -84,7 +86,8 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
         contexts: this.contexts,
         scenario: this.scenario,
         avalaibleHandlers: this.avalaibleHandlers,
-        isReadonly: this.isReadonly
+        isReadonly: this.isReadonly,
+        availableStories: this.availableStories
       }
     });
     modal.componentRef.instance.saveModifications.pipe(take(1)).subscribe((actionDef: ScenarioActionDefinition) => {

@@ -9,6 +9,7 @@ import { getContrastYIQ, getScenarioActionDefinitions, getScenarioActions, norma
 import { entityColor, qualifiedName, qualifiedRole } from '../../../../model/nlp';
 import { UserInterfaceType } from '../../../../core/model/configuration';
 import { deepCopy } from '../../../../shared/utils';
+import { StoryDefinitionConfigurationSummary } from '../../../../bot/model/story';
 
 type InputOrOutputContext = 'input' | 'output';
 
@@ -23,6 +24,7 @@ export class ActionEditComponent implements OnInit {
   @Input() scenario: ScenarioVersion;
   @Input() isReadonly: boolean;
   @Input() readonly avalaibleHandlers: Handler[] = [];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   @Output() saveModifications = new EventEmitter();
   @Output() deleteDefinition = new EventEmitter();
@@ -57,6 +59,7 @@ export class ActionEditComponent implements OnInit {
     inputContextNames: new FormArray([]),
     outputContextNames: new FormArray([]),
     trigger: new FormControl(undefined, [this.actionHasHandler()]),
+    targetStory: new FormControl(),
     unknownAnswers: new FormArray([]),
     final: new FormControl(false)
   });
@@ -88,6 +91,9 @@ export class ActionEditComponent implements OnInit {
   }
   get trigger(): FormControl {
     return this.form.get('trigger') as FormControl;
+  }
+  get targetStory(): FormControl {
+    return this.form.get('targetStory') as FormControl;
   }
   get unknownAnswers(): FormArray {
     return this.form.get('unknownAnswers') as FormArray;
@@ -187,6 +193,12 @@ export class ActionEditComponent implements OnInit {
 
       return c.value && !this.handler.value ? { custom: 'An event can only be positioned on an action with a handler' } : null;
     };
+  }
+
+  targetStoryWasDeleted() {
+    if (this.targetStory.value && !this.availableStories.find((as) => as.storyId === this.targetStory.value)) return true;
+
+    return false;
   }
 
   copyDescToAnswer(): void {
