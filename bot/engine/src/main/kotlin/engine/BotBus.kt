@@ -48,12 +48,14 @@ import ai.tock.bot.engine.message.MessagesList.Companion.toMessageList
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.user.UserPreferences
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineDAO
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.entity.Value
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
+import com.github.salomonbrys.kodein.instance
 
 /**
  * Bus implementation for Tock integrated mode.
@@ -67,6 +69,8 @@ interface BotBus : Bus<BotBus> {
          * (warning: advanced usage only).
          */
         fun retrieveCurrentBus(): BotBus? = Bot.retrieveCurrentBus()
+
+        private val userTimelineDAO: UserTimelineDAO by injector.instance()
     }
 
     /**
@@ -427,6 +431,10 @@ interface BotBus : Bus<BotBus> {
      * Switches the context to the specified story definition (start a new [Story]).
      */
     fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent()) {
+        // before switching story, we need to save a snapshot with the current intent
+        if (connectorData.saveTimeline){
+            userTimelineDAO.save(userTimeline, botDefinition)
+        }
         story = Story(storyDefinition, starterIntent, story.step)
         hasCurrentSwitchStoryProcess = true
         story.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
