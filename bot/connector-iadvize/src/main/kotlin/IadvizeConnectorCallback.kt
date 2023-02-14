@@ -24,7 +24,7 @@ import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
@@ -35,7 +35,6 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
 import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
-import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.loadProperties
@@ -51,6 +50,7 @@ private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_messag
 
 class IadvizeConnectorCallback(override val  applicationId: String,
                                controller: ConnectorController,
+                               val locale: Locale,
                                val context: RoutingContext,
                                val request: IadvizeRequest,
                                distributionRule: String?,
@@ -64,9 +64,6 @@ class IadvizeConnectorCallback(override val  applicationId: String,
 
     @Volatile
     private var answered: Boolean = false
-
-    @Volatile
-    private var locale: Locale = defaultLocale
 
     private val translator: I18nTranslator = controller.botDefinition.i18nTranslator(locale, iadvizeConnectorType)
 
@@ -145,8 +142,15 @@ class IadvizeConnectorCallback(override val  applicationId: String,
                     //Combine 1 MessageTextPayload with messages enhanced IadvizeReply
                     listOf(listOf(simpleTextPayload), listIadvizeReply).flatten()
                 } else {
-                    //No simple MessageTextPayload, just return enhanced IadvizeReply
-                    listIadvizeReply
+                    // No simple MessageTextPayload
+                    // translate all TextPayloads if they exist
+                    listIadvizeReply.map {reply ->
+                        if(reply is IadvizeMessage){
+                            reply.copy(payload = TextPayload(translator.translate((reply.payload as TextPayload).value)))
+                        }else{
+                            reply
+                        }
+                    }
                 }
             } else {
                 emptyList()

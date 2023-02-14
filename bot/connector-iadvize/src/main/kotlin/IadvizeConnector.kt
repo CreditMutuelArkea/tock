@@ -40,8 +40,10 @@ import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.I18nTranslator
 
 import ai.tock.bot.engine.action.Action
+import ai.tock.shared.defaultLocale
 
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.vertx.BadRequestException
@@ -52,7 +54,9 @@ import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Route
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
+import org.apache.commons.lang3.LocaleUtils
 import java.time.LocalDateTime
+import java.util.Locale
 
 private const val QUERY_ID_OPERATOR: String = "idOperator"
 private const val QUERY_ID_CONVERSATION: String = "idConversation"
@@ -70,11 +74,14 @@ class IadvizeConnector internal constructor(
     val distributionRule: String?,
     val secretToken: String?,
     val distributionRuleUnvailableMessage: String,
+    val localeCode: String?
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
     }
+
+    val locale: Locale = localeCode?.let{ getLocale(localeCode) } ?: defaultLocale
 
     override fun register(controller: ConnectorController) {
         controller.registerServices(path) { router ->
@@ -188,8 +195,15 @@ class IadvizeConnector internal constructor(
         context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
-    internal var handlerFirstMessage: IadvizeHandler = { context, _ ->
-        context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
+    internal var handlerFirstMessage: IadvizeHandler = { context, controller ->
+        val translator: I18nTranslator = controller.botDefinition.i18nTranslator(locale, iadvizeConnectorType)
+        context.response().endWithJson(
+            RepliesResponse(
+                IadvizeMessage(
+                    translator.translate(firstMessage as CharSequence).toString()
+                )
+            )
+        )
     }
 
     internal var handlerStartConversation: IadvizeHandler = { context, controller ->
@@ -197,7 +211,15 @@ class IadvizeConnector internal constructor(
         val conversationRequest: ConversationsRequest =
             mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
 
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, conversationRequest, distributionRule, distributionRuleUnvailableMessage)
+        val callback = IadvizeConnectorCallback(
+            applicationId,
+            controller,
+            localeCode?.let{ getLocale(localeCode) } ?: defaultLocale,
+            context,
+            conversationRequest,
+            distributionRule,
+            distributionRuleUnvailableMessage
+        )
 
         callback.sendResponse()
     }
@@ -260,7 +282,16 @@ class IadvizeConnector internal constructor(
         iadvizeRequest: IadvizeRequest
     ) {
 
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
+        val callback = IadvizeConnectorCallback(
+            applicationId,
+            controller,
+            localeCode?.let{ getLocale(localeCode) } ?: defaultLocale,
+            context,
+            iadvizeRequest,
+            distributionRule,
+            distributionRuleUnvailableMessage
+        )
+
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
@@ -294,6 +325,15 @@ class IadvizeConnector internal constructor(
 
     override fun toConnectorMessage(message: MediaMessage): BotBus.() -> List<ConnectorMessage> =
         MediaConverter.toConnectorMessage(message)
+
+    private fun getLocale(it: String): Locale? {
+        return try {
+            LocaleUtils.toLocale(it)
+        } catch (e: Exception) {
+            logger.error(e)
+            null
+        }
+    }
 }
 
 @JsonInclude(JsonInclude.Include.ALWAYS)
