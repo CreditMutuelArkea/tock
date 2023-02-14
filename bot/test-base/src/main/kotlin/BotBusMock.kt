@@ -136,7 +136,7 @@ open class BotBusMock(
             }
         }
 
-        story.definition.storyHandler.handle(this){}
+        story.definition.storyHandler.handle(this)
 
         context.testContext.storyHandlerListeners.forEach {
             it.endAction(this, story.definition.storyHandler)

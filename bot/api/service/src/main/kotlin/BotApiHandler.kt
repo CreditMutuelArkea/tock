@@ -123,7 +123,7 @@ internal class BotApiHandler(
             if (response.storyId != request.storyId) {
                 botDefinition.findStoryDefinitionById(response.storyId, request.context.applicationId)
                     .also {
-                        switchStory(it){}
+                        switchStory(it)
                     }
             }
             // set step
@@ -142,7 +142,7 @@ internal class BotApiHandler(
     private fun BotBus.switchEndingStory(target: StoryDefinition) {
         step = step?.takeUnless { story.definition == target }
         setBusContextValue(VIEWED_STORIES_BUS_KEY, viewedStories + target)
-        handleAndSwitchStory(target){}
+        handleAndSwitchStory(target)
     }
 
     private val BotBus.viewedStories: Set<StoryDefinition>

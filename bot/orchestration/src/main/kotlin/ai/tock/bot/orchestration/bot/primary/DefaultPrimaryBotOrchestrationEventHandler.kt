@@ -29,7 +29,7 @@ open class DefaultPrimaryBotOrchestrationEventHandler(
 
     override fun onStopOrchestration(bus: BotBus, orchestration: Orchestration): ComeBackFromSecondary {
         bus.send("Your conversation with {0} is now over.", orchestration.targetBot.botLabel)
-        bus.handleAndSwitchStory(comebackStory){}
+        bus.handleAndSwitchStory(comebackStory)
 
         return ComeBackFromSecondary.DO_NOTHING_MORE
     }
