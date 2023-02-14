@@ -8,6 +8,9 @@
 
 @include nb-install-component {
   #formMiddleSection {
+    border-top: 1px solid nb-theme(border-basic-color-3);
+    padding-top: 1rem;
+
     display: grid;
     grid-template-columns: minmax(5rem, 80vw);
 

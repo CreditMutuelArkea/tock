@@ -61,7 +61,12 @@ object TickAnswerHandler {
 
             when (result) {
                 is Success -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
-                is Redirect -> result.storyId?.let { redirectFn(it) }
+                is Redirect -> {
+                    // when a redirection is performed, the current story state is considered as finished
+                    dialog.tickStates.compute(story._id.toString()) { _, state -> state?.copy(finished = true) }
+
+                    result.storyId?.let { redirectFn(it) }
+                }
             }
 
         }

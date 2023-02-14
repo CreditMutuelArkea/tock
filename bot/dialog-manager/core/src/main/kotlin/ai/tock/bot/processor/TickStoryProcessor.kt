@@ -118,9 +118,15 @@ class TickStoryProcessor(
             else -> TickActionHandlingStep(action = secondaryObjective)
         }
 
+        // Get the corresponding action
+        val tickAction = getTickAction(secondaryObjective)
+
+        // If the executed action has a non-null target story, then a redirection is required
+        tickAction.targetStory?.let { return Redirect(it) }
+
 
         // Execute the action corresponding of secondary objective.
-        val executedAction = execute(secondaryObjective)
+        execute(tickAction)
 
         // Update the current state
         updateCurrentState(primaryObjective, secondaryObjective)
@@ -139,14 +145,14 @@ class TickStoryProcessor(
 
         // If the action has a trigger, the process method should be called with a new [TickUserAction] that have an intent corresponding to the trigger
         // Else If the action is silent or if it should proceed, then we restart the processing again, otherwise we send the results
-        return  if (executedAction.trigger != null) {
-            process(TickUserAction(intentName = executedAction.trigger, emptyMap()))
-        } else  if(executedAction.isSilent()){
+        return  if (tickAction.trigger != null) {
+            process(TickUserAction(intentName = tickAction.trigger, emptyMap()))
+        } else  if(tickAction.isSilent()){
             process(null)
         } else {
             Success(
                 TickSession(currentState, contextNames, ranHandlers, objectivesStack.toList(), handlingStep = handlingStep),
-                executedAction.final)
+                tickAction.final)
         }
     }
 
@@ -164,8 +170,7 @@ class TickStoryProcessor(
     /**
      * Execute a given tick action id
      */
-    private fun execute(actionName: String): TickAction {
-        val action = getTickAction(actionName)
+    private fun execute(action: TickAction) {
         debugInput(action)
 
         // send answer if provided
@@ -189,7 +194,6 @@ class TickStoryProcessor(
         // Add action name to already executed handlers
         ranHandlers.add(action.name)
 
-        return action
     }
 
     /**

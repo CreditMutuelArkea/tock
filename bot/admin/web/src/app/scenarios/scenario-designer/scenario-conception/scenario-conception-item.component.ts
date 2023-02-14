@@ -96,32 +96,11 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
         renameSmStateById(this.item.actionDefinition.name, actionDef.name, this.scenario.data.stateMachine);
       }
 
-      actionDef.answers = actionDef.answers.filter((scenarioAnswer) => scenarioAnswer.answer?.trim().length > 0);
+      // we update the answers according to incoming modifications
+      this.updateAnswersModifications(actionDef, false);
 
-      if (actionDef.answerId) {
-        actionDef.answers.forEach((scenarioAnswer) => {
-          const storedAnswer = this.item.actionDefinition.answers?.find(
-            (storedScenarioAnswer) => storedScenarioAnswer.locale === scenarioAnswer.locale
-          );
-          if (storedAnswer && storedAnswer.answer !== scenarioAnswer.answer) {
-            scenarioAnswer.answerUpdate = true;
-          }
-        });
-      }
-
-      actionDef.unknownAnswers = actionDef.unknownAnswers.filter(
-        (scenarioUnknownAnswer) => scenarioUnknownAnswer.answer?.trim().length > 0
-      );
-      if (actionDef.unknownAnswerId) {
-        actionDef.unknownAnswers.forEach((scenarioUnknownAnswer) => {
-          const storedAnswer = this.item.actionDefinition.unknownAnswers?.find(
-            (storedScenarioUnknownAnswer) => storedScenarioUnknownAnswer.locale === scenarioUnknownAnswer.locale
-          );
-          if (storedAnswer && storedAnswer.answer !== scenarioUnknownAnswer.answer) {
-            scenarioUnknownAnswer.answerUpdate = true;
-          }
-        });
-      }
+      // we update the unknown answers according to incoming modifications
+      this.updateAnswersModifications(actionDef, true);
 
       this.item.actionDefinition = actionDef;
 
@@ -133,6 +112,57 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
 
       modal.close();
     });
+  }
+
+  private updateAnswersModifications(actionDef: ScenarioActionDefinition, unknownAnswers: boolean): void {
+    let answersArray;
+    let storedAnswerId;
+
+    if (!unknownAnswers) {
+      // We get rid of the empty locale answers
+      actionDef.answers = actionDef.answers.filter((scenarioAnswer) => scenarioAnswer.answer?.trim().length > 0);
+
+      answersArray = actionDef.answers;
+      storedAnswerId = actionDef.answerId;
+    } else {
+      // We get rid of the empty locale unknown answers
+      actionDef.unknownAnswers = actionDef.unknownAnswers.filter((scenarioAnswer) => scenarioAnswer.answer?.trim().length > 0);
+
+      answersArray = actionDef.unknownAnswers;
+      storedAnswerId = actionDef.unknownAnswerId;
+    }
+
+    // We check the necessary updates if answers already existed
+    if (storedAnswerId) {
+      let stillHasAnswers = false;
+      answersArray.forEach((scenarioAnswer) => {
+        if (scenarioAnswer.answer.trim().length) stillHasAnswers = true;
+      });
+
+      if (!stillHasAnswers) {
+        // No more answer is defined, we delete the stored answer id
+        if (!unknownAnswers) {
+          delete actionDef.answerId;
+        } else {
+          delete actionDef.unknownAnswerId;
+        }
+      } else {
+        // We check if answers have changed to flag them in update
+        answersArray.forEach((scenarioAnswer) => {
+          let existingAnswersArray = this.item.actionDefinition.answers;
+          if (unknownAnswers) {
+            existingAnswersArray = this.item.actionDefinition.unknownAnswers;
+          }
+
+          const existingAnswer = existingAnswersArray?.find(
+            (storedScenarioAnswer) => storedScenarioAnswer.locale === scenarioAnswer.locale
+          );
+          if (existingAnswer && existingAnswer.answer !== scenarioAnswer.answer) {
+            scenarioAnswer.answerUpdate = true;
+          }
+        });
+      }
+    }
   }
 
   private checkAndAddNewTrigger(trigger: string): void {

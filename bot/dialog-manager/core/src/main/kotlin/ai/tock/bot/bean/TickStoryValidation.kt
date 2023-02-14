@@ -88,6 +88,10 @@ object TickStoryValidation {
             "Unknown intent $it is not defined as a secondary intent"
         }
 
+        val ACTION_TARGET_STORY_NOT_FOUND : (Pair<String,String>) -> String =  { p ->
+            "Target story (${p.second}) provided for action ${p.first} does not exist"
+        }
+
     }
 
     fun validateIntents(tickStory: TickStory): List<String> {
@@ -281,9 +285,12 @@ object TickStoryValidation {
             .map { MessageProvider.UNKNOWN_INTENT_NOT_IN_SECONDARY_INTENTS(it) }
     }
 
+    fun validateTargetStory(tickStory: TickStory, storyExistFn :(String) ->Boolean) : List<String> = with(tickStory.actions) {
+       filterNot { it.isValid(storyExistFn) }
+           .map { MessageProvider.ACTION_TARGET_STORY_NOT_FOUND(it.name to it.targetStory!!) }
+    }
 
-
-    fun validateTickStory(tick: TickStory): Set<String> {
+    fun validateTickStory(tick: TickStory, storyExistFn : (String) ->Boolean): Set<String> {
         val errors = mutableSetOf<String>()
 
         // Consistency between declared intents/triggers and the state machine transitions :
@@ -314,6 +321,9 @@ object TickStoryValidation {
         errors.addAll(validateUnknownConfigActions(tick))
 
         errors.addAll(validateUnknownConfigIntents(tick))
+
+        // Consistency of targetStory
+        errors.addAll(validateTargetStory(tick, storyExistFn))
 
         return errors
     }
