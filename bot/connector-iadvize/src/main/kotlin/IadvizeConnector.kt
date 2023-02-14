@@ -42,9 +42,9 @@ import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
 
 import ai.tock.bot.engine.action.Action
+import ai.tock.shared.exception.rest.BadRequestException
 
 import ai.tock.shared.jackson.mapper
-import ai.tock.shared.vertx.BadRequestException
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse

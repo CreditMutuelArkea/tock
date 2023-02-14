@@ -16,8 +16,8 @@
 
 package ai.tock.bot.connector.iadvize
 
+import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.jackson.mapper
-import ai.tock.shared.vertx.BadRequestException
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 import mu.KotlinLogging
