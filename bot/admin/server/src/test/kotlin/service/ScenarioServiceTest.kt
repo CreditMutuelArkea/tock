@@ -18,9 +18,6 @@ package ai.tock.bot.admin.service
 
 
 import ai.tock.bot.admin.scenario.*
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
-import ai.tock.nlp.front.service.storage.ApplicationDefinitionDAO
-import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
 import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
@@ -28,8 +25,6 @@ import ai.tock.shared.exception.scenario.group.ScenarioGroupWithoutVersionExcept
 import ai.tock.shared.exception.scenario.version.ScenarioVersionBadStateException
 import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
 import ai.tock.shared.exception.scenario.version.ScenarioVersionsInconsistentException
-import ai.tock.shared.tockInternalInjector
-import com.github.salomonbrys.kodein.*
 import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -76,25 +71,6 @@ class ScenarioServiceTest {
         versions = listOf(scenarioVersion1, scenarioVersion2), description = "DESC-COPY", enabled = false)
     private val scenarioGroup2 = ScenarioGroup(_id = groupId2.toId(), botId = botId2, name = "name2", creationDate = dateNow, updateDate = dateNow,
         versions = listOf(scenarioVersion3), enabled = false)
-
-    companion object {
-
-        init {
-            tockInternalInjector = KodeinInjector()
-            val module = Kodein.Module {
-                bind<ScenarioGroupDAO>() with singleton { mockk() }
-                bind<ScenarioVersionDAO>() with singleton { mockk() }
-                bind<ScenarioSettingsDAO>() with singleton { mockk() }
-                bind<ApplicationDefinitionDAO>() with singleton { mockk() }
-                bind<StoryDefinitionConfigurationDAO>() with singleton { mockk() }
-            }
-            tockInternalInjector.inject(
-                Kodein {
-                    import(module)
-                }
-            )
-        }
-    }
 
     @BeforeEach
     fun setUp() {
