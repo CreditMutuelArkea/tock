@@ -1,15 +1,16 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbTabComponent, NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { Observable, of } from 'rxjs';
-import { take, takeUntil } from 'rxjs/operators';
+import { Observable, of, Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { StateService } from '../../../core-nlp/state.service';
 import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ChoiceDialogComponent } from '../../../shared/components';
-import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/sentences-generation-wrapper/sentences-generation-wrapper.component';
+import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/components/sentences-generation-wrapper/sentences-generation-wrapper.component';
+import { SentencesGenerationService } from '../../../shared/modules/sentences-generation/services';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
 export enum FaqTabs {
@@ -43,7 +44,12 @@ export class FaqManagementEditComponent implements OnChanges {
   @ViewChild('addUtteranceInput') addUtteranceInput: ElementRef;
   @ViewChild('utterancesListWrapper') utterancesListWrapper: ElementRef;
 
-  constructor(private nbDialogService: NbDialogService, private nlp: NlpService, private readonly state: StateService) {}
+  constructor(
+    private nbDialogService: NbDialogService,
+    private nlp: NlpService,
+    private readonly state: StateService,
+    private sentencesGenerationService: SentencesGenerationService
+  ) {}
 
   faqTabs: typeof FaqTabs = FaqTabs;
   isSubmitted: boolean = false;
@@ -390,6 +396,7 @@ export class FaqManagementEditComponent implements OnChanges {
   }
 
   generateSentences(): void {
+    const subscription = new Subscription();
     const dialogRef = this.nbDialogService.open(SentencesGenerationWrapperComponent, {
       context: {
         sentences: this.utterances.value
@@ -398,6 +405,16 @@ export class FaqManagementEditComponent implements OnChanges {
 
     dialogRef.componentRef.instance.onGeneratedSentences.subscribe((generatedSentences: string[]) => {
       generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
+      subscription.add(
+        this.utterances.valueChanges.subscribe((utterances) => {
+          this.sentencesGenerationService.feedSentencesExample(utterances);
+        })
+      );
+    });
+
+    dialogRef.onClose.subscribe(() => {
+      this.sentencesGenerationService.reset();
+      subscription.unsubscribe();
     });
   }
 

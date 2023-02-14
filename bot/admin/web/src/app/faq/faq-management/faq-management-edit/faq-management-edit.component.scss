@@ -2,6 +2,10 @@
 @import '~@nebular/theme/styles/theming';
 @import '~@nebular/theme/styles/themes';
 
+nb-card {
+  height: calc(100vh - 11.5rem);
+}
+
 @include nb-install-component() {
   .entries-list {
     max-height: 35vh;

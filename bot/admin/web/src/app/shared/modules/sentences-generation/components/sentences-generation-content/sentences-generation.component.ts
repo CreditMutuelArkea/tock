@@ -1,10 +1,9 @@
-import { SelectionModel } from '@angular/cdk/collections';
 import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService } from '@nebular/theme';
 
-import { RestService } from '../../../../core-nlp/rest/rest.service';
+import { RestService } from '../../../../../core-nlp/rest/rest.service';
 
 type GeneratedSentence = {
   sentence: string;
@@ -26,9 +25,9 @@ export class SentencesGenerationComponent implements OnChanges {
   @Output() onGeneratedSentences = new EventEmitter<string[]>();
 
   generatedSentences: GeneratedSentence[] = [];
-  selection: SelectionModel<GeneratedSentence> = new SelectionModel<GeneratedSentence>(true, []);
   distinctGeneratedSentencesLength: number = 0;
   alert: boolean = true;
+  sentencesExampleMax: number = 5;
 
   form = new FormGroup({
     spellingMistakes: new FormControl(false),
@@ -36,7 +35,7 @@ export class SentencesGenerationComponent implements OnChanges {
     abbreviatedLanguage: new FormControl(false),
     temperature: new FormControl(0.7),
     sentenceExample: new FormControl(''),
-    sentencesExample: new FormControl([], [Validators.maxLength(3)])
+    sentencesExample: new FormControl([], [Validators.maxLength(this.sentencesExampleMax)])
   });
 
   get spellingMistakes(): FormControl {
@@ -61,6 +60,10 @@ export class SentencesGenerationComponent implements OnChanges {
 
   get sentencesExample(): FormControl {
     return this.form.get('sentencesExample') as FormControl;
+  }
+
+  get canGenerate(): boolean {
+    return !this.form.valid || !(this.sentenceExample.value || this.sentencesExample.value.length);
   }
 
   constructor(private toastrService: NbToastrService, private rest: RestService, private http: HttpClient) {}
@@ -89,7 +92,7 @@ export class SentencesGenerationComponent implements OnChanges {
     }
 
     request.push(
-      'Takes into account the previous parameters and generates 10 sentences derived from the sentences in the following table:'
+      'Takes into account the previous parameters and generates 5 sentences derived from the sentences in the following table: '
     );
     request.push('[');
 
@@ -131,7 +134,8 @@ export class SentencesGenerationComponent implements OnChanges {
       },
       error: (e) => {
         this.onLoading.emit(false);
-        this.toastrService.danger(e?.message || 'An error has occured', 'Error');
+        console.error(e);
+        this.toastrService.danger(e?.error?.error?.message || 'An error has occured', 'Error');
       }
     });
   }

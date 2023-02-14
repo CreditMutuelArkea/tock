@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
-import { SentencesGenerationComponent } from './sentences-generation-content/sentences-generation.component';
-import { SentencesGenerationWrapperComponent } from './sentences-generation-wrapper/sentences-generation-wrapper.component';
 import {
   NbButtonModule,
   NbCardModule,
@@ -17,6 +14,9 @@ import {
   NbSelectModule
 } from '@nebular/theme';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+
+import { SentencesGenerationComponent, SentencesGenerationWrapperComponent } from './components';
+import { SentencesGenerationService } from './services';
 
 @NgModule({
   declarations: [SentencesGenerationComponent, SentencesGenerationWrapperComponent],
@@ -36,6 +36,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     NbInputModule,
     NbSelectModule
   ],
-  exports: [SentencesGenerationComponent, SentencesGenerationWrapperComponent]
+  exports: [SentencesGenerationComponent, SentencesGenerationWrapperComponent],
+  providers: [SentencesGenerationService]
 })
 export class SentencesGenerationModule {}

@@ -45,7 +45,7 @@ import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 
 import { CanvasModule } from './canvas/canvas.module';
-import { SentencesGenerationModule } from './modules/sentences-generation/sentences-generation.module';
+import { SentencesGenerationModule } from './modules';
 
 import {
   AutocompleteInputComponent,
