@@ -16,10 +16,6 @@
 
 package ai.tock.bot.connector.iadvize.model.response.conversation.payload
 
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeClose
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
