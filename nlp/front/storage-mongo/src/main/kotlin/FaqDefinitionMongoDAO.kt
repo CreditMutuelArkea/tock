@@ -329,11 +329,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 joinOnClassifiedSentence(),
                 // unwind : to flat faq array into an object
                 FaqQueryResult::faq.unwind(),
-                // unwind : to flat utterrances array into an object
-                // Make it possible to filter directly on classified sentences per element ($elemMatch not available in Mongo 3.6.5)
-                // FaqQueryResult::utterances.unwind(
-                //     // keep faq search with orphans utterances
-                //     UnwindOptions().preserveNullAndEmptyArrays(true)),
+
                 match(
                     andNotNull(
                         andNotNull(
