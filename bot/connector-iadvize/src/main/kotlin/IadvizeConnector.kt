@@ -317,7 +317,9 @@ class IadvizeConnector internal constructor(
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
-                controller.handle(event, ConnectorData(callback))
+                controller.handle(event, ConnectorData(callback, conversationData = mapOf(
+                    ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
+                )))
             }
 
             // Only MessageRequest are supported, other messages are UnsupportedMessage
