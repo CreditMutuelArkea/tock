@@ -16,9 +16,10 @@
 
 package ai.tock.bot.admin.service
 
-import ai.tock.bot.admin.AbstractTest
+
 import ai.tock.bot.admin.scenario.*
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
+import ai.tock.nlp.front.service.storage.ApplicationDefinitionDAO
 import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
 import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
@@ -38,7 +39,7 @@ import org.litote.kmongo.toId
 import java.time.ZonedDateTime
 import kotlin.test.*
 
-class ScenarioServiceTest : AbstractTest() {
+class ScenarioServiceTest {
 
     private val dateNow = ZonedDateTime.parse("2022-01-01T00:00:00.000Z")
 
@@ -48,7 +49,6 @@ class ScenarioServiceTest : AbstractTest() {
 
     private val groupId1 = "groupId1"
     private val groupId2 = "groupId2"
-    private val groupId3 = "groupId3"
     private val versionId1 = "versionId1"
     private val versionId2 = "versionId2"
     private val versionId3 = "versionId3"
@@ -79,20 +79,17 @@ class ScenarioServiceTest : AbstractTest() {
 
     companion object {
 
-        private val storyDefinitionConfigurationDAO: StoryDefinitionConfigurationDAO = mockk()
-        private val scenarioSettingsDAO: ScenarioSettingsDAO = mockk()
-
         init {
             tockInternalInjector = KodeinInjector()
             val module = Kodein.Module {
                 bind<ScenarioGroupDAO>() with singleton { mockk() }
                 bind<ScenarioVersionDAO>() with singleton { mockk() }
-                bind<ScenarioSettingsDAO>() with singleton { scenarioSettingsDAO }
-                bind<StoryDefinitionConfigurationDAO>() with singleton { storyDefinitionConfigurationDAO }
+                bind<ScenarioSettingsDAO>() with singleton { mockk() }
+                bind<ApplicationDefinitionDAO>() with singleton { mockk() }
+                bind<StoryDefinitionConfigurationDAO>() with singleton { mockk() }
             }
             tockInternalInjector.inject(
                 Kodein {
-                    import(defaultModulesBinding())
                     import(module)
                 }
             )
@@ -101,11 +98,12 @@ class ScenarioServiceTest : AbstractTest() {
 
     @BeforeEach
     fun setUp() {
-        every { scenarioSettingsDAO.listenChanges(any()) } answers {}
+        mockkObject(ScenarioSettingsService)
+        every { ScenarioSettingsService.listenChanges(any()) } answers {}
         mockkObject(ScenarioGroupService)
         mockkObject(ScenarioVersionService)
         mockkObject(StoryService)
-        mockkObject(ScenarioSettingsService)
+
     }
 
     @AfterEach
