@@ -110,10 +110,9 @@ class IadvizeConnectorCallback(override val  applicationId: String,
             request.idConversation,
             request.idOperator,
             LocalDateTime.now(),
-            LocalDateTime.now()
-        )
+            LocalDateTime.now())
 
-        return when (request) {
+        return when(request) {
             is ConversationsRequest -> response
 
             is MessageRequest,

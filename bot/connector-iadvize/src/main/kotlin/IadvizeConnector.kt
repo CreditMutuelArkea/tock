@@ -129,12 +129,12 @@ class IadvizeConnector internal constructor(
                 logContextRequest(context)
 
                 // Check payloads signature
-                if (!secretToken.isNullOrBlank()) {
+                if(!secretToken.isNullOrBlank()) {
                     IadvizeSecurity(secretToken).validatePayloads(context)
                 }
                 // Invoke handler
                 iadvizeHandler.invoke(context, controller)
-            } catch (error: BadRequestException) {
+            } catch (error: BadRequestException){
                 logger.error(error)
                 context.fail(400)
             } catch (error: Throwable) {
@@ -197,8 +197,7 @@ class IadvizeConnector internal constructor(
     }
 
     internal var handlerStrategies: IadvizeHandler = { context, _ ->
-        context.response()
-            .endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
+        context.response().endWithJson(listOf(AvailabilityStrategies(strategy = customAvailability, availability = true)))
     }
 
     internal var handlerFirstMessage: IadvizeHandler = { context, controller ->
