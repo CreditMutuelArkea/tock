@@ -14,23 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.sender
+package ai.tock.bot
 
-/**
- * A tick sender
- */
-interface TickSender {
-
-    fun sendById(id: String)
-
-    fun endById(id: String)
-
-    fun sendPlainText(text: String = "")
-
-    fun endPlainText(text: String = "")
-
-    /**
-     * Give control back to the user without any message text
-     */
-    fun end()
-}
+const val IADVIZE_HANDLER_ID = "check_client_connected"
+const val IADVIZE_CONVERSATION_ID = "CONVERSATION_ID"
+const val IADVIZE_CLIENT_CONNECTED = "CLIENT_CONNECTED"
+const val IADVIZE_CLIENT_DISCONNECTED = "CLIENT_DISCONNECTED"
+const val IADVIZE_DESCRIPTION = "Check if the client is connected or not"
+const val IADVIZE_CUSTOM_DATA_KEY = "iadvize_custom_data_key"
+const val IADVIZE_CUSTOM_DATA_VALUE = "iadvize_custom_data_value"

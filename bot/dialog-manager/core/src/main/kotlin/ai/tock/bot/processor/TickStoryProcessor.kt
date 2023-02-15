@@ -90,20 +90,33 @@ class TickStoryProcessor(
         /*
         Sets the current handling step
             If the current handling step has the same linked action as the secondary objective,
-                then the current handling step is incremented
-                    If the action is repeated more than the maximum number of repetitions
-                        then a redirection is required
+                And If the user action is null (it is na infinite loop)
+                    Then return
+                Else,
+                    Then the current handling step is incremented
+                        If the action is repeated more than the maximum number of repetitions
+                            then a redirection is required
             Else, the current handling step is set to a new handling step with the secondary objective as linked action
         */
-        handlingStep = if (handlingStep.action == secondaryObjective) {
-            with(configuration.storySettings) {
-                if (handlingStep.repeated > repetitionNb) {
-                    return Redirect(redirectStory)
+
+        handlingStep = when (handlingStep.action) {
+            secondaryObjective ->
+                when (tickUserAction) {
+                    null -> {
+                        sender.end()
+                        return Success(TickSession(currentState, contextNames, ranHandlers, objectivesStack.toList(),
+                                handlingStep = handlingStep), false)
+                    }
+                    else -> {
+                        with(configuration.storySettings) {
+                            if (handlingStep.repeated > repetitionNb) {
+                                return Redirect(redirectStory)
+                            }
+                        }
+                        handlingStep.next() as TickActionHandlingStep
+                    }
                 }
-            }
-            handlingStep.next() as TickActionHandlingStep
-        } else {
-            TickActionHandlingStep(action =  secondaryObjective)
+            else -> TickActionHandlingStep(action = secondaryObjective)
         }
 
         // Get the corresponding action
