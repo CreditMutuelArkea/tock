@@ -16,10 +16,8 @@
 
 package ai.tock.bot.admin.service
 
-import ai.tock.bot.admin.scenario.ScenarioGroup
-import ai.tock.bot.admin.scenario.ScenarioVersion
-import ai.tock.bot.admin.scenario.ScenarioVersionState
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
+
+import ai.tock.bot.admin.scenario.*
 import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
@@ -27,14 +25,9 @@ import ai.tock.shared.exception.scenario.group.ScenarioGroupWithoutVersionExcept
 import ai.tock.shared.exception.scenario.version.ScenarioVersionBadStateException
 import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
 import ai.tock.shared.exception.scenario.version.ScenarioVersionsInconsistentException
-import ai.tock.shared.injector
-import ai.tock.shared.tockInternalInjector
-import com.github.salomonbrys.kodein.Kodein
-import com.github.salomonbrys.kodein.KodeinInjector
-import com.github.salomonbrys.kodein.instance
 import io.mockk.*
-import org.junit.Before
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.toId
@@ -51,7 +44,6 @@ class ScenarioServiceTest {
 
     private val groupId1 = "groupId1"
     private val groupId2 = "groupId2"
-    private val groupId3 = "groupId3"
     private val versionId1 = "versionId1"
     private val versionId2 = "versionId2"
     private val versionId3 = "versionId3"
@@ -79,6 +71,13 @@ class ScenarioServiceTest {
         versions = listOf(scenarioVersion1, scenarioVersion2), description = "DESC-COPY", enabled = false)
     private val scenarioGroup2 = ScenarioGroup(_id = groupId2.toId(), botId = botId2, name = "name2", creationDate = dateNow, updateDate = dateNow,
         versions = listOf(scenarioVersion3), enabled = false)
+
+    @BeforeEach
+    fun setUp() {
+        mockkObject(ScenarioSettingsService)
+        every { ScenarioSettingsService.listenChanges(any()) } answers {}
+        mockkObject(StoryService)
+    }
 
     @AfterEach
     fun clearMockk() {
