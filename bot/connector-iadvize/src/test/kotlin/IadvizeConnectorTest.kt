@@ -21,7 +21,7 @@ import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
@@ -55,7 +55,7 @@ class IadvizeConnectorTest {
     val firstMessage = "firstMessage"
     val distributionRule = "distributionRuleId"
     val distributionRuleUnavailableMessage = "distributionRuleUnavailableMessage"
-    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, null, distributionRuleUnavailableMessage)
+    val connector = IadvizeConnector(applicationId, path, editorURL,firstMessage, distributionRule, null, distributionRuleUnavailableMessage, null)
     val controller: ConnectorController = mockk(relaxed = true)
     val context: RoutingContext = mockk(relaxed = true)
     val response: HttpServerResponse = mockk(relaxed = true)
@@ -66,6 +66,7 @@ class IadvizeConnectorTest {
     val conversationId = "conversationId"
 
 
+    private val marcus: String = "MARCUS"
     private val marcus1: String = "MARCUS1"
     private val marcus2: String = "MARCUS2"
 
@@ -80,15 +81,15 @@ class IadvizeConnectorTest {
         every { context.pathParam("idConversation") } returns conversationId
 
         every { controller.botDefinition.i18nTranslator(any(), any(), any(), any()) } returns translator
-        val marcusAnswer1 = I18nLabelValue("", "", "", marcus1)
-        every { translator.translate(marcus1) } returns marcusAnswer1.raw
-        val marcusAnswer2 = I18nLabelValue("", "", "", marcus2)
-        every { translator.translate(marcus2) } returns marcusAnswer2.raw
+
+        val messageSlot = slot<CharSequence>()
+        every { translator.translate(capture(messageSlot)) } answers { I18nLabelValue("", "", "", messageSlot.captured).raw }
 
         // Force date to expected date
         mockkStatic(LocalDateTime::class)
         every { LocalDateTime.now() } returns LocalDateTime.of(2022, 4, 8, 16, 52, 37)
         every { LocalDateTime.of(2022, 4, 8, 16, 52, 37) } answers { callOriginal() }
+
     }
 
     @Test
