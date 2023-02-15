@@ -1,0 +1,67 @@
+<section class="list">
+  <header class="list--header d-flex align-items-center gap-1 pl-3 py-2">
+    <nb-checkbox
+      class="lineHeight-0 checkbox-all"
+      [checked]="isAllSelectedGeneratedSentences"
+      [indeterminate]="isSelectedGeneratedSentences"
+      (checkedChange)="toggleAllSelectGeneratedSentences($event)"
+    ></nb-checkbox>
+    <div class="d-flex w-100">
+      <button
+        *ngIf="isSelectedGeneratedSentences || isAllSelectedGeneratedSentences"
+        nbButton
+        nbTooltip="Validate all selected sentences"
+        class="text-success"
+        ghost
+        shape="round"
+        (click)="validateSelection()"
+      >
+        <nb-icon icon="checkmark-circle-2"></nb-icon>
+      </button>
+      <button
+        class="ml-auto"
+        nbButton
+        nbTooltip="Regenerate"
+        ghost
+        shape="round"
+        (click)="generate()"
+      >
+        <nb-icon icon="refresh-outline"></nb-icon>
+      </button>
+      <button
+        nbButton
+        nbTooltip="Options"
+        ghost
+        shape="round"
+        (click)="backOptions()"
+      >
+        <nb-icon icon="options-2-outline"></nb-icon>
+      </button>
+    </div>
+  </header>
+  <nb-list>
+    <nb-list-item
+      *ngFor="let generatedSentence of generatedSentences"
+      class="d-flex flex-wrap align-items-center gap-1"
+    >
+      <nb-checkbox
+        *ngIf="generatedSentence.distinct"
+        class="lineHeight-0"
+        [(ngModel)]="generatedSentence.selected"
+      ></nb-checkbox>
+      <nb-icon
+        *ngIf="!generatedSentence.distinct"
+        icon="checkmark-circle-2-outline"
+        nbTooltip="Already present"
+      ></nb-icon>
+      <span
+        *ngIf="generatedSentence.distinct"
+        class="pointer"
+        (click)="toggleSelectGeneratedSentence(generatedSentence)"
+      >
+        {{ generatedSentence.sentence }}
+      </span>
+      <span *ngIf="!generatedSentence.distinct">{{ generatedSentence.sentence }}</span>
+    </nb-list-item>
+  </nb-list>
+</section>

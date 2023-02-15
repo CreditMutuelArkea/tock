@@ -15,11 +15,21 @@ import {
 } from '@nebular/theme';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { SentencesGenerationComponent, SentencesGenerationWrapperComponent } from './components';
+import {
+  SentencesGenerationContentComponent,
+  SentencesGenerationListComponent,
+  SentencesGenerationOptionsComponent,
+  SentencesGenerationWrapperComponent
+} from './components';
 import { SentencesGenerationService } from './services';
 
 @NgModule({
-  declarations: [SentencesGenerationComponent, SentencesGenerationWrapperComponent],
+  declarations: [
+    SentencesGenerationContentComponent,
+    SentencesGenerationListComponent,
+    SentencesGenerationOptionsComponent,
+    SentencesGenerationWrapperComponent
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -36,7 +46,7 @@ import { SentencesGenerationService } from './services';
     NbInputModule,
     NbSelectModule
   ],
-  exports: [SentencesGenerationComponent, SentencesGenerationWrapperComponent],
+  exports: [SentencesGenerationContentComponent, SentencesGenerationWrapperComponent],
   providers: [SentencesGenerationService]
 })
 export class SentencesGenerationModule {}
