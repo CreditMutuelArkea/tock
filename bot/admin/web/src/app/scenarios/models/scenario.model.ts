@@ -96,6 +96,7 @@ export interface ScenarioActionDefinition {
   trigger?: ScenarioTriggerDefinition;
   answers?: ScenarioAnswer[];
   answerId?: string;
+  targetStory?: string;
   unknownAnswers?: ScenarioAnswer[];
   unknownAnswerId?: string;
   final?: boolean;

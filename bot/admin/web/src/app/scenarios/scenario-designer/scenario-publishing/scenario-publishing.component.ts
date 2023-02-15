@@ -1,13 +1,14 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
-import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 
 import { BotService } from '../../../bot/bot-service';
 import { CreateI18nLabelRequest, I18nLabel, I18nLabels, I18nLocalizedLabel } from '../../../bot/model/i18n';
+import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 import { StateService } from '../../../core-nlp/state.service';
 import { ClassifiedEntity, Intent, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
-import { JsonPreviewerComponent } from '../../../shared/components/json-previewer/json-previewer.component';
+import { deepCopy } from '../../../shared/utils';
 import { isStepValid } from '../../commons/scenario-validation';
 import { getScenarioActionDefinitions, getScenarioActions, getScenarioIntents } from '../../commons/utils';
 import {
@@ -37,6 +38,7 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
   @Input() isReadonly: boolean;
   @Input() i18n: I18nLabels;
   @Input() readonly avalaibleHandlers: Handler[];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   destroy = new Subject();
 
@@ -48,7 +50,6 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
     private nlp: NlpService,
     private scenarioDesignerService: ScenarioDesignerService,
     private botService: BotService,
-    private nbDialogService: NbDialogService,
     private scenarioService: ScenarioService,
     private toastrService: NbToastrService
   ) {}
@@ -75,16 +76,32 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
 
     if (!unPublishable) {
       const actionDefs = getScenarioActionDefinitions(this.scenario);
+
       const expectedHandlers = actionDefs.filter((ad) => ad.handler).map((ad) => ad.handler);
-      let unImplementedHandlers = [];
-      expectedHandlers.forEach((eh) => {
-        if (!this.avalaibleHandlers.find((h) => h.name === eh)) {
-          unImplementedHandlers.push(eh);
+      const unImplementedHandlers = [];
+      expectedHandlers.forEach((expectedHandler) => {
+        if (!this.avalaibleHandlers.find((h) => h.name === expectedHandler)) {
+          unImplementedHandlers.push(expectedHandler);
         }
       });
 
       if (unImplementedHandlers.length) {
         unPublishable = `The following handlers are not yet implemented on the server side : ${unImplementedHandlers.join(', ')}`;
+      }
+
+      const expectedStories = actionDefs.filter((ad) => ad.targetStory).map((ad) => ad.targetStory);
+      const missingTargetStories = [];
+      expectedStories.forEach((expectedStory) => {
+        if (!this.availableStories.find((s) => s.storyId === expectedStory)) {
+          missingTargetStories.push(expectedStory);
+        }
+      });
+
+      if (missingTargetStories.length) {
+        if (!unPublishable) {
+          unPublishable = '';
+        }
+        unPublishable += `The following target stories have been removed : ${missingTargetStories.join(', ')}`;
       }
     }
 
@@ -472,7 +489,16 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
       }
     });
 
-    const actionsDefinitions = getScenarioActionDefinitions(this.scenario);
+    const actionsDefinitions = deepCopy(getScenarioActionDefinitions(this.scenario));
+
+    // If an action refers to a targetStory, we delete all that concerns the unknown answers and the output contexts which, in this case, are useless
+    actionsDefinitions.forEach((actionDef) => {
+      if (actionDef.targetStory) {
+        delete actionDef.unknownAnswerId;
+        delete actionDef.unknownAnswers;
+        actionDef.outputContextNames = [];
+      }
+    });
 
     let unknownAnswerConfigs = [];
     actionsDefinitions.forEach((actionDefinition) => {

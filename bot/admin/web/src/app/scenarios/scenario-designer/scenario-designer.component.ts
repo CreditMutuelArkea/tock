@@ -27,6 +27,7 @@ import { FullscreenDirective } from '../../shared/directives';
 import { Handler } from '../models';
 import { deepCopy } from '../../shared/utils';
 import { UserInterfaceType } from '../../core/model/configuration';
+import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../bot/model/story';
 
 @Component({
   selector: 'scenario-designer',
@@ -45,6 +46,7 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
   isReadonly: boolean = false;
   i18n: I18nLabels;
   avalaibleHandlers: Handler[];
+  availableStories: StoryDefinitionConfigurationSummary[];
   initialDependenciesCheckDone: boolean = false;
 
   private footer: HTMLElement;
@@ -77,6 +79,7 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
     });
 
     this.loadAvalaibleHandlers();
+    this.loadAvailableStories();
 
     this.route.params.pipe(takeUntil(this.destroy)).subscribe((routeParams) => {
       this.loadAndInitScenario(routeParams);
@@ -184,6 +187,23 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
     this.scenarioService.getActionHandlers().subscribe((handlers) => {
       this.avalaibleHandlers = handlers;
     });
+  }
+
+  private loadAvailableStories(): void {
+    this.botService
+      .searchStories(
+        new StorySearchQuery(
+          this.state.currentApplication.namespace,
+          this.state.currentApplication.name,
+          this.state.currentLocale,
+          0,
+          10000
+        )
+      )
+      .pipe(take(1))
+      .subscribe((stories: StoryDefinitionConfigurationSummary[]) => {
+        this.availableStories = stories;
+      });
   }
 
   private checkDependencies(): void {
