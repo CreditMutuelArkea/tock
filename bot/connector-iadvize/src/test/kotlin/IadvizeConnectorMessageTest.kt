@@ -14,14 +14,10 @@ package ai.tock.bot.connector.iadvize/*
  * limitations under the License.
  */
 
-import ai.tock.bot.connector.iadvize.IadvizeConnectorMessage
-import ai.tock.bot.connector.iadvize.iadvizeConnectorType
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
-import ai.tock.bot.connector.iadvize.minutes
-import ai.tock.bot.connector.iadvize.seconds
 import ai.tock.bot.engine.message.Choice
 import ai.tock.bot.engine.message.GenericMessage
 import org.junit.jupiter.api.Test
