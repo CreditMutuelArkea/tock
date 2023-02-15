@@ -25,7 +25,8 @@ import ai.tock.shared.booleanProperty
 import mu.KotlinLogging
 import java.util.Stack
 
-val debugEnabled = booleanProperty("tock_bot_dialog_manager_debug_enabled", true)
+// TODO MASS : to be deleted with DERCBOT-321
+val debugEnabled = booleanProperty("tock_bot_dialog_manager_debug_enabled", false)
 
 /**
  * A processor of tick story, it orchestrates the use of the state machine and the solver.
@@ -118,7 +119,7 @@ class TickStoryProcessor(
         updateCurrentState(primaryObjective, secondaryObjective)
 
         if(debugEnabled) {
-            // TODO MASS à supprimer une fois le debug front est ok: c'est juste pour MAJ le graph
+            // TODO MASS (JIRA DERCBOT-321) à supprimer une fois le debug front est ok: c'est juste pour MAJ le graph
             GraphSolver.solve(
                 debugEnabled,
                 ranHandlers.lastOrNull(),

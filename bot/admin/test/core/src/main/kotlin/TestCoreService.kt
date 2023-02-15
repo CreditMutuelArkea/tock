@@ -210,7 +210,10 @@ class TestCoreService : TestService {
         }
     }
 
+    // TODO MASS : to be deleted with DERCBOT-321
     private fun getDebugLog(conf: BotApplicationConfiguration): ScenarioDebugResponse {
+        if(!debugEnabled) return ScenarioDebugResponse(imgBase64 = "")
+
         val restClient = getRestClient(conf)
         val response = restClient.getDebugLog(conf.path ?: conf.applicationId)
 
