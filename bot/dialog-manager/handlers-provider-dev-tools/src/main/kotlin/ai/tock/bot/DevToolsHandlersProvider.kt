@@ -18,11 +18,15 @@ package ai.tock.bot
 
 import ai.tock.bot.handler.ActionHandler
 import ai.tock.bot.handler.ActionHandlersProvider
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
+import ai.tock.iadvize.client.graphql.models.customData.CustomDatas
 
 /**
  * The [DevToolsHandlersProvider] is a set of developer handlers made available to speed up scenario design
  */
-class DevToolsHandlersProvider: ActionHandlersProvider {
+class DevToolsHandlersProvider : ActionHandlersProvider {
+
+    private val iadvizeGraphQLClient = IadvizeGraphQLClient()
 
     override fun getNameSpace() = HandlerNamespace.DEV_TOOLS
 
@@ -33,7 +37,7 @@ class DevToolsHandlersProvider: ActionHandlersProvider {
                 description = "Handler who does nothing. It is used to force the next round",
                 handler = { emptyMap() })
         ).plus(
-            (1..7).map {counter ->
+            (1..7).map { counter ->
                 createActionHandler(
                     id = "set_context_$counter",
                     description = "Handler that just sets <DEV_CONTEXT_$counter>",
@@ -41,5 +45,28 @@ class DevToolsHandlersProvider: ActionHandlersProvider {
                     handler = { mapOf("DEV_CONTEXT_$counter" to null) }
                 )
             }
-        ).toSet()
+        ).plus(createIadvizeHandler())
+            .toSet()
+
+    private fun createIadvizeHandler(): ActionHandler {
+
+        return createActionHandler(
+            id = IADVIZE_HANDLER_ID,
+            description = IADVIZE_DESCRIPTION,
+            inputContexts = setOf(IADVIZE_CONVERSATION_ID),
+            outputContexts = setOf(IADVIZE_CLIENT_CONNECTED, IADVIZE_CLIENT_DISCONNECTED),
+            handler = {
+                with(mutableMapOf<String, String?>()) {
+                    it[IADVIZE_CONVERSATION_ID]?.let { conversationId ->
+                        iadvizeGraphQLClient.isCustomDataExist(conversationId, CustomDatas.CHAT_ENABLED)
+                            .let { connected ->
+                                if (connected) put(IADVIZE_CLIENT_CONNECTED, null)
+                                else put(IADVIZE_CLIENT_DISCONNECTED, null)
+                            }
+                    }
+                    this
+                }
+            }
+        )
+    }
 }
