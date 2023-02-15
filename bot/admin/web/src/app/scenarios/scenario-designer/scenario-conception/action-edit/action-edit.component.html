@@ -385,10 +385,7 @@
             Output contexts
           </label>
 
-          <nb-list
-            class="contexts-list"
-            *ngIf="!targetStory.value"
-          >
+          <nb-list class="contexts-list">
             <nb-list-item
               *ngFor="let outputContext of outputContextNames.value"
               class="p-2 d-flex justify-content-between"
