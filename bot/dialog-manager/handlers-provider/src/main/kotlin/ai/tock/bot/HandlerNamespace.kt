@@ -22,7 +22,6 @@ enum class HandlerNamespace(val key: String, val shared: Boolean = true) { // TO
     SURAVENIR_ASSURANCES(key = "suravenir-assurances"),
     AVENIR_ASSURANCE(key = "avenir-assurance"), // TODO MASS : to delete
     JOIGNABILITE(key = "joignabilite"),
-    IADVIZE(key = "iadvize"),
     UNKNOWN(key = "UNKNOWN");
 
     companion object {
