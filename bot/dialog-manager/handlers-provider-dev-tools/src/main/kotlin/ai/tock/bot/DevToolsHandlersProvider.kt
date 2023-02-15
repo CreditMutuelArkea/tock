@@ -19,7 +19,10 @@ package ai.tock.bot
 import ai.tock.bot.handler.ActionHandler
 import ai.tock.bot.handler.ActionHandlersProvider
 import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
-import ai.tock.iadvize.client.graphql.models.customData.CustomDatas
+import ai.tock.shared.propertyOrNull
+
+val customDataKey = propertyOrNull(IADVIZE_CUSTOM_DATA_KEY)
+val customDataValue = propertyOrNull(IADVIZE_CUSTOM_DATA_VALUE)
 
 /**
  * The [DevToolsHandlersProvider] is a set of developer handlers made available to speed up scenario design
@@ -45,8 +48,16 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
                     handler = { mapOf("DEV_CONTEXT_$counter" to null) }
                 )
             }
-        ).plus(createIadvizeHandler())
-            .toSet()
+        ).let {
+            if (customDataKey != null && customDataValue != null) {
+                println("$customDataKey => $customDataValue")
+                it.plus(createIadvizeHandler())
+            } else {
+                it
+            }
+        }
+
+
 
     private fun createIadvizeHandler(): ActionHandler {
 
@@ -58,7 +69,7 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
             handler = {
                 with(mutableMapOf<String, String?>()) {
                     it[IADVIZE_CONVERSATION_ID]?.let { conversationId ->
-                        iadvizeGraphQLClient.isCustomDataExist(conversationId, CustomDatas.CHAT_ENABLED)
+                        iadvizeGraphQLClient.isCustomDataExist(conversationId, customDataKey!! to customDataValue!!)
                             .let { connected ->
                                 if (connected) put(IADVIZE_CLIENT_CONNECTED, null)
                                 else put(IADVIZE_CLIENT_DISCONNECTED, null)
@@ -69,4 +80,5 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
             }
         )
     }
+
 }
