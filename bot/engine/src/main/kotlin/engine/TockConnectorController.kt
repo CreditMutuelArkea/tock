@@ -81,8 +81,10 @@ internal class TockConnectorController constructor(
                     logger.info { "Register connector $connector for bot $bot" }
                     connector.register(this)
 
-                    // TODO MASS
-                    exposePythonLog()
+                    if(debugEnabled) {
+                        // TODO MASS: JIRA DERCBOT-321
+                        exposePythonLog()
+                    }
                 }
 
         internal fun unregister(
