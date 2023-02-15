@@ -18,11 +18,23 @@ package ai.tock.bot.connector.iadvize.model.request
 
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 
-data class TransferRequest(override val idOperator: String, override val idConversation: String, val message: Message<TextPayload>, val isProactive: Boolean) : IadvizeRequest {
-
-    data class TransferRequestJson(val idOperator: String, val message: Message<TextPayload>, val isProactive: Boolean)
-
-    constructor(transferRequestJson: TransferRequestJson, idConversation: String, isProactive: Boolean) :
-            this(transferRequestJson.idOperator, idConversation, transferRequestJson.message, isProactive)
+data class TransferRequest(
+    override val idOperator: String,
+    override val idConversation: String,
+    val history: List<Message<TextPayload>>,
+    val isProactive: Boolean
+) : IadvizeRequest {
+    data class TransferRequestJson(
+        val idOperator: String,
+        val history: List<Message<TextPayload>>,
+        val isProactive: Boolean
+    )
+    constructor(transferRequestJson: TransferRequestJson, idConversation: String) :
+            this(
+                transferRequestJson.idOperator,
+                idConversation,
+                transferRequestJson.history,
+                transferRequestJson.isProactive
+            )
 
 }

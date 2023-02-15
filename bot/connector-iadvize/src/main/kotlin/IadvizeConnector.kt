@@ -24,6 +24,7 @@ import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
 import ai.tock.bot.connector.iadvize.model.request.TransferRequest
+import ai.tock.bot.connector.iadvize.model.request.TransferRequest.TransferRequestJson
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest.MessageRequestJson
 import ai.tock.bot.connector.iadvize.model.request.TypeMessage
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
@@ -38,6 +39,7 @@ import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
+import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
@@ -59,6 +61,7 @@ private const val QUERY_ID_OPERATOR: String = "idOperator"
 private const val QUERY_ID_CONVERSATION: String = "idConversation"
 private const val TYPE_TEXT: String = "text"
 private const val ROLE_OPERATOR: String = "operator"
+private const val TRANSFERRED: String = "TRANSFERRED"
 
 /**
  * Iadvize API Connector
@@ -70,7 +73,7 @@ class IadvizeConnector internal constructor(
     val firstMessage: String,
     val distributionRule: String?,
     val secretToken: String?,
-    val distributionRuleUnvailableMessage: String,
+    val distributionRuleUnavailableMessage: String,
 ) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
 
     companion object {
@@ -95,7 +98,7 @@ class IadvizeConnector internal constructor(
                 .handleAndCatchException(controller, handlerFirstMessage)
 
             router.post("$path/conversations")
-                .handleAndCatchException(controller, handlerStartConversation)
+                .handleAndCatchException(controller, handlerStartOrTransferConversation)
 
             router.post("$path/conversations/:idConversation/messages")
                 .handleAndCatchException(controller, handlerConversation)
@@ -194,33 +197,42 @@ class IadvizeConnector internal constructor(
         context.response().endWithJson(RepliesResponse(IadvizeMessage(firstMessage)))
     }
 
-    internal var handlerStartConversation: IadvizeHandler = { context, controller ->
-
-        val conversationRequest: ConversationsRequest =
-            mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
-
+    /**
+     * Handler is used when conservation starts or when the conversation is transferred
+     */
+    internal var handlerStartOrTransferConversation: IadvizeHandler = { context, controller ->
+        val iadvizeRequest: IadvizeRequest = mapConversationsRequest(context)
         val callback = IadvizeConnectorCallback(
             applicationId,
             controller,
             context,
-            conversationRequest,
+            iadvizeRequest,
             distributionRule,
-            distributionRuleUnvailableMessage
+            distributionRuleUnavailableMessage
         )
 
-        callback.sendResponse()
+        when (iadvizeRequest) {
+            is TransferRequest -> {
+                val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
+                controller.handle(event, ConnectorData(callback))
+            }
+            //default response
+            is ConversationsRequest -> {
+                callback.sendResponse()
+            }
+        }
     }
 
     internal var handlerConversation: IadvizeHandler = { context, controller ->
         val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
-        val iadvizeRequest: IadvizeRequest = mapRequest(idConversation, context)
-
+        val iadvizeRequest: IadvizeRequest = mapConversationMessageRequest(idConversation, context)
         if (!isOperator(iadvizeRequest)) {
-                handleVisitorRequest(controller,context, iadvizeRequest)
+            handleRequest(controller, context, iadvizeRequest)
         } else {
-                handleOperatorRequest(controller, context, iadvizeRequest)
-            }
+            //ignore message from operator
+            context.response().end()
         }
+    }
 
     /*
      * If request is a MessageRequest and the author of message have role "operator" : do not treat request.
@@ -231,7 +243,10 @@ class IadvizeConnector internal constructor(
                 && iadvizeRequest.message.author.role == ROLE_OPERATOR
     }
 
-    private fun mapRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
+    /**
+     * mapper for /conversations/:idConversation/messages request
+     */
+    private fun mapConversationMessageRequest(idConversation: String, context: RoutingContext): IadvizeRequest {
         val typeMessage: TypeMessage = mapper.readValue(context.body().asString(), TypeMessage::class.java)
         return when (typeMessage.type) {
             //json doesn't contain idConversation, to prevent null pointer,
@@ -241,11 +256,33 @@ class IadvizeConnector internal constructor(
                     mapper.readValue(context.body().asString(), MessageRequestJson::class.java)
                 MessageRequest(messageRequestJson, idConversation)
             }
+
             else -> {
                 val unsupportedRequestJson: UnsupportedRequestJson =
                     mapper.readValue(context.body().asString(), UnsupportedRequestJson::class.java)
                 UnsupportedRequest(unsupportedRequestJson, idConversation, typeMessage.type)
             }
+        }
+    }
+
+    /**
+     * Mapper for /conversations Request
+     */
+    private fun mapConversationsRequest(context: RoutingContext): IadvizeRequest {
+        val request: ConversationsRequest =
+            mapper.readValue(context.body().asString(), ConversationsRequest::class.java)
+        return if (request.history.isNotEmpty()
+            && request.history.any {
+                it.payload.contentType == "text" && (it.payload as TextPayload).value == TRANSFERRED
+            }
+        ) {
+            // we use the inner class TransferRequestJson to enhance the json.
+            val transferRequestJson: TransferRequestJson =
+                mapper.readValue(context.body().asString(), TransferRequestJson::class.java)
+            TransferRequest(transferRequestJson, request.idConversation)
+        } else {
+            // default as ConversationsRequest with history
+            request
         }
     }
 
@@ -263,45 +300,29 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    /**
-     * handle visitor request
-     */
-    internal fun handleVisitorRequest(
+    internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,
-        iadvizeRequest: IadvizeRequest,
+        iadvizeRequest: IadvizeRequest
     ) {
-        val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
+
+        val callback = IadvizeConnectorCallback(
+            applicationId,
+            controller,
+            context,
+            iadvizeRequest,
+            distributionRule,
+            distributionRuleUnavailableMessage
+        )
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
                 controller.handle(event, ConnectorData(callback))
             }
-            // Only TransferRequest are supported, other messages are UnsupportedMessage
+
+            // Only MessageRequest are supported, other messages are UnsupportedMessage
             // and UnsupportedResponse can be sent immediately
             else -> callback.sendResponse()
-        }
-    }
-
-
-    /**
-     * handle operator request
-     */
-    internal fun handleOperatorRequest(
-        controller: ConnectorController,
-        context: RoutingContext,
-        iadvizeRequest: IadvizeRequest,
-    ) {
-        when (iadvizeRequest) {
-            is TransferRequest -> {
-                // callback is used only on transfer request
-                val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
-                val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
-                controller.handle(event, ConnectorData(callback))
-            }
-
-            //ignore message from operator
-            else -> context.response().end()
         }
     }
 
@@ -317,7 +338,7 @@ class IadvizeConnector internal constructor(
     ): BotBus.() -> ConnectorMessage? = {
         (message as? IadvizeConnectorMessage)?.let {
             val iadvizeMessage = message.replies.last { it is IadvizeMessage } as IadvizeMessage
-            iadvizeMessage.quickReplies.addAll( suggestions.map{ QuickReply(translate(it).toString())} )
+            iadvizeMessage.quickReplies.addAll(suggestions.map { QuickReply(translate(it).toString()) })
         }
         message
     }
@@ -332,4 +353,5 @@ data class CustomRequest(
     val path: String?,
     val query: String?,
     val body: JsonObject?,
-    val headers: Map<String, String>)
+    val headers: Map<String, String>
+)

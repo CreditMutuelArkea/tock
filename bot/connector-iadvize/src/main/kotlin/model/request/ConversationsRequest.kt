@@ -16,7 +16,14 @@
 
 package ai.tock.bot.connector.iadvize.model.request
 
+import ai.tock.bot.connector.iadvize.model.response.conversation.payload.Payload
+
 /**
- * Request that contains the conversation history. we do not use the history messages, we only use the idOperator and the idConversation
+ * Request that contains the conversation history
  */
-data class ConversationsRequest(override val idOperator: String, override val idConversation: String) : IadvizeRequest
+data class ConversationsRequest(
+    override val idOperator: String,
+    override val idConversation: String,
+    val history: List<Message<Payload>>,
+    val isProactive: Boolean
+) : IadvizeRequest

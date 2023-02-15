@@ -18,17 +18,11 @@ package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.ConnectorMessage
-import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
-import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
-import ai.tock.bot.connector.iadvize.model.request.MessageRequest
-import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
+import ai.tock.bot.connector.iadvize.model.request.*
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
@@ -49,13 +43,14 @@ import java.util.Properties
 
 private const val UNSUPPORTED_MESSAGE_REQUEST = "tock_iadvize_unsupported_message_request"
 
-class IadvizeConnectorCallback(override val  applicationId: String,
-                               controller: ConnectorController,
-                               val context: RoutingContext,
-                               val request: IadvizeRequest,
-                               distributionRule: String?,
-                               distributionRuleUnvailableMessage: String,
-                               val actions: MutableList<ActionWithDelay> = mutableListOf()
+class IadvizeConnectorCallback(
+    override val applicationId: String,
+    controller: ConnectorController,
+    val context: RoutingContext,
+    val request: IadvizeRequest,
+    distributionRule: String?,
+    distributionRuleUnvailableMessage: String,
+    val actions: MutableList<ActionWithDelay> = mutableListOf()
 ) : ConnectorCallbackBase(applicationId, iadvizeConnectorType) {
 
     companion object {
@@ -112,20 +107,23 @@ class IadvizeConnectorCallback(override val  applicationId: String,
             request.idConversation,
             request.idOperator,
             LocalDateTime.now(),
-            LocalDateTime.now())
+            LocalDateTime.now()
+        )
 
-        return when(request) {
+        return when (request) {
             is ConversationsRequest -> response
 
-            is MessageRequest -> {
+            is MessageRequest,
+                // specific actions also available for transfer requests
+            is TransferRequest -> {
                 response.replies.addAll(toListIadvizeReply(actions))
                 return response
             }
 
             is UnsupportedRequest -> {
                 logger.error("Request type ${request.type} is not supported by connector")
-                //TODO: to be replaced by a transfer to a human when this type of message is supported
-                val configuredMessage: String = properties.getProperty(UNSUPPORTED_MESSAGE_REQUEST, UNSUPPORTED_MESSAGE_REQUEST)
+                val configuredMessage: String =
+                    properties.getProperty(UNSUPPORTED_MESSAGE_REQUEST, UNSUPPORTED_MESSAGE_REQUEST)
                 val message: String = translator.translate(configuredMessage).toString()
                 response.replies.add(IadvizeMessage(TextPayload(message)))
                 return response
@@ -157,9 +155,9 @@ class IadvizeConnectorCallback(override val  applicationId: String,
     private fun List<ConnectorMessage>.filterAndEnhanceIadvizeReply(): List<IadvizeReply> {
         // Filter Message not IadvizeConnectorMessage for other connector
         return filterIsInstance<IadvizeConnectorMessage>()
-            .map{ connectorMessage -> connectorMessage.replies }
+            .map { connectorMessage -> connectorMessage.replies }
             .flatten()
-            .map (addDistributionRulesOnTransfer)
+            .map(addDistributionRulesOnTransfer)
 
     }
 
