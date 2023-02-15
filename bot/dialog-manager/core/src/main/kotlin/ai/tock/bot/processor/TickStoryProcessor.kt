@@ -131,7 +131,7 @@ class TickStoryProcessor(
 
         // If the action has a trigger, the process method should be called with a new [TickUserAction] that have an intent corresponding to the trigger
         // Else If the action is silent or if it should proceed, then we restart the processing again, otherwise we send the results
-        return  if (tickAction.trigger != null) {
+        return  if (!tickAction.trigger.isNullOrBlank()) {
             process(TickUserAction(intentName = tickAction.trigger, emptyMap()))
         } else  if(tickAction.isSilent()){
             process(null)
