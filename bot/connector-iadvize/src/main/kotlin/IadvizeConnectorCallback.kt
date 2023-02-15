@@ -25,7 +25,7 @@ import ai.tock.bot.connector.iadvize.model.request.TransferRequest
 import ai.tock.bot.connector.iadvize.model.request.UnsupportedRequest
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.MessageResponse
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeReply
