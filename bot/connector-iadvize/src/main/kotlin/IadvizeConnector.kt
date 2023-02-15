@@ -40,6 +40,7 @@ import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
+import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
@@ -242,11 +243,12 @@ class IadvizeConnector internal constructor(
         val idConversation: String = context.pathParam(QUERY_ID_CONVERSATION)
         val iadvizeRequest: IadvizeRequest = mapConversationMessageRequest(idConversation, context)
         if (!isOperator(iadvizeRequest)) {
-                handleVisitorRequest(controller,context, iadvizeRequest)
+            handleRequest(controller, context, iadvizeRequest)
         } else {
-                handleOperatorRequest(controller, context, iadvizeRequest)
-            }
+            //ignore message from operator
+            context.response().end()
         }
+    }
 
     /*
      * If request is a MessageRequest and the author of message have role "operator" : do not treat request.
@@ -314,13 +316,10 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    /**
-     * handle visitor request
-     */
-    internal fun handleVisitorRequest(
+    internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,
-        iadvizeRequest: IadvizeRequest,
+        iadvizeRequest: IadvizeRequest
     ) {
 
         val callback = IadvizeConnectorCallback(
@@ -340,31 +339,10 @@ class IadvizeConnector internal constructor(
                     ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
                 )))
             }
-            // Only TransferRequest are supported, other messages are UnsupportedMessage
+
+            // Only MessageRequest are supported, other messages are UnsupportedMessage
             // and UnsupportedResponse can be sent immediately
             else -> callback.sendResponse()
-        }
-    }
-
-
-    /**
-     * handle operator request
-     */
-    internal fun handleOperatorRequest(
-        controller: ConnectorController,
-        context: RoutingContext,
-        iadvizeRequest: IadvizeRequest,
-    ) {
-        when (iadvizeRequest) {
-            is TransferRequest -> {
-                // callback is used only on transfer request
-                val callback = IadvizeConnectorCallback(applicationId, controller, context, iadvizeRequest, distributionRule, distributionRuleUnvailableMessage)
-                val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
-                controller.handle(event, ConnectorData(callback))
-            }
-
-            //ignore message from operator
-            else -> context.response().end()
         }
     }
 
