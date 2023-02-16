@@ -405,7 +405,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 FaqQueryResult::enabled first FaqQueryResult::enabled,
                 FaqQueryResult::creationDate first FaqQueryResult::creationDate,
                 FaqQueryResult::updateDate first FaqQueryResult::updateDate,
-                FaqQueryResult::utterances first   FaqQueryResult::utterances,
+                FaqQueryResult::utterances first FaqQueryResult::utterances,
                 FaqQueryResult::faq first FaqQueryResult::faq
             )
         )
