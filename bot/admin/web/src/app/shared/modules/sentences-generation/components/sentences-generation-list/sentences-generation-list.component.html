@@ -1,6 +1,7 @@
 <section class="list">
   <header class="list--header d-flex align-items-center gap-1 pl-3 py-2">
     <nb-checkbox
+      *ngIf="!(distinctGeneratedSentencesLength === 0)"
       class="lineHeight-0 checkbox-all"
       [checked]="isAllSelectedGeneratedSentences"
       [indeterminate]="isSelectedGeneratedSentences"
@@ -42,26 +43,32 @@
   <nb-list>
     <nb-list-item
       *ngFor="let generatedSentence of generatedSentences"
-      class="d-flex flex-wrap align-items-center gap-1"
+      class="grid gap-1"
     >
       <nb-checkbox
-        *ngIf="generatedSentence.distinct"
+        *ngIf="generatedSentence.distinct && !generatedSentence.errorMessage"
         class="lineHeight-0"
         [(ngModel)]="generatedSentence.selected"
       ></nb-checkbox>
       <nb-icon
-        *ngIf="!generatedSentence.distinct"
+        *ngIf="generatedSentence.errorMessage"
+        icon="alert-circle-outline"
+        status="danger"
+        [nbTooltip]="generatedSentence.errorMessage"
+      ></nb-icon>
+      <nb-icon
+        *ngIf="!generatedSentence.distinct && !generatedSentence.errorMessage"
         icon="checkmark-circle-2-outline"
         nbTooltip="Already present"
       ></nb-icon>
       <span
-        *ngIf="generatedSentence.distinct"
+        *ngIf="generatedSentence.distinct && !generatedSentence.errorMessage"
         class="pointer"
         (click)="toggleSelectGeneratedSentence(generatedSentence)"
       >
         {{ generatedSentence.sentence }}
       </span>
-      <span *ngIf="!generatedSentence.distinct">{{ generatedSentence.sentence }}</span>
+      <span *ngIf="!generatedSentence.distinct || generatedSentence.errorMessage">{{ generatedSentence.sentence }}</span>
     </nb-list-item>
   </nb-list>
 </section>

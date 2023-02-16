@@ -3,7 +3,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { NbToastrService } from '@nebular/theme';
 
 import { RestService } from '../../../../../core-nlp/rest/rest.service';
-import { GeneratedSentence, SentencesGenerationOptions } from '../../models';
+import { GeneratedSentence, GeneratedSentenceError, SentencesGenerationOptions } from '../../models';
 
 @Component({
   selector: 'tock-sentences-generation',
@@ -12,11 +12,12 @@ import { GeneratedSentence, SentencesGenerationOptions } from '../../models';
 })
 export class SentencesGenerationContentComponent implements OnChanges {
   @Input() sentences: string[] = [];
+  @Input() errors: GeneratedSentenceError[] = [];
   @Input() closable: boolean | string = false;
 
   @Output() onClose = new EventEmitter<boolean>(false);
   @Output() onLoading = new EventEmitter<boolean>(false);
-  @Output() onGeneratedSentences = new EventEmitter<string[]>();
+  @Output() onValidateSelection = new EventEmitter<string[]>();
 
   generatedSentences: GeneratedSentence[] = [];
   alert: boolean = true;
@@ -32,13 +33,25 @@ export class SentencesGenerationContentComponent implements OnChanges {
   constructor(private toastrService: NbToastrService, private rest: RestService, private http: HttpClient) {}
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes.sentences.currentValue?.length !== changes.sentences.previousValue?.length) {
+    if (changes.sentences?.currentValue?.length !== changes.sentences?.previousValue?.length) {
       this.generatedSentences = this.generatedSentences.map((sentence: GeneratedSentence) => ({
         ...sentence,
         selected: false,
         distinct: this.isDistinct(sentence.sentence)
       }));
     }
+
+    if (changes.errors?.currentValue?.length !== changes.errors?.previousValue?.length) {
+      this.generatedSentences = this.generatedSentences.map((sentence: GeneratedSentence) => ({
+        ...sentence,
+        selected: false,
+        errorMessage: this.feedGeneratedSentenceError(changes.errors.currentValue, sentence.sentence)
+      }));
+    }
+  }
+
+  private feedGeneratedSentenceError(errors: GeneratedSentenceError[], sentence: string): string | undefined {
+    return errors.find((error: GeneratedSentenceError) => error.sentence === sentence)?.message;
   }
 
   private getRequest(
@@ -60,7 +73,7 @@ export class SentencesGenerationContentComponent implements OnChanges {
     }
 
     request.push(
-      'Takes into account the previous parameters and generates 5 sentences derived from the sentences in the following table: '
+      'Takes into account the previous parameters and generates 10 sentences derived from the sentences in the following table: '
     );
     request.push('[');
 
@@ -133,7 +146,7 @@ export class SentencesGenerationContentComponent implements OnChanges {
   }
 
   validateSelection(selectedGeneratedSentences: string[]): void {
-    this.onGeneratedSentences.emit(selectedGeneratedSentences);
+    this.onValidateSelection.emit(selectedGeneratedSentences);
   }
 
   closeAlert(): void {

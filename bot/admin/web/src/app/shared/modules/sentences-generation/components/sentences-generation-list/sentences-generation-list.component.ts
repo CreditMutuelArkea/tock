@@ -23,20 +23,24 @@ export class SentencesGenerationListComponent implements OnChanges {
   }
 
   get isSelectedGeneratedSentences(): boolean {
-    const generatedSentencesLength = this.generatedSentences.filter((s: GeneratedSentence) => s.selected).length;
+    const generatedSentencesLength = this.generatedSentences.filter(
+      (generatedSentence: GeneratedSentence) => generatedSentence.selected
+    ).length;
 
     return generatedSentencesLength > 0 && generatedSentencesLength < this.distinctGeneratedSentencesLength;
   }
 
   get isAllSelectedGeneratedSentences(): boolean {
-    const generatedSentencesLength = this.generatedSentences.filter((s: GeneratedSentence) => s.selected).length;
+    const generatedSentencesLength = this.generatedSentences.filter(
+      (generatedSentence: GeneratedSentence) => generatedSentence.selected
+    ).length;
 
     return this.distinctGeneratedSentencesLength > 0 && this.distinctGeneratedSentencesLength === generatedSentencesLength;
   }
 
   private feedDistinctGeneratedSentencesLength(): number {
-    return this.generatedSentences.reduce((acc, curr) => {
-      if (curr.distinct) acc++;
+    return this.generatedSentences.reduce((acc: number, curr: GeneratedSentence) => {
+      if (curr.distinct && !curr.errorMessage) acc++;
 
       return acc;
     }, 0);
@@ -44,26 +48,34 @@ export class SentencesGenerationListComponent implements OnChanges {
 
   toggleAllSelectGeneratedSentences(value: boolean): void {
     if (!value) {
-      this.generatedSentences = this.generatedSentences.map((s: GeneratedSentence) => {
-        if (s.distinct) return { ...s, selected: false };
+      this.generatedSentences = this.generatedSentences.map((generatedSentence: GeneratedSentence) => {
+        if (generatedSentence.distinct && !generatedSentence.errorMessage) return { ...generatedSentence, selected: false };
 
-        return s;
+        return generatedSentence;
       });
     } else {
-      this.generatedSentences = this.generatedSentences.map((s: GeneratedSentence) => {
-        if (s.distinct) return { ...s, selected: true };
+      this.generatedSentences = this.generatedSentences.map((generatedSentence: GeneratedSentence) => {
+        if (generatedSentence.distinct && !generatedSentence.errorMessage) return { ...generatedSentence, selected: true };
 
-        return s;
+        return generatedSentence;
       });
     }
   }
 
   toggleSelectGeneratedSentence(sentence: GeneratedSentence): void {
-    this.generatedSentences = this.generatedSentences.map((s: GeneratedSentence) => {
-      if (s === sentence) return { ...s, selected: !s.selected };
+    this.generatedSentences = this.generatedSentences.map((generatedSentence: GeneratedSentence) => {
+      if (generatedSentence === sentence) return { ...generatedSentence, selected: !generatedSentence.selected };
 
-      return s;
+      return generatedSentence;
     });
+  }
+
+  validateSelection(): void {
+    const selectedGeneratedSentences = this.generatedSentences
+      .filter((generatedSentence: GeneratedSentence) => generatedSentence.selected)
+      .map((generatedSentence: GeneratedSentence) => generatedSentence.sentence);
+
+    this.onValidateSelection.emit(selectedGeneratedSentences);
   }
 
   backOptions(): void {
@@ -72,13 +84,5 @@ export class SentencesGenerationListComponent implements OnChanges {
 
   generate(): void {
     this.onGenerate.emit();
-  }
-
-  validateSelection(): void {
-    const selectedGeneratedSentences = this.generatedSentences
-      .filter((s: GeneratedSentence) => s.selected)
-      .map((s: GeneratedSentence) => s.sentence);
-
-    this.onValidateSelection.emit(selectedGeneratedSentences);
   }
 }

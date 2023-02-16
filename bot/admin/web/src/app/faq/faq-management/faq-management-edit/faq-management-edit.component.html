@@ -147,7 +147,8 @@
           <tock-sentences-generation
             [closable]="true"
             [sentences]="utterances.value"
-            (onGeneratedSentences)="addGeneratedSentences($event)"
+            [errors]="errorsAddSentences"
+            (onValidateSelection)="addGeneratedSentences($event)"
             (onLoading)="loadingGeneratedSentences($event)"
             (onClose)="closeGenerateSentences()"
           ></tock-sentences-generation>

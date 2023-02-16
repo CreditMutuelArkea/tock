@@ -18,4 +18,9 @@
       background-color: nb-theme(card-background-color);
     }
   }
+
+  .grid {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+  }
 }

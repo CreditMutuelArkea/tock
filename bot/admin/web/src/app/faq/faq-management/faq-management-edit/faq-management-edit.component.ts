@@ -10,6 +10,7 @@ import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ChoiceDialogComponent } from '../../../shared/components';
 import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/components/sentences-generation-wrapper/sentences-generation-wrapper.component';
+import { GeneratedSentenceError } from '../../../shared/modules/sentences-generation/models';
 import { SentencesGenerationService } from '../../../shared/modules/sentences-generation/services';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
@@ -54,6 +55,7 @@ export class FaqManagementEditComponent implements OnChanges {
   faqTabs: typeof FaqTabs = FaqTabs;
   isSubmitted: boolean = false;
   currentTab = FaqTabs.INFO;
+  errorsAddSentences: GeneratedSentenceError[] = [];
 
   controlsMaxLength = {
     description: 500,
@@ -235,6 +237,10 @@ export class FaqManagementEditComponent implements OnChanges {
               if (existingIntentId) {
                 let intent = this.state.findIntentById(existingIntentId);
                 this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
+                this.errorsAddSentences = [
+                  ...this.errorsAddSentences,
+                  { sentence: utterance, message: 'This sentence is already associated with another intent' }
+                ];
               } else {
                 this.utterances.push(new FormControl(utterance));
                 this.form.markAsDirty();
@@ -251,6 +257,7 @@ export class FaqManagementEditComponent implements OnChanges {
             }
           });
       }
+
       if (this.addUtteranceInput?.nativeElement) this.addUtteranceInput.nativeElement.value = '';
     }
   }
@@ -427,7 +434,7 @@ export class FaqManagementEditComponent implements OnChanges {
     this.showGenerateSentencesV2 = false;
   }
 
-  addGeneratedSentences(generatedSentences: string[]): void {
+  addGeneratedSentences(generatedSentences: string[], resetErrors: boolean): void {
     generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
   }
 
