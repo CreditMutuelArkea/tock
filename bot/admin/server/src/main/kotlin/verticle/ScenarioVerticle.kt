@@ -40,7 +40,6 @@ import mu.KotlinLogging
 open class ScenarioVerticle {
 
     private val logger: KLogger = KotlinLogging.logger {}
-    //private val ScenarioServiceImpl: ScenarioServiceImpl by injector.instance()
 
     private val botId = "botId"
     private val groupId = "groupId"

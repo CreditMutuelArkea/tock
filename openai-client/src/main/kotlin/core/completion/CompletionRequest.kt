@@ -1,0 +1,328 @@
+/*
+ * Copyright (C) 2017/2022 e-voyageurs technologies
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package core.completion
+
+import core.model.ModelId
+import core.OpenAIDsl
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+/**
+ * A request for OpenAI to generate a predicted completion for a prompt.
+ * All fields are Optional.
+ *
+ * [documentation](https://beta.openai.com/docs/api-reference/create-completion)
+ */
+@Serializable
+class CompletionRequest(
+
+    /**
+     * ID of the model to use.
+     */
+    @SerialName("model") val model: ModelId,
+
+    /**
+     * The prompt(s) to generate completions for, encoded as a string, a list of strings, or a list of token lists.
+     *
+     * Note that `<|endoftext|>` is the document separator that the model sees during training, so if a prompt is not
+     * specified the model will generate as if from the beginning of a new document.
+     *
+     * Defaults to `<|endoftext|>`.
+     */
+    @SerialName("prompt") val prompt: String? = null,
+
+    /**
+     * The maximum number of tokens to generate.
+     * Requests can use up to 2048 tokens shared between prompt and completion.
+     * (One token is roughly 4 characters for normal English text)
+     *
+     * Defaults to 16.
+     */
+    @SerialName("max_tokens") val maxTokens: Int? = null,
+
+    /**
+     * What sampling temperature to use. Higher values means the model will take more risks.
+     * Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
+     *
+     * We generally recommend using this or [topP] but not both.
+     *
+     * Defaults to 1.
+     */
+    @SerialName("temperature") val temperature: Double? = null,
+
+    /**
+     * An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of
+     * the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are
+     * considered.
+     *
+     * We generally recommend using this or [temperature] but not both.
+     *
+     * Defaults to 1.
+     */
+    @SerialName("top_p") val topP: Double? = null,
+
+    /**
+     * How many completions to generate for each prompt.
+     *
+     * **Note:** Because this parameter generates many completions, it can quickly consume your token quota.
+     * Use carefully and ensure that you have reasonable settings for [maxTokens] and [stop].
+     *
+     * Defaults to 1.
+     */
+    @SerialName("n") val n: Int? = null,
+
+    /**
+     * Include the log probabilities on the [logprobs] most likely tokens, as well the chosen tokens.
+     * For example, if [logprobs] is 10, the API will return a list of the 10 most likely tokens.
+     * The API will always return the logprob of the sampled token, so there may be up to [logprobs]+1 elements
+     * in the response.
+     *
+     * Defaults to `null`.
+     */
+    @SerialName("logprobs") val logprobs: Int? = null,
+
+    /**
+     * Echo back the prompt in addition to the completion.
+     *
+     * Defaults to `false`.
+     */
+    @SerialName("echo") val echo: Boolean? = null,
+
+    /**
+     * Up to 4 sequences where the API will stop generating further tokens.
+     * The returned text will not contain the stop sequence.
+     *
+     * Defaults to `null`.
+     */
+    @SerialName("stop") val stop: List<String>? = null,
+
+    /**
+     * Number between 0 and 1 (default 0) that penalizes new tokens based on whether they appear in the text so far.
+     * Increases the model's likelihood to talk about new topics.
+     *
+     * Defaults to 0.
+     */
+    @SerialName("presence_penalty") val presencePenalty: Double? = null,
+
+    /**
+     * Number between 0 and 1 (default 0) that penalizes new tokens based on their existing frequency in the text so far.
+     * Decreases the model's likelihood to repeat the same line verbatim.
+     *
+     * Defaults to 0.
+     */
+    @SerialName("frequency_penalty") val frequencyPenalty: Double? = null,
+
+    /**
+     * Generates [bestOf] completions server-side and returns the "best"
+     * (the one with the lowest log probability per token). Results cannot be streamed.
+     *
+     * When used with [n], [bestOf] controls the number of candidate completions and [n] specifies how many to return,
+     * [bestOf] must be greater than [n].
+     *
+     * **Note:** Because this parameter generates many completions, it can quickly consume your token quota.
+     * Use carefully and ensure that you have reasonable settings for [maxTokens] and [stop].
+     *
+     * Defaults to 1
+     */
+    @SerialName("best_of") val bestOf: Int? = null,
+
+    /**
+     * Modify the likelihood of specified tokens appearing in the completion.
+     *
+     * Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer) to an associated bias`
+     * value from -100 to 100. You can use this tokenizer tool (which works for both GPT-2 and GPT-3) to convert text
+     * to token IDs. Mathematically, the bias is added to the logits generated by the model prior to sampling.
+     * The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood
+     * of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.
+     *
+     * As an example, you can pass `{"50256": -100}` to prevent the `<|endoftext|> token from being generated.
+     *
+     * Defaults to `null`.
+     */
+    @SerialName("logit_bias") val logitBias: Map<String, Int>? = null,
+
+    /**
+     * A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
+     */
+    @SerialName("user") val user: String? = null,
+)
+
+/**
+ * A request for OpenAI to generate a predicted completion for a prompt.
+ * All fields are Optional.
+ *
+ * [documentation](https://beta.openai.com/docs/api-reference/create-completion)
+ */
+fun completionRequest(block: CompletionRequestBuilder.() -> Unit): CompletionRequest =
+    CompletionRequestBuilder().apply(block).build()
+
+/**
+ * Builder of [CompletionRequest] instances.
+ */
+@OpenAIDsl
+class CompletionRequestBuilder {
+
+    /**
+     * ID of the model to use.
+     */
+    var model: ModelId? = null
+
+    /**
+     * The prompt(s) to generate completions for, encoded as a string, a list of strings, or a list of token lists.
+     *
+     * Note that `<|endoftext|>` is the document separator that the model sees during training, so if a prompt is not
+     * specified the model will generate as if from the beginning of a new document.
+     *
+     * Defaults to `<|endoftext|>`.
+     */
+    var prompt: String? = null
+
+    /**
+     * The maximum number of tokens to generate.
+     * Requests can use up to 2048 tokens shared between prompt and completion.
+     * (One token is roughly 4 characters for normal English text)
+     *
+     * Defaults to 16.
+     */
+    var maxTokens: Int? = null
+
+    /**
+     * What sampling temperature to use. Higher values means the model will take more risks.
+     * Try 0.9 for more creative applications, and 0 (argmax sampling) for ones with a well-defined answer.
+     *
+     * We generally recommend using this or [topP] but not both.
+     *
+     * Defaults to 1.
+     */
+    var temperature: Double? = null
+
+    /**
+     * An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of
+     * the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are
+     * considered.
+     *
+     * We generally recommend using this or [temperature] but not both.
+     *
+     * Defaults to 1.
+     */
+    var topP: Double? = null
+
+    /**
+     * How many completions to generate for each prompt.
+     *
+     * **Note:** Because this parameter generates many completions, it can quickly consume your token quota.
+     * Use carefully and ensure that you have reasonable settings for [maxTokens] and [stop].
+     *
+     * Defaults to 1.
+     */
+    var n: Int? = null
+
+    /**
+     * Include the log probabilities on the [logprobs] most likely tokens, as well the chosen tokens.
+     * For example, if [logprobs] is 10, the API will return a list of the 10 most likely tokens.
+     * The API will always return the logprob of the sampled token, so there may be up to [logprobs]+1 elements
+     * in the response.
+     *
+     * Defaults to `null`.
+     */
+    var logprobs: Int? = null
+
+    /**
+     * Echo back the prompt in addition to the completion.
+     *
+     * Defaults to `false`.
+     */
+    var echo: Boolean? = null
+
+    /**
+     * Up to 4 sequences where the API will stop generating further tokens.
+     * The returned text will not contain the stop sequence.
+     *
+     * Defaults to `null`.
+     */
+    var stop: List<String>? = null
+
+    /**
+     * Number between 0 and 1 (default 0) that penalizes new tokens based on whether they appear in the text so far.
+     * Increases the model's likelihood to talk about new topics.
+     *
+     * Defaults to 0.
+     */
+    var presencePenalty: Double? = null
+
+    /**
+     * Number between 0 and 1 (default 0) that penalizes new tokens based on their existing frequency in the text so far.
+     * Decreases the model's likelihood to repeat the same line verbatim.
+     *
+     * Defaults to 0.
+     */
+    var frequencyPenalty: Double? = null
+
+    /**
+     * Generates [bestOf] completions server-side and returns the "best"
+     * (the one with the lowest log probability per token). Results cannot be streamed.
+     *
+     * When used with [n], [bestOf] controls the number of candidate completions and [n] specifies how many to return,
+     * [bestOf] must be greater than [n].
+     *
+     * **Note:** Because this parameter generates many completions, it can quickly consume your token quota.
+     * Use carefully and ensure that you have reasonable settings for [maxTokens] and [stop].
+     *
+     * Defaults to 1
+     */
+    var bestOf: Int? = null
+
+    /**
+     * Modify the likelihood of specified tokens appearing in the completion.
+     *
+     * Accepts a json object that maps tokens (specified by their token ID in the GPT tokenizer) to an associated bias`
+     * value from -100 to 100. You can use this tokenizer tool (which works for both GPT-2 and GPT-3) to convert text
+     * to token IDs. Mathematically, the bias is added to the logits generated by the model prior to sampling.
+     * The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood
+     * of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.
+     *
+     * As an example, you can pass `{"50256": -100}` to prevent the `<|endoftext|> token from being generated.
+     *
+     * Defaults to `null`.
+     */
+    var logitBias: Map<String, Int>? = null
+
+    /**
+     * A unique identifier representing your end-user, which will help OpenAI to monitor and detect abuse.
+     */
+    var user: String? = null
+
+    /**
+     * Create [CompletionRequest] instance.
+     */
+    fun build(): CompletionRequest = CompletionRequest(
+        model = requireNotNull(model) { "model is required" },
+        prompt = prompt,
+        maxTokens = maxTokens,
+        temperature = temperature,
+        topP = topP,
+        n = n,
+        logprobs = logprobs,
+        echo = echo,
+        stop = stop,
+        presencePenalty = presencePenalty,
+        frequencyPenalty = frequencyPenalty,
+        bestOf = bestOf,
+        logitBias = logitBias,
+        user = user
+    )
+}
