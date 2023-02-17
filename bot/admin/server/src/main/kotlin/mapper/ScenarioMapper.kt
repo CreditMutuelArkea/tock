@@ -48,7 +48,8 @@ object ScenarioMapper {
             versions = versions.map {
                 it.toScenarioVersionWithoutData()
             },
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 
@@ -101,7 +102,8 @@ object ScenarioMapper {
             tags = tags,
             description = description,
             versions = emptyList(),
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 
@@ -127,7 +129,8 @@ object ScenarioMapper {
             tags = tags,
             description = description,
             versions = versions.map { it.toScenarioVersion(scenarioGroupId) },
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 

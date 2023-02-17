@@ -22,6 +22,7 @@ import ai.tock.shared.ensureUniqueIndex
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.warn
+import ai.tock.shared.watch
 import com.mongodb.MongoWriteException
 import com.mongodb.client.result.DeleteResult
 import mu.KotlinLogging
@@ -32,6 +33,7 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.getCollectionOfName
 import org.litote.kmongo.lookup
 import org.litote.kmongo.match
+import org.litote.kmongo.reactivestreams.getCollectionOfName
 import org.litote.kmongo.updateOne
 import java.time.ZonedDateTime
 
@@ -42,6 +44,8 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
     internal val collection =
         MongoBotConfiguration.database.
         getCollectionOfName<ScenarioGroup>("scenario_group")
+
+    private val asyncCol = MongoBotConfiguration.asyncDatabase.getCollectionOfName<ScenarioGroup>("scenario_group")
 
     init {
         try {
@@ -111,7 +115,8 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
             tags = scenarioGroup.tags,
             description = scenarioGroup.description,
             updateDate = ZonedDateTime.now(),
-            versions = emptyList()
+            versions = emptyList(),
+            unknownAnswerId = scenarioGroup.unknownAnswerId
         )
 
         collection.updateOne(scenarioGroupUpdated)
@@ -122,6 +127,12 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
         val result: DeleteResult = collection.deleteOneById(scenarioGroupId)
         if(result.deletedCount == 0L) {
             throw ScenarioGroupNotFoundException(scenarioGroupId.toString())
+        }
+    }
+
+    override fun listenChanges(listener: (ScenarioGroup) -> Unit) {
+        asyncCol.watch {
+            it.fullDocument?.let {  doc -> listener.invoke(doc) }
         }
     }
 

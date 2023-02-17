@@ -74,4 +74,12 @@ object ScenarioGroupService {
         scenarioGroupDAO.deleteOneById(id.toId())
     }
 
+    /**
+     * Listen changes on scenario groups
+     * @param listener: the listener to call when a scenario group changes
+     */
+    fun listenChanges(listener: (ScenarioGroup) -> Unit) {
+        scenarioGroupDAO.listenChanges(listener)
+    }
+
 }

@@ -44,11 +44,12 @@ class ScenarioGroupServiceTest {
     private val groupId2 = "groupId2".toId<ScenarioGroup>()
 
     private val botId1 = "botId1"
+    private val unknownAnswerId = "unknownAnswerId"
 
     private val scenarioGroup1 = ScenarioGroup(_id =groupId1, botId = botId1, name = "name1",
-        creationDate = dateNow, updateDate = dateNow)
+        creationDate = dateNow, updateDate = dateNow, unknownAnswerId = unknownAnswerId)
     private val scenarioGroup2 = ScenarioGroup(_id =groupId2, botId = botId1, name = "name2",
-        creationDate = dateNow, updateDate = dateNow)
+        creationDate = dateNow, updateDate = dateNow, unknownAnswerId = unknownAnswerId)
 
 
     companion object {

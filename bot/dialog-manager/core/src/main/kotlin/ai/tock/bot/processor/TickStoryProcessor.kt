@@ -57,7 +57,7 @@ class TickStoryProcessor(
     private var objectivesStack = createStackFromList(session.objectivesStack)
     private var ranHandlers = session.ranHandlers.toMutableList()
     private val stateMachine: StateMachine = StateMachine(configuration.stateMachine)
-    private var currentState = session.currentState ?: getGlobalState()
+    private var currentState = session.currentState ?: getInitialGlobalState()
     private var handlingStep = session.handlingStep
     private var unknownHandlingStep = session.unknownHandlingStep
 
@@ -88,7 +88,7 @@ class TickStoryProcessor(
         logger.debug { "secondaryObjective : $secondaryObjective" }
 
         try {
-            updateLastExecutedAction(secondaryObjective, tickUserAction)
+            updateHandlingStep(secondaryObjective, tickUserAction)
         } catch (e: InfiniteLoopException){
             logger.warn("abnormal end of processing. (infinite loop !)", e)
             return Success(computeNewSession())
@@ -150,7 +150,7 @@ class TickStoryProcessor(
         }
     }
 
-    private fun updateLastExecutedAction(
+    private fun updateHandlingStep(
         secondaryObjective: String,
         tickUserAction: TickUserAction?
     ) {
@@ -228,10 +228,10 @@ class TickStoryProcessor(
     }
 
     /**
-     * Call a state machine to get the Global state if it exists, or throws error exception
+     * Call a state machine to get the Initial of Global state if it exists, or throws error exception
      */
-    private fun getGlobalState() =
-        stateMachine.getState(GLOBAL_STATE)?.id ?: throw GlobalRootStateMachineNotFound("$GLOBAL_STATE state not found <$GLOBAL_STATE>")
+    private fun getInitialGlobalState() =
+        stateMachine.getInitial(GLOBAL_STATE)?.id ?: error("Initial of Global state not found <Global>")
 
     /**
      * Util function to create a [Stack] from a [List]
@@ -409,7 +409,7 @@ class TickStoryProcessor(
     }
 
     private fun handleUnknown(action: TickUserAction?): ProcessingResult? =
-        if (configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
+        if (ranHandlers.isNotEmpty() && configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
             logger.debug { "handle unknown intent..." }
             val (step, redirectStoryId) = TickUnknownHandler.handle(
                 lastExecutedActionName = ranHandlers.last(),

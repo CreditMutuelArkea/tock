@@ -24,9 +24,9 @@ import java.util.TreeSet
  */
 @kotlinx.serialization.Serializable
 data class TickUnknownConfiguration(
-    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet()
+    val unknownAnswerConfigs: Set<TickUnknownAnswerConfig> = TreeSet()
 ){
-    fun unknownIntents() = unknownAnswerConfigs.map { it.intent }.distinct()
+    fun unknownIntents() = unknownAnswerConfigs.map { it.intent }.plus(UNKNOWN).distinct()
 }
 
 

@@ -16,9 +16,11 @@
 
 package ai.tock.bot.admin.scenario
 
+import ai.tock.shared.exception.scenario.group.ScenarioGroupInvalidException
+import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
-import java.time.Instant
+import java.lang.Exception
 import java.time.ZonedDateTime
 
 
@@ -33,5 +35,15 @@ data class ScenarioGroup(
     val updateDate: ZonedDateTime = ZonedDateTime.now(),
     val versions: List<ScenarioVersion> = emptyList(),
     @Transient
-    val enabled: Boolean? = null
-)
+    val enabled: Boolean? = null,
+    val unknownAnswerId: String
+) {
+    init {
+        try {
+            require(name.isNotBlank()) { "The scenario group name is required !" }
+            require(unknownAnswerId.isNotBlank()) { "The unknown answer id is required !" }
+        }catch (e: Exception) {
+            throw ScenarioGroupInvalidException(e.message)
+        }
+    }
+}

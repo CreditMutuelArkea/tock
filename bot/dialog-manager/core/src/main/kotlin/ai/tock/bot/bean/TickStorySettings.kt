@@ -27,7 +27,8 @@ import ai.tock.bot.bean.unknown.UNKNOWN
 @kotlinx.serialization.Serializable
 data class TickStorySettings(
     val repetitionNb: Int,
-    val redirectStory: String
+    val redirectStory: String,
+    val unknownAnswerId: String? = null
 ) {
     companion object {
         val default = TickStorySettings(DEFAULT_RETRY_NB, UNKNOWN)

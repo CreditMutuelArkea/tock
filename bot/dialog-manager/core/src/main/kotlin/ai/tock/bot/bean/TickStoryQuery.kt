@@ -16,13 +16,13 @@
 
 package ai.tock.bot.bean
 
-import ai.tock.bot.bean.unknown.UnknownAnswerConfig
+import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
 import ai.tock.bot.statemachine.State
 import java.util.TreeSet
 
 /**
  * The tick story query, corresponding on published scenario version
- * 
+ *
  * @param id technical story identifier (mongodb's _id)
  * @param botId the botId
  * @param storyId functional story identifier (equals to scenario group id)
@@ -53,6 +53,6 @@ data class TickStoryQuery(
     val contexts: Set<TickContext>,
     val actions: Set<TickAction>,
     val intentsContexts: Set<TickIntent> = emptySet(),
-    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet()
+    val unknownAnswerConfigs: Set<TickUnknownAnswerConfig> = TreeSet()
 )
 

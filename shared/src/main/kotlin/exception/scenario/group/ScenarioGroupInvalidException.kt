@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.nlp.front.service.storage
+package ai.tock.shared.exception.scenario.group
 
-import ai.tock.nlp.front.shared.config.ScenarioSettings
-import ai.tock.nlp.front.shared.config.ApplicationDefinition
-import org.litote.kmongo.Id
+import ai.tock.shared.exception.scenario.ScenarioException
 
-interface ScenarioSettingsDAO {
-
-    fun save(scenarioSettings: ScenarioSettings)
-
-    fun getScenarioSettingsByApplicationId(id: Id<ApplicationDefinition>): ScenarioSettings?
-
-    fun listenChanges(listener: (ScenarioSettings) -> Unit)
-
-}
+class ScenarioGroupInvalidException(val error: String?) : ScenarioException(error ?: "The scenario group is not valid")

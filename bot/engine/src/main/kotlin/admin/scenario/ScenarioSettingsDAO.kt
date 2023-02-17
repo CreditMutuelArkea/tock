@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.model.scenario
+package ai.tock.bot.admin.scenario
 
-data class ScenarioGroupRequest(
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val description: String? = null,
-    val enabled: Boolean? = null,
-    val unknownAnswerId: String,
-)
+
+interface ScenarioSettingsDAO {
+
+    fun save(scenarioSettings: ScenarioSettings)
+
+    fun getScenarioSettingsByBotId(id: String): ScenarioSettings?
+
+    fun listenChanges(listener: (ScenarioSettings) -> Unit)
+}

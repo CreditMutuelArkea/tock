@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.nlp.front.shared.config
+package ai.tock.bot.admin.scenario
+
 
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
@@ -24,7 +25,7 @@ import java.time.Instant
  * A scenario settings
  *
  * @param _id : The unique [Id] of the settings.
- * @param applicationId : The application id.
+ * @param botId : The application name.
  * @param actionRepetitionNumber : The number of authorized repetition of an action.
  * @param redirectStoryId : The story's id to redirect to when the actionRepetitionNumber is exceeded.
  * @param creationDate : Settings creation date
@@ -32,11 +33,9 @@ import java.time.Instant
  */
 data class ScenarioSettings (
     val _id: Id<ScenarioSettings> = newId(),
-    val applicationId: Id<ApplicationDefinition>,
+    val botId: String,
     val actionRepetitionNumber: Int,
     val redirectStoryId: String?=  null,
     val creationDate: Instant,
     val updateDate: Instant
-) {
-    fun toScenarioSettingsQuery() = ScenarioSettingsQuery(actionRepetitionNumber, redirectStoryId)
-}
+)
