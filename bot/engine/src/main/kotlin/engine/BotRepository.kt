@@ -250,11 +250,12 @@ object BotRepository {
      */
     fun registerBuiltInStoryDefinitions(botProvider: BotProvider) {
         val botDefinition = botProvider.botDefinition()
-        checkBuiltInStoryCompliance(botDefinition)
+        val storiesBuiltIn = botDefinition.stories
+        checkBuiltInStoryCompliance(storiesBuiltIn)
         val configurationName = botProvider.botProviderId.configurationName
         executor.executeBlocking {
             storyDefinitionConfigurationDAO.createBuiltInStoriesIfNotExist(
-                botDefinition.stories
+                storiesBuiltIn
                     .filter { it.mainIntent() != Intent.unknown }
                     .map { storyDefinition ->
                         StoryDefinitionConfiguration(botDefinition, storyDefinition, configurationName)
@@ -263,9 +264,13 @@ object BotRepository {
         }
     }
 
-    private fun checkBuiltInStoryCompliance(botDefinition: BotDefinition) {
+
+    /**
+     * @param builtInStories : list of built in stories
+     */
+    private fun checkBuiltInStoryCompliance(builtInStories: List<StoryDefinition>) {
         val starterIntentsMap: MutableMap<String, MutableList<StoryDefinition>> = mutableMapOf()
-        botDefinition.stories.map { s ->
+        builtInStories.map { s ->
             s.starterIntents.forEach {
                 val l = starterIntentsMap.getOrPut(it.name) { mutableListOf() }
                 l.add(s)
