@@ -239,8 +239,12 @@ export class FaqManagementEditComponent implements OnChanges {
                 this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
                 this.errorsAddSentences = [
                   ...this.errorsAddSentences,
-                  { sentence: utterance, message: 'This sentence is already associated with another intent' }
+                  {
+                    sentence: utterance,
+                    message: `This sentence is already associated with the intent: "${this.existingUterranceInOtherintent}"`
+                  }
                 ];
+                this.sentencesGenerationService.feedErrors(this.errorsAddSentences);
               } else {
                 this.utterances.push(new FormControl(utterance));
                 this.form.markAsDirty();
@@ -410,7 +414,7 @@ export class FaqManagementEditComponent implements OnChanges {
       }
     });
 
-    dialogRef.componentRef.instance.onGeneratedSentences.subscribe((generatedSentences: string[]) => {
+    dialogRef.componentRef.instance.onValidateSelection.subscribe((generatedSentences: string[]) => {
       generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
       subscription.add(
         this.utterances.valueChanges.subscribe((utterances) => {
@@ -420,7 +424,7 @@ export class FaqManagementEditComponent implements OnChanges {
     });
 
     dialogRef.onClose.subscribe(() => {
-      this.sentencesGenerationService.reset();
+      this.sentencesGenerationService.resetSentencesExample();
       subscription.unsubscribe();
     });
   }

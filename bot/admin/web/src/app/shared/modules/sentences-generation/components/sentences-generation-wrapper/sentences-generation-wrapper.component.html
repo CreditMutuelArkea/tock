@@ -16,8 +16,9 @@
   <nb-card-body>
     <tock-sentences-generation
       [sentences]="sentences"
+      [errors]="errors"
       (onLoading)="handleLoading($event)"
-      (onGeneratedSentences)="handleGeneratedSentences($event)"
+      (onValidateSelection)="handleGeneratedSentences($event)"
     ></tock-sentences-generation>
   </nb-card-body>
 </nb-card>

@@ -1,23 +1,37 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { GeneratedSentenceError } from '../../models';
+
+type State = {
+  sentencesExample: string[];
+  errors: GeneratedSentenceError[];
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class SentencesGenerationService {
-  private _sentencesExample: BehaviorSubject<string[]>;
-  sentencesExample$: Observable<string[]>;
+  private _state: BehaviorSubject<State>;
+  state$: Observable<State>;
 
   constructor() {
-    this._sentencesExample = new BehaviorSubject([]);
-    this.sentencesExample$ = this._sentencesExample.asObservable();
+    this._state = new BehaviorSubject({ sentencesExample: [], errors: [] });
+    this.state$ = this._state.asObservable();
   }
 
   feedSentencesExample(sentencesExample: string[]): void {
-    this._sentencesExample.next(sentencesExample);
+    this._state.next({ ...this._state.getValue(), sentencesExample });
   }
 
-  reset(): void {
-    this._sentencesExample.next([]);
+  resetSentencesExample(): void {
+    this._state.next({ ...this._state.getValue(), sentencesExample: [] });
+  }
+
+  feedErrors(errors: GeneratedSentenceError[]): void {
+    this._state.next({ ...this._state.getValue(), errors });
+  }
+
+  resetErrors(): void {
+    this._state.next({ ...this._state.getValue(), errors: [] });
   }
 }
