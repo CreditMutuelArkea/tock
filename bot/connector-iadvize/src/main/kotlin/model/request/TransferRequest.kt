@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector.iadvize.model.request
 
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 
 data class TransferRequest(
     override val idOperator: String,
