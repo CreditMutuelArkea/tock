@@ -101,7 +101,8 @@ object ScenarioMapper {
             tags = tags,
             description = description,
             versions = emptyList(),
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 

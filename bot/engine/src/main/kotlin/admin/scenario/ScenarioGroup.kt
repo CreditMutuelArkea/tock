@@ -18,7 +18,6 @@ package ai.tock.bot.admin.scenario
 
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
-import java.time.Instant
 import java.time.ZonedDateTime
 
 
@@ -33,7 +32,8 @@ data class ScenarioGroup(
     val updateDate: ZonedDateTime = ZonedDateTime.now(),
     val versions: List<ScenarioVersion> = emptyList(),
     @Transient
-    val enabled: Boolean? = null
+    val enabled: Boolean? = null,
+    val unknownAnswerId: String? = null
 )
 
     // TODO MASS : transient versions
