@@ -82,4 +82,9 @@ interface StoryDefinitionConfigurationDAO {
      * Get all story definitions with a given category
      */
     fun getStoryDefinitionByCategory(category: String): List<StoryDefinitionConfiguration>
+
+    /**
+     * Get all story definitions with a given category and a given storyId
+     */
+    fun getStoryDefinitionByCategoryAndStoryId(category: String, storyId: String): StoryDefinitionConfiguration?
 }

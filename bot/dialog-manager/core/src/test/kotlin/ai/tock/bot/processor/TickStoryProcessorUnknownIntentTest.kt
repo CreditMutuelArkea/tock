@@ -575,11 +575,11 @@ internal class TickStoryProcessorUnknownIntentTest {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = UnknownAnswerConfig(
+        val answerConfig1 = TickUnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = UnknownAnswerConfig(
+        val answerConfig2 = TickUnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -695,11 +695,11 @@ internal class TickStoryProcessorUnknownIntentTest {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = UnknownAnswerConfig(
+        val answerConfig1 = TickUnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = UnknownAnswerConfig(
+        val answerConfig2 = TickUnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -814,11 +814,11 @@ internal class TickStoryProcessorUnknownIntentTest {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = UnknownAnswerConfig(
+        val answerConfig1 = TickUnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = UnknownAnswerConfig(
+        val answerConfig2 = TickUnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -935,11 +935,11 @@ internal class TickStoryProcessorUnknownIntentTest {
     @Test
     fun `process when unknown intent is detected and unknownAnswerConfig is provided and repetitionNb is exceeded`() {
 
-        val answerConfig1 = UnknownAnswerConfig(
+        val answerConfig1 = TickUnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = UnknownAnswerConfig(
+        val answerConfig2 = TickUnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -1025,11 +1025,11 @@ internal class TickStoryProcessorUnknownIntentTest {
     @Test
     fun `process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided`() {
 
-        val answerConfig1 = UnknownAnswerConfig(
+        val answerConfig1 = TickUnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = UnknownAnswerConfig(
+        val answerConfig2 = TickUnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )

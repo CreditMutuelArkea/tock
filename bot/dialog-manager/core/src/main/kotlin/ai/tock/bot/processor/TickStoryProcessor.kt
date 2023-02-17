@@ -102,7 +102,7 @@ class TickStoryProcessor(
                             }
                         }
                         // Then the current handling step is incremented
-                        handlingStep.incrementRepetition() as TickActionHandlingStep
+                        handlingStep.next() as TickActionHandlingStep
                     }
                 }
             // Else, the current handling step is set to a new handling step with the secondary objective as linked action
@@ -357,7 +357,7 @@ class TickStoryProcessor(
     }
 
     private fun handleUnknown(action: TickUserAction?): ProcessingResult? =
-        if (configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
+        if (ranHandlers.isNotEmpty() && configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
             logger.debug { "handle unknown intent..." }
             val (step, redirectStoryId) = TickUnknownHandler.handle(
                 lastExecutedActionName = ranHandlers.last(),

@@ -39,10 +39,11 @@ class ScenarioGroupDAOTest : AbstractTest() {
     private val dateNow = ZonedDateTime.now()
     private val botId1 = "botId1"
     private val botId2 = "botId2"
+    private val unknownAnswerId = "unknownAnswerId"
 
-    private val scenarioGroup1 = ScenarioGroup(botId = botId1, name = "name1", creationDate = dateNow, updateDate = dateNow)
-    private val scenarioGroup2 = ScenarioGroup(botId = botId1, name = "name2", creationDate = dateNow, updateDate = dateNow)
-    private val scenarioGroup3 = ScenarioGroup(botId = botId2, name = "name3", creationDate = dateNow, updateDate = dateNow)
+    private val scenarioGroup1 = ScenarioGroup(botId = botId1, name = "name1", creationDate = dateNow, updateDate = dateNow, unknownAnswerId = unknownAnswerId)
+    private val scenarioGroup2 = ScenarioGroup(botId = botId1, name = "name2", creationDate = dateNow, updateDate = dateNow, unknownAnswerId = unknownAnswerId)
+    private val scenarioGroup3 = ScenarioGroup(botId = botId2, name = "name3", creationDate = dateNow, updateDate = dateNow, unknownAnswerId = unknownAnswerId)
     private val scenarioGroup3Copy = scenarioGroup3.copy(name = "name3Copy", category = "categoryCopy", description = "descCopy")
 
     private fun initDb(scenarioGroups: List<ScenarioGroup>){

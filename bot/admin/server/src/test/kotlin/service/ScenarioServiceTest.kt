@@ -41,6 +41,7 @@ class ScenarioServiceTest {
     private val namespace = "namespace_app"
     private val botId1 = "botId1"
     private val botId2 = "botId2"
+    private val unknownAnswerId = "unknownAnswerId"
 
     private val groupId1 = "groupId1"
     private val groupId2 = "groupId2"
@@ -66,16 +67,18 @@ class ScenarioServiceTest {
         state = ScenarioVersionState.ARCHIVED, comment = "v1", creationDate = dateNow, updateDate = dateNow)
 
     private val scenarioGroup1 = ScenarioGroup(_id = groupId1.toId(), botId = botId1, name = "name1", creationDate = dateNow, updateDate = dateNow,
-        versions = listOf(scenarioVersion1, scenarioVersion2), enabled = false)
+        versions = listOf(scenarioVersion1, scenarioVersion2), enabled = false, unknownAnswerId = unknownAnswerId)
     private val scenarioGroup1Copy = ScenarioGroup(_id = groupId1.toId(), botId = botId1, name = "name1", creationDate = dateNow, updateDate = dateNow,
-        versions = listOf(scenarioVersion1, scenarioVersion2), description = "DESC-COPY", enabled = false)
+        versions = listOf(scenarioVersion1, scenarioVersion2), description = "DESC-COPY", enabled = false, unknownAnswerId = unknownAnswerId)
     private val scenarioGroup2 = ScenarioGroup(_id = groupId2.toId(), botId = botId2, name = "name2", creationDate = dateNow, updateDate = dateNow,
-        versions = listOf(scenarioVersion3), enabled = false)
+        versions = listOf(scenarioVersion3), enabled = false, unknownAnswerId = unknownAnswerId)
 
     @BeforeEach
     fun setUp() {
         mockkObject(ScenarioSettingsService)
+        mockkObject(ScenarioGroupService)
         every { ScenarioSettingsService.listenChanges(any()) } answers {}
+        every { ScenarioGroupService.listenChanges(any()) } answers {}
         mockkObject(StoryService)
     }
 
