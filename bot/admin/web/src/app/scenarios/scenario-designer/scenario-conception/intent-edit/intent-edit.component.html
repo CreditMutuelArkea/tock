@@ -17,13 +17,13 @@
   </nb-card-header>
 
   <nb-card-body *ngIf="showGenerateSentences">
-    <tock-sentences-generation
+    <tock-sentences-generation-content
       [closable]="true"
       [sentences]="sentencesExample"
       (onValidateSelection)="addGeneratedSentences($event)"
       (onLoading)="loadingGeneratedSentences($event)"
       (onClose)="closeGenerateSentences()"
-    ></tock-sentences-generation>
+    ></tock-sentences-generation-content>
   </nb-card-body>
 
   <nb-card-body *ngIf="!showGenerateSentences">

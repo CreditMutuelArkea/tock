@@ -14,11 +14,11 @@
   </nb-card-header>
 
   <nb-card-body>
-    <tock-sentences-generation
+    <tock-sentences-generation-content
       [sentences]="sentences"
       [errors]="errors"
       (onLoading)="handleLoading($event)"
       (onValidateSelection)="handleGeneratedSentences($event)"
-    ></tock-sentences-generation>
+    ></tock-sentences-generation-content>
   </nb-card-body>
 </nb-card>

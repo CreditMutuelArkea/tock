@@ -144,14 +144,14 @@
 
       <div *ngIf="currentTab == 'question'">
         <div *ngIf="showGenerateSentencesV2">
-          <tock-sentences-generation
+          <tock-sentences-generation-content
             [closable]="true"
             [sentences]="utterances.value"
             [errors]="errorsAddSentences"
             (onValidateSelection)="addGeneratedSentences($event)"
             (onLoading)="loadingGeneratedSentences($event)"
             (onClose)="closeGenerateSentences()"
-          ></tock-sentences-generation>
+          ></tock-sentences-generation-content>
         </div>
         <div *ngIf="!showGenerateSentencesV2">
           <tock-form-control

@@ -1,12 +1,11 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { NbToastrService } from '@nebular/theme';
 
-import { RestService } from '../../../../../core-nlp/rest/rest.service';
-import { GeneratedSentence, GeneratedSentenceError, SentencesGenerationOptions } from '../../models';
+import { StateService } from '../../../../../core-nlp/state.service';
+import { CompletionRequest, CompletionResponse, GeneratedSentence, GeneratedSentenceError, SentencesGenerationOptions } from '../../models';
+import { SentencesGenerationApiService } from '../../services';
 
 @Component({
-  selector: 'tock-sentences-generation',
+  selector: 'tock-sentences-generation-content',
   templateUrl: './sentences-generation-content.component.html',
   styleUrls: ['./sentences-generation-content.component.scss']
 })
@@ -20,7 +19,7 @@ export class SentencesGenerationContentComponent implements OnChanges {
   @Output() onValidateSelection = new EventEmitter<string[]>();
 
   generatedSentences: GeneratedSentence[] = [];
-  alert: boolean = true;
+  showAlert: boolean = true;
   options: SentencesGenerationOptions = {
     abbreviatedLanguage: false,
     sentenceExample: '',
@@ -30,7 +29,7 @@ export class SentencesGenerationContentComponent implements OnChanges {
     temperature: 0.7
   };
 
-  constructor(private toastrService: NbToastrService, private rest: RestService, private http: HttpClient) {}
+  constructor(private stateService: StateService, private sentencesGenerationApiService: SentencesGenerationApiService) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes.sentences?.currentValue?.length !== changes.sentences?.previousValue?.length) {
@@ -54,70 +53,32 @@ export class SentencesGenerationContentComponent implements OnChanges {
     return errors.find((error: GeneratedSentenceError) => error.sentence === sentence)?.message;
   }
 
-  private getRequest(
-    spellingMistakes: boolean,
-    smsLanguage: boolean,
-    abbreviatedLanguage: boolean,
-    sentenceExample: string,
-    sentencesExample: string[]
-  ): string {
-    const request = ['Parameters:\n'];
-    const sentences = [];
-
-    if (spellingMistakes || smsLanguage || abbreviatedLanguage) {
-      if (spellingMistakes) request.push('- include sentences with spelling mistakes\n');
-      if (smsLanguage) request.push('- include sentences with sms language\n');
-      if (abbreviatedLanguage) request.push('- include sentences with abbreviated language\n');
-    } else {
-      request.push('- no parameters\n');
-    }
-
-    request.push(
-      'Takes into account the previous parameters and generates 10 sentences derived from the sentences in the following table: '
-    );
-    request.push('[');
-
-    if (sentenceExample) sentences.push(`"${sentenceExample}"`);
-
-    sentencesExample.forEach((sentence: string) => {
-      sentences.push(`"${sentence}"`);
-    });
-
-    request.push(sentences.toString());
-    request.push(']');
-
-    return request.join('');
-  }
-
   generate(options: SentencesGenerationOptions = this.options): void {
     const { abbreviatedLanguage, sentenceExample, sentencesExample, smsLanguage, spellingMistakes, temperature } = options;
-    const body = {
-      model: 'text-davinci-003',
-      prompt: this.getRequest(spellingMistakes, smsLanguage, abbreviatedLanguage, sentenceExample, sentencesExample),
-      max_tokens: 2048,
-      temperature: temperature
+    const sentences: string[] = sentenceExample ? [sentenceExample, ...sentencesExample] : sentencesExample;
+    const completionRequest: CompletionRequest = {
+      data: {
+        sentences,
+        locale: this.stateService.currentLocale,
+        abbreviatedLanguage,
+        smsLanguage,
+        spellingMistakes
+      },
+      config: {
+        temperature
+      }
     };
-
-    const headers = {
-      Authorization: 'Bearer '
-    };
-
-    const request = this.http.post<any>('https://api.openai.com/v1/completions', body, {
-      headers: headers
-    });
 
     this.updateOptions(options);
     this.onLoading.emit(true);
 
-    request.subscribe({
-      next: (v) => {
-        this.generatedSentences = this.feedGeneratedSentences(this.parseResult(v.choices[0].text));
+    this.sentencesGenerationApiService.generateSentences(completionRequest).subscribe({
+      next: (completionResponse: CompletionResponse) => {
+        this.generatedSentences = this.feedGeneratedSentences(completionResponse.choices);
         this.onLoading.emit(false);
       },
       error: (e) => {
         this.onLoading.emit(false);
-        console.error(e);
-        this.toastrService.danger(e?.error?.error?.message || 'An error has occured', 'Error');
       }
     });
   }
@@ -134,13 +95,6 @@ export class SentencesGenerationContentComponent implements OnChanges {
     }));
   }
 
-  private parseResult(text: string): string[] {
-    return text
-      .split(new RegExp('[\\n]+[0-9]+.'))
-      .map((r) => r.trim())
-      .filter((r) => r);
-  }
-
   private isDistinct(sentence: string): boolean {
     return !!!this.sentences.find((s) => s === sentence);
   }
@@ -150,7 +104,7 @@ export class SentencesGenerationContentComponent implements OnChanges {
   }
 
   closeAlert(): void {
-    this.alert = false;
+    this.showAlert = false;
   }
 
   backOptions(): void {
