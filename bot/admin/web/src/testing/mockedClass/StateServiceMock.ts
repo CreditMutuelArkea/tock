@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs';
+
 export class StateServiceMock {
   currentApplication = {
     namespace: 'namespace/test',
@@ -6,6 +8,8 @@ export class StateServiceMock {
   };
 
   currentLocal = 'fr';
+
+  configurationChange = new Subject();
 
   intentIdExistsInOtherApplication() {
     return false;

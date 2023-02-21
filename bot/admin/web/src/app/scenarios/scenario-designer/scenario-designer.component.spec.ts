@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { TestingModule } from '@tock/testing';
 import { of, Subject } from 'rxjs';
+import { StateServiceMock } from '../../../testing/mockedClass';
 
 import { BotService } from '../../bot/bot-service';
 import { StateService } from '../../core-nlp/state.service';
@@ -51,11 +52,7 @@ describe('ScenarioDesignerComponent', () => {
         { provide: NbToastrService, useValue: {} },
         {
           provide: StateService,
-          useValue: {
-            configurationChange: new Subject(),
-            currentApplication: { namespace: 'testNamespace', name: 'testAppName' },
-            currentLocale: 'fr'
-          }
+          useClass: StateServiceMock
         },
         {
           provide: ScenarioDesignerService,
