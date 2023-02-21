@@ -1,9 +1,9 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { StateService } from 'src/app/core-nlp/state.service';
+import { StateService } from '../../../../core-nlp/state.service';
 import { ChoiceDialogComponent } from '../../../../shared/components';
 import { getSmStateParentById } from '../../../commons/utils';
 import { ScenarioIntentDefinition, MachineState, ScenarioActionDefinition, Transition } from '../../../models';

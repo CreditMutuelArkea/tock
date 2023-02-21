@@ -38,7 +38,7 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
   @Input() isReadonly: boolean;
   @Input() i18n: I18nLabels;
   @Input() readonly avalaibleHandlers: Handler[];
-  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[];
 
   destroy = new Subject();
 
@@ -64,7 +64,6 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
 
   isScenarioUnPublishable(): string {
     let unPublishable: string;
-
     const isPublishingStepValid =
       isStepValid(this.scenario, SCENARIO_MODE.casting).valid &&
       isStepValid(this.scenario, SCENARIO_MODE.production).valid &&

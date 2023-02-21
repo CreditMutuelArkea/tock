@@ -327,7 +327,10 @@
           </span>
         </tock-form-control>
 
-        <div *ngIf="!targetStory.value">
+        <div
+          *ngIf="!targetStory.value"
+          data-testid="output-context-block"
+        >
           <tock-form-control
             *ngIf="!isReadonly"
             label="Output contexts"
@@ -463,6 +466,7 @@
       <div
         id="formBottomSection"
         *ngIf="!targetStory.value"
+        data-testid="unknown-answers-block"
       >
         <label class="font-weight-bold text-mitigated"> Question for unknown answer </label>
 

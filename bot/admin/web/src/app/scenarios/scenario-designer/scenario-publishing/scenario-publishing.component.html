@@ -1,5 +1,5 @@
 <nb-card>
-  <nb-card-body *ngIf="avalaibleHandlers">
+  <nb-card-body>
     <div *ngIf="dependencies">
       <ng-container *ngFor="let intentJobsType of [dependencies.intentsToCreate, dependencies.intentsToUpdate]">
         <div *ngIf="intentJobsType.length">
@@ -127,6 +127,7 @@
         nbButton
         status="danger"
         (click)="processDependencies()"
+        data-testid="publish-button"
       >
         Publish scenario
       </button>

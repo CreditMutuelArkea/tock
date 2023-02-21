@@ -49,7 +49,14 @@ describe('ScenarioDesignerComponent', () => {
         },
         { provide: ActivatedRoute, useValue: { params: of({ id: '5' }) } },
         { provide: NbToastrService, useValue: {} },
-        { provide: StateService, useValue: { configurationChange: new Subject() } },
+        {
+          provide: StateService,
+          useValue: {
+            configurationChange: new Subject(),
+            currentApplication: { namespace: 'testNamespace', name: 'testAppName' },
+            currentLocale: 'fr'
+          }
+        },
         {
           provide: ScenarioDesignerService,
           useValue: {
@@ -60,7 +67,8 @@ describe('ScenarioDesignerComponent', () => {
         {
           provide: BotService,
           useValue: {
-            i18nLabels: () => of({})
+            i18nLabels: () => of({}),
+            searchStories: () => of({})
           }
         }
       ],
