@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbTabComponent, NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 
 import { StateService } from '../../../core-nlp/state.service';
@@ -9,6 +9,9 @@ import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ChoiceDialogComponent } from '../../../shared/components';
+import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/components/sentences-generation-wrapper/sentences-generation-wrapper.component';
+import { GeneratedSentenceError } from '../../../shared/modules/sentences-generation/models';
+import { SentencesGenerationService } from '../../../shared/modules/sentences-generation/services';
 import { FaqDefinitionExtended } from '../faq-management.component';
 
 export enum FaqTabs {
@@ -42,11 +45,17 @@ export class FaqManagementEditComponent implements OnChanges {
   @ViewChild('addUtteranceInput') addUtteranceInput: ElementRef;
   @ViewChild('utterancesListWrapper') utterancesListWrapper: ElementRef;
 
-  constructor(private nbDialogService: NbDialogService, private nlp: NlpService, private readonly state: StateService) {}
+  constructor(
+    private nbDialogService: NbDialogService,
+    private nlp: NlpService,
+    private readonly state: StateService,
+    private sentencesGenerationService: SentencesGenerationService
+  ) {}
 
   faqTabs: typeof FaqTabs = FaqTabs;
   isSubmitted: boolean = false;
   currentTab = FaqTabs.INFO;
+  errorsAddSentences: GeneratedSentenceError[] = [];
 
   controlsMaxLength = {
     description: 500,
@@ -228,12 +237,21 @@ export class FaqManagementEditComponent implements OnChanges {
               if (existingIntentId) {
                 let intent = this.state.findIntentById(existingIntentId);
                 this.existingUterranceInOtherintent = intent?.label || intent?.name || '';
+                this.errorsAddSentences = [
+                  ...this.errorsAddSentences,
+                  {
+                    sentence: utterance,
+                    message: `This sentence is already associated with the intent: "${this.existingUterranceInOtherintent}"`
+                  }
+                ];
+                this.sentencesGenerationService.feedErrors(this.errorsAddSentences);
               } else {
                 this.utterances.push(new FormControl(utterance));
                 this.form.markAsDirty();
                 setTimeout(() => {
-                  this.addUtteranceInput?.nativeElement.focus();
-                  this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
+                  this.addUtteranceInput?.nativeElement?.focus();
+                  if (this.utterancesListWrapper?.nativeElement)
+                    this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
                 });
               }
               this.lookingForSameUterranceInOtherInent = false;
@@ -243,7 +261,8 @@ export class FaqManagementEditComponent implements OnChanges {
             }
           });
       }
-      this.addUtteranceInput.nativeElement.value = '';
+
+      if (this.addUtteranceInput?.nativeElement) this.addUtteranceInput.nativeElement.value = '';
     }
   }
 
@@ -385,5 +404,45 @@ export class FaqManagementEditComponent implements OnChanges {
   save(faqDFata): void {
     this.onSave.emit(faqDFata);
     if (!this.faq.id) this.onClose.emit(true);
+  }
+
+  generateSentences(): void {
+    const subscription = new Subscription();
+    const dialogRef = this.nbDialogService.open(SentencesGenerationWrapperComponent, {
+      context: {
+        sentences: this.utterances.value
+      }
+    });
+
+    dialogRef.componentRef.instance.onValidateSelection.subscribe((generatedSentences: string[]) => {
+      generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
+      subscription.add(
+        this.utterances.valueChanges.subscribe((utterances) => {
+          this.sentencesGenerationService.feedSentencesExample(utterances);
+        })
+      );
+    });
+
+    dialogRef.onClose.subscribe(() => {
+      this.sentencesGenerationService.resetSentencesExample();
+      subscription.unsubscribe();
+    });
+  }
+
+  showGenerateSentencesV2 = false;
+  generateSentencesV2(): void {
+    this.showGenerateSentencesV2 = true;
+  }
+
+  closeGenerateSentences(): void {
+    this.showGenerateSentencesV2 = false;
+  }
+
+  addGeneratedSentences(generatedSentences: string[], resetErrors: boolean): void {
+    generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
+  }
+
+  loadingGeneratedSentences(loading: boolean): void {
+    this.loading = loading;
   }
 }

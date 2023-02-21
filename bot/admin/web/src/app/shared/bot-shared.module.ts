@@ -45,6 +45,8 @@ import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 
 import { CanvasModule } from './canvas/canvas.module';
+import { SentencesGenerationModule } from './modules';
+
 import {
   AutocompleteInputComponent,
   ChatUiComponent,
@@ -76,6 +78,7 @@ import { AutofocusDirective, DelayDirective, FullscreenDirective, MouseWheelList
     NbPopoverModule,
     NbButtonModule,
     NbButtonGroupModule,
+
     CanvasModule
   ],
   declarations: [
@@ -130,7 +133,8 @@ import { AutofocusDirective, DelayDirective, FullscreenDirective, MouseWheelList
     FullscreenDirective,
     MouseWheelListnerDirective,
 
-    CanvasModule
+    CanvasModule,
+    SentencesGenerationModule
   ],
   providers: [BotSharedService],
   entryComponents: []

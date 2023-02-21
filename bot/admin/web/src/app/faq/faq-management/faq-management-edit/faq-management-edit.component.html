@@ -143,143 +143,195 @@
       </div>
 
       <div *ngIf="currentTab == 'question'">
-        <tock-form-control
-          label="Question"
-          name="question"
-          [controls]="utterances"
-          [showError]="isSubmitted"
-          [required]="true"
-          data-testid="question"
-        >
-          <div class="d-flex">
-            <input
-              #addUtteranceInput
-              autofocusElement
-              nbInput
-              fullWidth
-              id="question"
-              type="text"
-              placeholder="Type a new wording and press the Enter key"
-              [disabled]="lookingForSameUterranceInOtherInent"
-              (keyup)="resetAlerts()"
-              (keyup.enter)="addUtterance()"
-            />
-            <button
-              type="button"
-              nbButton
-              ghost
-              size="small"
-              [disabled]="lookingForSameUterranceInOtherInent"
-              (click)="addUtterance()"
-            >
-              Add
-            </button>
-          </div>
-        </tock-form-control>
-
-        <nb-alert
-          status="danger"
-          *ngIf="existingUterranceInOtherintent"
-          class="closable mt-2"
-          data-testid="existing-uterrance-in-other-intent"
-        >
-          <button
-            type="button"
-            aria-label="Close"
-            class="close alert-custom-close"
-            (click)="resetAlerts()"
+        <div *ngIf="showGenerateSentencesV2">
+          <tock-sentences-generation-content
+            [closable]="true"
+            [sentences]="utterances.value"
+            [errors]="errorsAddSentences"
+            (onValidateSelection)="addGeneratedSentences($event)"
+            (onLoading)="loadingGeneratedSentences($event)"
+            (onClose)="closeGenerateSentences()"
+          ></tock-sentences-generation-content>
+        </div>
+        <div *ngIf="!showGenerateSentencesV2">
+          <tock-form-control
+            label="Question"
+            name="question"
+            [controls]="utterances"
+            [showError]="isSubmitted"
+            [required]="true"
+            data-testid="question"
           >
-            <span>×</span>
-          </button>
-          <span data-testid="alert-message">
-            Addition cancelled. This Sentence is already associated with the intent :
-            <strong>"{{ existingUterranceInOtherintent }}" </strong>
-          </span>
-        </nb-alert>
-
-        <div
-          #utterancesListWrapper
-          class="entries-list d-flex flex-column mb-2"
-          [nbSpinner]="lookingForSameUterranceInOtherInent"
-        >
-          <ul>
-            <li
-              *ngFor="let utterance of utterances.controls"
-              class="d-flex justify-content-between align-items-center"
-            >
-              <div
-                class="flex-grow-1"
-                *ngIf="!utterance._edit"
-              >
-                {{ utterance.value }}
-              </div>
-              <div
-                class="flex-grow-1 mr-3"
-                *ngIf="utterance._edit"
-              >
-                <textarea
+            <div class="add-utterances gap-1">
+              <nb-form-field>
+                <input
+                  #addUtteranceInput
+                  autofocusElement
                   nbInput
                   fullWidth
-                  fieldSize="small"
-                  [(ngModel)]="utteranceEditionValue"
-                  [ngModelOptions]="{ standalone: true }"
-                  (keyup.enter)="validateEditUtterance(utterance)"
-                ></textarea>
-              </div>
-
-              <button
-                *ngIf="!utterance._edit"
+                  id="question"
+                  type="text"
+                  placeholder="Type a new wording and press the Enter key"
+                  [disabled]="lookingForSameUterranceInOtherInent"
+                  (keyup)="resetAlerts()"
+                  (keyup.enter)="addUtterance()"
+                />
+                <button
+                  type="button"
+                  nbButton
+                  nbSuffix
+                  ghost
+                  nbTooltip="Add"
+                  [disabled]="lookingForSameUterranceInOtherInent"
+                  (click)="addUtterance()"
+                >
+                  <nb-icon icon="plus-outline"></nb-icon>
+                </button>
+              </nb-form-field>
+              <!-- <button
                 type="button"
                 nbButton
-                nbTooltip="Edit"
+                ghost
+                size="small"
+                [disabled]="lookingForSameUterranceInOtherInent"
+                (click)="addUtterance()"
+              >
+                Add
+              </button> -->
+              <button
+                nbButton
+                type="button"
+                nbTooltip="Generate sentences"
                 ghost
                 shape="round"
-                size="small"
-                (click)="editUtterance(utterance.value)"
+                (click)="generateSentences()"
               >
-                <nb-icon icon="edit-outline"></nb-icon>
-              </button>
-              <button
-                *ngIf="utterance._edit"
-                type="button"
-                nbButton
-                nbTooltip="Validate changes"
-                shape="round"
-                size="small"
-                status="success"
-                (click)="validateEditUtterance(utterance)"
-              >
-                <nb-icon icon="checkmark-outline"></nb-icon>
-              </button>
-
-              <button
-                *ngIf="!utterance._edit"
-                type="button"
-                nbButton
-                nbTooltip="Delete"
-                ghost
-                shape="round"
-                size="small"
-                status="danger"
-                (click)="removeUtterance(utterance.value)"
-              >
-                <nb-icon icon="trash-2-outline"></nb-icon>
+                <nb-icon
+                  icon="bulb-outline"
+                  status="primary"
+                ></nb-icon>
               </button>
 
               <button
-                *ngIf="utterance._edit"
-                type="button"
                 nbButton
-                nbTooltip="Cancel changes"
+                type="button"
+                nbTooltip="Generate sentences V2"
                 ghost
                 shape="round"
-                size="small"
-                (click)="cancelEditUtterance(utterance)"
+                (click)="generateSentencesV2()"
               >
-                <nb-icon icon="close-outline"></nb-icon>
+                <nb-icon
+                  icon="bulb-outline"
+                  status="success"
+                ></nb-icon>
               </button>
-            </li>
-          </ul>
+            </div>
+          </tock-form-control>
+
+          <nb-alert
+            status="danger"
+            *ngIf="existingUterranceInOtherintent"
+            class="closable mt-2"
+            data-testid="existing-uterrance-in-other-intent"
+          >
+            <button
+              type="button"
+              aria-label="Close"
+              class="close alert-custom-close"
+              (click)="resetAlerts()"
+            >
+              <span>×</span>
+            </button>
+            <span data-testid="alert-message">
+              Addition cancelled. This Sentence is already associated with the intent :
+              <strong>"{{ existingUterranceInOtherintent }}" </strong>
+            </span>
+          </nb-alert>
+
+          <div
+            #utterancesListWrapper
+            class="entries-list d-flex flex-column mb-2"
+            [nbSpinner]="lookingForSameUterranceInOtherInent"
+          >
+            <ul>
+              <li
+                *ngFor="let utterance of utterances.controls"
+                class="d-flex justify-content-between align-items-center"
+              >
+                <div
+                  class="flex-grow-1"
+                  *ngIf="!utterance._edit"
+                >
+                  {{ utterance.value }}
+                </div>
+                <div
+                  class="flex-grow-1 mr-3"
+                  *ngIf="utterance._edit"
+                >
+                  <textarea
+                    nbInput
+                    fullWidth
+                    fieldSize="small"
+                    [(ngModel)]="utteranceEditionValue"
+                    [ngModelOptions]="{ standalone: true }"
+                    (keyup.enter)="validateEditUtterance(utterance)"
+                  ></textarea>
+                </div>
+
+                <button
+                  *ngIf="!utterance._edit"
+                  type="button"
+                  nbButton
+                  nbTooltip="Edit"
+                  ghost
+                  shape="round"
+                  size="small"
+                  (click)="editUtterance(utterance.value)"
+                >
+                  <nb-icon icon="edit-outline"></nb-icon>
+                </button>
+                <button
+                  *ngIf="utterance._edit"
+                  type="button"
+                  nbButton
+                  nbTooltip="Validate changes"
+                  shape="round"
+                  size="small"
+                  status="success"
+                  (click)="validateEditUtterance(utterance)"
+                >
+                  <nb-icon icon="checkmark-outline"></nb-icon>
+                </button>
+
+                <button
+                  *ngIf="!utterance._edit"
+                  type="button"
+                  nbButton
+                  nbTooltip="Delete"
+                  ghost
+                  shape="round"
+                  size="small"
+                  status="danger"
+                  (click)="removeUtterance(utterance.value)"
+                >
+                  <nb-icon icon="trash-2-outline"></nb-icon>
+                </button>
+
+                <button
+                  *ngIf="utterance._edit"
+                  type="button"
+                  nbButton
+                  nbTooltip="Cancel changes"
+                  ghost
+                  shape="round"
+                  size="small"
+                  (click)="cancelEditUtterance(utterance)"
+                >
+                  <nb-icon icon="close-outline"></nb-icon>
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

@@ -53,11 +53,13 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   @ViewChild('addSentenceInput') addSentenceInput: ElementRef;
   @ViewChild('addContextInput') addContextInput: ElementRef;
 
+  sentencesExample: string[] = [];
+  loading: boolean = false;
+
   private qualifiedName = qualifiedName;
+  _sentences: Sentence[] = [];
 
   constructor(private dialogRef: NbDialogRef<IntentEditComponent>, private stateService: StateService) {}
-
-  _sentences: Sentence[] = [];
 
   ngOnInit(): void {
     this.form.patchValue({ primary: this.item.intentDefinition.primary });
@@ -314,5 +316,31 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy.next();
     this.destroy.complete();
+  }
+
+  showGenerateSentences = false;
+  generateSentences(): void {
+    this.sentencesExample = this.feedSentencesExample();
+    this.showGenerateSentences = true;
+  }
+
+  closeGenerateSentences(): void {
+    this.showGenerateSentences = false;
+  }
+
+  addGeneratedSentences(generatedSentences: string[]): void {
+    generatedSentences.forEach((generatedSentence: string) => this.addSentence(generatedSentence));
+    this.sentencesExample = this.feedSentencesExample();
+  }
+
+  loadingGeneratedSentences(loading: boolean): void {
+    this.loading = loading;
+  }
+
+  feedSentencesExample(): string[] {
+    return [
+      ...this.sentences.value.map((sentence: TempSentence) => sentence.query),
+      ...this._sentences.map((sentence: Sentence) => sentence.text)
+    ];
   }
 }
