@@ -16,7 +16,7 @@
 
 package ai.tock.bot.connector.iadvize.model.request
 
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.Payload
+import ai.tock.bot.connector.iadvize.model.payload.Payload
 
 /**
  * Request that contains the conversation history

@@ -40,7 +40,6 @@ import ai.tock.bot.engine.event.Event
 import ai.tock.shared.error
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
-import ai.tock.bot.connector.iadvize.model.response.conversation.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.engine.BotBus
