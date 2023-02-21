@@ -24,7 +24,7 @@ export class ActionEditComponent implements OnInit {
   @Input() scenario: ScenarioVersion;
   @Input() isReadonly: boolean;
   @Input() readonly avalaibleHandlers: Handler[] = [];
-  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[];
 
   @Output() saveModifications = new EventEmitter();
   @Output() deleteDefinition = new EventEmitter();

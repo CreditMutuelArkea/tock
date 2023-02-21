@@ -13,8 +13,7 @@ type SentencesGroupedByIntent = { intent: Intent; sentences: Sentence[] };
 @Component({
   selector: 'scenario-intents-search',
   templateUrl: './intents-search.component.html',
-  styleUrls: ['./intents-search.component.scss'],
-  providers: [NlpService]
+  styleUrls: ['./intents-search.component.scss']
 })
 export class IntentsSearchComponent implements OnInit, OnDestroy {
   @Input() intentSentence: string;

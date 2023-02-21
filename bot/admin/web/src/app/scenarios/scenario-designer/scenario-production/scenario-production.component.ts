@@ -1,16 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  OnDestroy,
-  OnInit,
-  Output,
-  SimpleChanges,
-  ViewChild,
-  ViewEncapsulation
-} from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { G, Marker, Svg, SVG } from '@svgdotjs/svg.js';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -101,13 +89,16 @@ export class ScenarioProductionComponent implements OnInit, OnChanges, OnDestroy
     });
   }
 
-  ngOnInit(): void {
+  ngOnChanges(changes: SimpleChanges) {
     if (!this.scenario.data.stateMachine) this.initStateMachine();
+    this.setScenarioDefinition();
+  }
 
+  ngOnInit(): void {
     this.transitionsDefinition = [...this.scenarioDefinition.intents, ...this.scenarioDefinition.triggers];
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  private setScenarioDefinition() {
     this.scenarioDefinition = {
       actions: this.getScenarioActionDefinitions(),
       intents: this.getScenarioIntentDefinitions(),

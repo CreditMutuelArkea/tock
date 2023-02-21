@@ -44,7 +44,7 @@ export class ScenarioConceptionComponent implements OnInit, OnDestroy {
   @Input() isReadonly: boolean;
   @Input() isFullscreen: boolean = false;
   @Input() readonly avalaibleHandlers: Handler[];
-  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[] = [];
+  @Input() readonly availableStories: StoryDefinitionConfigurationSummary[];
 
   @Output() requestFullscreen = new EventEmitter();
 

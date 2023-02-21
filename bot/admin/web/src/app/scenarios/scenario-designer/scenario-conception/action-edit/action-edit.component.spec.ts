@@ -147,6 +147,7 @@ describe('ActionEditComponent', () => {
       inputContextNames: ['TEST'],
       outputContextNames: ['CONTEXT2'],
       final: false,
+      targetStory: null,
       unknownAnswers: [{ locale: 'fr', interfaceType: UserInterfaceType.textChat }]
     });
   });
@@ -217,5 +218,25 @@ describe('ActionEditComponent', () => {
   it('Should return context contrast', () => {
     let color = component.getContextEntityContrast(scenarioMock.data.contexts[0] as ScenarioContext);
     expect(color).toEqual('black');
+  });
+
+  it('Should hide output contexts and unknown answers if target story is set', () => {
+    Object.defineProperty(component, 'availableStories', { value: [] });
+    let modifItem = getScenarioMock().data.scenarioItems[2];
+    modifItem.actionDefinition.targetStory = 'targetStoryTestId';
+    component.item = modifItem;
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css('[data-testid="output-context-block"]'))).toBeNull();
+    expect(fixture.debugElement.query(By.css('[data-testid="unknown-answers-block"]'))).toBeNull();
+
+    modifItem.actionDefinition.targetStory = null;
+    component.item = modifItem;
+    component.ngOnInit();
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.query(By.css('[data-testid="output-context-block"]'))).not.toBeNull();
+    expect(fixture.debugElement.query(By.css('[data-testid="unknown-answers-block"]'))).not.toBeNull();
   });
 });

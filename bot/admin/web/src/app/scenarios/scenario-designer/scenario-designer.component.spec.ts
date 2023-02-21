@@ -5,6 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { TestingModule } from '@tock/testing';
 import { of, Subject } from 'rxjs';
+import { StateServiceMock } from '../../../testing/mockedClass';
 
 import { BotService } from '../../bot/bot-service';
 import { StateService } from '../../core-nlp/state.service';
@@ -49,7 +50,10 @@ describe('ScenarioDesignerComponent', () => {
         },
         { provide: ActivatedRoute, useValue: { params: of({ id: '5' }) } },
         { provide: NbToastrService, useValue: {} },
-        { provide: StateService, useValue: { configurationChange: new Subject() } },
+        {
+          provide: StateService,
+          useClass: StateServiceMock
+        },
         {
           provide: ScenarioDesignerService,
           useValue: {
@@ -60,7 +64,8 @@ describe('ScenarioDesignerComponent', () => {
         {
           provide: BotService,
           useValue: {
-            i18nLabels: () => of({})
+            i18nLabels: () => of({}),
+            searchStories: () => of({})
           }
         }
       ],
