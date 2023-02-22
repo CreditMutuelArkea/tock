@@ -23,7 +23,12 @@ import ai.tock.bot.mongo.MongoBotConfiguration
 import ai.tock.shared.watch
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
-import org.litote.kmongo.*
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollection
+import org.litote.kmongo.ensureUniqueIndex
+import org.litote.kmongo.replaceOneWithFilter
+import org.litote.kmongo.and
 import org.litote.kmongo.reactivestreams.getCollection
 
 

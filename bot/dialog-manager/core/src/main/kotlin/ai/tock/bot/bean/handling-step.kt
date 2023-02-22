@@ -19,7 +19,7 @@ package ai.tock.bot.bean
 import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
 
 /**
- * HandlingStep represents a step
+ * TickHandlingStep represents a step
  * @param repeated the number of repetition of this step
  * @param key the step key
  */
