@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
@@ -23,7 +23,7 @@ import { BotApplicationConfiguration, BotConfiguration, ConnectorType } from './
 import { switchMap, tap } from 'rxjs/operators';
 
 @Injectable()
-export class BotConfigurationService implements OnInit, OnDestroy {
+export class BotConfigurationService implements OnDestroy {
   private subscription: Subscription;
 
   //only rest configurations
@@ -41,8 +41,6 @@ export class BotConfigurationService implements OnInit, OnDestroy {
     this.subscription = this.state.configurationChange.subscribe((_) => this.updateConfigurations());
     this.updateConfigurations();
   }
-
-  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();

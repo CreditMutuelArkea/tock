@@ -13,6 +13,30 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<<<<<<< HEAD
+=======
+<nb-card class="dialog">
+  <nb-card-header>
+    Test the application <i>{{ state.currentApplication.label }}</i>
+  </nb-card-header>
+  <nb-card-body
+    *ngIf="testContext"
+    id="test-saving-accordions"
+  >
+    <nb-accordion>
+      <nb-accordion-item>
+        <nb-accordion-item-header (click)="removeXrayTestName()">Save dialog in Xray</nb-accordion-item-header>
+        <nb-accordion-item-body>
+          <input
+            *ngIf="testContext"
+            nbInput
+            [status]="isXrayTestNameFilled ? 'basic' : 'danger'"
+            placeholder="Xray test name"
+            id="test-name"
+            [(ngModel)]="xrayTestName"
+            (ngModelChange)="updateSaveButtonStatus($event)"
+          />
+>>>>>>> master
 
 
 
@@ -31,8 +55,23 @@
                   placeholder="Xray test name" id="test-name" [(ngModel)]="xrayTestName"
                   (ngModelChange)="updateSaveButtonStatus($event)" />
 
+<<<<<<< HEAD
                 <input *ngIf="testContext" nbInput status="default" placeholder="US identifier in Jira" id="jira-name"
                   [(ngModel)]="jiraIdentifier" />
+=======
+      <nb-accordion-item>
+        <nb-accordion-item-header (click)="removeXrayTestIdentifier()">Update dialog in Xray</nb-accordion-item-header>
+        <nb-accordion-item-body>
+          <input
+            *ngIf="testContext"
+            nbInput
+            [status]="isXrayTestIdentifierFilled ? 'basic' : 'danger'"
+            placeholder="Xray test identifier"
+            id="test-identifier"
+            [(ngModel)]="xrayTestIdentifier"
+            (ngModelChange)="updateUpdateButtonStatus($event)"
+          />
+>>>>>>> master
 
                 <nb-select *ngIf="testContext" multiple placeholder="Xray test plans" class="test-plans-select"
                   name="testplans" [(selected)]="selectTestPlans" (selectedChange)="printSelectedTestPlans($event)">

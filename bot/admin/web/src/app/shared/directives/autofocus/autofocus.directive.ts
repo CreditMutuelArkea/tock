@@ -1,7 +1,7 @@
 import { AfterContentInit, Directive, ElementRef, Input } from '@angular/core';
 
 @Directive({
-  selector: '[autofocusElement]'
+  selector: '[tockAutofocusElement]'
 })
 export class AutofocusDirective implements AfterContentInit {
   @Input() autofocusElement: boolean | string = true;

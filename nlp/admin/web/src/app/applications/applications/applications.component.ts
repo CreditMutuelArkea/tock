@@ -15,7 +15,7 @@
  */
 
 import { saveAs } from 'file-saver-es';
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Application } from '../../model/application';
 import { StateService } from '../../core-nlp/state.service';
 import { ApplicationService } from '../../core-nlp/applications.service';
@@ -27,17 +27,11 @@ import { NbToastrService } from '@nebular/theme';
   templateUrl: 'applications.component.html',
   styleUrls: ['applications.component.css']
 })
-export class ApplicationsComponent implements OnInit {
+export class ApplicationsComponent {
   UserRole = UserRole;
   uploadDump: boolean = false;
 
-  constructor(
-    private toastrService: NbToastrService,
-    public state: StateService,
-    private applicationService: ApplicationService
-  ) {}
-
-  ngOnInit() {}
+  constructor(private toastrService: NbToastrService, public state: StateService, private applicationService: ApplicationService) {}
 
   selectApplication(app: Application) {
     this.state.changeApplication(app);
@@ -52,12 +46,10 @@ export class ApplicationsComponent implements OnInit {
   }
 
   downloadSentencesDump(app: Application) {
-    this.applicationService
-      .getSentencesDump(app, this.state.hasRole(UserRole.technicalAdmin))
-      .subscribe((blob) => {
-        saveAs(blob, app.name + '_sentences.json');
-        this.toastrService.show(`Dump provided`, 'Dump', { duration: 2000 });
-      });
+    this.applicationService.getSentencesDump(app, this.state.hasRole(UserRole.technicalAdmin)).subscribe((blob) => {
+      saveAs(blob, app.name + '_sentences.json');
+      this.toastrService.show(`Dump provided`, 'Dump', { duration: 2000 });
+    });
   }
 
   showUploadDumpPanel() {

@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-import {saveAs} from 'file-saver-es';
-import {Component, Injectable, OnDestroy, OnInit} from '@angular/core';
-import {BotService} from '../bot-service';
-import {NlpService} from '../../nlp-tabs/nlp.service';
-import {StateService} from '../../core-nlp/state.service';
-import {StoryDefinitionConfiguration, StoryDefinitionConfigurationSummary, StorySearchQuery, AnswerConfigurationType, IntentName} from '../model/story';
-import {Subscription} from 'rxjs';
-import {FileItem, FileUploader, ParsedResponseHeaders} from 'ng2-file-upload';
-import {ConfirmDialogComponent} from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import {ChoiceDialogComponent} from '../../shared/components';
-import {CanDeactivate} from '@angular/router';
-import {LocationStrategy} from '@angular/common';
-import {NbToastrService} from '@nebular/theme';
-import {DialogService} from 'src/app/core-nlp/dialog.service';
-import {I18nLabel} from '../model/i18n'
-
+import { saveAs } from 'file-saver-es';
+import { Component, Injectable, OnDestroy, OnInit } from '@angular/core';
+import { BotService } from '../bot-service';
+import { NlpService } from '../../nlp-tabs/nlp.service';
+import { StateService } from '../../core-nlp/state.service';
+import {
+  StoryDefinitionConfiguration,
+  StoryDefinitionConfigurationSummary,
+  StorySearchQuery,
+  AnswerConfigurationType,
+  IntentName
+} from '../model/story';
+import { Subscription } from 'rxjs';
+import { FileItem, FileUploader, ParsedResponseHeaders } from 'ng2-file-upload';
+import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { ChoiceDialogComponent } from '../../shared/components';
+import { CanDeactivate } from '@angular/router';
+import { LocationStrategy } from '@angular/common';
+import { NbToastrService } from '@nebular/theme';
+import { DialogService } from 'src/app/core-nlp/dialog.service';
+import { I18nLabel } from '../model/i18n';
 
 interface TreeNode<T> {
   data: T;
@@ -55,7 +60,7 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
   allColumns = [this.categoryColumn, this.intentColumn, this.descriptionColumn, this.lastEditedColumn, this.actionsColumn];
   nodes: TreeNode<any>[];
   private lastExpandableState: Map<string, boolean> = new Map<string, boolean>();
-  dateFormat = 'dd/MM/yyyy HH:mm'
+  dateFormat = 'dd/MM/yyyy HH:mm';
 
   filter: string = '';
   category: string = '';
@@ -77,8 +82,7 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
     private toastrService: NbToastrService,
     private location: LocationStrategy,
     private backButtonHolder: BackButtonHolder
-  ) {
-  }
+  ) {}
 
   ngOnInit(): void {
     // check if back or forward button is pressed.
@@ -243,21 +247,22 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
           });
 
           this.stories = s.sort((a, b) => {
-            let fa = a.lastEdited, fb = b.lastEdited;
-            if (fa < fb) { return 1; }
-            if (fa > fb) { return -1; }
+            let fa = a.lastEdited,
+              fb = b.lastEdited;
+            if (fa < fb) {
+              return 1;
+            }
+            if (fa > fb) {
+              return -1;
+            }
             return 0;
-           });
+          });
 
           this.nodes = Array.from(sortedMap, ([key, value]) => {
             return {
               expanded:
-                s.length < 100 && (
-                  this.categories.length < 2 ||
-                  this.category != '' ||
-                  this.filter !== '' ||
-                  this.lastExpandableState.get(key) === true
-                ),
+                s.length < 100 &&
+                (this.categories.length < 2 || this.category != '' || this.filter !== '' || this.lastExpandableState.get(key) === true),
               data: {
                 category: key,
                 expandable: true
@@ -308,25 +313,18 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
   }
 
   prepareUpload() {
-    this.uploader = new FileUploader({removeAfterUpload: true});
-    this.uploader.onCompleteItem = (
-      item: FileItem,
-      response: string,
-      status: number,
-      headers: ParsedResponseHeaders
-    ) => {
-      this.toastrService.show(`Dump uploaded`, 'Dump', {duration: 3000, status: 'success'});
+    this.uploader = new FileUploader({ removeAfterUpload: true });
+    this.uploader.onCompleteItem = (item: FileItem, response: string, status: number, headers: ParsedResponseHeaders) => {
+      this.toastrService.show(`Dump uploaded`, 'Dump', { duration: 3000, status: 'success' });
       this.state.resetConfiguration();
     };
     this.displayUpload = true;
   }
 
   upload() {
-    this.bot.prepareStoryDumpUploader(
-      this.uploader,
-      this.state.currentApplication.name,
-      this.state.currentLocale
-    );
+    this.loading = true;
+    this.uploader.onCompleteAll = () => (this.loading = false);
+    this.bot.prepareStoryDumpUploader(this.uploader, this.state.currentApplication.name, this.state.currentLocale);
     this.uploader.uploadAll();
     this.displayUpload = false;
   }
@@ -339,8 +337,7 @@ export class BackButtonHolder {
 
 @Injectable()
 export class SearchStoryNavigationGuard implements CanDeactivate<any> {
-  constructor(private backButtonHolder: BackButtonHolder) {
-  }
+  constructor(private backButtonHolder: BackButtonHolder) {}
 
   canDeactivate(component: any) {
     // will prevent user from going back
