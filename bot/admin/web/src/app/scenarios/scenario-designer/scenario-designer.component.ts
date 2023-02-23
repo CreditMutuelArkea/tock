@@ -30,11 +30,10 @@ import { UserInterfaceType } from '../../core/model/configuration';
 import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../bot/model/story';
 
 @Component({
-  selector: 'scenario-designer',
+  selector: 'tock-scenario-designer',
   templateUrl: './scenario-designer.component.html',
   styleUrls: ['./scenario-designer.component.scss']
 })
-@Injectable()
 export class ScenarioDesignerComponent implements OnInit, OnDestroy {
   destroy = new Subject();
   @ViewChild('canvasWrapperElem') canvasWrapperElem: ElementRef;
@@ -363,7 +362,7 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.showFooter();
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 

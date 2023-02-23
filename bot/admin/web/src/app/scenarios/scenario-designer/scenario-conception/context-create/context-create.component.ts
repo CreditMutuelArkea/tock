@@ -6,7 +6,7 @@ import { normalizedSnakeCaseUpper, getScenarioActionDefinitions } from '../../..
 import { ACTION_OR_CONTEXT_NAME_MINLENGTH, ScenarioVersionExtended } from '../../../models';
 
 @Component({
-  selector: 'scenario-context-create',
+  selector: 'tock-scenario-context-create',
   templateUrl: './context-create.component.html',
   styleUrls: ['./context-create.component.scss']
 })
@@ -17,7 +17,7 @@ export class ContextCreateComponent {
   constructor(private dialogRef: NbDialogRef<ContextCreateComponent>) {}
 
   form: FormGroup = new FormGroup({
-    name: new FormControl(undefined, [
+    name: new FormControl<string>(undefined, [
       Validators.required,
       Validators.minLength(ACTION_OR_CONTEXT_NAME_MINLENGTH),
       this.isContextNameUnic.bind(this)

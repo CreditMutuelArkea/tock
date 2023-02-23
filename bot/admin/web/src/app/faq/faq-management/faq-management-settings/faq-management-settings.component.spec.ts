@@ -21,6 +21,8 @@ import { FaqService } from '../../services/faq.service';
 import { FaqManagementSettingsComponent } from './faq-management-settings.component';
 import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 import { Settings } from '../../models';
+import { NbDialogServiceMock, NbToastrServiceMock, StateServiceMock } from '../../../../testing/mockedClass';
+import { TestingModule } from '@tock/testing';
 
 const mockStories = [
   { _id: '1', name: 'story 1', category: 'category' } as StoryDefinitionConfigurationSummary,
@@ -182,7 +184,7 @@ describe('FaqManagementSettingsComponent', () => {
       component.satisfactionEnabled.setValue(false);
       component.save();
 
-      expect(component['dialogService'].openDialog).toHaveBeenCalled();
+      expect(component['nbDialogService'].open).toHaveBeenCalled();
       expect(component.saveSettings).toHaveBeenCalledOnceWith(component.form.value as Settings);
     });
 
@@ -205,7 +207,7 @@ describe('FaqManagementSettingsComponent', () => {
       component.satisfactionStoryId.setValue('1');
       component.save();
 
-      expect(component['dialogService'].openDialog).not.toHaveBeenCalled();
+      expect(component['nbDialogService'].open).not.toHaveBeenCalled();
       expect(component.saveSettings).toHaveBeenCalledOnceWith(component.form.value as Settings);
     });
   });

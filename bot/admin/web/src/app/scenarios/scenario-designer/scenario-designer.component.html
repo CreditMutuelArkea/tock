@@ -1,5 +1,5 @@
 <section
-  tock-fullscreen
+  tockFullscreen
   #fullscreen="fullscreen"
   [attr.data-fullscreen]="fullscreen.isFullscreen"
 >
@@ -64,16 +64,16 @@
       </div>
     </div>
 
-    <scenario-mode-stepper
+    <tock-scenario-mode-stepper
       *ngIf="scenarioVersion?.data"
       class="mb-3"
       [mode]="scenarioVersion.data.mode"
       [scenario]="scenarioVersion"
       (modeSwitch)="switchMode($event)"
-    ></scenario-mode-stepper>
+    ></tock-scenario-mode-stepper>
   </header>
 
-  <scenario-conception
+  <tock-scenario-conception
     *ngIf="
       initialDependenciesCheckDone &&
       (scenarioVersion?.data.mode === SCENARIO_MODE.writing || scenarioVersion?.data.mode === SCENARIO_MODE.casting)
@@ -84,17 +84,17 @@
     [availableStories]="availableStories"
     [isFullscreen]="fullscreen.isFullscreen"
     (requestFullscreen)="fullscreen.toggle()"
-  ></scenario-conception>
+  ></tock-scenario-conception>
 
-  <scenario-production
+  <tock-scenario-production
     *ngIf="initialDependenciesCheckDone && scenarioVersion?.data.mode === SCENARIO_MODE.production"
     [scenario]="scenarioVersion"
     [isReadonly]="isReadonly"
     [isFullscreen]="fullscreen.isFullscreen"
     (requestFullscreen)="fullscreen.toggle()"
-  ></scenario-production>
+  ></tock-scenario-production>
 
-  <scenario-publishing
+  <tock-scenario-publishing
     *ngIf="initialDependenciesCheckDone && scenarioVersion?.data.mode === SCENARIO_MODE.publishing"
     [scenario]="scenarioVersion"
     [isReadonly]="isReadonly"
@@ -102,5 +102,5 @@
     [availableStories]="availableStories"
     [i18n]="i18n"
     [isFullscreen]="fullscreen.isFullscreen"
-  ></scenario-publishing>
+  ></tock-scenario-publishing>
 </section>

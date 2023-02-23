@@ -4,7 +4,15 @@ import { NbDialogRef } from '@nebular/theme';
 import { Observable, of } from 'rxjs';
 
 import { StateService } from '../../../../core-nlp/state.service';
-import { ScenarioVersion, ScenarioItem, ScenarioContext, Handler, ACTION_OR_CONTEXT_NAME_MINLENGTH } from '../../../models';
+import {
+  ScenarioVersion,
+  ScenarioItem,
+  ScenarioContext,
+  Handler,
+  ACTION_OR_CONTEXT_NAME_MINLENGTH,
+  ScenarioAnswer,
+  ScenarioActionDefinition
+} from '../../../models';
 import { getContrastYIQ, getScenarioActionDefinitions, getScenarioActions, normalizedSnakeCaseUpper } from '../../../commons/utils';
 import { entityColor, qualifiedName, qualifiedRole } from '../../../../model/nlp';
 import { UserInterfaceType } from '../../../../core/model/configuration';
@@ -13,8 +21,22 @@ import { StoryDefinitionConfigurationSummary } from '../../../../bot/model/story
 
 type InputOrOutputContext = 'input' | 'output';
 
+interface ActionEditForm {
+  description: FormControl<string>;
+  name: FormControl<string>;
+  handler: FormControl<string>;
+  inputContextNames: FormArray<FormControl<string>>;
+  outputContextNames: FormArray<FormControl<string>>;
+  answerId: FormControl<string>;
+  trigger: FormControl<string>;
+  targetStory: FormControl<string>;
+  final: FormControl<boolean>;
+  answers: FormArray<FormControl<ScenarioAnswer>>;
+  unknownAnswers: FormArray<FormControl<ScenarioAnswer>>;
+}
+
 @Component({
-  selector: 'scenario-action-edit',
+  selector: 'tock-scenario-action-edit',
   templateUrl: './action-edit.component.html',
   styleUrls: ['./action-edit.component.scss']
 })
@@ -27,7 +49,8 @@ export class ActionEditComponent implements OnInit {
   @Input() readonly availableStories: StoryDefinitionConfigurationSummary[];
 
   @Output() saveModifications = new EventEmitter();
-  @Output() deleteDefinition = new EventEmitter();
+  @Output() deleteDefinition = new EventEmitter<ScenarioActionDefinition>();
+
   @ViewChild('inputContextsInput') inputContextsInput: ElementRef;
   @ViewChild('outputContextsInput') outputContextsInput: ElementRef;
 
@@ -46,7 +69,7 @@ export class ActionEditComponent implements OnInit {
 
   isSubmitted: boolean = false;
 
-  form: FormGroup = new FormGroup({
+  form: FormGroup = new FormGroup<ActionEditForm>({
     name: new FormControl(undefined, [
       Validators.required,
       Validators.minLength(ACTION_OR_CONTEXT_NAME_MINLENGTH),

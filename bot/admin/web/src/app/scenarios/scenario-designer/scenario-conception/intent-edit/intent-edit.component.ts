@@ -30,11 +30,18 @@ import { SentenceEditComponent } from './sentence/sentence-edit.component';
 import { getContrastYIQ, getScenarioActionDefinitions, normalizedSnakeCaseUpper } from '../../../commons/utils';
 import { deepCopy } from '../../../../shared/utils';
 
+interface IntentEditForm {
+  sentences: FormArray<FormControl<string>>;
+  contextsEntities: FormArray<FormControl<string>>;
+  primary: FormControl<boolean>;
+  outputContextNames: FormArray<FormControl<string>>;
+}
+
 export type SentenceExtended = Sentence & { _tokens?: Token[] };
 export type TempSentenceExtended = TempSentence & { _tokens?: Token[] };
 
 @Component({
-  selector: 'scenario-intent-edit',
+  selector: 'tock-scenario-intent-edit',
   templateUrl: './intent-edit.component.html',
   styleUrls: ['./intent-edit.component.scss']
 })
@@ -135,7 +142,7 @@ export class IntentEditComponent implements OnInit, OnDestroy {
     return isIn_Sentences ? true : false;
   }
 
-  form: FormGroup = new FormGroup({
+  form: FormGroup = new FormGroup<IntentEditForm>({
     sentences: new FormArray([]),
     contextsEntities: new FormArray([]),
     primary: new FormControl(false),
@@ -312,7 +319,7 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

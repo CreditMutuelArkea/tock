@@ -101,9 +101,7 @@ import { AutofocusDirective, FullscreenDirective, MouseWheelListnerDirective } f
     JsonPreviewerComponent,
     FileUploadComponent,
     NoBotConfigurationComponent,
-
     AutofocusDirective,
-    DelayDirective,
     FullscreenDirective,
     MouseWheelListnerDirective
   ],
@@ -126,7 +124,6 @@ import { AutofocusDirective, FullscreenDirective, MouseWheelListnerDirective } f
     NoBotConfigurationComponent,
 
     AutofocusDirective,
-    DelayDirective,
     FullscreenDirective,
     MouseWheelListnerDirective,
 

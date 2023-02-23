@@ -66,7 +66,7 @@
       [ngStyle]="{ 'width.px': transitionWrapperWidth }"
     >
       <ng-container *ngFor="let transition of state.on | keyvalue">
-        <scenario-transition
+        <tock-scenario-transition
           class="cursor-default"
           [isReadonly]="isReadonly"
           [transition]="{ name: transition.key, target: transition.value }"
@@ -74,12 +74,12 @@
           [intents]="intents"
           [actions]="actions"
           (removeTransition)="removeTransition($event)"
-        ></scenario-transition>
+        ></tock-scenario-transition>
       </ng-container>
     </div>
 
     <div class="actions-wrapper">
-      <scenario-state-group
+      <tock-scenario-state-group
         *ngFor="let state of state.states | keyvalue"
         [isReadonly]="isReadonly"
         [state]="state.value"
@@ -87,7 +87,7 @@
         [usedNames]="usedNames"
         [intents]="intents"
         [actions]="actions"
-      ></scenario-state-group>
+      ></tock-scenario-state-group>
     </div>
   </div>
 </div>
@@ -98,7 +98,7 @@
     *ngFor="let transition of state.on | keyvalue"
     [ngStyle]="{ 'width.px': transitionWrapperWidth }"
   >
-    <scenario-transition
+    <tock-scenario-transition
       class="cursor-default"
       [isReadonly]="isReadonly"
       [transition]="{ name: transition.key, target: transition.value }"
@@ -106,6 +106,6 @@
       [intents]="intents"
       [actions]="actions"
       (removeTransition)="removeTransition($event)"
-    ></scenario-transition>
+    ></tock-scenario-transition>
   </div>
 </ng-container>

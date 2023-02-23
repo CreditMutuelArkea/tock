@@ -6,6 +6,12 @@ import { debounceTime } from 'rxjs/operators';
 import { Filter } from '../../models';
 import { ScenarioService } from '../../services';
 
+interface ScenarioFiltersForm {
+  search: FormControl<string>;
+  tags: FormControl<string[]>;
+  enabled: FormControl<boolean | null>;
+}
+
 @Component({
   selector: 'tock-scenario-filters',
   templateUrl: './scenario-filters.component.html',
@@ -17,7 +23,7 @@ export class ScenarioFiltersComponent implements OnInit, OnDestroy {
   subscription = new Subscription();
   tagsCache: string[] = [];
 
-  form = new FormGroup({
+  form = new FormGroup<ScenarioFiltersForm>({
     search: new FormControl(),
     tags: new FormControl([]),
     enabled: new FormControl(null)

@@ -6,7 +6,7 @@
         *ngIf="deduplicatedIntents?.length"
         class="card-header-subtitle"
       >
-        <span *ngIf="deduplicatedIntents.length == 1">
+        <span *ngIf="deduplicatedIntents.length === 1">
           There is one intent matching the given sentence "{{ intentSentence }}"
           <br />
           Do you want to use it as intent for this scenario ?

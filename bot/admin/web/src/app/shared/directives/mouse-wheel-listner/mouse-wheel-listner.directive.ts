@@ -1,7 +1,7 @@
 import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Directive({
-  selector: '[appMouseWheelListner]'
+  selector: '[tockMouseWheelListner]'
 })
 export class MouseWheelListnerDirective {
   @Output() onMouseWheel: EventEmitter<number> = new EventEmitter<number>();

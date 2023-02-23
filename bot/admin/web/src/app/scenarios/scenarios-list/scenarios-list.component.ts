@@ -19,7 +19,7 @@ import { Pagination } from '../../shared/components';
 import { ScenariosSettingsComponent } from './scenarios-settings/scenarios-settings.component';
 
 @Component({
-  selector: 'scenarios-list',
+  selector: 'tock-scenarios-list',
   templateUrl: './scenarios-list.component.html',
   styleUrls: ['./scenarios-list.component.scss']
 })
@@ -104,7 +104,7 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
+    this.destroy$.next(true);
     this.destroy$.complete();
   }
 
@@ -143,7 +143,7 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
   }
 
   duplicationForm: FormGroup = new FormGroup({
-    comment: new FormControl('', [Validators.required])
+    comment: new FormControl<string>('', [Validators.required])
   });
 
   get comment(): FormControl {

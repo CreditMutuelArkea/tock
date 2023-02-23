@@ -1,4 +1,15 @@
-import { Component, ElementRef, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -6,11 +17,11 @@ import { ScenarioIntentDefinition, MachineState, Transition } from '../../../../
 import { ScenarioProductionService } from '../../scenario-production.service';
 
 @Component({
-  selector: 'scenario-transition',
+  selector: 'tock-scenario-transition',
   templateUrl: './transition.component.html',
   styleUrls: ['./transition.component.scss']
 })
-export class ScenarioTransitionComponent implements OnInit, OnDestroy {
+export class ScenarioTransitionComponent implements OnInit, OnDestroy, AfterViewInit {
   destroy = new Subject();
   @Output() removeTransition = new EventEmitter();
   @Input() transition: Transition;
@@ -109,7 +120,7 @@ export class ScenarioTransitionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.scenarioProductionService.unRegisterTransitionComponent(this.transition.name);
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

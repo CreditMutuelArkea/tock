@@ -33,7 +33,7 @@ import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 const CANVAS_TRANSITION_TIMING: number = 300;
 
 @Component({
-  selector: 'scenario-conception',
+  selector: 'tock-scenario-conception',
   templateUrl: './scenario-conception.component.html',
   styleUrls: ['./scenario-conception.component.scss'],
   providers: [ScenarioConceptionService]
@@ -490,7 +490,7 @@ export class ScenarioConceptionComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

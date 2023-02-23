@@ -154,7 +154,7 @@
 
             <div *ngIf="showAnswersLocales">
               <ng-container *ngFor="let localeAnswerDef of answers.value; let i = index">
-                <ng-container *ngIf="localeAnswerDef.locale != currentLocale">
+                <ng-container *ngIf="localeAnswerDef.locale !== currentLocale">
                   <tock-form-control name="answer{{ i }}">
                     <nb-form-field *ngIf="!isReadonly">
                       <div

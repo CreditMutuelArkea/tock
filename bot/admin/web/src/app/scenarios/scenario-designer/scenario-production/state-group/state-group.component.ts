@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Input,
+  OnDestroy,
+  QueryList,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -12,11 +22,11 @@ import { ScenarioProductionStateGroupAddComponent } from './state-group-add/stat
 import { ScenarioTransitionComponent } from './transition/transition.component';
 
 @Component({
-  selector: 'scenario-state-group',
+  selector: 'tock-scenario-state-group',
   templateUrl: './state-group.component.html',
   styleUrls: ['./state-group.component.scss']
 })
-export class ScenarioStateGroupComponent implements OnDestroy {
+export class ScenarioStateGroupComponent implements OnDestroy, AfterViewInit {
   destroy = new Subject();
   @Input() state: MachineState;
   @Input() stateMachine: MachineState;
@@ -204,7 +214,7 @@ export class ScenarioStateGroupComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.scenarioProductionService.unRegisterStateComponent(this.state.id);
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

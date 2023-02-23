@@ -15,7 +15,7 @@ export interface ScenarioGroup {
   creationDate?: string;
   updateDate?: string;
   enabled?: boolean;
-  versions: ScenarioVersion[];
+  versions?: ScenarioVersion[];
 }
 
 export type ScenarioGroupExtended = ScenarioGroup & { _expanded?: boolean; _loading?: boolean };

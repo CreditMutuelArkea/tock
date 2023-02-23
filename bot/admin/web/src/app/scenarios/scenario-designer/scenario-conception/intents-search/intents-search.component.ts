@@ -11,7 +11,7 @@ import { ScenarioService } from '../../../services';
 type SentencesGroupedByIntent = { intent: Intent; sentences: Sentence[] };
 
 @Component({
-  selector: 'scenario-intents-search',
+  selector: 'tock-scenario-intents-search',
   templateUrl: './intents-search.component.html',
   styleUrls: ['./intents-search.component.scss']
 })
@@ -104,7 +104,7 @@ export class IntentsSearchComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

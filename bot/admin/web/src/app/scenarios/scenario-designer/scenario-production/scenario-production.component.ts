@@ -1,4 +1,16 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+  SimpleChanges,
+  ViewChild
+} from '@angular/core';
 import { G, Marker, Svg, SVG } from '@svgdotjs/svg.js';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -46,12 +58,12 @@ type PathHandler = {
 const TRANSITION_COLOR = '#006fd6';
 const TRANSITION_COLOR_HOVERED = '#42aaff';
 @Component({
-  selector: 'scenario-production',
+  selector: 'tock-scenario-production',
   templateUrl: './scenario-production.component.html',
   styleUrls: ['./scenario-production.component.scss'],
   providers: [ScenarioProductionService]
 })
-export class ScenarioProductionComponent implements OnInit, OnChanges, OnDestroy {
+export class ScenarioProductionComponent implements OnInit, OnChanges, OnDestroy, AfterViewInit {
   destroy = new Subject();
   @Input() scenario: ScenarioVersionExtended;
   @Input() isReadonly: boolean;
@@ -461,7 +473,7 @@ export class ScenarioProductionComponent implements OnInit, OnChanges, OnDestroy
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }
