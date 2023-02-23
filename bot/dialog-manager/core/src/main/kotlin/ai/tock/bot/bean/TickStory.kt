@@ -16,7 +16,7 @@
 
 package ai.tock.bot.bean
 
-import ai.tock.bot.bean.unknown.UnknownAnswerConfig
+import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
 import ai.tock.bot.statemachine.State
 import java.util.TreeSet
 
@@ -38,7 +38,7 @@ data class TickStory(
     val contexts: Set<TickContext>,
     val actions: Set<TickAction>,
     val intentsContexts: Set<TickIntent> = emptySet(),
-    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet(),
+    val unknownAnswerConfigs: Set<TickUnknownAnswerConfig> = TreeSet(),
     val debug: Boolean = false
 )
 

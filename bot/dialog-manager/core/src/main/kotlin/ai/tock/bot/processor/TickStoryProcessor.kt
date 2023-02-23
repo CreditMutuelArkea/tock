@@ -306,7 +306,8 @@ class TickStoryProcessor(
     }
 
     private fun handleUnknown(action: TickUserAction?): Pair<TickSession?, String?>? =
-        if (configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
+
+        if (ranHandlers.isNotEmpty() && configuration.unknownHandleConfiguration.unknownIntents().contains(action?.intentName)) {
             val (step, redirectStoryId) = TickUnknownHandler.handle(
                 lastExecutedActionName = ranHandlers.last(),
                 unknownConfiguration = configuration.unknownHandleConfiguration,
