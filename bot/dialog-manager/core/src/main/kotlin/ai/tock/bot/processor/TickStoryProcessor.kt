@@ -173,13 +173,17 @@ class TickStoryProcessor(
     private fun execute(action: TickAction) {
         debugInput(action)
 
-        // send answer if provided
-        action.answerId?.let {
+        // manage answer
+        if(action.answerId != null) {
+            // send answer if provided
             if(endingStoryRuleExists && action.final || debugEnabled || action.isSilent()) {
-                sender.sendById(it)
+                sender.sendById(action.answerId)
             } else {
-                sender.endById(it)
+                sender.endById(action.answerId)
             }
+        } else if(!endingStoryRuleExists && action.final && !debugEnabled){
+            // end the conversation if the final action has no ending story and no answer
+            sender.endPlainText()
         }
 
         // invoke handler if provided
