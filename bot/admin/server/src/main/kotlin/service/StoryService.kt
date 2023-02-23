@@ -208,8 +208,8 @@ object StoryService {
         botConf
             ?: WebVerticle.badRequest("No bot configuration is defined yet [namespace: $namespace, botId = ${story.botId}]")
 
-        val application = applicationDefinitionDAO.getApplicationByNamespaceAndName(namespace, botConf.applicationId)
-            ?: WebVerticle.badRequest("No application is defined yet [namespace: $namespace, name = ${botConf.applicationId}]")
+        val application = applicationDefinitionDAO.getApplicationByNamespaceAndName(namespace, botConf.name)
+            ?: WebVerticle.badRequest("No application is defined yet [namespace: $namespace, name = ${botConf.name}]")
 
         val newStory =
             StoryDefinitionConfiguration(
