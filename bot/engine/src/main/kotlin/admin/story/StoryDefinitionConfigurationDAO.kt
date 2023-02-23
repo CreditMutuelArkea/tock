@@ -62,6 +62,12 @@ interface StoryDefinitionConfigurationDAO {
         storyId: String
     )
 
+    fun deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(
+        namespace: String,
+        botId: String,
+        intentName: String
+    ): Long
+
     fun getStoryDefinitionsByNamespaceAndBotId(namespace: String, botId: String): List<StoryDefinitionConfiguration>
 
     fun save(story: StoryDefinitionConfiguration)

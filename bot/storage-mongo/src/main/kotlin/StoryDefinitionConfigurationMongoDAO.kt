@@ -179,6 +179,14 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
         }
     }
 
+    override fun deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(
+        namespace: String,
+        botId: String,
+        intentName: String
+    ): Long {
+        return col.deleteOne(and( Namespace eq namespace, BotId eq botId, Intent::name eq intentName)).deletedCount
+    }
+
     override fun getStoryDefinitionsByNamespaceAndBotId(
         namespace: String,
         botId: String

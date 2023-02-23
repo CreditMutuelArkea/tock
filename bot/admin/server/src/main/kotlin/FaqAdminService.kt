@@ -24,7 +24,6 @@ import ai.tock.bot.admin.model.CreateI18nLabelRequest
 import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqDefinitionSearchResult
 import ai.tock.bot.admin.model.FaqSearchRequest
-import ai.tock.bot.admin.service.StoryService
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
@@ -757,14 +756,7 @@ object FaqAdminService {
             faqDefinitionDAO.deleteFaqDefinitionById(faqDefinition._id)
             i18nDao.deleteByNamespaceAndId(namespace, faqDefinition.i18nId)
 
-            val existingStory = storyDefinitionDAO.getConfiguredStoryDefinitionByNamespaceAndBotIdAndIntent(
-                applicationDefinition.namespace, applicationDefinition.name, intentName
-            )
-
-            if (existingStory != null) {
-                StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(existingStory.namespace, existingStory._id.toString())
-            }
-            return true
+            return storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(namespace,applicationDefinition.name,intentName)>0
         }
         return false
     }

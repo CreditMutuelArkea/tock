@@ -21,7 +21,6 @@ import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.model.BotStoryDefinitionConfiguration
 import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqSearchRequest
-import ai.tock.bot.admin.service.StoryService
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.connector.ConnectorType
@@ -86,7 +85,6 @@ class FaqAdminServiceTest : AbstractTest() {
                 bind<IntentDefinitionDAO>() with provider { intentDAO }
                 bind<I18nDAO>() with provider { i18nDAO }
                 bind<FaqSettingsDAO>() with provider { faqSettingsDAO }
-                //bind<StoryService>() with provider { storyService }
             }
             tockInternalInjector.inject(Kodein {
                 import(defaultModulesBinding())
@@ -479,16 +477,6 @@ class FaqAdminServiceTest : AbstractTest() {
     @Nested
     inner class DeleteFaq {
 
-        @BeforeEach
-        fun setUp() {
-            mockkObject(StoryService)
-        }
-
-        @AfterEach
-        fun tearDown() {
-            clearAllMocks()
-        }
-
         private fun initDeleteFaqMock(
             mockedIntentDefinition: IntentDefinition? = existingIntent,
             mockedFaqDefinition: FaqDefinition? = faqDefinition,
@@ -518,23 +506,17 @@ class FaqAdminServiceTest : AbstractTest() {
                     ConnectorType.rest, ConnectorType.rest
                 )
             )
-        }
 
-        private fun initDeleteStoryMock(){
-            mockkObject(StoryService)
             every {
-                StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(
-                    existingStory.namespace,
-                    existingStory._id.toString()
-                )
-            } returns true
+                // TODO : use real calls instead of any
+                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(),any(),any())
+            } returns 1
         }
 
         @Test
         fun `GIVEN delete single faq WHEN intent existing and one applicationId is found`() {
             val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
             initDeleteFaqMock()
-            initDeleteStoryMock()
 
             val isDeleted = faqAdminService.deleteFaqDefinition(namespace, faqId.toString())
 
@@ -544,7 +526,8 @@ class FaqAdminServiceTest : AbstractTest() {
                 faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
                 intentDAO.getIntentById(any())
                 i18nDAO.deleteByNamespaceAndId(any(), any())
-                StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(any(), any())
+                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(),any(
+                    ), any()) > 0
             }
         }
 
