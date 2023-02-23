@@ -57,7 +57,6 @@ import ai.tock.bot.mongo.UserTimelineCol_.Companion.LastUserActionDate
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.Namespace
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.PlayerId
 import ai.tock.bot.mongo.UserTimelineCol_.Companion.TemporaryIds
-import ai.tock.shared.Executor
 import ai.tock.shared.booleanProperty
 import ai.tock.shared.defaultCountOptions
 import ai.tock.shared.ensureIndex
@@ -131,8 +130,6 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
         if (text.length > 512) text.substring(0, Math.min(512, text.length)) else text
 
     private val logger = KotlinLogging.logger {}
-
-    private val executor: Executor by injector.instance()
 
     val userTimelineCol = database.getCollection<UserTimelineCol>("user_timeline")
     val dialogCol = database.getCollection<DialogCol>("dialog")
@@ -247,63 +244,62 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
             logger.debug { "dialog saved $userTimeline" }
         }
 
-        executor.executeBlocking {
-            if (userTimeline.playerId.clientId != null) {
-                clientIdCol.updateOneById(
-                    userTimeline.playerId.clientId!!,
-                    addEachToSet(
-                        UserIds,
-                        listOf(userTimeline.playerId.id)
-                    ),
-                    upsert()
-                )
-            }
-            var lastSnapshot: SnapshotCol? = null
-            for (dialog in userTimeline.dialogs) {
-                lastSnapshot = addSnapshot(dialog)
-                addArchivedValues(dialog)
+        if (userTimeline.playerId.clientId != null) {
+            clientIdCol.updateOneById(
+                userTimeline.playerId.clientId!!,
+                addEachToSet(
+                    UserIds,
+                    listOf(userTimeline.playerId.id)
+                ),
+                upsert()
+            )
+        }
+        var lastSnapshot: SnapshotCol? = null
+        for (dialog in userTimeline.dialogs) {
+            lastSnapshot = addSnapshot(dialog)
+            addArchivedValues(dialog)
 
-                dialog.allActions().forEach {
-                    when (it) {
-                        is SendSentenceNotYetLoaded -> {
-                            if (it.messageLoaded && it.messages.isNotEmpty()) {
-                                saveConnectorMessage(it.toActionId(), dialog.id, it.messages)
-                            }
-                            if (it.nlpStatsLoaded && it.nlpStats != null) {
-                                saveNlpStats(it.toActionId(), dialog.id, it.nlpStats!!)
-                            }
+            dialog.allActions().forEach {
+                when (it) {
+                    is SendSentenceNotYetLoaded -> {
+                        if (it.messageLoaded && it.messages.isNotEmpty()) {
+                            saveConnectorMessage(it.toActionId(), dialog.id, it.messages)
                         }
+                        if (it.nlpStatsLoaded && it.nlpStats != null) {
+                            saveNlpStats(it.toActionId(), dialog.id, it.nlpStats!!)
+                        }
+                    }
 
-                        is SendSentence -> {
-                            if (it.messages.isNotEmpty()) {
-                                saveConnectorMessage(it.toActionId(), dialog.id, it.messages)
-                            }
-                            if (it.nlpStats != null) {
-                                saveNlpStats(it.toActionId(), dialog.id, it.nlpStats!!)
-                            }
+                    is SendSentence -> {
+                        if (it.messages.isNotEmpty()) {
+                            saveConnectorMessage(it.toActionId(), dialog.id, it.messages)
                         }
+                        if (it.nlpStats != null) {
+                            saveNlpStats(it.toActionId(), dialog.id, it.nlpStats!!)
+                        }
+                    }
 
-                        else -> {
-                            /*do nothing*/
-                        }
+                    else -> {
+                        /*do nothing*/
                     }
                 }
             }
-            val lastUserAction = lastDialog?.allActions()?.lastOrNull { it.playerId.type == PlayerType.user }
-            lastUserAction?.let { action ->
-                if (action is SendSentence && action.stringText != null) {
-                    val text = textKey(action.stringText!!)
-                    dialogTextCol.replaceOneWithFilter(
-                        and(Text eq text, DialogId eq lastDialog.id),
-                        DialogTextCol(text, lastDialog.id),
-                        ReplaceOptions().upsert(true)
-                    )
-                }
-            }
-            if (dialogFlowStatEnabled && botDefinition != null && lastDialog != null && lastSnapshot != null && lastUserAction != null) {
-                DialogFlowMongoDAO.addFlowStat(userTimeline, botDefinition, lastUserAction, lastDialog, lastSnapshot)
+        }
+        val lastUserAction = lastDialog?.allActions()?.lastOrNull { it.playerId.type == PlayerType.user }
+        lastUserAction?.let { action ->
+            if (action is SendSentence && action.stringText != null) {
+                val text = textKey(action.stringText!!)
+                dialogTextCol.replaceOneWithFilter(
+                    and(Text eq text, DialogId eq lastDialog.id),
+                    DialogTextCol(text, lastDialog.id),
+                    ReplaceOptions().upsert(true)
+                )
             }
         }
+        if (dialogFlowStatEnabled && botDefinition != null && lastDialog != null && lastSnapshot != null && lastUserAction != null) {
+            DialogFlowMongoDAO.addFlowStat(userTimeline, botDefinition, lastUserAction, lastDialog, lastSnapshot)
+        }
+
         logger.debug { "end saving timeline $userTimeline" }
     }
 

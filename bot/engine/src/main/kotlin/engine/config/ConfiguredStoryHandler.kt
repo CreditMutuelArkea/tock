@@ -39,8 +39,11 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.dialog.NextUserActionState
 import ai.tock.bot.engine.message.ActionWrappedMessage
 import ai.tock.bot.engine.message.MessagesList
+import ai.tock.bot.engine.user.UserTimelineDAO
 import ai.tock.nlp.api.client.model.Entity
 import ai.tock.nlp.api.client.model.NlpIntentQualifier
+import ai.tock.shared.injector
+import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
 
 /**
@@ -55,6 +58,8 @@ internal class ConfiguredStoryHandler(
         private val logger = KotlinLogging.logger {}
         private const val VIEWED_STORIES_BUS_KEY = "_viewed_stories_tock_switch"
     }
+
+    private val userTimelineDAO: UserTimelineDAO by injector.instance()
 
     override fun handle(bus: BotBus) {
 
@@ -174,6 +179,12 @@ internal class ConfiguredStoryHandler(
             configuration.findEnabledEndWithStoryId(bus.applicationId)
                 ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
                 ?.let {
+
+                    // before switching story (Only for an ending rule), we need to save a snapshot with the current intent
+                    if (bus.connectorData.saveTimeline){
+                        userTimelineDAO.save(bus.userTimeline, bus.botDefinition)
+                    }
+
                     bus.switchConfiguredStory(it, it.mainIntent().name)
                 }
         }
