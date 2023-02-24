@@ -75,9 +75,7 @@ class ScenarioServiceTest {
     @BeforeEach
     fun setUp() {
         mockkObject(ScenarioSettingsService)
-        mockkObject(ScenarioGroupService)
         every { ScenarioSettingsService.listenChanges(any()) } answers {}
-        every { ScenarioGroupService.listenChanges(any()) } answers {}
         mockkObject(StoryService)
     }
 

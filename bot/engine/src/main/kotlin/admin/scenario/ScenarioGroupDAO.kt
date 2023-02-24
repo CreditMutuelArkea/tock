@@ -60,9 +60,4 @@ interface ScenarioGroupDAO {
      */
     fun deleteOneById(id: Id<ScenarioGroup>)
 
-    /**
-     * Listen any change on scenario group collection
-     * @param listener: the listener to call when a change occurs
-     */
-    fun listenChanges(listener: (ScenarioGroup) -> Unit)
 }

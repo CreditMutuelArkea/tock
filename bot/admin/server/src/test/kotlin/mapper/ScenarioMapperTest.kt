@@ -32,6 +32,7 @@ import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionState
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
@@ -142,8 +143,7 @@ class ScenarioMapperTest {
             name = "NAME",
             category = "CATEGORY",
             tags = listOf("TAG1"),
-            description = "DESCRIPTION",
-            unknownAnswerId = "UNKNOWN_ANSWER_ID",
+            description = "DESCRIPTION"
         )
 
         private val scenarioGroupWithVersionsRequest = ScenarioGroupWithVersionsRequest(
@@ -192,7 +192,6 @@ class ScenarioMapperTest {
             assertEquals(scenarioGroupRequest.category, scenarioGroup.category)
             assertEquals(scenarioGroupRequest.tags, scenarioGroup.tags)
             assertEquals(scenarioGroupRequest.description, scenarioGroup.description)
-            assertEquals(scenarioGroupRequest.unknownAnswerId, scenarioGroup.unknownAnswerId)
         }
     }
 

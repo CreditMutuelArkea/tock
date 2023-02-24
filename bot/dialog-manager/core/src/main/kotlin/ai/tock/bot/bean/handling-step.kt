@@ -16,15 +16,15 @@
 
 package ai.tock.bot.bean
 
-import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
+import ai.tock.bot.bean.unknown.UnknownAnswerConfig
 
 /**
- * TickHandlingStep represents a step
+ * HandlingStep represents a step
  * @param repeated the number of repetition of this step
  * @param key the step key
  */
-sealed class TickHandlingStep(open val repeated: Int, val key: String) {
-    fun next(): TickHandlingStep = when (this) {
+sealed class HandlingStep(open val repeated: Int, val key: String) {
+    fun next(): HandlingStep = when (this) {
         is TickActionHandlingStep -> this.copy(repeated = repeated + 1)
         is UnknownHandlingStep -> this.copy(repeated = repeated + 1)
     }
@@ -36,8 +36,8 @@ sealed class TickHandlingStep(open val repeated: Int, val key: String) {
  */
 data class UnknownHandlingStep(
     override val repeated: Int = 1,
-    val answerConfig: TickUnknownAnswerConfig
-) : TickHandlingStep(repeated, answerConfig.key())
+    val answerConfig: UnknownAnswerConfig
+) : HandlingStep(repeated, answerConfig.key())
 
 /**
  * TickActionHandlingStep represents a step while an action is being handled
@@ -46,4 +46,4 @@ data class UnknownHandlingStep(
 data class TickActionHandlingStep(
     override val repeated: Int = 1,
     val action: String,
-) : TickHandlingStep(repeated, action)
+) : HandlingStep(repeated, action)

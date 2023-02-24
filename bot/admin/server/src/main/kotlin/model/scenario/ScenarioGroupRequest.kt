@@ -21,6 +21,5 @@ data class ScenarioGroupRequest(
     val category: String? = null,
     val tags: List<String> = emptyList(),
     val description: String? = null,
-    val enabled: Boolean? = null,
-    val unknownAnswerId: String,
+    val enabled: Boolean? = null
 )
