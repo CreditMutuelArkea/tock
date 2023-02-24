@@ -16,9 +16,13 @@
 
 package ai.tock.bot.admin.service
 
+import ai.tock.bot.test.TConsumer
+import ai.tock.bot.test.TFunction
+import ai.tock.bot.test.TRunnable
+import ai.tock.bot.test.TSupplier
+import ai.tock.bot.test.TestCase
 import ai.tock.bot.admin.scenario.ScenarioSettings
 import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
-import ai.tock.bot.test.*
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.ScenarioSettingsQuery
 import ai.tock.shared.tockInternalInjector
