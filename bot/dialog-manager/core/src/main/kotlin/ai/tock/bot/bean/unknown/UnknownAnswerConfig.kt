@@ -20,7 +20,7 @@ package ai.tock.bot.bean.unknown
  * Unknown intent handler for a given [ai.tock.bot.bean.TickAction] name
  */
 @kotlinx.serialization.Serializable
-data class TickUnknownAnswerConfig(
+data class UnknownAnswerConfig(
     /*
     Detected unknown intent
     */
@@ -35,7 +35,7 @@ data class TickUnknownAnswerConfig(
     val answerId: String,
 
 
-): Comparable<TickUnknownAnswerConfig> {
+): Comparable<UnknownAnswerConfig> {
 
     /**
      * Handler key is a composition of its intent value and its action value
@@ -45,9 +45,9 @@ data class TickUnknownAnswerConfig(
     /**
      * Key is the handler identity
      */
-    override fun compareTo(other: TickUnknownAnswerConfig): Int = key().compareTo(other.key())
+    override fun compareTo(other: UnknownAnswerConfig): Int = key().compareTo(other.key())
 
-    infix fun eq(other: TickUnknownAnswerConfig) = key() == other.key()
+    infix fun eq(other: UnknownAnswerConfig) = key() == other.key()
 
-    infix fun notEq(other: TickUnknownAnswerConfig) = !eq(other)
+    infix fun notEq(other: UnknownAnswerConfig) = !eq(other)
 }

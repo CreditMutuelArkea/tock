@@ -16,12 +16,13 @@
 
 package ai.tock.bot.admin.service
 
-import ai.tock.bot.admin.scenario.ScenarioSettings
-import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
+import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
+import ai.tock.nlp.front.shared.config.ScenarioSettings
 import ai.tock.nlp.front.shared.config.ScenarioSettingsQuery
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
+import org.litote.kmongo.toId
 import java.time.Instant
 
 object ScenarioSettingsService   {
@@ -29,12 +30,12 @@ object ScenarioSettingsService   {
     private val scenarioSettingsDAO: ScenarioSettingsDAO by injector.instance()
 
     fun save(applicationDefinition: ApplicationDefinition, query: ScenarioSettingsQuery) {
-        val settings = scenarioSettingsDAO.getScenarioSettingsByBotId(applicationDefinition._id.toString())?.copy(
+        val settings = scenarioSettingsDAO.getScenarioSettingsByApplicationId(applicationDefinition._id)?.copy(
             actionRepetitionNumber = query.actionRepetitionNumber,
             redirectStoryId = query.redirectStoryId,
             updateDate = Instant.now()
         ) ?: ScenarioSettings(
-                botId = applicationDefinition.name,
+                applicationId = applicationDefinition._id,
                 actionRepetitionNumber = query.actionRepetitionNumber,
                 redirectStoryId = query.redirectStoryId,
                 creationDate = Instant.now(),
@@ -43,8 +44,8 @@ object ScenarioSettingsService   {
         scenarioSettingsDAO.save(settings)
     }
 
-    fun getScenarioSettingsByBotId(id: String): ScenarioSettings? {
-        return scenarioSettingsDAO.getScenarioSettingsByBotId(id)
+    fun getScenarioSettingsByApplicationId(id: String): ScenarioSettings? {
+        return scenarioSettingsDAO.getScenarioSettingsByApplicationId(id.toId())
     }
 
     fun listenChanges(listener: (ScenarioSettings) -> Unit) {

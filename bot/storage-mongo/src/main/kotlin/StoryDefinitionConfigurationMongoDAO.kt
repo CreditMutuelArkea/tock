@@ -259,16 +259,4 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
     override fun getStoryDefinitionByCategory(category: String): List<StoryDefinitionConfiguration> {
        return col.find(Category eq category).toList()
     }
-
-    override fun getStoryDefinitionByCategoryAndStoryId(
-        category: String,
-        storyId: String
-    ): StoryDefinitionConfiguration? {
-        return col.findOne {
-         and(
-            Category eq category,
-            StoryId eq storyId
-         )
-        }
-    }
 }

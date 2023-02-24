@@ -52,9 +52,7 @@ class ScenarioSettingsVerticle {
                 val id = context.pathId<ApplicationDefinition>(PATH_PARAM_APPLICATION_ID)
                 val applicationDefinition = front.getApplicationById(id)
                 if (context.organization == applicationDefinition?.namespace) {
-                    ScenarioSettingsService.getScenarioSettingsByBotId(applicationDefinition.name)?.let {
-                     ScenarioSettingsQuery(it.actionRepetitionNumber, it.redirectStoryId)
-                    }
+                    ScenarioSettingsService.getScenarioSettingsByApplicationId(id.toString())?.toScenarioSettingsQuery()
                 } else {
                     WebVerticle.unauthorized()
                 }

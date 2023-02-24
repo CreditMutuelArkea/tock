@@ -20,7 +20,6 @@ import ai.tock.bot.bean.TickStorySettings
 import ai.tock.bot.bean.UnknownHandlingStep
 import ai.tock.bot.bean.unknown.ConfigMismatchedError
 import ai.tock.bot.bean.unknown.RetryExceededError
-import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
 import ai.tock.bot.sender.TickSender
 
@@ -44,10 +43,8 @@ object TickUnknownHandler {
         /*
         Get the unknownAnswerConfig for the lastExecutedAction name
         */
-        (unknownConfiguration.unknownAnswerConfigs.firstOrNull { it.action == lastExecutedActionName }
-            ?: storySettings.unknownAnswerId?.let { answerId ->
-                        TickUnknownAnswerConfig(action = lastExecutedActionName, answerId = answerId)
-            })
+        unknownConfiguration.unknownAnswerConfigs
+            .firstOrNull { it.action == lastExecutedActionName }
             ?.let { answerConfig ->
                 (
                         /*

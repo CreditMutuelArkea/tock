@@ -668,11 +668,11 @@ internal class TickStoryProcessorTest {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = TickUnknownAnswerConfig(
+        val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = TickUnknownAnswerConfig(
+        val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -788,11 +788,11 @@ internal class TickStoryProcessorTest {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = TickUnknownAnswerConfig(
+        val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = TickUnknownAnswerConfig(
+        val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -854,7 +854,6 @@ internal class TickStoryProcessorTest {
             every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
 
         }
-
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
@@ -904,139 +903,15 @@ internal class TickStoryProcessorTest {
     }
 
     @Test
-    fun `process when unknown intent is detected and unknownAnswerConfig is not provided but default unknown answer is provided`() {
-
-        val msgCapture = slot<String>()
-
-        val answerConfig1 = TickUnknownAnswerConfig(
-            action = StateIds.STATE_1.value,
-            answerId ="unknown 1"
-        )
-        val answerConfig2 = TickUnknownAnswerConfig(
-            action = StateIds.STATE_2.value,
-            answerId ="unknown 2"
-        )
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session.copy(ranHandlers = listOf(
-                    StateIds.STATE_1.value,
-                    StateIds.STATE_2.value
-                ), currentState = StateIds.STATE_2.value),
-                configuration.copy(
-                    stateMachine = configuration.stateMachine.copy(
-                        states =  mapOf(
-                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
-                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
-                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
-                    ),
-                    actions =  setOf(
-                        TickAction(
-                            StateIds.STATE_1.value,
-                            handler = HandlerNames.HANDLER_1.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_2.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_3.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        )
-                    ),
-                    unknownHandleConfiguration = configuration.unknownHandleConfiguration.copy(
-                        unknownAnswerConfigs = setOf(
-                            answerConfig1
-                        )
-                    ),
-                    storySettings = configuration.storySettings.copy(
-                        unknownAnswerId = answerConfig2.answerId
-                    )
-                ),
-                sender,
-                false
-            )
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(IntentNames.UNKNOWN_INTENT.value, emptyMap()))
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { sender.sendById(capture(msgCapture)) } answers {}
-            every { sender.endById(capture(msgCapture)) } answers {}
-            every { sender.sendPlainText(any()) } answers {}
-            every { sender.endPlainText(any()) } answers {}
-            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
-            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
-
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-
-            assertNotNull(it)
-
-            val result =  it as Success
-            with(result.session) {
-                assertEquals(StateIds.STATE_2.value, currentState)
-                assertEquals(2, ranHandlers.size)
-                assertTrue { contexts.isEmpty() }
-                assertNotNull(unknownHandlingStep)
-            }
-
-            assertFalse { result.isFinal }
-
-            assertTrue(msgCapture.isCaptured)
-
-            verify(exactly = 1) { sender.endById(answerConfig2.answerId) }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is not provided but default unknown answer is provided")
-
-            .given("""
-    - current state is "state2"
-    - ranHandlers are "state1" and "state2"
-    - unknown handler is provided for action "state1" only
-                   """, produceProcessor)
-
-            .and("""
-    - sended message is capture  
-    - graphsolver always returns state3
-            """, mockBehaviours)
-
-            .`when`("""
-    - processor.process method is called with a user intent "unknown"
-                 """, processCall)
-
-            .then("""
-    - current state should be "State2"
-    - session's ranHandlers should have two items
-    - session's contexts should be empty
-    - session should have a not null unknownHandlingStep
-    - the session's unknownHandlingStep must have repeated equals 1
-    - the session's unknownHandlingStep must be linked to answerConfig2
-                """, checkResult)
-
-            .run()
-    }
-
-    @Test
     fun `process when unknown intent is detected and unknownHandlingStep already exist`() {
 
         val msgCapture = slot<String>()
 
-        val answerConfig1 = TickUnknownAnswerConfig(
+        val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = TickUnknownAnswerConfig(
+        val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -1153,11 +1028,11 @@ internal class TickStoryProcessorTest {
     @Test
     fun `process when unknown intent is detected and unknownAnswerConfig is provided and repetitionNb is exceeded`() {
 
-        val answerConfig1 = TickUnknownAnswerConfig(
+        val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = TickUnknownAnswerConfig(
+        val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )
@@ -1243,11 +1118,11 @@ internal class TickStoryProcessorTest {
     @Test
     fun `process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided`() {
 
-        val answerConfig1 = TickUnknownAnswerConfig(
+        val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
             answerId ="unknown 1"
         )
-        val answerConfig2 = TickUnknownAnswerConfig(
+        val answerConfig2 = UnknownAnswerConfig(
             action = StateIds.STATE_2.value,
             answerId ="unknown 2"
         )

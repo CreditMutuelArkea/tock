@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,48 +14,50 @@
  * limitations under the License.
  */
 
-package scenario
+package ai.tock.nlp.front.storage.mongo
 
-
-import ai.tock.bot.admin.scenario.ScenarioSettings
-import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
-import ai.tock.bot.mongo.MongoBotConfiguration
+import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
+import ai.tock.nlp.front.shared.config.ApplicationDefinition
+import ai.tock.nlp.front.shared.config.ScenarioSettings
 import ai.tock.shared.watch
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.ReplaceOptions
+import org.litote.kmongo.Id
+import org.litote.kmongo.and
+import org.litote.kmongo.ensureUniqueIndex
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
-import org.litote.kmongo.ensureUniqueIndex
-import org.litote.kmongo.replaceOneWithFilter
-import org.litote.kmongo.and
 import org.litote.kmongo.reactivestreams.getCollection
+import org.litote.kmongo.replaceOneWithFilter
 
 
-object ScenarioSettingsMongoDAO : ScenarioSettingsDAO{
 
-    private val col: MongoCollection<ScenarioSettings> by lazy {
-        val c = MongoBotConfiguration.database.getCollection<ScenarioSettings>().apply {
+object ScenarioSettingsMongoDAO : ScenarioSettingsDAO {
+
+    internal val col: MongoCollection<ScenarioSettings> by lazy {
+        val c = MongoFrontConfiguration.database.getCollection<ScenarioSettings>().apply {
             ensureUniqueIndex(
-                ScenarioSettings::botId
+                ScenarioSettings::applicationId
             )
         }
         c
     }
 
-    private val asyncCol = MongoBotConfiguration.asyncDatabase.getCollection<ScenarioSettings>()
+    private val asyncCol = MongoFrontConfiguration.asyncDatabase.getCollection<ScenarioSettings>()
+
     override fun save(scenarioSettings: ScenarioSettings) {
         col.replaceOneWithFilter(
             and(
-                ScenarioSettings::botId eq scenarioSettings.botId,
+                ScenarioSettings::applicationId eq scenarioSettings.applicationId,
             ),
             scenarioSettings,
             ReplaceOptions().upsert(true)
         )
     }
 
-    override fun getScenarioSettingsByBotId(id: String): ScenarioSettings? {
-        return col.findOne(ScenarioSettings::botId eq id)
+    override fun getScenarioSettingsByApplicationId(id: Id<ApplicationDefinition>): ScenarioSettings? {
+        return col.findOne(ScenarioSettings::applicationId eq id)
     }
 
     override fun listenChanges(listener: (ScenarioSettings) -> Unit) {
@@ -63,4 +65,5 @@ object ScenarioSettingsMongoDAO : ScenarioSettingsDAO{
             it.fullDocument?.let {  doc -> listener.invoke(doc) }
         }
     }
+
 }
