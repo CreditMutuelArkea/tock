@@ -45,6 +45,7 @@ import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.admin.verticle.StoryVerticle
 import ai.tock.bot.admin.test.TestPlanService
 import ai.tock.bot.admin.test.findTestService
+import ai.tock.bot.admin.verticle.IndicatorVerticle
 import ai.tock.bot.admin.verticle.ScenarioSettingsVerticle
 import ai.tock.bot.connector.ConnectorType.Companion.rest
 import ai.tock.bot.connector.ConnectorTypeConfiguration
@@ -94,6 +95,7 @@ open class BotAdminVerticle : AdminVerticle() {
     private val scenarioVerticle = ScenarioVerticle()
     private val storyVerticle = StoryVerticle()
     private val scenarioSettingsVerticle = ScenarioSettingsVerticle()
+    private val indicatorVerticle = IndicatorVerticle()
 
     override val logger: KLogger = KotlinLogging.logger {}
 
@@ -140,6 +142,7 @@ open class BotAdminVerticle : AdminVerticle() {
         scenarioVerticle.configureScenario(this)
         storyVerticle.configure(this)
         scenarioSettingsVerticle.configure(this)
+        indicatorVerticle.configure(this)
 
         blockingJsonPost("/users/search", botUser) { context, query: UserSearchQuery ->
             if (context.organization == query.namespace) {

@@ -44,8 +44,6 @@ import io.vertx.core.Future
 import io.vertx.core.Handler
 import io.vertx.core.Promise
 import io.vertx.core.Vertx
-import io.vertx.core.file.AsyncFile
-import io.vertx.core.file.OpenOptions
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.http.HttpMethod.DELETE
 import io.vertx.core.http.HttpMethod.GET
@@ -54,7 +52,6 @@ import io.vertx.core.http.HttpMethod.PUT
 import io.vertx.core.http.HttpServer
 import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.http.HttpServerResponse
-import io.vertx.core.streams.Pump
 import io.vertx.ext.web.FileUpload
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -897,12 +894,14 @@ abstract class WebVerticle : AbstractVerticle() {
     val RoutingContext.userLogin: String
         get() = user?.user ?: error("no user in session")
 
-    private fun HttpServerResponse.endJson(result: Any?) {
+        private fun HttpServerResponse.endJson(result: Any?) {
+
+        if (ended()) return
+
+        this.putHeader("content-type", "application/json; charset=utf-8")
+
         if (result == null) {
             statusCode = 204
-        }
-        this.putHeader("content-type", "application/json; charset=utf-8")
-        if (result == null) {
             end()
         } else {
             val output = mapper.writeValueAsString(result)
