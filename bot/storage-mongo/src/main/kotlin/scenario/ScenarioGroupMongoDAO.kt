@@ -78,10 +78,9 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
         return collection.find().toList()
     }
 
-
     override fun createOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         return try {
-            collection.insertOne(scenarioGroup)
+            collection.insertOne(scenarioGroup.copy(versions = emptyList()))
             scenarioGroup
         } catch (ex: MongoWriteException){
             if(ex.code == 11000) {
@@ -92,7 +91,6 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
             }
         }
     }
-
 
     override fun updateOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         val scenarioGroupDB = collection.aggregate<ScenarioGroup>(
@@ -112,7 +110,8 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
             category = scenarioGroup.category,
             tags = scenarioGroup.tags,
             description = scenarioGroup.description,
-            updateDate = ZonedDateTime.now()
+            updateDate = ZonedDateTime.now(),
+            versions = emptyList()
         )
 
         collection.updateOne(scenarioGroupUpdated)

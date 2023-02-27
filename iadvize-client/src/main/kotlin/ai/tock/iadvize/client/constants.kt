@@ -26,7 +26,6 @@ const val GRANT_TYPE = "grant_type"
 
 const val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
 const val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
-const val IADVIZE_ENV_CREDENTIALS_STORED = "iadvize_env_credentials_stored"
 
 const val APPLICATION_JSON = "application/json"
 const val AUTHORIZATION = "Authorization"

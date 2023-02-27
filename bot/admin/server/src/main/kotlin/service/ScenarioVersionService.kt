@@ -35,19 +35,15 @@ object ScenarioVersionService {
      * @param id: id of the scenario version
      * @throws [ScenarioVersionNotFoundException] if the scenario version was not found.
      */
-    fun findOneById(id: String): ScenarioVersion {
-        val scenarioVersion = scenarioVersionDAO.findOneById(id.toId())
-        scenarioVersion ?: throw ScenarioVersionNotFoundException(id)
-
-        return scenarioVersion
-    }
+    fun findOneById(id: String): ScenarioVersion =
+        scenarioVersionDAO.findOneById(id.toId()) ?: throw ScenarioVersionNotFoundException(id)
 
     /**
      * Returns all scenario versions that matches with scenario group and state
      * @param scenarioGroupId: id of the scenario group
      * @param state: state of the scenario version
      */
-    fun findAllByScenarioGroupIdAndState(scenarioGroupId: String, state: ScenarioVersionState): List<ScenarioVersion>{
+    fun findAllByScenarioGroupIdAndState(scenarioGroupId: String, state: ScenarioVersionState): List<ScenarioVersion> {
         return scenarioVersionDAO.findAllByScenarioGroupIdAndState(scenarioGroupId.toId(), state)
     }
 

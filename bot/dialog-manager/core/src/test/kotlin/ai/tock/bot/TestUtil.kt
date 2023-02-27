@@ -16,6 +16,7 @@
 
 package ai.tock.bot
 
+import mu.KotlinLogging
 import java.util.logging.Logger
 
 typealias TConsumer<T> = (T) -> Unit
@@ -36,7 +37,7 @@ class TestCase<T, R>(val name: String) {
     private val whenStatements = mutableListOf<Pair<FnType, Any>>()
     private val thenStatements = mutableListOf<Pair<FnType, Any>>()
 
-    private val givenInfos = mutableListOf("\nGIVEN : ")
+    private val givenInfos = mutableListOf("GIVEN : ")
     private val whenInfos = mutableListOf("WHEN : ")
     private val thenInfos = mutableListOf("THEN : ")
 
@@ -44,7 +45,7 @@ class TestCase<T, R>(val name: String) {
     private var result: R? = null
 
     companion object {
-        private val logger = Logger.getLogger(TestCase::class.simpleName)
+        private val logger = KotlinLogging.logger {}
     }
 
     @JvmName("givenCn")
@@ -57,6 +58,13 @@ class TestCase<T, R>(val name: String) {
     @JvmName("givenSp")
     fun given(message: String, fn: TSupplier<T?>) : Given<T,R> {
         givenInfos.add(message)
+        givenStatements.add(FnType.SUPPLIER to fn)
+        return Given(this)
+    }
+
+    @JvmName("givenSp")
+    fun given(messages: Set<String>, fn: TSupplier<T?>) : Given<T,R> {
+        givenInfos.addAll(messages.toItems())
         givenStatements.add(FnType.SUPPLIER to fn)
         return Given(this)
     }
@@ -81,6 +89,12 @@ class TestCase<T, R>(val name: String) {
         givenStatements.add(FnType.CONSUMER to fn)
     }
 
+    @JvmName("andGivenCn")
+    fun andGiven(messages: Set<String>, fn: TConsumer<T?>) {
+        givenInfos.addAll(messages)
+        givenStatements.add(FnType.CONSUMER to fn)
+    }
+
     @JvmName("andGivenSp")
     fun andGiven(message: String, fn: TSupplier<T?>) {
         givenInfos.add(message)
@@ -96,6 +110,12 @@ class TestCase<T, R>(val name: String) {
     @JvmName("andGivenRn")
     fun andGiven(message: String, fn: TRunnable) {
         givenInfos.add(message)
+        givenStatements.add(FnType.RUNNABLE to fn)
+    }
+
+    @JvmName("andGivenRn")
+    fun andGiven(messages: Set<String>, fn: TRunnable) {
+        givenInfos.addAll(messages.toItems())
         givenStatements.add(FnType.RUNNABLE to fn)
     }
 
@@ -116,6 +136,27 @@ class TestCase<T, R>(val name: String) {
     @JvmName("whenSp")
     fun `when`(message: String, fn: TSupplier<R?>): When<T,R> {
         whenInfos.add(message)
+        whenStatements.add(FnType.SUPPLIER to fn)
+        return When(this)
+    }
+
+    @JvmName("whenCn")
+    fun `when`(messages: Set<String>, fn: TConsumer<T?>): When<T,R> {
+        whenInfos.addAll(messages.toItems())
+        whenStatements.add(FnType.CONSUMER to fn)
+        return When(this)
+    }
+
+    @JvmName("whenFn")
+    fun `when`(messages: Set<String>, fn: TFunction<T?,R?>): When<T,R> {
+        whenInfos.addAll(messages.toItems())
+        whenStatements.add(FnType.FUNCTION to fn)
+        return When(this)
+    }
+
+    @JvmName("whenSp")
+    fun `when`(messages: Set<String>, fn: TSupplier<R?>): When<T,R> {
+        whenInfos.addAll(messages.toItems())
         whenStatements.add(FnType.SUPPLIER to fn)
         return When(this)
     }
@@ -146,6 +187,19 @@ class TestCase<T, R>(val name: String) {
 
     fun then(message: String, fn: TRunnable) : Then<T,R> {
         thenInfos.add(message)
+        thenStatements.add(FnType.RUNNABLE to fn)
+        return Then(this)
+    }
+
+
+    fun then(messages: Set<String>, fn: TConsumer<R?>) : Then<T,R> {
+        thenInfos.addAll(messages.toItems())
+        thenStatements.add(FnType.CONSUMER to fn)
+        return Then(this)
+    }
+
+    fun then(messages: Set<String>, fn: TRunnable) : Then<T,R> {
+        thenInfos.addAll(messages.toItems())
         thenStatements.add(FnType.RUNNABLE to fn)
         return Then(this)
     }
@@ -195,19 +249,15 @@ class TestCase<T, R>(val name: String) {
     }
 
     private fun log() {
-
         mutableListOf(
-            """
-            
-            ***************************************************************************
-             TEST CASE :::  $name
-            ***************************************************************************
-        """.trimIndent()
+            "***************************************************************************",
+            "TEST CASE ::: $name",
+            "***************************************************************************",
         ).also {
             it.addAll(givenInfos)
             it.addAll(whenInfos)
             it.addAll(thenInfos)
-        }.joinToString("\n").let { logger.info(it) }
+        }.joinToString("\n").let { logger.info("\n$it\n") }
     }
 
 }
@@ -220,9 +270,21 @@ class Given<T,R>(private val testCase: TestCase<T,R>){
         return this
     }
 
+    @JvmName("andCn")
+    fun and(messages: Set<String>, fn: TConsumer<T?>): Given<T,R> {
+        testCase.andGiven(messages, fn)
+        return this
+    }
+
     @JvmName("andRn")
     fun and(message: String, fn: TRunnable): Given<T,R> {
         testCase.andGiven(message, fn)
+        return this
+    }
+
+    @JvmName("andRn")
+    fun and(messages: Set<String>, fn: TRunnable): Given<T,R> {
+        testCase.andGiven(messages, fn)
         return this
     }
 
@@ -250,6 +312,20 @@ class Given<T,R>(private val testCase: TestCase<T,R>){
     @JvmName("whenFn")
     fun `when`(message: String, fn: TFunction<T?,R?>) : When<T,R> {
         return testCase.`when`(message, fn)
+    }
+
+    @JvmName("whenCn")
+    fun `when`(messages: Set<String>, fn: TConsumer<T?>) : When<T,R> {
+        return testCase.`when`(messages, fn)
+    }
+
+    @JvmName("whenSp")
+    fun `when`(messages: Set<String>, fn: TSupplier<R?>) : When<T,R> {
+        return testCase.`when`(messages, fn)
+    }
+    @JvmName("whenFn")
+    fun `when`(messages: Set<String>, fn: TFunction<T?,R?>) : When<T,R> {
+        return testCase.`when`(messages, fn)
     }
 }
 
@@ -280,6 +356,14 @@ class When<T,R>(private val testCase: TestCase<T,R>){
     fun then(message: String, fn: TRunnable) : Then<T,R> {
         return testCase.then(message, fn)
     }
+
+    fun then(messages: Set<String>, fn: TConsumer<R?>) : Then<T,R> {
+        return testCase.then(messages, fn)
+    }
+
+    fun then(messages: Set<String>, fn: TRunnable) : Then<T,R> {
+        return testCase.then(messages, fn)
+    }
 }
 
 class Then<T,R>(private val testCase: TestCase<T,R>){
@@ -298,3 +382,6 @@ class Then<T,R>(private val testCase: TestCase<T,R>){
         testCase.run()
     }
 }
+
+private fun String.toItem() = "- $this"
+private fun Set<String>.toItems() = this.map { it.toItem() }

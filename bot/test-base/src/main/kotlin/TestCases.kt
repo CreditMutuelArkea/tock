@@ -195,19 +195,15 @@ class TestCase<T, R>(val name: String) {
     }
 
     private fun log() {
-
         mutableListOf(
-            """
-            
-            ***************************************************************************
-             TEST CASE :::  $name
-            ***************************************************************************
-        """.trimIndent()
+            "***************************************************************************",
+            "TEST CASE ::: $name",
+            "***************************************************************************",
         ).also {
             it.addAll(givenInfos)
             it.addAll(whenInfos)
             it.addAll(thenInfos)
-        }.joinToString("\n").let { logger.info(it) }
+        }.joinToString("\n").let { logger.info("\n$it\n") }
     }
 
 }

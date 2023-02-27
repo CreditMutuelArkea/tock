@@ -82,7 +82,7 @@ internal class TockConnectorController constructor(
                     connector.register(this)
 
                     if(debugEnabled) {
-                        // TODO MASS: JIRA DERCBOT-321
+                        // FIXME (WITH DERCBOT-321)
                         exposePythonLog()
                     }
                 }
@@ -257,7 +257,7 @@ internal class TockConnectorController constructor(
     override fun toString(): String = configuration.toString()
 
 
-    // TODO MASS : do rollback when front debug is ready
+    // FIXME (WITH DERCBOT-321)
     // ----------------------------------- DEBUG -------------------------------------
     fun exposePythonLog() {
         val path = "/dialog-manager"

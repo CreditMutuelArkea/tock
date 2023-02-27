@@ -28,9 +28,12 @@ import ai.tock.bot.engine.dialog.TickState
 import ai.tock.bot.processor.Redirect
 import ai.tock.bot.processor.Success
 import ai.tock.bot.processor.TickStoryProcessor
+import mu.KotlinLogging
 import java.time.Instant
 
 object TickAnswerHandler {
+
+    private val logger = KotlinLogging.logger {}
 
     internal fun handle(
         botBus: BotBus,
@@ -60,7 +63,7 @@ object TickAnswerHandler {
                 )
 
             when (result) {
-                is Success -> updateDialog(dialog, result.isFinal, story._id.toString(), result.session)
+                is Success -> updateDialog(dialog, story._id.toString(), result.session)
                 is Redirect -> {
                     // when a redirection is performed, the current story state is considered as finished
                     dialog.tickStates.compute(story._id.toString()) { _, state -> state?.copy(finished = true) }
@@ -76,17 +79,21 @@ object TickAnswerHandler {
      * If action is final, then remove a given tick story from a Dialog
      * else update a tick state
      */
-    private fun updateDialog(dialog: Dialog, isFinal: Boolean, storyId: String, tickSession: TickSession) {
-        dialog.tickStates[storyId] = TickState(
-            tickSession.currentState!!,
-            tickSession.contexts,
-            tickSession.ranHandlers,
-            tickSession.objectivesStack,
-            tickSession.init,
-            tickSession.unknownHandlingStep,
-            tickSession.handlingStep,
-            isFinal
-        )
+    private fun updateDialog(dialog: Dialog, storyId: String, tickSession: TickSession) {
+        logger.debug { "updating dialog tick state with session data... " }
+        dialog.tickStates[storyId] =
+            with(tickSession) {
+                TickState(
+                    currentState!!,
+                    contexts,
+                    ranHandlers,
+                    objectivesStack,
+                    init,
+                    unknownHandlingStep,
+                    handlingStep,
+                    finished
+                )
+            }
     }
 
     /**

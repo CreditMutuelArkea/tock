@@ -286,47 +286,54 @@ object TickStoryValidation {
     }
 
     fun validateTargetStory(tickStory: TickStory, storyExistFn :(String) ->Boolean) : List<String> = with(tickStory.actions) {
-       filterNot { it.isValid(storyExistFn) }
+       filterNot { isValidTargetStory(it.targetStory, storyExistFn) }
            .map { MessageProvider.ACTION_TARGET_STORY_NOT_FOUND(it.name to it.targetStory!!) }
     }
 
-    fun validateTickStory(tick: TickStory, storyExistFn : (String) ->Boolean): Set<String> {
-        val errors = mutableSetOf<String>()
+    /**
+     * The target story is valid only if the story exists
+     * @param storyExistFn the function to check if a storyDefinition exists by its storyId
+     */
+    private fun isValidTargetStory(targetStory: String?, storyExistFn: (String) -> Boolean): Boolean = targetStory?.let{ storyExistFn(it) } ?: true
 
-        // Consistency between declared intents/triggers and the state machine transitions :
-        errors.addAll(validateIntents(tick))
-        errors.addAll(validateTriggers(tick))
-        errors.addAll(validateTransitions(tick))
+    /**
+     * Apply all previous validations
+     */
+    fun validateTickStory(tick: TickStory, storyExistFn : (String) ->Boolean): Set<String> =
+        setOf(
+            // Consistency between declared intents/triggers and the state machine transitions :
+            validateIntents(tick),
+            validateTriggers(tick),
+            validateTransitions(tick),
 
-        // Consistency between declared actions and the state machine states:
-        errors.addAll(validateActions(tick))
-        errors.addAll(validateStates(tick))
+            // Consistency between declared actions and the state machine states:
+            validateActions(tick),
+            validateStates(tick),
 
-        // Consistency of action handlers :
-        errors.addAll(validateActionHandlers(tick))
+            // Consistency of action handlers :
+            validateActionHandlers(tick),
 
-        // Consistency of contexts :
-        errors.addAll(validateInputOutputContexts(tick))
-        errors.addAll(validateDeclaredActionContexts(tick))
+            // Consistency of contexts :
+            validateInputOutputContexts(tick),
+            validateDeclaredActionContexts(tick),
 
-        // Consistency of tick intents :
-        errors.addAll(validateTickIntentNames(tick))
-        errors.addAll(validateTickIntentAssociationActions(tick))
-        errors.addAll(validateDeclaredIntentContexts(tick))
+            // Consistency of tick intents :
+            validateTickIntentNames(tick),
+            validateTickIntentAssociationActions(tick),
+            validateDeclaredIntentContexts(tick),
 
-        // Consistency of names :
-        errors.addAll(validateNames(tick))
+            // Consistency of names :
+            validateNames(tick),
 
-        // Consistency of unknown config
-        errors.addAll(validateUnknownConfigActions(tick))
+            // Consistency of unknown config
+            validateUnknownConfigActions(tick),
 
-        errors.addAll(validateUnknownConfigIntents(tick))
+            validateUnknownConfigIntents(tick),
 
-        // Consistency of targetStory
-        errors.addAll(validateTargetStory(tick, storyExistFn))
+            // Consistency of targetStory
+            validateTargetStory(tick, storyExistFn),
+        ).flatten().toSet()
 
-        return errors
-    }
 }
 
 

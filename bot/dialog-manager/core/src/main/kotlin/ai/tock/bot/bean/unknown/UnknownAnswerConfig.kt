@@ -18,23 +18,15 @@ package ai.tock.bot.bean.unknown
 
 /**
  * Unknown intent handler for a given [ai.tock.bot.bean.TickAction] name
+ * @param intent : detected unknown intent
+ * @param action : handled action name
+ * @param answerId : answer id
  */
 @kotlinx.serialization.Serializable
 data class UnknownAnswerConfig(
-    /*
-    Detected unknown intent
-    */
     val intent: String = UNKNOWN,
-    /*
-    Handled action name
-    */
     val action: String,
-    /*
-     Answer text
-     */
-    val answerId: String,
-
-
+    val answerId: String
 ): Comparable<UnknownAnswerConfig> {
 
     /**

@@ -210,7 +210,7 @@ class TestCoreService : TestService {
         }
     }
 
-    // TODO MASS : to be deleted with DERCBOT-321
+    // FIXME (WITH DERCBOT-321)
     private fun getDebugLog(conf: BotApplicationConfiguration): ScenarioDebugResponse {
         if(!debugEnabled) return ScenarioDebugResponse(imgBase64 = "")
 

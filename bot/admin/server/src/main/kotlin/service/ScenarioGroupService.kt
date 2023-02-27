@@ -31,7 +31,7 @@ object ScenarioGroupService {
 
     /**
      * Returns all scenario groups by botId with their scenario versions
-     * @param botId: if of the bot
+     * @param botId: id of the bot
      */
     fun findAllByBotId(botId: String): List<ScenarioGroup> {
         return scenarioGroupDAO.findAllByBotId(botId)
@@ -42,12 +42,9 @@ object ScenarioGroupService {
      * @param scenarioGroupId : id of the scenario group
      * @throws [ScenarioGroupNotFoundException] if the scenario group was not found
      */
-    fun findOneById(scenarioGroupId: String): ScenarioGroup{
-        val scenarioGroup = scenarioGroupDAO.findOneById(scenarioGroupId.toId())
-        scenarioGroup ?: throw ScenarioGroupNotFoundException(scenarioGroupId)
-
-        return scenarioGroup
-    }
+    fun findOneById(scenarioGroupId: String): ScenarioGroup =
+        scenarioGroupDAO.findOneById(scenarioGroupId.toId())
+            ?: throw ScenarioGroupNotFoundException(scenarioGroupId)
 
     /**
      * Create a new scenario group and returns the created scenario group

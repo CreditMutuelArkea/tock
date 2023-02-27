@@ -23,9 +23,9 @@ data class TickAction(
     val answerId: String? = null,
     val handler: String? = null,
     val trigger: String? = null,
-    val inputContextNames: Set<String>,
-    val outputContextNames: Set<String>,
-    val final: Boolean,
+    val inputContextNames: Set<String> = emptySet(),
+    val outputContextNames: Set<String> = emptySet(),
+    val final: Boolean = false,
     val targetStory: String? = null,
 ){
     /**
@@ -33,11 +33,5 @@ data class TickAction(
      */
     @java.beans.Transient
     fun isSilent() = !handler.isNullOrBlank() || !trigger.isNullOrBlank()
-
-    /**
-     * The action is valid only if the targetStory exists if it is provided
-     * @param storyExistFn the function to check if a storyDefinition exists by its storyId
-     */
-    fun isValid(storyExistFn: (String) -> Boolean): Boolean = targetStory?.let{ storyExistFn(it) } ?: true
 
 }

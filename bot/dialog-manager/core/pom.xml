@@ -100,17 +100,6 @@
             <artifactId>tock-bot-dialog-manager-handlers-provider-dev-tools</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- TODO MASS : Add to patchs-->
-        <!--dependency>
-            <groupId>ai.tock</groupId>
-            <artifactId>tock-bot-dialog-manager-handlers-provider-joignabilite</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>ai.tock</groupId>
-            <artifactId>tock-bot-dialog-manager-handlers-provider-suravenir-assurances</artifactId>
-            <version>1.0.0</version>
-        </dependency-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>

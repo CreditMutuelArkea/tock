@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.scenario
+package ai.tock.bot.bean.unknown
 
-import org.litote.kmongo.Id
-import org.litote.kmongo.newId
-import java.time.Instant
-import java.time.ZonedDateTime
+/**
+ * Exceptions related to unknown intent handling
+ * @param message error message
+ */
+sealed class UnknownHandlingException(override val message: String) : Exception(message)
 
-
-data class ScenarioGroup(
-    val _id: Id<ScenarioGroup> = newId(),
-    val botId: String,
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val description: String? = null,
-    val creationDate: ZonedDateTime = ZonedDateTime.now(),
-    val updateDate: ZonedDateTime = ZonedDateTime.now(),
-    val versions: List<ScenarioVersion> = emptyList(),
-    @Transient
-    val enabled: Boolean? = null
-)
+class RetryExceededError : UnknownHandlingException(RETRY_NB_EXCEEDED_MSG)
+class ConfigMismatchedError: UnknownHandlingException(CONFIG_MISMATCHED_MSG)

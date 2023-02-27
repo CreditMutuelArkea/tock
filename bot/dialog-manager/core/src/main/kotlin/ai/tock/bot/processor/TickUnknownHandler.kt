@@ -63,7 +63,7 @@ object TickUnknownHandler {
                             Else set the step to null and return the redirectStoryId
                             */
                             if (storySettings.repetitionNb > step.repeated)
-                                UnknownHandleResult(handlingStep = step.next() as UnknownHandlingStep)
+                                UnknownHandleResult(handlingStep = step.incrementRepetition() as UnknownHandlingStep)
                             else
                                 storySettings.redirectStory?.let { UnknownHandleResult(redirectStoryId = it) } ?: throw RetryExceededError()
 

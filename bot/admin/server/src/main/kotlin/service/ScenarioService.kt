@@ -39,11 +39,13 @@ object ScenarioService {
 
     /**
      * Returns all scenario groups with their scenario versions
+     * @param namespace bot namespace
+     * @param botId applicationName of the bot
      */
     fun findAllScenarioGroupWithVersionsByBotId(namespace: String, botId: String): List<ScenarioGroup> {
         // Get scenario group from DB
         val scenarioGroups = ScenarioGroupService.findAllByBotId(botId)
-        // Map a stories features to scenario groups
+        // Map story features to scenario groups
         return scenarioGroups.map { mapStoryFeatures(namespace, it) }
     }
 
@@ -267,8 +269,13 @@ object ScenarioService {
 
     }
 
-    private fun mapStoryFeatures(namespace: String, scenarioGroup: ScenarioGroup): ScenarioGroup {
-        val sc = if(scenarioGroup.versions.any(ScenarioVersion::isCurrent)){
+    /**
+     * Update scenario group with the tick story activation feature
+     * @param namespace : the namespace
+     * @param scenarioGroup: the [ScenarioGroup] to update
+     */
+    private fun mapStoryFeatures(namespace: String, scenarioGroup: ScenarioGroup): ScenarioGroup =
+        if(scenarioGroup.versions.any(ScenarioVersion::isCurrent)){
             // If scenario group has a current version, then check tick story
             scenarioGroup.copy(
                 enabled = StoryService.getStoryByNamespaceAndBotIdAndStoryId(
@@ -287,9 +294,6 @@ object ScenarioService {
         } else{
             scenarioGroup
         }
-
-        return sc
-    }
 
     private fun checkScenarioVersionsToImport(scenarioVersions: List<ScenarioVersion>) {
         // Check scenario group has versions

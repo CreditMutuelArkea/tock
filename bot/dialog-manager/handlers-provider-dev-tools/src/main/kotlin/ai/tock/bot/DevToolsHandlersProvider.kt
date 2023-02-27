@@ -18,67 +18,36 @@ package ai.tock.bot
 
 import ai.tock.bot.handler.ActionHandler
 import ai.tock.bot.handler.ActionHandlersProvider
-import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
-import ai.tock.shared.propertyOrNull
 
-val customDataKey = propertyOrNull(IADVIZE_CUSTOM_DATA_KEY)
-val customDataValue = propertyOrNull(IADVIZE_CUSTOM_DATA_VALUE)
 
-/**
- * The [DevToolsHandlersProvider] is a set of developer handlers made available to speed up scenario design
- */
 class DevToolsHandlersProvider : ActionHandlersProvider {
 
-    private val iadvizeGraphQLClient = IadvizeGraphQLClient()
-
     override fun getNameSpace() = HandlerNamespace.DEV_TOOLS
+
+    private enum class HandlerId {
+        DO_NOTHING,
+        SET_CONTEXT
+    }
+
+    private enum class ContextName {
+        DEV_CONTEXT
+    }
 
     override fun getActionHandlers(): Set<ActionHandler> =
         setOf(
             createActionHandler(
-                id = "do_nothing",
+                id = HandlerId.DO_NOTHING.name,
                 description = "Handler who does nothing. It is used to force the next round",
                 handler = { emptyMap() })
         ).plus(
             (1..7).map { counter ->
                 createActionHandler(
-                    id = "set_context_$counter",
-                    description = "Handler that just sets <DEV_CONTEXT_$counter>",
-                    outputContexts = setOf("DEV_CONTEXT_$counter"),
-                    handler = { mapOf("DEV_CONTEXT_$counter" to null) }
+                    id = "${HandlerId.SET_CONTEXT.name}_$counter",
+                    description = "Handler that just sets <${ContextName.DEV_CONTEXT.name}_$counter>",
+                    outputContexts = setOf("${ContextName.DEV_CONTEXT.name}_$counter"),
+                    handler = { mapOf("${ContextName.DEV_CONTEXT.name}_$counter" to null) }
                 )
             }
-        ).let {
-            if (customDataKey != null && customDataValue != null) {
-                println("$customDataKey => $customDataValue")
-                it.plus(createIadvizeHandler())
-            } else {
-                it
-            }
-        }
-
-
-
-    private fun createIadvizeHandler(): ActionHandler {
-
-        return createActionHandler(
-            id = IADVIZE_HANDLER_ID,
-            description = IADVIZE_DESCRIPTION,
-            inputContexts = setOf(IADVIZE_CONVERSATION_ID),
-            outputContexts = setOf(IADVIZE_CLIENT_CONNECTED, IADVIZE_CLIENT_DISCONNECTED),
-            handler = {
-                with(mutableMapOf<String, String?>()) {
-                    it[IADVIZE_CONVERSATION_ID]?.let { conversationId ->
-                        iadvizeGraphQLClient.isCustomDataExist(conversationId, customDataKey!! to customDataValue!!)
-                            .let { connected ->
-                                if (connected) put(IADVIZE_CLIENT_CONNECTED, null)
-                                else put(IADVIZE_CLIENT_DISCONNECTED, null)
-                            }
-                    }
-                    this
-                }
-            }
         )
-    }
 
 }

@@ -61,6 +61,8 @@ def solve_graph_asp(graph, priorities):
         solutions.append(frozenset(s.strip('"') for s in solution))
     return solutions
 
+# FIXME (WITH DERCBOT-321)
+# debugEnabled, save_graph_asp, pythonLogPath, png
 def callClyngor(debugEnabled, current, bot_actions, target:BotAction=None, available_contexts=set(), ran_handlers=set()):
     graph = create_whole_graph_asp(current, bot_actions, target, available_contexts, ran_handlers)
     if debugEnabled:

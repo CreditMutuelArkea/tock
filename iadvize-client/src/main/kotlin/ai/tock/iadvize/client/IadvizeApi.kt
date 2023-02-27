@@ -30,6 +30,9 @@ import retrofit2.http.Body
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.POST
+import java.net.InetSocketAddress
+import java.net.Proxy
+
 
 /**
  * Iadvize API.
@@ -56,13 +59,17 @@ interface IadvizeApi {
 
 private const val TIMEOUT = 30000L
 
+// FIXME : Rollback
+var proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 3128))
+
 /**
  * Create a new Iadvize api client.
  *
  * @param logger the logger
  * @return the new client
  */
-fun createApi(logger: KLogger): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(TIMEOUT, logger)
+fun createApi(logger: KLogger): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(TIMEOUT, logger
+        ,proxy = proxy)
         .baseUrl(BASE_URL)
         .addConverterFactory(JacksonConverterFactory.create())
         .build()
@@ -75,7 +82,8 @@ fun createApi(logger: KLogger): IadvizeApi = retrofitBuilderWithTimeoutAndLogger
  * @return the new client
  */
 fun createSecuredApi(logger: KLogger, tokenProvider: () -> String): IadvizeApi = retrofitBuilderWithTimeoutAndLogger(
-    TIMEOUT, logger, interceptors = listOf(tokenAuthenticationInterceptor(tokenProvider)))
+    TIMEOUT, logger, interceptors = listOf(tokenAuthenticationInterceptor(tokenProvider)),
+    proxy = proxy)
     .baseUrl(BASE_URL)
     .addConverterFactory(JacksonConverterFactory.create())
     .build()

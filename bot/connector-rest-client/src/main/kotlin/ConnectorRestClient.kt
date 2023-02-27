@@ -86,7 +86,7 @@ class ConnectorRestClient(
 
     /**
      * Get a python generated graph
-     * TODO MASS : to replace
+     * FIXME (WITH DERCBOT-321)
      */
     fun getDebugLog(path: String): Response<ScenarioDebugResponse> {
         return getService("/dialog-manager").getDebugLog().execute()

@@ -26,8 +26,7 @@ import ai.tock.shared.retrofitBuilderWithTimeoutAndLogger
 import mu.KotlinLogging
 
 internal class BotApiClient(baseUrl: String) {
-    // TODO MASS : rollback timeout
-    private val timeoutInSeconds = longProperty("tock_bot_api_timeout_in_ms", 500000L)
+    private val timeoutInSeconds = longProperty("tock_bot_api_timeout_in_ms", 5000L)
     private val logger = KotlinLogging.logger {}
 
     private val service: BotApiService

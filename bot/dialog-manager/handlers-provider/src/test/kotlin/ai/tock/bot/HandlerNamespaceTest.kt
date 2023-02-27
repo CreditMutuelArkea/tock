@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.scenario
+package ai.tock.bot
 
-import org.litote.kmongo.Id
-import org.litote.kmongo.newId
-import java.time.Instant
-import java.time.ZonedDateTime
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
+class HandlerNamespaceTest {
 
-data class ScenarioGroup(
-    val _id: Id<ScenarioGroup> = newId(),
-    val botId: String,
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val description: String? = null,
-    val creationDate: ZonedDateTime = ZonedDateTime.now(),
-    val updateDate: ZonedDateTime = ZonedDateTime.now(),
-    val versions: List<ScenarioVersion> = emptyList(),
-    @Transient
-    val enabled: Boolean? = null
-)
+    @Test
+    fun `all namespaces are not blank`(){
+        HandlerNamespace.values()
+            .forEach {
+                assertFalse { it.key.isNullOrBlank() }
+            }
+    }
+
+    @Test
+    fun `UNKOWN namespace`(){
+        assertFalse { HandlerNamespace.UNKNOWN.shared }
+        assertEquals(HandlerNamespace.UNKNOWN, HandlerNamespace.find("TEST-123"))
+    }
+
+}

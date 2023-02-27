@@ -137,7 +137,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
           this.messages.push(new TestMessage(true, m));
         });
 
-        // TODO MASS : FIX ME !
+        // FIXME (WITH DERCBOT-321)
         (async () => {
           await new Promise( resolve => setTimeout(resolve, 750) )
           this.test.getDebugLog(

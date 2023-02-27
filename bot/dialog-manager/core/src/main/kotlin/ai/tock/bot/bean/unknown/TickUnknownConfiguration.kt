@@ -19,7 +19,7 @@ package ai.tock.bot.bean.unknown
 import java.util.TreeSet
 
 /**
- * TickUnknownConfiguration
+ * Configuration to customize unknown intent handling in tick stories
  */
 @kotlinx.serialization.Serializable
 data class TickUnknownConfiguration(

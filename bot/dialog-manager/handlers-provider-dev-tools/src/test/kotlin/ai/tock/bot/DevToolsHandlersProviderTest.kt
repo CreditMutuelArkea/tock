@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.scenario
+package ai.tock.bot
 
-import org.litote.kmongo.Id
-import org.litote.kmongo.newId
-import java.time.Instant
-import java.time.ZonedDateTime
+import org.junit.jupiter.api.assertDoesNotThrow
+import kotlin.test.Test
+
+class DevToolsHandlersProviderTest {
+
+    @Test
+    fun `invoke all handlers`(){
+        DevToolsHandlersProvider().getActionHandlers()
+            .forEach {
+                assertDoesNotThrow("Requirements failed") {
+                    it.invokeHandler(it.inputContexts.associateWith { null })
+                }
+            }
+    }
 
 
-data class ScenarioGroup(
-    val _id: Id<ScenarioGroup> = newId(),
-    val botId: String,
-    val name: String,
-    val category: String? = null,
-    val tags: List<String> = emptyList(),
-    val description: String? = null,
-    val creationDate: ZonedDateTime = ZonedDateTime.now(),
-    val updateDate: ZonedDateTime = ZonedDateTime.now(),
-    val versions: List<ScenarioVersion> = emptyList(),
-    @Transient
-    val enabled: Boolean? = null
-)
+
+}
