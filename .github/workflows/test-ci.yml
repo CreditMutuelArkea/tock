@@ -18,5 +18,6 @@ jobs:
           distribution: 'corretto'
           java-version: 11
           cache: maven
+          server-id: maven
       - name: Test
         run:  mvn  --batch-mode --update-snapshots -Dskip.npm -Dassembly.skipAssembly=true clean install -T 4C
