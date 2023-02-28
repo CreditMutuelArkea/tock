@@ -66,7 +66,7 @@ interface StoryDefinitionConfigurationDAO {
         namespace: String,
         botId: String,
         intentName: String
-    ): Long
+    ): Boolean
 
     fun getStoryDefinitionsByNamespaceAndBotId(namespace: String, botId: String): List<StoryDefinitionConfiguration>
 

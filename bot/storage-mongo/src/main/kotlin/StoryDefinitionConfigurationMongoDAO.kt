@@ -183,8 +183,8 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
         namespace: String,
         botId: String,
         intentName: String
-    ): Long {
-        return col.deleteOne(and( Namespace eq namespace, BotId eq botId, Intent::name eq intentName)).deletedCount
+    ): Boolean {
+        return col.deleteOne( Namespace eq namespace, BotId eq botId, Intent.name_ eq intentName).deletedCount > 0
     }
 
     override fun getStoryDefinitionsByNamespaceAndBotId(
