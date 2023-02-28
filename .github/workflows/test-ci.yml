@@ -4,8 +4,8 @@ on:
     push:
         branches:
           - master
-          - contribution/*
-          - feature/*
+          - contribution/**
+          - feature/**
 
 jobs:
   build-and-test:
