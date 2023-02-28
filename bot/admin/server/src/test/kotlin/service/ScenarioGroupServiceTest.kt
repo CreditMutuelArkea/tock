@@ -25,17 +25,20 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.provider
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.justRun
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.toId
 import java.time.ZonedDateTime
-import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class ScenarioGroupServiceImplTest {
+class ScenarioGroupServiceTest {
     private val dateNow = ZonedDateTime.parse("2022-01-01T00:00:00.000Z")
     private val groupId1 = "groupId1".toId<ScenarioGroup>()
     private val groupId2 = "groupId2".toId<ScenarioGroup>()
