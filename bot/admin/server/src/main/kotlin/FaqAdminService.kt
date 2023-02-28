@@ -756,7 +756,7 @@ object FaqAdminService {
             faqDefinitionDAO.deleteFaqDefinitionById(faqDefinition._id)
             i18nDao.deleteByNamespaceAndId(namespace, faqDefinition.i18nId)
 
-            return storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(namespace,applicationDefinition.name,intentName)>0
+            return storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(namespace,applicationDefinition.name,intentName)
         }
         return false
     }

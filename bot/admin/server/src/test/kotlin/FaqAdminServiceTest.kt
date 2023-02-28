@@ -94,7 +94,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
 
         private val applicationId = newId<ApplicationDefinition>()
-        private val botId ="botId"
+        private val botId = "botId"
         private val intentId = "idIntent".toId<IntentDefinition>()
         private val intentId2 = "idIntent2".toId<IntentDefinition>()
         private val intentId3 = "idIntent3".toId<IntentDefinition>()
@@ -506,17 +506,16 @@ class FaqAdminServiceTest : AbstractTest() {
                     ConnectorType.rest, ConnectorType.rest
                 )
             )
-
-            every {
-                // TODO : use real calls instead of any
-                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(),any(),any())
-            } returns 1
         }
 
         @Test
         fun `GIVEN delete single faq WHEN intent existing and one applicationId is found`() {
             val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
-            initDeleteFaqMock()
+            initDeleteFaqMock().apply {
+                every {
+                    storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(), any(), any())
+                } returns true
+            }
 
             val isDeleted = faqAdminService.deleteFaqDefinition(namespace, faqId.toString())
 
@@ -526,8 +525,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
                 intentDAO.getIntentById(any())
                 i18nDAO.deleteByNamespaceAndId(any(), any())
-                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(),any(
-                    ), any()) > 0
+                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(), any(), any())
             }
         }
 
@@ -544,7 +542,7 @@ class FaqAdminServiceTest : AbstractTest() {
             verify(exactly = 0) {
                 faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
                 i18nDAO.deleteByNamespaceAndId(any(), any())
-                storyDefinitionDAO.delete(any())
+                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(), any(), any())
             }
         }
 
@@ -559,7 +557,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 faqDefinitionDAO.deleteFaqDefinitionById(eq(faqId))
                 intentDAO.getIntentById(any())
                 i18nDAO.deleteByNamespaceAndId(any(), any())
-                storyDefinitionDAO.delete(any())
+                storyDefinitionDAO.deleteStoryDefinitionByNamespaceAndBotIdAndIntentName(any(), any(), any())
             }
 
             assertFalse(isDeleted, "It should returns false because faq could not be deleted")
@@ -580,7 +578,12 @@ class FaqAdminServiceTest : AbstractTest() {
 
             initSearchFaqMockWithoutLabelsSearch(
                 listOf(
-                    createFaqQueryResult(faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0),
+                    createFaqQueryResult(
+                        faqId = faqId2,
+                        intentId = intentId2,
+                        i18nId = i18nId2,
+                        numberOfUtterances = 0
+                    ),
                     createFaqQueryResult(numberOfUtterances = 1, utteranceText = expectedUtteranceLabel)
                 )
             )
@@ -684,7 +687,8 @@ class FaqAdminServiceTest : AbstractTest() {
                         faqId = faqId2, intentId = intentId2, i18nId = i18nId2, numberOfUtterances = 0
                     ),
                     createFaqQueryResult(
-                        numberOfUtterances = 1, utteranceText = "testUtteranceText")
+                        numberOfUtterances = 1, utteranceText = "testUtteranceText"
+                    )
                 ),
                 stories = listOf(story1, story2)
             )
@@ -736,7 +740,7 @@ class FaqAdminServiceTest : AbstractTest() {
             every { i18nDAO.getLabels(namespace, any()) } returns mockedI18nLabels
 
             val i18nLabelId: CapturingSlot<Id<I18nLabel>> = slot()
-            every { i18nDAO.getLabelById(capture(i18nLabelId))} answers { mockedI18nLabels.firstOrNull { it._id == i18nLabelId.captured } }
+            every { i18nDAO.getLabelById(capture(i18nLabelId)) } answers { mockedI18nLabels.firstOrNull { it._id == i18nLabelId.captured } }
 
             every { faqDefinitionDAO.getFaqDetailsWithCount(any(), any(), any()) } returns searchResult
 
@@ -795,7 +799,17 @@ class FaqAdminServiceTest : AbstractTest() {
             }
 
             return FaqQueryResult(
-                faqId, botId, intentId, i18nId, tagList, enabled, instant, instant, utterances, createdIntent, intentName
+                faqId,
+                botId,
+                intentId,
+                i18nId,
+                tagList,
+                enabled,
+                instant,
+                instant,
+                utterances,
+                createdIntent,
+                intentName
             )
         }
 
@@ -823,6 +837,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 category = FAQ_CATEGORY
             )
         }
+
         private fun generateStory(intent: IntentDefinition, storyId: String): StoryDefinitionConfiguration {
             return StoryDefinitionConfiguration(
                 _id = storyId.toId(),
