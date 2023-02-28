@@ -43,12 +43,9 @@
       </p>
       <ul class="mention">
         <li *ngIf="state.hasRole(UserRole.technicalAdmin)">
-          The "Application Dump" format is an internal format, useful to copy application data
-          across environments.
+          The "Application Dump" format is an internal format, useful to copy application data across environments.
         </li>
-        <li>
-          The "Sentences Dump" format is an agnostic format, used to share data with other systems.
-        </li>
+        <li>The "Sentences Dump" format is an agnostic format, used to share data with other systems.</li>
       </ul>
       <p *ngIf="!applicationName">
         <mat-form-field id="applicationName">
@@ -127,7 +124,7 @@
             >
               Number of sentences imported
             </h3>
-            <mat-list-item *ngIf="report.sentencesImported != 0">
+            <mat-list-item *ngIf="report.sentencesImported !== 0">
               <mat-icon mat-list-icon>speaker_notes</mat-icon>
               <h4 mat-line>{{ report.sentencesImported }}</h4>
             </mat-list-item>
@@ -138,7 +135,7 @@
             >
               Number of FAQs imported
             </h3>
-            <mat-list-item *ngIf="report.faqsImported != 0">
+            <mat-list-item *ngIf="report.faqsImported !== 0">
               <mat-icon mat-list-icon>speaker_notes</mat-icon>
               <h4 mat-line>{{ report.faqsImported }}</h4>
             </mat-list-item>

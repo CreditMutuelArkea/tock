@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
 import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { ApplicationScopedQuery } from '../model/commons';
-import {
-  BotApplicationConfiguration,
-  BotConfiguration,
-  ConnectorType
-} from './model/configuration';
+import { BotApplicationConfiguration, BotConfiguration, ConnectorType } from './model/configuration';
 
 @Injectable()
-export class BotConfigurationService implements OnInit, OnDestroy {
+export class BotConfigurationService implements OnDestroy {
   private subscription: Subscription;
 
   //only rest configurations
-  readonly restConfigurations: BehaviorSubject<BotApplicationConfiguration[]> = new BehaviorSubject(
-    []
-  );
+  readonly restConfigurations: BehaviorSubject<BotApplicationConfiguration[]> = new BehaviorSubject([]);
   //all configurations
   readonly configurations: BehaviorSubject<BotApplicationConfiguration[]> = new BehaviorSubject([]);
   //has rest configuration
@@ -43,13 +37,9 @@ export class BotConfigurationService implements OnInit, OnDestroy {
   readonly bots: BehaviorSubject<BotConfiguration[]> = new BehaviorSubject([]);
 
   constructor(private rest: RestService, private state: StateService) {
-    this.subscription = this.state.configurationChange.subscribe((_) =>
-      this.updateConfigurations()
-    );
+    this.subscription = this.state.configurationChange.subscribe((_) => this.updateConfigurations());
     this.updateConfigurations();
   }
-
-  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
@@ -66,10 +56,7 @@ export class BotConfigurationService implements OnInit, OnDestroy {
           this.hasRestConfigurations.next(rest.length !== 0);
           const connectors = [];
           c.forEach((conf) => {
-            if (
-              !conf.connectorType.isRest() &&
-              !connectors.some((e) => conf.connectorType.id === e.id)
-            ) {
+            if (!conf.connectorType.isRest() && !connectors.some((e) => conf.connectorType.id === e.id)) {
               connectors.push(conf.connectorType);
             }
           });
@@ -79,9 +66,7 @@ export class BotConfigurationService implements OnInit, OnDestroy {
     }
   }
 
-  private getConfigurations(
-    query: ApplicationScopedQuery
-  ): Observable<BotApplicationConfiguration[]> {
+  private getConfigurations(query: ApplicationScopedQuery): Observable<BotApplicationConfiguration[]> {
     return this.rest.post('/configuration/bots', query, BotApplicationConfiguration.fromJSONArray);
   }
 
@@ -121,16 +106,12 @@ export class BotConfigurationService implements OnInit, OnDestroy {
 
   findValidPath(connectorType: ConnectorType): string {
     const bots = this.bots.getValue();
-    const baseTargetPath = `/io/${
-      this.state.user.organization
-    }/${this.state.currentApplication.name.replace(/\s/g, '_')}/${connectorType.id}`;
+    const baseTargetPath = `/io/${this.state.user.organization}/${this.state.currentApplication.name.replace(/\s/g, '_')}/${
+      connectorType.id
+    }`;
     let targetPath = baseTargetPath;
     let index = 1;
-    while (
-      bots.findIndex(
-        (b) => b.configurations && b.configurations.findIndex((c) => c.path === targetPath) !== -1
-      ) !== -1
-    ) {
+    while (bots.findIndex((b) => b.configurations && b.configurations.findIndex((c) => c.path === targetPath) !== -1) !== -1) {
       targetPath = baseTargetPath + index++;
     }
     return targetPath;
@@ -141,12 +122,7 @@ export class BotConfigurationService implements OnInit, OnDestroy {
     const baseId = name;
     let targetId = baseId;
     let index = 1;
-    while (
-      bots.findIndex(
-        (b) =>
-          b.configurations && b.configurations.findIndex((c) => c.applicationId === targetId) !== -1
-      ) !== -1
-    ) {
+    while (bots.findIndex((b) => b.configurations && b.configurations.findIndex((c) => c.applicationId === targetId) !== -1) !== -1) {
       targetId = baseId + index++;
     }
     return targetId;

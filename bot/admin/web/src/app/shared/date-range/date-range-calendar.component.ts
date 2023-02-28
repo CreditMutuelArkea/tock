@@ -19,7 +19,7 @@ import { NbCalendarRange, NbDateService, NbPopoverDirective } from '@nebular/the
 import { StateService } from 'src/app/core-nlp/state.service';
 
 @Component({
-  selector: 'date-range-calendar',
+  selector: 'tock-date-range-calendar',
   templateUrl: './date-range-calendar.component.html',
   styleUrls: ['./date-range-calendar.component.css']
 })
@@ -42,11 +42,7 @@ export class DateRangeCalendarComponent implements OnInit {
   constructor(protected dateService: NbDateService<Date>, private state: StateService) {}
 
   ngOnInit(): void {
-    if (
-      this.state.dateRange.start != null &&
-      this.state.dateRange.end != null &&
-      this.state.dateRange.rangeInDays != null
-    ) {
+    if (this.state.dateRange.start != null && this.state.dateRange.end != null && this.state.dateRange.rangeInDays != null) {
       this.range = {
         start: this.state.dateRange.start,
         end: this.state.dateRange.end

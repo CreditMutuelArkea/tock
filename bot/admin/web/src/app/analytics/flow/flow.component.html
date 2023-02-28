@@ -64,11 +64,11 @@
           nbTooltip="Show effective user trafic (dynamic mode)"
           >User flow on</span
         >
-        <date-range-calendar
+        <tock-date-range-calendar
           [disabled]="!statsMode"
           [rangeInDays]="7"
           (datesChanged)="datesChanged($event)"
-        ></date-range-calendar>
+        ></tock-date-range-calendar>
       </div>
 
       <br />
@@ -108,9 +108,7 @@
             >
               <span nbTooltip="{{ typeFilter.description }}">
                 {{ typeFilter.name }}
-                <span *ngIf="typeFilterCounters.get(typeFilter) > 0">
-                  ({{ typeFilterCounters.get(typeFilter) }})</span
-                ></span
+                <span *ngIf="typeFilterCounters.get(typeFilter) > 0"> ({{ typeFilterCounters.get(typeFilter) }})</span></span
               >
             </nb-option>
           </nb-select>
@@ -198,7 +196,7 @@
                   icon="code"
                 ></nb-icon>
                 <nb-icon
-                  *ngIf="selectedStory.storyType == undefined"
+                  *ngIf="selectedStory.storyType === undefined"
                   class="story-type"
                   icon="question-mark-circle-outline"
                 ></nb-icon>
@@ -230,7 +228,7 @@
                 icon="code"
               ></nb-icon>
               <nb-icon
-                *ngIf="entry.value.storyType == undefined"
+                *ngIf="entry.value.storyType === undefined"
                 class="story-type"
                 nbTooltip="Unknown Type"
                 icon="question-mark-circle-outline"
@@ -421,7 +419,7 @@
   </nb-accordion-item>
 </nb-accordion>
 
-<div *ngIf="selectedLayout != 'Sankey'">
+<div *ngIf="selectedLayout !== 'Sankey'">
   <div
     *ngIf="graphData"
     class="cytoscape"
@@ -469,11 +467,11 @@
     </button>
   </div>
 </div>
-<div *ngIf="selectedLayout == 'Sankey'">
+<div *ngIf="selectedLayout === 'Sankey'">
   <nb-card>
     <nb-card-body>
       <google-chart
-        *ngIf="flowData != null"
+        *ngIf="flowData !== null"
         type="Sankey"
         [data]="flowData.data"
         [columns]="flowData.columnNames"

@@ -15,7 +15,7 @@
  */
 
 import { map } from 'rxjs/operators';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { StateService } from '../core-nlp/state.service';
 import { NlpService } from '../nlp-tabs/nlp.service';
 import { ApplicationService } from '../core-nlp/applications.service';
@@ -29,7 +29,7 @@ import { DialogService } from '../core-nlp/dialog.service';
   templateUrl: './entity-details.component.html',
   styleUrls: ['./entity-details.component.css']
 })
-export class EntityDetailsComponent implements OnInit {
+export class EntityDetailsComponent {
   @Input()
   entity: EntityDefinition;
   @Input()
@@ -44,8 +44,6 @@ export class EntityDetailsComponent implements OnInit {
     private dialog: DialogService,
     private applicationService: ApplicationService
   ) {}
-
-  ngOnInit() {}
 
   findEntityType(): EntityType {
     return this.state.findEntityTypeByName(this.entity.entityTypeName);
@@ -68,24 +66,13 @@ export class EntityDetailsComponent implements OnInit {
     });
     dialogRef.onClose.subscribe((result) => {
       if (result === 'remove') {
-        this.nlp
-          .removeSubEntity(this.state.currentApplication, this.entityType, this.entity)
-          .subscribe(
-            (_) => {
-              this.state.resetConfiguration();
-              this.toastrService.show(
-                `Subentity ${this.entity.entityTypeName} removed`,
-                'Remove Subentity',
-                { duration: 2000 }
-              );
-            },
-            (_) =>
-              this.toastrService.show(
-                `Remove Subentity ${this.entity.entityTypeName} failed`,
-                'Error',
-                { duration: 5000 }
-              )
-          );
+        this.nlp.removeSubEntity(this.state.currentApplication, this.entityType, this.entity).subscribe(
+          (_) => {
+            this.state.resetConfiguration();
+            this.toastrService.show(`Subentity ${this.entity.entityTypeName} removed`, 'Remove Subentity', { duration: 2000 });
+          },
+          (_) => this.toastrService.show(`Remove Subentity ${this.entity.entityTypeName} failed`, 'Error', { duration: 5000 })
+        );
       }
     });
   }
