@@ -27,7 +27,6 @@ import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { StateService } from '../../../core-nlp/state.service';
 import { FaqManagementEditComponent, FaqTabs } from './faq-management-edit.component';
 import { FormControlComponent } from '../../../shared/components';
-import { DelayDirective } from '../../../shared/directives';
 import { FaqDefinitionExtended } from '../faq-management.component';
 import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../../model/nlp';
 
@@ -141,7 +140,7 @@ describe('FaqManagementEditComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FaqManagementEditComponent, FormControlComponent, DelayDirective],
+      declarations: [FaqManagementEditComponent, FormControlComponent],
       imports: [
         TestingModule,
         NbAlertModule,

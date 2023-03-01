@@ -7,6 +7,12 @@ import { ScenarioGroup } from '../../models';
 import { ScenarioService } from '../../services';
 import { ChoiceDialogComponent } from '../../../shared/components';
 
+interface ScenarioGroupEditForm {
+  category: FormControl<string>;
+  description: FormControl<string>;
+  name: FormControl<string>;
+  tags: FormArray<FormControl<string>>;
+}
 @Component({
   selector: 'tock-scenario-edit',
   templateUrl: './scenario-edit.component.html',
@@ -17,11 +23,11 @@ export class ScenarioEditComponent implements OnChanges {
   @Input() scenarioGroup?: ScenarioGroup;
 
   @Output() onClose = new EventEmitter<boolean>();
-  @Output() onSave = new EventEmitter<{ scenarioGroup: ScenarioGroup; redirect: boolean }>();
+  @Output() onSave = new EventEmitter<{ scenarioGroup: Partial<ScenarioGroup>; redirect: boolean }>();
 
   isSubmitted: boolean = false;
 
-  form = new FormGroup({
+  form = new FormGroup<ScenarioGroupEditForm>({
     category: new FormControl(),
     description: new FormControl(),
     name: new FormControl(undefined, Validators.required),

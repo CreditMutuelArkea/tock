@@ -26,6 +26,7 @@ import {
 } from './models';
 
 @Component({
+  // eslint-disable-next-line
   selector: '[tock-canvas]',
   templateUrl: './canvas.component.html',
   encapsulation: ViewEncapsulation.None

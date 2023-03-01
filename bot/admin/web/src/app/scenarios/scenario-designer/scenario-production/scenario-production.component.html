@@ -134,14 +134,14 @@
       class="production-canvas"
       #canvasElem
     >
-      <scenario-state-group
+      <tock-scenario-state-group
         [isReadonly]="isReadonly"
         [state]="scenario.data.stateMachine.states.Global"
         [stateMachine]="scenario.data.stateMachine"
         [usedNames]="collectAllUsedNames()"
         [intents]="transitionsDefinition"
         [actions]="scenarioDefinition.actions"
-      ></scenario-state-group>
+      ></tock-scenario-state-group>
 
       <ng-container *ngFor="let handler of pathHandlers">
         <div

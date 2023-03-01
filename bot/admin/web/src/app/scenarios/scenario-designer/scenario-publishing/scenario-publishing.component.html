@@ -12,8 +12,8 @@
             <span *ngIf="!areAllJobsTypeDone(intentJobsType)"> will be </span>
             <span *ngIf="areAllJobsTypeDone(intentJobsType)"> have been </span>
 
-            <span *ngIf="getJobsType(intentJobsType) == 'creation'"> created </span>
-            <span *ngIf="getJobsType(intentJobsType) == 'update'"> updated </span>
+            <span *ngIf="getJobsType(intentJobsType) === 'creation'"> created </span>
+            <span *ngIf="getJobsType(intentJobsType) === 'update'"> updated </span>
           </h5>
           <div class="row">
             <div
@@ -63,8 +63,8 @@
             >
             <span *ngIf="!areAllJobsTypeDone(answerJobsType)"> will be </span>
             <span *ngIf="areAllJobsTypeDone(answerJobsType)"> have been </span>
-            <span *ngIf="getJobsType(answerJobsType) == 'creation'"> created </span>
-            <span *ngIf="getJobsType(answerJobsType) == 'update'"> updated </span>
+            <span *ngIf="getJobsType(answerJobsType) === 'creation'"> created </span>
+            <span *ngIf="getJobsType(answerJobsType) === 'update'"> updated </span>
           </h5>
 
           <div class="row">
@@ -97,8 +97,8 @@
             for an unknown answer
             <span *ngIf="!areAllJobsTypeDone(unknownAnswerJobsType)"> will be </span>
             <span *ngIf="areAllJobsTypeDone(unknownAnswerJobsType)"> have been </span>
-            <span *ngIf="getJobsType(unknownAnswerJobsType) == 'creation'"> created </span>
-            <span *ngIf="getJobsType(unknownAnswerJobsType) == 'update'"> updated </span>
+            <span *ngIf="getJobsType(unknownAnswerJobsType) === 'creation'"> created </span>
+            <span *ngIf="getJobsType(unknownAnswerJobsType) === 'update'"> updated </span>
           </h5>
 
           <div class="row">

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { Edge, GraphEdge, graphlib, layout, Node } from 'dagre';
@@ -12,11 +12,11 @@ import { StateService } from '../../../core-nlp/state.service';
 type GraphNode = Node & { name?: string; actionDef?: ScenarioActionDefinition; type?: string };
 
 @Component({
-  selector: 'scenario-contexts-graph',
+  selector: 'tock-scenario-contexts-graph',
   templateUrl: './contexts-graph.component.html',
   styleUrls: ['./contexts-graph.component.scss']
 })
-export class ContextsGraphComponent implements OnInit {
+export class ContextsGraphComponent implements OnInit, OnDestroy {
   destroy = new Subject();
 
   @Input() scenario: ScenarioVersionExtended;
@@ -289,7 +289,7 @@ export class ContextsGraphComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

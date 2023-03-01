@@ -31,7 +31,7 @@ import { ScenarioConceptionService } from './scenario-conception-service.service
 type Draggable = { data: number };
 
 @Component({
-  selector: 'scenario-conception-item',
+  selector: 'tock-scenario-conception-item',
   templateUrl: './scenario-conception-item.component.html',
   styleUrls: ['./scenario-conception-item.component.scss']
 })
@@ -474,7 +474,7 @@ export class ScenarioConceptionItemComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

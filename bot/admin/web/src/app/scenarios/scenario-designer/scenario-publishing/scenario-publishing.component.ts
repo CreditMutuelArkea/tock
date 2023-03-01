@@ -29,7 +29,7 @@ import { ScenarioService } from '../../services';
 import { ScenarioDesignerService } from '../scenario-designer.service';
 
 @Component({
-  selector: 'scenario-publishing',
+  selector: 'tock-scenario-publishing',
   templateUrl: './scenario-publishing.component.html',
   styleUrls: ['./scenario-publishing.component.scss']
 })
@@ -535,7 +535,7 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

@@ -42,7 +42,7 @@ export class ScenarioImportComponent {
   isImportSubmitted: boolean = false;
   loading: boolean = false;
   importForm: FormGroup = new FormGroup({
-    filesSources: new FormControl(
+    filesSources: new FormControl<File[]>(
       [],
       [Validators.required, FileValidators.mimeTypeSupported(['application/json'])],
       [this.checkFilesFormat()]
@@ -105,8 +105,8 @@ export class ScenarioImportComponent {
           try {
             let scenarioGroup: ScenarioGroupImport = JSON.parse(result.data);
 
-            // backward compatibility : import of old scenarios export format
             if (scenarioGroup.name && scenarioGroup['data']?.scenarioItems) {
+              // backward compatibility : import of old scenarios export format
               console.log('BACKWARD COMPATIBILITY IMPORT');
               type LegacyScenarioFormat = ScenarioGroupImport & { data: any };
               const scenarioGroupCopy = deepCopy(scenarioGroup) as LegacyScenarioFormat;
@@ -124,9 +124,8 @@ export class ScenarioImportComponent {
                   }
                 ]
               };
-            }
-            // backward compatibility end
-            else if (scenarioGroup.name && scenarioGroup.versions?.length) {
+              // backward compatibility end
+            } else if (scenarioGroup.name && scenarioGroup.versions?.length) {
               scenarioGroup.versions.forEach((scenarioVersion: ScenarioVersion) => {
                 if (!scenarioVersion.data?.scenarioItems || !scenarioVersion.data?.mode) {
                   filesNameWithWrongFormat.push(result.fileName);
@@ -174,8 +173,8 @@ export class ScenarioImportComponent {
 
   nameConflictForm: FormGroup = new FormGroup(
     {
-      addOrChangeName: new FormControl(null, Validators.required),
-      newGroupName: new FormControl('', this.isGroupNameUnic.bind(this))
+      addOrChangeName: new FormControl<boolean>(null, Validators.required),
+      newGroupName: new FormControl<string>('', this.isGroupNameUnic.bind(this))
     },
     {
       validators: [this.newGroupNameValidation]

@@ -15,7 +15,7 @@ export class ScenarioExportComponent {
   @Output() onClose = new EventEmitter<boolean>();
 
   form: FormGroup = new FormGroup({
-    allOrCurrentOnly: new FormControl('one')
+    allOrCurrentOnly: new FormControl<'all' | 'one'>('one')
   });
 
   constructor(protected state: StateService, private scenarioService: ScenarioService) {}

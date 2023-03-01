@@ -17,7 +17,7 @@ export class TriggerCreateComponent {
   isSubmitted: boolean = false;
 
   form: FormGroup = new FormGroup({
-    trigger: new FormControl(undefined, [
+    trigger: new FormControl<string>(undefined, [
       Validators.required,
       Validators.minLength(5),
       this.isAlreadyPresentInTriggerList(),

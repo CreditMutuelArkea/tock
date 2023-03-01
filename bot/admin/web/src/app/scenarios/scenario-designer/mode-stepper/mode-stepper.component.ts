@@ -6,7 +6,7 @@ import { isStepValid } from '../../commons/scenario-validation';
 import { ScenarioVersion, SCENARIO_MODE } from '../../models';
 
 @Component({
-  selector: 'scenario-mode-stepper',
+  selector: 'tock-scenario-mode-stepper',
   templateUrl: './mode-stepper.component.html',
   styleUrls: ['./mode-stepper.component.scss']
 })

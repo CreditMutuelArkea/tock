@@ -30,7 +30,7 @@ import { ContextCreateComponent } from '../../../scenario-conception/context-cre
 import { SentenceExtended, TempSentenceExtended } from '../intent-edit.component';
 
 @Component({
-  selector: 'scenario-sentence-edit',
+  selector: 'tock-scenario-sentence-edit',
   templateUrl: './sentence-edit.component.html',
   styleUrls: ['./sentence-edit.component.scss']
 })
@@ -382,7 +382,7 @@ export class SentenceEditComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.hideTokenMenu();
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }

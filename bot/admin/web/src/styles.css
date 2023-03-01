@@ -17,11 +17,11 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '~material-design-icons-iconfont/dist/material-design-icons.css';
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
 /* Workaround: icon displayed twice */
 nb-icon.material-icons:before {
-    content: "" !important;
+  content: '' !important;
 }
 
 html,
@@ -30,5 +30,5 @@ body {
 }
 body {
   margin: 0;
-  font-family: 'Roboto', sans-serif;
+  font-family: sans-serif;
 }

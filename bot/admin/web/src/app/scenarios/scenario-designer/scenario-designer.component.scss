@@ -1,4 +1,4 @@
-@import '~@nebular/theme/styles/global/_breakpoints.scss';
+@import '@nebular/theme/styles/global/breakpoints';
 
 :host {
   --layout-side-margin: -2.25rem;
@@ -29,15 +29,15 @@ section {
   display: flex;
   flex-direction: column;
 
-  scenario-conception,
-  scenario-production {
+  tock-scenario-conception,
+  tock-scenario-production {
     overflow: hidden;
     margin: 0 var(--layout-side-margin) var(--layout-bottom-margin);
     height: 100%;
   }
 
-  &[data-fullscreen='true'] > scenario-conception,
-  &[data-fullscreen='true'] > scenario-production {
+  &[data-fullscreen='true'] > tock-scenario-conception,
+  &[data-fullscreen='true'] > tock-scenario-production {
     margin: 0 -1rem -1rem;
   }
 }

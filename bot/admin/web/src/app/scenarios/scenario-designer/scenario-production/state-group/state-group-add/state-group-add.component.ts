@@ -6,7 +6,7 @@ import { normalizedSnakeCaseUpper } from '../../../../commons/utils';
 import { ACTION_OR_CONTEXT_NAME_MINLENGTH } from '../../../../models';
 
 @Component({
-  selector: 'scenario-production-state-group-add',
+  selector: 'tock-scenario-production-state-group-add',
   templateUrl: './state-group-add.component.html',
   styleUrls: ['./state-group-add.component.scss']
 })
@@ -17,7 +17,7 @@ export class ScenarioProductionStateGroupAddComponent {
   constructor(private dialogRef: NbDialogRef<ScenarioProductionStateGroupAddComponent>) {}
 
   form: FormGroup = new FormGroup({
-    name: new FormControl(undefined, [
+    name: new FormControl<string>(undefined, [
       Validators.required,
       Validators.minLength(ACTION_OR_CONTEXT_NAME_MINLENGTH),
       this.notUsedName.bind(this)

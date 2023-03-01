@@ -27,8 +27,8 @@ export class ScenariosSettingsComponent implements OnInit, OnDestroy {
   availableStories: StoryDefinitionConfigurationSummary[] = [];
 
   form = new FormGroup({
-    actionRepetitionNumber: new FormControl(2, [Validators.required, Validators.min(0)]),
-    redirectStoryId: new FormControl({ value: null, disabled: false })
+    actionRepetitionNumber: new FormControl<number>(2, [Validators.required, Validators.min(0)]),
+    redirectStoryId: new FormControl<string>({ value: null, disabled: false })
   });
 
   get actionRepetitionNumber(): FormControl {
@@ -70,7 +70,7 @@ export class ScenariosSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
+    this.destroy$.next(true);
     this.destroy$.complete();
   }
 

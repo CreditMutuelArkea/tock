@@ -131,7 +131,7 @@ describe('ScenarioDesignerComponent', () => {
 
   it('should display stepper component', () => {
     const compiled = fixture.debugElement.nativeElement;
-    const stepper = compiled.querySelector('scenario-mode-stepper');
+    const stepper = compiled.querySelector('tock-scenario-mode-stepper');
     expect(stepper).toBeTruthy();
   });
 
@@ -140,14 +140,14 @@ describe('ScenarioDesignerComponent', () => {
     fixture.detectChanges();
 
     let compiled = fixture.debugElement.nativeElement;
-    let stepper = compiled.querySelector('scenario-conception');
+    let stepper = compiled.querySelector('tock-scenario-conception');
     expect(stepper).toBeTruthy();
 
     component.scenarioVersion.data.mode = SCENARIO_MODE.casting;
     fixture.detectChanges();
 
     compiled = fixture.debugElement.nativeElement;
-    stepper = compiled.querySelector('scenario-conception');
+    stepper = compiled.querySelector('tock-scenario-conception');
     expect(stepper).toBeTruthy();
   });
 
@@ -156,7 +156,7 @@ describe('ScenarioDesignerComponent', () => {
     fixture.detectChanges();
 
     let compiled = fixture.debugElement.nativeElement;
-    let stepper = compiled.querySelector('scenario-production');
+    let stepper = compiled.querySelector('tock-scenario-production');
     expect(stepper).toBeTruthy();
   });
 
@@ -165,7 +165,7 @@ describe('ScenarioDesignerComponent', () => {
     fixture.detectChanges();
 
     let compiled = fixture.debugElement.nativeElement;
-    let stepper = compiled.querySelector('scenario-publishing');
+    let stepper = compiled.querySelector('tock-scenario-publishing');
     expect(stepper).toBeTruthy();
   });
 });

@@ -189,7 +189,7 @@
     [position]="elementPosition"
     [isFullscreen]="isFullscreen"
     (onFullscreen)="toggleFullscreen($event)"
-    appMouseWheelListner
+    tockMouseWheelListner
   >
     <div
       class="canvas"
@@ -198,7 +198,7 @@
     >
       <div class="card-row">
         <div class="card-col">
-          <scenario-conception-item
+          <tock-scenario-conception-item
             *ngIf="scenario?.data.scenarioItems.length"
             [isReadonly]="isReadonly"
             [mode]="scenario.data.mode"
@@ -209,7 +209,7 @@
             [avalaibleHandlers]="avalaibleHandlers"
             [availableStories]="availableStories"
             (onSelectElement)="handleSeletedElement($event)"
-          ></scenario-conception-item>
+          ></tock-scenario-conception-item>
         </div>
       </div>
     </div>

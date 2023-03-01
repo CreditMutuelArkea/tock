@@ -1,19 +1,27 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
-import { Observable, of, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { StateService } from '../../../../core-nlp/state.service';
 import { Intent, nameFromQualifiedName } from '../../../../model/nlp';
 import { getScenarioIntentDefinitions, normalizedCamelCase } from '../../../commons/utils';
 import { ScenarioVersion, ScenarioItem } from '../../../models';
 
+interface IntentCreateForm {
+  label: FormControl<string>;
+  name: FormControl<string>;
+  category: FormControl<string>;
+  description: FormControl<string>;
+  primary: FormControl<boolean>;
+}
+
 @Component({
-  selector: 'scenario-intent-create',
+  selector: 'tock-scenario-intent-create',
   templateUrl: './intent-create.component.html',
   styleUrls: ['./intent-create.component.scss']
 })
-export class IntentCreateComponent implements OnInit {
+export class IntentCreateComponent implements OnInit, OnDestroy {
   destroy = new Subject();
 
   @Input() item: ScenarioItem;
@@ -41,7 +49,7 @@ export class IntentCreateComponent implements OnInit {
     this.form.markAsDirty();
   }
 
-  form: FormGroup = new FormGroup({
+  form: FormGroup = new FormGroup<IntentCreateForm>({
     label: new FormControl(undefined, Validators.required),
     name: new FormControl(undefined, [Validators.required, this.isIntentNameUnic.bind(this)]),
     category: new FormControl('scenarios'),
@@ -126,7 +134,7 @@ export class IntentCreateComponent implements OnInit {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next();
+    this.destroy.next(true);
     this.destroy.complete();
   }
 }
