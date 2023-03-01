@@ -20,4 +20,4 @@ jobs:
           cache: maven
           server-id: maven
       - name: Test
-        run:  mvn  --batch-mode --update-snapshots clean install -T 4C
+        run:  mvn  --batch-mode --update-snapshots clean install -Dassembly.skipAssembly=true -T 4C
