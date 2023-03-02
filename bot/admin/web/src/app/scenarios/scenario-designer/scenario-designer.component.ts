@@ -196,7 +196,10 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
           this.state.currentApplication.name,
           this.state.currentLocale,
           0,
-          10000
+          10000,
+          undefined,
+          undefined,
+          false
         )
       )
       .pipe(take(1))

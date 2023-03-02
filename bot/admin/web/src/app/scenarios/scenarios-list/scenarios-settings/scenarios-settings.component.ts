@@ -103,7 +103,10 @@ export class ScenariosSettingsComponent implements OnInit, OnDestroy {
           this.stateService.currentApplication.name,
           this.stateService.currentLocale,
           0,
-          10000
+          10000,
+          undefined,
+          undefined,
+          false
         )
       )
       .pipe(take(1))
