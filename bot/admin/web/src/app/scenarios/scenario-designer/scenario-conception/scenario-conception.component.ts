@@ -125,10 +125,10 @@ export class ScenarioConceptionComponent implements OnInit, OnDestroy {
     this.scenario.data.scenarioItems.forEach((item) => {
       if (item.from == SCENARIO_ITEM_FROM_BOT && item.actionDefinition && item.actionDefinition.trigger === trigger) {
         item.actionDefinition.trigger = null;
-
-        this.removeTriggerTransitionInStateMachine(trigger);
       }
     });
+
+    this.removeTriggerTransitionInStateMachine(trigger);
     this.scenario.data.triggers = this.scenario.data.triggers.filter((tgg) => tgg !== trigger);
   }
 
