@@ -1,9 +1,9 @@
 import { ElementRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { TestingModule } from '@tock/testing';
 import { Subject } from 'rxjs';
-import { MachineState } from '../../../../models';
 
+import { TestingModule } from '../../../../../../testing';
+import { MachineState } from '../../../../models';
 import { ScenarioProductionService } from '../../scenario-production.service';
 import { ScenarioTransitionComponent } from './transition.component';
 

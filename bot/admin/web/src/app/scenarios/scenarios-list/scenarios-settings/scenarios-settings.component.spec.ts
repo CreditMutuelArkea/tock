@@ -11,8 +11,6 @@ import {
   NbToastrService,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbDialogServiceMock, NbToastrServiceMock, StateServiceMock } from '@tock/testing/mockedClass';
 import { of, throwError } from 'rxjs';
 
 import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
@@ -22,6 +20,8 @@ import { ScenarioSettingsService } from '../../services';
 import { ScenariosSettingsComponent } from './scenarios-settings.component';
 import { StateService } from '../../../core-nlp/state.service';
 import { FormControlComponent } from '../../../shared/components';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService, StubNbToastrService, StubStateService } from '../../../../testing/stubs';
 
 const mock: { stories: StoryDefinitionConfigurationSummary[]; settings: ScenarioSettings } = {
   stories: [
@@ -60,10 +60,10 @@ describe('ScenariosSettingsComponent', () => {
       imports: [TestingModule, NbCardModule, NbIconModule, NbInputModule, NbSelectModule, NbSpinnerModule, NbTooltipModule],
       providers: [
         { provide: BotService, useClass: BotServiceMock },
-        { provide: StateService, useClass: StateServiceMock },
+        { provide: StateService, useClass: StubStateService },
         { provide: ScenarioSettingsService, useClass: ScenarioSettingsServiceMock },
-        { provide: NbDialogService, useClass: NbDialogServiceMock },
-        { provide: NbToastrService, useClass: NbToastrServiceMock }
+        { provide: NbDialogService, useClass: StubNbDialogService },
+        { provide: NbToastrService, useClass: StubNbToastrService }
       ]
     }).compileComponents();
   });

@@ -19,8 +19,6 @@ import {
   NbTagModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbDialogServiceMock } from '@tock/testing/mockedClass';
 import { of } from 'rxjs';
 
 import { NlpService } from '../../../nlp-tabs/nlp.service';
@@ -29,6 +27,8 @@ import { FaqManagementEditComponent, FaqTabs } from './faq-management-edit.compo
 import { FormControlComponent } from '../../../shared/components';
 import { FaqDefinitionExtended } from '../faq-management.component';
 import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../../model/nlp';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService } from '../../../../testing/stubs';
 
 const mockSentences: Sentence[] = [
   {
@@ -159,7 +159,7 @@ describe('FaqManagementEditComponent', () => {
       ],
       providers: [
         { provide: StateService, useClass: MockState },
-        { provide: NbDialogService, useClass: NbDialogServiceMock },
+        { provide: NbDialogService, useClass: StubNbDialogService },
         { provide: NlpService, useClass: NlpServiceMock }
       ]
     }).compileComponents();

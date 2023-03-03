@@ -1,10 +1,11 @@
 import { Subject } from 'rxjs';
 
-export class StateServiceMock {
+export class StubStateService {
   currentApplication = {
     namespace: 'namespace/test',
     name: 'test',
-    _id: '1'
+    _id: '1',
+    supportedLocales: ['fr', 'en']
   };
 
   currentLocal = 'fr';
@@ -13,5 +14,9 @@ export class StateServiceMock {
 
   intentIdExistsInOtherApplication() {
     return false;
+  }
+
+  localeName(locale: 'fr' | 'en') {
+    return locale === 'fr' ? 'french' : locale === 'en' ? 'english' : 'unknown locale';
   }
 }

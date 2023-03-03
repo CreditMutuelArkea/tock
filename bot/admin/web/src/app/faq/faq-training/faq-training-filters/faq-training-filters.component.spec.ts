@@ -9,9 +9,9 @@ import {
   NbToggleModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { FaqTrainingFiltersComponent } from './faq-training-filters.component';
+import { TestingModule } from '../../../../testing';
 
 describe('FaqTrainingFiltersComponent', () => {
   let component: FaqTrainingFiltersComponent;

@@ -1,11 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbButtonModule, NbCardModule, NbDialogRef, NbIconModule, NbInputModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
+import { TriggerCreateComponent } from './trigger-create.component';
 import { ScenarioVersionExtended, SCENARIO_MODE, SCENARIO_STATE } from '../../../../scenarios/models';
 import { FormControlComponent } from '../../../../shared/components';
-import { TriggerCreateComponent } from './trigger-create.component';
+import { TestingModule } from '../../../../../testing';
 
 const scenarioVersion: ScenarioVersionExtended = {
   state: SCENARIO_STATE.draft,

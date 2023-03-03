@@ -16,8 +16,6 @@ import {
   NbToggleModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbDialogServiceMock, StateServiceMock } from '@tock/testing/mockedClass';
 
 import { ScenarioListSimpleComponent } from './scenario-list-simple.component';
 import { ScenarioService } from '../../services';
@@ -26,6 +24,8 @@ import { StateService } from '../../../core-nlp/state.service';
 import { ScenarioDesignerComponent } from '../../scenario-designer/scenario-designer.component';
 import { ScenariosListComponent } from '../scenarios-list.component';
 import { SpyOnCustomMatchers } from '../../../../testing/matchers/custom-matchers';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService, StubStateService } from '../../../../testing/stubs';
 
 const mockScenariosGroups: ScenarioGroupExtended[] = [
   {
@@ -33,6 +33,7 @@ const mockScenariosGroups: ScenarioGroupExtended[] = [
     name: 'scenario 1',
     tags: [],
     enabled: true,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's1v1',
@@ -61,6 +62,7 @@ const mockScenariosGroups: ScenarioGroupExtended[] = [
     name: 'scenario 2',
     tags: [],
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's2v1',
@@ -79,6 +81,7 @@ const mockScenariosGroups: ScenarioGroupExtended[] = [
     name: 'scenario 3',
     tags: [],
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's3v1',
@@ -102,6 +105,7 @@ const mockScenariosGroups: ScenarioGroupExtended[] = [
     name: 'scenario 4',
     tags: [],
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's4v1',
@@ -115,6 +119,7 @@ const mockScenariosGroups: ScenarioGroupExtended[] = [
     name: 'scenario 5',
     tags: [],
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's5v1',
@@ -152,8 +157,8 @@ describe('ScenarioListSimpleComponent', () => {
           provide: ScenarioService,
           useValue: { redirectToDesigner: () => {}, patchScenarioGroupState: () => {} }
         },
-        { provide: StateService, useClass: StateServiceMock },
-        { provide: NbDialogService, useClass: NbDialogServiceMock }
+        { provide: StateService, useClass: StubStateService },
+        { provide: NbDialogService, useClass: StubNbDialogService }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

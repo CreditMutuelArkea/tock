@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NbIconModule, NbTooltipModule } from '@nebular/theme';
 
 import { ScenarioCanvasWrapperComponent } from './scenario-canvas-wrapper.component';
+import { TestingModule } from '../../../../testing';
 
 describe('ScenarioCanvasWrapperComponent', () => {
   let component: ScenarioCanvasWrapperComponent;
@@ -8,9 +10,9 @@ describe('ScenarioCanvasWrapperComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ScenarioCanvasWrapperComponent ]
-    })
-    .compileComponents();
+      declarations: [ScenarioCanvasWrapperComponent],
+      imports: [TestingModule, NbIconModule, NbTooltipModule]
+    }).compileComponents();
   });
 
   beforeEach(() => {

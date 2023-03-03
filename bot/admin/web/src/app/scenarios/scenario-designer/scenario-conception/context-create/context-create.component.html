@@ -26,6 +26,7 @@
         [hasMargin]="false"
       >
         <input
+          tockAutofocusElement
           nbInput
           formControlName="name"
           fullWidth
@@ -33,7 +34,6 @@
           type="text"
           placeholder="Enter new context name"
           (blur)="formatContextName()"
-          autofocusElement
           data-testid="name"
         />
       </tock-form-control>

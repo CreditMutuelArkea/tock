@@ -2,9 +2,9 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbDialogRef } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { ContextCreateComponent } from './context-create.component';
+import { TestingModule } from '../../../../../testing';
 
 describe('ContextCreateComponent', () => {
   let component: ContextCreateComponent;

@@ -1,10 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbButtonModule, NbCardModule, NbDialogRef, NbIconModule, NbInputModule, NbToggleModule, NbTooltipModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
-import { StateService } from '../../../../core-nlp/state.service';
-import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE } from '../../../models';
 import { IntentEditComponent } from './intent-edit.component';
+import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE } from '../../../models';
+import { StateService } from '../../../../core-nlp/state.service';
+import { TestingModule } from '../../../../../testing';
 
 const scenario = {
   id: '62fcbb7ae4d25c16a44071a1',

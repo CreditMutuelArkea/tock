@@ -2,9 +2,9 @@ import { SimpleChange } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbCardModule, NbDialogRef, NbIconModule, NbSelectModule, NbToastrModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { JsonPreviewerComponent } from './json-previewer.component';
+import { TestingModule } from '../../../../testing';
 
 describe('JsonPreviewerComponent', () => {
   let component: JsonPreviewerComponent;
@@ -71,7 +71,7 @@ describe('JsonPreviewerComponent', () => {
     ];
 
     stringsToTest.forEach((s, i) => {
-      const stringReplaced = component['replaceCharactersByHtmlCode'](s); // access to private method
+      const stringReplaced = component['replaceCharactersByHtmlCode'](s);
 
       expect(stringReplaced).toEqual(expectedResult[i]);
     });

@@ -116,6 +116,7 @@ export class ScenarioImportComponent {
                 category: scenarioGroupCopy.category,
                 tags: scenarioGroupCopy.tags,
                 enabled: scenarioGroupCopy.enabled,
+                unknownAnswerId: '',
                 versions: [
                   {
                     data: scenarioGroupCopy.data,
@@ -126,6 +127,8 @@ export class ScenarioImportComponent {
               };
               // backward compatibility end
             } else if (scenarioGroup.name && scenarioGroup.versions?.length) {
+              if (!scenarioGroup.unknownAnswerId) scenarioGroup.unknownAnswerId = '';
+
               scenarioGroup.versions.forEach((scenarioVersion: ScenarioVersion) => {
                 if (!scenarioVersion.data?.scenarioItems || !scenarioVersion.data?.mode) {
                   filesNameWithWrongFormat.push(result.fileName);

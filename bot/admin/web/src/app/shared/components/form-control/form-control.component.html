@@ -5,7 +5,7 @@
 >
   <label
     *ngIf="label"
-    [ngClass]="{ 'font-weight-bold': boldLabel, 'text-mitigated': true, required: required, hasError: showError && !!controls.errors }"
+    [ngClass]="{ 'font-weight-bold': boldLabel, 'text-mitigated': true, required: required, hasError: showError && controls.invalid }"
     [for]="name"
     data-testid="label"
   >
