@@ -17,7 +17,6 @@
 package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.HandlerNamespace
-import ai.tock.bot.admin.BotAdminService
 import ai.tock.bot.admin.mapper.ScenarioExceptionManager
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioActionHandlerResponse
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioGroup
@@ -27,19 +26,15 @@ import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioVersionResponse
 import ai.tock.bot.admin.model.scenario.*
 import ai.tock.bot.admin.service.ScenarioService
 import ai.tock.bot.handler.ActionHandlersRepository
-import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole.*
 import ai.tock.shared.vertx.WebVerticle
 import io.vertx.ext.web.RoutingContext
-import mu.KLogger
-import mu.KotlinLogging
 
 /**
  * ScenarioVerticle contains all the routes and actions associated with the scenarios
  */
-open class ScenarioVerticle {
+open class ScenarioVerticle : AbstractServerVerticle(){
 
-    private val logger: KLogger = KotlinLogging.logger {}
     //private val ScenarioServiceImpl: ScenarioServiceImpl by injector.instance()
 
     private val botId = "botId"
@@ -306,25 +301,5 @@ open class ScenarioVerticle {
             ScenarioService.deleteOneScenarioVersion(getNamespace(context), botId, groupId, versionId)
         }
     }
-
-    /**
-     * Check the bot configuration.
-     * Throws [BadRequestException] if there is not a bot found.
-     * @param context : the vertx routing context
-     * @param botId : id of the bot
-     */
-    private fun checkBotConfiguration(context: RoutingContext, botId: String) {
-        val namespace = getNamespace(context)
-        val botConfiguration = BotAdminService.getBotConfigurationsByNamespaceAndBotId(namespace, botId).firstOrNull()
-        botConfiguration ?: WebVerticle.badRequest("No bot configuration is defined yet")
-    }
-
-    /**
-     * Get the namespace from the context
-     * @param context : the vertx routing context
-     */
-    private fun getNamespace(context: RoutingContext) = (context.user() as TockUser).namespace
-
-    private fun RoutingContext.setResponseStatusCode(statusCode: Int) { response().statusCode = statusCode }
 
 }

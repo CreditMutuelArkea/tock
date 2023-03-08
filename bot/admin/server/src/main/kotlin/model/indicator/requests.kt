@@ -46,9 +46,8 @@ data class SaveIndicatorRequest(
 ) : BaseIndicatorRequest(label, description, dimensions, values) {
     override fun validate(): List<String> {
         val errors = mutableListOf<String>()
-        if (name.isBlank()) errors.add("Indicator's ame is required")
+        if (name.isBlank()) errors.add("Indicator's name is required")
         if (label.isBlank()) errors.add("Indicator's label is required")
-
         return (super.validate() + errors)
     }
 

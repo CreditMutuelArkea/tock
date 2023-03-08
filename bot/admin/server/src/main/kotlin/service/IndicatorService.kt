@@ -21,7 +21,11 @@ import ai.tock.bot.admin.indicators.IndicatorDAO
 import ai.tock.bot.admin.indicators.IndicatorError
 import ai.tock.bot.admin.indicators.IndicatorValue
 import ai.tock.bot.admin.model.Valid
-import ai.tock.bot.admin.model.indicator.*
+import ai.tock.bot.admin.model.indicator.IndicatorResponse
+import ai.tock.bot.admin.model.indicator.SaveIndicatorRequest
+import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
+import ai.tock.bot.admin.model.indicator.toIndicator
+import ai.tock.bot.admin.model.indicator.toResponse
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
 import org.litote.kmongo.toId

@@ -23,54 +23,59 @@ import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
 import ai.tock.bot.admin.service.IndicatorService
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
-
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.ext.web.RoutingContext
-import org.litote.kmongo.Id
 
-class IndicatorVerticle {
+class IndicatorVerticle : AbstractServerVerticle() {
 
     companion object {
-        const val PATH_PARAM_APPLICATION_ID = "applicationId"
+        const val PATH_PARAM_APPLICATION_NAME = "applicationName"
         const val PATH_PARAM_NAME = "name"
         const val PATH_PARAM_ID = "id"
         const val BASE_PATH = "/indicator"
-        const val SAVE_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_ID"
-        const val GET_BY_NAME = "$BASE_PATH/:$PATH_PARAM_APPLICATION_ID/:$PATH_PARAM_NAME"
+        const val SAVE_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME"
+        const val GET_BY_NAME = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME/:$PATH_PARAM_NAME"
         const val DELETE_PATH = "$BASE_PATH/:$PATH_PARAM_ID"
     }
 
     private val front = FrontClient
 
     fun configure(webVerticle: WebVerticle) {
-
         val authorizedRoles = setOf(TockUserRole.botUser, TockUserRole.admin, TockUserRole.technicalAdmin)
 
         with(webVerticle) {
 
-            val getApplicationById = { id: Id<ApplicationDefinition> -> front.getApplicationById(id)}
+            val currentContextApp: (RoutingContext) -> ApplicationDefinition? =
+                { context ->
+                    front.getApplicationByNamespaceAndName(
+                        getNamespace(context),
+                        context.pathParam(PATH_PARAM_APPLICATION_NAME)
+                    )
+                }
 
             blockingJsonPost(SAVE_PATH, authorizedRoles) { context: RoutingContext, request: SaveIndicatorRequest ->
-                checkNamespaceAndExecute(context, getApplicationById) {
+                checkNamespaceAndExecute(context, currentContextApp) {
                     tryExecute(context) {
                         IndicatorService.save(it.name, Valid(request))
                     }
                 }
+                return@blockingJsonPost request
             }
 
             blockingJsonPut(GET_BY_NAME, authorizedRoles) { context: RoutingContext, request: UpdateIndicatorRequest ->
-                checkNamespaceAndExecute(context,getApplicationById) {
+                checkNamespaceAndExecute(context, currentContextApp) {
                     val name = context.path(PATH_PARAM_NAME)
                     tryExecute(context) {
-                        IndicatorService.update( it.name, name, Valid(request))
+                        IndicatorService.update(it.name, name, Valid(request))
                     }
                 }
+                return@blockingJsonPut request
             }
 
             blockingJsonGet(GET_BY_NAME, authorizedRoles) { context ->
-                checkNamespaceAndExecute(context,getApplicationById) {
+                checkNamespaceAndExecute(context, currentContextApp) {
                     val name = context.path(PATH_PARAM_NAME)
                     tryExecute(context) {
                         IndicatorService.findByNameAndBotId(name, it.name)
@@ -79,7 +84,7 @@ class IndicatorVerticle {
             }
 
             blockingJsonGet(SAVE_PATH, authorizedRoles) { context: RoutingContext ->
-                checkNamespaceAndExecute(context, getApplicationById) {
+                checkNamespaceAndExecute(context, currentContextApp) {
                     tryExecute(context) {
                         IndicatorService.findAllByBotId(it.name)
                     }
@@ -100,19 +105,22 @@ class IndicatorVerticle {
     }
 }
 
-private fun <T> WebVerticle.checkNamespaceAndExecute(context: RoutingContext, applicationDefinition: (Id<ApplicationDefinition>) -> ApplicationDefinition?, block: (ApplicationDefinition) -> T): T? =
-    context.pathId<ApplicationDefinition>(IndicatorVerticle.PATH_PARAM_APPLICATION_ID).let {id->
-        applicationDefinition.invoke(id)?.let {
-            if (context.organization == it.namespace) {
-                block.invoke(it)
-            } else {
-                WebVerticle.unauthorized()
-            }
-        }
+private fun <T> WebVerticle.checkNamespaceAndExecute(
+    context: RoutingContext,
+    applicationDefinition: (RoutingContext) -> ApplicationDefinition?,
+    block: (ApplicationDefinition) -> T
+): T? {
+    val appFound = applicationDefinition.invoke(context)
+    return if (context.organization == appFound?.namespace) {
+        block.invoke(appFound)
+    } else {
+        WebVerticle.unauthorized()
     }
+}
 
 data class ErrorMessage(val message: String? = "Unexpected error occurred")
-private fun <T> tryExecute(context: RoutingContext, block: () -> T) : T? {
+
+private fun <T> tryExecute(context: RoutingContext, block: () -> T): T? {
     return try {
         block.invoke()
     } catch (e: Exception) {
@@ -126,6 +134,6 @@ private fun <T> tryExecute(context: RoutingContext, block: () -> T) : T? {
             .setStatusCode(statusCode)
             .end(ObjectMapper().writeValueAsString(ErrorMessage(e.message)))
 
-         null
+        null
     }
 }
