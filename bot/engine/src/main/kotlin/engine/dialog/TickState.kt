@@ -28,5 +28,5 @@ data class TickState(
     val init: Instant,
     val unknownHandlingStep: UnknownHandlingStep?,
     val handlingStep: TickActionHandlingStep?,
-    val finished : Boolean
+    val finished : Boolean = false
 )

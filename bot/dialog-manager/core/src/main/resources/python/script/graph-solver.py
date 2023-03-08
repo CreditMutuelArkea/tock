@@ -62,14 +62,14 @@ def solve_graph_asp(graph, priorities):
     return solutions
 
 # FIXME (WITH DERCBOT-321)
-# debugEnabled, save_graph_asp, pythonLogPath, png
+# debugEnabled, save_graph_asp, png
 def callClyngor(debugEnabled, current, bot_actions, target:BotAction=None, available_contexts=set(), ran_handlers=set()):
     graph = create_whole_graph_asp(current, bot_actions, target, available_contexts, ran_handlers)
     if debugEnabled:
-        save_graph_asp(graph, pythonLogPath+'/action-graph-full-new.png')
+        save_graph_asp(graph, '/tmp/action-graph-full-new.png')
     graph = reduce_graph_asp(graph)
     if debugEnabled:
-            save_graph_asp(graph, pythonLogPath+'/action-graph-reduced-new.png')
+            save_graph_asp(graph, '/tmp/action-graph-reduced-new.png')
     candidate_uids = solve_graph_asp(graph, {
         'raw_context': 10,
         'branch_length': 8,

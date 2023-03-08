@@ -279,7 +279,7 @@ internal class TockConnectorController constructor(
                 ScenarioDebugResponse("")
             }
             else {
-                val inputStream: InputStream = FileInputStream("/tmp/python/log/action-graph-full-new.png")
+                val inputStream: InputStream = FileInputStream("/tmp/action-graph-full-new.png")
                 val buffer = ByteArray(8192 * 4)
                 var bytesRead: Int
                 val output = ByteArrayOutputStream()

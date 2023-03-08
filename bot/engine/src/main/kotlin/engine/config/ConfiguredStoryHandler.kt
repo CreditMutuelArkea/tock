@@ -122,13 +122,10 @@ internal class ConfiguredStoryHandler(
         // When sending the answer, a redirection (switch to another type of story) can be performed
         answerContainer.send(bus)
 
-        // check if the current story handled by the bot is a TickStory
-        val isCurrentTickStory = bus.story.definition is TickStoryDefinition
-
-        switchStoryIfEnding(null, bus, isCurrentTickStory)
+        // switch to ending story if it exists
+        switchStoryIfEnding(null, bus)
 
         // Restrict next intents if defined in story settings:
-
         if (configuration.nextIntentsQualifiers.isNotEmpty()) {
             val nextIntentsQualifiers: MutableList<NlpIntentQualifier> = configuration.nextIntentsQualifiers.toMutableList()
 
@@ -177,14 +174,30 @@ internal class ConfiguredStoryHandler(
     private fun switchStoryIfEnding(
         step: StoryDefinitionConfigurationStep?,
         bus: BotBus,
-        isCurrentTickStory: Boolean  = false
     ) {
+        val storyDefinition = bus.story.definition
 
-        if (!isCurrentTickStory && (!isMissingMandatoryEntities(bus) && bus.story.definition.steps.isEmpty() || step?.hasNoChildren == true)
-            || (isCurrentTickStory && bus.dialog.tickStates[bus.story.definition.id]?.finished == true)) {
-            configuration.findEnabledEndWithStoryId(bus.applicationId)
-                ?.let { bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
+        // Check story type
+        val isTickStory = when(storyDefinition){
+            is ConfiguredStoryDefinition -> this.configuration.isTickAnswerType()
+            else -> false
+        }
+
+        // Check if ready to switch
+        val readyToSwitch = if(!isTickStory) {
+            !isMissingMandatoryEntities(bus) && storyDefinition.steps.isEmpty() || step?.hasNoChildren == true
+        }else{
+            bus.dialog.tickStates[storyDefinition.id]?.finished
+        }
+
+        // Switch to story if ending rule exists and is enabled, and if story exists
+        if (readyToSwitch == true) {
+            configuration
+                .findEnabledEndWithStoryId(bus.applicationId)
                 ?.let {
+                    bus.botDefinition.findStoryDefinitionById(it, bus.applicationId) }
+                ?.let {
+                    logger.debug { "Switch to ending story ${it.id} (intent: ${it.mainIntent()}) " }
                     bus.switchConfiguredStory(it, it.mainIntent().name)
                 }
         }
