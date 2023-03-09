@@ -490,7 +490,7 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
 
     const actionsDefinitions = deepCopy(getScenarioActionDefinitions(this.scenario));
 
-    // If an action refers to a targetStory, we delete all that concerns the unknown answers
+    // If an action refers to a targetStory, we delete everything concerning unknown answers
     actionsDefinitions.forEach((actionDef) => {
       if (actionDef.targetStory) {
         delete actionDef.unknownAnswerId;
