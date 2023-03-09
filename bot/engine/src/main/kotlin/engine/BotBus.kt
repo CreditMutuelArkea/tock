@@ -430,7 +430,7 @@ interface BotBus : Bus<BotBus> {
      * Switches the context to the specified story definition (start a new [Story]).
      */
     fun switchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent()) {
-        logger.debug { "Switch to new story ${storyDefinition.id} (intent: ${storyDefinition.mainIntent()}) " }
+        logger.debug { "Switch to new story ${storyDefinition.id} (intent: ${storyDefinition.mainIntent()})" }
         story = Story(storyDefinition, starterIntent, story.step)
         hasCurrentSwitchStoryProcess = true
         story.computeCurrentStep(userTimeline, currentDialog, action, starterIntent)
