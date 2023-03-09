@@ -21,7 +21,6 @@ import ai.tock.nlp.front.ioc.FrontIoc
 import ai.tock.shared.vertx.vertx
 import com.github.salomonbrys.kodein.Kodein
 
-
 fun main() {
     startAdminServer()
 }

@@ -16,7 +16,7 @@
 
 package ai.tock.bot
 
-import ai.tock.bot.bean.TickStory
+import ai.tock.bot.bean.TickStoryQuery
 import ai.tock.bot.statemachine.State
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
@@ -24,7 +24,7 @@ import java.io.File
 
 abstract class DialogManagerTest {
 
-    fun getTickStoryFromFile(group: String, fileName: String): TickStory {
+    fun getTickStoryFromFile(group: String, fileName: String): TickStoryQuery {
         return getFileFromJson("src/test/resources/tickstory/$group/$fileName.json")
     }
 
@@ -32,7 +32,7 @@ abstract class DialogManagerTest {
         return getFileFromJson("src/test/resources/statemachine/$fileName.json")
     }
 
-    private inline fun  <reified T> getFileFromJson(fileName: String): T {
-        return Json.decodeFromStream<T>(File(fileName).inputStream())
+    private inline fun  <reified T> getFileFromJson(filePath: String): T {
+        return Json.decodeFromStream(File(filePath).inputStream())
     }
 }

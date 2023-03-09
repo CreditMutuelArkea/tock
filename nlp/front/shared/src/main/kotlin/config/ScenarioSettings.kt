@@ -20,40 +20,23 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.time.Instant
 
+/**
+ * A scenario settings
+ *
+ * @param _id : The unique [Id] of the settings.
+ * @param applicationId : The application id.
+ * @param actionRepetitionNumber : The number of authorized repetition of an action.
+ * @param redirectStoryId : The story's id to redirect to when the actionRepetitionNumber is exceeded.
+ * @param creationDate : Settings creation date
+ * @param updateDate : Settings update date
+ */
 data class ScenarioSettings (
-
-    /**
-     * The unique [Id] of the settings.
-     */
     val _id: Id<ScenarioSettings> = newId(),
-
-    /**
-     * The application id.
-     */
     val applicationId: Id<ApplicationDefinition>,
-
-    /**
-     * The number of authorized repetition of an action.
-     */
     val actionRepetitionNumber: Int,
-
-    /**
-     * The story's id to redirect to when the actionRepetitionNumber is exceeded.
-     */
     val redirectStoryId: String?=  null,
-
-    /**
-     * Settings creation date
-     */
     val creationDate: Instant,
-
-    /**
-     * Settings update date
-     */
-    val updateDate: Instant,
-
-    ) {
-    fun toScenarioSettingsQuery(): ScenarioSettingsQuery{
-        return ScenarioSettingsQuery(actionRepetitionNumber, redirectStoryId)
-    }
+    val updateDate: Instant
+) {
+    fun toScenarioSettingsQuery() = ScenarioSettingsQuery(actionRepetitionNumber, redirectStoryId)
 }

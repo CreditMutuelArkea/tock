@@ -20,13 +20,16 @@ import ai.tock.bot.bean.TickActionHandlingStep
 import ai.tock.bot.bean.UnknownHandlingStep
 import java.time.Instant
 
+/**
+ * A tick state saved at [Dialog]
+ */
 data class TickState(
     val currentState: String,
-    val contexts: Map<String, String?>,
-    val ranHandlers: List<String>,
-    val objectivesStack: List<String>,
-    val init: Instant,
-    val unknownHandlingStep: UnknownHandlingStep?,
-    val handlingStep: TickActionHandlingStep?,
-    val finished : Boolean
+    val contexts: Map<String, String?> = emptyMap(),
+    val ranHandlers: List<String> = emptyList(),
+    val objectivesStack: List<String> = emptyList(),
+    val initDate: Instant,
+    val unknownHandlingStep: UnknownHandlingStep? = null,
+    val lastExecutedAction: TickActionHandlingStep? = null,
+    val finished : Boolean = false
 )

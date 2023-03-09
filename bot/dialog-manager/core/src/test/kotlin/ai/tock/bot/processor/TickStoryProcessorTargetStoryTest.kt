@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class TickStoryProcessorTest {
+class TickStoryProcessorTargetStoryTest {
     init {
         System.setProperty("tock_bot_dialog_manager_debug_enabled", "false")
     }
@@ -94,6 +94,7 @@ class TickStoryProcessorTest {
         handler = "dev-tools:set_context_3",
         inputContextNames = setOf(contextJeNeVeuxPasJouer).map { it.name }.toSet(),
         outputContextNames = setOf(contextDev3).map { it.name }.toSet(),
+        targetStory = "targetStory"
     )
 
     private val actionTantMieux = TickAction(
@@ -144,14 +145,20 @@ class TickStoryProcessorTest {
     private val tickSender = mockk<TickSender>()
 
     @Test
-    fun `process when user intent is intentBonjourRobot then process should success and sender send actionBonjourAanswerId then actionVeuxTuJouerAnswerId then end with actionTicTacToeAnswerId`() {
+    fun `process when user intent is "non" then sender send actionTantMieuxAnswerId and processor redirect to target story`() {
 
         val sendAnswersCaptured = mutableListOf<String>()
         val endAnswersCaptured = mutableListOf<String>()
 
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
-                session = TickSession(),
+                session = TickSession(
+                    currentState = stateTicTacToe.id,
+                    contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
+                    ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
+                    objectivesStack = listOf(stateAurevoir.id),
+                    lastExecutedAction = TickActionHandlingStep(1, actionTicTacToe.name)
+                ),
                 configuration = tickConfigBonjourRobot,
                 sender = tickSender,
                 endingStoryRuleExists = false
@@ -164,31 +171,27 @@ class TickStoryProcessorTest {
         }
 
         val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentBonjourRobot))
+            it!!.process(TickUserAction(intentNon))
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assert(it is Success)
+            assert(it is Redirect)
 
-            assertEquals(2, sendAnswersCaptured.size)
-            assertEquals(1, endAnswersCaptured.size)
+            assertEquals(actionTantPis.targetStory, (it as Redirect).storyId)
 
-            verify(exactly = 1) { tickSender.sendById(actionBonjour.answerId!!) }
-            verify(exactly = 1) { tickSender.sendById(actionVeuxTuJouer.answerId!!) }
-            verify(exactly = 1) { tickSender.endById(actionTicTacToe.answerId!!) }
+            assertEquals(1, sendAnswersCaptured.size)
+            assertEquals(0, endAnswersCaptured.size)
 
-            verifyOrder {
-                tickSender.sendById(actionBonjour.answerId!!)
-                tickSender.sendById(actionVeuxTuJouer.answerId!!)
-                tickSender.endById(actionTicTacToe.answerId!!)
-            }
+            verify(exactly = 1) { tickSender.sendById(actionTantPis.answerId!!) }
+            verify(exactly = 0) { tickSender.endById(any()) }
+            verify(exactly = 0) { tickSender.end() }
         }
 
         TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 1")
             .given(
                 setOf(
-                    "user intent is intentBonjourRobot"
+                    "user intent is intentNon"
                 ), produceProcessor)
             .and(
                 setOf(
@@ -200,150 +203,12 @@ class TickStoryProcessorTest {
                 ), processCall)
             .then(
                 setOf(
-                "process should success",
-                "sender send actionBonjour.answerId",
-                "then send actionVeuxTuJouer.answerId",
-                "then end with actionTicTacToe.answerId",
-                ), checkResult)
-            .run()
-    }
-
-    @Test
-    fun `process when user intent is oui then process should success and sender send actionTantMieuxAnswerId then end with actionAurevoirAnswerId`() {
-
-        val sendAnswersCaptured = mutableListOf<String>()
-        val endAnswersCaptured = mutableListOf<String>()
-
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session = TickSession(
-                    currentState = stateTicTacToe.id,
-                    contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
-                    ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
-                    objectivesStack = listOf(stateAurevoir.id),
-                    lastExecutedAction = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
-                configuration = tickConfigBonjourRobot,
-                sender = tickSender,
-                endingStoryRuleExists = false
-            )
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { tickSender.sendById(capture(sendAnswersCaptured)) } answers {}
-            every { tickSender.endById(capture(endAnswersCaptured)) } answers {}
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentOui))
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-            assertNotNull(it)
-            assert(it is Success)
-
-            assertEquals(1, sendAnswersCaptured.size)
-            assertEquals(1, endAnswersCaptured.size)
-
-            verify(exactly = 1) { tickSender.sendById(actionTantMieux.answerId!!) }
-            verify(exactly = 1) { tickSender.endById(actionAurevoir.answerId!!) }
-
-            verifyOrder {
-                tickSender.sendById(actionTantMieux.answerId!!)
-                tickSender.endById(actionAurevoir.answerId!!)
-            }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 2")
-            .given(
-                setOf(
-                    "user intent is intentOui"
-                ), produceProcessor)
-            .and(
-                setOf(
-                    "sender is mocked and messages are captured",
-                ), mockBehaviours)
-            .`when`(
-                setOf(
-                    "process method is called"
-                ), processCall)
-            .then(
-                setOf(
-                    "process should success",
                     "sender send actionTantMieux.answerId",
-                    "then sender end with actionAurevoir.answerId"
+                    "sender does not end with any message (empty or not)",
+                    "processor should redirect to actionTantPis.targetStory",
                 ), checkResult)
             .run()
     }
 
-    @Test
-    fun `process when user intent is oui and final action has no answer then process should success and sender send actionTantMieuxAnswerId then end with emtpy message`() {
-
-        val sendAnswersCaptured = mutableListOf<String>()
-
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session = TickSession(
-                    currentState = stateTicTacToe.id,
-                    contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
-                    ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
-                    objectivesStack = listOf(stateAurevoir.id),
-                    lastExecutedAction = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
-                configuration = tickConfigBonjourRobot.copy(actions = tickConfigBonjourRobot.actions.map {
-                    if(it.final){
-                        it.copy(answerId = null)
-                    } else {
-                        it
-                    }
-                }.toSet()),
-                sender = tickSender,
-                endingStoryRuleExists = false
-            )
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { tickSender.sendById(capture(sendAnswersCaptured)) } answers {}
-            every { tickSender.end() } answers {}
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentOui))
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-            assertNotNull(it)
-            assert(it is Success)
-
-            assertEquals(1, sendAnswersCaptured.size)
-
-            verify(exactly = 1) { tickSender.sendById(actionTantMieux.answerId!!) }
-            verify(exactly = 1) { tickSender.end() }
-
-            verifyOrder {
-                tickSender.sendById(actionTantMieux.answerId!!)
-                tickSender.end()
-            }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 3")
-            .given(
-                setOf(
-                    "user intent is intentOui"
-                ), produceProcessor)
-            .and(
-                setOf(
-                    "sender is mocked and messages are captured",
-                ), mockBehaviours)
-            .`when`(
-                setOf(
-                    "process method is called"
-                ), processCall)
-            .then(
-                setOf(
-                    "process should success",
-                    "sender send answerId",
-                    "end with emtpy message",
-                ), checkResult)
-            .run()
-    }
 
 }

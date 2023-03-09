@@ -16,4 +16,4 @@
 
 package ai.tock.shared.exception.error
 
-data class ErrorMessage(val code: String = "000", val message: String)
+data class ErrorMessage(val code: String? = null, val message: String)

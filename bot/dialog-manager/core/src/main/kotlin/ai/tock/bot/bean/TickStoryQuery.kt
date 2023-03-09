@@ -21,10 +21,25 @@ import ai.tock.bot.statemachine.State
 import java.util.TreeSet
 
 /**
- * The tick story
+ * The tick story query, corresponding on published scenario version
+ * 
+ * @param id technical story identifier (mongodb's _id)
+ * @param botId the botId
+ * @param storyId functional story identifier (equals to scenario group id)
+ * @param name story name
+ * @param description story description
+ * @param stateMachine state machine
+ * @param mainIntent main intent
+ * @param primaryIntents set of primary intents
+ * @param secondaryIntents set of secondary intents
+ * @param triggers set of triggers (events)
+ * @param contexts set of contexts
+ * @param actions set of tick actions [TickContext]
+ * @param intentsContexts set of tick intents [TickIntent]
+ * @param unknownAnswerConfigs set of unknown answer configuration [UnknownAnswerConfig]
  */
 @kotlinx.serialization.Serializable
-data class TickStory(
+data class TickStoryQuery(
     val id: String? = null,
     val botId: String,
     val storyId: String,
@@ -38,7 +53,6 @@ data class TickStory(
     val contexts: Set<TickContext>,
     val actions: Set<TickAction>,
     val intentsContexts: Set<TickIntent> = emptySet(),
-    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet(),
-    val debug: Boolean = false
+    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet()
 )
 

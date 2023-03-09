@@ -1,5 +1,5 @@
-package ai.tock.bot.connector.iadvize/*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+/*
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,16 @@ package ai.tock.bot.connector.iadvize/*
  * limitations under the License.
  */
 
+package ai.tock.bot.connector.iadvize
+
+import ai.tock.bot.connector.iadvize.model.payload.TextPayload
 import ai.tock.bot.connector.iadvize.model.response.conversation.Duration
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
-import ai.tock.bot.connector.iadvize.model.payload.TextPayload
-import ai.tock.bot.connector.iadvize.model.response.conversation.reply.*
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeAwait
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeClose
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMultipartReply
+import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeTransfer
 import ai.tock.bot.engine.message.Choice
 import ai.tock.bot.engine.message.GenericMessage
 import org.junit.jupiter.api.Test
@@ -48,26 +54,26 @@ class IadvizeConnectorMessageTest {
 
     @Test
     fun `convert await to generic message`() {
-        val m = IadvizeConnectorMessage(await)
-        assertNull(m.toGenericMessage())
+        val message = IadvizeConnectorMessage(await)
+        assertNull(message.toGenericMessage())
     }
 
     @Test
     fun `convert transfer to generic message`() {
-        val m = IadvizeConnectorMessage(transfer)
-        assertNull(m.toGenericMessage())
+        val message = IadvizeConnectorMessage(transfer)
+        assertNull(message.toGenericMessage())
     }
 
     @Test
     fun `convert close to generic message`() {
-        val m = IadvizeConnectorMessage(close)
-        assertNull(m.toGenericMessage())
+        val message = IadvizeConnectorMessage(close)
+        assertNull(message.toGenericMessage())
     }
 
     @Test
     fun `convert message to generic message`() {
-        val m = IadvizeConnectorMessage(message)
-        val e = m.toGenericMessage()
+        val message = IadvizeConnectorMessage(message)
+        val e = message.toGenericMessage()
         assertEquals(
             GenericMessage(
                 iadvizeConnectorType,
@@ -81,8 +87,8 @@ class IadvizeConnectorMessageTest {
 
     @Test
     fun `convert message with quick replies to generic message`() {
-        val m = IadvizeConnectorMessage(messageWithQuickReplies)
-        val e = m.toGenericMessage()
+        val message = IadvizeConnectorMessage(messageWithQuickReplies)
+        val e = message.toGenericMessage()
         assertEquals(
             GenericMessage(
                 iadvizeConnectorType,
@@ -97,8 +103,8 @@ class IadvizeConnectorMessageTest {
 
     @Test
     fun `convert multipart reply to generic message`() {
-        val m = IadvizeConnectorMessage(multipartReply)
-        val e = m.toGenericMessage()
+        val message = IadvizeConnectorMessage(multipartReply)
+        val e = message.toGenericMessage()
         assertEquals(
             GenericMessage(
                 iadvizeConnectorType,

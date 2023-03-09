@@ -1,7 +1,3 @@
-package ai.tock.bot.statemachine
-
-import mu.KotlinLogging
-
 /*
  * Copyright (C) 2017/2022 e-voyageurs technologies
  *
@@ -18,9 +14,13 @@ import mu.KotlinLogging
  * limitations under the License.
  */
 
+package ai.tock.bot.statemachine
+
+import mu.KotlinLogging
 
 /**
- * Class that manages access to the state machine - Implementation of xstate.js.org
+ * Class that manages access to the state machine
+ * Implementation of xstate.js.org
  */
 class StateMachine(val root: State) {
 
@@ -85,6 +85,10 @@ class StateMachine(val root: State) {
     }
 
 
+    /**
+     * Get the state by its [id]
+     * @param id state id
+     */
     fun getState(id: String): State? = getState(id, root)
 
     private fun getState(id: String, stateMachine: State): State? =
@@ -93,7 +97,10 @@ class StateMachine(val root: State) {
             else -> stateMachine.states?.firstNotNullOfOrNull { getState(id, it.value) }
         }
 
-    // Get the initial state of state machine.
+    /**
+     * Get the initial state of state
+     * @param id state id
+    */
     fun getInitial(id: String): State? = getInitial(id, root)
 
     private fun getInitial(id: String, stateMachine: State): State? {
@@ -106,6 +113,10 @@ class StateMachine(val root: State) {
         }
     }
 
+    /**
+     * Get the parent state of the state with its [id]
+     * @param id state id
+     */
     fun getParent(id: String): State? = getParent(id, root)
 
     private fun getParent(id: String, stateMachine: State): State? =
@@ -114,7 +125,11 @@ class StateMachine(val root: State) {
             else -> stateMachine.states?.firstNotNullOfOrNull { getParent(id, it.value) }
         }
 
-    // Get the next state following the transition
+    /**
+     * Get the next state following the [transition]
+     * @param id state id
+     * @param transition transition name
+     */
     fun getNext(id: String, transition: String): State? = getNext(id, transition, root)
 
     private fun getNext(id: String, transition: String, stateMachine: State): State? {
@@ -137,7 +152,7 @@ class StateMachine(val root: State) {
     }
 
     /**
-     * Search the state from current. If not exist, search it from the parent
+     * Search the state from the current on. If it not exists, search it from the parent
      */
     private fun getStateFromCurrentOrParent(id: String, stateMachine: State): State? =
         when(val currentState = getState(id, stateMachine)){
@@ -147,7 +162,10 @@ class StateMachine(val root: State) {
             else -> currentState
         }
 
-    // Check if state machine has a transition
+    /**
+     * Check if state machine has a transition
+     * @param transition the transition name to check
+    */
     fun containsTransition(transition: String): Boolean = containsTransition(transition, root)
 
     private fun containsTransition(transition: String, stateMachine: State): Boolean =

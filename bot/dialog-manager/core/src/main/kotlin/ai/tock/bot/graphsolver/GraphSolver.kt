@@ -16,21 +16,18 @@
 package ai.tock.bot.graphsolver
 
 import ai.tock.bot.bean.TickAction
+import ai.tock.bot.exception.NoClyngorResultsFound
+import ai.tock.shared.property
 import ai.tock.shared.resource
-import ai.tock.shared.resourceAsString
 import jep.SharedInterpreter
-import mu.KotlinLogging
-import java.io.File
 
 /**
  * Class that handles the call to the Clyngor python library
  */
 object GraphSolver {
 
-    // TODO MASS : tock-docker, do not copy file in /tmp
-    private val pythonPath = resource("/python").path
+    private val pythonPath = property("tock_bot_dialog_manager_python_path", resource("/python").path)
     private val pythonScriptPath = "$pythonPath/script"
-    private val pythonLogPath = "$pythonPath/log"
 
     fun solve(
         debugEnabled: Boolean = false,
@@ -58,7 +55,6 @@ object GraphSolver {
 
         val results = SharedInterpreter().use { interp ->
             interp.set("pythonScriptPath", pythonScriptPath)
-            interp.set("pythonLogPath", pythonLogPath) // FIXME (WITH DERCBOT-321)
 
             interp.runScript("$pythonScriptPath/graph-solver.py")
             interp.invoke(
@@ -77,7 +73,7 @@ object GraphSolver {
 
     private fun List<String>.getIfNotEmpty(): List<String>{
         if(this.isEmpty()) {
-            error("No clyngor results found !")
+            throw NoClyngorResultsFound("No clyngor results found !")
         }
         return this
     }

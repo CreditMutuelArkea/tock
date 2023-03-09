@@ -18,7 +18,9 @@ package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioVersion
-import ai.tock.bot.admin.scenario.ScenarioVersionState.*
+import ai.tock.bot.admin.scenario.ScenarioVersionState.DRAFT
+import ai.tock.bot.admin.scenario.ScenarioVersionState.ARCHIVED
+import ai.tock.bot.admin.scenario.ScenarioVersionState.CURRENT
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
 import ai.tock.shared.exception.scenario.ScenarioException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
@@ -51,6 +53,7 @@ object ScenarioService {
 
     /**
      * Returns one scenario group with its scenario versions
+     * @param namespace bot namespace
      * @param scenarioGroupId: id of the scenario group
      * @throws [ScenarioGroupNotFoundException] if the scenario group was not found
      */
@@ -122,14 +125,15 @@ object ScenarioService {
     /**
      * Create a new scenario version
      * Returns the created scenario version
+     * @param namespace bot namespace
      * @param scenarioVersion: the scenario version to create
-     * @throws [ScenarioGroupNotFoundException] if the scenario group of the [scenarioVersion] was not found
+     * @throws [ScenarioGroupNotFoundException] if the scenario group of the [ScenarioVersion] was not found
      */
     fun createOneScenarioVersion(namespace: String, scenarioVersion: ScenarioVersion): ScenarioVersion {
         // Find and check existence of scenario group
         findOneScenarioGroup(namespace, scenarioVersion.scenarioGroupId.toString())
 
-        if(!scenarioVersion.isDraft()){
+        if (!scenarioVersion.isDraft()) {
             throw ScenarioVersionBadStateException("Only a draft version can be created")
         }
 
@@ -141,7 +145,7 @@ object ScenarioService {
      * Returns the updated scenario group
      * @param namespace: the namespace
      * @param scenarioGroup: the scenario group to update
-     * @throws [ScenarioGroupNotFoundException] if the [scenarioGroup] was not found
+     * @throws [ScenarioGroupNotFoundException] if the [ScenarioVersion] was not found
      */
     fun updateOneScenarioGroup(namespace: String, scenarioGroup: ScenarioGroup): ScenarioGroup {
         val updatedScenarioGroup = ScenarioGroupService.updateOne(scenarioGroup)
@@ -162,10 +166,9 @@ object ScenarioService {
      * Update a given scenario version
      * Returns the updated scenario version
      * @param scenarioVersion: the scenario version to update.
-     * @throws [ScenarioVersionNotFoundException] if the [scenarioVersion] was not found.
-     * @throws [ScenarioGroupNotFoundException] if the scenario group of the [scenarioVersion] was not found
-     * @throws [MismatchedScenarioException] if the [scenarioVersion] is not part of its scenario group
-     * @throws [UnauthorizedUpdateScenarioVersionException] if the [scenarioVersion] cannot be updated
+     * @throws [ScenarioVersionNotFoundException] if the [ScenarioVersion] was not found.
+     * @throws [ScenarioGroupNotFoundException] if the scenario group of the [ScenarioVersion] was not found
+     * @throws [ScenarioGroupAndVersionMismatchException] if the [ScenarioVersion] is not part of its scenario group
      */
     fun updateOneScenarioVersion(scenarioVersion: ScenarioVersion): ScenarioVersion {
         val scenarioVersionDB = ScenarioVersionService.findOneById(scenarioVersion._id.toString())
@@ -173,14 +176,14 @@ object ScenarioService {
         // Check consistency
         checkConsistencyOfScenarioGroupAndVersion(scenarioVersionDB.scenarioGroupId.toString(), scenarioVersion)
 
-        if(!scenarioVersionDB.isDraft()){
+        if (!scenarioVersionDB.isDraft()) {
             // Only a draft version can be updated
             logger.error { "Scenario version ${scenarioVersion._id} cannot be updated, because it's state is ${scenarioVersionDB.state}" }
             throw ScenarioVersionBadStateException()
         }
 
         // The given scenario version is CURRENT
-        if(scenarioVersion.isCurrent()){
+        if (scenarioVersion.isCurrent()) {
             // Get the CURRENT version in database if exists
             val scenarioVersionCurrentDB = ScenarioVersionService.findAllByScenarioGroupIdAndState(
                 scenarioVersion.scenarioGroupId.toString(),
@@ -240,9 +243,14 @@ object ScenarioService {
      * @param scenarioVersionId: id of the scenario version
      * @throws [ScenarioGroupNotFoundException] if the scenario group was not found
      * @throws [ScenarioVersionNotFoundException] if the scenario version was not found
-     * @throws [MismatchedScenarioException] if the scenario version is not part of its scenario group
+     * @throws [ScenarioGroupAndVersionMismatchException] if the scenario version is not part of its scenario group
      */
-    fun deleteOneScenarioVersion(namespace: String, botId: String, scenarioGroupId: String, scenarioVersionId: String): Boolean {
+    fun deleteOneScenarioVersion(
+        namespace: String,
+        botId: String,
+        scenarioGroupId: String,
+        scenarioVersionId: String
+    ): Boolean {
         return try {
             val scenarioVersionDB = ScenarioVersionService.findOneById(scenarioVersionId)
 
@@ -275,7 +283,7 @@ object ScenarioService {
      * @param scenarioGroup: the [ScenarioGroup] to update
      */
     private fun mapStoryFeatures(namespace: String, scenarioGroup: ScenarioGroup): ScenarioGroup =
-        if(scenarioGroup.versions.any(ScenarioVersion::isCurrent)){
+        if (scenarioGroup.versions.any(ScenarioVersion::isCurrent)) {
             // If scenario group has a current version, then check tick story
             scenarioGroup.copy(
                 enabled = StoryService.getStoryByNamespaceAndBotIdAndStoryId(
@@ -283,37 +291,37 @@ object ScenarioService {
                     scenarioGroup.botId,
                     scenarioGroup._id.toString()
                 )?.let { story ->
-                        with(story.features) {
-                            // If story has no feature, then it is enabled
-                            isEmpty()
-                                // else check story activation feature
-                                .or(firstOrNull { it.isStoryActivation() }?.enabled ?: false)
-                        }
+                    with(story.features) {
+                        // If story has no feature, then it is enabled
+                        isEmpty()
+                            // else check story activation feature
+                            .or(firstOrNull { it.isStoryActivationFeature() }?.enabled ?: false)
                     }
+                }
             )
-        } else{
+        } else {
             scenarioGroup
         }
 
     private fun checkScenarioVersionsToImport(scenarioVersions: List<ScenarioVersion>) {
         // Check scenario group has versions
-        if(scenarioVersions.isEmpty()){
+        if (scenarioVersions.isEmpty()) {
             throw ScenarioGroupWithoutVersionException()
         }
 
         // Check if all versions have the same scenario group id
-        if(scenarioVersions.map { it.scenarioGroupId }.distinct().count() > 1){
+        if (scenarioVersions.map { it.scenarioGroupId }.distinct().count() > 1) {
             throw ScenarioVersionsInconsistentException()
         }
 
         // Check presence of CURRENT version
-        if(scenarioVersions.count { it.isCurrent() } > 0){
+        if (scenarioVersions.count { it.isCurrent() } > 0) {
             throw ScenarioVersionBadStateException("An imported scenario group must not have a current version")
         }
     }
 
     private fun checkConsistencyOfScenarioGroupAndVersion(scenarioGroupId: String, scenarioVersion: ScenarioVersion) {
-        if(scenarioGroupId != scenarioVersion.scenarioGroupId.toString()){
+        if (scenarioGroupId != scenarioVersion.scenarioGroupId.toString()) {
             logger.error { "The scenario version <id:${scenarioVersion._id}> is not part of the scenario group <id:${scenarioVersion.scenarioGroupId}>" }
             throw ScenarioGroupAndVersionMismatchException()
         }

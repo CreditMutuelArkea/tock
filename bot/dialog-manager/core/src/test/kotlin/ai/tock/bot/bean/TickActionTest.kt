@@ -22,65 +22,70 @@ import kotlin.test.assertTrue
 
 class TickActionTest {
 
-    @Test fun `given handler and trigger are null then action is not silent`() {
+    @Test
+    fun `given handler and trigger are null then action is not silent`() {
         assertFalse {
             TickAction(
                 name = "action",
                 handler = null,
                 trigger = null,
-                inputContextNames =  emptySet(),
+                inputContextNames = emptySet(),
                 outputContextNames = emptySet(),
                 final = false
             ).isSilent()
         }
     }
 
-    @Test fun `given handler and trigger are empty string then action is not silent`() {
+    @Test
+    fun `given handler and trigger are empty string then action is not silent`() {
         assertFalse {
             TickAction(
                 name = "action",
                 handler = "",
                 trigger = "",
-                inputContextNames =  emptySet(),
+                inputContextNames = emptySet(),
                 outputContextNames = emptySet(),
                 final = false
             ).isSilent()
         }
     }
 
-    @Test fun `given handler and trigger are blank string then action is not silent`() {
+    @Test
+    fun `given handler and trigger are blank string then action is not silent`() {
         assertFalse {
             TickAction(
                 name = "action",
                 handler = "   ",
                 trigger = " ",
-                inputContextNames =  emptySet(),
+                inputContextNames = emptySet(),
                 outputContextNames = emptySet(),
                 final = false
             ).isSilent()
         }
     }
 
-    @Test fun `given handler is not null or blank string then action is silent`() {
+    @Test
+    fun `given handler is not null or blank string then action is silent`() {
         assertTrue {
             TickAction(
                 name = "action",
                 handler = "handler",
                 trigger = null,
-                inputContextNames =  emptySet(),
+                inputContextNames = emptySet(),
                 outputContextNames = emptySet(),
                 final = false
             ).isSilent()
         }
     }
 
-    @Test fun `given trigger is not null or blank string then action is silent`() {
+    @Test
+    fun `given trigger is not null or blank string then action is silent`() {
         assertTrue {
             TickAction(
                 name = "action",
                 handler = null,
                 trigger = "trigger",
-                inputContextNames =  emptySet(),
+                inputContextNames = emptySet(),
                 outputContextNames = emptySet(),
                 final = false
             ).isSilent()

@@ -44,8 +44,6 @@ import io.vertx.core.Future
 import io.vertx.core.Handler
 import io.vertx.core.Promise
 import io.vertx.core.Vertx
-import io.vertx.core.file.AsyncFile
-import io.vertx.core.file.OpenOptions
 import io.vertx.core.http.HttpMethod
 import io.vertx.core.http.HttpMethod.DELETE
 import io.vertx.core.http.HttpMethod.GET
@@ -54,7 +52,6 @@ import io.vertx.core.http.HttpMethod.PUT
 import io.vertx.core.http.HttpServer
 import io.vertx.core.http.HttpServerOptions
 import io.vertx.core.http.HttpServerResponse
-import io.vertx.core.streams.Pump
 import io.vertx.ext.web.FileUpload
 import io.vertx.ext.web.Router
 import io.vertx.ext.web.RoutingContext
@@ -67,12 +64,14 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.*
+
 import kotlin.LazyThreadSafetyMode.PUBLICATION
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
+import java.util.Locale
+import java.util.ServiceLoader
 
 /**
  * Base class for web Tock [io.vertx.core.Verticle]s. Provides utility methods.
@@ -915,7 +914,7 @@ abstract class WebVerticle : AbstractVerticle() {
      * See https://vertx.io/docs/vertx-web/java/#_route_match_failures
      */
     open fun defaultErrorHandler(statusCode: Int): Handler<RoutingContext> = Handler<RoutingContext> { event ->
-        logger.info { "Error $statusCode: ${event.request().path()}" }
+        logger.error { "Error  $statusCode: ${event.request().path()}" }
         tockErrorHandler.handle(event)
     }
 }

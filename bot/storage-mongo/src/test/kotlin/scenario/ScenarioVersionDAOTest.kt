@@ -117,7 +117,7 @@ class ScenarioVersionDAOTest : AbstractTest() {
     }
 
     @Test
-    fun `countAllByScenarioGroupId WHEN 2 scenario versions matching the group id exists THEN count 3`() {
+    fun `countAllByScenarioGroupId WHEN 2 scenario versions matching the group id exists THEN count 2`() {
         // GIVEN
         initDb(listOf(scenarioGroup1, scenarioGroup2))
         // WHEN

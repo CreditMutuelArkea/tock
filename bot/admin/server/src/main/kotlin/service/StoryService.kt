@@ -23,9 +23,9 @@ import ai.tock.bot.admin.answer.TickAnswerConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
-import ai.tock.bot.bean.TickStory
+import ai.tock.bot.bean.TickStoryQuery
 import ai.tock.bot.bean.TickStorySettings
-import ai.tock.bot.bean.TickStoryValidation
+import ai.tock.bot.validation.TickStoryValidation
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.nlp.front.service.storage.ApplicationDefinitionDAO
@@ -39,16 +39,15 @@ import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.toId
 
-private const val TICK = "tick"
-
 /**
  * Service that manage the scenario functionality
  */
 object StoryService {
 
+    private const val TICK = "tick"
+
     private val logger: KLogger = KotlinLogging.logger {}
     private val storyDefinitionDAO: StoryDefinitionConfigurationDAO by injector.instance()
-
     private val applicationDefinitionDAO: ApplicationDefinitionDAO by injector.instance()
 
     init {
@@ -61,7 +60,7 @@ object StoryService {
                             (answer as TickAnswerConfiguration).copy(
                                 storySettings = TickStorySettings(
                                     settings.actionRepetitionNumber,
-                                    settings.redirectStoryId
+                                    settings.redirectStoryId ?: TickStorySettings.default.redirectStory
                                 )
                             )
                         } else {
@@ -79,7 +78,7 @@ object StoryService {
     }
 
     /**
-     * Get a tick story
+     * Get a [StoryDefinitionConfiguration]
      * @param namespace : the namespace
      * @param botId : the id of the bot
      * @param storyId : functional id of story to delete
@@ -95,22 +94,23 @@ object StoryService {
     /**
      * Create a new tick story
      * @param namespace : the namespace
-     * @param tickStory : the tick story to create
+     * @param tickStoryQuery : the tick story to create
+     * @throws [BadRequestException] if a tick story is invalid
      */
     fun createTickStory(
         namespace: String,
-        tickStory: TickStory
+        tickStoryQuery: TickStoryQuery
     ) {
-        val errors = TickStoryValidation.validateTickStory(tickStory){
+        val errors = TickStoryValidation.validateTickStory(tickStoryQuery){
             storyDefinitionDAO.getStoryDefinitionByNamespaceAndBotIdAndStoryId(
                 namespace,
-                tickStory.botId,
+                tickStoryQuery.botId,
                 it
             ) != null
         }
 
         if(errors.isEmpty()) {
-            saveTickStory(namespace, tickStory)
+            saveTickStory(namespace, tickStoryQuery)
         } else {
             throw BadRequestException(errors)
         }
@@ -133,14 +133,14 @@ object StoryService {
             val botConf = BotAdminService.getBotConfigurationsByNamespaceAndBotId(namespace, story.botId).firstOrNull()
             if (botConf != null) {
                 storyDefinitionDAO.save(
-                    story.copy(features = story.features.filterNot { it.isStoryActivation() } + feature))
+                    story.copy(features = story.features.filterNot { it.isStoryActivationFeature() } + feature))
             }
         }
         return false
     }
 
     /**
-     * Delete a tick story
+     * Delete a [StoryDefinitionConfiguration]
      * @param namespace : the namespace
      * @param storyDefinitionConfigurationId : technical id of story to delete
      */
@@ -159,7 +159,7 @@ object StoryService {
     }
 
     /**
-     * Delete a tick story
+     * Delete a [StoryDefinitionConfiguration]
      * @param namespace : the namespace
      * @param botId : the id of the bot
      * @param storyId : functional id of story to delete
@@ -181,7 +181,7 @@ object StoryService {
 
     private fun saveTickStory(
         namespace: String,
-        story: TickStory,
+        story: TickStoryQuery,
     ) {
 
         val botConf = BotAdminService.getBotConfigurationsByNamespaceAndBotId(namespace, story.botId).firstOrNull()
@@ -206,8 +206,14 @@ object StoryService {
                         story.actions,
                         story.intentsContexts,
                         TickUnknownConfiguration(story.unknownAnswerConfigs),
-                        storySettings = ScenarioSettingsService.getScenarioSettingsByApplicationId(application._id.toString())
-                            ?.let { TickStorySettings(it.actionRepetitionNumber, it.redirectStoryId) } ?: TickStorySettings(2)
+                        storySettings = ScenarioSettingsService
+                            .getScenarioSettingsByApplicationId(application._id.toString())
+                            ?.let {
+                                TickStorySettings(
+                                    repetitionNb = it.actionRepetitionNumber,
+                                    redirectStory = it.redirectStoryId ?: TickStorySettings.default.redirectStory
+                                )
+                            } ?: TickStorySettings.default
                     )
                 ),
                 namespace = namespace,

@@ -877,13 +877,6 @@ open class BotAdminVerticle : AdminVerticle() {
         configureStaticHandling()
     }
 
-    private fun checkOrganisation(context: RoutingContext, applicationId: Id<ApplicationDefinition>) {
-        val applicationDefinition = front.getApplicationById(applicationId)
-        if(context.organization != applicationDefinition?.namespace) {
-            unauthorized()
-        }
-    }
-
     override fun deleteApplication(app: ApplicationDefinition) {
         super.deleteApplication(app)
         BotAdminService.deleteApplication(app)

@@ -16,6 +16,11 @@
 
 package ai.tock.nlp.front.shared.config
 
+/**
+ * Scenario settings query
+ * @param actionRepetitionNumber : The number of authorized repetition of an action.
+ * @param redirectStoryId : The story's id to redirect to when the actionRepetitionNumber is exceeded.
+ */
 data class ScenarioSettingsQuery(
     val actionRepetitionNumber: Int,
     val redirectStoryId: String? = null

@@ -18,8 +18,6 @@ package ai.tock.bot
 
 enum class HandlerNamespace(val key: String, val shared: Boolean = false) {
     DEV_TOOLS(key = "dev-tools", shared = true),
-    SURAVENIR_ASSURANCES(key = "suravenir-assurances"),
-    JOIGNABILITE(key = "joignabilite"),
     UNKNOWN(key = "UNKNOWN");
 
     companion object {

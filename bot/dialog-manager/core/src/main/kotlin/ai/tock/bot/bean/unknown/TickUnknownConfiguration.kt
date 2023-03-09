@@ -20,6 +20,7 @@ import java.util.TreeSet
 
 /**
  * Configuration to customize unknown intent handling in tick stories
+ * @param unknownAnswerConfigs unkown answer configurations
  */
 @kotlinx.serialization.Serializable
 data class TickUnknownConfiguration(
