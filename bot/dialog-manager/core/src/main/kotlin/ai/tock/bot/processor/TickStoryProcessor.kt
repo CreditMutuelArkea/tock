@@ -113,7 +113,7 @@ class TickStoryProcessor(
         // Get the corresponding action
         val tickAction = getTickAction(secondaryObjective)
 
-        // Execute the action corresponding of secondary objective.
+        // Execute the action corresponding to the secondary objective.
         execute(tickAction)
 
         // If the executed action has a non-null target story, then a redirection is required
