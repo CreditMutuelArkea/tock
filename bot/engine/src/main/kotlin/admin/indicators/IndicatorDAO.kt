@@ -52,11 +52,9 @@ interface IndicatorDAO {
      */
     fun findAll(): List<Indicator>
 
-
-
     /**
      * Delete an indicator by its id
      * @param id the indicator id
      */
-    fun delete(id: Id<Indicator>):Boolean
+    fun delete(id: Id<Indicator>): Boolean
 }

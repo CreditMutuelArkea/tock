@@ -21,17 +21,31 @@ import ai.tock.bot.admin.indicators.IndicatorDAO
 import ai.tock.bot.admin.indicators.IndicatorError
 import ai.tock.bot.admin.indicators.IndicatorValue
 import ai.tock.bot.admin.model.Valid
-import ai.tock.bot.admin.model.indicator.*
+import ai.tock.bot.admin.model.indicator.IndicatorResponse
+import ai.tock.bot.admin.model.indicator.IndicatorValueRequest
+import ai.tock.bot.admin.model.indicator.IndicatorValueResponse
+import ai.tock.bot.admin.model.indicator.SaveIndicatorRequest
+import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
 import ai.tock.bot.admin.service.IndicatorService
-import ai.tock.bot.test.*
+import ai.tock.bot.test.TConsumer
+import ai.tock.bot.test.TFunction
+import ai.tock.bot.test.TRunnable
+import ai.tock.bot.test.TSupplier
+import ai.tock.bot.test.TestCase
 import ai.tock.shared.tockInternalInjector
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.singleton
-import io.mockk.*
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.newId
@@ -123,7 +137,7 @@ class IndicatorServiceTest {
                 "Indicator not exist with request name or label and the given application name",
                 similarIndicatorNotExist
             )
-            .and("The indicator to persist in database is capture", captureIndicatorToSave)
+            .and("The indicator to persist in database is captured", captureIndicatorToSave)
             .`when`("IndicatorService's save method is called", callServiceSave)
             .then("The dao's existByNameAndBotId must be called exactly once", daoExistByFnIsCalledOnce)
             .and(
@@ -173,9 +187,9 @@ class IndicatorServiceTest {
 
         }
 
-        TestCase<SaveFnEntry, IndicatorError>("Try to save valid indicator that already exist")
-            .given("A application name and a valid request", entry)
-            .and("Indicator exist with request name or label and the given application name", similarIndicatorNotExist)
+        TestCase<SaveFnEntry, IndicatorError>("Try to save valid indicator that already exists")
+            .given("An application name and a valid request", entry)
+            .and("Indicator exists with request name or label and the given application name", similarIndicatorNotExist)
             .`when`("IndicatorService's save method is called", callServiceSave)
             .then("The dao's existByNameAndBotId must be called exactly once", daoExistByFnIsCalledOnce)
             .and("The dao's save must not be called", daoSaveByFnIsNotCalled)
@@ -225,15 +239,15 @@ class IndicatorServiceTest {
         }
 
         TestCase<UpdateFnEntry, Unit>("Update existing indicator")
-            .given("A application name and a valid request", entry)
-            .and("Indicator exist with request name the given application name", indicatorExist)
-            .and("The indicator to persist in database is capture", captureIndicatorToSave)
+            .given("An application name and a valid request", entry)
+            .and("Indicator exists with request name the given application name", indicatorExist)
+            .and("The indicator to persist in database is captured", captureIndicatorToSave)
             .`when`("IndicatorService's update method is called", callServiceUpdate)
             .then("The dao's findByNameAndBotId must be called exactly once", daoFindByNameAndBotIdIsCalledOnce)
             .and(
                 """
-                - Indicator to persist must be not null
-                - Indicator to persist must have a not null id
+                - Indicator to persist must not be null
+                - Indicator to persist must not have a null id
             """.trimIndent(), checkIndicatorToPersist
             )
             .run()
@@ -277,7 +291,7 @@ class IndicatorServiceTest {
         }
 
         TestCase<UpdateFnEntry, IndicatorError>("Try to update non existing indicator ")
-            .given("A application name and a valid request", entry)
+            .given("An application name and a valid request", entry)
             .and("Indicator not exist with request name the given application name", indicatorDoNotExist)
             .`when`("IndicatorService's update method is called", callServiceUpdate)
             .then("The dao's findByNameAndBotId must be called exactly once", daoFindByNameAndBotIdIsCalledOnce)
@@ -318,7 +332,7 @@ class IndicatorServiceTest {
 
         TestCase<Pair<String, String>, IndicatorResponse>("Find indicator by name and bot id")
             .given("A given name and application name", entries)
-            .and("An indicator exist with the given entries", indicatorExist)
+            .and("An indicator exists with the given entries", indicatorExist)
             .`when`("The IndicatorService findByNameAndBotId method is called", callServiceFindByNameAndBotId)
             .then(
                 """"
@@ -349,7 +363,7 @@ class IndicatorServiceTest {
         }
 
         TestCase<String, Boolean>("Delete successfully an indicator")
-            .given("An given a identifier", indicatorId)
+            .given("A given identifier", indicatorId)
             .and("The call of dao delete method returns true", deleteSucceed)
             .`when`("The IndicatorService deleteById method is called", callServiceDelete)
             .then("The response should be true", checkResponse)
@@ -376,7 +390,7 @@ class IndicatorServiceTest {
         }
 
         TestCase<String, IndicatorError>("Try to delete  an indicator")
-            .given("An given a identifier", indicatorId)
+            .given("A given identifier", indicatorId)
             .and("The call of dao delete method returns false", deleteFails)
             .`when`("The IndicatorService deleteById method is called", callServiceDelete)
             .then("An error of type IndicatorDeletionFailed should be returned", checkError)

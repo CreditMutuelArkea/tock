@@ -55,7 +55,7 @@ object IndicatorService {
      * @throws [IndicatorError.IndicatorNotFound]
      */
     fun update(botId: String, indicatorName: String, request: Valid<UpdateIndicatorRequest>) = request.data.let {
-        findIndicatorAndMap(indicatorName, botId){ it }.let { indicator ->
+        findIndicatorAndMap(indicatorName, botId) { it }.let { indicator ->
             dao.save(
                 indicator.copy(
                     label = it.label,
@@ -69,13 +69,13 @@ object IndicatorService {
 
     /**
      * Retrieve an indicator with a given name and application name
-     * @param indicatorName the  looked for indicator name
+     * @param indicatorName the expected indicator name
      * @param botId the name of the application which the indicator is linked to
      * @throws [IndicatorError.IndicatorNotFound]
      * @return [IndicatorResponse]
      */
     fun findByNameAndBotId(indicatorName: String, botId: String): IndicatorResponse =
-        findIndicatorAndMap(indicatorName, botId){
+        findIndicatorAndMap(indicatorName, botId) {
             toResponse(it)
         }
 
@@ -110,12 +110,14 @@ object IndicatorService {
      * @param name the indicator name
      * @param botId the application name
      * @param mapper the indicator's mapping function
+     * @throws [IndicatorError.IndicatorNotFound] in case indicator is not found
      */
-    private  fun <T> findIndicatorAndMap(
+    private fun <T> findIndicatorAndMap(
         name: String,
         botId: String,
         mapper: (Indicator) -> T
-    ): T = dao.findByNameAndBotId(name, botId)?.let { mapper(it) } ?: throw IndicatorError.IndicatorNotFound(name, botId)
+    ): T =
+        dao.findByNameAndBotId(name, botId)?.let { mapper(it) } ?: throw IndicatorError.IndicatorNotFound(name, botId)
 
 
 }

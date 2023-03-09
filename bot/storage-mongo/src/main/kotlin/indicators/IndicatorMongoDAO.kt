@@ -19,21 +19,27 @@ package indicators
 import ai.tock.bot.admin.indicators.Indicator
 import ai.tock.bot.admin.indicators.IndicatorDAO
 import ai.tock.bot.mongo.MongoBotConfiguration
-import org.litote.kmongo.*
+import org.litote.kmongo.Id
+import org.litote.kmongo.and
+import org.litote.kmongo.ensureUniqueIndex
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollectionOfName
+import org.litote.kmongo.save
 
-object IndicatorMongoDAO: IndicatorDAO {
+object IndicatorMongoDAO : IndicatorDAO {
 
     private val col =
-        MongoBotConfiguration.database.
-        getCollectionOfName<Indicator>("indicator").also {
+        MongoBotConfiguration.database.getCollectionOfName<Indicator>("indicator").also {
             it.ensureUniqueIndex(
                 Indicator::name,
                 Indicator::botId
             )
         }
+
     override fun save(indicator: Indicator) = col.save(indicator)
 
-    override fun existByNameAndBotId(name: String,  botId: String): Boolean {
+    override fun existByNameAndBotId(name: String, botId: String): Boolean {
         return (col.countDocuments(
             and(
                 Indicator::botId eq botId,
@@ -42,10 +48,12 @@ object IndicatorMongoDAO: IndicatorDAO {
         ) > 0)
     }
 
-    override fun findByNameAndBotId(name: String, botId: String): Indicator? = col.findOne(and(
-        Indicator::name eq name,
-        Indicator::botId eq botId
-    ))
+    override fun findByNameAndBotId(name: String, botId: String): Indicator? = col.findOne(
+        and(
+            Indicator::name eq name,
+            Indicator::botId eq botId
+        )
+    )
 
     override fun findAllByBotId(botId: String): List<Indicator> = col.find(Indicator::botId eq botId).toList()
 

@@ -16,6 +16,7 @@
 
 package ai.tock.bot.admin.verticle
 
+import ai.tock.bot.admin.indicators.IndicatorError
 import ai.tock.bot.admin.model.Valid
 import ai.tock.bot.admin.model.ValidationError
 import ai.tock.bot.admin.model.indicator.SaveIndicatorRequest
@@ -23,6 +24,7 @@ import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
 import ai.tock.bot.admin.service.IndicatorService
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
+import ai.tock.shared.exception.rest.UnauthorizedException
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -35,8 +37,8 @@ class IndicatorVerticle : AbstractServerVerticle() {
         const val PATH_PARAM_NAME = "name"
         const val PATH_PARAM_ID = "id"
         const val BASE_PATH = "/indicator"
-        const val SAVE_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME"
-        const val GET_BY_NAME = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME/:$PATH_PARAM_NAME"
+        const val INDICATOR_BY_APPLICATION_NAME_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME"
+        const val BY_APPLICATION_NAME_AND_BY_NAME_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME/:$PATH_PARAM_NAME"
         const val DELETE_PATH = "$BASE_PATH/:$PATH_PARAM_ID"
     }
 
@@ -47,51 +49,71 @@ class IndicatorVerticle : AbstractServerVerticle() {
 
         with(webVerticle) {
 
+            /**
+             * lamdba calling database to retrieve application definition from request context
+             * @return [ApplicationDefinition]
+             */
             val currentContextApp: (RoutingContext) -> ApplicationDefinition? =
                 { context ->
-                    front.getApplicationByNamespaceAndName(
-                        getNamespace(context),
-                        context.pathParam(PATH_PARAM_APPLICATION_NAME)
-                    )
+                    if(context.pathParam(PATH_PARAM_APPLICATION_NAME).isNotBlank()) {
+                        front.getApplicationByNamespaceAndName(
+                            getNamespace(context),
+                            context.pathParam(PATH_PARAM_APPLICATION_NAME)
+                        )
+                    } else{
+                        logger.error { "Could not find empty application name" }
+                        WebVerticle.notFound()
+                    }
                 }
 
-            blockingJsonPost(SAVE_PATH, authorizedRoles) { context: RoutingContext, request: SaveIndicatorRequest ->
+            blockingJsonPost(
+                INDICATOR_BY_APPLICATION_NAME_PATH,
+                authorizedRoles
+            ) { context: RoutingContext, request: SaveIndicatorRequest ->
                 checkNamespaceAndExecute(context, currentContextApp) {
                     tryExecute(context) {
+                        logger.info { "saving new indicator ${request.name}" }
                         IndicatorService.save(it.name, Valid(request))
                     }
                 }
                 return@blockingJsonPost request
             }
 
-            blockingJsonPut(GET_BY_NAME, authorizedRoles) { context: RoutingContext, request: UpdateIndicatorRequest ->
+            blockingJsonPut(
+                BY_APPLICATION_NAME_AND_BY_NAME_PATH,
+                authorizedRoles
+            ) { context: RoutingContext, request: UpdateIndicatorRequest ->
                 checkNamespaceAndExecute(context, currentContextApp) {
                     val name = context.path(PATH_PARAM_NAME)
                     tryExecute(context) {
+                        logger.info { "updating indicator $name" }
                         IndicatorService.update(it.name, name, Valid(request))
                     }
                 }
                 return@blockingJsonPut request
             }
 
-            blockingJsonGet(GET_BY_NAME, authorizedRoles) { context ->
+            blockingJsonGet(BY_APPLICATION_NAME_AND_BY_NAME_PATH, authorizedRoles) { context ->
                 checkNamespaceAndExecute(context, currentContextApp) {
                     val name = context.path(PATH_PARAM_NAME)
                     tryExecute(context) {
+                        logger.info { "deleting indicator $name" }
                         IndicatorService.findByNameAndBotId(name, it.name)
                     }
                 }
             }
 
-            blockingJsonGet(SAVE_PATH, authorizedRoles) { context: RoutingContext ->
+            blockingJsonGet(INDICATOR_BY_APPLICATION_NAME_PATH, authorizedRoles) { context: RoutingContext ->
                 checkNamespaceAndExecute(context, currentContextApp) {
                     tryExecute(context) {
+                        logger.info { "retrieve indicators from ${it.name}" }
                         IndicatorService.findAllByBotId(it.name)
                     }
                 }
             }
 
             blockingJsonGet(BASE_PATH, authorizedRoles) { _: RoutingContext ->
+                logger.info { "retrieve all indicators" }
                 IndicatorService.findAll()
             }
 
@@ -105,6 +127,14 @@ class IndicatorVerticle : AbstractServerVerticle() {
     }
 }
 
+/**
+ * Check the app requested is found to execute the request
+ * @param context [RoutingContext] the request context
+ * @param applicationDefinition the application definition retrieved from [context][RoutingContext]
+ * @param block the code block invoke after check is OK
+ * @throws [UnauthorizedException] if context check is KO
+ *
+ */
 private fun <T> WebVerticle.checkNamespaceAndExecute(
     context: RoutingContext,
     applicationDefinition: (RoutingContext) -> ApplicationDefinition?,
@@ -120,6 +150,11 @@ private fun <T> WebVerticle.checkNamespaceAndExecute(
 
 data class ErrorMessage(val message: String? = "Unexpected error occurred")
 
+/**
+ * try to execute [block] code otherwise throw an exception and set the status code
+ * @param context [RoutingContext] request context to be set
+ * @param block code block invoked
+ */
 private fun <T> tryExecute(context: RoutingContext, block: () -> T): T? {
     return try {
         block.invoke()
@@ -127,6 +162,9 @@ private fun <T> tryExecute(context: RoutingContext, block: () -> T): T? {
 
         val statusCode = when (e) {
             is ValidationError -> 400
+            is IndicatorError.IndicatorDeletionFailed -> 409
+            is IndicatorError.IndicatorAlreadyExists -> 409
+            is IndicatorError.IndicatorNotFound -> 404
             else -> 500
         }
 

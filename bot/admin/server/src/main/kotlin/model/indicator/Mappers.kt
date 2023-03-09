@@ -19,6 +19,12 @@ package ai.tock.bot.admin.model.indicator
 import ai.tock.bot.admin.indicators.Indicator
 import ai.tock.bot.admin.indicators.IndicatorValue
 
+/**
+ * Map a [request][SaveIndicatorRequest] to [Indicator]
+ * @param botId the application name
+ * @param request [SaveIndicatorRequest]
+ * @return [Indicator]
+ */
 fun toIndicator(botId: String, request: SaveIndicatorRequest): Indicator {
     return Indicator(
         name = request.name,
@@ -30,6 +36,11 @@ fun toIndicator(botId: String, request: SaveIndicatorRequest): Indicator {
     )
 }
 
+/**
+ * Map an [indicator][Indicator] to [IndicatorResponse]
+ * @param indicator indicator
+ * @return [IndicatorResponse]
+ */
 fun toResponse(indicator: Indicator) : IndicatorResponse = IndicatorResponse(
     id = indicator._id.toString(),
     name = indicator.name,

@@ -20,6 +20,11 @@ interface ToValidate {
     fun validate() : List<String>
 }
 
+/**
+ * Validate the request, if any bad request add error into the list
+ * if no errors return an empty list
+ * otherwise return a list of errors
+ */
 data class Valid<T: ToValidate> (val data: T) {
     init {
         data.validate().let {
