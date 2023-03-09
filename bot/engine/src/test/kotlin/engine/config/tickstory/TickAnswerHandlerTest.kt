@@ -17,7 +17,6 @@
 package ai.tock.bot.engine.config.tickstory
 
 import org.junit.jupiter.api.Test
-import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class TickAnswerHandlerTest {

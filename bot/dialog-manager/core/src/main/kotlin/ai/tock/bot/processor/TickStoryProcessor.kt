@@ -113,14 +113,14 @@ class TickStoryProcessor(
         // Get the corresponding action
         val tickAction = getTickAction(secondaryObjective)
 
+        // Execute the action corresponding to the secondary objective.
+        execute(tickAction)
+
         // If the executed action has a non-null target story, then a redirection is required
         if(!tickAction.targetStory.isNullOrBlank()) {
             logger.debug { "end of processing with redirect result. (Action target story: ${tickAction.targetStory})" }
             return Redirect(tickAction.targetStory)
         }
-
-        // Execute the action corresponding of secondary objective.
-        execute(tickAction)
 
         // Update the current state
         updateCurrentState(primaryObjective, secondaryObjective)
@@ -179,6 +179,7 @@ class TickStoryProcessor(
      */
     private fun computeSecondaryObjective(primaryObjective: String): String {
         logger.debug { "call clyngor graph solver to get a potentials objectives..." }
+
         val potentialObjectives = GraphSolver.solve(
             debugEnabled,
             ranHandlers.lastOrNull(),

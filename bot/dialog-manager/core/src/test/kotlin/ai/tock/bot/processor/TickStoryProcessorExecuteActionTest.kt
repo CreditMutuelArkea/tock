@@ -189,7 +189,7 @@ class TickStoryProcessorExecuteActionTest {
                 ), produceProcessor)
             .and(
                 setOf(
-                    "sender is mocked and message is captured",
+                    "sender is mocked and messages are captured",
                     "handler invocation is mocked"
                 ), mockBehaviours)
             .`when`(
@@ -238,7 +238,7 @@ class TickStoryProcessorExecuteActionTest {
                 ), produceProcessor)
             .and(
                 setOf(
-                    "sender is mocked and message is captured",
+                    "sender is mocked and messages are captured",
                     "handler invocation is mocked"
                 ), mockBehaviours)
             .`when`(
@@ -288,7 +288,7 @@ class TickStoryProcessorExecuteActionTest {
                 ), produceProcessor)
             .and(
                 setOf(
-                    "sender is mocked and message is captured",
+                    "sender is mocked and messages are captured",
                     "handler invocation is mocked"
                 ), mockBehaviours)
             .`when`(
@@ -341,7 +341,7 @@ class TickStoryProcessorExecuteActionTest {
                 ), produceProcessor)
             .and(
                 setOf(
-                    "sender is mocked and message is captured",
+                    "sender is mocked and messages are captured",
                     "handler invocation is mocked"
                 ), mockBehaviours)
             .`when`(
@@ -398,7 +398,7 @@ class TickStoryProcessorExecuteActionTest {
                 ), produceProcessor)
             .and(
                 setOf(
-                    "sender is mocked and message is captured",
+                    "sender is mocked and messages are captured",
                     "handler invocation is mocked and handler name is captured"
                 ), mockBehaviours)
             .`when`(
