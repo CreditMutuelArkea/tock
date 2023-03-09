@@ -177,7 +177,7 @@ internal class ConfiguredStoryHandler(
     ) {
         val storyDefinition = bus.story.definition
 
-        // Check story type
+        // Check story type because TickStory are only available as ConfiguredStoryDefinition
         val isTickStory = when(storyDefinition){
             is ConfiguredStoryDefinition -> this.configuration.isTickAnswerType()
             else -> false
