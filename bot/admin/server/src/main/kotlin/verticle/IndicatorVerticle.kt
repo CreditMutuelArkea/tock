@@ -32,6 +32,7 @@ import ai.tock.shared.vertx.WebVerticle
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
+import mu.KotlinLogging
 
 /**
  * IndicatorVerticle contains all the routes and actions associated with the indicators analytics
@@ -183,6 +184,8 @@ private fun <T> tryExecute(context: RoutingContext, block: () -> T): T? {
             is IndicatorError.IndicatorNotFound -> 404
             else -> 500
         }
+
+        KotlinLogging.logger{}.error { "Error ${e.message}" }
 
         context.response()
             .setStatusCode(statusCode)
