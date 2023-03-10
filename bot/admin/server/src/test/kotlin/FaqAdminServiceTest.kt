@@ -41,9 +41,9 @@ import ai.tock.nlp.front.shared.config.FaqQueryResult
 import ai.tock.nlp.front.shared.config.FaqSettingsQuery
 import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQueryResult
+import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.security.UserLogin
 import ai.tock.shared.tockInternalInjector
-import ai.tock.shared.vertx.BadRequestException
 import ai.tock.translator.I18nDAO
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLocalizedLabel
