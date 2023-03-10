@@ -18,7 +18,6 @@ package ai.tock.bot.admin.indicators
 
 import org.litote.kmongo.Id
 
-
 interface IndicatorDAO {
 
     /**
@@ -57,4 +56,11 @@ interface IndicatorDAO {
      * @param id the indicator id
      */
     fun delete(id: Id<Indicator>): Boolean
+
+    /**
+     * Delete an indicator by its name and its application name
+     * @param name indicator name
+     * @param applicationName application name
+     */
+    fun deleteByNameAndApplicationName(name: String, applicationName: String): Boolean
 }

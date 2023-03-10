@@ -21,6 +21,7 @@ import ai.tock.bot.admin.indicators.IndicatorDAO
 import ai.tock.bot.mongo.MongoBotConfiguration
 import org.litote.kmongo.Id
 import org.litote.kmongo.and
+import org.litote.kmongo.deleteOne
 import org.litote.kmongo.ensureUniqueIndex
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
@@ -29,7 +30,7 @@ import org.litote.kmongo.save
 
 object IndicatorMongoDAO : IndicatorDAO {
 
-    private val col =
+    internal val col =
         MongoBotConfiguration.database.getCollectionOfName<Indicator>("indicator").also {
             it.ensureUniqueIndex(
                 Indicator::name,
@@ -48,17 +49,22 @@ object IndicatorMongoDAO : IndicatorDAO {
         ) > 0)
     }
 
-    override fun findByNameAndBotId(name: String, botId: String): Indicator? = col.findOne(
-        and(
-            Indicator::name eq name,
-            Indicator::botId eq botId
+    override fun findByNameAndBotId(name: String, botId: String): Indicator? =
+        col.findOne(
+            and(
+                Indicator::name eq name,
+                Indicator::botId eq botId
+            )
         )
-    )
 
     override fun findAllByBotId(botId: String): List<Indicator> = col.find(Indicator::botId eq botId).toList()
 
     override fun findAll(): List<Indicator> = col.find().toList()
 
     override fun delete(id: Id<Indicator>) = col.deleteOne(Indicator::_id eq id).deletedCount == 1L
+
+    override fun deleteByNameAndApplicationName(name: String, applicationName: String): Boolean =
+        col.deleteOne(Indicator::name eq name, Indicator::botId eq applicationName).deletedCount == 1L
+
 
 }

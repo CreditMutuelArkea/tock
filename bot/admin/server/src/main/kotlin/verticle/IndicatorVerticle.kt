@@ -24,22 +24,29 @@ import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
 import ai.tock.bot.admin.service.IndicatorService
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
+import ai.tock.shared.exception.rest.NotFoundException
 import ai.tock.shared.exception.rest.UnauthorizedException
+import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.RoutingContext
 
-class IndicatorVerticle : AbstractServerVerticle() {
+/**
+ * IndicatorVerticle contains all the routes and actions associated with the indicators analytics
+ */
+class IndicatorVerticle {
 
     companion object {
         const val PATH_PARAM_APPLICATION_NAME = "applicationName"
         const val PATH_PARAM_NAME = "name"
-        const val PATH_PARAM_ID = "id"
-        const val BASE_PATH = "/indicator"
-        const val INDICATOR_BY_APPLICATION_NAME_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME"
-        const val BY_APPLICATION_NAME_AND_BY_NAME_PATH = "$BASE_PATH/:$PATH_PARAM_APPLICATION_NAME/:$PATH_PARAM_NAME"
-        const val DELETE_PATH = "$BASE_PATH/:$PATH_PARAM_ID"
+        private const val INDICATORS = "indicators"
+        const val ALL_INDICATORS = "/$INDICATORS"
+        private const val BOT = "bot"
+        const val INDICATORS_BY_APPLICATION_NAME_PATH = "/$BOT/:$PATH_PARAM_APPLICATION_NAME/$INDICATORS"
+        const val BY_APPLICATION_NAME_AND_BY_NAME_PATH =
+            "/$BOT/:$PATH_PARAM_APPLICATION_NAME/$INDICATORS/:$PATH_PARAM_NAME"
     }
 
     private val front = FrontClient
@@ -55,19 +62,16 @@ class IndicatorVerticle : AbstractServerVerticle() {
              */
             val currentContextApp: (RoutingContext) -> ApplicationDefinition? =
                 { context ->
-                    if(context.pathParam(PATH_PARAM_APPLICATION_NAME).isNotBlank()) {
-                        front.getApplicationByNamespaceAndName(
-                            getNamespace(context),
-                            context.pathParam(PATH_PARAM_APPLICATION_NAME)
-                        )
-                    } else{
-                        logger.error { "Could not find empty application name" }
-                        WebVerticle.notFound()
-                    }
+                    val appName = context.pathParam(PATH_PARAM_APPLICATION_NAME)
+                    val namespace = getNamespace(context)
+                    front.getApplicationByNamespaceAndName(
+                        namespace,
+                        appName
+                    ) ?: throw NotFoundException(404, "Could not find $appName in $namespace")
                 }
 
             blockingJsonPost(
-                INDICATOR_BY_APPLICATION_NAME_PATH,
+                INDICATORS_BY_APPLICATION_NAME_PATH,
                 authorizedRoles
             ) { context: RoutingContext, request: SaveIndicatorRequest ->
                 checkNamespaceAndExecute(context, currentContextApp) {
@@ -103,7 +107,7 @@ class IndicatorVerticle : AbstractServerVerticle() {
                 }
             }
 
-            blockingJsonGet(INDICATOR_BY_APPLICATION_NAME_PATH, authorizedRoles) { context: RoutingContext ->
+            blockingJsonGet(INDICATORS_BY_APPLICATION_NAME_PATH, authorizedRoles) { context: RoutingContext ->
                 checkNamespaceAndExecute(context, currentContextApp) {
                     tryExecute(context) {
                         logger.info { "retrieve indicators from ${it.name}" }
@@ -112,19 +116,27 @@ class IndicatorVerticle : AbstractServerVerticle() {
                 }
             }
 
-            blockingJsonGet(BASE_PATH, authorizedRoles) { _: RoutingContext ->
+            blockingJsonGet(ALL_INDICATORS, authorizedRoles) { _: RoutingContext ->
                 logger.info { "retrieve all indicators" }
                 IndicatorService.findAll()
             }
 
-            blockingJsonDelete(DELETE_PATH, authorizedRoles) { context: RoutingContext ->
-                val id = context.path(PATH_PARAM_ID)
-                tryExecute(context) {
-                    IndicatorService.deleteById(id)
+            blockingJsonDelete(BY_APPLICATION_NAME_AND_BY_NAME_PATH, authorizedRoles) { context: RoutingContext ->
+                val indicatorName = context.path(PATH_PARAM_NAME)
+                checkNamespaceAndExecute(context, currentContextApp) { app ->
+                    tryExecute(context) {
+                        IndicatorService.deleteByNameAndApplicationName(indicatorName, app.name)
+                    }
                 } ?: false
             }
         }
     }
+
+    /**
+     * Get the namespace from the context
+     * @param context : the vertx routing context
+     */
+    private fun getNamespace(context: RoutingContext) = (context.user() as TockUser).namespace
 }
 
 /**
@@ -157,6 +169,10 @@ data class ErrorMessage(val message: String? = "Unexpected error occurred")
  */
 private fun <T> tryExecute(context: RoutingContext, block: () -> T): T? {
     return try {
+        // in case of success the status code is 201 for POST creation method in this Verticle
+        if (context.request().method() == HttpMethod.POST) {
+            context.response().statusCode = 201
+        }
         block.invoke()
     } catch (e: Exception) {
 

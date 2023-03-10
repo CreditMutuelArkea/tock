@@ -28,7 +28,6 @@ import ai.tock.bot.admin.model.indicator.toIndicator
 import ai.tock.bot.admin.model.indicator.toResponse
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
-import org.litote.kmongo.toId
 
 object IndicatorService {
 
@@ -98,12 +97,14 @@ object IndicatorService {
 
     /**
      * Delete an indicator
-     * @param id the indicator to delete id
+     * @param name the indicator name to delete
+     * @param applicationName the application name associated to the indicator
      * @throws [IndicatorError.IndicatorDeletionFailed]
      * @return [Boolean]
      */
-    fun deleteById(id: String): Boolean =
-        dao.delete(id.toId()).also { if (!it) throw IndicatorError.IndicatorDeletionFailed(id) }
+    fun deleteByNameAndApplicationName(name: String, applicationName: String): Boolean =
+        dao.deleteByNameAndApplicationName(name, applicationName)
+            .also { if (!it) throw IndicatorError.IndicatorDeletionFailed(name, applicationName) }
 
     /**
      * Find an indicator with a given name and application name and map it into a desired type
@@ -118,6 +119,5 @@ object IndicatorService {
         mapper: (Indicator) -> T
     ): T =
         dao.findByNameAndBotId(name, botId)?.let { mapper(it) } ?: throw IndicatorError.IndicatorNotFound(name, botId)
-
 
 }
