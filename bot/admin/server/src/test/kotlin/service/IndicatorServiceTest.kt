@@ -183,7 +183,7 @@ class IndicatorServiceTest {
 
             assertEquals(NAME, it.name)
             assertEquals(LABEL, it.label)
-            assertEquals(BOT_ID, it.botId)
+            assertEquals(BOT_ID, it.applicationName)
 
         }
 
@@ -286,7 +286,7 @@ class IndicatorServiceTest {
             it as IndicatorError.IndicatorNotFound
 
             assertEquals(NAME, it.name)
-            assertEquals(BOT_ID, it.botId)
+            assertEquals(BOT_ID, it.applicationName)
 
         }
 
@@ -346,15 +346,15 @@ class IndicatorServiceTest {
 
     @Test
     fun `Delete successfully an indicator`() {
-        val indicatorId: TSupplier<String> = { "id" }
+        val indicatorName: TSupplier<String> = { NAME }
 
         val deleteSucceed: TRunnable = {
-            every { dao.delete(any()) } returns true
+            every { dao.deleteByNameAndApplicationName(any(),any()) } returns true
         }
 
         val callServiceDelete: TFunction<String?, Boolean> = {
             assertNotNull(it)
-            IndicatorService.deleteById(it!!)
+            IndicatorService.deleteByNameAndApplicationName(NAME, BOT_ID)
         }
 
         val checkResponse: TConsumer<Boolean?> = {
@@ -363,7 +363,7 @@ class IndicatorServiceTest {
         }
 
         TestCase<String, Boolean>("Delete successfully an indicator")
-            .given("A given identifier", indicatorId)
+            .given("A given identifier", indicatorName)
             .and("The call of dao delete method returns true", deleteSucceed)
             .`when`("The IndicatorService deleteById method is called", callServiceDelete)
             .then("The response should be true", checkResponse)
@@ -371,16 +371,16 @@ class IndicatorServiceTest {
 
     @Test
     fun `Try to delete an indicator`() {
-        val indicatorId: TSupplier<String> = { "id" }
+        val indicatorName: TSupplier<String> = { NAME }
 
         val deleteFails: TRunnable = {
-            every { dao.delete(any()) } returns false
+            every { dao.deleteByNameAndApplicationName(any(),any()) } returns false
         }
 
         val callServiceDelete: TFunction<String?, IndicatorError> = {
             assertNotNull(it)
             assertThrows {
-                IndicatorService.deleteById(it!!)
+                IndicatorService.deleteByNameAndApplicationName(NAME, BOT_ID)
             }
         }
 
@@ -390,7 +390,7 @@ class IndicatorServiceTest {
         }
 
         TestCase<String, IndicatorError>("Try to delete  an indicator")
-            .given("A given identifier", indicatorId)
+            .given("A given identifier", indicatorName)
             .and("The call of dao delete method returns false", deleteFails)
             .`when`("The IndicatorService deleteById method is called", callServiceDelete)
             .then("An error of type IndicatorDeletionFailed should be returned", checkError)
