@@ -43,6 +43,7 @@ import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.admin.test.TestPlanService
 import ai.tock.bot.admin.test.findTestService
+import ai.tock.bot.admin.verticle.IndicatorVerticle
 import ai.tock.bot.connector.ConnectorType.Companion.rest
 import ai.tock.bot.connector.ConnectorTypeConfiguration
 import ai.tock.bot.connector.rest.addRestConnector
@@ -78,6 +79,7 @@ import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
+import org.litote.kmongo.Id
 import org.litote.kmongo.toId
 
 /**
@@ -86,6 +88,8 @@ import org.litote.kmongo.toId
 open class BotAdminVerticle : AdminVerticle() {
 
     private val botAdminConfiguration = BotAdminConfiguration()
+
+    private val indicatorVerticle = IndicatorVerticle()
 
     override val logger: KLogger = KotlinLogging.logger {}
 
@@ -97,6 +101,8 @@ open class BotAdminVerticle : AdminVerticle() {
 
     override val supportCreateNamespace: Boolean = !botAdminConfiguration.botApiSupport
 
+    override fun protectedPaths(): Set<String> = setOf(rootPath)
+
     override fun configureServices() {
         vertx.eventBus().consumer<Boolean>(ServerStatus.SERVER_STARTED) {
             if (it.body() && booleanProperty(Properties.FAQ_MIGRATION_ENABLED, false)) {
@@ -105,7 +111,6 @@ open class BotAdminVerticle : AdminVerticle() {
         }
         initTranslator()
         dialogFlowDAO.initFlowStatCrawl()
-
         super.configureServices()
     }
 
@@ -127,6 +132,8 @@ open class BotAdminVerticle : AdminVerticle() {
 
     override fun configure() {
         configureServices()
+
+        indicatorVerticle.configure(this)
 
         blockingJsonPost("/users/search", botUser) { context, query: UserSearchQuery ->
             if (context.organization == query.namespace) {
@@ -620,21 +627,14 @@ open class BotAdminVerticle : AdminVerticle() {
             )
         }
 
-        blockingJsonDelete(
-            "/bot/story/:storyId",
-            setOf(botUser, faqBotUser),
-            simpleLogger("Delete Story", { it.path("storyId") })
-        ) { context ->
-            BotAdminService.deleteStory(context.organization, context.path("storyId"))
-        }
-
         blockingJsonPost("/flow", botUser) { context, request: DialogFlowRequest ->
             if (context.organization == request.namespace) {
                 measureTimeMillis(
-                    context
-                ) {
-                    BotAdminService.loadDialogFlow(request)
-                }
+                    context,
+                    {
+                        BotAdminService.loadDialogFlow(request)
+                    }
+                )
             } else {
                 unauthorized()
             }
