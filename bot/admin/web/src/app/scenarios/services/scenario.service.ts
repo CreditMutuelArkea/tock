@@ -374,7 +374,7 @@ export class ScenarioService {
         exportableGroup.group.versions = exportableGroup.group.versions.filter((v) => exportableGroup.versionsIds.includes(v.id));
 
         exportableGroup.group.versions.forEach((version: ScenarioVersion) => {
-          version.data.scenarioItems.forEach((item) => {
+          version.data?.scenarioItems.forEach((item) => {
             if (item.intentDefinition?.intentId) {
               const existingIntent: Intent = this.stateService.findIntentById(item.intentDefinition.intentId);
 
@@ -404,7 +404,7 @@ export class ScenarioService {
               exportableGroups.forEach((exportableGroup) => {
                 exportableGroup.versionsIds.forEach((versionId) => {
                   const version: ScenarioVersion = exportableGroup.group.versions.find((v) => v.id === versionId);
-                  version.data.scenarioItems.forEach((item) => {
+                  version.data?.scenarioItems.forEach((item) => {
                     const intentId = item.intentDefinition?.intentId;
                     if (intentId === sentence.classification.intentId) {
                       const app = this.stateService.currentApplication;
