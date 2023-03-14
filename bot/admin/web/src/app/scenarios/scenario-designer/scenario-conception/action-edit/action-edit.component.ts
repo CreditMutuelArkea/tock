@@ -224,6 +224,10 @@ export class ActionEditComponent implements OnInit {
     return false;
   }
 
+  findStory(id: string): StoryDefinitionConfigurationSummary | undefined {
+    return this.availableStories.find((availableStorie) => availableStorie.storyId === id);
+  }
+
   copyDescToAnswer(): void {
     const answers = this.form.controls.answers.value;
     const currLocale = answers.find((a) => a.locale === this.currentLocale);
