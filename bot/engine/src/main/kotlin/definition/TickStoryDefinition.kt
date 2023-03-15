@@ -19,7 +19,7 @@ package ai.tock.bot.definition
 import ai.tock.bot.engine.BotBus
 
 /**
- * [TickStoryDefinition] implementation.
+ * [TickStoryDefinition] implementation witch extends [StoryDefinitionBase]
  */
 class TickStoryDefinition(
     name: String,

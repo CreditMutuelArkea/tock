@@ -16,7 +16,17 @@
 
 package ai.tock.bot.processor
 
-import ai.tock.bot.bean.*
+import ai.tock.bot.bean.TickAction
+import ai.tock.bot.bean.TickActionHandlingStep
+import ai.tock.bot.bean.TickConfiguration
+import ai.tock.bot.bean.TickSession
+import ai.tock.bot.bean.TickUserAction
+import ai.tock.bot.bean.UnknownHandlingStep
+import ai.tock.bot.exception.GlobalRootStateMachineNotFound
+import ai.tock.bot.exception.InfiniteLoopException
+import ai.tock.bot.exception.NextStateEquivalentException
+import ai.tock.bot.exception.RetryExceededErrorException
+import ai.tock.bot.exception.TickActionNotFoundException
 import ai.tock.bot.graphsolver.GraphSolver
 import ai.tock.bot.handler.ActionHandlersRepository
 import ai.tock.bot.sender.TickSender
@@ -40,15 +50,16 @@ class TickStoryProcessor(
 
     companion object {
         private val logger = KotlinLogging.logger {}
+        private val GLOBAL_STATE: String = "Global"
     }
 
     private var contexts = session.contexts.toMutableMap()
-    private var objectivesStack = createStackFormList(session.objectivesStack)
+    private var objectivesStack = createStackFromList(session.objectivesStack)
     private var ranHandlers = session.ranHandlers.toMutableList()
     private val stateMachine: StateMachine = StateMachine(configuration.stateMachine)
     private var currentState = session.currentState ?: getGlobalState()
+    private var lastExecutedAction = session.lastExecutedAction
     private var unknownHandlingStep = session.unknownHandlingStep
-    private var handlingStep = session.handlingStep ?: TickActionHandlingStep(0, currentState)
 
     /**
      * the main function to process the user action, this is the core process.
@@ -76,55 +87,37 @@ class TickStoryProcessor(
         val secondaryObjective = computeSecondaryObjective(primaryObjective)
         logger.debug { "secondaryObjective : $secondaryObjective" }
 
-        // Sets the current handling step
-        logger.debug { "calculate handling step..." }
-        handlingStep = when (handlingStep.action) {
-            // If the current handling step has the same linked action as the secondary objective,
-            secondaryObjective ->
-                when (tickUserAction) {
-                    // And If the user action is null (it is an infinite loop)
-                    null -> {
-                        // Then return
-                        logger.warn("abnormal end of processing with success result. (infinite loop !)")
-                        sender.end()
-                        return Success(
-                            TickSession(currentState, contexts, ranHandlers,
-                                objectivesStack.toList(), handlingStep = handlingStep)
-                        )
-                    }
-                    else -> {
-                        with(configuration.storySettings) {
-                            // If the action is repeated more than the maximum number of repetitions
-                            if (handlingStep.repeated > repetitionNb) {
-                                // then a redirection is required
-                                logger.debug { "end of processing with redirect result. (Configured redirect story: $redirectStory)" }
-                                return Redirect(redirectStory)
-                            }
-                        }
-                        // Then the current handling step is incremented
-                        handlingStep.incrementRepetition() as TickActionHandlingStep
-                    }
-                }
-            // Else, the current handling step is set to a new handling step with the secondary objective as linked action
-            else -> TickActionHandlingStep(action = secondaryObjective)
+        try {
+            updateLastExecutedAction(secondaryObjective, tickUserAction)
+        } catch (e: InfiniteLoopException){
+            logger.warn("abnormal end of processing. (infinite loop !)", e)
+            return Success(computeNewSession())
+        } catch (e: RetryExceededErrorException){
+            logger.warn("end of processing with redirect result. (Configured redirect story: ${e.redirectedStoryId})", e)
+            // when a redirection is performed, the current story state is considered as finished
+            return Redirect(computeNewSession(finished = true), e.redirectedStoryId)
         }
-        logger.debug { "handlingStep : $handlingStep" }
+        logger.debug { "lastExecutedAction : $lastExecutedAction" }
 
         // Get the corresponding action
         val tickAction = getTickAction(secondaryObjective)
 
-        // Execute the action corresponding to the secondary objective.
+        // Execute the action corresponding of the secondary objective.
         execute(tickAction)
-
-        // If the executed action has a non-null target story, then a redirection is required
-        if(!tickAction.targetStory.isNullOrBlank()) {
-            logger.debug { "end of processing with redirect result. (Action target story: ${tickAction.targetStory})" }
-            return Redirect(tickAction.targetStory)
-        }
 
         // Update the current state
         updateCurrentState(primaryObjective, secondaryObjective)
         logger.debug { "currentState : $currentState" }
+
+        // If the executed action has a non-null target story, then a redirection is required
+        if(!tickAction.targetStory.isNullOrBlank()) {
+            logger.debug { "end of processing with redirect result. (Action target story: ${tickAction.targetStory})" }
+            return Redirect(
+                // when a redirection is performed, the current story state is considered as finished
+                session = computeNewSession(finished = true),
+                storyId = tickAction.targetStory
+            )
+        }
 
         // FIXME (WITH DERCBOT-321)
         // To update graph. Not needed after DERCBOT-321
@@ -151,11 +144,52 @@ class TickStoryProcessor(
             process(null)
         } else {
             // otherwise we send the results
-            val updatedSession = TickSession(currentState, contexts, ranHandlers, objectivesStack.toList(), handlingStep = handlingStep, finished = tickAction.final)
+            val updatedSession = computeNewSession(finished = tickAction.final)
             logger.debug { "end of processing with success result. session updated : $updatedSession" }
             Success(updatedSession)
         }
     }
+
+    private fun updateLastExecutedAction(
+        secondaryObjective: String,
+        tickUserAction: TickUserAction?
+    ) {
+        logger.debug { "manage the last executed action..." }
+        lastExecutedAction = lastExecutedAction?.let {
+            // If the last executed action equals to the secondary objective,
+            if (it.actionName == secondaryObjective) {
+                when (tickUserAction) {
+                    null -> {
+                        // And If the user action is null then an infinite loop is detected
+                        sender.end()
+                        throw InfiniteLoopException("An infinite loop is detected.")
+                    }
+                    else -> {
+                        with(configuration.storySettings) {
+                            if (it.repeated > repetitionNb) {
+                                throw RetryExceededErrorException("Action (${it.actionName}) is executed more than the allowed number of repetitions", redirectStory)
+                            }
+                        }
+                        // Then the current handling step is incremented
+                        it.next() as TickActionHandlingStep
+                    }
+                }
+            } else null
+            // Else, the last executed action is the computed secondary objective
+        } ?: TickActionHandlingStep(1, secondaryObjective)
+    }
+
+    private fun computeNewSession(unknownHandlingStep: UnknownHandlingStep? = null, finished: Boolean =  false) =
+        TickSession(
+            currentState,
+            contexts,
+            ranHandlers,
+            objectivesStack.toList(),
+            session.initDate, // keep same init date
+            unknownHandlingStep,
+            lastExecutedAction,
+            finished
+        )
 
     /**
      * Use of state machine to calculate the primary objective
@@ -178,9 +212,9 @@ class TickStoryProcessor(
      * Randomly choose one among the multiple results
      */
     private fun computeSecondaryObjective(primaryObjective: String): String {
-        logger.debug { "call clyngor graph solver to get a potentials objectives..." }
+        logger.debug { "call clyngor graph solver to get potential objectives..." }
 
-        val potentialObjectives = GraphSolver.solve(
+        val potentialObjectives: List<String> = GraphSolver.solve(
             debugEnabled,
             ranHandlers.lastOrNull(),
             configuration.actions,
@@ -189,7 +223,7 @@ class TickStoryProcessor(
             ranHandlers.toSet()
         )
 
-        logger.debug { "choosing the secondaryObjective randomly from a potentials objectives: $potentialObjectives" }
+        logger.debug { "choosing the secondaryObjective randomly from potential objectives: $potentialObjectives" }
         return potentialObjectives.random()
     }
 
@@ -197,15 +231,21 @@ class TickStoryProcessor(
      * Call a state machine to get the Global state if it exists, or throws error exception
      */
     private fun getGlobalState() =
-        stateMachine.getState("Global")?.id ?: error("Global state not found <Global>")
+        stateMachine.getState(GLOBAL_STATE)?.id ?: throw GlobalRootStateMachineNotFound("$GLOBAL_STATE state not found <$GLOBAL_STATE>")
 
-    private fun createStackFormList(elements: List<String>): Stack<String> {
+    /**
+     * Util function to create a [Stack] from a [List]
+     * @param elements list elements
+     * @return the created [Stack]
+     */
+    private fun createStackFromList(elements: List<String>): Stack<String> {
         val stack = Stack<String>()
         elements.forEach(stack::push)
         return stack
     }
     /**
-     * Execute a given tick action id
+     * Execute a given `action` [TickAction]
+     * @param action [TickAction]
      */
     fun execute(action: TickAction) {
         debugInput(action)
@@ -240,6 +280,8 @@ class TickStoryProcessor(
 
     /**
      * Debug the input and output contexts of the actions
+     * @param action the tick action
+     * @param type INPUT or OUTPUT
      */
     private fun getDebugMessage(action: TickAction, type: String): String {
         val contexts = contexts.map { (key, value) -> "$key : $value" }.joinToString(" | ")
@@ -269,6 +311,11 @@ class TickStoryProcessor(
         }
     }
 
+    /**
+     * Update the current state according to a primary or secondary objective from the objective stack
+     * @param primaryObjective primary objective name
+     * @param secondaryObjective secondary objective name
+     */
     private fun updateCurrentState(primaryObjective: String, secondaryObjective: String) {
         logger.debug { "Updating current state..." }
         currentState = when(primaryObjective){
@@ -283,12 +330,15 @@ class TickStoryProcessor(
         }
     }
 
+    /**
+     * Retrieve the next state machine state name from a [tickUserAction][TickUserAction]
+     */
     private fun getStateMachineNextState(tickUserAction : TickUserAction): String {
         val nextState = stateMachine.getNext(currentState, tickUserAction.intentName)
 
         nextState?.let {
             if(it.id == currentState && isADirectTransition(tickUserAction.intentName)){
-                error("Next state shouldn't be equals to the current state <$currentState>")
+                throw NextStateEquivalentException("Next state shouldn't be equals to the current state <$currentState>")
             }
         }
 
@@ -298,7 +348,9 @@ class TickStoryProcessor(
         return state
     }
 
-    // Check if a transition is a father-son transition
+    /**
+     *  Check if a transition is a father-son transition
+     */
     private fun isADirectTransition(transition: String): Boolean
             = stateMachine.getState(currentState)?.on?.get(transition) != null
 
@@ -353,7 +405,7 @@ class TickStoryProcessor(
      */
     private fun getTickAction(actionName: String): TickAction {
         val tickAction = configuration.actions.firstOrNull { it.name == actionName }
-        return tickAction ?: error("TickAction <$actionName> not found")
+        return tickAction ?: throw TickActionNotFoundException("TickAction <$actionName> not found")
     }
 
     private fun handleUnknown(action: TickUserAction?): ProcessingResult? =
@@ -369,16 +421,15 @@ class TickStoryProcessor(
 
             if (step != null) {
                 logger.debug { "handle unknown intent... success" }
-                Success(
-                    TickSession(currentState, contexts, ranHandlers, objectivesStack.toList(),
-                        unknownHandlingStep = step, handlingStep = this.handlingStep)
-                )
+                Success(computeNewSession(step))
             } else if (redirectStoryId != null) {
                 logger.debug { "handle unknown intent... redirect to $redirectStoryId" }
-                Redirect(redirectStoryId)
+                Redirect(
+                    session = computeNewSession(),
+                    storyId = redirectStoryId
+                )
             } else null
         } else {
             null
         }
-
 }

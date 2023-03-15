@@ -23,7 +23,7 @@ import io.netty.handler.codec.http.HttpResponseStatus
  * Http 409 exception.
  */
 class ConflictException(httpResponseBody: ErrorMessageWrapper)
-    : RestException(httpResponseBody, HttpResponseStatus.BAD_REQUEST) {
+    : RestException(httpResponseBody, HttpResponseStatus.CONFLICT) {
     constructor(message: String) : this(ErrorMessageWrapper(message))
 }
 

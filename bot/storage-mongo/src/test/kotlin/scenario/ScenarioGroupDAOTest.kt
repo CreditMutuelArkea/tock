@@ -181,7 +181,7 @@ class ScenarioGroupDAOTest : AbstractTest() {
         // WHEN
         ScenarioGroupMongoDAO.updateOne(scenarioGroup3Copy)
         val result = ScenarioGroupMongoDAO.findOneById(scenarioGroup3._id)
-            // THEN
+        // THEN
         assertEquals(scenarioGroup3Copy, result?.copy(creationDate = dateNow, updateDate = dateNow))
     }
 }

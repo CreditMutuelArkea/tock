@@ -35,7 +35,6 @@ import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.LastDialogState
 import ai.tock.bot.engine.dialog.Snapshot
-import ai.tock.bot.engine.dialog.TickState
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
@@ -115,8 +114,6 @@ import org.litote.kmongo.sort
 import org.litote.kmongo.toId
 import org.litote.kmongo.updateOneById
 import org.litote.kmongo.upsert
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.SECONDS
 
 /**
  *

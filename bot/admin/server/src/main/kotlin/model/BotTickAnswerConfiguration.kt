@@ -25,18 +25,24 @@ import ai.tock.bot.bean.TickStorySettings
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
 import ai.tock.bot.statemachine.State
 
-data class BotTickAnswerConfiguration(val stateMachine: State,
-                                      val primaryIntents: Set<String>,
-                                      val secondaryIntents: Set<String>,
-                                      val triggers: Set<String>,
-                                      val contexts: Set<TickContext>,
-                                      val actions: Set<TickAction>,
-                                      val intentsContexts: Set<TickIntent>,
-                                      val unknownHandleConfiguration: TickUnknownConfiguration,
-                                      val storySettings: TickStorySettings?) :
+/**
+ * A bot tick answer configuration
+ */
+data class BotTickAnswerConfiguration(
+    val stateMachine: State,
+    val primaryIntents: Set<String>,
+    val secondaryIntents: Set<String>,
+    val triggers: Set<String>,
+    val contexts: Set<TickContext>,
+    val actions: Set<TickAction>,
+    val intentsContexts: Set<TickIntent>,
+    val unknownHandleConfiguration: TickUnknownConfiguration,
+    val storySettings: TickStorySettings?
+) :
     BotAnswerConfiguration(AnswerConfigurationType.tick) {
 
-    constructor(conf: TickAnswerConfiguration) : this(conf.stateMachine,
+    constructor(conf: TickAnswerConfiguration) : this(
+        conf.stateMachine,
         conf.primaryIntents,
         conf.secondaryIntents,
         conf.triggers,
@@ -44,9 +50,12 @@ data class BotTickAnswerConfiguration(val stateMachine: State,
         conf.actions,
         conf.intentsContexts,
         conf.unknownHandleConfiguration,
-        conf.storySettings)
+        conf.storySettings
+    )
 
-    fun toTickAnswerConfiguration() : TickAnswerConfiguration = TickAnswerConfiguration(stateMachine,
+    fun toTickAnswerConfiguration(): TickAnswerConfiguration = TickAnswerConfiguration(
+        stateMachine,
         primaryIntents, secondaryIntents, triggers, contexts, actions, intentsContexts, unknownHandleConfiguration,
-        storySettings)
+        storySettings
+    )
 }

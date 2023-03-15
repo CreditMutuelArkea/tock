@@ -37,7 +37,7 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
         setOf(
             createActionHandler(
                 id = HandlerId.DO_NOTHING.name,
-                description = "Handler who does nothing. It is used to force the next round",
+                description = "Handler witch does nothing. It is used to force the next round",
                 handler = { emptyMap() })
         ).plus(
             (1..7).map { counter ->

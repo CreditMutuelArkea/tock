@@ -17,12 +17,12 @@
 package ai.tock.bot.sender
 
 /**
- * A default tick sender :
+ * Default implementation of [TickSenderDefault]
  * - It uses a standard output to show messages sent
  * - It stores all messages in history
  * - Useful for testing
  */
-class TickSenderDefault: TickSender {
+class TickSenderDefault : TickSender {
 
     private val history = mutableListOf<String>()
 
@@ -49,12 +49,13 @@ class TickSenderDefault: TickSender {
     private fun addMessage(operation: String, element: String, type: String) {
         history.add("$operation message [$type : $element]")
     }
+
     fun getHistory() = history.toList()
 
     companion object {
-        private const val SEND= "Send"
-        private const val END= "End"
-        private const val TEXT= "TEXT"
-        private const val ID= "ID"
+        private const val SEND = "Send"
+        private const val END = "End"
+        private const val TEXT = "TEXT"
+        private const val ID = "ID"
     }
 }

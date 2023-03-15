@@ -66,7 +66,7 @@ object ScenarioVersionService {
     /**
      * Update a given scenario version and returns the updated scenario version
      * @param scenarioVersion: the scenario version to update.
-     * @throws [ScenarioVersionNotFoundException] if the [scenarioVersion] was not found.
+     * @throws [ScenarioVersionNotFoundException] if [ScenarioVersion] was not found.
      */
     fun updateOne(scenarioVersion: ScenarioVersion): ScenarioVersion {
         return scenarioVersionDAO.updateOne(scenarioVersion)
@@ -75,7 +75,7 @@ object ScenarioVersionService {
     /**
      * Delete an existing scenario version.
      * @param id: id of the scenario version
-     * @throws [ScenarioVersionNotFoundException] if the scenario version was not found
+     * @throws [ScenarioVersionNotFoundException] if the scenario version `id` is not found
      */
     fun deleteOneById(id: String) {
         scenarioVersionDAO.deleteOneById(id.toId())

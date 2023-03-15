@@ -18,4 +18,4 @@ package ai.tock.shared.exception.scenario.version
 
 import ai.tock.shared.exception.scenario.ScenarioException
 
-class ScenarioVersionDuplicatedException: ScenarioException("Duplicate scenario version")
+class ScenarioVersionDuplicatedException: ScenarioException("Duplicated scenario version")

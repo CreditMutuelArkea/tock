@@ -24,24 +24,27 @@ import kotlin.test.assertFalse
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class StateMachineTest: DialogManagerTest() {
+class StateMachineTest : DialogManagerTest() {
 
-    @Test fun `given state machine when has duplicate states then throw IllegalArgumentException`(){
+    @Test
+    fun `given state machine when has duplicate states then throw IllegalArgumentException`() {
         val root = getStateMachineFromFile("xstate-invalid-duplicate-states")
         assertThrows<IllegalArgumentException> { StateMachine(root) }
     }
 
-    @Test fun `given state machine when has self-loop states then throw IllegalArgumentException`(){
+    @Test
+    fun `given state machine when has self-loop states then throw IllegalArgumentException`() {
         val root = getStateMachineFromFile("xstate-invalid-self-loop")
         assertThrows<IllegalArgumentException> { StateMachine(root) }
     }
 
-     /**
-      * Given a state machine
-      * When has no loop
-      * Then check existing and non-existing state
-      */
-    @Test fun getState() {
+    /**
+     * Given a state machine
+     * When has no loop
+     * Then check existing and non-existing state
+     */
+    @Test
+    fun getState() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -68,7 +71,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then get a state parent if exist
      */
-    @Test fun getParent() {
+    @Test
+    fun getParent() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -92,7 +96,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then get the initial state if exist
      */
-    @Test fun getInitial() {
+    @Test
+    fun getInitial() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -119,7 +124,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then use a transition and get the next existing and non-existing state
      */
-    @Test fun getNext() {
+    @Test
+    fun getNext() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -130,7 +136,7 @@ class StateMachineTest: DialogManagerTest() {
         val sShowProcedureBookMeeting = sBookMeeting.states?.get("S_SHOW_PROCEDURE_BOOK_MEETING")!!
 
         // Non-existing State
-        assertNull(stateMachine.getNext("root","ANY"))
+        assertNull(stateMachine.getNext("root", "ANY"))
         assertNull(stateMachine.getNext("TOTO", "ANY"))
         assertNull(stateMachine.getNext("Global", "i_book_physical_or_tel"))
         assertNull(stateMachine.getNext("S_BOOK_MEETING", "i_book_physical_or_tel_3"))
@@ -147,7 +153,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then get all states that are not a group
      */
-    @Test fun getAllStatesNotGroup() {
+    @Test
+    fun getAllStatesNotGroup() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -159,7 +166,8 @@ class StateMachineTest: DialogManagerTest() {
             "S_SHOW_PROCEDURE_BOOK_MEETING",
             "S_SHOW_PROCEDURE_BOOK_MEETING_2",
             "S_ASK_CHANNEL_2",
-            "S_SHOW_PROCEDURE_BOOK_MEETING_4")
+            "S_SHOW_PROCEDURE_BOOK_MEETING_4"
+        )
 
         assertEquals(expectedStatesNotGroup.size, allStatesNotGroup.size)
         assertTrue(expectedStatesNotGroup.containsAll(allStatesNotGroup))
@@ -170,7 +178,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then get all transitions
      */
-    @Test fun getAllTransitions() {
+    @Test
+    fun getAllTransitions() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 
@@ -181,7 +190,8 @@ class StateMachineTest: DialogManagerTest() {
             "i_book_physical_or_tel",
             "i_book_physical_or_tel_2",
             "i_book_physical_or_tel_3",
-            "i_book_physical_or_tel_4")
+            "i_book_physical_or_tel_4"
+        )
 
         assertEquals(expectedTransitions.size, allTransitions.size)
         assertTrue(expectedTransitions.containsAll(allTransitions))
@@ -192,7 +202,8 @@ class StateMachineTest: DialogManagerTest() {
      * When has no loop
      * Then check presence of transition
      */
-    @Test fun containsTransition() {
+    @Test
+    fun containsTransition() {
         val root = getStateMachineFromFile("xstate-valid")
         val stateMachine = StateMachine(root)
 

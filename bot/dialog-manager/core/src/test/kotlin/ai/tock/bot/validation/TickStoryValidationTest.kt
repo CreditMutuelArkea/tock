@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.bean
+package ai.tock.bot.validation
 
 import ai.tock.bot.DialogManagerTest
 import ai.tock.bot.handler.ActionHandlersRepository
@@ -28,14 +28,16 @@ import kotlin.test.assertTrue
 
 class TickStoryValidationTest : DialogManagerTest() {
 
-    @Test fun tickStoryWithoutValidationErrors() {
+    @Test
+    fun tickStoryWithoutValidationErrors() {
         val tickStory = getTickStoryFromFile("validation", "tickStory-valid")
-        val errors = TickStoryValidation.validateTickStory(tickStory){ true }
+        val errors = TickStoryValidation.validateTickStory(tickStory) { true }
 
         assertTrue { errors.isEmpty() }
     }
 
-    @Nested inner class ConsistencyBetweenDeclaredIntentsAndStateMachineTransitions {
+    @Nested
+    inner class ConsistencyBetweenDeclaredIntentsAndStateMachineTransitions {
         @Test
         fun validIntents() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-intents")
@@ -52,7 +54,8 @@ class TickStoryValidationTest : DialogManagerTest() {
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidIntents() {
+        @Test
+        fun invalidIntents() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-intents")
             val errors = TickStoryValidation.validateIntents(tickStory)
 
@@ -64,32 +67,36 @@ class TickStoryValidationTest : DialogManagerTest() {
                 "primaryIntents_3",
                 "secondaryIntents_1",
                 "secondaryIntents_2"
-            ).map { TickStoryValidation.MessageProvider.INTENT_NOT_FOUND(it) }
+            ).map { MessageProvider.INTENT_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
 
-        @Test fun invalidTriggers() {
+        @Test
+        fun invalidTriggers() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-triggers")
             val errors = TickStoryValidation.validateTriggers(tickStory)
 
 
             val expectedErrors = listOf(
                 "e_trigger"
-            ).map { TickStoryValidation.MessageProvider.TRIGGER_NOT_FOUND(it) }
+            ).map { MessageProvider.TRIGGER_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
-        @Test fun validTransitions() {
+
+        @Test
+        fun validTransitions() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-transitions")
             val errors = TickStoryValidation.validateTransitions(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidTransitions() {
+        @Test
+        fun invalidTransitions() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-transitions")
             val errors = TickStoryValidation.validateTransitions(tickStory)
 
@@ -101,22 +108,25 @@ class TickStoryValidationTest : DialogManagerTest() {
                 "secondaryIntents_1-test",
                 "secondaryIntents_2-test",
                 "trigger-test"
-            ).map { TickStoryValidation.MessageProvider.TRANSITION_NOT_FOUND(it) }
+            ).map { MessageProvider.TRANSITION_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
     }
 
-    @Nested inner class ConsistencyBetweenDeclaredActionsAndStateMachineStates {
-        @Test fun validActions() {
+    @Nested
+    inner class ConsistencyBetweenDeclaredActionsAndStateMachineStates {
+        @Test
+        fun validActions() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-actions")
             val errors = TickStoryValidation.validateActions(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidActions() {
+        @Test
+        fun invalidActions() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-actions")
             val errors = TickStoryValidation.validateActions(tickStory)
 
@@ -126,20 +136,23 @@ class TickStoryValidationTest : DialogManagerTest() {
                 "INTRODUCTION-TEST",
                 "ACTION_1-TEST",
                 "ACTION_2-TEST",
-                "ACTION_3-TEST").map { TickStoryValidation.MessageProvider.ACTION_NOT_FOUND(it) }
+                "ACTION_3-TEST"
+            ).map { MessageProvider.ACTION_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
 
-        @Test fun validStates() {
+        @Test
+        fun validStates() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-states")
             val errors = TickStoryValidation.validateStates(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidStates() {
+        @Test
+        fun invalidStates() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-states")
             val errors = TickStoryValidation.validateStates(tickStory)
 
@@ -149,15 +162,18 @@ class TickStoryValidationTest : DialogManagerTest() {
                 "INTRODUCTION",
                 "ACTION_1",
                 "ACTION_2",
-                "ACTION_3").map { TickStoryValidation.MessageProvider.STATE_NOT_FOUND(it) }
+                "ACTION_3"
+            ).map { MessageProvider.STATE_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
     }
 
-    @Nested inner class ConsistencyOfActionHandlers {
-        @Test fun validActionHandlers() {
+    @Nested
+    inner class ConsistencyOfActionHandlers {
+        @Test
+        fun validActionHandlers() {
 
             mockkObject(ActionHandlersRepository)
             every { ActionHandlersRepository.contains("BYE_handler") } returns true
@@ -169,83 +185,96 @@ class TickStoryValidationTest : DialogManagerTest() {
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidActionHandlers() {
+        @Test
+        fun invalidActionHandlers() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-action-handlers")
             val errors = TickStoryValidation.validateActionHandlers(tickStory)
 
             val expectedErrors = setOf(
                 "BYE_handler-TEST",
-                "ACTION_2_handler-TEST")
-                .map { TickStoryValidation.MessageProvider.ACTION_HANDLER_NOT_FOUND(it) }
+                "ACTION_2_handler-TEST"
+            )
+                .map { MessageProvider.ACTION_HANDLER_NOT_FOUND(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
     }
 
-    @Nested inner class ConsistencyOfContexts {
-        @Test fun validInputOutputContexts() {
+    @Nested
+    inner class ConsistencyOfContexts {
+        @Test
+        fun validInputOutputContexts() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-input-output-contexts")
             val errors = TickStoryValidation.validateInputOutputContexts(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidInputOutputContexts() {
+        @Test
+        fun invalidInputOutputContexts() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-input-output-contexts")
             val errors = TickStoryValidation.validateInputOutputContexts(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.INPUT_CTX_NOT_FOUND("CONTEXT_4" to "ACTION_2"),
-                TickStoryValidation.MessageProvider.OUTPUT_CTX_NOT_FOUND("CONTEXT_5" to "ACTION_3")
+                MessageProvider.INPUT_CTX_NOT_FOUND("CONTEXT_4" to "ACTION_2"),
+                MessageProvider.OUTPUT_CTX_NOT_FOUND("CONTEXT_5" to "ACTION_3")
             )
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
 
-        @Test fun validDeclaredActionContexts() {
+        @Test
+        fun validDeclaredActionContexts() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-declared-contexts")
             val errors = TickStoryValidation.validateInputOutputContexts(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidDeclaredActionContexts() {
+        @Test
+        fun invalidDeclaredActionContexts() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-declared-contexts")
             val errors = TickStoryValidation.validateDeclaredActionContexts(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.ACTION_CTX_NOT_FOUND("CONTEXT_3"),
-                TickStoryValidation.MessageProvider.DECLARED_CTX_NOT_FOUND("CONTEXT_20"))
+                MessageProvider.ACTION_CTX_NOT_FOUND("CONTEXT_3"),
+                MessageProvider.DECLARED_CTX_NOT_FOUND("CONTEXT_20")
+            )
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
     }
 
-    @Nested inner class ConsistencyOfNames {
-        @Test fun validNames() {
+    @Nested
+    inner class ConsistencyOfNames {
+        @Test
+        fun validNames() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-names")
             val errors = TickStoryValidation.validateNames(tickStory)
 
             assertTrue { errors.isEmpty() }
         }
 
-        @Test fun invalidNames() {
+        @Test
+        fun invalidNames() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-invalid-names")
             val errors = TickStoryValidation.validateNames(tickStory)
 
             val expectedErrors = setOf(
                 "CONTEXT_1",
-                "INTRODUCTION").map { TickStoryValidation.MessageProvider.ACTION_HANDLER_CTX_NAME_CONFLICT(it) }
+                "INTRODUCTION"
+            ).map { MessageProvider.ACTION_HANDLER_CTX_NAME_CONFLICT(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
         }
     }
 
-    @Nested inner class ConsistencyOfTickIntent {
+    @Nested
+    inner class ConsistencyOfTickIntent {
         @Test
         fun validTickIntentNames() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-valid-tick-intent-names")
@@ -262,7 +291,7 @@ class TickStoryValidationTest : DialogManagerTest() {
             val expectedErrors = setOf(
                 "primaryIntents_1",
                 "secondaryIntents_3"
-            ).map { TickStoryValidation.MessageProvider.NOT_SECONDARY_INTENT_ASSOCIATED_TO_CTX(it) }
+            ).map { MessageProvider.NO_SECONDARY_INTENT_ASSOCIATED_TO_CTX(it) }
 
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
@@ -282,7 +311,7 @@ class TickStoryValidationTest : DialogManagerTest() {
             val errors = TickStoryValidation.validateTickIntentAssociationActions(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.INTENT_ACTION_ASSOCIATION_NOT_FOUND("ACTION_20"),
+                MessageProvider.INTENT_ACTION_ASSOCIATION_NOT_FOUND("ACTION_20"),
             )
 
             assertEquals(expectedErrors.size, errors.size)
@@ -303,7 +332,7 @@ class TickStoryValidationTest : DialogManagerTest() {
             val errors = TickStoryValidation.validateDeclaredIntentContexts(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.INTENT_CTX_ASSOCIATION_NOT_FOUND("CONTEXT_3"),
+                MessageProvider.INTENT_CTX_ASSOCIATION_NOT_FOUND("CONTEXT_3"),
             )
 
             assertEquals(expectedErrors.size, errors.size)
@@ -316,7 +345,7 @@ class TickStoryValidationTest : DialogManagerTest() {
             val errors = TickStoryValidation.validateUnknownConfigActions(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.UNKNOWN_ACTION_NOT_FOUND("unknown-action")
+                MessageProvider.UNKNOWN_ACTION_NOT_FOUND("unknown-action")
             )
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
@@ -344,7 +373,7 @@ class TickStoryValidationTest : DialogManagerTest() {
             val errors = TickStoryValidation.validateUnknownConfigIntents(tickStory)
 
             val expectedErrors = setOf(
-                TickStoryValidation.MessageProvider.UNKNOWN_INTENT_NOT_IN_SECONDARY_INTENTS("unknown")
+                MessageProvider.UNKNOWN_INTENT_NOT_IN_SECONDARY_INTENTS("unknown")
             )
             assertEquals(expectedErrors.size, errors.size)
             assertTrue { errors.containsAll(expectedErrors) }
@@ -352,11 +381,12 @@ class TickStoryValidationTest : DialogManagerTest() {
 
     }
 
-    @Nested inner class ConsistencyOfTargetStory {
+    @Nested
+    inner class ConsistencyOfTargetStory {
         @Test
         fun validTickAction() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-with-target-story")
-            val errors = TickStoryValidation.validateTargetStory(tickStory){ true }
+            val errors = TickStoryValidation.validateTargetStory(tickStory) { true }
 
             assertTrue { errors.isEmpty() }
         }
@@ -364,11 +394,11 @@ class TickStoryValidationTest : DialogManagerTest() {
         @Test
         fun invalidTickAction() {
             val tickStory = getTickStoryFromFile("validation", "tickStory-with-target-story")
-            val errors = TickStoryValidation.validateTargetStory(tickStory){ false }
+            val errors = TickStoryValidation.validateTargetStory(tickStory) { false }
 
             assertFalse { errors.isEmpty() }
             assertEquals(1, errors.size)
-            assertEquals (TickStoryValidation.MessageProvider.ACTION_TARGET_STORY_NOT_FOUND("HELLO" to "targetStory"), errors[0] )
+            assertEquals(MessageProvider.ACTION_TARGET_STORY_NOT_FOUND("HELLO" to "targetStory"), errors[0])
         }
 
 

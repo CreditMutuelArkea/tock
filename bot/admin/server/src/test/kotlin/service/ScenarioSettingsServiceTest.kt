@@ -26,10 +26,7 @@ import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.KodeinInjector
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.singleton
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.litote.kmongo.toId
@@ -85,7 +82,7 @@ class ScenarioSettingsServiceTest {
 
         val mockBehaviours : TRunnable = {
             every { dao.getScenarioSettingsByApplicationId(any()) } returns dbResult()
-            every { dao.save(capture(settingsSlot)) } returns Unit
+            justRun { dao.save(capture(settingsSlot)) }
         }
 
         val callService : TFunction<Pair<ApplicationDefinition, ScenarioSettingsQuery>?, Unit> = {
@@ -122,7 +119,7 @@ class ScenarioSettingsServiceTest {
         val mockBehaviours : TRunnable = {
             settingsSlot.clear()
             every { dao.getScenarioSettingsByApplicationId(any()) } returns null
-            every { dao.save(capture(settingsSlot)) } returns Unit
+            justRun { dao.save(capture(settingsSlot)) }
         }
 
         val callService : TFunction<Pair<ApplicationDefinition, ScenarioSettingsQuery>?, Unit> = {

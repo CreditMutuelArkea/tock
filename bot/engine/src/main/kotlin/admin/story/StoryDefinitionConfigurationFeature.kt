@@ -53,5 +53,5 @@ data class StoryDefinitionConfigurationFeature(
         botApplicationConfigurationId == conf._id ||
             botApplicationConfigurationId == conf.targetConfigurationId
 
-    fun isStoryActivation() = switchToStoryId == null && endWithStoryId == null
+    fun isStoryActivationFeature() = switchToStoryId == null && endWithStoryId == null
 }

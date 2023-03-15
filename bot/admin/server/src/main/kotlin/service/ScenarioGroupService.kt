@@ -18,6 +18,7 @@ package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
+import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.injector
 import com.github.salomonbrys.kodein.instance
@@ -49,7 +50,7 @@ object ScenarioGroupService {
     /**
      * Create a new scenario group and returns the created scenario group
      * @param scenarioGroup: the scenario group to create
-     * @throws [DuplicateKeyScenarioGroupException] if the scenario group name is already in use
+     * @throws [ScenarioGroupDuplicatedException] if the scenario group name is already in use
      */
     fun createOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         return scenarioGroupDAO.createOne(scenarioGroup)
@@ -58,7 +59,7 @@ object ScenarioGroupService {
     /**
      * Update a given scenario group and returns the updated scenario group
      * @param scenarioGroup: the scenario group to update
-     * @throws [ScenarioGroupNotFoundException] if the [scenarioGroup] was not found
+     * @throws [ScenarioGroupNotFoundException] if the [ScenarioVersion] was not found
      */
     fun updateOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         return scenarioGroupDAO.updateOne(scenarioGroup)

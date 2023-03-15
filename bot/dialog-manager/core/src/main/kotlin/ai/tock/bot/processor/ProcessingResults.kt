@@ -23,8 +23,8 @@ import ai.tock.bot.bean.TickSession
  * - [Success] if the processing is successful
  * - [Redirect] if a redirection is required
  */
-sealed class ProcessingResult
+sealed class ProcessingResult(open val session: TickSession)
 
-data class Success(val session: TickSession) : ProcessingResult() {}
+data class Success(override val session: TickSession) : ProcessingResult(session)
 
-data class Redirect(val storyId: String?) : ProcessingResult()
+data class Redirect(override val session: TickSession, val storyId: String) : ProcessingResult(session)

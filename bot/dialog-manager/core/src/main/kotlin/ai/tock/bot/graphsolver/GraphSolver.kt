@@ -16,6 +16,7 @@
 package ai.tock.bot.graphsolver
 
 import ai.tock.bot.bean.TickAction
+import ai.tock.bot.exception.NoClyngorResultsFound
 import ai.tock.shared.property
 import ai.tock.shared.resource
 import jep.SharedInterpreter
@@ -72,7 +73,7 @@ object GraphSolver {
 
     private fun List<String>.getIfNotEmpty(): List<String>{
         if(this.isEmpty()) {
-            error("No clyngor results found !")
+            throw NoClyngorResultsFound("No clyngor results found !")
         }
         return this
     }

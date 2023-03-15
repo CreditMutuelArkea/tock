@@ -17,7 +17,7 @@
 package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.admin.service.StoryService
-import ai.tock.bot.bean.TickStory
+import ai.tock.bot.bean.TickStoryQuery
 import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
@@ -25,22 +25,24 @@ import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
 
-
+/**
+ * [StoryVerticle] contains all the routes and actions associated with the stories
+ */
 class StoryVerticle {
 
-    private val logger: KLogger = KotlinLogging.logger {}
-    //private val StoryServiceImpl: StoryServiceImpl by injector.instance()
+    companion object {
+        private val logger: KLogger = KotlinLogging.logger {}
 
-    private val baseURL = "/bot"
-    private val storyURL = "$baseURL/story"
-    private val tickURL = "$storyURL/tick"
-
+        private const val baseURL = "/bot"
+        private const val storyURL = "$baseURL/story"
+        private const val tickURL = "$storyURL/tick"
+    }
 
     /**
      * Declaration of routes and association to the appropriate handler
      */
     fun configure(verticle: WebVerticle) {
-        logger.info { "configure ScenarioVerticle" }
+        logger.info { "configure StoryVerticle" }
 
         with(verticle) {
             blockingJsonPost(tickURL, setOf(TockUserRole.botUser), handler = createTickStory)
@@ -55,7 +57,7 @@ class StoryVerticle {
         }
     }
 
-    private val createTickStory: (RoutingContext, TickStory) -> Unit = { context, tickStory ->
+    private val createTickStory: (RoutingContext, TickStoryQuery) -> Unit = { context, tickStory ->
         logger.debug { "request to create tick story <${tickStory.storyId}>" }
         val namespace = (context.user() as TockUser).namespace
         StoryService.createTickStory(namespace, tickStory)

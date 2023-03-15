@@ -271,6 +271,8 @@ internal class ConfiguredStoryHandler(
 
     /**
      * A tick story handler
+     * @param container answers container [StoryDefinitionAnswersContainer]
+     * @param configuration the tick answer configuration [TickAnswerConfiguration]
      */
     private fun BotBus.handleTickAnswer(
         container: StoryDefinitionAnswersContainer,
@@ -334,7 +336,7 @@ internal class ConfiguredStoryHandler(
         return transformedAnswers
     }
 
-    fun BotBus.send(container: StoryDefinitionAnswersContainer, answer: SimpleAnswer, end: Boolean = false) {
+    private fun BotBus.send(container: StoryDefinitionAnswersContainer, answer: SimpleAnswer, end: Boolean = false) {
         val label = translate(answer.key)
         val suggestions = container.findNextSteps(this, configuration).map { this.translate(it) }
         val connectorMessages =

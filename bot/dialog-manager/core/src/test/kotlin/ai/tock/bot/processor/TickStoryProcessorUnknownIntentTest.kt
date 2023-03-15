@@ -28,7 +28,6 @@ import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import kotlin.test.*
 
 internal class TickStoryProcessorUnknownIntentTest {
@@ -77,7 +76,7 @@ internal class TickStoryProcessorUnknownIntentTest {
             contexts = mutableSetOf(),
             intentsContexts = mutableSetOf(),
             unknownHandleConfiguration = TickUnknownConfiguration(),
-            storySettings = TickStorySettings(2)
+            storySettings = TickStorySettings.default
         )
 
         session = TickSession()
@@ -95,8 +94,8 @@ internal class TickStoryProcessorUnknownIntentTest {
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
                 session = session.copy(
-                    handlingStep = TickActionHandlingStep(
-                        action = StateIds.STATE_3.value,
+                    lastExecutedAction = TickActionHandlingStep(
+                        actionName = StateIds.STATE_3.value,
                         repeated = 3
                     )
                 ),
@@ -184,8 +183,8 @@ internal class TickStoryProcessorUnknownIntentTest {
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
                 session = session.copy(
-                    handlingStep = TickActionHandlingStep(
-                        action = StateIds.STATE_3.value,
+                    lastExecutedAction = TickActionHandlingStep(
+                        actionName = StateIds.STATE_3.value,
                         repeated = 1
                     )
                 ),
@@ -248,9 +247,9 @@ internal class TickStoryProcessorUnknownIntentTest {
 
             val result = it as Success
 
-            with(result.session.handlingStep) {
+            with(result.session.lastExecutedAction) {
                 assertNotNull(this)
-                assertEquals(StateIds.STATE_3.value, action)
+                assertEquals(StateIds.STATE_3.value, actionName)
                 assertEquals(2, repeated)
             }
 
@@ -341,8 +340,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                 assertEquals(StateIds.STATE_3.value, currentState)
                 assertEquals(1, ranHandlers.size)
                 assertTrue { contexts.isEmpty() }
-                assertEquals(StateIds.STATE_3.value, handlingStep?.action)
-                assertEquals(1, handlingStep?.repeated)
+                assertEquals(StateIds.STATE_3.value, lastExecutedAction?.actionName)
+                assertEquals(1, lastExecutedAction?.repeated)
             }
 
             assertFalse { result.session.finished }
@@ -933,7 +932,7 @@ internal class TickStoryProcessorUnknownIntentTest {
     }
 
     @Test
-    fun `process when unknown intent is detected and unknownAnswerConfig is provided and repetitionNb is exceeded`() {
+    fun `process when unknown intent is detected and unknownAnswerConfig is provided and repetitionNb is exceeded and redirectStoryId is not provided`() {
 
         val answerConfig1 = UnknownAnswerConfig(
             action = StateIds.STATE_1.value,
@@ -993,17 +992,17 @@ internal class TickStoryProcessorUnknownIntentTest {
             )
         }
 
-        val processCall: TFunction<TickStoryProcessor?, RetryExceededError> = {
-            assertThrows {
-                it!!.process(TickUserAction(IntentNames.UNKNOWN_INTENT.value, emptyMap()))
-            }
+        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
+            it!!.process(TickUserAction(IntentNames.UNKNOWN_INTENT.value, emptyMap()))
         }
 
-        val checkResult: TConsumer<RetryExceededError?> = {
+        val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
+            assertTrue(it is Redirect)
+            assertEquals(UNKNOWN, it.storyId)
         }
 
-        TestCase<TickStoryProcessor, RetryExceededError>("process when executedAction with no trigger and no handler")
+        TestCase<TickStoryProcessor, ProcessingResult>("process when executedAction with no trigger and no handler")
 
             .given("""
     - current state is "state2"
@@ -1096,7 +1095,8 @@ internal class TickStoryProcessorUnknownIntentTest {
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assert(it is Redirect)
+            assertTrue(it is Redirect)
+            assertEquals("storyId", it.storyId)
         }
 
         TestCase<TickStoryProcessor,ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided")

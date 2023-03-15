@@ -25,10 +25,9 @@ import mu.KotlinLogging
  * @param key the step key
  */
 sealed class HandlingStep(open val repeated: Int, val key: String) {
-
     private val logger = KotlinLogging.logger {}
 
-    fun incrementRepetition(): HandlingStep {
+    fun next(): HandlingStep {
         logger.debug { "increment number of repetition of $key ($repeated to ${repeated + 1})" }
         return when (this) {
             is TickActionHandlingStep -> this.copy(repeated = repeated + 1)
@@ -48,9 +47,9 @@ data class UnknownHandlingStep(
 
 /**
  * TickActionHandlingStep represents a step while an action is being handled
- * @param action the current action name
+ * @param actionName the current action name
  */
 data class TickActionHandlingStep(
     override val repeated: Int = 1,
-    val action: String,
-) : HandlingStep(repeated, action)
+    val actionName: String,
+) : HandlingStep(repeated, actionName)

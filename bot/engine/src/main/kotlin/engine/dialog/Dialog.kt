@@ -54,7 +54,6 @@ data class Dialog(
 
     /**
      * the tick states
-     * FIXME : à mettre dans DialogState ?
      */
     val tickStates: MutableMap<String, TickState> = mutableMapOf()
 ) {

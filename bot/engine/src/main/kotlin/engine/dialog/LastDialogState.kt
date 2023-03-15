@@ -16,6 +16,7 @@
 
 package ai.tock.bot.engine.dialog
 
+// FIXME (DERCBOT-321)
 data class LastDialogState(
     val intentName: String?,
     val storyId: String?,

@@ -22,5 +22,4 @@ package ai.tock.bot.bean.unknown
  */
 sealed class UnknownHandlingException(override val message: String) : Exception(message)
 
-class RetryExceededError : UnknownHandlingException(RETRY_NB_EXCEEDED_MSG)
 class ConfigMismatchedError: UnknownHandlingException(CONFIG_MISMATCHED_MSG)

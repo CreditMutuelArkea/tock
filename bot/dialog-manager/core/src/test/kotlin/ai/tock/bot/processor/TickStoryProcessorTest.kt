@@ -19,7 +19,6 @@ package ai.tock.bot.processor
 import ai.tock.bot.*
 import ai.tock.bot.bean.*
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
-import ai.tock.bot.handler.ActionHandlersRepository
 import ai.tock.bot.sender.TickSender
 import ai.tock.bot.statemachine.State
 import io.mockk.*
@@ -222,7 +221,7 @@ class TickStoryProcessorTest {
                     contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
                     ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
                     objectivesStack = listOf(stateAurevoir.id),
-                    handlingStep = TickActionHandlingStep(repeated=1, action=actionTicTacToe.name)),
+                    lastExecutedAction = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
                 configuration = tickConfigBonjourRobot,
                 sender = tickSender,
                 endingStoryRuleExists = false
@@ -288,7 +287,7 @@ class TickStoryProcessorTest {
                     contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
                     ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
                     objectivesStack = listOf(stateAurevoir.id),
-                    handlingStep = TickActionHandlingStep(repeated=1, action=actionTicTacToe.name)),
+                    lastExecutedAction = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
                 configuration = tickConfigBonjourRobot.copy(actions = tickConfigBonjourRobot.actions.map {
                     if(it.final){
                         it.copy(answerId = null)

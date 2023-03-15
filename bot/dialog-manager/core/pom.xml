@@ -28,10 +28,10 @@
     <name>Tock Bot Dialog Manager Core</name>
 
     <properties>
-        <serialization.version>1.4.1</serialization.version>
-        <jep.version>4.0.3</jep.version>
-        <antrun.version>3.1.0</antrun.version>
-        <minidev.version>2.4.8</minidev.version>
+        <serialization>1.4.1</serialization>
+        <jep>4.0.3</jep>
+        <antrun>3.1.0</antrun>
+        <minidev>2.4.8</minidev>
     </properties>
 
 
@@ -67,7 +67,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>${antrun.version}</version>
+                <version>${antrun}</version>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -107,17 +107,17 @@
         <dependency>
             <groupId>black.ninia</groupId>
             <artifactId>jep</artifactId>
-            <version>${jep.version}</version>
+            <version>${jep}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-serialization-json</artifactId>
-            <version>${serialization.version}</version>
+            <version>${serialization}</version>
         </dependency>
         <dependency>
             <groupId>net.minidev</groupId>
             <artifactId>json-smart</artifactId>
-            <version>${minidev.version}</version>
+            <version>${minidev}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

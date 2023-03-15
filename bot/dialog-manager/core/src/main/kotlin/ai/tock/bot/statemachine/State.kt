@@ -17,8 +17,14 @@
 package ai.tock.bot.statemachine
 
 /**
- * The main component of the state machine.
+ * The main component of the hierarchical state machine.
  * Recursive element
+ * More information at xstate.js.org, inspired from its definition
+ * @param id state id
+ * @param type state type can be final
+ * @param initial parent state
+ * @param states hierarchical sons states
+ * @param on state transitions
  */
 @kotlinx.serialization.Serializable
 data class State(

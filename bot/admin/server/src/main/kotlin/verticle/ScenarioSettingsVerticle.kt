@@ -24,6 +24,9 @@ import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
 import io.vertx.ext.web.RoutingContext
 
+/**
+ * [ScenarioSettingsVerticle] contains all the routes and actions associated with the scenario settings
+ */
 class ScenarioSettingsVerticle {
 
     companion object {
