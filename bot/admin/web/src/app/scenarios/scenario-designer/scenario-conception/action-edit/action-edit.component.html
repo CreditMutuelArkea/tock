@@ -288,7 +288,7 @@
               </nb-list-item>
             </nb-list>
             <ng-container *ngIf="isReadonly && !inputContextNames.value.length">
-              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: findStory(targetStory.value)?.name }"></ng-container>
+              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: undefined }"></ng-container>
             </ng-container>
           </tock-form-control>
         </div>
@@ -312,10 +312,7 @@
           </ng-container>
         </tock-form-control>
 
-        <div
-          *ngIf="!targetStory.value"
-          data-testid="output-context-block"
-        >
+        <div data-testid="output-context-block">
           <tock-form-control
             label="Output contexts"
             name="outputContexts"
@@ -398,7 +395,7 @@
               </nb-list-item>
             </nb-list>
             <ng-container *ngIf="isReadonly && !outputContextNames.value.length">
-              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: findStory(targetStory.value)?.name }"></ng-container>
+              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: undefined }"></ng-container>
             </ng-container>
           </tock-form-control>
         </div>
