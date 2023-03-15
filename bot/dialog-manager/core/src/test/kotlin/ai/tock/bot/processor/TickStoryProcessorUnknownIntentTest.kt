@@ -94,7 +94,7 @@ internal class TickStoryProcessorUnknownIntentTest {
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
                 session = session.copy(
-                    lastExecutedAction = TickActionHandlingStep(
+                    handlingStep = TickActionHandlingStep(
                         actionName = StateIds.STATE_3.value,
                         repeated = 3
                     )
@@ -183,7 +183,7 @@ internal class TickStoryProcessorUnknownIntentTest {
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
                 session = session.copy(
-                    lastExecutedAction = TickActionHandlingStep(
+                    handlingStep = TickActionHandlingStep(
                         actionName = StateIds.STATE_3.value,
                         repeated = 1
                     )
@@ -247,7 +247,7 @@ internal class TickStoryProcessorUnknownIntentTest {
 
             val result = it as Success
 
-            with(result.session.lastExecutedAction) {
+            with(result.session.handlingStep) {
                 assertNotNull(this)
                 assertEquals(StateIds.STATE_3.value, actionName)
                 assertEquals(2, repeated)
@@ -340,8 +340,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                 assertEquals(StateIds.STATE_3.value, currentState)
                 assertEquals(1, ranHandlers.size)
                 assertTrue { contexts.isEmpty() }
-                assertEquals(StateIds.STATE_3.value, lastExecutedAction?.actionName)
-                assertEquals(1, lastExecutedAction?.repeated)
+                assertEquals(StateIds.STATE_3.value, handlingStep?.actionName)
+                assertEquals(1, handlingStep?.repeated)
             }
 
             assertFalse { result.session.finished }

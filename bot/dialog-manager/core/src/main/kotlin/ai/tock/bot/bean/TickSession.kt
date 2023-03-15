@@ -28,7 +28,7 @@ data class TickSession(
     val objectivesStack: List<String> = emptyList(),
     val initDate: Instant = Instant.now(),
     val unknownHandlingStep: UnknownHandlingStep? = null,
-    val lastExecutedAction: TickActionHandlingStep? = null,
+    val handlingStep: TickActionHandlingStep? = null,
     val finished: Boolean = false
 )
 

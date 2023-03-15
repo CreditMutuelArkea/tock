@@ -157,7 +157,7 @@ class TickStoryProcessorTargetStoryTest {
                     contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
                     ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
                     objectivesStack = listOf(stateAurevoir.id),
-                    lastExecutedAction = TickActionHandlingStep(1, actionTicTacToe.name)
+                    handlingStep = TickActionHandlingStep(1, actionTicTacToe.name)
                 ),
                 configuration = tickConfigBonjourRobot,
                 sender = tickSender,

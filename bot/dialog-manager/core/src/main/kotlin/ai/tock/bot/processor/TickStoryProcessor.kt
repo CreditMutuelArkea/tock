@@ -58,7 +58,7 @@ class TickStoryProcessor(
     private var ranHandlers = session.ranHandlers.toMutableList()
     private val stateMachine: StateMachine = StateMachine(configuration.stateMachine)
     private var currentState = session.currentState ?: getGlobalState()
-    private var lastExecutedAction = session.lastExecutedAction
+    private var handlingStep = session.handlingStep
     private var unknownHandlingStep = session.unknownHandlingStep
 
     /**
@@ -97,7 +97,7 @@ class TickStoryProcessor(
             // when a redirection is performed, the current story state is considered as finished
             return Redirect(computeNewSession(finished = true), e.redirectedStoryId)
         }
-        logger.debug { "lastExecutedAction : $lastExecutedAction" }
+        logger.debug { "lastExecutedAction : $handlingStep" }
 
         // Get the corresponding action
         val tickAction = getTickAction(secondaryObjective)
@@ -155,7 +155,7 @@ class TickStoryProcessor(
         tickUserAction: TickUserAction?
     ) {
         logger.debug { "manage the last executed action..." }
-        lastExecutedAction = lastExecutedAction?.let {
+        handlingStep = handlingStep?.let {
             // If the last executed action equals to the secondary objective,
             if (it.actionName == secondaryObjective) {
                 when (tickUserAction) {
@@ -187,7 +187,7 @@ class TickStoryProcessor(
             objectivesStack.toList(),
             session.initDate, // keep same init date
             unknownHandlingStep,
-            lastExecutedAction,
+            handlingStep,
             finished
         )
 

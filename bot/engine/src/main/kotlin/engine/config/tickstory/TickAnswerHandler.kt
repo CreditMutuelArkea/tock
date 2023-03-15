@@ -88,7 +88,7 @@ object TickAnswerHandler {
                     objectivesStack,
                     initDate,
                     unknownHandlingStep,
-                    lastExecutedAction,
+                    handlingStep,
                     finished
                 )
             }
