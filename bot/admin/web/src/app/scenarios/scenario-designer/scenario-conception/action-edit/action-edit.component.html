@@ -1,4 +1,7 @@
-<nb-card id="modal-wrapper">
+<nb-card
+  id="modal-wrapper"
+  class="m-0"
+>
   <nb-card-header class="d-flex justify-content-between align-items-start gap-1">
     Action definition
     <button
@@ -37,19 +40,15 @@
             (blur)="formatActionName()"
             data-testid="name"
           />
-          <span
-            *ngIf="isReadonly"
-            class="text-mitigated"
-          >
-            {{ name.value }}
-          </span>
+          <ng-container *ngIf="isReadonly">
+            <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: name.value }"></ng-container>
+          </ng-container>
         </tock-form-control>
 
         <div class="position-relative">
           <div
             *ngIf="!isReadonly"
-            class="position-absolute"
-            style="left: 49%"
+            class="arrowhead-centered"
           >
             <nb-icon
               icon="arrowhead-up-outline"
@@ -75,12 +74,9 @@
               placeholder="Enter description"
               rows="2"
             ></textarea>
-            <span
-              *ngIf="isReadonly"
-              class="text-mitigated"
-            >
-              {{ description.value }}
-            </span>
+            <ng-container *ngIf="isReadonly">
+              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: description.value }"></ng-container>
+            </ng-container>
           </tock-form-control>
         </div>
 
@@ -88,11 +84,9 @@
           <div class="position-relative">
             <div
               *ngIf="!isReadonly"
-              class="position-absolute"
-              style="left: 49%"
+              class="arrowhead-centered"
             >
               <nb-icon
-                *ngIf="!isReadonly"
                 icon="arrowhead-down-outline"
                 status="basic"
                 nbTooltip="Use description as answer"
@@ -125,12 +119,12 @@
                   [ngModelOptions]="{ standalone: true }"
                 ></textarea>
               </nb-form-field>
-              <span
-                *ngIf="isReadonly"
-                class="text-mitigated"
-              >
-                {{ currentLocaleAnswer.answer }}
-              </span>
+              <ng-container *ngIf="isReadonly">
+                <div class="d-flex gap-1">
+                  <span class="text-uppercase text-mitigated">{{ currentLocale }}</span>
+                  <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: currentLocaleAnswer.answer }"></ng-container>
+                </div>
+              </ng-container>
             </tock-form-control>
           </div>
 
@@ -176,12 +170,12 @@
                       ></textarea>
                     </nb-form-field>
 
-                    <span
-                      *ngIf="isReadonly"
-                      class="text-mitigated"
-                    >
-                      {{ localeAnswerDef.answer }}
-                    </span>
+                    <ng-container *ngIf="isReadonly">
+                      <div class="d-flex gap-1">
+                        <span class="text-uppercase text-mitigated">{{ localeAnswerDef.locale }}</span>
+                        <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: localeAnswerDef.answer }"></ng-container>
+                      </div>
+                    </ng-container>
                   </tock-form-control>
                 </ng-container>
               </ng-container>
@@ -204,23 +198,22 @@
             name="handler"
             [options]="handlers"
           ></tock-autocomplete-input>
-          <span
-            *ngIf="isReadonly"
-            class="text-mitigated"
-          >
-            {{ handler.value }}
-          </span>
+          <ng-container *ngIf="isReadonly">
+            <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: handler.value }"></ng-container>
+          </ng-container>
         </tock-form-control>
 
         <div>
           <tock-form-control
-            *ngIf="!isReadonly"
             label="Input contexts"
             name="inputContexts"
             [controls]="inputContextsAddError"
             [showError]="true"
           >
-            <div class="d-flex">
+            <div
+              *ngIf="!isReadonly"
+              class="d-flex mb-2"
+            >
               <div class="w-100">
                 <input
                   #inputContextsInput
@@ -261,48 +254,43 @@
                 Add
               </button>
             </div>
-          </tock-form-control>
+            <nb-list class="contexts-list">
+              <nb-list-item
+                *ngFor="let inputContext of inputContextNames.value"
+                class="p-2 d-flex justify-content-between"
+              >
+                <div class="d-flex flex-wrap justify-content-between w-100 mr-2">
+                  <div class="ellipsis font-weight-bold">
+                    {{ inputContext }}
+                  </div>
 
-          <label
-            *ngIf="isReadonly"
-            class="font-weight-bold text-mitigated"
-          >
-            Input contexts
-          </label>
-
-          <nb-list class="contexts-list">
-            <nb-list-item
-              *ngFor="let inputContext of inputContextNames.value"
-              class="p-2 d-flex justify-content-between"
-            >
-              <div class="d-flex flex-wrap justify-content-between w-100 mr-2">
-                <div class="ellipsis font-weight-bold">
-                  {{ inputContext }}
+                  <ng-container *ngFor="let context of getContextByName(inputContext)">
+                    <span
+                      *ngIf="context?.entityType"
+                      nbTooltip="Entity associated with the context"
+                      class="entity"
+                      [style.background]="getContextEntityColor(context)"
+                      [style.color]="getContextEntityContrast(context)"
+                    >
+                      {{ qualifiedName(stateService.user, context.entityType, context.entityRole) }}
+                    </span>
+                  </ng-container>
                 </div>
 
-                <ng-container *ngFor="let context of getContextByName(inputContext)">
-                  <span
-                    *ngIf="context?.entityType"
-                    nbTooltip="Entity associated with the context"
-                    class="entity"
-                    [style.background]="getContextEntityColor(context)"
-                    [style.color]="getContextEntityContrast(context)"
-                  >
-                    {{ qualifiedName(stateService.user, context.entityType, context.entityRole) }}
-                  </span>
-                </ng-container>
-              </div>
-
-              <nb-icon
-                *ngIf="!isReadonly"
-                icon="trash-2-outline"
-                status="danger"
-                (click)="removeContext('input', inputContext)"
-                class="min-width-1em ml-2 pointer"
-                nbTooltip="Remove this context from inputs"
-              ></nb-icon>
-            </nb-list-item>
-          </nb-list>
+                <nb-icon
+                  *ngIf="!isReadonly"
+                  icon="trash-2-outline"
+                  status="danger"
+                  (click)="removeContext('input', inputContext)"
+                  class="min-width-1em ml-2 pointer"
+                  nbTooltip="Remove this context from inputs"
+                ></nb-icon>
+              </nb-list-item>
+            </nb-list>
+            <ng-container *ngIf="isReadonly && !inputContextNames.value.length">
+              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: findStory(targetStory.value)?.name }"></ng-container>
+            </ng-container>
+          </tock-form-control>
         </div>
 
         <tock-form-control
@@ -319,12 +307,9 @@
             keyLabel="name"
             [options]="triggers"
           ></tock-autocomplete-input>
-          <span
-            *ngIf="isReadonly"
-            class="text-mitigated"
-          >
-            {{ trigger.value }}
-          </span>
+          <ng-container *ngIf="isReadonly">
+            <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: trigger.value }"></ng-container>
+          </ng-container>
         </tock-form-control>
 
         <div
@@ -332,13 +317,15 @@
           data-testid="output-context-block"
         >
           <tock-form-control
-            *ngIf="!isReadonly"
             label="Output contexts"
             name="outputContexts"
             [controls]="outputContextsAddError"
             [showError]="true"
           >
-            <div class="d-flex">
+            <div
+              *ngIf="!isReadonly"
+              class="d-flex mb-2"
+            >
               <div class="w-100">
                 <input
                   #outputContextsInput
@@ -379,46 +366,41 @@
                 Add
               </button>
             </div>
+            <nb-list class="contexts-list">
+              <nb-list-item
+                *ngFor="let outputContext of outputContextNames.value"
+                class="p-2 d-flex justify-content-between"
+              >
+                <div class="ellipsis font-weight-bold">
+                  {{ outputContext }}
+                </div>
+
+                <ng-container *ngFor="let context of getContextByName(outputContext)">
+                  <span
+                    *ngIf="context?.entityType"
+                    nbTooltip="Entity associated with the context"
+                    class="entity"
+                    [style.background]="getContextEntityColor(context)"
+                    [style.color]="getContextEntityContrast(context)"
+                  >
+                    {{ qualifiedName(stateService.user, context.entityType, context.entityRole) }}
+                  </span>
+                </ng-container>
+
+                <nb-icon
+                  *ngIf="!isReadonly"
+                  icon="trash-2-outline"
+                  status="danger"
+                  class="min-width-1em ml-2 pointer"
+                  nbTooltip="Remove this context from outputs"
+                  (click)="removeContext('output', outputContext)"
+                ></nb-icon>
+              </nb-list-item>
+            </nb-list>
+            <ng-container *ngIf="isReadonly && !outputContextNames.value.length">
+              <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: findStory(targetStory.value)?.name }"></ng-container>
+            </ng-container>
           </tock-form-control>
-
-          <label
-            *ngIf="isReadonly"
-            class="font-weight-bold text-mitigated"
-          >
-            Output contexts
-          </label>
-
-          <nb-list class="contexts-list">
-            <nb-list-item
-              *ngFor="let outputContext of outputContextNames.value"
-              class="p-2 d-flex justify-content-between"
-            >
-              <div class="ellipsis font-weight-bold">
-                {{ outputContext }}
-              </div>
-
-              <ng-container *ngFor="let context of getContextByName(outputContext)">
-                <span
-                  *ngIf="context?.entityType"
-                  nbTooltip="Entity associated with the context"
-                  class="entity"
-                  [style.background]="getContextEntityColor(context)"
-                  [style.color]="getContextEntityContrast(context)"
-                >
-                  {{ qualifiedName(stateService.user, context.entityType, context.entityRole) }}
-                </span>
-              </ng-container>
-
-              <nb-icon
-                *ngIf="!isReadonly"
-                icon="trash-2-outline"
-                status="danger"
-                class="min-width-1em ml-2 pointer"
-                nbTooltip="Remove this context from outputs"
-                (click)="removeContext('output', outputContext)"
-              ></nb-icon>
-            </nb-list-item>
-          </nb-list>
         </div>
       </div>
 
@@ -430,6 +412,7 @@
           [showError]="isSubmitted"
         >
           <nb-select
+            *ngIf="!isReadonly"
             id="targetStory"
             placeholder="Select a story to redirect to"
             formControlName="targetStory"
@@ -452,6 +435,10 @@
               {{ story.name }}
             </nb-option>
           </nb-select>
+
+          <ng-container *ngIf="isReadonly">
+            <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: findStory(targetStory.value)?.name }"></ng-container>
+          </ng-container>
         </tock-form-control>
 
         <div
@@ -509,13 +496,12 @@
                 </nb-icon>
               </button>
             </nb-form-field>
-
-            <span
-              *ngIf="isReadonly"
-              class="text-mitigated"
-            >
-              {{ localeAnswerDef.answer }}
-            </span>
+            <ng-container *ngIf="isReadonly">
+              <div class="d-flex gap-1">
+                <span class="text-uppercase text-mitigated">{{ localeAnswerDef.locale }}</span>
+                <ng-container *ngTemplateOutlet="readOnlyTemplate; context: { value: localeAnswerDef.answer }"></ng-container>
+              </div>
+            </ng-container>
           </tock-form-control>
         </ng-container>
       </div>
@@ -555,3 +541,21 @@
     </button>
   </nb-card-footer>
 </nb-card>
+
+<ng-template
+  #readOnlyTemplate
+  let-value="value"
+>
+  <span
+    *ngIf="value"
+    class="text-mitigated"
+  >
+    {{ value }}
+  </span>
+  <span
+    *ngIf="!value"
+    class="text-mitigated font-italic"
+  >
+    not specified
+  </span>
+</ng-template>

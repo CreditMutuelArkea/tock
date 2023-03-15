@@ -64,3 +64,9 @@
     padding-top: 1rem;
   }
 }
+
+.arrowhead-centered {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
