@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { takeUntil, take } from 'rxjs/operators';

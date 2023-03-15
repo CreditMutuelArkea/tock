@@ -218,7 +218,7 @@ export class ActionEditComponent implements OnInit {
     };
   }
 
-  targetStoryWasDeleted() {
+  targetStoryWasDeleted(): boolean {
     if (this.targetStory.value && !this.availableStories.find((as) => as.storyId === this.targetStory.value)) return true;
 
     return false;
