@@ -89,7 +89,7 @@ object ScenarioService {
         // Init the first draft version
         val scenarioVersion = ScenarioVersionService.createOne(initDraftScenarioVersion(scenarioGroup._id))
         // Associate the version to the group
-        return scenarioGroup.copy(versions = listOf(scenarioVersion), enabled = false)
+        return scenarioGroup.copy(versions = listOf(scenarioVersion), enabled = null)
     }
 
     /**

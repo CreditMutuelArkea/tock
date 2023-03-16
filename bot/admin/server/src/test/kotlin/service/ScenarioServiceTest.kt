@@ -222,7 +222,7 @@ class ScenarioServiceTest {
     @Test
     fun `createOneScenarioGroup WHEN the scenario group name not exists THEN create and return a scenario group created and its initial version`() {
         // GIVEN
-        val scenarioGroupWithoutVersions = scenarioGroup1.copy(versions = emptyList())
+        val scenarioGroupWithoutVersions = scenarioGroup1.copy(versions = emptyList(), enabled = null)
         mockkObject(ScenarioGroupService)
         mockkObject(ScenarioVersionService)
         every { ScenarioGroupService.createOne(scenarioGroupWithoutVersions) } returns scenarioGroupWithoutVersions
@@ -236,6 +236,7 @@ class ScenarioServiceTest {
         assertEquals(scenarioGroupWithoutVersions, result.copy(versions = emptyList()))
         assertEquals(1, result.versions.size)
         assertEquals(ScenarioVersionState.DRAFT, result.versions.first().state)
+        assertNull(result.enabled)
         verify(exactly = 1) { ScenarioGroupService.createOne(scenarioGroupWithoutVersions) }
         verify(exactly = 1) { ScenarioVersionService.createOne(any()) }
     }
