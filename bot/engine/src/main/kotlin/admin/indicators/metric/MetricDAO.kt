@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,28 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.story
+package ai.tock.bot.admin.indicators.metric
 
 /**
- * Association of indicator name and value
- * @param indicatorName mandatory indicator name
- * @param indicatorValueName mandatory indicator value name
+ * DAO to manage [Metric] entity
  */
-data class StoryDefinitionStepMetric(
-    val indicatorName: String,
-    val indicatorValueName: String
-)
+interface MetricDAO {
+    /**
+     * Save a metric.
+     * @param metric the metric to save
+     */
+    fun save(metric: Metric)
+
+    /**
+     * Save metrics.
+     * @param metrics the metrics to save
+     */
+    fun saveAll(metrics: List<Metric>)
+
+    /**
+     * Find all metrics by bot id
+     * @param botId the bot id
+     */
+    fun findAllByBotId(botId: String): List<Metric>
+
+}

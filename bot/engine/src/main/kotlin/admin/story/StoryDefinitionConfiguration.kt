@@ -23,6 +23,7 @@ import ai.tock.bot.admin.answer.BuiltInAnswerConfiguration
 import ai.tock.bot.admin.answer.DedicatedAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
+import ai.tock.bot.admin.indicators.metric.Metric
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
 import ai.tock.bot.definition.IntentWithoutNamespace
@@ -175,6 +176,18 @@ data class StoryDefinitionConfiguration(
                 features.filter { it.supportConfiguration(app) }
             }
         }
+
+    /**
+     * Save one [Metric]
+     * @param metric a [Metric] to save
+     */
+    fun saveMetric(metric: Metric) = BotRepository.saveMetric(metric)
+
+    /**
+     * Save many [Metric]
+     * @param metrics a set of [Metric] to save
+     */
+    fun saveMetrics(metrics: List<Metric>) = BotRepository.saveMetrics(metrics)
 
     internal fun isDisabled(applicationId: String?): Boolean =
         findFeatures(applicationId).let {

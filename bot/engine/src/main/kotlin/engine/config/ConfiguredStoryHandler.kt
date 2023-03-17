@@ -22,10 +22,12 @@ import ai.tock.bot.admin.answer.ScriptAnswerConfiguration
 import ai.tock.bot.admin.answer.SimpleAnswer
 import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
+import ai.tock.bot.admin.indicators.metric.TypeMetric
 import ai.tock.bot.admin.story.StoryDefinitionAnswersContainer
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep.Step
+import ai.tock.bot.admin.story.StoryDefinitionStepMetric
 import ai.tock.bot.connector.ConnectorFeature.CAROUSEL
 import ai.tock.bot.connector.media.MediaCardDescriptor
 import ai.tock.bot.connector.media.MediaCarouselDescriptor
@@ -87,9 +89,14 @@ internal class ConfiguredStoryHandler(
             }
         }
 
+        // Manage metrics
+        manageMetrics(bus)
+
+        // Manage step
         val busStep = bus.step as? Step
         busStep?.configuration
             ?.also { step ->
+
                 if (step.hasCurrentAnswer()) {
                     step.send(bus)
                 }
@@ -141,6 +148,52 @@ internal class ConfiguredStoryHandler(
             logger.debug { "NextIntentsQualifiers : ${bus.dialog.state.nextActionState} " }
         }
 
+    }
+
+    /**
+     * Manage story and step metrics :
+     * If a story is handled, save a [TypeMetric.STORY_HANDLED] metric
+     * If a story has steps with metrics, then save [TypeMetric.QUESTION_ASKED] metrics for indicators
+     * If a step is handled, save all its metrics as [TypeMetric.QUESTION_REPLIED]
+     * If a step has a children with metrics, then save them as [TypeMetric.QUESTION_ASKED]
+     */
+    private fun manageMetrics(bus: BotBus) {
+        val busStep = bus.step as? Step
+
+        if(busStep == null) {
+            // Save story handled metric if bot handle story and not a step
+            configuration.saveMetric(
+                bus.createMetric(TypeMetric.STORY_HANDLED)
+            )
+
+            // if story has steps with metrics then save all metrics as QuestionAsked
+            saveQuestionAskedMetrics(bus, configuration.steps.flatMap { it.metrics })
+
+        } else {
+            // Save step metric if bot handle story and not a step
+            busStep.configuration.metrics
+                .map { bus.createMetric(TypeMetric.QUESTION_REPLIED, it.indicatorName, it.indicatorValueName) }
+                .also {
+                    if(it.isNotEmpty())
+                        configuration.saveMetrics(it)
+                }
+
+            // if step has children with metrics then save all metrics as QuestionAsked
+            saveQuestionAskedMetrics(bus, busStep.children.flatMap { it.metrics })
+        }
+    }
+
+    /**
+     * Save a distinct [TypeMetric.QUESTION_ASKED] metrics
+     */
+    private fun saveQuestionAskedMetrics(bus: BotBus, metrics: List<StoryDefinitionStepMetric>) {
+        metrics.map { it.indicatorName }
+            .distinct()
+            .map { bus.createMetric(TypeMetric.QUESTION_ASKED, it) }
+            .also {
+                if(it.isNotEmpty())
+                    configuration.saveMetrics(it)
+            }
     }
 
     /**

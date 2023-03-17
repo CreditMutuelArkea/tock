@@ -16,7 +16,6 @@
 
 package ai.tock.bot.admin.model
 
-import StoryDefinitionStepMetric
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
@@ -27,6 +26,7 @@ import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.Translator
+import ai.tock.bot.admin.story.StoryDefinitionStepMetric
 
 data class BotStoryDefinitionConfigurationStep(
     /**

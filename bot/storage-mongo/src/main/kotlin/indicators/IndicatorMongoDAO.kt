@@ -66,5 +66,4 @@ object IndicatorMongoDAO : IndicatorDAO {
     override fun deleteByNameAndApplicationName(name: String, applicationName: String): Boolean =
         col.deleteOne(Indicator::name eq name, Indicator::botId eq applicationName).deletedCount == 1L
 
-
 }

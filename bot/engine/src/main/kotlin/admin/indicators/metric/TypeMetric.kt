@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.story
+package ai.tock.bot.admin.indicators.metric
 
 /**
- * Association of indicator name and value
- * @param indicatorName mandatory indicator name
- * @param indicatorValueName mandatory indicator value name
+ * Type of [Metric]
  */
-data class StoryDefinitionStepMetric(
-    val indicatorName: String,
-    val indicatorValueName: String
-)
+enum class TypeMetric {
+    QUESTION_ASKED,
+    QUESTION_REPLIED,
+    STORY_HANDLED
+}
