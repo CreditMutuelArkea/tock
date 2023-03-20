@@ -67,7 +67,7 @@ data class BotStoryDefinitionConfiguration(
     val configuredSteps: List<BotConfiguredSteps> = emptyList(),
     val _id: Id<StoryDefinitionConfiguration> = newId(),
     val nextIntentsQualifiers: List<NlpIntentQualifier> = emptyList(),
-    val isMetricStory: Boolean = false
+    val isMetricStory: Boolean? = false
 ) {
 
     constructor(story: StoryDefinitionConfiguration, userLocale: Locale, readOnly: Boolean = false) : this(
@@ -95,7 +95,7 @@ data class BotStoryDefinitionConfiguration(
     )
 
     fun validate() : Boolean {
-        return if (isMetricStory) {
+        return if (isMetricStory == true) {
             steps.any { it.hasMetrics() }
         } else {
             true
