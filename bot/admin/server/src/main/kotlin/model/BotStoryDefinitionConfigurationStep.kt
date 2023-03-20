@@ -16,7 +16,7 @@
 
 package ai.tock.bot.admin.model
 
-import StoryDefinitionStepIndicator
+import StoryDefinitionStepMetric
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
@@ -70,9 +70,9 @@ data class BotStoryDefinitionConfigurationStep(
      */
     val entity: EntityStepSelection?,
     /**
-     * The step indicator.
+     * The step metrics.
      */
-    val indicator: StoryDefinitionStepIndicator? = null,
+    val metrics: List<StoryDefinitionStepMetric> = emptyList(),
     /**
      * Intent defined by the intent name.
      */
@@ -82,7 +82,7 @@ data class BotStoryDefinitionConfigurationStep(
      */
     val targetIntentDefinition: IntentDefinition? = null,
 
-) {
+    ) {
 
     constructor(story: StoryDefinitionConfiguration, e: StoryDefinitionConfigurationStep, readOnly: Boolean = false) :
         this(
@@ -105,6 +105,10 @@ data class BotStoryDefinitionConfigurationStep(
             e.children.map { BotStoryDefinitionConfigurationStep(story, it, readOnly) },
             e.level,
             e.entity,
-            e.indicator
+            e.metrics
         )
+
+    fun hasMetrics() : Boolean {
+        return metrics.isNotEmpty() || children.any { it.hasMetrics() }
+    }
 }

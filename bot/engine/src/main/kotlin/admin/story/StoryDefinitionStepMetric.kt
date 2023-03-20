@@ -15,7 +15,7 @@
  */
 
 
-data class StoryDefinitionStepIndicator(
+data class StoryDefinitionStepMetric(
     val indicatorName: String,
     val indicatorValueName: String
 )

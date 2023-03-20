@@ -126,7 +126,12 @@ data class StoryDefinitionConfiguration(
     /**
      * To filter/re-qualify next intents
      */
-    val nextIntentsQualifiers: List<NlpIntentQualifier> = emptyList()
+    val nextIntentsQualifiers: List<NlpIntentQualifier> = emptyList(),
+
+    /**
+     * True if the story handle metrics
+     */
+    val isMetricStory: Boolean = false
 
 ) : StoryDefinitionAnswersContainer {
 

@@ -609,7 +609,8 @@ object BotAdminService {
             I18nLabelValue(userSentence),
             children.map { it.toStepConfiguration(app, botId, oldStory) },
             level,
-            entity
+            entity,
+            metrics
         ).apply {
             updateIntentDefinition(intentDefinition, intent, app)
             updateIntentDefinition(targetIntentDefinition, targetIntent, app)
@@ -670,7 +671,8 @@ object BotAdminService {
                 it.toConfiguredAnswer(botId, oldStory)
             },
             configuredSteps = story.configuredSteps.mapSteps(application, botId, oldStory),
-            nextIntentsQualifiers = story.nextIntentsQualifiers
+            nextIntentsQualifiers = story.nextIntentsQualifiers,
+            isMetricStory = story.isMetricStory,
         )
     }
 
@@ -687,6 +689,10 @@ object BotAdminService {
         user: UserLogin,
         createdIntent: IntentDefinition? = null
     ): BotStoryDefinitionConfiguration? {
+
+        if (!story.validate()) {
+            badRequest("Story is not valid : Metrics story must have at least one step with indicator")
+        }
 
         // Two stories (built-in or configured) should not have the same _id
         // There should be max one built-in (resp. configured) story for given namespace+bot+intent (or namespace+bot+storyId)
@@ -786,7 +792,8 @@ object BotAdminService {
                             )
                         },
                         configuredSteps = story.configuredSteps.mapSteps(application, botConf.botId, null),
-                        nextIntentsQualifiers = story.nextIntentsQualifiers
+                        nextIntentsQualifiers = story.nextIntentsQualifiers,
+                        isMetricStory = story.isMetricStory
                     )
                 }
             }
