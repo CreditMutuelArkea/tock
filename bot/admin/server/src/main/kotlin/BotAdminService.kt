@@ -690,8 +690,8 @@ object BotAdminService {
         createdIntent: IntentDefinition? = null
     ): BotStoryDefinitionConfiguration? {
 
-        if (!story.validate()) {
-            badRequest("Story is not valid : Metrics story must have at least one step that handles at least one metric.")
+        if (!story.validateMetrics()) {
+            badRequest("Story is not valid : Metric story must have at least one step that handles at least one metric.")
         }
 
         // Two stories (built-in or configured) should not have the same _id

@@ -94,9 +94,9 @@ data class BotStoryDefinitionConfiguration(
         story.isMetricStory
     )
 
-    fun validate() : Boolean {
+    fun validateMetrics() : Boolean {
         return if (isMetricStory == true) {
-            steps.any { it.hasMetrics() }
+            steps.isNotEmpty() && steps.any { it.hasMetrics() }
         } else {
             true
         }
