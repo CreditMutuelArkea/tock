@@ -672,7 +672,7 @@ object BotAdminService {
             },
             configuredSteps = story.configuredSteps.mapSteps(application, botId, oldStory),
             nextIntentsQualifiers = story.nextIntentsQualifiers,
-            isMetricStory = story.isMetricStory,
+            metricStory = story.metricStory,
         )
     }
 
@@ -793,7 +793,7 @@ object BotAdminService {
                         },
                         configuredSteps = story.configuredSteps.mapSteps(application, botConf.botId, null),
                         nextIntentsQualifiers = story.nextIntentsQualifiers,
-                        isMetricStory = story.isMetricStory
+                        metricStory = story.metricStory
                     )
                 }
             }

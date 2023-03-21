@@ -71,8 +71,8 @@ private val __ConfiguredSteps: KProperty1<StoryDefinitionConfiguration,
 private val __NextIntentsQualifiers: KProperty1<StoryDefinitionConfiguration,
         List<NlpIntentQualifier>?>
     get() = StoryDefinitionConfiguration::nextIntentsQualifiers
-private val __IsMetricStory: KProperty1<StoryDefinitionConfiguration, Boolean?>
-    get() = org.litote.kreflect.findProperty<StoryDefinitionConfiguration,Boolean?>("isMetricStory")
+private val __MetricStory: KProperty1<StoryDefinitionConfiguration, Boolean?>
+    get() = StoryDefinitionConfiguration::metricStory
 class StoryDefinitionConfiguration_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
         StoryDefinitionConfiguration?>) : KPropertyPath<T,
         StoryDefinitionConfiguration?>(previous,property) {
@@ -141,8 +141,8 @@ class StoryDefinitionConfiguration_<T>(previous: KPropertyPath<T, *>?, property:
         get() =
                 KCollectionSimplePropertyPath(this,StoryDefinitionConfiguration::nextIntentsQualifiers)
 
-    val isMetricStory: KPropertyPath<T, Boolean?>
-        get() = KPropertyPath(this,__IsMetricStory)
+    val metricStory: KPropertyPath<T, Boolean?>
+        get() = KPropertyPath(this,__MetricStory)
 
     companion object {
         val StoryId: KProperty1<StoryDefinitionConfiguration, String?>
@@ -194,8 +194,8 @@ class StoryDefinitionConfiguration_<T>(previous: KPropertyPath<T, *>?, property:
         val NextIntentsQualifiers: KCollectionSimplePropertyPath<StoryDefinitionConfiguration,
                 NlpIntentQualifier?>
             get() = KCollectionSimplePropertyPath(null, __NextIntentsQualifiers)
-        val IsMetricStory: KProperty1<StoryDefinitionConfiguration, Boolean?>
-            get() = __IsMetricStory}
+        val MetricStory: KProperty1<StoryDefinitionConfiguration, Boolean?>
+            get() = __MetricStory}
 }
 
 class StoryDefinitionConfiguration_Col<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
@@ -266,8 +266,8 @@ class StoryDefinitionConfiguration_Col<T>(previous: KPropertyPath<T, *>?, proper
         get() =
                 KCollectionSimplePropertyPath(this,StoryDefinitionConfiguration::nextIntentsQualifiers)
 
-    val isMetricStory: KPropertyPath<T, Boolean?>
-        get() = KPropertyPath(this,__IsMetricStory)
+    val metricStory: KPropertyPath<T, Boolean?>
+        get() = KPropertyPath(this,__MetricStory)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): StoryDefinitionConfiguration_<T>
@@ -341,8 +341,8 @@ class StoryDefinitionConfiguration_Map<T, K>(previous: KPropertyPath<T, *>?, pro
         get() =
                 KCollectionSimplePropertyPath(this,StoryDefinitionConfiguration::nextIntentsQualifiers)
 
-    val isMetricStory: KPropertyPath<T, Boolean?>
-        get() = KPropertyPath(this,__IsMetricStory)
+    val metricStory: KPropertyPath<T, Boolean?>
+        get() = KPropertyPath(this,__MetricStory)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): StoryDefinitionConfiguration_<T>

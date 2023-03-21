@@ -149,13 +149,9 @@ internal class StoryDefinitionConfiguration_Serializer :
                 null
                 )
                 .serialize(_nextIntentsQualifiers_, gen, serializers)
-        gen.writeFieldName("isMetricStory")
-        val _isMetricStory_ =
-                org.litote.kreflect.findPropertyValue<ai.tock.bot.admin.story.StoryDefinitionConfiguration,kotlin.Boolean>(value,
-                "isMetricStory")
-        if(_isMetricStory_ == null) { gen.writeNull() } else {
-                gen.writeBoolean(_isMetricStory_)
-                }
+        gen.writeFieldName("metricStory")
+        val _metricStory_ = value.metricStory
+        gen.writeBoolean(_metricStory_)
         gen.writeEndObject()
     }
 }

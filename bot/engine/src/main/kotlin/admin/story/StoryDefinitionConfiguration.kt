@@ -131,7 +131,7 @@ data class StoryDefinitionConfiguration(
     /**
      * True if the story handle metrics
      */
-    val isMetricStory: Boolean? = false
+    val metricStory: Boolean = false
 
 ) : StoryDefinitionAnswersContainer {
 

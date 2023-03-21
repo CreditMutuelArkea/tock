@@ -266,7 +266,7 @@ class BotAdminServiceTest : AbstractTest() {
                 assertThrows<BadRequestException> {
                     BotAdminService.saveStory(
                         existingStory.namespace,
-                        aMessageStory.copy(isMetricStory = true),
+                        aMessageStory.copy(metricStory = true),
                         "testUser"
                     )
                 }
