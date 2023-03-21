@@ -115,11 +115,10 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
             tags = scenarioGroup.tags,
             description = scenarioGroup.description,
             updateDate = ZonedDateTime.now(),
-            versions = emptyList(),
             unknownAnswerId = scenarioGroup.unknownAnswerId
         )
 
-        collection.updateOne(scenarioGroupUpdated)
+        collection.updateOne(scenarioGroupUpdated.copy(versions = emptyList()))
         return scenarioGroupUpdated
     }
 
