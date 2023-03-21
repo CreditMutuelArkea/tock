@@ -129,7 +129,7 @@ data class StoryDefinitionConfiguration(
     val nextIntentsQualifiers: List<NlpIntentQualifier> = emptyList(),
 
     /**
-     * True if the story handle metrics
+     * True if the story handle metrics and is not a main tracked story
      */
     val metricStory: Boolean = false
 
