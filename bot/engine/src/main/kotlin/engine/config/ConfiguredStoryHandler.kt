@@ -279,12 +279,12 @@ internal class ConfiguredStoryHandler(
         configuration: TickAnswerConfiguration
     ) {
         TickAnswerHandler.handle(this, container, configuration) {
-            botDefinition.stories.first { def ->
+            botDefinition.stories.firstOrNull { def ->
                 (def as ConfiguredStoryDefinition).storyId == it
-            }.let {
+            }?.let {
                 // Switch to the redirect configured story when redirection is required
                 switchConfiguredStory(it, it.mainIntent().name)
-            }
+            } ?: fallbackAnswer()
         }
     }
 
