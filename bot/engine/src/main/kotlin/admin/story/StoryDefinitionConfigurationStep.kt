@@ -16,6 +16,7 @@
 
 package ai.tock.bot.admin.story
 
+import StoryDefinitionStepMetric
 import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
@@ -70,7 +71,11 @@ data class StoryDefinitionConfigurationStep(
     /**
      * Entity selection.
      */
-    val entity: EntityStepSelection? = null
+    val entity: EntityStepSelection? = null,
+    /**
+     * The step metrics.
+     */
+    val metrics: List<StoryDefinitionStepMetric> = emptyList()
 ) : StoryDefinitionAnswersContainer {
 
     internal class Step(

@@ -34,6 +34,7 @@ import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.newId
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -259,6 +260,17 @@ class BotAdminServiceTest : AbstractTest() {
                 verify(exactly = 0) { storyDefinitionDAO.delete(any()) }
                 verify(exactly = 0) { storyDefinitionDAO.save(any()) }
             }
+
+            @Test
+            internal fun `GIVEN a metrics story with no step handling metric WHEN saving THEN a badRequest exception is returned`() {
+                assertThrows<BadRequestException> {
+                    BotAdminService.saveStory(
+                        existingStory.namespace,
+                        aMessageStory.copy(metricStory = true),
+                        "testUser"
+                    )
+                }
+            }
         }
     }
 
@@ -331,4 +343,5 @@ class BotAdminServiceTest : AbstractTest() {
         // Then
         assertNull(story)
     }
+
 }
