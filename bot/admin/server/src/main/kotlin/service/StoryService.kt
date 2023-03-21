@@ -86,7 +86,7 @@ object StoryService {
                         is TickAnswerConfiguration -> answer.copy(
                             storySettings =  TickStorySettings(
                                 answer.storySettings?.repetitionNb ?: 2,
-                                answer.storySettings?.redirectStory,
+                                answer.storySettings?.redirectStory ?: TickStorySettings.default.redirectStory,
                                 scenarioGroup.unknownAnswerId
                             )
                         )
@@ -240,7 +240,7 @@ object StoryService {
                                         ScenarioGroupService.findOneById(story.storyId)
                                 ).let { (settings, group) ->
                                 (settings
-                                    ?.let { TickStorySettings(it.actionRepetitionNumber, it.redirectStoryId) }
+                                    ?.let { TickStorySettings(it.actionRepetitionNumber, it.redirectStoryId ?: TickStorySettings.default.redirectStory) }
                                     ?: TickStorySettings.default).copy(unknownAnswerId = group.unknownAnswerId)
                             }
                     )

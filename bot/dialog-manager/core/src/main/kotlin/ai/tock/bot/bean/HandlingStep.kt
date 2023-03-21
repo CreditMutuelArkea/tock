@@ -52,4 +52,4 @@ data class UnknownHandlingStep(
 data class TickActionHandlingStep(
     override val repeated: Int = 1,
     val actionName: String,
-) : TickHandlingStep(repeated, action)
+) : TickHandlingStep(repeated, actionName)

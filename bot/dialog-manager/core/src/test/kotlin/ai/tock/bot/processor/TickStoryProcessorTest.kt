@@ -18,332 +18,454 @@ package ai.tock.bot.processor
 
 import ai.tock.bot.*
 import ai.tock.bot.bean.*
-import ai.tock.bot.bean.unknown.TickUnknownConfiguration
+import ai.tock.bot.bean.unknown.*
+import ai.tock.bot.graphsolver.GraphSolver
+import ai.tock.bot.handler.ActionHandlersRepository
 import ai.tock.bot.sender.TickSender
+import ai.tock.bot.sender.TickSenderDefault
 import ai.tock.bot.statemachine.State
 import io.mockk.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
+import org.junit.jupiter.api.assertThrows
+import kotlin.test.*
 
-class TickStoryProcessorTest {
-    init {
-        System.setProperty("tock_bot_dialog_manager_debug_enabled", "false")
+internal class TickStoryProcessorTest {
+
+    enum class StateIds(val value: String) {
+        GLOBAL("Global"),
+        STATE_1("State1"),
+        STATE_2("State2"),
+        STATE_3("State3")
     }
 
-    private val intentOui = "oui"
-    private val intentNon = "non"
-    private val intentBonjourRobot = "bonjourRobot"
+    enum class IntentNames(val value: String) {
+        INTENT_1("intent1"),
+        UNKNOWN_INTENT(UNKNOWN)
+    }
 
-    private val contextJeVeuxJouer = TickContext("JE_VEUX_JOUER")
-    private val contextJeNeVeuxPasJouer = TickContext("JE_NE_VEUX_PAS_JOUER")
-    private val contextDev1 = TickContext("DEV_CONTEXT_1")
-    private val contextDev2 = TickContext("DEV_CONTEXT_2")
-    private val contextDev3 = TickContext("DEV_CONTEXT_3")
+    enum class TriggerNames(val  value: String){
+        TRIGGER_1("trigger1")
+    }
 
-    private val stateBonjour = State(id = "BONJOUR_HUMAIN")
-    private val stateVeuxTuJouer = State(id = "VEUX_TU_JOUER")
-    private val stateTicTacToe = State(id = "TIC_TAC_TOE")
-    private val stateTantPis = State(id = "TANT_PIS")
-    private val stateTantMieux = State(id = "TANT_MIEUX")
-    private val stateAurevoir = State(id = "AU_REVOIR_HUMAIN")
+    enum class HandlerNames(val value: String) {
+        HANDLER_1("handler1"),
+        HANDLER_2("handler2"),
+    }
 
-    private val stateGroup = State(id = "GROUP", initial = stateAurevoir.id,
-        states = setOf(stateBonjour, stateVeuxTuJouer, stateTicTacToe, stateTantPis, stateTantMieux, stateAurevoir).associateBy { it.id },
-        on = mapOf(
-                intentOui to "#${stateAurevoir.id}",
-                intentNon to "#${stateAurevoir.id}",
-            )
-    )
+    enum class ContextNames(val value: String) {
+        CONTEXT_1("context1")
+    }
 
-    private val stateGlobal = State(id = "Global", initial = stateGroup.id,
-        states = setOf(stateGroup).associateBy { it.id },
-        on = mapOf(intentBonjourRobot to "#${stateGroup.id}")
-    )
+    private lateinit var configuration: TickConfiguration
+    private lateinit var session: TickSession
+    private val sender = mockk<TickSender>()
 
-    private val stateMachine = State(
-        id = "root", initial = "Global",
-        states = mapOf("Global" to stateGlobal),
-    )
+    @BeforeEach
+    internal fun setUp() {
+        mockkObject(GraphSolver)
+        mockkObject(ActionHandlersRepository)
 
-    private val actionBonjour = TickAction(
-        name =  stateBonjour.id,
-        answerId = "app_scenario_Bonjour Humain",
-        handler = "dev-tools:set_context_1",
-        outputContextNames = setOf(contextDev1).map { it.name }.toSet(),
-    )
 
-    private val actionVeuxTuJouer = TickAction(
-        name =  stateVeuxTuJouer.id,
-        answerId = "app_scenario_Veux-tu jouer ?",
-        handler = "dev-tools:set_context_2",
-        inputContextNames = setOf(contextDev1).map { it.name }.toSet(),
-        outputContextNames = setOf(contextDev2).map { it.name }.toSet(),
-    )
+        configuration = TickConfiguration(
+            State(StateIds.GLOBAL.value,
+                states = mutableMapOf(),
+                on = mutableMapOf()
+            ),
+            actions = mutableSetOf(),
+            contexts = mutableSetOf(),
+            intentsContexts = mutableSetOf(),
+            unknownHandleConfiguration = TickUnknownConfiguration(),
+            storySettings = TickStorySettings.default
+        )
 
-    private val actionTicTacToe = TickAction(
-        name =  stateTicTacToe.id,
-        answerId = "app_scenario_Tic tac toe ?",
-        inputContextNames = setOf(contextDev2).map { it.name }.toSet(),
-        outputContextNames = setOf(contextJeVeuxJouer, contextJeNeVeuxPasJouer).map { it.name }.toSet(),
-    )
+        session = TickSession()
+    }
 
-    private val actionTantPis = TickAction(
-        name =  stateTantPis.id,
-        answerId = "app_scenario_Tant pis",
-        handler = "dev-tools:set_context_3",
-        inputContextNames = setOf(contextJeNeVeuxPasJouer).map { it.name }.toSet(),
-        outputContextNames = setOf(contextDev3).map { it.name }.toSet(),
-    )
-
-    private val actionTantMieux = TickAction(
-        name =  stateTantMieux.id,
-        answerId = "app_scenario_Tant mieux",
-        handler = "dev-tools:set_context_3",
-        inputContextNames = setOf(contextJeVeuxJouer).map { it.name }.toSet(),
-        outputContextNames = setOf(contextDev3).map { it.name }.toSet(),
-    )
-
-    private val actionAurevoir = TickAction(
-        name =  stateAurevoir.id,
-        answerId = "app_scenario_Au revoir Humain !",
-        inputContextNames = setOf(contextDev3).map { it.name }.toSet(),
-        final = true
-    )
-
-    private val intentsContexts = setOf(
-        TickIntent(
-            intentName = intentOui,
-            associations = setOf(
-                TickIntentAssociation(
-                    actionName = actionTicTacToe.name,
-                    contextNames = setOf(contextJeVeuxJouer.name)
-                )
-            )
-        ),
-        TickIntent(
-            intentName = intentNon,
-            associations = setOf(
-                TickIntentAssociation(
-                    actionName = actionTicTacToe.name,
-                    contextNames = setOf(contextJeNeVeuxPasJouer.name)
-                )
-            )
-        ),
-    )
-
-    private val tickConfigBonjourRobot = TickConfiguration(
-        stateMachine = stateMachine,
-        contexts = setOf(contextJeVeuxJouer, contextJeNeVeuxPasJouer, contextDev1),
-        actions = setOf(actionBonjour, actionVeuxTuJouer, actionTicTacToe, actionTantPis, actionTantMieux, actionAurevoir),
-        intentsContexts = intentsContexts,
-        unknownHandleConfiguration = TickUnknownConfiguration(),
-        storySettings = TickStorySettings.default
-    )
-
-    private val tickSender = mockk<TickSender>()
+    @AfterEach
+    internal fun tearDown() {
+        unmockkObject(GraphSolver)
+        unmockkObject(ActionHandlersRepository)
+    }
 
     @Test
-    fun `process when user intent is intentBonjourRobot then process should success and sender send actionBonjourAanswerId then actionVeuxTuJouerAnswerId then end with actionTicTacToeAnswerId`() {
-
-        val sendAnswersCaptured = mutableListOf<String>()
-        val endAnswersCaptured = mutableListOf<String>()
+    fun `process when action is repeated more than the max number of repetitions`() {
 
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
-                session = TickSession(),
-                configuration = tickConfigBonjourRobot,
-                sender = tickSender,
-                endingStoryRuleExists = false
+                session = session.copy(
+                    handlingStep = TickActionHandlingStep(
+                        actionName = StateIds.STATE_3.value,
+                        repeated = 3
+                    )
+                ),
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        on = mapOf(
+                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
+                        ),
+                        initial = StateIds.STATE_1.value
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            handler = HandlerNames.HANDLER_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        )
+                    ),
+                    storySettings = TickStorySettings(
+                        2,
+                        "storyId"
+                    )
+                ),
+                TickSenderDefault(),
+                false
             )
         }
 
         val mockBehaviours: TRunnable = {
-            every { tickSender.sendById(capture(sendAnswersCaptured)) } answers {}
-            every { tickSender.endById(capture(endAnswersCaptured)) } answers {}
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
         }
 
         val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentBonjourRobot))
+            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assert(it is Success)
-
-            assertEquals(2, sendAnswersCaptured.size)
-            assertEquals(1, endAnswersCaptured.size)
-
-            verify(exactly = 1) { tickSender.sendById(actionBonjour.answerId!!) }
-            verify(exactly = 1) { tickSender.sendById(actionVeuxTuJouer.answerId!!) }
-            verify(exactly = 1) { tickSender.endById(actionTicTacToe.answerId!!) }
-
-            verifyOrder {
-                tickSender.sendById(actionBonjour.answerId!!)
-                tickSender.sendById(actionVeuxTuJouer.answerId!!)
-                tickSender.endById(actionTicTacToe.answerId!!)
-            }
+            assert(it is Redirect)
         }
 
-        TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 1")
-            .given(
-                setOf(
-                    "user intent is intentBonjourRobot"
-                ), produceProcessor)
-            .and(
-                setOf(
-                    "sender is mocked and messages are captured",
-                ), mockBehaviours)
-            .`when`(
-                setOf(
-                    "process method is called"
-                ), processCall)
-            .then(
-                setOf(
-                "process should success",
-                "sender send actionBonjour.answerId",
-                "then send actionVeuxTuJouer.answerId",
-                "then end with actionTicTacToe.answerId",
-                ), checkResult)
+        TestCase<TickStoryProcessor, ProcessingResult>("process when action is repeated more than the max number of repetitions")
+
+            .given("""
+    - user intent "intent1" leads to a primary objective "State1"
+    - secondary objective has no handler and no trigger
+                   """, produceProcessor)
+
+            .and("""
+    - graph resolver find a secondary objective "State3"
+    - secondary objective has no handler and no trigger
+                    """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "intent1"
+                 """, processCall)
+
+            .then("result should be a redirect", checkResult)
+
             .run()
     }
 
     @Test
-    fun `process when user intent is oui then process should success and sender send actionTantMieuxAnswerId then end with actionAurevoirAnswerId`() {
-
-        val sendAnswersCaptured = mutableListOf<String>()
-        val endAnswersCaptured = mutableListOf<String>()
+    fun `process when action executed has a target story`() {
 
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
-                session = TickSession(
-                    currentState = stateTicTacToe.id,
-                    contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
-                    ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
-                    objectivesStack = listOf(stateAurevoir.id),
-                    handlingStep = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
-                configuration = tickConfigBonjourRobot,
-                sender = tickSender,
-                endingStoryRuleExists = false
+                session = session.copy(
+                    handlingStep = TickActionHandlingStep(
+                        actionName = StateIds.STATE_3.value,
+                        repeated = 1
+                    )
+                ),
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        on = mapOf(
+                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
+                        ),
+                        initial = StateIds.STATE_1.value
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            handler = HandlerNames.HANDLER_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false,
+                            targetStory = "TARGET_STORY"
+                        )
+                    ),
+                    storySettings = TickStorySettings(
+                        2,
+                        "storyId"
+                    )
+                ),
+                TickSenderDefault(),
+                false
             )
         }
 
         val mockBehaviours: TRunnable = {
-            every { tickSender.sendById(capture(sendAnswersCaptured)) } answers {}
-            every { tickSender.endById(capture(endAnswersCaptured)) } answers {}
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
         }
 
         val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentOui))
+            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assert(it is Success)
-
-            assertEquals(1, sendAnswersCaptured.size)
-            assertEquals(1, endAnswersCaptured.size)
-
-            verify(exactly = 1) { tickSender.sendById(actionTantMieux.answerId!!) }
-            verify(exactly = 1) { tickSender.endById(actionAurevoir.answerId!!) }
-
-            verifyOrder {
-                tickSender.sendById(actionTantMieux.answerId!!)
-                tickSender.endById(actionAurevoir.answerId!!)
-            }
+            assert(it is Redirect)
+            ((it as Redirect).storyId == "TARGET_STORY").let { assertTrue { it } }
         }
 
-        TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 2")
-            .given(
-                setOf(
-                    "user intent is intentOui"
-                ), produceProcessor)
-            .and(
-                setOf(
-                    "sender is mocked and messages are captured",
-                ), mockBehaviours)
-            .`when`(
-                setOf(
-                    "process method is called"
-                ), processCall)
-            .then(
-                setOf(
-                    "process should success",
-                    "sender send actionTantMieux.answerId",
-                    "then sender end with actionAurevoir.answerId"
-                ), checkResult)
+        TestCase<TickStoryProcessor, ProcessingResult>("process when action executed has a target story")
+
+            .given("""
+    - user intent "intent1" leads to a primary objective "State1"
+    - secondary objective is an action with a target story
+                   """, produceProcessor)
+
+            .and("""
+    - graph resolver find a secondary objective "State3"
+    - Action "State3" has a target story
+                    """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "intent1"
+                 """, processCall)
+
+            .then("result should be a redirect", checkResult)
+
             .run()
     }
 
     @Test
-    fun `process when user intent is oui and final action has no answer then process should success and sender send actionTantMieuxAnswerId then end with emtpy message`() {
-
-        val sendAnswersCaptured = mutableListOf<String>()
+    fun `process when action is repeated `() {
 
         val produceProcessor: TSupplier<TickStoryProcessor> = {
             TickStoryProcessor(
-                session = TickSession(
-                    currentState = stateTicTacToe.id,
-                    contexts = setOf(contextDev1, contextDev2).associate { it.name to null },
-                    ranHandlers=listOf(actionBonjour.name, actionVeuxTuJouer.name, actionTicTacToe.name),
-                    objectivesStack = listOf(stateAurevoir.id),
-                    handlingStep = TickActionHandlingStep(repeated=1, actionName=actionTicTacToe.name)),
-                configuration = tickConfigBonjourRobot.copy(actions = tickConfigBonjourRobot.actions.map {
-                    if(it.final){
-                        it.copy(answerId = null)
-                    } else {
-                        it
-                    }
-                }.toSet()),
-                sender = tickSender,
-                endingStoryRuleExists = false
+                session = session.copy(
+                    handlingStep = TickActionHandlingStep(
+                        actionName = StateIds.STATE_3.value,
+                        repeated = 1
+                    )
+                ),
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        on = mapOf(
+                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
+                        ),
+                        initial = StateIds.STATE_1.value
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            handler = HandlerNames.HANDLER_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        )
+                    ),
+                    storySettings = TickStorySettings(
+                        2,
+                        "storyId"
+                    )
+                ),
+                TickSenderDefault(),
+                false
             )
         }
 
         val mockBehaviours: TRunnable = {
-            every { tickSender.sendById(capture(sendAnswersCaptured)) } answers {}
-            every { tickSender.end() } answers {}
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
         }
 
         val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(intentOui))
+            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
         }
 
         val checkResult: TConsumer<ProcessingResult?> = {
+
             assertNotNull(it)
             assert(it is Success)
 
-            assertEquals(1, sendAnswersCaptured.size)
+            val result = it as Success
 
-            verify(exactly = 1) { tickSender.sendById(actionTantMieux.answerId!!) }
-            verify(exactly = 1) { tickSender.end() }
+            with(result.session.handlingStep) {
+                assertNotNull(this)
+                assertEquals(StateIds.STATE_3.value, actionName)
+                assertEquals(2, repeated)
+            }
 
-            verifyOrder {
-                tickSender.sendById(actionTantMieux.answerId!!)
-                tickSender.end()
+        }
+
+        TestCase<TickStoryProcessor, ProcessingResult>("process when action is repeated")
+
+            .given("""
+    - user intent "intent1" leads to a primary objective "State1"
+    - secondary objective has no handler and no trigger
+                   """, produceProcessor)
+
+            .and("""
+    - graph resolver find a secondary objective "State3"
+    - secondary objective has no handler and no trigger
+                    """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "intent1"
+                 """, processCall)
+
+            .then("handlingStep must be the same with the repeated property incremented by 1", checkResult)
+
+            .run()
+    }
+
+    @Test
+    fun `process when executedAction with no trigger and no handler`() {
+
+        val produceProcessor: TSupplier<TickStoryProcessor> = {
+            TickStoryProcessor(
+                session,
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        on = mapOf(
+                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
+                        ),
+                        initial = StateIds.STATE_1.value
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            handler = HandlerNames.HANDLER_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        )
+                    ),
+                ),
+                TickSenderDefault(),
+                false
+            )
+        }
+
+        val mockBehaviours: TRunnable = {
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
+        }
+
+        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
+            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
+        }
+
+        val checkResult: TConsumer<ProcessingResult?> = {
+
+            assertNotNull(it)
+            assert(it is Success)
+
+            val result = it as Success
+            with(result.session) {
+                assertEquals(StateIds.STATE_3.value, currentState)
+                assertEquals(1, ranHandlers.size)
+                assertTrue { contexts.isEmpty() }
+                assertEquals(StateIds.STATE_3.value, handlingStep?.actionName)
+                assertEquals(1, handlingStep?.repeated)
+                assertFalse { finished }
             }
         }
 
-        TestCase<TickStoryProcessor, ProcessingResult>("process a tick user action - cas 3")
-            .given(
-                setOf(
-                    "user intent is intentOui"
-                ), produceProcessor)
-            .and(
-                setOf(
-                    "sender is mocked and messages are captured",
-                ), mockBehaviours)
-            .`when`(
-                setOf(
-                    "process method is called"
-                ), processCall)
-            .then(
-                setOf(
-                    "process should success",
-                    "sender send answerId",
-                    "end with emtpy message",
-                ), checkResult)
+        TestCase<TickStoryProcessor, ProcessingResult>("process when executedAction with no trigger and no handler")
+
+            .given("""
+    - user intent "intent1" leads to a primary objective "State1"
+    - secondary objective has no handler and no trigger
+                   """, produceProcessor)
+
+            .and("""
+    - graph resolver find a secondary objective "State3"
+    - secondary objective has no handler and no trigger
+                    """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "intent1"
+                 """, processCall)
+
+            .then("""
+    - current state should be "State3"
+    - session's ranHandlers should have one item "State3"
+    - session's contexts should be empty
+                """, checkResult)
+
             .run()
     }
+
 
 }

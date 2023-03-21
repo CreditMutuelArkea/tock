@@ -108,7 +108,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                         ),
                         on = mapOf(
                             IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -197,7 +198,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                         ),
                         on = mapOf(
                             IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -277,299 +279,6 @@ internal class TickStoryProcessorUnknownIntentTest {
     }
 
     @Test
-    fun `process when executedAction with no trigger and no handler`() {
-
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session,
-                configuration.copy(
-                    stateMachine = configuration.stateMachine.copy(
-                        states =  mapOf(
-                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
-                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
-                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        ),
-                        on = mapOf(
-                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}"
-                        )
-                    ),
-                    actions =  setOf(
-                        TickAction(
-                            StateIds.STATE_1.value,
-                            handler = HandlerNames.HANDLER_1.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_2.value,
-                            handler = HandlerNames.HANDLER_2.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_3.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        )
-                    ),
-                ),
-                TickSenderDefault(),
-                false
-            )
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
-            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-
-            assertNotNull(it)
-            assert(it is Success)
-
-            val result = it as Success
-            with(result.session) {
-                assertEquals(StateIds.STATE_3.value, currentState)
-                assertEquals(1, ranHandlers.size)
-                assertTrue { contexts.isEmpty() }
-                assertEquals(StateIds.STATE_3.value, handlingStep?.actionName)
-                assertEquals(1, handlingStep?.repeated)
-            }
-
-            assertFalse { result.session.finished }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process when executedAction with no trigger and no handler")
-
-            .given("""
-    - user intent "intent1" leads to a primary objective "State1"
-    - secondary objective has no handler and no trigger
-                   """, produceProcessor)
-
-            .and("""
-    - graph resolver find a secondary objective "State3"
-    - secondary objective has no handler and no trigger
-                    """, mockBehaviours)
-
-            .`when`("""
-    - processor.process method is called with a user intent "intent1"
-                 """, processCall)
-
-            .then("""
-    - current state should be "State3"
-    - session's ranHandlers should have one item "State3"
-    - session's contexts should be empty
-                """, checkResult)
-
-            .run()
-    }
-
-    @Test
-    fun `process when executedAction with handler and no trigger`() {
-
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session.copy(
-                    objectivesStack = listOf(
-                        StateIds.STATE_1.value
-                    )
-                ),
-                configuration.copy(
-                    stateMachine = configuration.stateMachine.copy(
-                        states =  mapOf(
-                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
-                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
-                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        ),
-                        on = mapOf(
-                            IntentNames.INTENT_1.value to "#${StateIds.STATE_2.value}"
-                        )
-                    ),
-                    actions =  setOf(
-                        TickAction(
-                            StateIds.STATE_1.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = true
-                        ),
-                        TickAction(
-                            StateIds.STATE_2.value,
-                            handler = HandlerNames.HANDLER_2.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_3.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        )
-                    ),
-                ),
-                TickSenderDefault(),
-                false
-            )
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { GraphSolver.solve(any(), any(), any(), any(), match { it.name == StateIds.STATE_2.value }, any()) } returns listOf(StateIds.STATE_2.value)
-            every { GraphSolver.solve(any(), any(), any(), any(), match { it.name == StateIds.STATE_1.value }, any()) } returns listOf(StateIds.STATE_1.value)
-            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-
-            assertNotNull(it)
-            val result = it as Success
-            with(result.session) {
-                assertEquals(StateIds.STATE_1.value, currentState)
-                assertEquals(2, ranHandlers.size)
-                assertTrue { ranHandlers.contains(StateIds.STATE_1.value) }
-                assertTrue { ranHandlers.contains(StateIds.STATE_2.value) }
-                assertTrue { contexts.containsKey(ContextNames.CONTEXT_1.value) }
-            }
-
-            assertTrue { result.session.finished }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process when executedAction with handler and no trigger")
-
-            .given("""
-    - user intent "intent1" leads to a primary objective "State2"
-    - "State2" objective has a handler and no trigger
-    - session objectiveStack has one item "State1"
-                   """, produceProcessor)
-
-            .and("""
-    - graph resolver find a secondary objective "State2" when primary objective is "State2"
-    - graph resolver find a secondary objective "State1 when primary objective is "State1"
-    - secondary objective has no handler and no trigger
-                    """, mockBehaviours)
-
-            .`when`("""
-    - processor.process method is called with a user intent "intent1"
-                 """, processCall)
-
-            .then("""
-    - current state should be "State1"
-    - session's ranHandlers should have two items "State2" and "State1"
-    - session's contexts should have one item
-                """, checkResult)
-
-            .run()
-    }
-
-    @Test
-    fun `process when executedAction with trigger and no handler`() {
-
-        val produceProcessor: TSupplier<TickStoryProcessor> = {
-            TickStoryProcessor(
-                session,
-                configuration.copy(
-                    stateMachine = configuration.stateMachine.copy(
-                        states =  mapOf(
-                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
-                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
-                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        ),
-                        on = mapOf(
-                            IntentNames.INTENT_1.value to "#${StateIds.STATE_1.value}",
-                            TriggerNames.TRIGGER_1.value to "#${StateIds.STATE_2.value}"
-                        )
-                    ),
-                    actions =  setOf(
-                        TickAction(
-                            StateIds.STATE_1.value,
-                            handler = HandlerNames.HANDLER_1.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_2.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        ),
-                        TickAction(
-                            StateIds.STATE_3.value,
-                            trigger = TriggerNames.TRIGGER_1.value,
-                            inputContextNames = setOf(),
-                            outputContextNames = setOf(),
-                            final = false
-                        )
-                    ),
-                ),
-                TickSenderDefault(),
-                false
-            )
-        }
-
-        val mockBehaviours: TRunnable = {
-            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
-            every { GraphSolver.solve(any(), any(), any(), any(), match { it.name == StateIds.STATE_2.value }, any()) } returns listOf(StateIds.STATE_2.value)
-            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
-        }
-
-        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
-            it!!.process(TickUserAction(IntentNames.INTENT_1.value, emptyMap()))
-        }
-
-        val checkResult: TConsumer<ProcessingResult?> = {
-
-            assertNotNull(it)
-            val result = it as Success
-            with(result.session) {
-                assertEquals(StateIds.STATE_2.value, currentState)
-                assertEquals(2, ranHandlers.size)
-                assertTrue { ranHandlers.contains(StateIds.STATE_3.value) }
-                assertTrue { ranHandlers.contains(StateIds.STATE_2.value) }
-                assertTrue { contexts.isEmpty() }
-            }
-
-            assertFalse { result.session.finished }
-        }
-
-        TestCase<TickStoryProcessor, ProcessingResult>("process when executedAction with trigger and no handler")
-
-            .given("""
-    - user intent "intent1" leads to a primary objective "State1"
-    - trigger "trigger1" leads to a primary objective "State2"
-    - secondary objective "State3" has trigger "trigger1"
-                   """, produceProcessor)
-
-            .and("""
-    - graph resolver find a secondary objective "State2" when primary objective is "State2"
-    - graph resolver find a secondary objective "State3" when primary objective another one
-                    """, mockBehaviours)
-
-            .`when`("""
-    - processor.process method is called with a user intent "intent1"
-                 """, processCall)
-
-            .then("""
-    - current state should be "State2"
-    - session's ranHandlers should have two items "State3" and "State2"
-    - session's contexts should be empty
-                """, checkResult)
-
-            .run()
-    }
-
-    @Test
     fun `process when unknown intent is detected and unknownAnswerConfig is provided`() {
 
         val msgCapture = slot<String>()
@@ -594,7 +303,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                             StateIds.STATE_1.value to State(StateIds.STATE_1.value),
                             StateIds.STATE_2.value to State(StateIds.STATE_2.value),
                             StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -651,10 +361,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                     assertEquals(1, repeated)
                     assertEquals(answerConfig2, answerConfig)
                 }
-
+                assertFalse { finished }
             }
-
-            assertFalse { result.session.finished }
 
             assertEquals(answerConfig2.answerId, msgCapture.captured)
 
@@ -714,7 +422,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                             StateIds.STATE_1.value to State(StateIds.STATE_1.value),
                             StateIds.STATE_2.value to State(StateIds.STATE_2.value),
                             StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -760,6 +469,7 @@ internal class TickStoryProcessorUnknownIntentTest {
             every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
 
         }
+
         val checkResult: TConsumer<ProcessingResult?> = {
 
             assertNotNull(it)
@@ -770,9 +480,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                 assertEquals(3, ranHandlers.size)
                 assertTrue { contexts.isEmpty() }
                 assertNull(unknownHandlingStep)
+                assertFalse { finished }
             }
-
-            assertFalse { result.session.finished }
 
             assertFalse(msgCapture.isCaptured)
 
@@ -836,7 +545,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                             StateIds.STATE_1.value to State(StateIds.STATE_1.value),
                             StateIds.STATE_2.value to State(StateIds.STATE_2.value),
                             StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -893,10 +603,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                     assertEquals(2, repeated)
                     assertEquals(answerConfig2, answerConfig)
                 }
-
+                assertFalse { finished }
             }
-
-            assertFalse { result.session.finished }
 
             assertEquals(answerConfig2.answerId, msgCapture.captured)
 
@@ -956,7 +664,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                             StateIds.STATE_1.value to State(StateIds.STATE_1.value),
                             StateIds.STATE_2.value to State(StateIds.STATE_2.value),
                             StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -1046,7 +755,8 @@ internal class TickStoryProcessorUnknownIntentTest {
                             StateIds.STATE_1.value to State(StateIds.STATE_1.value),
                             StateIds.STATE_2.value to State(StateIds.STATE_2.value),
                             StateIds.STATE_3.value to State(StateIds.STATE_3.value)
-                        )
+                        ),
+                        initial = StateIds.STATE_1.value
                     ),
                     actions =  setOf(
                         TickAction(
@@ -1095,8 +805,7 @@ internal class TickStoryProcessorUnknownIntentTest {
 
         val checkResult: TConsumer<ProcessingResult?> = {
             assertNotNull(it)
-            assertTrue(it is Redirect)
-            assertEquals("storyId", it.storyId)
+            assert(it is Redirect)
         }
 
         TestCase<TickStoryProcessor,ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is provided, repetitionNb is exceeded and redirectStoryId is provided")
@@ -1113,6 +822,130 @@ internal class TickStoryProcessorUnknownIntentTest {
 
             .then("""
     - A RetryExceededError is returned
+                """, checkResult)
+
+            .run()
+    }
+
+    @Test
+    fun `process when unknown intent is detected and unknownAnswerConfig is not provided but default unknown answer is provided`() {
+
+        val msgCapture = slot<String>()
+
+        val answerConfig1 = TickUnknownAnswerConfig(
+            action = StateIds.STATE_1.value,
+            answerId ="unknown 1"
+        )
+        val answerConfig2 = TickUnknownAnswerConfig(
+            action = StateIds.STATE_2.value,
+            answerId ="unknown 2"
+        )
+        val produceProcessor: TSupplier<TickStoryProcessor> = {
+            TickStoryProcessor(
+                session.copy(ranHandlers = listOf(
+                    StateIds.STATE_1.value,
+                    StateIds.STATE_2.value
+                ), currentState = StateIds.STATE_2.value),
+                configuration.copy(
+                    stateMachine = configuration.stateMachine.copy(
+                        states =  mapOf(
+                            StateIds.STATE_1.value to State(StateIds.STATE_1.value),
+                            StateIds.STATE_2.value to State(StateIds.STATE_2.value),
+                            StateIds.STATE_3.value to State(StateIds.STATE_3.value)
+                        ),
+                        initial = StateIds.STATE_1.value
+                    ),
+                    actions =  setOf(
+                        TickAction(
+                            StateIds.STATE_1.value,
+                            handler = HandlerNames.HANDLER_1.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_2.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        ),
+                        TickAction(
+                            StateIds.STATE_3.value,
+                            inputContextNames = setOf(),
+                            outputContextNames = setOf(),
+                            final = false
+                        )
+                    ),
+                    unknownHandleConfiguration = configuration.unknownHandleConfiguration.copy(
+                        unknownAnswerConfigs = setOf(
+                            answerConfig1
+                        )
+                    ),
+                    storySettings = configuration.storySettings.copy(
+                        unknownAnswerId = answerConfig2.answerId
+                    )
+                ),
+                sender,
+                false
+            )
+        }
+
+        val processCall: TFunction<TickStoryProcessor?, ProcessingResult> = {
+            it!!.process(TickUserAction(IntentNames.UNKNOWN_INTENT.value, emptyMap()))
+        }
+
+        val mockBehaviours: TRunnable = {
+            every { sender.sendById(capture(msgCapture)) } answers {}
+            every { sender.endById(capture(msgCapture)) } answers {}
+            every { sender.sendPlainText(any()) } answers {}
+            every { sender.endPlainText(any()) } answers {}
+            every { GraphSolver.solve(any(), any(), any(), any(), any(), any()) } returns listOf(StateIds.STATE_3.value)
+            every { ActionHandlersRepository.invoke(any(), any()) } returns mapOf(ContextNames.CONTEXT_1.value to null)
+
+        }
+
+        val checkResult: TConsumer<ProcessingResult?> = {
+
+            assertNotNull(it)
+
+            val result =  it as Success
+            with(result.session) {
+                assertEquals(StateIds.STATE_2.value, currentState)
+                assertEquals(2, ranHandlers.size)
+                assertTrue { contexts.isEmpty() }
+                assertNotNull(unknownHandlingStep)
+                assertFalse { finished }
+            }
+
+            assertTrue(msgCapture.isCaptured)
+
+            verify(exactly = 1) { sender.endById(answerConfig2.answerId) }
+        }
+
+        TestCase<TickStoryProcessor, ProcessingResult>("process when unknown intent is detected and unknownAnswerConfig is not provided but default unknown answer is provided")
+
+            .given("""
+    - current state is "state2"
+    - ranHandlers are "state1" and "state2"
+    - unknown handler is provided for action "state1" only
+                   """, produceProcessor)
+
+            .and("""
+    - sended message is capture  
+    - graphsolver always returns state3
+            """, mockBehaviours)
+
+            .`when`("""
+    - processor.process method is called with a user intent "unknown"
+                 """, processCall)
+
+            .then("""
+    - current state should be "State2"
+    - session's ranHandlers should have two items
+    - session's contexts should be empty
+    - session should have a not null unknownHandlingStep
+    - the session's unknownHandlingStep must have repeated equals 1
+    - the session's unknownHandlingStep must be linked to answerConfig2
                 """, checkResult)
 
             .run()
