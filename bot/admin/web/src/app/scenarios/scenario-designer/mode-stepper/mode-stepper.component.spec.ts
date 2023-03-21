@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbButtonModule, NbDialogService, NbIconModule, NbTooltipModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbDialogServiceMock } from '@tock/testing/mockedClass';
 
-import { Sentence } from '../../../model/nlp';
-import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE, TempSentence } from '../../models';
 import { ModeStepperComponent } from './mode-stepper.component';
+import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE, TempSentence } from '../../models';
+import { Sentence } from '../../../model/nlp';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService } from '../../../../testing/stubs';
 
 const scenarioWriting: ScenarioVersion = {
   id: '62fcbb7ae4d25c16a44071a1',
@@ -139,7 +139,7 @@ describe('ModeStepperComponent', () => {
     await TestBed.configureTestingModule({
       declarations: [ModeStepperComponent],
       imports: [TestingModule, NbButtonModule, NbIconModule, NbTooltipModule],
-      providers: [{ provide: NbDialogService, useClass: NbDialogServiceMock }]
+      providers: [{ provide: NbDialogService, useClass: StubNbDialogService }]
     }).compileComponents();
   });
 

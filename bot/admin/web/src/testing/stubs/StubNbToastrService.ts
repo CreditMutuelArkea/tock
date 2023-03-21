@@ -1,4 +1,4 @@
-export class NbToastrServiceMock {
+export class StubNbToastrService {
   success() {}
 
   danger() {}

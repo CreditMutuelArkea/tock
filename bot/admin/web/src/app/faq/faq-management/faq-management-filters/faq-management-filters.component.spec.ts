@@ -11,11 +11,11 @@ import {
   NbSelectModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { SpyOnCustomMatchers } from '@tock/testing/matchers';
 
-import { FaqFilter } from '../../models';
 import { FaqManagementFiltersComponent } from './faq-management-filters.component';
+import { FaqFilter } from '../../models';
+import { TestingModule } from '../../../../testing';
+import { SpyOnCustomMatchers } from '../../../../testing/matchers';
 
 describe('FaqManagementFiltersComponent', () => {
   let component: FaqManagementFiltersComponent;

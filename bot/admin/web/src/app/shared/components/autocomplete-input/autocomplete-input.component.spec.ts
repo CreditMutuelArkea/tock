@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbAutocompleteModule, NbInputModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { AutocompleteInputComponent } from './autocomplete-input.component';
+import { TestingModule } from '../../../../testing';
 
 describe('AutocompleteInputComponent', () => {
   let component: AutocompleteInputComponent;

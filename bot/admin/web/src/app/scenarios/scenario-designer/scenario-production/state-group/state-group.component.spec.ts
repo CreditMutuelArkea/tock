@@ -1,14 +1,13 @@
 import { ChangeDetectorRef, NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbDialogService } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 import { Subject } from 'rxjs';
 
-import { StateService } from '../../../../core-nlp/state.service';
-import { MachineState } from '../../../models';
-
-import { ScenarioProductionService } from '../scenario-production.service';
 import { ScenarioStateGroupComponent } from './state-group.component';
+import { ScenarioProductionService } from '../scenario-production.service';
+import { MachineState } from '../../../models';
+import { StateService } from '../../../../core-nlp/state.service';
+import { TestingModule } from '../../../../../testing';
 
 const machineState: MachineState = {
   id: 'root',

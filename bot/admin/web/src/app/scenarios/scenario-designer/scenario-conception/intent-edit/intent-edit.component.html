@@ -140,13 +140,13 @@
     >
       <input
         #addSentenceInput
+        tockAutofocusElement
         nbInput
         fullWidth
         id="newQuestion"
         type="text"
         placeholder="Add a new sentence formulation and press enter"
         (keyup.enter)="addSentence()"
-        autofocusElement
       />
 
       <button

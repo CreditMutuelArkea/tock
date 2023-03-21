@@ -25,6 +25,7 @@
         [showError]="isSubmitted"
       >
         <input
+          tockAutofocusElement
           nbInput
           formControlName="name"
           fullWidth
@@ -32,7 +33,6 @@
           type="text"
           placeholder="Enter new group name"
           (blur)="formatContextName()"
-          autofocusElement
         />
       </tock-form-control>
     </form>

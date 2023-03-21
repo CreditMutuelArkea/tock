@@ -14,6 +14,7 @@ import { ScenarioService } from './scenario.service';
 import { StateService } from '../../core-nlp/state.service';
 import { NlpService } from '../../nlp-tabs/nlp.service';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
+import { BotService } from '../../bot/bot-service';
 
 const mockScenarios: ScenarioGroupExtended[] = [
   {
@@ -25,6 +26,7 @@ const mockScenarios: ScenarioGroupExtended[] = [
     creationDate: '12/01/1980',
     updateDate: null,
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's1v1',
@@ -57,6 +59,7 @@ const mockScenarios: ScenarioGroupExtended[] = [
     creationDate: '01/01/1970',
     updateDate: '01/01/1970',
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's2v1',
@@ -78,6 +81,7 @@ const mockScenarios: ScenarioGroupExtended[] = [
     tags: ['tag1', 'tag2'],
     creationDate: '01/01/1970',
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's3v1',
@@ -104,6 +108,7 @@ const mockScenarios: ScenarioGroupExtended[] = [
     tags: [],
     creationDate: '12/01/1980',
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's4v1',
@@ -120,6 +125,7 @@ const mockScenarios: ScenarioGroupExtended[] = [
     tags: null,
     creationDate: '12/01/1980',
     enabled: false,
+    unknownAnswerId: 'app_test',
     versions: [
       {
         id: 's5v1',
@@ -159,6 +165,7 @@ const importScenarioGroup: ScenarioGroupExtended = {
   name: 'import',
   tags: ['import'],
   category: 'import',
+  unknownAnswerId: 'app_test',
   versions: [
     {
       state: SCENARIO_STATE.draft
@@ -180,6 +187,7 @@ const newScenario: ScenarioGroupExtended = {
   name: 'New scenario',
   enabled: false,
   tags: [],
+  unknownAnswerId: 'app_test',
   versions: []
 };
 
@@ -243,7 +251,8 @@ describe('ScenarioService', () => {
           provide: NlpService,
           useValue: {}
         },
-        { provide: BotConfigurationService, useValue: {} }
+        { provide: BotConfigurationService, useValue: {} },
+        { provide: BotService, useValue: {} }
       ]
     });
     service = TestBed.inject(ScenarioService);

@@ -9,13 +9,13 @@ import {
   NbToggleModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbDialogServiceMock, StateServiceMock } from '@tock/testing/mockedClass';
 import { of } from 'rxjs';
 
-import { StateService } from '../../../core-nlp/state.service';
 import { FaqManagementListComponent } from './faq-management-list.component';
 import { FaqDefinitionExtended } from '../faq-management.component';
+import { StateService } from '../../../core-nlp/state.service';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService, StubStateService } from '../../../../testing/stubs';
 
 const mockFaqs: FaqDefinitionExtended[] = [
   {
@@ -70,8 +70,8 @@ describe('FaqManagementListComponent', () => {
       declarations: [FaqManagementListComponent],
       imports: [TestingModule, NbIconModule, NbCardModule, NbButtonModule, NbTagModule, NbToggleModule, NbTooltipModule],
       providers: [
-        { provide: StateService, useClass: StateServiceMock },
-        { provide: NbDialogService, useClass: NbDialogServiceMock }
+        { provide: StateService, useClass: StubStateService },
+        { provide: NbDialogService, useClass: StubNbDialogService }
       ]
     }).compileComponents();
   });

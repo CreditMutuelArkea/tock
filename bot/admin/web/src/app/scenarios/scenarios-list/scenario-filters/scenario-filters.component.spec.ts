@@ -11,12 +11,12 @@ import {
   NbOptionModule,
   NbSelectModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { SpyOnCustomMatchers } from '@tock/testing/matchers';
 import { of } from 'rxjs';
 
-import { ScenarioService } from '../../services';
 import { ScenarioFiltersComponent } from './scenario-filters.component';
+import { ScenarioService } from '../../services';
+import { TestingModule } from '../../../../testing';
+import { SpyOnCustomMatchers } from '../../../../testing/matchers';
 
 describe('ScenarioFiltersComponent', () => {
   let component: ScenarioFiltersComponent;
@@ -75,7 +75,7 @@ describe('ScenarioFiltersComponent', () => {
    * Error: Can't assign single value if select is marked as multiple
    * Waiting upgrade of nebular to last version
    */
-  xdescribe('should show clear button when at least one filter is active', () => {
+  describe('should show clear button when at least one filter is active', () => {
     [
       { description: 'search active', formValue: { search: 'test', tags: [], enabled: null } },
       { description: 'tags active', formValue: { search: '', tags: ['tag1', 'tag2'], enabled: false } },
@@ -97,7 +97,7 @@ describe('ScenarioFiltersComponent', () => {
    * Error: Can't assign single value if select is marked as multiple
    * Waiting upgrade of nebular to last version
    */
-  xdescribe('should clear form when the method is called', () => {
+  describe('should clear form when the method is called', () => {
     [
       { description: 'search active', formValue: { search: 'test', tags: [], enabled: null } },
       { description: 'tags active', formValue: { search: '', tags: ['tag1', 'tag2'], enabled: false } },

@@ -98,7 +98,7 @@
     [loading]="loading.edit"
     [scenarioGroup]="scenarioGroupEdit"
     (onClose)="closeSidePanel('edit')"
-    (onSave)="saveScenarioGroup($event)"
+    (onSave)="saveScenarioGroupUnknownAnswers($event)"
   ></tock-scenario-edit>
 
   <tock-scenario-import
@@ -153,13 +153,13 @@
           [hasMargin]="false"
         >
           <textarea
+            tockAutofocusElement
             nbInput
             formControlName="comment"
             fullWidth
             id="comment"
             type="text"
             placeholder="Enter a comment"
-            autofocusElement
           ></textarea>
         </tock-form-control>
       </form>

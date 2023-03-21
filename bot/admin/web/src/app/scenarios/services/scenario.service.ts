@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, forkJoin, iif, merge, Observable, of } from 'rxjs';
 import { map, tap, switchMap, filter, concatMap, take } from 'rxjs/operators';
 
+import { BotService } from '../../bot/bot-service';
+import { CreateI18nLabelRequest, I18nLabel, I18nLocalizedLabel } from '../../bot/model/i18n';
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { StateService } from '../../core-nlp/state.service';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
@@ -14,7 +16,6 @@ import { NlpService } from '../../nlp-tabs/nlp.service';
 import { deepCopy, exportJsonDump } from '../../shared/utils';
 import { normalizedSnakeCase, stringifiedCleanObject } from '../commons/utils';
 import {
-  ScenarioDebug,
   ScenarioVersion,
   TickStory,
   ScenarioVersionExtended,
@@ -24,7 +25,8 @@ import {
   SCENARIO_STATE,
   ScenarioGroupUpdate,
   Handler,
-  TempSentence
+  TempSentence,
+  ScenarioAnswer
 } from '../models';
 import { ScenarioApiService } from './scenario.api.service';
 
@@ -50,6 +52,7 @@ export class ScenarioService {
   state$: Observable<ScenarioState>;
 
   constructor(
+    private botService: BotService,
     private scenarioApiService: ScenarioApiService,
     private applicationService: ApplicationService,
     private datePipe: DatePipe,
@@ -424,6 +427,42 @@ export class ScenarioService {
         });
       }
     });
+  }
+
+  saveAnswers(answers: ScenarioAnswer[]): Observable<I18nLabel> {
+    let request = new CreateI18nLabelRequest('scenario', answers[0].answer, answers[0].locale);
+    let i18nLabel: I18nLabel;
+
+    return this.botService.createI18nLabel(request).pipe(
+      tap((i18nLabelResponse: I18nLabel) => {
+        i18nLabel = i18nLabelResponse;
+      }),
+      concatMap((i18nLabel: I18nLabel) => {
+        return iif(() => !!(answers.length + 2), this.patchAnswer(i18nLabel, answers), of(false));
+      }),
+      map((_) => i18nLabel)
+    );
+  }
+
+  patchAnswer(i18nLabel: I18nLabel, answers: ScenarioAnswer[]): Observable<boolean> {
+    let i18n: I18nLocalizedLabel[] = [];
+
+    answers.forEach((answerToPatch) => {
+      const i18nLocalizedLabel = new I18nLocalizedLabel(
+        answerToPatch.locale,
+        answerToPatch.interfaceType,
+        answerToPatch.answer,
+        true,
+        null,
+        []
+      );
+
+      i18n = [...i18n, i18nLocalizedLabel];
+    });
+
+    i18nLabel.i18n = i18n;
+
+    return this.botService.saveI18nLabel(i18nLabel);
   }
 
   private downloadScenarioGroup(scenarioGroup: ScenarioGroup): void {

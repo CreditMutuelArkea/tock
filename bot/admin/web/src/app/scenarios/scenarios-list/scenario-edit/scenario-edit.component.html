@@ -29,8 +29,8 @@
         [required]="true"
       >
         <input
+          tockAutofocusElement
           nbInput
-          autofocusElement
           formControlName="name"
           fullWidth
           id="name"
@@ -74,12 +74,8 @@
         name="tags"
         [controls]="tags"
         [showError]="isSubmitted"
-        [hasMargin]="false"
       >
-        <nb-tag-list
-          tock-delay
-          (tagRemove)="tagRemove($event)"
-        >
+        <nb-tag-list (tagRemove)="tagRemove($event)">
           <nb-tag
             *ngFor="let tag of tags.value"
             removable
@@ -106,6 +102,59 @@
             </nb-option>
           </nb-autocomplete>
         </nb-tag-list>
+      </tock-form-control>
+
+      <tock-form-control
+        name="unknownAnswers"
+        label="Unknown answer"
+        [required]="true"
+        [hasMargin]="false"
+        [controls]="unknownAnswers"
+        [showError]="isSubmitted"
+        data-testid="unknownAnswers"
+      >
+        <ng-container formArrayName="unknownAnswers">
+          <ng-container *ngFor="let unknownAnswer of unknownAnswers.controls; let i = index; let last = last">
+            <div [formGroup]="unknownAnswer">
+              <tock-form-control
+                [name]="'unknownAnswer_' + unknownAnswer.value.locale"
+                [controls]="unknownAnswer.controls.answer"
+                [required]="true"
+                [showError]="isSubmitted"
+                [hasMargin]="!last"
+                data-testid="unknownAnswer"
+              >
+                <nb-form-field>
+                  <div
+                    nbPrefix
+                    class="text-uppercase"
+                  >
+                    {{ unknownAnswer.value.locale }}
+                  </div>
+                  <input
+                    nbInput
+                    fullWidth
+                    placeholder="Error message in {{ stateService.localeName(unknownAnswer.value.locale) }}"
+                    formControlName="answer"
+                    [id]="'unknownAnswer_' + unknownAnswer.value.locale"
+                  />
+
+                  <button
+                    type="button"
+                    nbSuffix
+                    nbButton
+                    ghost
+                    [disabled]="!unknownAnswer.value.answer?.length"
+                    (click)="resetLocaleUnknownAnswer(i)"
+                    data-testid="resetUnknownAnswer"
+                  >
+                    <nb-icon icon="trash-2-outline"></nb-icon>
+                  </button>
+                </nb-form-field>
+              </tock-form-control>
+            </div>
+          </ng-container>
+        </ng-container>
       </tock-form-control>
     </nb-card-body>
 

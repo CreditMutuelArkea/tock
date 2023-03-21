@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbCardModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { NoDataFoundComponent } from './no-data-found.component';
+import { TestingModule } from '../../../../testing';
 
 describe('NoDataFoundComponent', () => {
   let component: NoDataFoundComponent;
