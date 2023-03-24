@@ -34,10 +34,6 @@ interface FaqDefinitionDAO {
 
     fun getFaqDefinitionById(id: Id<FaqDefinition>): FaqDefinition?
 
-    /**
-     * Retrieve faqDefinition by filtering on the application name [id][ApplicationDefinition]
-     * @param id the application name
-     */
     fun getFaqDefinitionByBotId(id: String): List<FaqDefinition>
 
     fun listenFaqDefinitionChanges(listener: () -> Unit)
@@ -53,21 +49,11 @@ interface FaqDefinitionDAO {
     fun getFaqDefinitionByTags(tags: Set<String>): List<FaqDefinition>
 
     /**
-     * Retrieve faqDefinition by filtering on intent id [intentId][IntentDefinition] and the application name[botId][ApplicationDefinition]
-     * @param intentId intent id
-     * @param botId the application name
-     */
-    fun getFaqDefinitionByIntentIdAndBotId(intentId: Id<IntentDefinition>, botId: String): FaqDefinition?
-
-    /**
-     * Retrieve faq details with total count numbers according to the filter present un [FaqQuery]
-     * @param query [FaqQuery] the query search
-     * @param applicationDefinition the current [ApplicationDefinition]
-     * @param i18nIds optional to request eventually on i18nIds
+     * Get the aggregated Faq and total count
      */
     fun getFaqDetailsWithCount(
         query: FaqQuery,
-        applicationDefinition: ApplicationDefinition,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>? = null
     ): Pair<List<FaqQueryResult>, Long>
 

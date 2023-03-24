@@ -140,10 +140,6 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         return col.find(FaqDefinition::i18nId `in` ids).into(ArrayList())
     }
 
-    override fun getFaqDefinitionByIntentIdAndBotId(intentId: Id<IntentDefinition>, botId: String): FaqDefinition? {
-        return col.findOne(FaqDefinition::intentId eq intentId, FaqDefinition::botId eq botId)
-    }
-
     override fun save(faqDefinition: FaqDefinition) {
         col.replaceOneWithFilter(
             and(
@@ -156,17 +152,23 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
         )
     }
 
+    /**
+     * Retrieve faq details with total count numbers according to the filter present un [FaqQuery]
+     * @param : [FaqQuery] the query search
+     * @param : applicationId
+     * @param : i18nIds optional to request eventually on i18nIds
+     */
     override fun getFaqDetailsWithCount(
         query: FaqQuery,
-        applicationDefinition: ApplicationDefinition,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): Pair<List<FaqQueryResult>, Long> {
         with(query) {
             //prepare aggregation without skip and limit to know the total number of faq available
             val baseAggregation = if (isDocumentDB()) {
-                prepareFaqDetailBaseAggregationDocumentDb(query, applicationDefinition, i18nIds)
+                prepareFaqDetailBaseAggregationDocumentDb(query, botId, i18nIds)
             } else {
-                prepareFaqDetailBaseAggregation(query, applicationDefinition, i18nIds)
+                prepareFaqDetailBaseAggregation(query, botId, i18nIds)
             }
 
             logger.debug { baseAggregation.map { it.json } }
@@ -250,7 +252,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                             updateDate
                         )
                     }.let { faq -> col.save(faq) }
-                } else {
+                } else{
                     logger.warn { "Migrate FaqDefinition - applicationId=Null, faq=$projection" }
                 }
             }
@@ -266,13 +268,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
     /**
      * Prepare the faq detail aggregation without skip and limit
-     * @param query [FaqQuery] the query search
-     * @param applicationDefinition the current [ApplicationDefinition]
-     * @param i18nIds optional to request eventually on i18nIds
+     * @param : [FaqQuery] the query search
+     * @param : applicationId
+     * @param : i18nIds optional to request eventually on i18nIds
      */
     private fun prepareFaqDetailBaseAggregation(
         query: FaqQuery,
-        applicationDefinition: ApplicationDefinition,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
@@ -282,7 +284,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 // join FaqDefinition with IntentDefinition
                 joinOnIntentDefinition(),
                 // join FaqDefinition with ClassifiedSentence
-                joinOnClassifiedSentenceStatusNotDeleted(applicationDefinition._id),
+                joinOnClassifiedSentenceStatusNotDeleted(),
                 // unwind : to flat faq array into an object
                 FaqQueryResult::faq.unwind(),
                 match(
@@ -294,7 +296,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                             filterI18nIds(i18nIds)
                         ),
                         andNotNull(
-                            filterOnBotId(applicationDefinition.name),
+                            filterOnBotId(botId),
                             filterTags(),
                             filterEnabled(),
                         )
@@ -308,13 +310,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     /**
      * Prepare the faq detail aggregation without skip and limit and without lookup let pipeline and two unwind
      * to avoid unavailable aggregation let pipeline exp with documentDB
-     * @param query [FaqQuery] the query search
-     * @param applicationDefinition the current [ApplicationDefinition]
-     * @param i18nIds optional to request eventually on i18nIds
+     * @param : [FaqQuery] the query search
+     * @param : applicationId
+     * @param : i18nIds optional to request eventually on i18nIds
      */
     private fun prepareFaqDetailBaseAggregationDocumentDb(
         query: FaqQuery,
-        applicationDefinition: ApplicationDefinition,
+        botId: String,
         i18nIds: List<Id<I18nLabel>>?
     ): ArrayList<Bson> {
         with(query) {
@@ -327,13 +329,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 joinOnClassifiedSentence(),
                 // unwind : to flat faq array into an object
                 FaqQueryResult::faq.unwind(),
+
                 match(
                     andNotNull(
                         andNotNull(
-                            filterOnBotId(applicationDefinition.name),
+                            filterOnBotId(botId),
                             filterTags(),
                             filterEnabled(),
-                            filterCurrentApplicationClassifiedSentence(applicationDefinition._id),
                             filterNotDeletedClassifiedSentencesStatus()
                         ),
                         orNotNull(
@@ -351,25 +353,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     }
 
     private fun FaqQuery.filterTextSearchOnFaqTitle() =
-        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::label).regex(
-            pattern = search!!,
-            options = "i"
-        )
+        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::label).regex(pattern = search!!, options = "i")
 
     private fun FaqQuery.filterTextSearchOnFaqDescription() =
-        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::description).regex(
-            pattern = search!!,
-            options = "i"
-        )
+        if (search == null) null else (FaqQueryResult::faq / IntentDefinition::description).regex(pattern = search!!, options = "i")
 
     private fun FaqQuery.filterTextSearchOnClassifiedSentence() =
-        if (search == null) null else (FaqQueryResult::utterances / ClassifiedSentence::text).regex(
-            pattern = search!!,
-            options = "i"
-        )
-
-    private fun FaqQuery.filterCurrentApplicationClassifiedSentence(currentApplicationId: Id<ApplicationDefinition>) =
-        FaqQueryResult::utterances / ClassifiedSentence::applicationId eq currentApplicationId
+        if (search == null) null else (FaqQueryResult::utterances / ClassifiedSentence::text).regex(pattern = search!!, options = "i")
 
     /**
      *  add the filter on deleted Classified Sentences if cannot use aggegration pipeline with documentDB
@@ -399,7 +389,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
      * Filter on the botId
      */
     private fun filterOnBotId(botId: String): Bson =
-        FaqDefinition::botId eq botId
+        FaqDefinition::botId eq  botId
 
     /**
      * Group aggregation pipeline to recompose and group data after multiple unwind especially due to utterances unwind
@@ -444,7 +434,7 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     /**
      * Perform a lookup join from the FaqDefinition.intentId on ClassifiedSentence.classification.intentId and avoid returning deleted sentences
      */
-    private fun FaqQuery.joinOnClassifiedSentenceStatusNotDeleted(applicationId: Id<ApplicationDefinition>) =
+    private fun FaqQuery.joinOnClassifiedSentenceStatusNotDeleted() =
         //inspired from https://github.com/Litote/kmongo/blob/master/kmongo-core-tests/src/main/kotlin/org/litote/kmongo/AggregateTypedTest.kt#L322
         lookup(
             CLASSIFIED_SENTENCE_COLLECTION,
@@ -457,13 +447,11 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
                 expr(
                     and from
                             listOf(
-                                // join classifiedSentence intentId and FaqDefinition intentId
+                                // join classifiedSentence intentId and FaqDefintion intentId
                                 eq from listOf(
                                     ClassifiedSentence::classification / Classification::intentId,
                                     "\$\$$FAQ_INTENTID"
                                 ),
-                                //filter on current applicationId
-                                eq from listOf(ClassifiedSentence::applicationId, applicationId),
                                 // do not take classified sentences with deleted status because of the BuildWorker scheduled delay (1 second)
                                 // needed to check and erase the ones with deleted status each
                                 ne from listOf(
