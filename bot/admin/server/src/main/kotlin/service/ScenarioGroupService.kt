@@ -21,14 +21,14 @@ import ai.tock.bot.admin.scenario.ScenarioGroupDAO
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.injector
-import com.github.salomonbrys.kodein.instance
+import ai.tock.shared.provide
 import org.litote.kmongo.toId
 
 /**
  * Service that manage the scenario groups
  */
 object ScenarioGroupService {
-    private val scenarioGroupDAO: ScenarioGroupDAO by injector.instance()
+    private val scenarioGroupDAO: ScenarioGroupDAO get() = injector.provide()
 
     /**
      * Returns all scenario groups by botId with their scenario versions

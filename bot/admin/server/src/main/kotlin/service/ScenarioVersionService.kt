@@ -21,14 +21,14 @@ import ai.tock.bot.admin.scenario.ScenarioVersionDAO
 import ai.tock.bot.admin.scenario.ScenarioVersionState
 import ai.tock.shared.injector
 import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
-import com.github.salomonbrys.kodein.instance
+import ai.tock.shared.provide
 import org.litote.kmongo.toId
 
 /**
  * Service that manage the scenario versions
  */
 object ScenarioVersionService {
-    private val scenarioVersionDAO: ScenarioVersionDAO by injector.instance()
+    private val scenarioVersionDAO: ScenarioVersionDAO get() = injector.provide()
 
     /**
      * Returns one scenario version

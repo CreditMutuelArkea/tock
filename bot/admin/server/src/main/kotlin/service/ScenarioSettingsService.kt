@@ -21,13 +21,12 @@ import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.ScenarioSettingsQuery
 import ai.tock.shared.injector
-import com.github.salomonbrys.kodein.instance
+import ai.tock.shared.provide
 import java.time.Instant
 
 object ScenarioSettingsService   {
 
-    private val scenarioSettingsDAO: ScenarioSettingsDAO by injector.instance()
-
+    private val scenarioSettingsDAO: ScenarioSettingsDAO get() = injector.provide()
     fun save(applicationDefinition: ApplicationDefinition, query: ScenarioSettingsQuery) {
         val settings = scenarioSettingsDAO.getScenarioSettingsByBotId(applicationDefinition._id.toString())?.copy(
             actionRepetitionNumber = query.actionRepetitionNumber,
