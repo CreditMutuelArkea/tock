@@ -59,8 +59,10 @@ interface IadvizeApi {
 
 private const val TIMEOUT = 30000L
 
-// FIXME : Rollback
-var proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 3128))
+var proxy = ProxyConfiguration.configure(
+    property(IADVIZE_PROXY_HOST),
+    intProperty(IADVIZE_PROXY_PORT),
+)
 
 /**
  * Create a new Iadvize api client.
