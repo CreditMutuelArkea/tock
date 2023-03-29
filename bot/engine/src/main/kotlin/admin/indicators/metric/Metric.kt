@@ -28,7 +28,7 @@ import java.time.Instant
  * @param type mandatory type
  * @param indicatorName mandatory indicator name
  * @param indicatorValueName mandatory indicator value name
- * @param emitterStoryId mandatory id of emitter story,
+ * @param emitterStoryId mandatory id of emitter story
  * @param trackedStoryId mandatory id of tracked story
  * @param playerIds mandatory player ids - set of [PlayerId]
  * @param dialogId mandatory dialog id
