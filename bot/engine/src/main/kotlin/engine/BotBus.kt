@@ -464,7 +464,7 @@ interface BotBus : Bus<BotBus> {
         )
 
     /**
-     * A tracked story is the last story at dialog, witch flagged non metricStory,
+     * A tracked story is the last story in the dialog, wich flagged non metricStory,
      * If it doesn't exist, the tracked story is the current one
      */
     fun getTrackedStoryId() = dialog.stories
