@@ -16,14 +16,25 @@
 
 package ai.tock.iadvize.client
 
+import java.net.InetSocketAddress
+import java.net.Proxy
+
 /**
- * Get system or environment variable value.
- *
- * @param name the variable name
- * @param defaultValue the default value
+ * A proxy configuration
  */
-fun property(name: String, defaultValue: String = ""): String = System.getProperty(name) ?: System.getenv(name) ?: defaultValue
+object ProxyConfiguration {
 
-fun intProperty(name: String, defaultValue: Int = 3128): Int = property(name, defaultValue.toString()).toInt()
-
-fun booleanProperty(name: String, defaultValue: Boolean = false): Boolean = property(name, defaultValue.toString()).toBoolean()
+    /**
+     * Configure proxy
+     * @param proxyHost : host
+     * @param proxyPort : port
+     */
+    fun configure(proxyHost: String, proxyPort: Int): Proxy {
+        return if (proxyHost.isNotBlank()) {
+            val address = InetSocketAddress(proxyHost, proxyPort)
+            Proxy(Proxy.Type.HTTP, address)
+        } else {
+            Proxy.NO_PROXY
+        }
+    }
+}

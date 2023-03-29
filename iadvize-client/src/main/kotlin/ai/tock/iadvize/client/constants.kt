@@ -27,6 +27,9 @@ const val GRANT_TYPE = "grant_type"
 const val IADVIZE_USERNAME_AUTHENTICATION = "iadvize_username_authentication"
 const val IADVIZE_PASSWORD_AUTHENTICATION = "iadvize_password_authentication"
 
+const val IADVIZE_PROXY_HOST = "iadvize_proxy_host"
+const val IADVIZE_PROXY_PORT = "iadvize_proxy_port"
+
 const val APPLICATION_JSON = "application/json"
 const val AUTHORIZATION = "Authorization"
 const val BEARER = "Bearer"
