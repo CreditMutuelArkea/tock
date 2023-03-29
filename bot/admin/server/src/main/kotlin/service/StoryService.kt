@@ -32,9 +32,9 @@ import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.nlp.front.service.storage.ApplicationDefinitionDAO
 import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.injector
+import ai.tock.shared.provide
 import ai.tock.shared.vertx.WebVerticle
 import ai.tock.shared.withoutNamespace
-import com.github.salomonbrys.kodein.instance
 import com.mongodb.MongoWriteException
 import mu.KLogger
 import mu.KotlinLogging
@@ -48,8 +48,8 @@ object StoryService {
     private const val TICK = "tick"
 
     private val logger: KLogger = KotlinLogging.logger {}
-    private val storyDefinitionDAO: StoryDefinitionConfigurationDAO by injector.instance()
-    private val applicationDefinitionDAO: ApplicationDefinitionDAO by injector.instance()
+    private val storyDefinitionDAO: StoryDefinitionConfigurationDAO get() = injector.provide()
+    private val applicationDefinitionDAO: ApplicationDefinitionDAO get() = injector.provide()
 
     init {
         /* On scenarioSettings changes, all TickStoryConfiguration must be updated */
@@ -57,7 +57,6 @@ object StoryService {
             storyDefinitionDAO.getStoryDefinitionByCategory(TICK)
                 .forEach { storyDefinition ->
                     val answers: List<AnswerConfiguration> = storyDefinition.answers.map { answer ->
-
                         when (answer) {
                             is TickAnswerConfiguration -> answer.copy(
                                 storySettings = TickStorySettings(
