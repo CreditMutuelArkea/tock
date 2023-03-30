@@ -1103,6 +1103,12 @@ open class AdminVerticle : WebVerticle() {
         ) { context, conf : NamespaceConfiguration ->
             if (front.isNamespaceOwner(context.userLogin, conf.namespace)) {
                 front.saveNamespaceConfiguration(conf)
+                // For each application, trigger model build
+                front.getApplications().forEach {
+                    front.triggerBuild(
+                        ModelBuildTrigger(it._id, all = true, onlyIfModelNotExists = true)
+                    )
+                }
             } else {
                 unauthorized()
             }
