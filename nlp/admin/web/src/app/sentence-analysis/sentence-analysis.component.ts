@@ -42,7 +42,7 @@ export class SentenceAnalysisComponent implements OnInit {
   intentBeforeClassification: string;
   UNKNOWN_INTENT_FILTER = new FilterOption('tock:unknown', 'Unknown');
   intentId: string;
-  selectedIntent:Intent;
+  selectedIntent: Intent;
   selectedIntentLabel: string;
 
   constructor(
@@ -62,7 +62,7 @@ export class SentenceAnalysisComponent implements OnInit {
       this.selectedIntentLabel = this.UNKNOWN_INTENT_FILTER.label;
     } else {
       this.selectedIntent = this.state.findSharedNamespaceIntentById(this.intentBeforeClassification);
-      this.selectedIntentLabel = this.selectedIntent.name;
+      this.selectedIntentLabel = this.selectedIntent.label ? this.selectedIntent.label : this.selectedIntent.name;
     }
     if (this.minimalView) {
       setTimeout((_) => {
