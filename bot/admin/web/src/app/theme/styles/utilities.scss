@@ -153,32 +153,32 @@ nb-toggle > label {
   margin: 0;
 }
 
-nb-dialog-container {
+.cdk-global-overlay-wrapper nb-dialog-container nb-card {
   max-width: 95vw;
+  max-height: 95vh;
+  margin: 0;
 }
 
 @include media-breakpoint-up(md) {
-  nb-dialog-container {
+  .cdk-global-overlay-wrapper nb-dialog-container nb-card {
     max-width: 80vw;
   }
 }
 
 @include media-breakpoint-up(lg) {
-  nb-dialog-container {
+  .cdk-global-overlay-wrapper nb-dialog-container nb-card {
     max-width: 60vw;
   }
 }
 
 @include media-breakpoint-up(xl) {
-  nb-dialog-container {
+  .cdk-global-overlay-wrapper nb-dialog-container nb-card {
     max-width: 40vw;
   }
 }
 
-.full-width-dialog {
-  nb-dialog-container {
-    min-width: 95vw;
-  }
+.cdk-global-overlay-wrapper .full-width-dialog nb-dialog-container nb-card {
+  min-width: 95vw;
 }
 
 .wrapperFullscreen {
