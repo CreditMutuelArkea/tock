@@ -79,7 +79,6 @@ import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
-import org.litote.kmongo.Id
 import org.litote.kmongo.toId
 
 /**
@@ -627,14 +626,21 @@ open class BotAdminVerticle : AdminVerticle() {
             )
         }
 
+        blockingJsonDelete(
+            "/bot/story/:storyId",
+            setOf(botUser, faqBotUser),
+            simpleLogger("Delete Story", { it.path("storyId") })
+        ) { context ->
+            BotAdminService.deleteStory(context.organization, context.path("storyId"))
+        }
+
         blockingJsonPost("/flow", botUser) { context, request: DialogFlowRequest ->
             if (context.organization == request.namespace) {
                 measureTimeMillis(
-                    context,
-                    {
-                        BotAdminService.loadDialogFlow(request)
-                    }
-                )
+                    context
+                ) {
+                    BotAdminService.loadDialogFlow(request)
+                }
             } else {
                 unauthorized()
             }
