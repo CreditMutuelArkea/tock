@@ -16,7 +16,6 @@
 
 package ai.tock.bot.admin.story
 
-import StoryDefinitionStepMetric
 import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
@@ -103,6 +102,9 @@ data class StoryDefinitionConfigurationStep(
         override val hasNoChildren: Boolean get() = children.isEmpty()
 
         override val entityStepSelection: EntityStepSelection? = configuration.entity
+
+        override val metrics: List<StoryDefinitionStepMetric>
+            get() = configuration.metrics
     }
 
     val hasNoChildren: Boolean get() = children.isEmpty()
