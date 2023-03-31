@@ -2,10 +2,6 @@
 @import '@nebular/theme/styles/theming';
 @import '@nebular/theme/styles/themes';
 
-:host nb-card {
-  max-height: nb-theme(card-height-giant);
-}
-
 @include nb-install-component {
   #formMiddleSection {
     border-top: 1px solid nb-theme(border-basic-color-3);
