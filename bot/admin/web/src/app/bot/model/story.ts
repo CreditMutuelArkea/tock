@@ -187,7 +187,7 @@ export class StoryDefinitionConfiguration extends AnswerContainer {
     public tags: string[] = [],
     public configuredAnswers: BotConfiguredAnswer[] = [],
     public configuredSteps: BotConfiguredSteps[] = [],
-    public isMetricStory: boolean = false
+    public metricStory: boolean = false
   ) {
     super(currentType, answers, category);
   }
@@ -243,7 +243,7 @@ export class StoryDefinitionConfiguration extends AnswerContainer {
       this.tags,
       this.configuredAnswers,
       this.configuredSteps,
-      this.isMetricStory
+      this.metricStory
     );
   }
 
