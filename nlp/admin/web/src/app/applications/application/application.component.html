@@ -160,11 +160,11 @@
             </nb-option>
           </nb-select>
         </mat-card-actions>
-        <mat-chip-list
+        <mat-chip-listbox
           placeholder="Supported Locales"
           *ngIf="application.supportedLocales.length !== 0"
         >
-          <mat-chip
+          <mat-chip-option
             *ngFor="let locale of application.supportedLocales"
             nbTooltip="Delete locale"
             [selected]="true"
@@ -172,8 +172,8 @@
             style="background: #73a1ff"
           >
             {{ state.localeName(locale) }}
-          </mat-chip>
-        </mat-chip-list>
+          </mat-chip-option>
+        </mat-chip-listbox>
       </nb-card-body>
     </nb-card>
     <nb-card>

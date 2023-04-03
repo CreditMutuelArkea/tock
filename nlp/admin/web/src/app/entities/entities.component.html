@@ -17,8 +17,8 @@
 <nb-card class="entities">
   <nb-card-header>All Entity Types</nb-card-header>
   <nb-card-body>
-    <mat-chip-list>
-      <mat-chip
+    <mat-chip-listbox>
+      <mat-chip-option
         *ngFor="let e of state.entityTypesSortedByName() | async"
         [color]="e.dictionary ? 'primary' : e === selectedEntityType ? 'accent' : 'secondary'"
         [removable]="e.namespace() === state.currentApplication.namespace"
@@ -46,8 +46,8 @@
           class="remove"
           matTooltip="delete entity type"
         ></mat-icon>
-      </mat-chip>
-    </mat-chip-list>
+      </mat-chip-option>
+    </mat-chip-listbox>
   </nb-card-body>
 </nb-card>
 <nb-card
@@ -170,8 +170,8 @@
             </mat-form-field>
           </td>
           <td>
-            <mat-chip-list>
-              <mat-chip
+            <mat-chip-listbox>
+              <mat-chip-option
                 *ngFor="let label of predefinedValue.labels.get(state.currentLocale)"
                 [removable]="true"
               >
@@ -181,8 +181,8 @@
                   (click)="deleteLabel(predefinedValue, label)"
                   >cancel</mat-icon
                 >
-              </mat-chip>
-            </mat-chip-list>
+              </mat-chip-option>
+            </mat-chip-listbox>
           </td>
           <td style="white-space: nowrap">
             <mat-form-field>

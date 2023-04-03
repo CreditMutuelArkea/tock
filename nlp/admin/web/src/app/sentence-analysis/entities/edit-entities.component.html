@@ -22,16 +22,16 @@
     *ngFor="let entity of container.getEntities()"
     class="entity"
   >
-    <mat-chip-list class="role-container">
-      <mat-chip
+    <mat-chip-listbox class="role-container">
+      <mat-chip-option
         [style.background-color]="entity.entityColor"
         [matTooltip]="entity.qualifiedName(state.user)"
         selected="false"
         color="primary"
       >
         {{ entity.role }}
-      </mat-chip>
-    </mat-chip-list>
+      </mat-chip-option>
+    </mat-chip-listbox>
     <span
       *ngIf="!readOnly"
       class="value"

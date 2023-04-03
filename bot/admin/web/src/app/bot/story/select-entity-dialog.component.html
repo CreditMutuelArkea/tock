@@ -33,8 +33,8 @@
     </p>
     <p>
       Entity:
-      <mat-chip-list>
-        <mat-chip
+      <mat-chip-listbox>
+        <mat-chip-option
           *ngFor="let e of entities"
           [color]="e === selectedEntity ? 'primary' : e.dictionary ? 'accent' : 'secondary'"
           (click)="selectEntityType(e)"
@@ -53,8 +53,8 @@
             matTooltip="Click to Select"
             >playlist_add_check
           </mat-icon>
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
     </p>
     <p>
       With role:
@@ -69,8 +69,8 @@
     </p>
     <p *ngIf="!generate && entityValues.length !== 0">
       Entity value:
-      <mat-chip-list>
-        <mat-chip
+      <mat-chip-listbox>
+        <mat-chip-option
           *ngFor="let e of entityValues"
           [color]="e === entityValue ? 'primary' : 'secondary'"
           (click)="selectEntityValue(e)"
@@ -82,8 +82,8 @@
             matTooltip="Click to select"
             >storage</mat-icon
           >
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
     </p>
   </div>
 </mat-dialog-content>

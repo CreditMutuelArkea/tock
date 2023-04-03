@@ -104,16 +104,16 @@
       *ngFor="let e of sentence.getEditedSubEntities(); let idx = index"
       [style.padding-left]="leftPadding + 'px'"
     >
-      <mat-chip-list class="role-container">
-        <mat-chip
+      <mat-chip-listbox class="role-container">
+        <mat-chip-option
           [style.background-color]="e.entityColor"
           [nbTooltip]="e.qualifiedName(state.user)"
           selected="false"
           color="primary"
         >
           {{ e.role }}
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
       <tock-highlight
         [sentence]="e"
         [readOnly]="readOnly"
@@ -129,11 +129,11 @@
     *ngIf="!readOnly && edited"
     class="highlight"
   >
-    <mat-chip-list
+    <mat-chip-listbox
       *ngIf="entityProvider"
       class="inner-highlight"
     >
-      <mat-chip
+      <mat-chip-option
         *ngFor="let entity of entityProvider.getEntities()"
         nbTooltip="Select {{ entity.qualifiedName(state.user) }}"
         selected="false"
@@ -142,8 +142,8 @@
         color="primary"
       >
         {{ entity.qualifiedName(state.user) }}
-      </mat-chip>
-    </mat-chip-list>
+      </mat-chip-option>
+    </mat-chip-listbox>
     <div>
       <button
         nbButton

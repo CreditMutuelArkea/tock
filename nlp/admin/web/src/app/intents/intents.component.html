@@ -159,31 +159,31 @@
               *ngIf="row.data.sharedIntents.length !== 0"
               class="shared_list"
             >
-              <mat-chip-list
+              <mat-chip-listbox
                 *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
                 nbTooltip="Shared intent - click to remove"
               >
-                <mat-chip
+                <mat-chip-option
                   *ngFor="let intentId of row.data.sharedIntents"
                   color="accent"
                   selected="true"
                   (click)="removeSharedIntent(row.data, intentId)"
                 >
                   {{ state.findIntentById(intentId)?.name }}
-                </mat-chip>
-              </mat-chip-list>
-              <mat-chip-list
+                </mat-chip-option>
+              </mat-chip-listbox>
+              <mat-chip-listbox
                 *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
                 nbTooltip="Shared intent"
               >
-                <mat-chip
+                <mat-chip-option
                   *ngFor="let intentId of row.data.sharedIntents"
                   color="accent"
                   selected="true"
                 >
                   {{ state.findIntentById(intentId)?.name }}
-                </mat-chip>
-              </mat-chip-list>
+                </mat-chip-option>
+              </mat-chip-listbox>
             </div>
           </div>
         </td>
@@ -217,33 +217,33 @@
               *ngIf="row.data.mandatoryStates.length !== 0"
               class="shared_list"
             >
-              <mat-chip-list
+              <mat-chip-listbox
                 *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
                 nbTooltip="Mandatory states - click to delete"
               >
                 <br />
-                <mat-chip
+                <mat-chip-option
                   *ngFor="let s of row.data.mandatoryStates"
                   color="accent"
                   selected="true"
                   (click)="removeState(row.data, s)"
                 >
                   {{ s }}
-                </mat-chip>
-              </mat-chip-list>
-              <mat-chip-list
+                </mat-chip-option>
+              </mat-chip-listbox>
+              <mat-chip-listbox
                 *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
                 matTooltip="Mandatory states"
               >
                 <br />
-                <mat-chip
+                <mat-chip-option
                   *ngFor="let s of row.data.mandatoryStates"
                   color="accent"
                   selected="true"
                 >
                   {{ s }}
-                </mat-chip>
-              </mat-chip-list>
+                </mat-chip-option>
+              </mat-chip-listbox>
             </div>
           </div>
         </td>

@@ -29,11 +29,11 @@
       ></tock-answer
       >&nbsp;
       <!-- entity role -->
-      <mat-chip-list
+      <mat-chip-listbox
         *ngIf="e.entity"
         class="entity-button"
       >
-        <mat-chip
+        <mat-chip-option
           matTooltip="Change Entity"
           selected="false"
           (click)="selectEntity(e)"
@@ -41,8 +41,8 @@
           color="primary"
         >
           {{ e.entity.qualifiedName(state.user) }}
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
       <div
         *ngIf="!e.entity"
         class="entity-button"
@@ -90,11 +90,11 @@
       ></tock-answer
       >&nbsp;
       <!-- entity role -->
-      <mat-chip-list
+      <mat-chip-listbox
         *ngIf="newEntity.entity"
         class="entity-button"
       >
-        <mat-chip
+        <mat-chip-option
           matTooltip="Change Entity"
           selected="false"
           (click)="selectEntity(newEntity)"
@@ -102,8 +102,8 @@
           color="primary"
         >
           {{ newEntity.entity.qualifiedName(state.user) }}
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
       <div
         *ngIf="!newEntity.entity"
         class="entity-button"

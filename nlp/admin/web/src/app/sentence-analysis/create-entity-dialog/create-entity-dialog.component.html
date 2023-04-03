@@ -26,8 +26,8 @@
     <p>
       <label>Select existing Entity:</label><br />
 
-      <mat-chip-list *ngIf="entityTypes">
-        <mat-chip
+      <mat-chip-listbox *ngIf="entityTypes">
+        <mat-chip-option
           *ngFor="let e of entityTypes"
           matTooltip="Select {{ e.qualifiedName(state.user) }}"
           selected="{{ e === entityType }}"
@@ -36,8 +36,8 @@
           color="primary"
         >
           {{ e.qualifiedName(state.user) }}
-        </mat-chip>
-      </mat-chip-list>
+        </mat-chip-option>
+      </mat-chip-listbox>
     </p>
 
     <div class="form-group">
