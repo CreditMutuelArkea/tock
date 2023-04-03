@@ -350,7 +350,7 @@ export class Sentence extends EntityContainer {
     public reviewComment: string,
     public qualifier: string,
     public key?: string,
-    public configuration? : string
+    public configuration?: string
   ) {
     super();
   }

@@ -72,7 +72,7 @@ export class ApplicationComponent implements OnInit {
           false,
           0.0,
           false,
-          [],
+          []
         );
       }
       this.nlpEngineType = this.application.nlpEngineType.name;

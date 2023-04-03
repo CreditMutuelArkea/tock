@@ -42,7 +42,7 @@ export class SentenceAnalysisComponent implements OnInit {
   intentBeforeClassification: string;
   UNKNOWN_INTENT_FILTER = new FilterOption('tock:unknown', 'Unknown');
   intentId: string;
-  selectedIntent:Intent;
+  selectedIntent: Intent;
   selectedIntentLabel: string;
 
   constructor(

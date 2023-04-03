@@ -47,19 +47,20 @@
     </span>
 
     <span class="toggle"
-    ><nb-toggle
-      status="primary"
-      [(ngModel)]="onlyConfigured"
-      (change)="search()"
-    >Only Configured Stories</nb-toggle
-    ></span
+      ><nb-toggle
+        status="primary"
+        [(ngModel)]="onlyConfigured"
+        (change)="search()"
+        >Only Configured Stories</nb-toggle
+      ></span
     >
     <span class="toggle"
-    ><nb-toggle
-      status="primary"
-      [(ngModel)]="sortedByDate"
-    >Sort by last modified</nb-toggle
-    ></span>
+      ><nb-toggle
+        status="primary"
+        [(ngModel)]="sortedByDate"
+        >Sort by last modified</nb-toggle
+      ></span
+    >
 
     <div class="download">
       <button
@@ -213,7 +214,7 @@
           nbTreeGridCell
           *nbTreeGridCellDef="let row"
         >
-          <span *ngIf="!row.data.expandable">{{ row.data.lastEdited | date:dateFormat}}</span>
+          <span *ngIf="!row.data.expandable">{{ row.data.lastEdited | date: dateFormat }}</span>
         </td>
       </ng-container>
       <ng-container [nbTreeGridColumnDef]="actionsColumn">
@@ -267,30 +268,32 @@
 
 <nb-card *ngIf="sortedByDate && stories && !selectedStory">
   <nb-card-body>
-
     <mat-table [dataSource]="stories">
       <mat-header-row *matHeaderRowDef="allColumns"></mat-header-row>
       <mat-row *matRowDef="let story; columns: allColumns"></mat-row>
 
-      <ng-container matColumnDef="{{categoryColumn}}">
-        <mat-header-cell *matHeaderCellDef> {{categoryColumn}} </mat-header-cell>
-        <mat-cell *matCellDef="let story"> {{story.name}} </mat-cell>
+      <ng-container matColumnDef="{{ categoryColumn }}">
+        <mat-header-cell *matHeaderCellDef> {{ categoryColumn }} </mat-header-cell>
+        <mat-cell *matCellDef="let story"> {{ story.name }} </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="{{intentColumn}}">
-        <mat-header-cell *matHeaderCellDef> {{intentColumn}} </mat-header-cell>
-        <mat-cell *matCellDef="let story"> {{story.intent.getIntentLabel(state)}} </mat-cell>
+      <ng-container matColumnDef="{{ intentColumn }}">
+        <mat-header-cell *matHeaderCellDef> {{ intentColumn }} </mat-header-cell>
+        <mat-cell *matCellDef="let story"> {{ story.intent.getIntentLabel(state) }} </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="{{descriptionColumn}}">
-        <mat-header-cell *matHeaderCellDef> {{descriptionColumn}} </mat-header-cell>
-        <mat-cell *matCellDef="let story"> {{story.description}} </mat-cell>
+      <ng-container matColumnDef="{{ descriptionColumn }}">
+        <mat-header-cell *matHeaderCellDef> {{ descriptionColumn }} </mat-header-cell>
+        <mat-cell *matCellDef="let story"> {{ story.description }} </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="{{lastEditedColumn}}">
-        <mat-header-cell *matHeaderCellDef> {{lastEditedColumn}} </mat-header-cell>
-        <mat-cell *matCellDef="let story"> {{ story.lastEdited | date:dateFormat }} </mat-cell>
+      <ng-container matColumnDef="{{ lastEditedColumn }}">
+        <mat-header-cell *matHeaderCellDef> {{ lastEditedColumn }} </mat-header-cell>
+        <mat-cell *matCellDef="let story"> {{ story.lastEdited | date: dateFormat }} </mat-cell>
       </ng-container>
-      <ng-container matColumnDef="{{actionsColumn}}">
-        <mat-header-cell *matHeaderCellDef> {{actionsColumn}} </mat-header-cell>
-        <mat-cell *matCellDef="let story" [ngClass]="nb-column-Actions">
+      <ng-container matColumnDef="{{ actionsColumn }}">
+        <mat-header-cell *matHeaderCellDef> {{ actionsColumn }} </mat-header-cell>
+        <mat-cell
+          *matCellDef="let story"
+          [ngClass]="nb - column - Actions"
+        >
           <button
             nbButton
             outline
@@ -324,7 +327,6 @@
         </mat-cell>
       </ng-container>
     </mat-table>
-
   </nb-card-body>
 </nb-card>
 

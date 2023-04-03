@@ -49,7 +49,7 @@ export class SearchComponent implements OnInit {
   update: SentencesUpdate = new SentencesUpdate();
   targetLocale: string;
   users: string[];
-  configurations : string[];
+  configurations: string[];
 
   private firstSearch = false;
   @ViewChild(SentencesScrollComponent) scroll;

@@ -70,24 +70,24 @@ const routes: Routes = [
 export class BotTestRoutingModule {}
 
 @NgModule({
-    imports: [
-        CommonModule,
-        SharedModule,
-        BotTestRoutingModule,
-        BotSharedModule,
-        MomentModule,
-        NbRouteTabsetModule,
-        NbCardModule,
-        NbButtonModule,
-        NbActionsModule,
-        NbSelectModule,
-        NbTooltipModule,
-        NbAccordionModule,
-        NbInputModule,
-        ReactiveFormsModule
-    ],
-    declarations: [TestTabsComponent, BotDialogComponent, TestPlanComponent, DisplayNlpStatsComponent],
-    exports: [],
-    providers: [TestService]
+  imports: [
+    CommonModule,
+    SharedModule,
+    BotTestRoutingModule,
+    BotSharedModule,
+    MomentModule,
+    NbRouteTabsetModule,
+    NbCardModule,
+    NbButtonModule,
+    NbActionsModule,
+    NbSelectModule,
+    NbTooltipModule,
+    NbAccordionModule,
+    NbInputModule,
+    ReactiveFormsModule
+  ],
+  declarations: [TestTabsComponent, BotDialogComponent, TestPlanComponent, DisplayNlpStatsComponent],
+  exports: [],
+  providers: [TestService]
 })
 export class BotTestModule {}

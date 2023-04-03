@@ -199,12 +199,8 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
           this.nodes = Array.from(sortedMap, ([key, value]) => {
             return {
               expanded:
-                s.length < 100 && (
-                  this.categories.length < 2 ||
-                  this.category != '' ||
-                  this.filter !== '' ||
-                  this.lastExpandableState.get(key) === true
-                ),
+                s.length < 100 &&
+                (this.categories.length < 2 || this.category != '' || this.filter !== '' || this.lastExpandableState.get(key) === true),
               data: {
                 category: key,
                 expandable: true
@@ -242,12 +238,8 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
 
   upload() {
     this.loading = true;
-    this.uploader.onCompleteAll = () => this.loading = false;
-    this.bot.prepareStoryDumpUploader(
-      this.uploader,
-      this.state.currentApplication.name,
-      this.state.currentLocale
-    );
+    this.uploader.onCompleteAll = () => (this.loading = false);
+    this.bot.prepareStoryDumpUploader(this.uploader, this.state.currentApplication.name, this.state.currentLocale);
     this.uploader.uploadAll();
     this.displayUpload = false;
   }
@@ -260,8 +252,7 @@ export class BackButtonHolder {
 
 @Injectable()
 export class SearchStoryNavigationGuard implements CanDeactivate<any> {
-  constructor(private backButtonHolder: BackButtonHolder) {
-  }
+  constructor(private backButtonHolder: BackButtonHolder) {}
 
   canDeactivate(component: any) {
     // will prevent user from going back
