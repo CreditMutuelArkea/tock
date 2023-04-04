@@ -42,7 +42,6 @@ describe('IndicatorsComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(IndicatorsComponent);
     component = fixture.componentInstance;
-    component.ngOnInit();
     fixture.detectChanges();
   });
 

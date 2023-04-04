@@ -54,14 +54,12 @@ describe('IndicatorsEditComponent', () => {
     }).compileComponents();
   });
 
-  beforeEach(fakeAsync(() => {
+  beforeEach(() => {
     fixture = TestBed.createComponent(IndicatorsEditComponent);
     component = fixture.componentInstance;
     component.indicatorEdition = mockIndicator;
     fixture.detectChanges();
-
-    tick(100);
-  }));
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();
@@ -78,14 +76,20 @@ describe('IndicatorsEditComponent', () => {
         dimensions: []
       }
     };
-    component.ngOnChanges({ faq: new SimpleChange(null, indicatorEdition, true) });
+    component.ngOnChanges({ indicatorEdition: new SimpleChange(null, indicatorEdition, true) });
     fixture.detectChanges();
 
     expect(component.form.valid).toBeFalse();
+
     expect(component.form.value).toEqual({
       label: '',
       description: '',
-      values: [],
+      values: [
+        {
+          name: null,
+          label: ''
+        }
+      ],
       dimensions: []
     });
   });
