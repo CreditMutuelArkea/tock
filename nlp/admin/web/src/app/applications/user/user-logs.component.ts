@@ -16,6 +16,7 @@
 import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NbDialogRef, NbDialogService } from '@nebular/theme';
 import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
+import { take } from 'rxjs';
 
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { StateService } from '../../core-nlp/state.service';
@@ -25,7 +26,7 @@ import { PaginatedQuery } from '../../model/commons';
 @Component({
   selector: 'tock-user-logs',
   templateUrl: './user-logs.component.html',
-  styleUrls: ['./user-logs.component.css']
+  styleUrls: ['./user-logs.component.scss']
 })
 export class UserLogsComponent implements OnInit {
   dataSource: UserLog[];
@@ -74,6 +75,7 @@ export class UserLogsComponent implements OnInit {
           this.pageSize
         )
       )
+      .pipe(take(1))
       .subscribe((r) => {
         this.loading = false;
         this.totalSize = r.total;
@@ -84,18 +86,29 @@ export class UserLogsComponent implements OnInit {
 
 @Component({
   selector: 'tock-display-full-log',
-  template: ` <nb-card status="primary">
-    <nb-card-header>User Action Data</nb-card-header>
-    <nb-card-body class="no-padding">
+  template: ` <nb-card>
+    <nb-card-header class="d-flex align-items-center justify-content-between gap-1">
+      User Action Data
+      <button
+        nbButton
+        ghost
+        shape="round"
+        (click)="close()"
+      >
+        <nb-icon icon="close-outline"></nb-icon>
+      </button>
+    </nb-card-header>
+    <nb-card-body class="p-0">
       <json-editor
         [options]="editorOptions"
         [data]="data"
       ></json-editor>
     </nb-card-body>
-    <nb-card-footer class="btn-align">
+    <nb-card-footer class="card-footer-actions">
       <button
         nbButton
-        status="primary"
+        size="small"
+        ghost
         (click)="close()"
       >
         Close
@@ -110,12 +123,6 @@ export class UserLogsComponent implements OnInit {
       :host ::ng-deep json-editor jsoneditor-outer {
         height: 30rem;
         width: 30rem;
-      }
-      .no-padding {
-        padding: 0;
-      }
-      .btn-align {
-        text-align: right;
       }
     `
   ]

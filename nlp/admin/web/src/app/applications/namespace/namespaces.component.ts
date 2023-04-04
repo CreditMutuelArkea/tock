@@ -15,18 +15,20 @@
  */
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { NbToastrService } from '@nebular/theme';
+import { take } from 'rxjs';
+
 import { StateService } from '../../core-nlp/state.service';
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { NamespaceConfiguration, NamespaceSharingConfiguration, UserNamespace } from '../../model/application';
 import { AuthService } from '../../core-nlp/auth/auth.service';
-import { NbToastrService } from '@nebular/theme';
 import { UserRole } from '../../model/auth';
 import { ApplicationConfig } from '../application.config';
 
 @Component({
   selector: 'tock-namespaces',
   templateUrl: 'namespaces.component.html',
-  styleUrls: ['namespaces.component.css']
+  styleUrls: ['namespaces.component.scss']
 })
 export class NamespacesComponent implements OnInit {
   namespaces: UserNamespace[];
@@ -42,6 +44,8 @@ export class NamespacesComponent implements OnInit {
 
   create: boolean;
   newNamespace: string = '';
+  selectedNamespace: string = '';
+
   //in order to focus
   @ViewChild('createNamespace') createNamespaceElement: ElementRef;
 
@@ -54,10 +58,17 @@ export class NamespacesComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.applicationService.getNamespaces().subscribe((n) => (this.namespaces = n));
+    this.applicationService
+      .getNamespaces()
+      .pipe(take(1))
+      .subscribe((namespaces: UserNamespace[]) => {
+        this.namespaces = namespaces;
+        this.selectedNamespace = namespaces.find((namespace: UserNamespace) => namespace.current).namespace || '';
+      });
   }
 
   selectNamespace(namespace: string) {
+    this.selectedNamespace = namespace;
     this.applicationService
       .selectNamespace(namespace)
       .subscribe((_) => this.authService.loadUser().subscribe((_) => this.applicationService.resetConfiguration));

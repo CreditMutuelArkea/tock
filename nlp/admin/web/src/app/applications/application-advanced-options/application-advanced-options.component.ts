@@ -29,7 +29,7 @@ import { NbToastrService } from '@nebular/theme';
 @Component({
   selector: 'tock-application-advanced-options',
   templateUrl: './application-advanced-options.component.html',
-  styleUrls: ['./application-advanced-options.component.css']
+  styleUrls: ['./application-advanced-options.component.scss']
 })
 export class ApplicationAdvancedOptionsComponent implements OnInit {
   @Input()

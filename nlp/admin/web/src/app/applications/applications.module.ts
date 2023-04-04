@@ -32,11 +32,14 @@ import {
   NbCardModule,
   NbCheckboxModule,
   NbDialogModule,
+  NbListModule,
   NbRadioModule,
   NbRouteTabsetModule,
   NbSelectModule,
   NbSpinnerModule,
   NbTabsetModule,
+  NbTagModule,
+  NbToggleModule,
   NbTooltipModule
 } from '@nebular/theme';
 import { DisplayUserDataComponent, UserLogsComponent } from './user/user-logs.component';
@@ -134,7 +137,10 @@ export class NlpApplicationConfig implements ApplicationConfig {
     NbRadioModule,
     NgJsonEditorModule,
     NbDialogModule.forRoot(),
-    NgbPaginationModule
+    NgbPaginationModule,
+    NbToggleModule,
+    NbTagModule,
+    NbListModule
   ],
   declarations: [
     ApplicationsComponent,

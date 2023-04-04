@@ -22,13 +22,13 @@ import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { Subject } from 'rxjs';
 import { NlpEngineType } from '../../model/nlp';
-import { NbToastrService } from '@nebular/theme';
+import { NbTagComponent, NbToastrService } from '@nebular/theme';
 import { DialogService } from '../../core-nlp/dialog.service';
 
 @Component({
   selector: 'tock-application',
   templateUrl: './application.component.html',
-  styleUrls: ['./application.component.css']
+  styleUrls: ['./application.component.scss']
 })
 export class ApplicationComponent implements OnInit {
   applications: Application[];

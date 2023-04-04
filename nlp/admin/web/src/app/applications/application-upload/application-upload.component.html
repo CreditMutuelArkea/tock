@@ -17,6 +17,7 @@
 <nb-card
   *ngIf="configuration"
   [nbSpinner]="uploading"
+  class="mt-3"
 >
   <nb-card-header>Upload a Dump</nb-card-header>
   <nb-card-body>
@@ -29,47 +30,52 @@
           <nb-radio
             *ngIf="state.hasRole(UserRole.technicalAdmin)"
             value="application"
-            class="dump-type"
           >
             Application Dump
           </nb-radio>
-          <nb-radio
-            value="sentences"
-            class="dump-type"
-          >
-            Sentences Dump
-          </nb-radio>
+          <nb-radio value="sentences"> Sentences Dump </nb-radio>
         </nb-radio-group>
       </p>
-      <ul class="mention">
+      <ul>
         <li *ngIf="state.hasRole(UserRole.technicalAdmin)">
           The "Application Dump" format is an internal format, useful to copy application data across environments.
         </li>
         <li>The "Sentences Dump" format is an agnostic format, used to share data with other systems.</li>
       </ul>
-      <p *ngIf="!applicationName">
-        <mat-form-field id="applicationName">
-          <input
-            matInput
-            [(ngModel)]="configuration.newApplicationName"
-            placeholder="Target Application Name"
-          />
-        </mat-form-field>
-        <span class="mention">(If empty, application name in dump will be used)</span>
-      </p>
-      <p>
+      <div
+        *ngIf="!applicationName"
+        class="d-flex flex-column mb-3"
+      >
+        <label
+          for="applicationName"
+          class="font-weight-bold text-mitigated"
+        >
+          Application name
+        </label>
+        <input
+          nbInput
+          id="applicationName"
+          name="applicationName"
+          placeholder="Target Application Name"
+          [(ngModel)]="configuration.newApplicationName"
+        />
+        <small class="text-mitigated">(If empty, application name in dump will be used)</small>
+      </div>
+
+      <div class="d-flex flex-column">
         <label
           for="file"
-          class="file-label"
-          >Please select a dump file:</label
+          class="font-weight-bold text-mitigated"
         >
+          Please select a dump file
+        </label>
         <input
           id="file"
           type="file"
           ng2FileSelect
           [uploader]="uploader"
         />
-      </p>
+      </div>
     </div>
     <div *ngIf="report">
       <div *ngIf="!report.success">
@@ -81,65 +87,60 @@
         </ul>
       </div>
       <div *ngIf="report.success">
-        <h4 *ngIf="!report.modified">No new data found, so no data imported.</h4>
+        <p
+          *ngIf="!report.modified"
+          class="h5"
+        >
+          No new data found, so no data imported.
+        </p>
         <div *ngIf="report.modified">
-          <h4>Successful Import Report:</h4>
-          <mat-list>
-            <h3
-              *ngIf="report.applicationsImported.length !== 0"
-              mat-subheader
-            >
-              Applications imported
-            </h3>
-            <mat-list-item *ngFor="let app of report.applicationsImported">
-              <mat-icon mat-list-icon>apps</mat-icon>
-              <h4 mat-line>{{ app }}</h4>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-            <h3
-              *ngIf="report.entitiesImported.length !== 0"
-              mat-subheader
-            >
-              Entities imported
-            </h3>
-            <mat-list-item *ngFor="let entity of report.entitiesImported">
-              <mat-icon mat-list-icon>invert_colors</mat-icon>
-              <h4 mat-line>{{ entity }}</h4>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-            <h3
-              *ngIf="report.intentsImported.length !== 0"
-              mat-subheader
-            >
-              Intents imported
-            </h3>
-            <mat-list-item *ngFor="let intent of report.intentsImported">
-              <mat-icon mat-list-icon>merge_type</mat-icon>
-              <h4 mat-line>{{ intent }}</h4>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-            <h3
-              *ngIf="report.sentencesImported !== 0"
-              mat-subheader
-            >
-              Number of sentences imported
-            </h3>
-            <mat-list-item *ngIf="report.sentencesImported !== 0">
-              <mat-icon mat-list-icon>speaker_notes</mat-icon>
-              <h4 mat-line>{{ report.sentencesImported }}</h4>
-            </mat-list-item>
-            <mat-divider></mat-divider>
-            <h3
-              *ngIf="report.faqsImported !== 0"
-              mat-subheader
-            >
-              Number of FAQs imported
-            </h3>
-            <mat-list-item *ngIf="report.faqsImported !== 0">
-              <mat-icon mat-list-icon>speaker_notes</mat-icon>
-              <h4 mat-line>{{ report.faqsImported }}</h4>
-            </mat-list-item>
-          </mat-list>
+          <p class="h5">Successful Import Report:</p>
+          <nb-list class="list">
+            <nb-list-item *ngIf="report.applicationsImported.length !== 0">
+              <p class="h6">Applications imported</p>
+              <div
+                *ngFor="let app of report.applicationsImported"
+                class="d-flex flex-wrap gap-1 mb-1"
+              >
+                <nb-icon icon="keypad-outline"></nb-icon>
+                <span>{{ app }}</span>
+              </div>
+            </nb-list-item>
+            <nb-list-item *ngIf="report.entitiesImported.length !== 0">
+              <p class="h6">Entities imported</p>
+              <div
+                *ngFor="let entity of report.entitiesImported"
+                class="d-flex flex-wrap gap-1 mb-1"
+              >
+                <nb-icon icon="droplet-outline"></nb-icon>
+                <span>{{ entity }}</span>
+              </div>
+            </nb-list-item>
+            <nb-list-item *ngIf="report.intentsImported.length !== 0">
+              <p class="h6">Intents imported</p>
+              <div
+                *ngFor="let intent of report.intentsImported"
+                class="d-flex flex-wrap gap-1 mb-1"
+              >
+                <nb-icon icon="corner-left-up-outline"></nb-icon>
+                <span>{{ intent }}</span>
+              </div>
+            </nb-list-item>
+            <nb-list-item *ngIf="report.sentencesImported !== 0">
+              <p class="h6">Number of sentences imported</p>
+              <div class="d-flex gap-1">
+                <nb-icon icon="list-outline"></nb-icon>
+                <span>{{ report.sentencesImported }}</span>
+              </div>
+            </nb-list-item>
+            <nb-list-item *ngIf="report.faqsImported !== 0">
+              <p class="h6">Number of FAQs imported</p>
+              <div class="d-flex gap-1">
+                <nb-icon icon="list-outline"></nb-icon>
+                <span>{{ report.faqsImported }}</span>
+              </div>
+            </nb-list-item>
+          </nb-list>
           <div *ngIf="report.errorMessages.length !== 0">
             <h5>Errors:</h5>
             <ul>
@@ -152,34 +153,35 @@
       </div>
     </div>
   </nb-card-body>
-  <nb-card-footer>
+  <nb-card-footer class="card-footer-actions">
     <button
-      nbButton
-      outline
-      status="primary"
-      (click)="cancel()"
       *ngIf="!report"
+      nbButton
+      size="small"
+      ghost
+      (click)="cancel()"
     >
       Cancel
     </button>
     <button
+      *ngIf="report"
       nbButton
-      status="primary"
-      (click)="upload()"
-      *ngIf="!report"
-      [disabled]="!uploader.getNotUploadedItems().length"
-      style="margin: 10px"
-    >
-      Upload
-    </button>
-    <button
-      nbButton
+      size="small"
       outline
       status="primary"
       (click)="close()"
-      *ngIf="report"
     >
       Hide dump report
+    </button>
+    <button
+      *ngIf="!report"
+      nbButton
+      size="small"
+      status="primary"
+      [disabled]="!uploader.getNotUploadedItems().length"
+      (click)="upload()"
+    >
+      Upload
     </button>
   </nb-card-footer>
 </nb-card>

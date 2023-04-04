@@ -13,13 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.dump-type {
-  margin-left: 20px;
-}
-.file-label {
-  margin-right: 20px;
-}
-.mention {
-  font-size: smaller;
+.list::ng-deep nb-list-item {
+  flex-direction: column;
+  align-items: start;
 }

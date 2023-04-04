@@ -14,103 +14,142 @@
   ~ limitations under the License.
   -->
 
-<nb-card>
-  <nb-card-header>
+<nb-card class="mt-3">
+  <nb-card-header class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+    <span>
+      Application
+      <span *ngIf="application?.name">"{{ application.name }}"</span>
+    </span>
     <div>
-      <div style="display: flex">
-        <span *ngIf="applications.length !== 0"
-          >Application
-          <span *ngIf="application && application?.name?.length !== 0">"{{ application?.name }}"</span>
-        </span>
-        <nb-actions>
-          <nb-action
-            class="save"
-            (click)="saveApplication()"
-            [nbTooltip]="newApplication ? 'Create New Application' : 'Update Application'"
-          >
-            <i class="material-icons">save</i>
-          </nb-action>
-          <nb-action
-            class="cancel"
-            *ngIf="applications.length !== 0"
-            (click)="cancel()"
-            nbTooltip="Cancel"
-          >
-            <i class="material-icons">cancel</i>
-          </nb-action>
-        </nb-actions>
-      </div>
-      <div>
-        <nb-actions
-          size="small"
-          style="cursor: pointer; float: right"
-        >
-          <nb-action
-            *ngIf="!newApplication"
-            (click)="deleteApplication()"
-            nbTooltip="Delete application"
-          >
-            <i
-              class="material-icons warn"
-              style="color: #ff708d"
-              >delete</i
-            >
-          </nb-action>
-        </nb-actions>
-      </div>
+      <button
+        *ngIf="!newApplication"
+        nbButton
+        status="danger"
+        ghost
+        shape="round"
+        nbTooltip="Delete"
+        (click)="deleteApplication()"
+      >
+        <nb-icon icon="trash-2-outline"></nb-icon>
+      </button>
+      <button
+        nbButton
+        status="primary"
+        ghost
+        shape="round"
+        (click)="saveApplication()"
+        [nbTooltip]="newApplication ? 'Create' : 'Update'"
+      >
+        <nb-icon icon="save-outline"></nb-icon>
+      </button>
+      <button
+        class="ml-4"
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="Cancel"
+        (click)="cancel()"
+      >
+        <nb-icon icon="close-outline"></nb-icon>
+      </button>
     </div>
   </nb-card-header>
   <nb-card-body *ngIf="application">
-    <nb-card>
+    <nb-card class="section-card">
       <nb-card-body>
-        <p>
-          <mat-form-field>
-            <input
-              matInput
-              name="appLabel"
-              placeholder="New Application Label"
-              [(ngModel)]="application.label"
-              (keyup)="format()"
-              (keyup.enter)="saveApplication()"
-              matTooltip="Displayed label"
-              #appLabel
-              required
-              autocomplete="off"
-            />
-          </mat-form-field>
-        </p>
-        <p>
-          <mat-form-field>
-            <input
-              matInput
-              name="appName"
-              placeholder="New Application Name"
-              [(ngModel)]="application.name"
-              (keyup.enter)="saveApplication()"
-              [disabled]="!newApplication"
-              matTooltip="Technical name (without special chars)"
-              #appName
-              required
-              autocomplete="off"
-            />
-          </mat-form-field>
-        </p>
-        <p>
-          <mat-form-field>
-            <input
-              matInput
-              type="number"
-              placeholder="Unknown intent threshold"
-              [(ngModel)]="application.unknownIntentThreshold"
-              min="0"
-              max="1"
-              matTooltip="Number between 0 and 1 - if the probability of the intent is below the threshold, unknown intent is returned"
-            />
-          </mat-form-field>
-        </p>
-        <p>
+        <div class="form-field d-flex flex-column mb-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <label
+              class="required font-weight-bold text-mitigated"
+              for="appLabel"
+            >
+              <abbr title="Required">*</abbr>
+              Label
+            </label>
+            <nb-icon
+              class="control-info"
+              icon="info-outline"
+              size="small"
+              status="info"
+              nbTooltip="Displayed label"
+            ></nb-icon>
+          </div>
+          <input
+            #appLabel
+            nbInput
+            tockAutofocusElement
+            name="appLabel"
+            id="appLabel"
+            placeholder="Enter an application label"
+            fullWidth
+            required
+            autocomplete="off"
+            [(ngModel)]="application.label"
+            (keyup)="format()"
+            (keyup.enter)="saveApplication()"
+          />
+        </div>
+        <div class="form-field d-flex flex-column mb-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <label
+              class="required font-weight-bold text-mitigated"
+              for="appName"
+            >
+              <abbr title="Required">*</abbr>
+              Name
+            </label>
+            <nb-icon
+              class="control-info"
+              icon="info-outline"
+              size="small"
+              status="info"
+              nbTooltip="Technical name (without special chars)"
+            ></nb-icon>
+          </div>
+          <input
+            #appName
+            nbInput
+            name="appName"
+            id="appName"
+            placeholder="Enter an application name"
+            fullWidth
+            required
+            autocomplete="off"
+            [disabled]="!newApplication"
+            [(ngModel)]="application.name"
+            (keyup.enter)="saveApplication()"
+          />
+        </div>
+        <div class="form-field d-flex flex-column mb-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <label
+              class="font-weight-bold text-mitigated"
+              for="unknownIntentThreshold"
+              >Unknown intent threshold</label
+            >
+            <nb-icon
+              class="control-info"
+              icon="info-outline"
+              size="small"
+              status="info"
+              nbTooltip="Number between 0 and 1 - if the probability of the intent is below the threshold, unknown intent is returned"
+            ></nb-icon>
+          </div>
+          <input
+            nbInput
+            name="unknownIntentThreshold"
+            id="unknownIntentThreshold"
+            type="number"
+            placeholder="Unknown intent threshold"
+            fullWidth
+            min="0"
+            max="1"
+            step="0.01"
+            [(ngModel)]="application.unknownIntentThreshold"
+          />
+        </div>
+        <div class="d-flex flex-wrap gap-1">
           <nb-checkbox
-            class="separator"
             [(ngModel)]="application.normalizeText"
             nbTooltip="If selected, this option uses normalized text models - for intent only models"
           >
@@ -118,14 +157,12 @@
           </nb-checkbox>
           <nb-checkbox
             *ngIf="!application.normalizeText"
-            class="separator"
             [(ngModel)]="application.mergeEngineTypes"
             nbTooltip="If selected, this option uses built-in entity models (like dates) in conjunction with standard NER"
           >
             Use entity models
           </nb-checkbox>
           <nb-checkbox
-            class="separator"
             *ngIf="!application.normalizeText && !application.mergeEngineTypes"
             [(ngModel)]="application.useEntityModels"
             nbTooltip="If selected, built-in entity models results are provided only for info and potential entity disambiguation"
@@ -134,49 +171,45 @@
           </nb-checkbox>
           <nb-checkbox
             *ngIf="!application.normalizeText"
-            class="separator"
             [(ngModel)]="application.supportSubEntities"
             nbTooltip="If selected, you can use subentities in your nlp models"
             >Allow subentities
           </nb-checkbox>
-        </p>
+        </div>
       </nb-card-body>
     </nb-card>
-    <nb-card *ngIf="state.locales">
+    <nb-card
+      *ngIf="state.locales"
+      class="section-card"
+    >
       <nb-card-header>Locales</nb-card-header>
-      <nb-card-body>
-        <mat-card-actions>
-          <nb-select
-            status="primary"
-            (selectedChange)="addLocale()"
-            [(ngModel)]="newLocale"
-            placeholder="Add new locale"
-            style="margin-bottom: 10px"
-          >
-            <nb-option
-              *ngFor="let locale of state.locales"
-              [value]="locale.first"
-              >{{ locale.second }}
-            </nb-option>
-          </nb-select>
-        </mat-card-actions>
-        <mat-chip-listbox
-          placeholder="Supported Locales"
-          *ngIf="application.supportedLocales.length !== 0"
+      <nb-card-body class="d-flex flex-column gap-1">
+        <nb-select
+          class="form-field"
+          placeholder="Add new locale"
+          [(ngModel)]="newLocale"
+          (selectedChange)="addLocale()"
         >
-          <mat-chip-option
+          <nb-option
+            *ngFor="let locale of state.locales"
+            [value]="locale.first"
+          >
+            {{ locale.second }}
+          </nb-option>
+        </nb-select>
+
+        <nb-tag-list *ngIf="application.supportedLocales.length !== 0">
+          <nb-tag
             *ngFor="let locale of application.supportedLocales"
             nbTooltip="Delete locale"
-            [selected]="true"
+            removable
+            [text]="state.localeName(locale)"
             (click)="removeLocale(locale)"
-            style="background: #73a1ff"
-          >
-            {{ state.localeName(locale) }}
-          </mat-chip-option>
-        </mat-chip-listbox>
+          ></nb-tag>
+        </nb-tag-list>
       </nb-card-body>
     </nb-card>
-    <nb-card>
+    <nb-card class="section-card">
       <nb-card-header>NLU engine</nb-card-header>
       <nb-card-body>
         <nb-radio-group
@@ -195,8 +228,6 @@
         </nb-radio-group>
       </nb-card-body>
     </nb-card>
-
-    <div class="divider"></div>
 
     <tock-application-advanced-options
       *ngIf="!newApplication"

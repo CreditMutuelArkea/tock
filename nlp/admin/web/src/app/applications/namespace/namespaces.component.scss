@@ -14,38 +14,13 @@
  * limitations under the License.
  */
 
-.locales {
-  padding-left: 20px;
+@import '@nebular/theme/styles/theming';
+@import '@nebular/theme/styles/themes';
+
+.section-card {
+  border: 1px solid nb-theme(color-basic-transparent-400);
 }
 
-.select-locale {
-  padding-top: 20px;
-  padding-bottom: 20px;
-  width: 200px;
-  margin: 0 16px;
-}
-
-.separator {
-  padding-right: 10px;
-}
-
-.divider {
-  height: 10px;
-}
-
-.engine-type {
-  margin-left: 20px;
-}
-
-.application-name {
-  margin-right: 10px;
-}
-
-.save {
-  color: #3366ff;
-  cursor: pointer;
-}
-
-.cancel {
-  cursor: pointer;
+nb-toggle::ng-deep label {
+  margin: 0;
 }

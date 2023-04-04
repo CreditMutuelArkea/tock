@@ -14,104 +14,115 @@
   ~ limitations under the License.
   -->
 
-<nb-card class="applications-applications">
-  <nb-card-header>
-    <div style="display: flex">
-      <span *ngIf="state.applications.length === 0"> Welcome! Please create your first Application </span>
-      <span *ngIf="state.applications.length !== 0">Applications</span>
-      <nb-actions
-        size="small"
-        *ngIf="!uploadDump"
-      >
-        <nb-action
-          class="control-item create"
-          routerLink="create"
-          nbTooltip="Create new application"
-        >
-          <i class="material-icons tock-toolbar-menu">add_box</i>
-        </nb-action>
-        <nb-action
-          class="control-item"
-          (click)="showUploadDumpPanel()"
-          nbTooltip="Upload dump"
-        >
-          <i class="material-icons tock-toolbar-menu">cloud_upload</i>
-        </nb-action>
-      </nb-actions>
-    </div>
-  </nb-card-header>
-
-  <nb-card-body>
+<nb-card
+  *ngIf="!uploadDump"
+  class="mt-3"
+>
+  <nb-card-header class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+    Applications
     <div
-      class="applications-applications__item"
-      *ngFor="let app of state.applications"
+      *ngIf="state.applications.length !== 0"
+      class="d-flex flex-wrap gap-1"
     >
       <button
-        *ngIf="app._id === state.currentApplication._id"
-        matTooltip="Current"
-        mat-button
-        class="applications-applications__select-action"
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="Upload dump"
+        (click)="showUploadDumpPanel()"
       >
-        <mat-icon>done</mat-icon>
+        <nb-icon icon="cloud-upload-outline"></nb-icon>
       </button>
-
       <button
-        *ngIf="app._id !== state.currentApplication._id"
-        class="applications-applications__select-action"
-        mat-button
-        matTooltip="Select"
-        (click)="selectApplication(app)"
+        nbButton
+        status="primary"
+        routerLink="create"
       >
-        <mat-icon></mat-icon>
+        <nb-icon icon="plus-outline"></nb-icon>
+        Create
       </button>
-
-      <span class="applications-applications__app-name">{{ app.label }}</span>
-
-      <div class="applications-applications__datas">
-        <span *ngFor="let locale of app.supportedLocales">
-          {{ state.localeName(locale) }}
-        </span>
-      </div>
-
-      <nb-actions
-        size="medium"
-        style="cursor: pointer"
+    </div>
+  </nb-card-header>
+  <nb-card-body>
+    <div
+      *ngIf="state.applications.length === 0"
+      class="d-flex flex-column align-items-center gap-1"
+    >
+      <span class="h2 text-center">
+        Welcome!<br />
+        Please create your first Application
+      </span>
+      <button
+        nbButton
+        status="primary"
+        routerLink="create"
       >
-        <nb-action
-          class="control-item"
-          (click)="downloadDump(app)"
+        <nb-icon icon="plus-outline"></nb-icon>
+        Create application
+      </button>
+      or
+      <button
+        nbButton
+        status="primary"
+        outline
+        (click)="showUploadDumpPanel()"
+      >
+        <nb-icon icon="cloud-upload-outline"></nb-icon>
+        Upload dump
+      </button>
+    </div>
+    <div
+      class="applications__item"
+      *ngFor="let app of state.applications"
+    >
+      <nb-toggle
+        [disabled]="app._id === state.currentApplication._id"
+        [checked]="app._id === state.currentApplication._id"
+        (checkedChange)="selectApplication(app)"
+      >
+        <span
+          [class.pointer]="app._id !== state.currentApplication._id"
+          nbTooltip="{{ app._id === state.currentApplication._id ? 'Current' : 'Select' }}"
+        >
+          {{ app.label }}
+        </span>
+      </nb-toggle>
+      <nb-tag-list>
+        <nb-tag
+          *ngFor="let locale of app.supportedLocales"
+          size="small"
+          [text]="state.localeName(locale)"
+        ></nb-tag>
+      </nb-tag-list>
+      <div>
+        <button
+          nbButton
+          ghost
+          shape="round"
           nbTooltip="Download an application dump"
+          (click)="downloadDump(app)"
         >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="font-size: 30px"
-            >get_app</i
-          >
-        </nb-action>
-        <nb-action
-          class="control-item"
-          (click)="downloadSentencesDump(app)"
+          <nb-icon icon="download-outline"></nb-icon>
+        </button>
+        <button
+          nbButton
+          ghost
+          shape="round"
           nbTooltip="Download a sentences dump"
+          (click)="downloadSentencesDump(app)"
         >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="font-size: 30px"
-            >cloud_download</i
-          >
-        </nb-action>
-
-        <nb-action
-          class="control-item"
-          routerLink="edit/{{ app._id }}"
+          <nb-icon icon="cloud-download-outline"></nb-icon>
+        </button>
+        <button
+          nbButton
+          ghost
+          shape="round"
           nbTooltip="Edit"
+          routerLink="edit/{{ app._id }}"
         >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="font-size: 30px"
-            >edit</i
-          >
-        </nb-action>
-      </nb-actions>
+          <nb-icon icon="edit-outline"></nb-icon>
+        </button>
+      </div>
     </div>
   </nb-card-body>
 </nb-card>

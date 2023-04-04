@@ -14,53 +14,50 @@
   ~ limitations under the License.
   -->
 
-<nb-card>
+<nb-card
+  class="mt-3"
+  [nbSpinner]="loading"
+>
   <nb-card-body>
     <table
       *ngIf="dataSource && dataSource.length !== 0"
-      class="table table-sm table-fixed"
+      class="table-logs mb-2"
     >
       <thead>
         <tr>
-          <th><p>Date</p></th>
-          <th><p>Type</p></th>
-          <th><p>User</p></th>
-          <th><p>Application</p></th>
-          <th><p>Data</p></th>
-          <th><p>Error</p></th>
+          <th>Date</th>
+          <th>Type</th>
+          <th>User</th>
+          <th>Application</th>
+          <th>Data</th>
+          <th>Error</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let row of dataSource; index as i">
+          <td>{{ row.date | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
+          <td>{{ row.actionType }}</td>
+          <td>{{ row.login }}</td>
+          <td>{{ appName(row.applicationId) }}</td>
           <td>
-            <p>{{ row.date | amDateFormat: 'YYYY-MM-DD HH:mm' }}</p>
+            <button
+              *ngIf="row.newData"
+              nbButton
+              ghost
+              shape="round"
+              size="small"
+              (click)="displayData(row)"
+            >
+              <nb-icon icon="eye-outline"></nb-icon>
+            </button>
           </td>
           <td>
-            <p>{{ row.actionType }}</p>
-          </td>
-          <td>
-            <p>{{ row.login }}</p>
-          </td>
-          <td>
-            <p>{{ appName(row.applicationId) }}</p>
-          </td>
-          <td>
-            <p>
-              <button
-                nbButton
-                ghost
-                size="tiny"
-                *ngIf="row.newData"
-                (click)="displayData(row)"
-              >
-                <mat-icon>visibility</mat-icon>
-              </button>
-            </p>
-          </td>
-          <td>
-            <p class="error">
-              <span *ngIf="row.error"><mat-icon style="color: red">error</mat-icon></span>
-            </p>
+            <nb-icon
+              *ngIf="row.error"
+              icon="alert-circle"
+              size="small"
+              status="danger"
+            ></nb-icon>
           </td>
         </tr>
       </tbody>
@@ -71,7 +68,7 @@
     >
       <nb-select
         [(ngModel)]="pageSize"
-        (ngModelChange)="search()"
+        (selectedChange)="search()"
         nbTooltip="Items per page:"
       >
         <nb-option [value]="10">10</nb-option>

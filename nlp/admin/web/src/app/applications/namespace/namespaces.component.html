@@ -14,35 +14,35 @@
   ~ limitations under the License.
   -->
 
-<nb-card class="applications-applications">
-  <nb-card-header>
-    <nb-actions size="medium">
-      <nb-action>Namespaces</nb-action>
-      <nb-action
-        *ngIf="!create && canCreateNamespace()"
-        icon="plus-outline"
-        nbTooltip="Create a new Namespace"
-        nbTooltipStatus="primary"
-        status="primary"
-        (click)="displayCreate()"
-      ></nb-action>
-    </nb-actions>
+<nb-card class="mt-3">
+  <nb-card-header class="d-flex flex-wrap justify-content-between align-items-center gap-1">
+    Namespaces
+    <button
+      *ngIf="canCreateNamespace()"
+      nbButton
+      status="primary"
+      (click)="displayCreate()"
+    >
+      <nb-icon icon="plus-outline"></nb-icon>
+      Create
+    </button>
+  </nb-card-header>
+
+  <nb-card-body>
     <div
       *ngIf="create"
-      class="create"
+      class="d-flex align-items-center gap-1 mb-4"
     >
       <input
         #createNamespace
         type="text"
         nbInput
         placeholder="New Namespace"
-        class="create-item"
         (keyup.enter)="createNew()"
         [(ngModel)]="newNamespace"
       />
       <button
         nbButton
-        class="create-item"
         status="primary"
         (click)="createNew()"
         nbTooltip="Create a new Namespace"
@@ -54,199 +54,156 @@
       <button
         nbButton
         ghost
-        class="create-item"
         (click)="create = false; newNamespace = ''"
         nbTooltip="Cancel"
       >
         <nb-icon icon="close-outline"></nb-icon>
       </button>
     </div>
-  </nb-card-header>
-
-  <nb-card-body>
     <div
-      class="applications-applications__item"
+      class="d-flex align-items-center gap-1 mb-2"
       *ngFor="let n of namespaces"
     >
-      <button
-        *ngIf="state.currentApplication && n.namespace === state.currentApplication.namespace"
-        matTooltip="Current"
-        mat-button
-        class="applications-applications__select-action"
+      <nb-toggle
+        [disabled]="n.namespace === selectedNamespace"
+        [checked]="n.namespace === selectedNamespace"
+        (checkedChange)="selectNamespace(n.namespace)"
       >
-        <mat-icon>done</mat-icon>
-      </button>
-
-      <button
-        *ngIf="!state.currentApplication || n.namespace !== state.currentApplication.namespace"
-        class="applications-applications__select-action"
-        mat-button
-        matTooltip="Select"
-        (click)="selectNamespace(n.namespace)"
-      >
-        <mat-icon></mat-icon>
-      </button>
-
-      <span class="applications-applications__app-name">{{ n.namespace }}</span>
-
-      <div class="applications-applications__datas">
-        <mat-icon
-          *ngIf="n.owner"
-          matTooltip="Owner"
-          >verified_user</mat-icon
+        <span
+          [class.pointer]="n.namespace !== selectedNamespace"
+          nbTooltip="{{ n.namespace === selectedNamespace ? 'Current' : 'Select' }}"
         >
-      </div>
+          {{ n.namespace }}
+        </span>
+      </nb-toggle>
+      <nb-icon
+        *ngIf="n.owner"
+        icon="person-outline"
+        nbTooltip="Owner"
+      ></nb-icon>
 
-      <nb-actions
-        size="medium"
-        style="cursor: pointer"
-      >
-        <nb-action
+      <div class="ml-auto">
+        <button
           *ngIf="n.owner"
-          class="control-item"
-          (click)="manageUsers(n.namespace)"
+          nbButton
+          ghost
+          shape="round"
           nbTooltip="Manage Users"
+          (click)="manageUsers(n.namespace)"
         >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="font-size: 30px"
-          >
-            person
-          </i>
-        </nb-action>
-        <nb-action
+          <nb-icon icon="people-outline"></nb-icon>
+        </button>
+        <button
           *ngIf="n.owner"
-          class="control-item"
-          (click)="manageSharingSettings(n.namespace)"
+          nbButton
+          ghost
+          shape="round"
           nbTooltip="Configure sharing settings"
+          (click)="manageSharingSettings(n.namespace)"
         >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="font-size: 30px"
-          >
-            settings
-          </i>
-        </nb-action>
-      </nb-actions>
+          <nb-icon icon="settings-outline"></nb-icon>
+        </button>
+      </div>
     </div>
-  </nb-card-body>
 
-  <nb-card
-    class="applications-applications"
-    *ngIf="managedNamespace && managedUsers"
-  >
-    <nb-card-header>
-      <div style="display: flex">
-        <span *ngIf="state.applications.length !== 0"
-          >Users for Namespace <b>{{ managedNamespace }}</b></span
+    <nb-card
+      class="section-card mt-3 mb-0"
+      *ngIf="managedNamespace && managedUsers"
+    >
+      <nb-card-header>
+        <span *ngIf="state.applications.length !== 0">Users for Namespace "{{ managedNamespace }}"</span>
+      </nb-card-header>
+
+      <nb-card-body>
+        <div
+          class="d-flex align-items-center gap-1"
+          *ngFor="let u of managedUsers"
         >
-      </div>
-    </nb-card-header>
-
-    <nb-card-body>
-      <div
-        class="applications-applications__item"
-        *ngFor="let u of managedUsers"
-      >
-        <span class="applications-applications__app-name">{{ u.login }}</span>
-
-        <div class="applications-applications__datas">
-          <mat-icon
+          <span>{{ u.login }}</span>
+          <nb-icon
             *ngIf="u.owner"
-            matTooltip="Owner"
-            >verified_user</mat-icon
-          >
-        </div>
-
-        <nb-actions
-          size="medium"
-          style="cursor: pointer"
-        >
-          <nb-action
-            class="control-item"
-            (click)="deleteUserNamespace(u)"
+            icon="person-outline"
+            nbTooltip="Owner"
+          ></nb-icon>
+          <button
+            class="ml-auto"
+            nbButton
+            ghost
+            shape="round"
+            status="danger"
             nbTooltip="Delete User"
+            (click)="deleteUserNamespace(u)"
           >
-            <i
-              class="material-icons tock-toolbar-menu"
-              style="font-size: 30px"
-              >delete</i
-            >
-          </nb-action>
-        </nb-actions>
-      </div>
-    </nb-card-body>
+            <nb-icon icon="trash-2-outline"></nb-icon>
+          </button>
+        </div>
+      </nb-card-body>
 
-    <nb-card-footer>
-      <div>
+      <nb-card-footer class="d-flex align-items-center gap-1">
         <input
           nbInput
-          [(ngModel)]="newLogin"
           placeholder="New User"
+          [(ngModel)]="newLogin"
         />
-        <nb-checkbox
-          [(checked)]="newOwner"
-          class="checkbox"
-          >Owner</nb-checkbox
-        >
+        <nb-checkbox [(checked)]="newOwner"> Owner </nb-checkbox>
         <button
+          class="ml-auto"
           nbButton
+          status="primary"
+          size="small"
           (click)="addUserNamespace()"
         >
           Add
         </button>
-      </div>
-    </nb-card-footer>
-  </nb-card>
+      </nb-card-footer>
+    </nb-card>
 
-  <nb-card
-    class="applications-applications"
-    *ngIf="managedNamespace && namespaceConfiguration"
-  >
-    <nb-card-header>
-      <div style="display: flex">
-        <span *ngIf="state.applications.length !== 0"
-          >Shared settings for Namespace <b>{{ managedNamespace }}</b></span
-        >
-      </div>
-    </nb-card-header>
+    <nb-card
+      class="section-card mt-3 mb-0"
+      *ngIf="managedNamespace && namespaceConfiguration"
+    >
+      <nb-card-header>
+        <span *ngIf="state.applications.length !== 0">Shared settings for Namespace "{{ managedNamespace }}"</span>
+      </nb-card-header>
 
-    <nb-card-body>
-      <p>
-        <nb-toggle [(ngModel)]="namespaceConfiguration.defaultSharingConfiguration.model"
-          >Allow sharing <b>model</b> with other namespaces</nb-toggle
-        >
-      </p>
-      <p>
-        <nb-toggle [(ngModel)]="namespaceConfiguration.defaultSharingConfiguration.stories"
-          >Allow sharing <b>stories</b> with other namespaces</nb-toggle
-        >
-      </p>
-      <p>
-        Imported namespaces:
-        <nb-select
-          multiple
-          placeholder="None"
-          [(selected)]="importedNamespaces"
-          style="width: 400px"
-        >
-          <nb-option
-            *ngFor="let c of sharableNamespaceConfigurations"
-            [value]="c.namespace"
+      <nb-card-body>
+        <p>
+          <nb-toggle [(ngModel)]="namespaceConfiguration.defaultSharingConfiguration.model"
+            >Allow sharing <b>model</b> with other namespaces</nb-toggle
           >
-            {{ c.namespace }}
-          </nb-option>
-        </nb-select>
-      </p>
-    </nb-card-body>
-    <nb-card-footer>
-      <button
-        nbButton
-        status="primary"
-        (click)="saveNamespaceConfiguration()"
-      >
-        Save
-      </button>
-    </nb-card-footer>
-  </nb-card>
+        </p>
+        <p>
+          <nb-toggle [(ngModel)]="namespaceConfiguration.defaultSharingConfiguration.stories"
+            >Allow sharing <b>stories</b> with other namespaces</nb-toggle
+          >
+        </p>
+        <p>
+          Imported namespaces:
+          <nb-select
+            multiple
+            placeholder="None"
+            [(selected)]="importedNamespaces"
+            style="width: 400px"
+          >
+            <nb-option
+              *ngFor="let c of sharableNamespaceConfigurations"
+              [value]="c.namespace"
+            >
+              {{ c.namespace }}
+            </nb-option>
+          </nb-select>
+        </p>
+      </nb-card-body>
+      <nb-card-footer class="card-footer-actions">
+        <button
+          nbButton
+          status="primary"
+          size="small"
+          (click)="saveNamespaceConfiguration()"
+        >
+          Save
+        </button>
+      </nb-card-footer>
+    </nb-card>
+  </nb-card-body>
 </nb-card>

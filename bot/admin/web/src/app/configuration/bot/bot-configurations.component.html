@@ -16,55 +16,48 @@
 
 <nb-card
   *ngIf="configurations"
-  class="configurations"
+  class="mt-3"
 >
-  <nb-card-header>
-    <div style="display: flex">
-      <span>Bot Configurations</span>
-      <nb-actions
-        size="small"
-        style="cursor: pointer"
+  <nb-card-header class="d-flex flex-wrap align-items-center justify-content-between gap-1">
+    Bot configurations
+    <div class="d-flex flex-wrap">
+      <button
+        *ngIf="state.currentApplication"
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="Refresh"
+        (click)="refresh()"
       >
-        <nb-action
-          *ngIf="state.currentApplication"
-          class="control-item"
-          nbTooltip="Refresh"
-          (click)="refresh()"
-        >
-          <i class="material-icons tock-toolbar-menu">refresh</i>
-        </nb-action>
-
-        <nb-action
-          class="control-item"
-          nbTooltip="Create a new Configuration"
-          (click)="prepareCreate()"
-          *ngIf="!newApplicationConfiguration && state.currentApplication"
-        >
-          <i
-            class="material-icons tock-toolbar-menu"
-            style="color: #3366ff"
-            >add_box</i
-          >
-        </nb-action>
-
-        <nb-action
-          class="control-item"
-          nbTooltip="{{ displayTestConfigurations ? 'Hide test configurations' : 'Display test configurations' }}"
-          (click)="displayTestConfigurations = !displayTestConfigurations"
-          *ngIf="!newApplicationConfiguration && state.currentApplication"
-        >
-          <i
-            *ngIf="!displayTestConfigurations"
-            class="material-icons tock-toolbar-menu"
-            >visibility</i
-          >
-          <i
-            *ngIf="displayTestConfigurations"
-            class="material-icons tock-toolbar-menu"
-            >visibility_off</i
-          >
-        </nb-action>
-      </nb-actions>
+        <nb-icon icon="refresh-outline"></nb-icon>
+      </button>
+      <button
+        *ngIf="!newApplicationConfiguration && state.currentApplication"
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="{{ displayTestConfigurations ? 'Hide test configurations' : 'Display test configurations' }}"
+        (click)="displayTestConfigurations = !displayTestConfigurations"
+      >
+        <nb-icon
+          *ngIf="!displayTestConfigurations"
+          icon="eye-outline"
+        ></nb-icon>
+        <nb-icon
+          *ngIf="displayTestConfigurations"
+          icon="eye-off-outline"
+        ></nb-icon>
+      </button>
+      <button
+        *ngIf="!newApplicationConfiguration && state.currentApplication"
+        class="ml-3"
+        nbButton
+        status="primary"
+        (click)="prepareCreate()"
+      >
+        <nb-icon icon="plus-outline"></nb-icon>
+        Create
+      </button>
     </div>
   </nb-card-header>
   <nb-card-body>

@@ -14,50 +14,14 @@
  * limitations under the License.
  */
 
-.applications-applications {
-  margin-top: 20px;
-}
-
-.applications-applications__item {
-  display: flex;
+.applications__item {
+  display: grid;
+  grid-template-columns: minmax(10rem, 1fr) 2fr auto;
   align-items: center;
-  margin: 10px 0;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.applications-applications__app-name {
-  padding-right: 20px;
-  padding-left: 20px;
-}
-
-.applications-applications__select-action {
-  min-width: 0;
-  padding: 0 10px;
-  cursor: pointer;
-}
-
-.applications-applications__datas {
-  padding-right: 20px;
-  margin-right: auto;
-  font-size: 0.9em;
-  color: #737373;
-}
-
-.applications-applications__complex-actions {
-}
-
-.applications-applications__complex-actions .mat-button {
-  font-size: 0.8em;
-}
-
-.btn {
-  margin: 0 8px;
-}
-
-.create {
-  color: #3366ff;
-  cursor: pointer;
-}
-
-.tock-toolbar-menu {
-  cursor: pointer;
+nb-toggle::ng-deep label {
+  margin: 0;
 }

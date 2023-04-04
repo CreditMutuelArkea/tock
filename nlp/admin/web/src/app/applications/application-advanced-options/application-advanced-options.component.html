@@ -18,7 +18,10 @@
   <nb-accordion-item>
     <nb-accordion-item-header>Advanced options</nb-accordion-item-header>
     <nb-accordion-item-body>
-      <div *ngIf="!exportAlexa && !tokenizerProperties && !uploadDump">
+      <div
+        *ngIf="!exportAlexa && !tokenizerProperties && !uploadDump"
+        class="d-flex flex-wrap gap-1"
+      >
         <button
           nbButton
           outline
@@ -28,7 +31,6 @@
         >
           Upload Dump
         </button>
-        &nbsp;
         <button
           nbButton
           outline
@@ -38,7 +40,6 @@
         >
           Trigger Build
         </button>
-        &nbsp;
         <button
           nbButton
           outline
@@ -48,7 +49,6 @@
         >
           NLU Engine configuration
         </button>
-        &nbsp;
         <button
           nbButton
           outline
@@ -60,42 +60,42 @@
         </button>
       </div>
 
-      <nb-card *ngIf="exportAlexa">
+      <nb-card
+        *ngIf="exportAlexa"
+        class="section-card"
+      >
         <nb-card-body>
-          <mat-form-field class="configuration-input">
-            <mat-select
-              placeholder="select Locale to export"
-              [(ngModel)]="alexaLocale"
+          <nb-select
+            class="form-field mb-2"
+            placeholder="select Locale to export"
+            [(ngModel)]="alexaLocale"
+          >
+            <nb-option
+              *ngFor="let locale of application.supportedLocales"
+              [value]="locale"
             >
-              <mat-option
-                *ngFor="let locale of application.supportedLocales"
-                [value]="locale"
-              >
-                {{ state.localeName(locale) }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-          <div>
-            <button
-              nbButton
-              outline
-              status="primary"
-              size="small"
-              (click)="exportAlexa = false"
-            >
-              Cancel
-            </button>
-            <button
-              nbButton
-              status="primary"
-              size="small"
-              style="margin-left: 10px"
-              (click)="downloadAlexaExport()"
-            >
-              Export
-            </button>
-          </div>
+              {{ state.localeName(locale) }}
+            </nb-option>
+          </nb-select>
         </nb-card-body>
+        <nb-card-footer class="card-footer-actions">
+          <button
+            nbButton
+            ghost
+            size="small"
+            (click)="exportAlexa = false"
+          >
+            Cancel
+          </button>
+          <button
+            nbButton
+            status="primary"
+            size="small"
+            (click)="downloadAlexaExport()"
+          >
+            Export
+          </button>
+        </nb-card-footer>
       </nb-card>
 
       <tock-application-upload
@@ -104,38 +104,36 @@
         [applicationName]="application.name"
       ></tock-application-upload>
 
-      <nb-card *ngIf="tokenizerProperties">
+      <nb-card
+        *ngIf="tokenizerProperties"
+        class="section-card"
+      >
         <nb-card-body>
-          <mat-form-field class="conf-container">
-            <textarea
-              matInput
-              class="conf"
-              [(ngModel)]="tokenizerProperties"
-              placeholder="Tokenizer properties"
-            ></textarea>
-          </mat-form-field>
-          <mat-form-field class="conf-container">
-            <textarea
-              matInput
-              class="conf"
-              [(ngModel)]="intentClassifierProperties"
-              placeholder="Intent Classifier properties"
-            ></textarea>
-          </mat-form-field>
-          <mat-form-field class="conf-container">
-            <textarea
-              matInput
-              class="conf"
-              [(ngModel)]="entityClassifierProperties"
-              placeholder="Entity Classifier properties"
-            ></textarea>
-          </mat-form-field>
+          <textarea
+            class="mb-2"
+            nbInput
+            fullWidth
+            [(ngModel)]="tokenizerProperties"
+            placeholder="Tokenizer properties"
+          ></textarea>
+          <textarea
+            class="mb-2"
+            nbInput
+            fullWidth
+            [(ngModel)]="intentClassifierProperties"
+            placeholder="Intent Classifier properties"
+          ></textarea>
+          <textarea
+            nbInput
+            fullWidth
+            [(ngModel)]="entityClassifierProperties"
+            placeholder="Entity Classifier properties"
+          ></textarea>
         </nb-card-body>
-        <nb-card-footer>
+        <nb-card-footer class="card-footer-actions">
           <button
             nbButton
-            outline
-            status="primary"
+            ghost
             size="small"
             (click)="tokenizerProperties = null; intentClassifierProperties = null; entityClassifierProperties = null"
           >
@@ -146,7 +144,6 @@
             status="primary"
             size="small"
             (click)="updateConfiguration()"
-            style="margin-left: 10px"
           >
             Update Configuration
           </button>
