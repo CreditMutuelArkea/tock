@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin
+package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.SimpleAnswer
@@ -24,7 +24,6 @@ import ai.tock.bot.admin.model.CreateI18nLabelRequest
 import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqDefinitionSearchResult
 import ai.tock.bot.admin.model.FaqSearchRequest
-import ai.tock.bot.admin.service.StoryService
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature

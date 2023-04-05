@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.version
+package ai.tock.shared.exception.admin.scenario.group
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.NotFoundException
+import ai.tock.shared.exception.rest.RestException
 
-class ScenarioVersionDuplicatedException: ScenarioException("Duplicated scenario version")
+class ScenarioGroupNotFoundException(val id: String) : ScenarioException("The scenario group [id=$id] was not found"){
+    override fun toRestException(): RestException = NotFoundException(message)
+}

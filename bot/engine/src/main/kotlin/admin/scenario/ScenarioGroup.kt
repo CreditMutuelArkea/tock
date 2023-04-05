@@ -16,8 +16,8 @@
 
 package ai.tock.bot.admin.scenario
 
-import ai.tock.shared.exception.scenario.group.ScenarioGroupInvalidException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
+
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupInvalidException
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.lang.Exception

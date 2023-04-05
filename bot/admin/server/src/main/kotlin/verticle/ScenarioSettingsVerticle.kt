@@ -20,14 +20,16 @@ import ai.tock.bot.admin.service.ScenarioSettingsService
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.nlp.front.shared.config.ScenarioSettingsQuery
+import ai.tock.shared.exception.admin.AdminException
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
+import ai.tock.shared.vertx.toRequestHandler
 import io.vertx.ext.web.RoutingContext
 
 /**
  * [ScenarioSettingsVerticle] contains all the routes and actions associated with the scenario settings
  */
-class ScenarioSettingsVerticle {
+class ScenarioSettingsVerticle : ChildVerticle<AdminException> {
 
     companion object {
         const val PATH_PARAM_APPLICATION_ID = "applicationId"
@@ -36,11 +38,11 @@ class ScenarioSettingsVerticle {
 
     private val front = FrontClient
 
-    fun configure(webVerticle: WebVerticle) {
+    override fun configure(parent: WebVerticle<AdminException>) {
 
         val authorizedRoles = setOf(TockUserRole.botUser, TockUserRole.admin, TockUserRole.technicalAdmin)
 
-        with(webVerticle) {
+        with(parent) {
 
             val handlePost = { context: RoutingContext, query: ScenarioSettingsQuery ->
                 val applicationDefinition = front.getApplicationById(context.pathId(PATH_PARAM_APPLICATION_ID))
@@ -56,17 +58,18 @@ class ScenarioSettingsVerticle {
                 val applicationDefinition = front.getApplicationById(id)
                 if (context.organization == applicationDefinition?.namespace) {
                     ScenarioSettingsService.getScenarioSettingsByBotId(applicationDefinition.name)?.let {
-                     ScenarioSettingsQuery(it.actionRepetitionNumber, it.redirectStoryId)
+                        ScenarioSettingsQuery(it.actionRepetitionNumber, it.redirectStoryId)
                     }
                 } else {
                     WebVerticle.unauthorized()
                 }
             }
 
-            blockingJsonPost(PATH, authorizedRoles, handler = handlePost)
+            blockingJsonPost(PATH, authorizedRoles, handler = toRequestHandler(handlePost))
 
-            blockingJsonGet(PATH, authorizedRoles, handler = handleGet)
+            blockingJsonGet(PATH, authorizedRoles, handler = toRequestHandler(handleGet))
         }
     }
+
 
 }

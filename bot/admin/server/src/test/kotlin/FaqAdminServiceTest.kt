@@ -21,9 +21,7 @@ import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.model.BotStoryDefinitionConfiguration
 import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqSearchRequest
-import ai.tock.bot.admin.service.ScenarioGroupService
-import ai.tock.bot.admin.service.ScenarioSettingsService
-import ai.tock.bot.admin.service.StoryService
+import ai.tock.bot.admin.service.*
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.connector.ConnectorType

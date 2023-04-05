@@ -16,7 +16,6 @@
 
 package ai.tock.bot.admin.service
 
-import ai.tock.bot.admin.BotAdminService
 import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.TickAnswerConfiguration

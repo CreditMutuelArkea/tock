@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.group
+package ai.tock.shared.exception.admin.scenario.version
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.ConflictException
+import ai.tock.shared.exception.rest.RestException
 
-class ScenarioGroupWithVersionsException : ScenarioException("The scenario group has versions")
+class ScenarioVersionBadStateException(message : String = "Bad scenario version state") : ScenarioException(message) {
+    override fun toRestException(): RestException = ConflictException(message)
+}

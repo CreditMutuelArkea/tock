@@ -19,22 +19,15 @@ import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
 import ai.tock.bot.mongo.MongoBotConfiguration
 import ai.tock.shared.ensureUniqueIndex
-import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupDuplicatedException
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.warn
 import ai.tock.shared.watch
 import com.mongodb.MongoWriteException
 import com.mongodb.client.result.DeleteResult
 import mu.KotlinLogging
-import org.litote.kmongo.Id
-import org.litote.kmongo.aggregate
-import org.litote.kmongo.deleteOneById
-import org.litote.kmongo.eq
-import org.litote.kmongo.getCollectionOfName
-import org.litote.kmongo.lookup
-import org.litote.kmongo.match
+import org.litote.kmongo.*
 import org.litote.kmongo.reactivestreams.getCollectionOfName
-import org.litote.kmongo.updateOne
 import java.time.ZonedDateTime
 
 internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {

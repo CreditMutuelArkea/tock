@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.group
+package ai.tock.shared.exception.rest
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.ToRestException
+import ai.tock.shared.exception.error.ErrorMessageWrapper
+import io.netty.handler.codec.http.HttpResponseStatus
 
-class ScenarioGroupInvalidException(val error: String?) : ScenarioException(error ?: "The scenario group is not valid")
+class CommonException(override val message: String): ToRestException(message) {
+    override fun toRestException(): RestException {
+        return RestException(ErrorMessageWrapper(message), HttpResponseStatus.INTERNAL_SERVER_ERROR)
+    }
+}

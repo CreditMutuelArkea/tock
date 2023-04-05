@@ -16,6 +16,7 @@
 
 package ai.tock.shared.security.auth.spi
 
+import ai.tock.shared.exception.ToRestException
 import ai.tock.shared.security.auth.CASAuthProvider
 import io.vertx.core.Vertx
 
@@ -29,5 +30,5 @@ interface CASAuthProviderFactory {
     /**
      * Creates CAS Authentication provider
      */
-    fun getCasAuthProvider(vertx: Vertx): CASAuthProvider;
+    fun <E: ToRestException>getCasAuthProvider(vertx: Vertx): CASAuthProvider<E>
 }

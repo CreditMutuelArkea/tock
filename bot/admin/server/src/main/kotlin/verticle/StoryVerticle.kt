@@ -18,9 +18,11 @@ package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.admin.service.StoryService
 import ai.tock.bot.bean.TickStoryQuery
+import ai.tock.shared.exception.admin.AdminException
 import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
+import ai.tock.shared.vertx.toRequestHandler
 import io.vertx.ext.web.RoutingContext
 import mu.KLogger
 import mu.KotlinLogging
@@ -28,7 +30,7 @@ import mu.KotlinLogging
 /**
  * [StoryVerticle] contains all the routes and actions associated with the stories
  */
-class StoryVerticle {
+class StoryVerticle: ChildVerticle<AdminException> {
 
     companion object {
         private val logger: KLogger = KotlinLogging.logger {}
@@ -41,33 +43,32 @@ class StoryVerticle {
     /**
      * Declaration of routes and association to the appropriate handler
      */
-    fun configure(verticle: WebVerticle) {
+    override fun configure(verticle: WebVerticle<AdminException>) {
         logger.info { "configure StoryVerticle" }
 
         with(verticle) {
-            blockingJsonPost(tickURL, setOf(TockUserRole.botUser), handler = createTickStory)
+
+            val createTickStory: (RoutingContext, TickStoryQuery) -> Unit = { context, tickStory ->
+                Companion.logger.debug { "request to create tick story <${tickStory.storyId}>" }
+                val namespace = (context.user() as TockUser).namespace
+                StoryService.createTickStory(namespace, tickStory)
+            }
+
+            val deleteStoryByStoryDefinitionConfigurationId: (RoutingContext) -> Boolean = { context ->
+                val storyDefinitionConfigurationId = context.pathParam("storyDefinitionConfigurationId")
+                Companion.logger.debug { "request to delete story <$storyDefinitionConfigurationId>" }
+                val namespace = (context.user() as TockUser).namespace
+                StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(namespace, storyDefinitionConfigurationId)
+            }
+
+            blockingJsonPost(tickURL, setOf(TockUserRole.botUser), handler = toRequestHandler(createTickStory))
 
             blockingJsonDelete(
                 "$storyURL/:storyDefinitionConfigurationId",
                 setOf(TockUserRole.botUser, TockUserRole.faqBotUser),
-                handler = deleteStoryByStoryDefinitionConfigurationId
+                handler = toRequestHandler(deleteStoryByStoryDefinitionConfigurationId)
             )
-
-            // TODO : migrate all story vert.x handlers to here  (ex BotAdminVerticle)
         }
+            // TODO : migrate all story vert.x handlers to here  (ex BotAdminVerticle)
     }
-
-    private val createTickStory: (RoutingContext, TickStoryQuery) -> Unit = { context, tickStory ->
-        logger.debug { "request to create tick story <${tickStory.storyId}>" }
-        val namespace = (context.user() as TockUser).namespace
-        StoryService.createTickStory(namespace, tickStory)
-    }
-
-    private val deleteStoryByStoryDefinitionConfigurationId: (RoutingContext) -> Boolean = { context ->
-        val storyDefinitionConfigurationId = context.pathParam("storyDefinitionConfigurationId")
-        logger.debug { "request to delete story <$storyDefinitionConfigurationId>" }
-        val namespace = (context.user() as TockUser).namespace
-        StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(namespace, storyDefinitionConfigurationId)
-    }
-
 }

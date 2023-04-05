@@ -20,16 +20,10 @@ import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionDAO
 import ai.tock.bot.admin.scenario.ScenarioVersionState
 import ai.tock.bot.mongo.MongoBotConfiguration
-import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
+import ai.tock.shared.exception.admin.scenario.version.ScenarioVersionNotFoundException
 import com.mongodb.client.result.DeleteResult
 import mu.KotlinLogging
-import org.litote.kmongo.Id
-import org.litote.kmongo.and
-import org.litote.kmongo.deleteOneById
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOneById
-import org.litote.kmongo.getCollectionOfName
-import org.litote.kmongo.updateOne
+import org.litote.kmongo.*
 import java.time.ZonedDateTime
 
 internal object ScenarioVersionMongoDAO : ScenarioVersionDAO {

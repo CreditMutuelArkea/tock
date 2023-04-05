@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.group
+package ai.tock.shared.exception.admin.scenario.version
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.ConflictException
+import ai.tock.shared.exception.rest.RestException
 
-class ScenarioGroupNotFoundException(val id: String) : ScenarioException("The scenario group [id=$id] was not found")
+class ScenarioVersionsInconsistentException : ScenarioException("The scenario versions are not consistent") {
+    override fun toRestException(): RestException = ConflictException(message)
+}

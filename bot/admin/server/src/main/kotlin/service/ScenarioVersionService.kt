@@ -19,8 +19,9 @@ package ai.tock.bot.admin.service
 import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionDAO
 import ai.tock.bot.admin.scenario.ScenarioVersionState
+import ai.tock.shared.exception.admin.scenario.version.ScenarioVersionNotFoundException
 import ai.tock.shared.injector
-import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
+
 import ai.tock.shared.provide
 import org.litote.kmongo.toId
 

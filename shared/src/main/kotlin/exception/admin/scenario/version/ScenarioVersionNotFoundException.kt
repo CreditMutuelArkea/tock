@@ -14,19 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.rest
+package ai.tock.shared.exception.admin.scenario.version
 
-import ai.tock.shared.exception.ToRestException
-import ai.tock.shared.exception.error.ErrorMessageWrapper
-import io.netty.handler.codec.http.HttpResponseStatus
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.NotFoundException
+import ai.tock.shared.exception.rest.RestException
 
-/**
- * Base class for rest exceptions.
- */
-open class RestException (
-    val httpResponseBody: ErrorMessageWrapper = ErrorMessageWrapper(),
-    val httpResponseStatus: HttpResponseStatus = HttpResponseStatus.INTERNAL_SERVER_ERROR)
-    : ToRestException(httpResponseStatus.reasonPhrase()){
-    override fun toRestException(): RestException  = this
-
+class ScenarioVersionNotFoundException(val id: String = "?") : ScenarioException("The scenario version [id=$id] was not found") {
+    override fun toRestException(): RestException = NotFoundException(message)
 }

@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.group
+package ai.tock.shared.exception.admin.scenario.group
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.ConflictException
+import ai.tock.shared.exception.rest.RestException
 
-class ScenarioGroupWithoutVersionException : ScenarioException("The scenario group has no versions")
+class ScenarioGroupAndVersionMismatchException : ScenarioException("The scenario group is not compatible with the versions") {
+    override fun toRestException(): RestException = ConflictException(message)
+}

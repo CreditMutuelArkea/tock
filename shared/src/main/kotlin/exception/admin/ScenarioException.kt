@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.version
+package ai.tock.shared.exception.admin
 
-import ai.tock.shared.exception.scenario.ScenarioException
 
-class ScenarioVersionNotFoundException(val id: String = "?") : ScenarioException("The scenario version [id=$id] was not found")
+abstract class ScenarioException(override val message : String) : AdminException(message)

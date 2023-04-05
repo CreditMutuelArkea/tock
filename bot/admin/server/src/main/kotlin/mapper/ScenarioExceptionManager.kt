@@ -16,20 +16,7 @@
 
 package ai.tock.bot.admin.mapper
 
-import ai.tock.shared.exception.rest.ConflictException
-import ai.tock.shared.exception.rest.NotFoundException
-import ai.tock.shared.exception.rest.RestException
-import ai.tock.shared.exception.scenario.ScenarioException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupInvalidException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupWithVersionsException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupWithoutVersionException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionBadStateException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionDuplicatedException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionNotFoundException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionsInconsistentException
+import ai.tock.shared.exception.admin.ScenarioException
 import mu.KLogger
 import mu.KotlinLogging
 
@@ -45,21 +32,4 @@ object ScenarioExceptionManager {
             throw ex.toRestException()
         }
     }
-
-    private fun ScenarioException.toRestException(): RestException {
-        return when(this) {
-            is ScenarioGroupAndVersionMismatchException -> ConflictException(message)
-            is ScenarioGroupDuplicatedException -> ConflictException(message)
-            is ScenarioGroupNotFoundException -> NotFoundException(message)
-            is ScenarioGroupWithoutVersionException -> ConflictException(message)
-            is ScenarioGroupWithVersionsException -> ConflictException(message)
-            is ScenarioVersionBadStateException -> ConflictException(message)
-            is ScenarioVersionDuplicatedException -> ConflictException(message)
-            is ScenarioVersionNotFoundException -> NotFoundException(message)
-            is ScenarioVersionsInconsistentException -> ConflictException(message)
-            is ScenarioGroupInvalidException -> ConflictException(message)
-            else -> RestException()
-        }
-    }
-
 }

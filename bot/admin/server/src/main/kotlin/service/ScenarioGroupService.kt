@@ -18,8 +18,7 @@ package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
-import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import org.litote.kmongo.toId

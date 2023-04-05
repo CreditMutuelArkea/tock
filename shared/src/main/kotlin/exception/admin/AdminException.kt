@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.group
+package ai.tock.shared.exception.admin
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.ToRestException
 
-class ScenarioGroupDuplicatedException: ScenarioException("Duplicated scenario group")
+sealed class AdminException(override val message: String?): ToRestException(message)

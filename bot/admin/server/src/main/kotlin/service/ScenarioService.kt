@@ -18,16 +18,13 @@ package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioVersion
-import ai.tock.bot.admin.scenario.ScenarioVersionState.DRAFT
-import ai.tock.bot.admin.scenario.ScenarioVersionState.ARCHIVED
-import ai.tock.bot.admin.scenario.ScenarioVersionState.CURRENT
+import ai.tock.bot.admin.scenario.ScenarioVersionState.*
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
-import ai.tock.shared.exception.scenario.ScenarioException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupAndVersionMismatchException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
-import ai.tock.shared.exception.scenario.group.ScenarioGroupWithoutVersionException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionBadStateException
-import ai.tock.shared.exception.scenario.version.ScenarioVersionsInconsistentException
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupAndVersionMismatchException
+import ai.tock.shared.exception.admin.scenario.group.ScenarioGroupWithoutVersionException
+import ai.tock.shared.exception.admin.scenario.version.ScenarioVersionBadStateException
+import ai.tock.shared.exception.admin.scenario.version.ScenarioVersionsInconsistentException
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.Id

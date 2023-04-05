@@ -16,7 +16,7 @@
 
 package ai.tock.bot.admin.scenario
 
-import ai.tock.shared.exception.scenario.version.ScenarioVersionBadStateException
+import ai.tock.shared.exception.admin.scenario.version.ScenarioVersionBadStateException
 
 enum class ScenarioVersionState(val value: String) {
     DRAFT("draft"),

@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario
+package ai.tock.shared.exception.admin.scenario.group
 
-abstract class ScenarioException(override val message : String) : RuntimeException(message)
+import ai.tock.shared.exception.admin.ScenarioException
+import ai.tock.shared.exception.rest.ConflictException
+import ai.tock.shared.exception.rest.RestException
+
+class ScenarioGroupWithoutVersionException : ScenarioException("The scenario group has no versions"){
+    override fun toRestException(): RestException = ConflictException(message)
+}

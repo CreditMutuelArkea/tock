@@ -14,8 +14,23 @@
  * limitations under the License.
  */
 
-package ai.tock.shared.exception.scenario.version
+package ai.tock.bot.admin.verticle
 
-import ai.tock.shared.exception.scenario.ScenarioException
+import ai.tock.shared.exception.ToRestException
+import ai.tock.shared.vertx.WebVerticle
 
-class ScenarioVersionsInconsistentException : ScenarioException("The scenario versions are not consistent")
+interface ChildVerticle<T: ToRestException> {
+    fun configure(parent: WebVerticle<T>)
+}
+
+interface ParentVerticle<T: ToRestException>  {
+
+    fun children(): List<ChildVerticle<T>>
+
+    fun preConfigure() {
+        if (this !is WebVerticle<*>)
+            throw IllegalStateException("ParentVerticle must be a WebVerticle")
+
+        children().forEach { it.configure(this as WebVerticle<T>) }
+    }
+}
