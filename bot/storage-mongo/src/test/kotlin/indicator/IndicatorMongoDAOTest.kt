@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package ai.tock.bot.mongo.indicator
 import ai.tock.bot.admin.indicators.Indicator
 import ai.tock.bot.admin.indicators.IndicatorValue
 import ai.tock.bot.mongo.AbstractTest
-import indicators.IndicatorMongoDAO
+import indicator.IndicatorMongoDAO
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

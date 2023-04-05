@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.model.indicator
+package ai.tock.bot.admin.indicators.metric
 
+import java.time.Instant
 
-data class IndicatorResponse(
-    val id: String,
-    val name: String,
-    val label: String,
-    val description: String?= null,
-    val applicationName: String,
-    val dimensions: Set<String> = mutableSetOf(),
-    val values: Set<IndicatorValueResponse>
+/**
+ * Metric filter
+ */
+data class MetricFilter(
+    val botId: String? = null,
+    val types: List<MetricType>? = null,
+    val emitterStoryIds: List<String>? = null,
+    val trackedStoryIds: List<String>? = null,
+    val indicatorNames: List<String>? = null,
+    val indicatorValueNames: List<String>? = null,
+    val creationDateSince: Instant? = null,
+    val creationDateUntil: Instant? = null,
 )
 
-data class IndicatorValueResponse(val name: String, val label: String)

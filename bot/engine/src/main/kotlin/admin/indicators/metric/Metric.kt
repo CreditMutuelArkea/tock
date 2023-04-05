@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ import java.time.Instant
  */
 data class Metric(
     val _id: Id<Metric> = newId(),
-    val type: TypeMetric,
-    val indicatorName: String?,
-    val indicatorValueName: String?,
+    val type: MetricType,
+    val indicatorName: String? = null,
+    val indicatorValueName: String? = null,
     val emitterStoryId: String,
     val trackedStoryId: String,
     val playerIds: Set<PlayerId>,
@@ -47,4 +47,3 @@ data class Metric(
     val creationDate: Instant = Instant.now(),
     val botId: String
 )
-

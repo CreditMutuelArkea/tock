@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,5 +37,12 @@ interface MetricDAO {
      * @param botId the bot id
      */
     fun findAllByBotId(botId: String): List<Metric>
+
+    /**
+     * Find all metrics by filtering and grouping data
+     * @param filter the [MetricFilter]
+     * @param groupBy list of [MetricGroupBy]
+     */
+    fun filterAndGroupBy(filter: MetricFilter, groupBy: List<MetricGroupBy>): List<CustomMetric>
 
 }

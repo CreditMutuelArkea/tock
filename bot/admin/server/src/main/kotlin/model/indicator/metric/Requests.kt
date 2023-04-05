@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.model.indicator
+package ai.tock.bot.admin.model.indicator.metric
 
+import ai.tock.bot.admin.indicators.metric.MetricFilter
+import ai.tock.bot.admin.indicators.metric.MetricGroupBy
 
-data class IndicatorResponse(
-    val id: String,
-    val name: String,
-    val label: String,
-    val description: String?= null,
-    val applicationName: String,
-    val dimensions: Set<String> = mutableSetOf(),
-    val values: Set<IndicatorValueResponse>
+/**
+ * Custom Metric Request
+ */
+data class Requests(
+    val filter: MetricFilter? = null, val groupBy: List<MetricGroupBy>
 )
-
-data class IndicatorValueResponse(val name: String, val label: String)

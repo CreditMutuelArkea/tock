@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.model.indicator
+package ai.tock.bot.admin.indicators.metric
 
-
-data class IndicatorResponse(
-    val id: String,
-    val name: String,
-    val label: String,
-    val description: String?= null,
-    val applicationName: String,
-    val dimensions: Set<String> = mutableSetOf(),
-    val values: Set<IndicatorValueResponse>
+/**
+ * Custom Metric
+ */
+data class CustomMetric(
+    val id: String?,
+    val type: MetricType?,
+    val indicatorName: String?,
+    val indicatorValueName: String?,
+    val emitterStoryId: String?,
+    val trackedStoryId: String?,
+    val count: Int = 0
 )
 
-data class IndicatorValueResponse(val name: String, val label: String)

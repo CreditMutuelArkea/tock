@@ -38,8 +38,8 @@ import com.github.salomonbrys.kodein.instance
 import com.github.salomonbrys.kodein.provider
 import com.github.salomonbrys.kodein.singleton
 import com.mongodb.client.MongoDatabase
-import indicators.IndicatorMongoDAO
-import indicators.metric.MetricMongoDAO
+import indicator.IndicatorMongoDAO
+import indicator.metric.MetricMongoDAO
 import org.litote.kmongo.getCollection
 
 

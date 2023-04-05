@@ -19,7 +19,7 @@ package ai.tock.bot.engine.config
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.answer.SimpleAnswer
 import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
-import ai.tock.bot.admin.indicators.metric.TypeMetric
+import ai.tock.bot.admin.indicators.metric.MetricType
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
 import ai.tock.bot.admin.story.StoryDefinitionStepMetric
@@ -50,7 +50,6 @@ import io.mockk.verify
 import org.junit.jupiter.api.Test
 import org.litote.kmongo.toId
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class ConfiguredStoryHandlerTest {
@@ -445,7 +444,7 @@ class ConfiguredStoryHandlerTest {
     @Test
     fun `GIVEN story without a step WHEN handled THEN save story handled metric`() {
 
-        val capturedTypeMetrics = mutableListOf<TypeMetric>()
+        val capturedMetricTypes = mutableListOf<MetricType>()
 
         val connector = mockk<Connector> {
             every { toConnectorMessage(any()) } returns { listOf(mockk()) }
@@ -495,7 +494,7 @@ class ConfiguredStoryHandlerTest {
                 }
             }
 
-            every { createMetric(capture(capturedTypeMetrics), any(), any()) } returns mockk()
+            every { createMetric(capture(capturedMetricTypes), any(), any()) } returns mockk()
         }
 
         every { configuration.findNextSteps(bus, configuration) } returns emptyList()
@@ -505,10 +504,10 @@ class ConfiguredStoryHandlerTest {
         handler.handle(bus)
 
         // Then
-        assertEquals(1, capturedTypeMetrics.size)
-        assertEquals(TypeMetric.STORY_HANDLED, capturedTypeMetrics.first())
+        assertEquals(1, capturedMetricTypes.size)
+        assertEquals(MetricType.STORY_HANDLED, capturedMetricTypes.first())
 
-        verify(exactly = 1) { bus.createMetric(TypeMetric.STORY_HANDLED, null, null) }
+        verify(exactly = 1) { bus.createMetric(MetricType.STORY_HANDLED, null, null) }
         verify(exactly = 1) { configuration.saveMetric(any()) }
         verify(exactly = 0) { configuration.saveMetrics(any()) }
     }
@@ -516,7 +515,7 @@ class ConfiguredStoryHandlerTest {
     @Test
     fun `GIVEN story WHEN a step handled and has metrics THEN save only step metrics`() {
 
-        val capturedTypeMetrics = mutableListOf<TypeMetric>()
+        val capturedMetricTypes = mutableListOf<MetricType>()
         val capturedIndicatorNames = mutableListOf<String>()
         val capturedIndicatorNameValues = mutableListOf<String>()
 
@@ -579,7 +578,7 @@ class ConfiguredStoryHandlerTest {
                 }
             }
             every { intent } returns null
-            every { createMetric(capture(capturedTypeMetrics), capture(capturedIndicatorNames), capture(capturedIndicatorNameValues)) } returns mockk()
+            every { createMetric(capture(capturedMetricTypes), capture(capturedIndicatorNames), capture(capturedIndicatorNameValues)) } returns mockk()
         }
 
         every { configuration.findNextSteps(bus, configuration) } returns emptyList()
@@ -589,10 +588,10 @@ class ConfiguredStoryHandlerTest {
         handler.handle(bus)
 
         // Then
-        assertEquals(2, capturedTypeMetrics.size)
+        assertEquals(2, capturedMetricTypes.size)
         assertEquals(2, capturedIndicatorNames.size)
         assertEquals(2, capturedIndicatorNameValues.size)
-        assertEquals(TypeMetric.QUESTION_REPLIED, capturedTypeMetrics.first())
+        assertEquals(MetricType.QUESTION_REPLIED, capturedMetricTypes.first())
         assertEquals(listOf(metric1.indicatorName, metric2.indicatorName), capturedIndicatorNames)
         assertEquals(listOf(metric1.indicatorValueName, metric2.indicatorValueName), capturedIndicatorNameValues)
 
