@@ -38,6 +38,7 @@ import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqSearchRequest
 import ai.tock.bot.admin.model.Feature
 import ai.tock.bot.admin.model.I18LabelQuery
+import ai.tock.bot.admin.model.MinimalStorySearchRequest
 import ai.tock.bot.admin.model.StorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
@@ -597,6 +598,22 @@ open class BotAdminVerticle : AdminVerticle() {
         blockingJsonPost("/bot/story/load", setOf(botUser, faqBotUser)) { context, request: StorySearchRequest ->
             if (context.organization == request.namespace) {
                 BotAdminService.loadStories(request)
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonPost("/bot/story/search", setOf(botUser, faqBotUser)) { context, request: StorySearchRequest ->
+            if (context.organization == request.namespace) {
+                BotAdminService.searchStories(request)
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonPost("/bot/story/search/minimal", setOf(botUser, faqBotUser)) { context, request: MinimalStorySearchRequest ->
+            if (context.organization == request.namespace) {
+                BotAdminService.searchMinimalStories(request)
             } else {
                 unauthorized()
             }

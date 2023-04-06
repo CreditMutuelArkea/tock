@@ -47,6 +47,7 @@ import ai.tock.bot.admin.model.CreateStoryRequest
 import ai.tock.bot.admin.model.DialogFlowRequest
 import ai.tock.bot.admin.model.DialogsSearchQuery
 import ai.tock.bot.admin.model.Feature
+import ai.tock.bot.admin.model.MinimalStorySearchRequest
 import ai.tock.bot.admin.model.StorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.model.UserSearchQueryResult
@@ -55,7 +56,8 @@ import ai.tock.bot.admin.story.StoryDefinitionConfigurationByBotStep
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationMandatoryEntity
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationStep
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationSummary
+import ai.tock.bot.admin.story.StoryDefinitionConfigurationSummaryExtended
+import ai.tock.bot.admin.story.StoryDefinitionConfigurationSummaryMinimumMetrics
 import ai.tock.bot.admin.story.dump.ScriptAnswerVersionedConfigurationDump
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpController
@@ -276,8 +278,11 @@ object BotAdminService {
         }
     }
 
-    fun searchStories(request: StorySearchRequest): List<StoryDefinitionConfigurationSummary> =
-        storyDefinitionDAO.searchStoryDefinitionSummaries(request.toSummaryRequest())
+    fun searchStories(request: StorySearchRequest): List<StoryDefinitionConfigurationSummaryExtended> =
+        storyDefinitionDAO.searchStoryDefinitionSummariesExtended(request.toSummaryRequest())
+
+    fun searchMinimalStories(request: MinimalStorySearchRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics> =
+        storyDefinitionDAO.searchStoryDefinitionSummariesMinimumMetrics(request.toSummaryRequest())
 
     fun loadStories(request: StorySearchRequest): List<BotStoryDefinitionConfiguration> =
         findStories(request.namespace, request.applicationName).map {
