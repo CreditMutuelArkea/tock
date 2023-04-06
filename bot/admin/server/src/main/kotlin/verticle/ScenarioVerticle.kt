@@ -17,7 +17,6 @@
 package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.HandlerNamespace
-import ai.tock.bot.admin.service.BotAdminService
 import ai.tock.bot.admin.mapper.ScenarioExceptionManager
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioActionHandlerResponse
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioGroup
@@ -25,6 +24,7 @@ import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioGroupResponse
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioVersion
 import ai.tock.bot.admin.mapper.ScenarioMapper.toScenarioVersionResponse
 import ai.tock.bot.admin.model.scenario.*
+import ai.tock.bot.admin.service.BotAdminService
 import ai.tock.bot.admin.service.ScenarioService
 import ai.tock.bot.handler.ActionHandlersRepository
 import ai.tock.shared.exception.admin.AdminException
@@ -32,8 +32,6 @@ import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole.*
 import ai.tock.shared.vertx.*
 import io.vertx.ext.web.RoutingContext
-import mu.KLogger
-import mu.KotlinLogging
 
 /**
  * [ScenarioVerticle] contains all the routes and actions associated with the scenarios
@@ -41,7 +39,6 @@ import mu.KotlinLogging
 class ScenarioVerticle : ChildVerticle<AdminException> {
 
     companion object {
-        private val logger: KLogger = KotlinLogging.logger {}
 
         private const val botId = "botId"
         private const val groupId = "groupId"
@@ -70,8 +67,6 @@ class ScenarioVerticle : ChildVerticle<AdminException> {
      * Declaration of routes and their appropriate handlers
      */
     override fun configure(parent: WebVerticle<AdminException>) {
-        logger.info { "Configure ScenarioVerticle" }
-
         with(parent) {
             // Create
             blockingJsonPost(importOneScenarioGroupPath, setOf(botUser), handler = toRequestHandler(importOneScenarioGroup))
