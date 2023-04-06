@@ -611,8 +611,14 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonPost("/bot/story/search/minimal", setOf(botUser, faqBotUser)) { context, request: MinimalStorySearchRequest ->
+        blockingJsonPost(
+            "/bot/story/search/minimal",
+            setOf(botUser, faqBotUser)
+        ) { context, request: MinimalStorySearchRequest ->
             if (context.organization == request.namespace) {
+                if (request.applicationName.isEmpty()) {
+                    badRequest("applicationName is needed")
+                }
                 BotAdminService.searchMinimalStories(request)
             } else {
                 unauthorized()
