@@ -47,7 +47,7 @@ import ai.tock.bot.admin.model.CreateStoryRequest
 import ai.tock.bot.admin.model.DialogFlowRequest
 import ai.tock.bot.admin.model.DialogsSearchQuery
 import ai.tock.bot.admin.model.Feature
-import ai.tock.bot.admin.model.MinimalStorySearchRequest
+import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.StorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.model.UserSearchQueryResult
@@ -281,8 +281,8 @@ object BotAdminService {
     fun searchStories(request: StorySearchRequest): List<StoryDefinitionConfigurationSummaryExtended> =
         storyDefinitionDAO.searchStoryDefinitionSummariesExtended(request.toSummaryRequest())
 
-    fun searchMinimalStories(request: MinimalStorySearchRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics> =
-        storyDefinitionDAO.searchStoryDefinitionSummariesMinimumMetrics(request.toSummaryRequest())
+    fun searchSummaryStories(request: SummaryStorySearchRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics> =
+        storyDefinitionDAO.searchStoryDefinitionSummaries(request.toSummaryRequest())
 
     fun loadStories(request: StorySearchRequest): List<BotStoryDefinitionConfiguration> =
         findStories(request.namespace, request.applicationName).map {

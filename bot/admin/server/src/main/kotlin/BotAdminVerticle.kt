@@ -38,7 +38,7 @@ import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqSearchRequest
 import ai.tock.bot.admin.model.Feature
 import ai.tock.bot.admin.model.I18LabelQuery
-import ai.tock.bot.admin.model.MinimalStorySearchRequest
+import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.StorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
@@ -612,14 +612,14 @@ open class BotAdminVerticle : AdminVerticle() {
         }
 
         blockingJsonPost(
-            "/bot/story/search/minimal",
+            "/bot/story/search/summary",
             setOf(botUser, faqBotUser)
-        ) { context, request: MinimalStorySearchRequest ->
+        ) { context, request: SummaryStorySearchRequest ->
             if (context.organization == request.namespace) {
                 if (request.applicationName.isEmpty()) {
                     badRequest("applicationName is needed")
                 }
-                BotAdminService.searchMinimalStories(request)
+                BotAdminService.searchSummaryStories(request)
             } else {
                 unauthorized()
             }

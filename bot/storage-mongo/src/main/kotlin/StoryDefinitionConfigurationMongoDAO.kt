@@ -203,7 +203,13 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
 
         return col.withDocumentClass<StoryDefinitionConfigurationSummaryExtended>()
             .find(
+                //default list of var args Bson
                 *filterStoryDefinitionSummaries(request)
+                // specific filters for extended
+                    .plusElement(
+                        request.textSearch?.takeUnless { it.isBlank() }
+                            ?.let { Name.regex(allowDiacriticsInRegexp(it.trim()), "i") }
+                    )
                     .plusElement(
                         if (request.onlyConfiguredStory) CurrentType ne AnswerConfigurationType.builtin else null
                     )
@@ -224,7 +230,7 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
             .toList()
     }
 
-    override fun searchStoryDefinitionSummariesMinimumMetrics(request: StoryDefinitionConfigurationMinimalSummaryRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics> {
+    override fun searchStoryDefinitionSummaries(request: StoryDefinitionConfigurationMinimalSummaryRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics> {
         val data = filterStoryDefinitionSummaries(request)
         return col.withDocumentClass<StoryDefinitionConfigurationSummaryMinimumMetrics>()
             .find(*data)
@@ -234,7 +240,7 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
                 StoryDefinitionConfigurationSummaryMinimumMetrics::currentType,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::name,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::category,
-                StoryDefinitionConfigurationSummaryMinimumMetrics::isMetricStory
+                StoryDefinitionConfigurationSummaryMinimumMetrics::metricStory
             )
             .safeCollation(Collation.builder().locale(defaultLocale.language).build())
             .sort(ascending(StoryDefinitionConfigurationSummaryMinimumMetrics::name))
@@ -248,8 +254,6 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
         arrayOf(Namespace eq request.namespace,
             BotId eq request.botId,
             if (request.category.isNullOrBlank()) null else Category eq request.category,
-            request.textSearch?.takeUnless { it.isBlank() }
-                ?.let { Name.regex(allowDiacriticsInRegexp(it.trim()), "i") }
         )
 
     override fun save(story: StoryDefinitionConfiguration) {

@@ -23,7 +23,6 @@ data class StoryDefinitionConfigurationMinimalSummaryRequest(
     override val namespace: String,
     override val botId: String,
     override val category: String?,
-    override val textSearch: String?,
 ) : StoryDefinitionConfigurationSummaryRequest
 
 /**
@@ -33,7 +32,7 @@ data class StoryDefinitionConfigurationExtendedSummaryRequest(
     override val namespace: String,
     override val botId: String,
     override val category: String?,
-    override val textSearch: String?,
+    val textSearch: String?,
     val onlyConfiguredStory: Boolean
 ) : StoryDefinitionConfigurationSummaryRequest
 
@@ -41,5 +40,4 @@ interface StoryDefinitionConfigurationSummaryRequest{
     val namespace: String
     val botId: String
     val category: String?
-    val textSearch: String?
 }

@@ -50,7 +50,7 @@ data class StoryDefinitionConfigurationSummaryMinimumMetrics(
     override val currentType: AnswerConfigurationType,
     override val name: String = storyId,
     override val category: String = "default",
-    val isMetricStory: Boolean
+    val metricStory: Boolean
 ) : StoryDefinitionConfigurationSummaryBase
 
 interface StoryDefinitionConfigurationSummaryBase {

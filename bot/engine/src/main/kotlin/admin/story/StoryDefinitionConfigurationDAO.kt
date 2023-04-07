@@ -67,7 +67,7 @@ interface StoryDefinitionConfigurationDAO {
      * @param request [StoryDefinitionConfigurationMinimalSummaryRequest] search request
      * @return list of [StoryDefinitionConfigurationSummaryMinimumMetrics]
      */
-    fun searchStoryDefinitionSummariesMinimumMetrics(request: StoryDefinitionConfigurationMinimalSummaryRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics>
+    fun searchStoryDefinitionSummaries(request: StoryDefinitionConfigurationMinimalSummaryRequest): List<StoryDefinitionConfigurationSummaryMinimumMetrics>
 
     /**
      * Search [StoryDefinitionConfigurationSummaryExtended]
