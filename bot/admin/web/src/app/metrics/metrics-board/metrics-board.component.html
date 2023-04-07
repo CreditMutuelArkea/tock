@@ -2,7 +2,23 @@
   <h1>Custom metrics</h1>
 </div>
 
-<nb-card>
+<nb-alert
+  *ngIf="configurations?.length === 0"
+  class="alert-config flex-row align-items-center"
+  accent="warning"
+>
+  <nb-icon
+    class="mr-1"
+    icon="alert-triangle-outline"
+    status="warning"
+  ></nb-icon>
+  No bot configuration detected
+</nb-alert>
+
+<nb-card
+  [nbSpinner]="loading"
+  *ngIf="configurations?.length > 0"
+>
   <nb-card-header class="d-flex gap-1">
     <nb-form-field>
       <nb-icon
@@ -10,6 +26,7 @@
         icon="calendar-outline"
       ></nb-icon>
       <input
+        #dateRangeInput
         nbInput
         fieldSize="medium"
         placeholder="Pick date range"
@@ -23,15 +40,17 @@
         nbButton
         ghost
         status="info"
-        nbTooltip="Display metrics for the last 24 hours"
+        nbTooltip="Display metrics for the last 3 days"
+        (click)="setTimeRange(TimeRanges.day)"
       >
-        1d
+        3d
       </button>
       <button
         nbButton
         ghost
         status="info"
         nbTooltip="Display metrics for the last 7 days"
+        (click)="setTimeRange(TimeRanges.week)"
       >
         7d
       </button>
@@ -39,7 +58,8 @@
         nbButton
         ghost
         status="info"
-        nbTooltip="Display metrics for the last 30 days"
+        nbTooltip="Display metrics for the last month"
+        (click)="setTimeRange(TimeRanges.month)"
       >
         1m
       </button>
@@ -48,6 +68,7 @@
         ghost
         status="info"
         nbTooltip="Display metrics for the last 3 months"
+        (click)="setTimeRange(TimeRanges.quarter)"
       >
         3m
       </button>
@@ -57,76 +78,94 @@
   <nb-rangepicker
     #dateRangePicker
     [(range)]="range"
+    (rangeChange)="datePickerChange($event)"
   ></nb-rangepicker>
 
-  <nb-card-body>
+  <nb-card-body class="main-card-body">
     <div class="row align-items-center mt-3">
       <div class="col-12 col-md-6">
-        <strong>Number of queries</strong>
+        <h6>Number of user messages</h6>
         <div
+          *ngIf="messagesChartOptions"
           echarts
-          [options]="queriesStats"
+          [options]="messagesChartOptions"
         ></div>
       </div>
 
       <div class="col-12 col-md-6 mb-3">
         <div class="stats-line p-2">
-          Number of questions
-          <span class="stats-line-value">45</span>
+          Number of user messages
+          <span class="stats-line-value">{{ userMessagesSum }}</span>
         </div>
         <div class="stats-line p-2">
-          Number of questions with answers
-          <span class="stats-line-value">28</span>
+          Number of answers
+          <span class="stats-line-value">{{ answeredMessages }}</span>
         </div>
         <div class="stats-line p-2">
-          Number of unanswered questions
-          <span class="stats-line-value">17</span>
+          Number of unanswered messages
+          <span class="stats-line-value">{{ unAnsweredMessages }}</span>
         </div>
         <div class="stats-line p-2 font-weight-bold">
           Bot response rate
-          <span class="stats-line-value">62%</span>
-        </div>
-        <div class="stats-line p-2">
-          Commitment rate
-          <span class="stats-line-value">79%</span>
-        </div>
-        <div class="stats-line p-2">
-          Human escalation Rate
-          <span class="stats-line-value">38%</span>
+          <span class="stats-line-value">{{ responseRate }}%</span>
         </div>
       </div>
     </div>
 
-    <div class="row align-items-center">
+    <div class="row align-items-top">
       <div class="col-12 col-md-6">
-        <strong>Distribution of the stories</strong>
+        <h6>Distribution of triggered stories</h6>
         <div
           echarts
-          [options]="storiesStats"
+          [options]="storiesChart"
         ></div>
       </div>
+
       <div class="col-12 col-md-6">
-        <div class="row">
+        <div class="row mb-3">
           <div class="col-12 col-md-6">
-            <strong>Satisfaction</strong>
+            <h6>Indicators</h6>
           </div>
-          <div class="col-12 col-md-6 text-right">
+          <div
+            class="col-12 col-md-6 text-right"
+            *ngIf="indicatorsDimensions.length"
+          >
             <nb-select
-              placeholder="Select Dimension"
-              (selectedChange)="dimensionSelected()"
+              *ngIf="indicators"
+              nbTooltip="Select a dimension to display"
+              placeholder="Select a dimension"
               size="small"
-              selected="satisfaction"
+              (selectedChange)="dimensionSelected($event)"
+              [(ngModel)]="currentDimension"
             >
-              <nb-option value="satisfaction">Satisfaction</nb-option>
-              <nb-option value="poll">Customer survey</nb-option>
+              <nb-option
+                *ngFor="let dimension of indicatorsDimensions"
+                [value]="dimension"
+                >{{ dimension }}</nb-option
+              >
             </nb-select>
           </div>
         </div>
 
         <div
-          echarts
-          [options]="satisfactionStats"
-        ></div>
+          *ngIf="!indicatorsDimensions.length"
+          class="text-muted font-italic"
+        >
+          No indicator defined
+        </div>
+
+        <div
+          class="dimension-chart"
+          *ngFor="let chart of currentDimensionCharts"
+        >
+          <span class="initial-capitalize"
+            ><strong>{{ chart.name }} : </strong></span
+          >
+          <div
+            echarts
+            [options]="chart"
+          ></div>
+        </div>
       </div>
     </div>
   </nb-card-body>
