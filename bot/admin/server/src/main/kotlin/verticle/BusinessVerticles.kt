@@ -19,11 +19,11 @@ package ai.tock.bot.admin.verticle
 import ai.tock.shared.exception.ToRestException
 import ai.tock.shared.vertx.WebVerticle
 
-interface ChildVerticle<T: ToRestException> {
-    fun configure(parent: WebVerticle<T>)
+interface ChildVerticle<T : ToRestException> {
+    fun configure(verticle: WebVerticle<T>)
 }
 
-interface ParentVerticle<T: ToRestException>  {
+interface ParentVerticle<T : ToRestException> {
 
     fun children(): List<ChildVerticle<T>>
 

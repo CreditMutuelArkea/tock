@@ -17,7 +17,6 @@
 package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.admin.service.StoryService
-import ai.tock.bot.bean.TickStoryQuery
 import ai.tock.shared.exception.admin.AdminException
 import ai.tock.shared.security.TockUser
 import ai.tock.shared.security.TockUserRole
@@ -37,7 +36,6 @@ class StoryVerticle: ChildVerticle<AdminException> {
 
         private const val baseURL = "/bot"
         private const val storyURL = "$baseURL/story"
-        private const val tickURL = "$storyURL/tick"
     }
 
     /**
@@ -48,20 +46,12 @@ class StoryVerticle: ChildVerticle<AdminException> {
 
         with(verticle) {
 
-            val createTickStory: (RoutingContext, TickStoryQuery) -> Unit = { context, tickStory ->
-                Companion.logger.debug { "request to create tick story <${tickStory.storyId}>" }
-                val namespace = (context.user() as TockUser).namespace
-                StoryService.createTickStory(namespace, tickStory)
-            }
-
             val deleteStoryByStoryDefinitionConfigurationId: (RoutingContext) -> Boolean = { context ->
                 val storyDefinitionConfigurationId = context.pathParam("storyDefinitionConfigurationId")
                 Companion.logger.debug { "request to delete story <$storyDefinitionConfigurationId>" }
                 val namespace = (context.user() as TockUser).namespace
                 StoryService.deleteStoryByNamespaceAndStoryDefinitionConfigurationId(namespace, storyDefinitionConfigurationId)
             }
-
-            blockingJsonPost(tickURL, setOf(TockUserRole.botUser), handler = toRequestHandler(createTickStory))
 
             blockingJsonDelete(
                 "$storyURL/:storyDefinitionConfigurationId",
