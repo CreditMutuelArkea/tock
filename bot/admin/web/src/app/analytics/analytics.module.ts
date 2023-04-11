@@ -29,8 +29,6 @@ import { BotModule } from '../bot/bot.module';
 import { NlpModule } from '../nlp-tabs/nlp.module';
 import { MomentModule } from 'ngx-moment';
 import { DialogsComponent } from './dialogs/dialogs.component';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatDatepickerModule } from '@angular/material/datepicker';
 import {
   NbAccordionModule,
   NbButtonModule,
@@ -49,7 +47,9 @@ import {
   NbUserModule,
   NbCalendarRangeModule,
   NbDialogModule,
-  NbRadioModule
+  NbRadioModule,
+  NbTagModule,
+  NbAlertModule
 } from '@nebular/theme';
 import { ChartComponent } from './chart/chart.component';
 import { ChartDialogComponent } from './chart-dialog/chart-dialog.component';
@@ -123,8 +123,6 @@ export class AnalyticsRoutingModule {}
     BotSharedModule,
     BotModule,
     NlpModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
     NbRouteTabsetModule,
     NbCheckboxModule,
     NbCardModule,
@@ -144,6 +142,8 @@ export class AnalyticsRoutingModule {}
     NbCalendarRangeModule,
     NbDialogModule.forRoot(),
     NbRadioModule,
+    NbTagModule,
+    NbAlertModule,
     NgxEchartsModule.forRoot({
       echarts: importEcharts
     })

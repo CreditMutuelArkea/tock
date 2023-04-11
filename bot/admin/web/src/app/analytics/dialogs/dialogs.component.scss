@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-.lastUpdateDate {
-  font-style: italic;
+@import '@nebular/theme/styles/global/breakpoints';
+
+.grid-filters {
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  align-items: center;
+
+  .search {
+    justify-self: end;
+    grid-column: auto / -1;
+  }
 }
 
-.select-plan {
-  width: 10rem;
+.search {
+  width: 100%;
 }
 
-.search-input {
-  font-size: large;
-  margin-right: 20px;
+nb-toggle::ng-deep label {
+  margin: 0;
 }
 
-.exact {
-  padding-right: 10px;
+@include media-breakpoint-up(lg) {
+  .input-search {
+    grid-column: span 2;
+  }
 }
 
-.dialogs {
-  height: 100%;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
-  text-align: center;
+@include media-breakpoint-up(sm) {
+  .search {
+    width: fit-content;
+  }
 }

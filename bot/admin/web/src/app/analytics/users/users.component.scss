@@ -1,0 +1,94 @@
+/*
+ * Copyright (C) 2017/2021 e-voyageurs technologies
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import '@nebular/theme/styles/global/breakpoints';
+@import '@nebular/theme/styles/theming';
+@import '@nebular/theme/styles/themes';
+
+@include nb-install-component() {
+  .users {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 100%;
+    align-items: start;
+
+    .main {
+      margin-bottom: 1rem;
+    }
+
+    .aside {
+      margin: 0;
+      max-height: 30rem;
+    }
+
+    tock-display-dialog::ng-deep nb-card {
+      border: none;
+
+      nb-card-body {
+        padding: 0;
+      }
+    }
+
+    .chat-card nb-card-header {
+      padding: nb-theme(accordion-padding);
+    }
+
+    img {
+      max-width: 100%;
+    }
+
+    .connector {
+      float: right;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .grid-filters {
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: 100%;
+    align-items: center;
+
+    nb-toggle {
+      width: fit-content;
+    }
+  }
+
+  nb-toggle::ng-deep label {
+    margin: 0;
+  }
+
+  @include media-breakpoint-up(sm) {
+    .grid-filters {
+      grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    .users {
+      grid-template-columns: 2fr 4fr;
+
+      .main {
+        margin: 0;
+      }
+
+      .main,
+      .aside {
+        max-height: calc(100vh - nb-theme(header-height) - nb-theme(header-padding) - 7rem);
+      }
+    }
+  }
+}

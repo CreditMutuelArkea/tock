@@ -33,7 +33,7 @@ import { NbToastrService } from '@nebular/theme';
 @Component({
   selector: 'tock-dialogs',
   templateUrl: './dialogs.component.html',
-  styleUrls: ['./dialogs.component.css']
+  styleUrls: ['./dialogs.component.scss']
 })
 export class DialogsComponent extends ScrollComponent<DialogReport> {
   filter: DialogFilter = new DialogFilter(true, false);

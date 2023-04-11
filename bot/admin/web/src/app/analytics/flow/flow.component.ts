@@ -39,7 +39,7 @@ import { ChartData } from '../chart/ChartData';
 @Component({
   selector: 'tock-flow',
   templateUrl: './flow.component.html',
-  styleUrls: ['./flow.component.css']
+  styleUrls: ['./flow.component.scss']
 })
 export class FlowComponent implements OnInit, OnDestroy {
   layouts = [

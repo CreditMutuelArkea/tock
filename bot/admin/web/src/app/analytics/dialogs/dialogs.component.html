@@ -14,27 +14,26 @@
   ~ limitations under the License.
   -->
 
-<div class="dialogs">
-  <nb-card>
-    <nb-card-body>
-      <span class="search-input">
+<div
+  class="mt-3"
+  [nbSpinner]="loading"
+>
+  <nb-card class="mb-2">
+    <nb-card-body class="d-flex flex-column gap-1">
+      <div class="grid-filters">
         <input
+          class="input-search"
           nbInput
+          fullWidth
           placeholder="Search user text"
-          status="primary"
           [(ngModel)]="filter.text"
           (keyup.enter)="refresh()"
         />
-      </span>
-      <nb-checkbox
-        class="exact"
-        [(ngModel)]="filter.exactMatch"
-        >Exact text match</nb-checkbox
-      >
-      <span>
+        <nb-checkbox [(ngModel)]="filter.exactMatch">Exact text match</nb-checkbox>
+      </div>
+      <div class="grid-filters">
         <nb-select
-          class="select-plan"
-          status="primary"
+          fullWidth
           placeholder="Connector type"
           [(ngModel)]="filter.connectorType"
           (selectedChange)="refresh()"
@@ -42,15 +41,12 @@
           <nb-option
             *ngFor="let c of connectorTypes"
             [value]="c"
-            >{{ c.id }}</nb-option
           >
+            {{ c.id }}
+          </nb-option>
         </nb-select>
-      </span>
-      &nbsp;
-      <span>
         <nb-select
-          class="select-plan"
-          status="primary"
+          fullWidth
           placeholder="Intent"
           [(ngModel)]="filter.intentName"
           (selectedChange)="refresh()"
@@ -64,75 +60,83 @@
           </nb-option>
           <nb-option value="unknown">Unknown</nb-option>
         </nb-select>
-      </span>
-      &nbsp;
-      <mat-slide-toggle
-        class="test"
-        [(ngModel)]="filter.displayTests"
-        (change)="waitAndRefresh()"
-        >Display tests</mat-slide-toggle
-      >
-      <button
-        nbButton
-        (click)="refresh()"
-        size="small"
-        style="margin-left: 10px"
-      >
-        GO
-      </button>
+        <nb-toggle
+          class="test"
+          [(ngModel)]="filter.displayTests"
+          (change)="waitAndRefresh()"
+        >
+          Display tests
+        </nb-toggle>
+        <button
+          class="search align-self-end"
+          nbButton
+          status="primary"
+          size="small"
+          (click)="refresh()"
+        >
+          <nb-icon icon="search-outline"></nb-icon>
+          search
+        </button>
+      </div>
     </nb-card-body>
   </nb-card>
-  <div *ngIf="total !== -1">
-    <h1 *ngIf="total === 0">
-      No dialogs found!
-      <button
-        mat-button
-        (click)="refresh()"
-      >
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </h1>
-    <h1
-      *ngIf="total !== 0"
-      style="margin: 20px"
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+    <span
+      *ngIf="loading"
+      class="h5 text-muted m-0"
+    >
+      Loading
+    </span>
+    <span
+      *ngIf="total === 0"
+      class="h5 text-muted m-0"
+    >
+      No dialogs found
+    </span>
+    <span
+      *ngIf="total > 0"
+      class="h5 text-muted m-0"
     >
       Dialogs : {{ formattedTotal() }}
-      <button
-        mat-button
-        (click)="refresh()"
-        style="vertical-align: top"
-      >
-        <mat-icon>refresh</mat-icon>
-      </button>
+    </span>
+    <div>
       <button
         *ngIf="filter.dialogId"
-        mat-button
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="View all dialogs using this text"
         (click)="viewAllWithThisText()"
-        matTooltip="View all dialogs using this text"
       >
-        <mat-icon>speaker_notes</mat-icon>
+        <nb-icon icon="message-square-outline"></nb-icon>
       </button>
-    </h1>
-    <p></p>
-    <div
-      infinite-scroll
-      [infiniteScrollDistance]="2"
-      [infiniteScrollThrottle]="300"
-      (scrolled)="onScroll()"
-    >
-      <div *ngFor="let dialog of data">
-        <tock-display-dialog [dialog]="dialog">
-          <div *ngIf="dialog.actions.length === 0">No dialog</div>
-        </tock-display-dialog>
-        <p></p>
-      </div>
+      <button
+        nbButton
+        shape="round"
+        ghost
+        nbTooltip="Refresh"
+        (click)="refresh()"
+      >
+        <nb-icon icon="refresh-outline"></nb-icon>
+      </button>
     </div>
   </div>
-  <nb-card
-    [nbSpinner]="loading"
-    nbSpinnerStatus="primary"
-    *ngIf="loading"
+
+  <div
+    *ngIf="total !== -1"
+    class="mt-2"
+    infinite-scroll
+    [infiniteScrollDistance]="2"
+    [infiniteScrollThrottle]="300"
+    (scrolled)="onScroll()"
   >
-    <nb-card-body></nb-card-body>
-  </nb-card>
+    <div
+      *ngFor="let dialog of data"
+      class="mb-2"
+    >
+      <tock-display-dialog [dialog]="dialog">
+        <div *ngIf="dialog.actions.length === 0">No dialog</div>
+      </tock-display-dialog>
+    </div>
+  </div>
 </div>
