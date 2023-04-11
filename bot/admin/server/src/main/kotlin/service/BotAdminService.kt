@@ -16,7 +16,7 @@
 
 package ai.tock.bot.admin.service
 
-import ai.tock.bot.admin.FaqAdminService.FAQ_CATEGORY
+import ai.tock.bot.admin.service.FaqAdminService.FAQ_CATEGORY
 import ai.tock.bot.admin.answer.AnswerConfiguration
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
 import ai.tock.bot.admin.answer.AnswerConfigurationType.script
