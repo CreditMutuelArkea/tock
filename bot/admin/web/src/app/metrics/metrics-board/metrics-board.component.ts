@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { AnalyticsService } from '../../analytics/analytics.service';
 import { DialogFlowRequest } from '../../analytics/flow/flow';
 import { UserAnalyticsQueryResult } from '../../analytics/users/users';
+import { AnswerConfigurationType } from '../../bot/model/story';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
@@ -18,6 +19,15 @@ export enum TimeRanges {
   month = 31,
   quarter = 92
 }
+
+enum StoriesFilterType {
+  metricsStories = 'metricsStories',
+  currentType = 'currentType',
+  category = 'category'
+}
+
+type StoriesFilter = { type: StoriesFilterType; value: string | AnswerConfigurationType };
+
 @Component({
   selector: 'tock-metrics-board',
   templateUrl: './metrics-board.component.html',
@@ -27,10 +37,11 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
   destroy = new Subject();
   loading: boolean = true;
   configurations: BotApplicationConfiguration[];
+  range: NbCalendarRange<Date>;
+  timeRanges = TimeRanges;
   indicators: IndicatorDefinition[];
   stories: StorySummary[];
-  range: NbCalendarRange<Date>;
-  TimeRanges = TimeRanges;
+  storiesFilterType = StoriesFilterType;
 
   @ViewChild(NbDatepickerDirective) dateRangeInputDirectiveRef;
 
@@ -42,7 +53,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
     private rest: RestService
   ) {
     this.range = {
-      start: this.dateService.addDay(this.dateService.today(), -TimeRanges.week),
+      start: this.dateService.addDay(this.dateService.today(), -this.timeRanges.week),
       end: this.dateService.today()
     };
   }
@@ -63,6 +74,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
     forkJoin(loaders).subscribe(([indicators, stories]: [IndicatorDefinition[], StorySummary[]]) => {
       this.indicators = indicators;
       this.stories = stories;
+      this.initStoriesFilters();
       this.initCurrentDimension();
       this.loadMetrics();
     });
@@ -84,6 +96,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
 
   private loadMetrics(): void {
     this.loading = true;
+
     const loaders = [
       this.getMessagesSearchQuery().pipe(take(1)),
       this.getStoriesHitsQuery().pipe(take(1)),
@@ -101,6 +114,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
 
   private loadCurrentDimensionMetrics(): void {
     this.loading = true;
+
     this.getCurrentDimensionMetricsQuery()
       .pipe(take(1))
       .subscribe((dimensionMetrics) => {
@@ -120,7 +134,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
         undefined,
         this.range.start,
         this.range.end,
-        !environment.production // In dev we ask for test messages to have usable content
+        !environment.production // In dev, we ask for test messages to dispose of some usable content
       )
     );
   }
@@ -173,6 +187,28 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
   storiesChart: EChartsOption;
 
   private initStoriesHitsChart(): void {
+    const filteredMetrics = [];
+
+    this.storiesMetrics.forEach((metric) => {
+      const story = this.getStorySummaryById(metric.row.trackedStoryId);
+
+      // the story may have been deleted but still appear in the recorded hits
+      if (story) {
+        if (!story.metricStory || this.selectedStoriesFilters.find((filter) => filter.type === StoriesFilterType.metricsStories)) {
+          if (
+            this.selectedStoriesFilters.find((filter) => {
+              return filter.type === StoriesFilterType.currentType && filter.value === story.currentType;
+            }) &&
+            this.selectedStoriesFilters.find((filter) => {
+              return filter.type === StoriesFilterType.category && filter.value === story.category;
+            })
+          ) {
+            filteredMetrics.push(metric);
+          }
+        }
+      }
+    });
+
     this.storiesChart = {
       tooltip: {
         trigger: 'item',
@@ -191,7 +227,8 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
           itemStyle: {
             borderRadius: 4
           },
-          data: this.storiesMetrics
+
+          data: filteredMetrics
             .map((hit) => {
               return {
                 value: hit.count,
@@ -212,7 +249,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
     this.currentDimension = this.indicatorsDimensions[0];
   }
 
-  dimensionSelected(dimension): void {
+  dimensionSelected(dimension: string): void {
     this.currentDimension = dimension;
     this.loadCurrentDimensionMetrics();
   }
@@ -222,10 +259,9 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
   }
 
   private getCurrentDimensionMetricsQuery(): Observable<MetricResult[]> {
-    const dimensionIndicatorsNames = this.currentDimensionIndicators.map((indicator) => indicator.name);
     const query = {
       filter: {
-        indicatorNames: dimensionIndicatorsNames,
+        indicatorNames: this.currentDimensionIndicators.map((indicator) => indicator.name),
         creationDateSince: this.range.start,
         creationDateUntil: this.range.end
       },
@@ -315,23 +351,23 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
     return this.getIndicatorByName(indicatorname).values.find((value) => value.name === indicatorValueName).label;
   }
 
-  get userMessagesSum() {
+  get userMessagesSum(): number {
     return this.messagesStatsData?.usersData?.reduce((acc, current) => acc + current[0], 0) || 0;
   }
 
-  get answeredMessages() {
+  get answeredMessages(): number {
     return this.storiesMetrics?.reduce((acc, current) => acc + current.count, 0) || 0;
   }
 
-  get unAnsweredMessages() {
+  get unAnsweredMessages(): number {
     return this.userMessagesSum - this.answeredMessages;
   }
 
-  get responseRate() {
+  get responseRate(): number {
     return Math.round(((this.answeredMessages * 100) / this.userMessagesSum) * 100) / 100;
   }
 
-  get indicatorsDimensions() {
+  get indicatorsDimensions(): string[] {
     return [
       ...new Set(
         <string>[].concat.apply(
@@ -342,15 +378,46 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
     ];
   }
 
-  setTimeRange(TimeRange: TimeRanges): void {
-    this.range.start = this.dateService.addDay(this.dateService.today(), -TimeRange);
+  get storiesTypes(): AnswerConfigurationType[] {
+    return [...new Set(this.stories?.map((v: StorySummary) => v.currentType))];
+  }
+
+  get storiesCategories(): string[] {
+    return [...new Set(this.stories?.map((v: StorySummary) => v.category))];
+  }
+
+  storiesFilters: StoriesFilter[];
+  selectedStoriesFilters: StoriesFilter[];
+
+  private initStoriesFilters(): void {
+    const filters = [];
+    this.storiesTypes.forEach((typeName) => {
+      filters.push({ type: StoriesFilterType.currentType, value: typeName });
+    });
+    this.storiesCategories.forEach((category) => {
+      filters.push({ type: StoriesFilterType.category, value: category });
+    });
+    this.storiesFilters = filters;
+    this.selectedStoriesFilters = filters;
+  }
+
+  matchStoriesFilters(a: StoriesFilter, b: StoriesFilter): boolean {
+    return a.type === b.type && a.value === b.value;
+  }
+
+  storiesFilterSelected(): void {
+    this.initStoriesHitsChart();
+  }
+
+  setTimeRange(timeRange: TimeRanges): void {
+    this.range.start = this.dateService.addDay(this.dateService.today(), -timeRange);
     this.range.end = this.dateService.today();
 
     this.dateRangeInputDirectiveRef.writeValue(this.range);
     this.loadMetrics();
   }
 
-  datePickerChange(event): void {
+  datePickerChange(event: NbCalendarRange<Date>): void {
     if (event.end) {
       this.loadMetrics();
     }
