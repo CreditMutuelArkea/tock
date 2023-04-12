@@ -47,7 +47,7 @@ export class MetricsBoardComponent implements OnInit, OnDestroy {
 
   constructor(
     private stateService: StateService,
-    protected dateService: NbDateService<Date>,
+    private dateService: NbDateService<Date>,
     private analyticsService: AnalyticsService,
     private botConfiguration: BotConfigurationService,
     private rest: RestService
