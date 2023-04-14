@@ -137,7 +137,7 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
 * Pour une action utilisateur :
     * L'es 'intentions permettant de comprendre la question/réponse qu'aura envoyé l'utilisateur
     * Si l'intention est primaire ou secondaire (les intentions primaires déclenchent la story sous-jacente alors que les intentions secondaires ne sont reconnues qu'une fois entré dans la story)
-    * Un ensemble de phrases permettant d'entrainer l'intention
+    * Un ensemble de phrases permettant d'entrainer l'intention. Sur les phrase il est possible d'y associer des entités en sélectionnant un mot et en cliquant sur _Add entity_. Il est possible d'associer un contexte à une entité en cliquant sur le mot et en choisissant le contexte à associer. Si à la réception du message utilisateur l'entité est détectée, alors le contexte associé sera créé avec comme valeur le texte de l'entité.
     * Associer un contexte en sortie : permet lorsque l'intention est suffisante pour déterminer qu'un contexte peut être créé sans nécessiter la détection d'une entité associée à l'intention (ex : les intentions génériques type 'oui' ou 'non')
 
 ![schéma Tock](../../../img/scenarios_casting_intent.png "Création d'un' scénario - Casting - Intent")
@@ -164,7 +164,7 @@ La machine à état peut être construite de plusieurs manières :
 * _Classique_ : les transitions vont d'une action A vers une action B déterminée. Cette modélisation ne permet pas de bénéficier de l'optimisation par contrainte, le flow de la conversation étant ici géré directement par la machine à états
 * _Orienté objectif_ : dans cette modélisation, nous allons utiliser la puissance des machines à état hiérarchiques pour spécialiser des moments de la conversation à un instant T. Chaque "boîte" va rassembler un ensemble cohérent d'actions qui vont permettre de résoudre un sous-ensemble de la problématique utilisateur qui sera représentée par un objectif (action de bot spécifique). 
 
-> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre. (voir les exemples.........) 
+> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre.  
 
 ### Publishing
 
