@@ -39,9 +39,9 @@
       </div>
       <div class="col-12">
         <label class="font-weight-bold">Name :</label>
-        <span>
-          {{ item.intentDefinition.name }}
-        </span>
+        <span *ngIf="!doesIntentBelongToCurrentNameSpace(item.intentDefinition)"
+          >{{ getIntentDefinitionIntent(item.intentDefinition).namespace }}:</span
+        >{{ item.intentDefinition.name }}
       </div>
       <div
         *ngIf="item.intentDefinition.label"

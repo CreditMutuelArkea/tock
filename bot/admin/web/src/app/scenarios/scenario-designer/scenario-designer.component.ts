@@ -213,7 +213,7 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
     let deletedAnswers = [];
     this.scenarioVersion.data.scenarioItems.forEach((item) => {
       if (item.intentDefinition?.intentId) {
-        const existingIntent: Intent = this.state.findIntentById(item.intentDefinition.intentId);
+        const existingIntent: Intent = this.state.findSharedNamespaceIntentById(item.intentDefinition.intentId);
         if (!existingIntent) {
           // The intent has been removed. We delete the lapsed intentId
           delete item.intentDefinition.intentId;

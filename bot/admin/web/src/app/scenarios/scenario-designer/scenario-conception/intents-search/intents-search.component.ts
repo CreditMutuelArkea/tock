@@ -78,7 +78,7 @@ export class IntentsSearchComponent implements OnInit, OnDestroy {
 
     let intentsIds = Object.keys(intents);
     return intentsIds.map((intentId) => {
-      let intent = this.stateService.findIntentById(intentId);
+      let intent = this.stateService.findSharedNamespaceIntentById(intentId);
       let sentences = intents[intentId];
       return {
         intent: intent,
@@ -93,6 +93,10 @@ export class IntentsSearchComponent implements OnInit, OnDestroy {
     });
 
     return this.nlpService.searchSentences(searchQuery);
+  }
+
+  doesIntentBelongToCurrentNameSpace(intent: Intent): boolean {
+    return intent.namespace === this.stateService.currentApplication.namespace;
   }
 
   cancel(): void {
