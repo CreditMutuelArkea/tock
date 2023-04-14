@@ -14,11 +14,11 @@
   ~ limitations under the License.
   -->
 
-<nb-card>
+<nb-card class="mt-3">
   <nb-card-body style="padding: 2rem 5.5rem">
     <nb-stepper
       #stepper
-      [linear]="true"
+      orientation="horizontal"
     >
       <nb-step
         [stepControl]="languageForm"
@@ -77,7 +77,7 @@
                 <img
                   src="{{ channel.value.iconUrl() }}"
                   class="connector-icon"
-                  [matTooltip]="channel.value.label()"
+                  [nbTooltip]="channel.value.label()"
                 />
                 {{ channel.value.label() }}
               </span>

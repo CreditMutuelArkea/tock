@@ -15,10 +15,7 @@
   -->
 
 <div class="header-container">
-  <div
-    class="logo-containter"
-    style="display: contents"
-  >
+  <div class="logo-containter d-flex align-items-center">
     <a
       (click)="toggleSidebar()"
       href="#"
@@ -34,32 +31,34 @@
         class="logo-img"
         src="{{ baseHref }}assets/images/logo-black.svg"
       />
-      Tock Studio
+      <span class="hide-title font-weight-bold">Tock Studio</span>
     </div>
   </div>
 </div>
 
 <div class="header-container">
-  <nb-icon
-    icon="sun-outline"
-    nbTooltip="Light Mode"
-  ></nb-icon>
-  <nb-toggle
-    [ngModel]="isDarkTheme()"
-    (change)="switchTheme()"
-    class="darkmode-toggle"
-    nbTooltip="Switch Mode"
-  ></nb-toggle>
-  <nb-icon
-    icon="moon-outline"
-    nbTooltip="Dark Mode"
-  ></nb-icon>
+  <div class="d-flex align-items-center">
+    <nb-icon
+      icon="sun-outline"
+      nbTooltip="Light Mode"
+    ></nb-icon>
+    <nb-toggle
+      [ngModel]="isDarkTheme()"
+      (change)="switchTheme()"
+      class="darkmode-toggle"
+      nbTooltip="Switch Mode"
+    ></nb-toggle>
+    <nb-icon
+      icon="moon-outline"
+      nbTooltip="Dark Mode"
+    ></nb-icon>
+  </div>
   <nb-select
     status="primary"
     *ngIf="state.currentApplication"
     (selectedChange)="changeApplication($event)"
     [ngModel]="state.currentApplication.name"
-    class="app"
+    class="app hide"
   >
     <nb-option
       *ngFor="let app of state.applications"
@@ -73,7 +72,7 @@
     *ngIf="state.currentApplication"
     (selectedChange)="changeLocale($event)"
     [ngModel]="state.currentLocale"
-    class="locale"
+    class="locale hide"
   >
     <nb-option
       *ngFor="let l of state.currentApplication.supportedLocales"
@@ -81,21 +80,14 @@
       >{{ state.localeName(l) }}</nb-option
     >
   </nb-select>
-  <nb-actions
-    size="medium"
-    style="cursor: pointer"
-  >
+  <nb-actions size="medium">
     <nb-action
-      class="control-item"
+      class="pointer pr-0"
       *ngIf="auth.isLoggedIn() && !auth.isSSO()"
       (click)="auth.logout()"
       nbTooltip="Logout"
     >
-      <i
-        class="material-icons tock-toolbar-menu"
-        style="font-size: 30px"
-        >exit_to_app</i
-      >
+      <nb-icon icon="log-out-outline"></nb-icon>
     </nb-action>
   </nb-actions>
 </div>

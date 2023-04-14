@@ -28,30 +28,15 @@
     width: calc(#{nb-theme(sidebar-width)} - #{nb-theme(header-padding)});
   }
 
-  nb-action {
-    height: auto;
-    display: flex;
-    align-content: center;
-  }
-
-  .app {
-    margin-left: 10px;
-    min-width: 150px;
-  }
-
+  .app,
   .locale {
     margin-left: 10px;
     min-width: 100px;
   }
 
-  ::ng-deep nb-search button {
-    padding: 0 !important;
-  }
-
   .header-container {
     display: flex;
     align-items: center;
-    width: auto;
 
     .sidebar-toggle {
       @include nb-ltr(padding-right, 1.25rem);
@@ -64,14 +49,17 @@
     }
 
     .darkmode-toggle {
-      position: relative;
-      top: 4px;
-      margin-left: 5px;
-      margin-right: 5px;
+      margin: 0 5px;
+
+      &::ng-deep label {
+        margin: 0;
+      }
     }
 
     .logo {
       cursor: pointer;
+      display: flex;
+      align-items: center;
       padding: 0 1.25rem;
       font-size: 1.75rem;
       @include nb-ltr(border-left, 1px solid nb-theme(divider-color));
@@ -84,24 +72,16 @@
       width: 45px;
       filter: nb-theme(img-revert);
     }
-
-    .small {
-      font-size: 20px;
-    }
   }
 
   @include media-breakpoint-down(sm) {
-    .control-item {
+    .hide-title {
       display: none;
-    }
-    .user-action {
-      border: none;
-      padding: 0;
     }
   }
 
   @include media-breakpoint-down(is) {
-    nb-select {
+    .hide {
       display: none;
     }
   }
