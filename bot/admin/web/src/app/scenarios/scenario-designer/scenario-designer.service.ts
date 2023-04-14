@@ -3,10 +3,10 @@ import { Router } from '@angular/router';
 import { Observable, Subject } from 'rxjs';
 import { tap, take, share } from 'rxjs/operators';
 
-import { SearchQuery, SentencesResult } from '../../model/nlp';
+import { ClassifiedEntity, SearchQuery, SentencesResult } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
 import { stringifiedCleanObject } from '../commons/utils';
-import { ScenarioItem, ScenarioVersion, ScenarioVersionExtended } from '../models';
+import { ScenarioItem, ScenarioVersion, ScenarioVersionExtended, TempEntity } from '../models';
 import { ScenarioService } from '../services';
 
 export type ScenarioItemExtended = ScenarioItem & { _sentencesLoading?: boolean };
@@ -60,7 +60,15 @@ export class ScenarioDesignerService {
           (s) => s.language === sentence.language && s.query === sentence.text
         );
         if (existingTempSentenceIndex >= 0) {
-          item.intentDefinition.sentences.splice(existingTempSentenceIndex, 1);
+          // But an existing classified sentence may have been transferred to tempSentences because we wanted to add or remove an entity to it. In this case it should not be purged
+          if (
+            this.areEntitiesIdentical(
+              sentence.classification.entities,
+              item.intentDefinition.sentences[existingTempSentenceIndex].classification.entities
+            )
+          ) {
+            item.intentDefinition.sentences.splice(existingTempSentenceIndex, 1);
+          }
         }
       });
 
@@ -68,5 +76,21 @@ export class ScenarioDesignerService {
       item._sentencesLoading = false;
     });
     return sentenceSubscription;
+  }
+
+  areEntitiesIdentical(entitiesA: ClassifiedEntity[], entitiesB: TempEntity[]): boolean {
+    if (entitiesA.length != entitiesB.length) return false;
+    let entitiesAreEquals = true;
+    entitiesA.forEach((entityA) => {
+      if (
+        !entitiesB.find((entityB) => {
+          return (
+            entityB.type === entityA.type && entityB.role === entityA.role && entityB.start === entityA.start && entityB.end === entityA.end
+          );
+        })
+      )
+        entitiesAreEquals = false;
+    });
+    return entitiesAreEquals;
   }
 }
