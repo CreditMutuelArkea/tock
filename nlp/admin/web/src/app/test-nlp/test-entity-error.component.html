@@ -41,11 +41,11 @@
     <button
       nbButton
       ghost
-      size="small"
+      shape="round"
       (click)="download()"
       nbTooltip="Download the whole error list"
     >
-      <mat-icon>cloud_download</mat-icon>
+      <nb-icon icon="cloud-download-outline"></nb-icon>
     </button>
   </nb-card-body>
 </nb-card>
@@ -121,29 +121,38 @@
                 <button
                   nbButton
                   ghost
-                  size="tiny"
+                  shape="round"
                   status="success"
                   (click)="validate(row)"
                 >
-                  <mat-icon nbTooltip="Validate entities">check_circle</mat-icon>
+                  <nb-icon
+                    icon="checkmark-circle-2-outline"
+                    nbTooltip="Validate entities"
+                  ></nb-icon>
                 </button>
                 <button
                   nbButton
                   ghost
-                  size="tiny"
+                  shape="round"
                   status="danger"
                   (click)="change(row)"
                 >
-                  <mat-icon nbTooltip="Change entities">update</mat-icon>
+                  <nb-icon
+                    icon="trending-up-outline"
+                    nbTooltip="Change entities"
+                  ></nb-icon>
                 </button>
                 <button
                   nbButton
                   ghost
-                  size="tiny"
+                  shape="round"
                   *ngIf="canReveal(row)"
                   (click)="reveal(row)"
                 >
-                  <mat-icon nbTooltip="Reveal the sentence">visibility</mat-icon>
+                  <nb-icon
+                    icon="eye-outline"
+                    nbTooltip="Reveal the sentence"
+                  ></nb-icon>
                 </button>
               </p>
             </td>

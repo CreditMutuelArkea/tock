@@ -14,10 +14,28 @@
  * limitations under the License.
  */
 
-.builds-table {
-  width: 100%;
-}
+@import '@nebular/theme/styles/theming';
+@import '@nebular/theme/styles/themes';
 
-.table thead tr th p{
-  font-weight: bold;
+.table-logs {
+  width: 100%;
+
+  thead th,
+  tbody td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid nb-theme(color-basic-transparent-400);
+  }
+
+  thead th {
+    border-bottom: 2px solid nb-theme(color-basic-transparent-400);
+  }
+
+  tbody tr {
+    transition: background 0.2s ease-in-out;
+
+    &:hover {
+      background-color: nb-theme(color-basic-transparent-100);
+    }
+  }
 }

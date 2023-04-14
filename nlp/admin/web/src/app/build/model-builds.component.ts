@@ -21,24 +21,19 @@ import { StateService } from '../core-nlp/state.service';
 import { ModelBuild } from '../model/application';
 import { PaginatedQuery } from '../model/commons';
 
-
 @Component({
   selector: 'tock-model-builds',
   templateUrl: './model-builds.component.html',
-  styleUrls: ['./model-builds.component.css']
+  styleUrls: ['./model-builds.component.scss']
 })
-export class ModelBuildsComponent implements OnInit{
-
+export class ModelBuildsComponent implements OnInit {
   dataSource: ModelBuild[] = [];
   totalSize: number;
   pageSize: number = 10;
   pageIndex: number = 1;
   loading: boolean = false;
 
-  constructor(private state: StateService,
-              private applicationService: ApplicationService) {
-
-  }
+  constructor(private state: StateService, private applicationService: ApplicationService) {}
 
   ngOnInit(): void {
     this.refresh();
@@ -46,21 +41,25 @@ export class ModelBuildsComponent implements OnInit{
 
   duration(d: number): string {
     const duration = moment.duration(d, 's');
-    return this.formatDuration(duration.get('hours')) + ":"
-      + this.formatDuration(duration.get('minutes')) + ":"
-      + this.formatDuration(duration.get('seconds'));
+    return (
+      this.formatDuration(duration.get('hours')) +
+      ':' +
+      this.formatDuration(duration.get('minutes')) +
+      ':' +
+      this.formatDuration(duration.get('seconds'))
+    );
   }
 
   private formatDuration(d: number): string {
-    return d <= 9 ? "0" + d : d.toString()
+    return d <= 9 ? '0' + d : d.toString();
   }
 
   intentName(build: ModelBuild): string {
     if (build.intentId) {
       const i = this.state.findIntentById(build.intentId);
-      return i ? i.intentLabel() : "unknown";
+      return i ? i.intentLabel() : 'unknown';
     } else {
-      return "";
+      return '';
     }
   }
 
@@ -70,30 +69,32 @@ export class ModelBuildsComponent implements OnInit{
       return i;
     } else {
       const e = this.state.findEntityTypeByName(build.entityTypeName);
-      return e ? e.simpleName() : "";
+      return e ? e.simpleName() : '';
     }
   }
 
-  getIndex(){
-    if(this.pageIndex > 0) return this.pageIndex - 1;
-    else return this.pageIndex
+  getIndex() {
+    if (this.pageIndex > 0) return this.pageIndex - 1;
+    else return this.pageIndex;
   }
 
   refresh() {
     this.loading = true;
     const startIndex = this.getIndex() * this.pageSize;
-    this.applicationService.builds(
-      new PaginatedQuery(
-        this.state.currentApplication.namespace,
-        this.state.currentApplication.name,
-        this.state.currentLocale,
-        startIndex,
-        this.pageSize
+    this.applicationService
+      .builds(
+        new PaginatedQuery(
+          this.state.currentApplication.namespace,
+          this.state.currentApplication.name,
+          this.state.currentLocale,
+          startIndex,
+          this.pageSize
+        )
       )
-    ).subscribe(r => {
-      this.loading = false;
-      this.totalSize = r.total;
-      this.dataSource = r.data;
-    });
+      .subscribe((r) => {
+        this.loading = false;
+        this.totalSize = r.total;
+        this.dataSource = r.data;
+      });
   }
 }
