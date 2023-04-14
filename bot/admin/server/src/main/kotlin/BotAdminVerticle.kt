@@ -711,6 +711,20 @@ open class BotAdminVerticle : AdminVerticle() {
             )
         }
 
+        blockingGet(
+            "/i18n/:id",
+            setOf(botUser, faqBotUser),
+        ) { context ->
+            val i18nId = context.queryId<I18nLabel>("id")
+            if (i18nId == null || i18nId.toString().isBlank()) {
+                badRequest("Missing parameter id for i18n")
+            } else {
+                i18n.getLabelById(i18nId)?.let {
+                    mapper.writeValueAsString(it)
+                } ?: notFound()
+            }
+        }
+
         blockingJsonPost(
                 "/i18n/complete",
                 setOf(botUser, faqBotUser),
