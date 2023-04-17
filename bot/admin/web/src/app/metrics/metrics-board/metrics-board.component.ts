@@ -26,7 +26,7 @@ enum StoriesFilterType {
   category = 'category'
 }
 
-type StoriesFilter = { type: StoriesFilterType; value: string | AnswerConfigurationType };
+export type StoriesFilter = { type: StoriesFilterType; value: string | AnswerConfigurationType };
 
 @Component({
   selector: 'tock-metrics-board',
