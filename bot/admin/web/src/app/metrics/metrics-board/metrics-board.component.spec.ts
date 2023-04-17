@@ -96,7 +96,7 @@ const dimensionMetrics: MetricResult[] = [
   }
 ];
 
-fdescribe('MetricsBoardComponent', () => {
+describe('MetricsBoardComponent', () => {
   let component: MetricsBoardComponent;
   let fixture: ComponentFixture<MetricsBoardComponent>;
 
