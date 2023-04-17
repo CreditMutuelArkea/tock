@@ -16,7 +16,7 @@
 
 package ai.tock.iadvize.client.authentication.credentials
 
-import ai.tock.iadvize.client.ADVIZE_CREDENTIALS_PROVIDER_TYPE
+import ai.tock.iadvize.client.IADVIZE_CREDENTIALS_PROVIDER_TYPE
 import ai.tock.iadvize.client.IADVIZE_PASSWORD_AUTHENTICATION
 import ai.tock.iadvize.client.IADVIZE_USERNAME_AUTHENTICATION
 import ai.tock.iadvize.client.property
