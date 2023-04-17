@@ -625,14 +625,6 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonPost("/bot/story/search", setOf(botUser, faqBotUser)) { context, request: StorySearchRequest ->
-            if (context.organization == request.namespace) {
-                BotAdminService.searchStories(request)
-            } else {
-                unauthorized()
-            }
-        }
-
         blockingJsonGet("/bot/story/:storyId", setOf(botUser, faqBotUser)) { context ->
             BotAdminService.findStory(context.organization, context.path("storyId"))
         }
