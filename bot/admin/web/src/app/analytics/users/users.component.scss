@@ -67,10 +67,6 @@
     }
   }
 
-  nb-toggle::ng-deep label {
-    margin: 0;
-  }
-
   @include media-breakpoint-up(sm) {
     .grid-filters {
       grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));

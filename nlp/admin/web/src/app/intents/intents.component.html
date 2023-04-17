@@ -66,10 +66,14 @@
           >
           <div
             *ngIf="state.intentExistsInOtherApplication(row.data.name)"
-            nbTooltip="This intent is shared between at least one other application. All changes to the intent will also affect the other applications that use this intent."
+            class="d-flex align-items-center gap-1"
           >
+            <nb-icon
+              icon="share-outline"
+              status="primary"
+              nbTooltip="This intent is shared between at least one other application. All changes to the intent will also affect the other applications that use this intent."
+            ></nb-icon>
             <span class="shared_application_label">Multi-application intent</span>
-            <mat-icon>share</mat-icon>
           </div>
         </td>
       </ng-container>
@@ -100,13 +104,14 @@
           nbTreeGridCell
           *nbTreeGridCellDef="let row"
         >
-          <span *ngFor="let e of row.data.entities">
-            <span class="entity">
-              <mat-icon
+          <div *ngFor="let e of row.data.entities">
+            <div class="entity">
+              <nb-icon
                 [style.color]="e.entityColor"
                 class="entity_icon"
-                >extension</mat-icon
-              >
+                pack="material-icons"
+                icon="extension"
+              ></nb-icon>
               <span
                 class="status"
                 [style.background-color]="e.entityColor"
@@ -115,18 +120,19 @@
               <button
                 *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
                 nbButton
-                size="tiny"
                 ghost
                 status="danger"
+                size="small"
+                shape="round"
                 (click)="removeEntity(row.data, e)"
                 class="removeEntity"
                 nbTooltip="Delete entity"
               >
-                <mat-icon>remove_circle_outline</mat-icon>
+                <nb-icon icon="trash-2-outline"></nb-icon>
               </button>
-            </span>
+            </div>
             &nbsp;
-          </span>
+          </div>
         </td>
       </ng-container>
       <ng-container [nbTreeGridColumnDef]="sharedIntentsColumn">
@@ -147,43 +153,36 @@
               *ngIf="!state.isOtherNamespaceIntent(row.data)"
               [disabled]="selectedIntent === row.data"
               nbButton
-              size="small"
               ghost
+              shape="round"
               nbTooltip="Add shared intent"
               status="primary"
               (click)="displayAddSharedIntentDialog(row.data)"
             >
-              <mat-icon>add_box</mat-icon>
+              <nb-icon icon="plus-square-outline"></nb-icon>
             </button>
             <div
               *ngIf="row.data.sharedIntents.length !== 0"
               class="shared_list"
             >
-              <mat-chip-listbox
-                *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
-                nbTooltip="Shared intent - click to remove"
-              >
-                <mat-chip-option
+              <nb-tag-list *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)">
+                <nb-tag
                   *ngFor="let intentId of row.data.sharedIntents"
-                  color="accent"
-                  selected="true"
+                  removable
+                  nbTooltip="Shared intent - click to remove"
+                  [text]="state.findIntentById(intentId)?.name"
                   (click)="removeSharedIntent(row.data, intentId)"
                 >
-                  {{ state.findIntentById(intentId)?.name }}
-                </mat-chip-option>
-              </mat-chip-listbox>
-              <mat-chip-listbox
-                *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
-                nbTooltip="Shared intent"
-              >
-                <mat-chip-option
+                </nb-tag>
+              </nb-tag-list>
+              <nb-tag-list *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)">
+                <nb-tag
                   *ngFor="let intentId of row.data.sharedIntents"
-                  color="accent"
-                  selected="true"
+                  nbTooltip="Shared intent"
+                  [text]="state.findIntentById(intentId)?.name"
                 >
-                  {{ state.findIntentById(intentId)?.name }}
-                </mat-chip-option>
-              </mat-chip-listbox>
+                </nb-tag>
+              </nb-tag-list>
             </div>
           </div>
         </td>
@@ -205,45 +204,35 @@
             <button
               *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
               nbButton
-              size="small"
               ghost
+              shape="round"
               nbTooltip="Add state"
               status="primary"
               (click)="addState(row.data)"
             >
-              <mat-icon>add_box</mat-icon>
+              <nb-icon icon="plus-square-outline"></nb-icon>
             </button>
             <div
               *ngIf="row.data.mandatoryStates.length !== 0"
               class="shared_list"
             >
-              <mat-chip-listbox
-                *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
-                nbTooltip="Mandatory states - click to delete"
-              >
-                <br />
-                <mat-chip-option
+              <nb-tag-list *ngIf="!state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)">
+                <nb-tag
                   *ngFor="let s of row.data.mandatoryStates"
-                  color="accent"
-                  selected="true"
+                  nbTooltip="Mandatory states - click to delete"
+                  [text]="s"
                   (click)="removeState(row.data, s)"
                 >
-                  {{ s }}
-                </mat-chip-option>
-              </mat-chip-listbox>
-              <mat-chip-listbox
-                *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)"
-                matTooltip="Mandatory states"
-              >
-                <br />
-                <mat-chip-option
+                </nb-tag>
+              </nb-tag-list>
+              <nb-tag-list *ngIf="state.intentExistsInOtherApplication(row.data.name) && !state.isOtherNamespaceIntent(row.data)">
+                <nb-tag
                   *ngFor="let s of row.data.mandatoryStates"
-                  color="accent"
-                  selected="true"
+                  nbTooltip="Mandatory states"
+                  [text]="s"
                 >
-                  {{ s }}
-                </mat-chip-option>
-              </mat-chip-listbox>
+                </nb-tag>
+              </nb-tag-list>
             </div>
           </div>
         </td>

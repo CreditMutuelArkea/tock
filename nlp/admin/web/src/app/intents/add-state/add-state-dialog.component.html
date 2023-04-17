@@ -13,29 +13,39 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<nb-card status="info">
-  <nb-card-header>{{ title }}</nb-card-header>
+<nb-card>
+  <nb-card-header class="d-flex flex-wrap align-items-center justify-content-between gap-1">
+    {{ title }}
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Close"
+      (click)="dialogRef.close()"
+    >
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </nb-card-header>
   <nb-card-body>
     <p>
-      If at least one mandatory state is set for an intent,
-      <br />
-      only query with at least one mandatory state of the intent
-      <br />
-      is able to returns this intent.
+      If at least one mandatory state is set for an intent, only query with at least one mandatory state of the intent is able to returns
+      this intent.
     </p>
     <form #stateForm="ngForm">
       <input
         nbInput
         required
+        fullWidth
         name="name"
         placeholder="New State*"
         [(ngModel)]="name"
       />
     </form>
   </nb-card-body>
-  <nb-card-footer class="footer">
+  <nb-card-footer class="card-footer-actions">
     <button
       nbButton
+      ghost
       size="small"
       (click)="dialogRef.close('cancel')"
     >
@@ -44,8 +54,7 @@
     <button
       nbButton
       size="small"
-      status="success"
-      class="submit-button"
+      status="primary"
       (click)="save()"
       [disabled]="!stateForm.form.valid"
     >

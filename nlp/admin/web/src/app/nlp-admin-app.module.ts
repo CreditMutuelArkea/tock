@@ -30,7 +30,8 @@ import {
   NbSidebarModule,
   NbToastrModule,
   NbWindowModule,
-  NbThemeModule
+  NbThemeModule,
+  NbIconLibraries
 } from '@nebular/theme';
 import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 
@@ -86,4 +87,15 @@ export class NlpAdminAppRoutingModule {}
   ],
   bootstrap: [NlpAdminAppComponent]
 })
-export class NlpAdminAppModule {}
+export class NlpAdminAppModule {
+  constructor(private iconLibraries: NbIconLibraries) {
+    this.registerMaterialIcons();
+  }
+
+  private registerMaterialIcons() {
+    this.iconLibraries.registerFontPack('material-icons', {
+      packClass: 'material-icons',
+      ligature: true
+    });
+  }
+}

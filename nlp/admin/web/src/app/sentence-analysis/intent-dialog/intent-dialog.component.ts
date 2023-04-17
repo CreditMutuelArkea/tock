@@ -35,11 +35,8 @@ export class IntentDialogComponent implements OnInit {
   story: string;
   private nameInitialized = false;
 
-  @ViewChild('labelElement') labelElement: ElementRef;
-
   constructor(public dialogRef: NbDialogRef<IntentDialogComponent>, private state: StateService) {
     this.dialogType = this.story ? 'Story' : 'Intent';
-    setTimeout(() => this.labelElement.nativeElement.focus(), 500);
   }
 
   ngOnInit() {

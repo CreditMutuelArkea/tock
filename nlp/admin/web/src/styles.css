@@ -19,13 +19,9 @@
 @import '~material-design-icons-iconfont/dist/material-design-icons.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
 
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
+/* Workaround: icon displayed twice */
+nb-icon.material-icons:before {
+  content: '' !important;
 }
 
 html,

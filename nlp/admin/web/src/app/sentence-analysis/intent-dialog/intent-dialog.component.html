@@ -14,13 +14,19 @@
   ~ limitations under the License.
   -->
 
-<nb-card
-  status="info"
-  class="container"
->
-  <nb-card-header>
+<nb-card>
+  <nb-card-header class="d-flex justify-content-between gap-1">
     <span *ngIf="create">Create New {{ dialogType }}</span>
     <span *ngIf="!create">Update {{ dialogType }} {{ name ? name : label }}</span>
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Close"
+      (click)="cancel()"
+    >
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
   </nb-card-header>
   <nb-card-body>
     <form
@@ -29,6 +35,7 @@
     >
       <div class="form-group">
         <input
+          tockAutofocusElement
           nbInput
           fullWidth
           name="label"
@@ -37,7 +44,6 @@
           (keyup)="copyToName()"
           (keyup.enter)="save()"
           nbTooltip="Displayed label"
-          #labelElement
           autocomplete="off"
         />
       </div>
@@ -65,19 +71,19 @@
           nbTooltip="Category"
           (keyup)="categoryChange()"
           (focus)="categoryChange()"
-          [matAutocomplete]="catAuto"
+          [nbAutocomplete]="catAuto"
         />
       </div>
-      <mat-autocomplete
-        #catAuto="matAutocomplete"
-        autoActiveFirstOption
+      <nb-autocomplete
+        #catAuto
+        activeFirst
       >
-        <mat-option
+        <nb-option
           *ngFor="let c of categories"
           [value]="c"
-          >{{ c }}</mat-option
+          >{{ c }}</nb-option
         >
-      </mat-autocomplete>
+      </nb-autocomplete>
       <div class="form-group">
         <textarea
           nbInput
@@ -90,9 +96,11 @@
       </div>
     </form>
   </nb-card-body>
-  <nb-card-footer class="footer">
+  <nb-card-footer class="card-footer-actions">
     <button
       nbButton
+      ghost
+      size="small"
       (click)="cancel()"
     >
       Cancel
@@ -100,10 +108,10 @@
     <button
       type="submit"
       nbButton
-      status="success"
+      status="primary"
+      size="small"
       (click)="save()"
       [disabled]="!intentForm.form.valid"
-      class="submit-button"
     >
       {{ create ? 'Create' : 'Update' }}
     </button>

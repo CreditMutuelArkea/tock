@@ -88,6 +88,11 @@ nb-card.selected {
   padding: 1rem 1.5rem;
 }
 
+// Remove the margin for all nebular toggle label
+.toggle-label {
+  margin: 0;
+}
+
 .divider {
   background-color: var(--color-basic-transparent-200);
 }

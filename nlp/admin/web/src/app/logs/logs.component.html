@@ -14,21 +14,21 @@
   ~ limitations under the License.
   -->
 
-<div class="search">
-  <nb-card [nbSpinner]="loading">
-    <nb-card-body style="display: flex">
-      <div class="search-input">
-        <input
-          nbInput
-          placeholder="Search Logs"
-          [(ngModel)]="text"
-          (keyup.enter)="refresh()"
-          style="width: -webkit-fill-available"
-        />
-      </div>
+<div class="mt-3">
+  <nb-card
+    [nbSpinner]="loading"
+    class="mb-2"
+  >
+    <nb-card-body class="grid-filters">
+      <input
+        nbInput
+        fullWidth
+        placeholder="Search Logs"
+        [(ngModel)]="text"
+        (keyup.enter)="refresh()"
+      />
       <nb-toggle
         status="primary"
-        class="choice"
         [(ngModel)]="onlyCurrentLocale"
         (change)="refresh()"
         >Only current locale</nb-toggle
@@ -41,49 +41,63 @@
       >
       <button
         nbButton
-        outline
         status="primary"
         size="small"
         (click)="refresh()"
-        class="go-btn"
       >
-        GO
+        <nb-icon icon="search-outline"></nb-icon>
+        search
       </button>
     </nb-card-body>
   </nb-card>
 
-  <div *ngIf="total !== -1">
-    <h1 *ngIf="total === 0">
-      {{ title }} is empty!
+  <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
+    <span
+      *ngIf="loading"
+      class="h5 text-muted m-0"
+    >
+      Loading
+    </span>
+    <span
+      *ngIf="total === 0"
+      class="h5 text-muted m-0"
+    >
+      No logs found
+    </span>
+    <span
+      *ngIf="total > 0"
+      class="h5 text-muted m-0"
+    >
+      Logs size: {{ formattedTotal() }}
+    </span>
+    <div>
       <button
-        mat-button
-        (click)="refresh()"
-        nbTooltip="Refresh"
-      >
-        <mat-icon>refresh</mat-icon>
-      </button>
-    </h1>
-    <h1 *ngIf="total !== 0">
-      {{ title }} size : {{ formattedTotal() }}
-      <button
-        mat-icon-button
-        class="button"
+        *ngIf="total > 0"
+        nbButton
+        ghost
+        shape="round"
         (click)="downloadDump()"
         nbTooltip="Download a minimal csv dump of the logs"
       >
-        <mat-icon>cloud_download</mat-icon>
+        <nb-icon icon="cloud-download-outline"></nb-icon>
       </button>
       <button
-        mat-icon-button
-        class="button"
+        nbButton
+        ghost
+        shape="round"
+        [disabled]="loading"
         (click)="refresh()"
         nbTooltip="Refresh"
       >
-        <mat-icon>refresh</mat-icon>
+        <nb-icon icon="refresh-outline"></nb-icon>
       </button>
-    </h1>
+    </div>
+  </div>
 
-    <p></p>
+  <div
+    *ngIf="total !== -1"
+    class="mt-2"
+  >
     <div
       infinite-scroll
       [infiniteScrollDistance]="2"
@@ -92,16 +106,16 @@
     >
       <nb-card
         *ngFor="let d of data"
-        class="log"
+        class="mb-2"
       >
         <nb-card-header>
           <h4 *ngIf="d.error">
             {{ d.textRequest() }}
-            <mat-icon
-              color="warn"
+            <nb-icon
+              icon="danger-outline"
+              status="danger"
               nbTooltip="error"
-              >error</mat-icon
-            >
+            ></nb-icon>
           </h4>
           <tock-highlight
             *ngIf="!d.error"
@@ -126,17 +140,19 @@
               text: d.textRequest()
             }"
             *ngIf="d.error && config.displayDialogUrl"
-            mat-icon-button
-            matTooltip="Display Conversation"
+            nbButton
+            nbTooltip="Display Conversation"
             color="primary"
-            ><mat-icon>speaker_notes</mat-icon></a
-          >
+            ><nb-icon icon="message-square-outline"></nb-icon
+          ></a>
           <button
-            mat-icon-button
-            (click)="displayFullLog(d)"
+            nbButton
+            ghost
+            shape="round"
             nbTooltip="View Full Log"
+            (click)="displayFullLog(d)"
           >
-            <mat-icon>visibility</mat-icon>
+            <nb-icon icon="eye-outline"></nb-icon>
           </button>
         </nb-card-body>
       </nb-card>

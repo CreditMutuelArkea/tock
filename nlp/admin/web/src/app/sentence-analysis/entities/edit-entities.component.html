@@ -20,51 +20,52 @@
 >
   <div
     *ngFor="let entity of container.getEntities()"
-    class="entity"
+    class="d-flex flex-wrap align-items-center gap-1 mb-1"
   >
-    <mat-chip-listbox class="role-container">
-      <mat-chip-option
+    <nb-tag-list>
+      <nb-tag
         [style.background-color]="entity.entityColor"
-        [matTooltip]="entity.qualifiedName(state.user)"
-        selected="false"
-        color="primary"
-      >
-        {{ entity.role }}
-      </mat-chip-option>
-    </mat-chip-listbox>
+        [nbTooltip]="entity.qualifiedName(state.user)"
+        [text]="entity.role"
+        size="small"
+      ></nb-tag>
+    </nb-tag-list>
     <span
       *ngIf="!readOnly"
-      class="value"
+      class="d-flex flex-wrap align-items-center gap-1"
     >
       {{ container.entityValue(entity) }}
       <span
         *ngIf="displayProbabilities && entity.hasProbability()"
-        class="probability"
-        matTooltip="Probability of entity recognition"
+        class="font-italic"
+        nbTooltip="Probability of entity recognition"
       >
         {{ entity.probability | percent: '1.0-2' }}
       </span>
       <button
-        mat-icon-button
-        color="warn"
+        nbButton
+        ghost
+        size="small"
+        shape="round"
+        status="danger"
+        nbTooltip="Delete"
         (click)="onDeleteEntity(entity)"
-        matTooltip="Delete"
       >
-        <mat-icon>delete</mat-icon>
+        <nb-icon icon="trash-2-outline"></nb-icon>
       </button>
     </span>
 
     <span
       *ngIf="readOnly"
-      class="read-only"
+      class="d-flex flex-wrap align-items-center gap-1"
     >
       {{ entity.value ? container.entityText(entity) : '' }}
       {{ container.entityValue(entity) }}
 
       <span
         *ngIf="displayProbabilities && entity.hasProbability()"
-        class="probability"
-        matTooltip="Probability of entity recognition"
+        class="font-italic"
+        nbTooltip="Probability of entity recognition"
       >
         {{ entity.probability | percent: '1.0-2' }}
       </span>

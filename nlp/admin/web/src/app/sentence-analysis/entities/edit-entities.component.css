@@ -13,28 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-.entity {
-  padding-top: 10px;
-  text-align: left;
-}
-
-.role-container {
-  float: left;
-  padding-right: 15px;
-}
-
-.probability {
-  font-style: italic;
-  font-size: smaller;
-  padding-left: 10px;
-}
-
-.value {
-  position: relative;
-  top: -4px;
-}
-
-.read-only {
-  line-height: 36px;
-}

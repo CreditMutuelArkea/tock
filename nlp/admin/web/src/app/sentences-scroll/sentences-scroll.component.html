@@ -21,11 +21,13 @@
     <div style="text-align: left">
       <h4 class="title">No Sentence found</h4>
       <button
-        mat-button
+        nbButton
+        ghost
+        shape="round"
         (click)="refresh()"
         class="button"
       >
-        <mat-icon>refresh</mat-icon>
+        <nb-icon icon="refresh-outline"></nb-icon>
       </button>
       <p>
         To add Sentences, start from <em>New Sentence</em> or <em>Test the Bot</em> in Tock Studio, or talk to the bot on any connected
@@ -44,7 +46,7 @@
   <div class="header">
     <h4 class="title"></h4>
     <nb-actions
-      size="medium"
+      size="small"
       fullWidth
       style="cursor: pointer"
     >
@@ -52,7 +54,7 @@
         (click)="refresh()"
         nbTooltip="Refresh"
       >
-        <mat-icon>refresh</mat-icon>
+        <nb-icon icon="refresh-outline"></nb-icon>
       </nb-action>
 
       <nb-action
@@ -60,7 +62,7 @@
         (click)="downloadSentencesDump()"
         nbTooltip="Download a sentences dump of the current selection"
       >
-        <mat-icon>cloud_download</mat-icon>
+        <nb-icon icon="cloud-download-outline"></nb-icon>
       </nb-action>
 
       <nb-action
@@ -68,7 +70,7 @@
         (click)="switchToScrollView()"
         nbTooltip="Switch to scroll view"
       >
-        <mat-icon>grid_off</mat-icon>
+        <nb-icon icon="list-outline"></nb-icon>
       </nb-action>
 
       <nb-action
@@ -76,7 +78,7 @@
         (click)="switchAdvancedView(true)"
         nbTooltip="Display additional stats"
       >
-        <mat-icon>expand_more</mat-icon>
+        <nb-icon icon="arrow-ios-upward-outline"></nb-icon>
       </nb-action>
 
       <nb-action
@@ -84,7 +86,7 @@
         (click)="switchAdvancedView(false)"
         nbTooltip="Hide additional stats"
       >
-        <mat-icon>expand_less</mat-icon>
+        <nb-icon icon="arrow-ios-downward-outline"></nb-icon>
       </nb-action>
 
       <nb-action
@@ -92,7 +94,7 @@
         (click)="switchToTableView()"
         nbTooltip="Switch to table view"
       >
-        <mat-icon>grid_on</mat-icon>
+        <nb-icon icon="grid-outline"></nb-icon>
       </nb-action>
     </nb-actions>
   </div>

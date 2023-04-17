@@ -31,10 +31,6 @@
   width: 100%;
 }
 
-nb-toggle::ng-deep label {
-  margin: 0;
-}
-
 @include media-breakpoint-up(lg) {
   .input-search {
     grid-column: span 2;

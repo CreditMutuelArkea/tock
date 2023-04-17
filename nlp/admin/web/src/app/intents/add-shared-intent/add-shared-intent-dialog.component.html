@@ -14,11 +14,22 @@
   ~ limitations under the License.
   -->
 
-<nb-card status="info">
-  <nb-card-header>{{ title }}</nb-card-header>
+<nb-card>
+  <nb-card-header class="d-flex flex-wrap align-items-center justify-content-between gap-1">
+    {{ title }}
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Close"
+      (click)="dialogRef.close()"
+    >
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </nb-card-header>
   <nb-card-body>
     <nb-select
-      class="intent"
+      fullWidth
       placeholder="Add shared intent"
       [(selected)]="selectedIntent"
     >
@@ -35,9 +46,10 @@
       </nb-option-group>
     </nb-select>
   </nb-card-body>
-  <nb-card-footer class="footer">
+  <nb-card-footer class="card-footer-actions">
     <button
       nbButton
+      ghost
       size="small"
       (click)="dialogRef.close('cancel')"
     >
@@ -46,8 +58,7 @@
     <button
       nbButton
       size="small"
-      status="success"
-      class="submit-button"
+      status="primary"
       (click)="save()"
       [disabled]="!selectedIntent"
     >

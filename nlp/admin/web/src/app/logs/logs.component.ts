@@ -32,7 +32,6 @@ import { JsonEditorComponent, JsonEditorOptions } from 'ang-jsoneditor';
   styleUrls: ['./logs.component.css']
 })
 export class LogsComponent extends ScrollComponent<Log> {
-  title: string = 'Logs';
   text: string;
   test: boolean = false;
   onlyCurrentLocale: boolean = false;

@@ -29,6 +29,11 @@
   color: #8f9bb354;
 }
 
+// Remove the margin for all nebular toggle label
+.toggle-label {
+  margin: 0;
+}
+
 .card-footer-actions {
   display: flex;
   flex-direction: column;

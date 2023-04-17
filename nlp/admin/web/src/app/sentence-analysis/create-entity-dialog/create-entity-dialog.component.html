@@ -13,9 +13,20 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<nb-card status="info">
-  <nb-card-header>Add Entity</nb-card-header>
-  <nb-card-body class="content">
+<nb-card>
+  <nb-card-header class="d-flex justify-content-between flex-wrap gap-1">
+    Add Entity
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Close"
+      (click)="dialogRef.close()"
+    >
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+  </nb-card-header>
+  <nb-card-body>
     <p
       *ngIf="error"
       class="error"
@@ -23,46 +34,51 @@
       {{ error }}
     </p>
 
-    <p>
-      <label>Select existing Entity:</label><br />
-
-      <mat-chip-listbox *ngIf="entityTypes">
-        <mat-chip-option
+    <div class="form-group">
+      <label>Select existing Entity</label>
+      <nb-tag-list *ngIf="entityTypes">
+        <nb-tag
           *ngFor="let e of entityTypes"
-          matTooltip="Select {{ e.qualifiedName(state.user) }}"
-          selected="{{ e === entityType }}"
-          (click)="onSelect(e)"
+          class="pointer"
+          [text]="e.qualifiedName(state.user)"
           [style.background-color]="e === entityType ? '' : e.qualifiedEntityColor(state.user)"
-          color="primary"
-        >
-          {{ e.qualifiedName(state.user) }}
-        </mat-chip-option>
-      </mat-chip-listbox>
-    </p>
-
-    <div class="form-group">
-      <span>Or create: </span>
-      <input
-        cdkFocusInitial
-        nbInput
-        placeholder="Entity Type"
-        [(ngModel)]="type"
-        (keyup)="onTypeKeyUp($event)"
-      />
+          (click)="onSelect(e)"
+        ></nb-tag>
+      </nb-tag-list>
     </div>
-    <div class="form-group">
-      <label> With role: </label>
-      <input
-        nbInput
-        placeholder="Role"
-        [(ngModel)]="role"
-        (keyup)="onRoleKeyUp($event)"
-      />
+
+    <div class="d-flex flex-wrap gap-1">
+      <div class="form-group m-0 flex-grow-1">
+        <label for="entity-type">Or create</label>
+        <input
+          class="form-control"
+          cdkFocusInitial
+          nbInput
+          fullWidth
+          id="entity-type"
+          placeholder="Entity Type"
+          [(ngModel)]="type"
+          (keyup)="onTypeKeyUp($event)"
+        />
+      </div>
+      <div class="form-group m-0 flex-grow-1">
+        <label for="role">With role</label>
+        <input
+          class="form-control"
+          nbInput
+          fullWidth
+          id="role"
+          placeholder="Role"
+          [(ngModel)]="role"
+          (keyup)="onRoleKeyUp($event)"
+        />
+      </div>
     </div>
   </nb-card-body>
-  <nb-card-footer class="footer">
+  <nb-card-footer class="card-footer-actions">
     <button
       nbButton
+      ghost
       size="small"
       (click)="dialogRef.close('cancel')"
     >
@@ -71,8 +87,7 @@
     <button
       nbButton
       size="small"
-      class="submit-button"
-      status="success"
+      status="primary"
       (click)="save()"
     >
       Add

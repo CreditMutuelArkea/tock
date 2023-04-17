@@ -14,47 +14,57 @@
   ~ limitations under the License.
   -->
 
-<mat-list-item [style.padding-left]="paddingLeft + 'px'">
-  <mat-icon
-    matListIcon
-    [style.color]="entity.entityColor"
-    >extension</mat-icon
-  >
-  <span
-    class="status"
-    [style.background-color]="entity.entityColor"
-    >{{ entity.qualifiedName(state.user) }}</span
-  >
+<div
+  class="d-flex align-items-center gap-1"
+  [style.padding-left]="paddingLeft + 'px'"
+>
+  <div class="d-flex align-items-center">
+    <nb-icon
+      [style.color]="entity.entityColor"
+      icon="extension"
+      pack="material-icons"
+    ></nb-icon>
+    <span
+      class="status ml-1"
+      [style.background-color]="entity.entityColor"
+      >{{ entity.qualifiedName(state.user) }}</span
+    >
+  </div>
   <div
     *ngIf="entity.isDateType()"
-    class="dateType"
+    class="d-flex align-items-center gap-1"
   >
     <nb-checkbox
       [(ngModel)]="entity.atStartOfDay"
-      matTooltip="Useful for non relative time"
-      >Evaluate at start of day
+      nbTooltip="Useful for non relative time"
+    >
+      Evaluate at start of day
     </nb-checkbox>
     <button
       nbButton
-      (click)="update()"
       status="primary"
+      size="small"
       outline
+      (click)="update()"
     >
       Update
     </button>
   </div>
   <button
     *ngIf="entityType"
-    mat-icon-button
+    nbButton
+    ghost
+    shape="round"
+    status="danger"
+    nbTooltip="Remove sub entity type"
     (click)="remove()"
-    color="warn"
-    matTooltip="Remove sub entity type"
   >
-    <mat-icon>delete</mat-icon>
+    <nb-icon icon="trash-2-outline"></nb-icon>
   </button>
-</mat-list-item>
+</div>
 <tock-entity-details
   *ngFor="let e of subEntities()"
+  class="mb-1"
   [entity]="e"
   [paddingLeft]="paddingLeft + 50"
   [entityType]="findEntityType()"

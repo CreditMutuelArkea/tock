@@ -14,46 +14,14 @@
  * limitations under the License.
  */
 
-.search {
-  height: 100%;
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 20px;
-  text-align: center;
-}
-
-.log {
-  width: 90%;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.search-input {
-  width: 40%;
-  font-size: large;
-}
-
-.choice {
-  margin-right: 10px;
-}
-
 .intentProbability {
   font-style: italic;
   font-size: x-small;
 }
 
-.button {
-  vertical-align: text-top;
-  margin: auto;
-}
-
-.btn {
-  margin: 0 8px;
-}
-
-.go-btn {
-  margin-left: 10px;
+.grid-filters {
+  display: grid;
+  grid-template-columns: minmax(15rem, 1fr) repeat(3, auto);
+  align-items: center;
+  gap: 1rem;
 }
