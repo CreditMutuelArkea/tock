@@ -42,6 +42,6 @@ fun credentialProviderInstance(): CredentialsProvider {
     return ServiceLoader.load(CredentialsProvider::class.java)
         .firstOrNull {
             it.type.equals(
-                property(ADVIZE_CREDENTIALS_PROVIDER_TYPE), true)
+                property(IADVIZE_CREDENTIALS_PROVIDER_TYPE), true)
         } ?: EnvCredentialsProvider()
 }
