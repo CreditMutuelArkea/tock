@@ -16,20 +16,19 @@
 
 package ai.tock.bot.admin.model
 
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationExtendedSummaryRequest
-import ai.tock.nlp.admin.model.PaginatedQuery
+import ai.tock.bot.admin.story.StoryDefinitionConfigurationMinimalSummaryRequest
+import ai.tock.nlp.admin.model.ApplicationScopedQuery
 
 /**
- *
+ * Minimal story search request without pagination
+ * Used principally into custom metrics search component
  */
-class StorySearchRequest(
+class SummaryStorySearchRequest(
     val category: String? = null,
-    val textSearch: String? = null,
-    val onlyConfiguredStory: Boolean = true
-) : PaginatedQuery() {
+) : ApplicationScopedQuery() {
 
-    fun toSummaryRequest(): StoryDefinitionConfigurationExtendedSummaryRequest =
-        StoryDefinitionConfigurationExtendedSummaryRequest(
-            namespace, applicationName, category, textSearch, onlyConfiguredStory
+    fun toSummaryRequest(): StoryDefinitionConfigurationMinimalSummaryRequest =
+        StoryDefinitionConfigurationMinimalSummaryRequest(
+            namespace, applicationName, category
         )
 }
