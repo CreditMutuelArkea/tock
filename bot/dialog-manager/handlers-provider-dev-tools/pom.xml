@@ -41,6 +41,11 @@
         </dependency>
 
         <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-aws-tools</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <scope>test</scope>
