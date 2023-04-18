@@ -13,10 +13,10 @@ Il permet à partir de l'intention initiale de l'utilisateur de déterminer un o
 ## Définitions
 
 _Action_ : une action peut être de 2 types : 
-* Action utilisateur : message envoyé par l'utilisateur qui va être reconnue via une intention
+* Action utilisateur : message envoyé par l'utilisateur qui va être reconnu via une intention
 * Action du bot : action exécutée par le gestionnaire de dialogue suite à la réception d'un message utilisateur 
 
-_Context_ : les contextes, (associés ou non à des entités), vont permettre de construire un graphe de contraintes entre les différentes actions du bot et ainsi permettre d'optimiser le parcours en fonction de la collecte des informations lors du déroulement du scénario.
+_Context_ : les contextes, (associés ou non à des entités), vont permettre de construire un graphe de contraintes entre les différentes actions du bot et ainsi permettre d'optimiser le parcours en fonction de la collecte des informations lors du déroulement du scénario
 
 _Graph of constraints_ : graphe construit en se basant sur les actions du bot et les contextes d'entrées/sorties associés à ces actions
 
@@ -135,10 +135,10 @@ Chaque interaction va être représentée par une carte qui peut avoir 2 types :
 
 Cette phase permet d'identifier les différents ingrédients qui vont permettre le bon déroulement du scénario :
 * Pour une action utilisateur :
-    * L'es 'intentions permettant de comprendre la question/réponse qu'aura envoyé l'utilisateur
-    * Si l'intention est primaire ou secondaire (les intentions primaires déclenchent la story sous-jacente alors que les intentions secondaires ne sont reconnues qu'une fois entré dans la story)
-    * Un ensemble de phrases permettant d'entrainer l'intention. Sur les phrase il est possible d'y associer des entités en sélectionnant un mot et en cliquant sur _Add entity_. Il est possible d'associer un contexte à une entité en cliquant sur le mot et en choisissant le contexte à associer. Si à la réception du message utilisateur l'entité est détectée, alors le contexte associé sera créé avec comme valeur le texte de l'entité.
-    * Associer un contexte en sortie : permet lorsque l'intention est suffisante pour déterminer qu'un contexte peut être créé sans nécessiter la détection d'une entité associée à l'intention (ex : les intentions génériques type 'oui' ou 'non')
+    * _Name_ : nom de l'intention permettant de comprendre la question/réponse qu'aura envoyé l'utilisateur
+    * _Primary intent_ : permet de définir si l'intention est primaire ou secondaire (les intentions primaires déclenchent la story sous-jacente alors que les intentions secondaires ne sont reconnues qu'une fois entré dans la story)
+    * _Sentences matching this Intent_ : un ensemble de phrases permettant d'entrainer l'intention. Sur les phrase, il est possible d'associer des entités en sélectionnant un mot et en cliquant sur _Add entity_. Il est possible d'associer un contexte à une entité en cliquant sur le mot et en choisissant le contexte à associer. Si, à la réception du message utilisateur, l'entité est détectée alors le contexte associé sera créé avec comme valeur le texte de l'entité.
+    * _Output contexts_ : Associer un contexte en sortie : permet lorsque l'intention est suffisante pour déterminer qu'un contexte peut être créé sans nécessiter la détection d'une entité associée à l'intention (ex : les intentions génériques type 'oui' ou 'non')
 
 ![schéma Tock](../../../img/scenarios_casting_intent.png "Création d'un' scénario - Casting - Intent")
 
@@ -146,7 +146,7 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
     * _Name_ : le nom de l'action
     * _Description_ : description textuelle de ce que fait l'action
     * _Answer_ : réponse envoyée à l'utilisateur à l'exécution de l'action
-    * _Api handler_ : code métier qui sera exécuté lors de l'exéuction de l'action (voir......). L'exécution d'une action comportant un handler ne rend pas la main à l'utilisateur mais déclenche un nouveau round du gestionnaire de dialogue, l'exuction du code métier ayant potentiellement produit de nouvelles informations utiles à l'avancée du scénario 
+    * _Api handler_ : code métier qui sera exécuté lors de l'exéuction de l'action. L'exécution d'une action comportant un handler ne rend pas la main à l'utilisateur mais déclenche un nouveau round du gestionnaire de dialogue, l'exécuction du code métier ayant potentiellement produit de nouvelles informations utiles à l'avancée du scénario 
     * _Event_ : évènement interne qui se traduira par une transition dans la machine à état. Uniquement disponible pour les actions qui possèdent un handler (qui ne rendent pas la main à l'utilisateur)
     * _Input contexts_ : contextes nécessaires à l'exécution de l'action. Une action ne peut s'exécuter que si tous les contextes définis en entrée existent.
     * _Output contexts_ : contextes pouvant être générés lors de l'exécution de l'action : 
@@ -155,6 +155,8 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
     * _Target story_ : permet de forcer le switch vers une autre story
     * _Question for unknown answer_ : permet d'envoyer un message d'erreur ciblé sur la question portée par cette action si suite à l'exécution de l'action la réponse de l'utilisateur n'est pas reconnue (intent unknown reçue)
 
+> Note relative aux contextes : pour l'optimisation du parcours par la résolution du graphe, c'est l'existance d'un contexte qui est primordiale indépendamment de la valeur qui peut lui être associée. Souvent, des contextes seront créés sans avoir de valeur associée, ces derniers ne servant qu'à dérouler le dialogue. Ce sera souvent le cas de contextes créés suite à la reconnaissance d'une intention sans qu'il y ait d'entités associées.
+
 ![schéma Tock](../../../img/scenarios_casting_action.png "Création d'un' scénario - Casting - Action")
 
 ### Production
@@ -162,9 +164,9 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
 Cette phase va permettre de décrire la machine à états permettant de gérer la conversation.
 La machine à état peut être construite de plusieurs manières : 
 * _Classique_ : les transitions vont d'une action A vers une action B déterminée. Cette modélisation ne permet pas de bénéficier de l'optimisation par contrainte, le flow de la conversation étant ici géré directement par la machine à états
-* _Orienté objectif_ : dans cette modélisation, nous allons utiliser la puissance des machines à état hiérarchiques pour spécialiser des moments de la conversation à un instant T. Chaque "boîte" va rassembler un ensemble cohérent d'actions qui vont permettre de résoudre un sous-ensemble de la problématique utilisateur qui sera représentée par un objectif (action de bot spécifique). 
+* _Orienté objectif_ : dans cette modélisation, nous allons utiliser les machines à état hiérarchiques pour spécialiser des moments de la conversation à un instant T. Chaque "boîte" va rassembler un ensemble cohérent d'actions qui vont permettre de résoudre un sous-ensemble de la problématique utilisateur qui sera représentée par un objectif (action de bot spécifique). 
 
-> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre.  
+> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre, c'est le solveur du graphe qui déterminera à chaque round de la conversation quelle est la meilleure action à exécuter compte des informations disponibles.  
 
 ### Publishing
 
@@ -172,6 +174,7 @@ Cette dernière phase permet de récapituler les éléments qui vont être cré�
 * Les nouvelles intentions
 * Les nouvelles réponses
 * Les Les nouvelles réponses à envoyer en cas d'incompréhension
+* La TickStory permettant d'exécuter le scénario
 
 Des contrôles de cohérence sont effectués au moment de la publication afin d'éviter les problèmes au moment de l'exécution de la story.
 
