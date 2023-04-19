@@ -932,10 +932,27 @@ object BotAdminService {
 
     fun createI18nRequest(namespace: String, request: CreateI18nLabelRequest): I18nLabel {
         val labelKey =
-                I18nKeyProvider
-                        .simpleKeyProvider(namespace, request.category)
-                        .i18n(request.label)
-        return Translator.create(labelKey, request.locale)
+            I18nKeyProvider
+                .simpleKeyProvider(namespace, request.category)
+                .i18n(request.label)
+
+        val createdI18nLabel = Translator.create(labelKey, request.locale)
+        createdI18nLabel.apply {
+            createI18nRequestWithMultiLocales(request,this)
+        }
+        //return data with i18n label and multi locales or just use simply created
+        return request.i18n?.let { createdI18nLabel.copy(i18n = it) } ?: createdI18nLabel
+    }
+
+    /**
+     * Add locales to current created [I18nLabel]
+     * @param request the [CreateI18nLabelRequest]
+     * @param i18nLabel the current created [I18nLabel]
+     */
+    private fun createI18nRequestWithMultiLocales(request: CreateI18nLabelRequest, i18nLabel: I18nLabel) {
+        if (request.i18n?.isNotEmpty() == true) {
+            Translator.completeAllLabels(listOf(i18nLabel.copy(i18n = request.i18n)))
+        }
     }
 
     fun getFeatures(botId: String, namespace: String): List<FeatureState> {
