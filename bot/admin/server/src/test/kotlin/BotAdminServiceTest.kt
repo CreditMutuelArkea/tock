@@ -17,8 +17,11 @@
 package ai.tock.bot.admin
 
 import ai.tock.bot.admin.answer.AnswerConfigurationType
+import ai.tock.bot.admin.answer.AnswerConfigurationType.simple
+import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
+import ai.tock.bot.admin.story.StoryDefinitionConfigurationSummaryMinimumMetrics
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.definition.IntentWithoutNamespace
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
@@ -36,6 +39,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.newId
+import org.litote.kmongo.toId
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertNotEquals
@@ -271,6 +275,23 @@ class BotAdminServiceTest : AbstractTest() {
                     )
                 }
             }
+
+            @Test
+            internal fun `GIVEN a story for a given namespace WHEN summary search on it THEN the story is returned`() {
+
+                val mockedStoryList = listOf(StoryDefinitionConfigurationSummaryMinimumMetrics("Id".toId(),"storyId",simple, metricStory = false))
+                every {
+                    storyDefinitionDAO.searchStoryDefinitionSummaries(
+                        SummaryStorySearchRequest("category").toSummaryRequest()
+                    )
+                } returns mockedStoryList
+
+                // When
+                val storiesList = BotAdminService.searchSummaryStories(SummaryStorySearchRequest("category"))
+
+                // Then
+                assertEquals(storiesList, mockedStoryList)
+            }
         }
     }
 
@@ -342,6 +363,22 @@ class BotAdminServiceTest : AbstractTest() {
 
         // Then
         assertNull(story)
+    }
+
+    @Test
+    internal fun `GIVEN a non-existing story for a given namespace WHEN summary search on it THEN a null dump is returned`() {
+
+        every {
+            storyDefinitionDAO.searchStoryDefinitionSummaries(
+                any()
+            )
+        } returns emptyList()
+
+        // When
+        val storiesList = BotAdminService.searchSummaryStories(SummaryStorySearchRequest("category"))
+
+        // Then
+        assertEquals(storiesList, emptyList())
     }
 
 }
