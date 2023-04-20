@@ -41,7 +41,7 @@ Chaque scénario est représenté dans un bloc permettant de consulter :
 * Un ensemble de _tags_
 
 Pour chaque bloc scénario les actions suivantes sont disponibles :
-* _Open latest version_ : ouvrir le designer sur la version la plus récente du scénario. En fonction du statut de la version, le scnério sera ou non modifiable :
+* _Open latest version_ : ouvrir le designer sur la version la plus récente du scénario. En fonction du statut de la version, le scénario sera ou non modifiable :
     * Scénario publié (CURRENT) : icône _oeil_. Le scénario n'est disponible qu'en lecture seule. Il faut le dupliquer avant de le modifier
     * Scénario en cours de design (DRAFT) : icône _palette_. Le scénario est modifiable dans le designer 
 * _Edit scenario group_ : permet d'éditer les éléments de description du scénario (Nom, Catégorie, Description et Tags)
@@ -66,7 +66,7 @@ Sur chaque version d'un scénario les actions suivantes sont disponibles :
 
 ### Filtres
 
-Il est possible de rechercher un scénario saisissant du texte dans le champ _Search_.
+Il est possible de rechercher un scénario en saisissant du texte dans le champ _Search_.
 
 Il est possible de filtrer la liste des scénarios en sélectionnant un ou plusieurs tags dans la liste déroulante _Tags_.
 
@@ -146,11 +146,11 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
     * _Name_ : le nom de l'action
     * _Description_ : description textuelle de ce que fait l'action
     * _Answer_ : réponse envoyée à l'utilisateur à l'exécution de l'action
-    * _Api handler_ : code métier qui sera exécuté lors de l'exéuction de l'action. L'exécution d'une action comportant un handler ne rend pas la main à l'utilisateur mais déclenche un nouveau round du gestionnaire de dialogue, l'exécuction du code métier ayant potentiellement produit de nouvelles informations utiles à l'avancée du scénario 
+    * _Api handler_ : code métier qui sera exécuté lors de l’exécution de l'action. L'exécution d'une action comportant un handler ne rend pas la main à l'utilisateur mais déclenche un nouveau round du gestionnaire de dialogue, l’exécution du code métier ayant potentiellement produit de nouvelles informations utiles à l'avancée du scénario 
     * _Event_ : évènement interne qui se traduira par une transition dans la machine à état. Uniquement disponible pour les actions qui possèdent un handler (qui ne rendent pas la main à l'utilisateur)
     * _Input contexts_ : contextes nécessaires à l'exécution de l'action. Une action ne peut s'exécuter que si tous les contextes définis en entrée existent.
     * _Output contexts_ : contextes pouvant être générés lors de l'exécution de l'action : 
-        * soit directement via l'exécution d'un handler qui va produire ce contexte
+        * soit directement via l'exécution d'un handler (par exemple un Api handler) qui va produire ce contexte
         * soit indirectement par la réponse de l'utilisateur suite à l'exécution de cette action
     * _Target story_ : permet de forcer le switch vers une autre story
     * _Question for unknown answer_ : permet d'envoyer un message d'erreur ciblé sur la question portée par cette action si suite à l'exécution de l'action la réponse de l'utilisateur n'est pas reconnue (intent unknown reçue)
@@ -173,7 +173,7 @@ La machine à état peut être construite de plusieurs manières :
 Cette dernière phase permet de récapituler les éléments qui vont être créés au moment de la publication dont :
 * Les nouvelles intentions
 * Les nouvelles réponses
-* Les Les nouvelles réponses à envoyer en cas d'incompréhension
+* Les nouvelles réponses à envoyer en cas d'incompréhension
 * La TickStory permettant d'exécuter le scénario
 
 Des contrôles de cohérence sont effectués au moment de la publication afin d'éviter les problèmes au moment de l'exécution de la story.
