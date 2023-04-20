@@ -21,7 +21,7 @@
     <parent>
         <groupId>ai.tock</groupId>
         <artifactId>tock-bot</artifactId>
-        <version>22.9.6-SNAPSHOT</version>
+        <version>23.3.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>tock-bot-connector-whatsapp</artifactId>
@@ -70,6 +70,12 @@
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-stt-google-speech</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-shared</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

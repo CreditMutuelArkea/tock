@@ -220,7 +220,6 @@ class IadvizeConnector internal constructor(
             distributionRule,
             distributionRuleUnvailableMessage
         )
-
         callback.sendResponse()
     }
 

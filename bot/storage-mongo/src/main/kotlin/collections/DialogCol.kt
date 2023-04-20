@@ -59,17 +59,18 @@ import java.time.Instant.now
 @Data(internal = true)
 @JacksonData(internal = true)
 internal data class DialogCol(
-    val playerIds: Set<PlayerId>,
-    var _id: Id<Dialog>,
-    val state: DialogStateMongoWrapper,
-    val tickStates: Map<String, TickState> = emptyMap(),
-    val stories: List<StoryMongoWrapper>,
-    val applicationIds: Set<String> = emptySet(),
-    val lastUpdateDate: Instant = now(),
-    val groupId: String? = null,
-    val test: Boolean = false,
-    val namespace: String? = null
-) {
+        val playerIds: Set<PlayerId>,
+        var _id: Id<Dialog>,
+        val state: DialogStateMongoWrapper,
+        val tickStates: Map<String, TickState> = emptyMap(),
+        val stories: List<StoryMongoWrapper>,
+        val applicationIds: Set<String> = emptySet(),
+        val lastUpdateDate: Instant = now(),
+        val groupId: String? = null,
+        val test: Boolean = false,
+        val namespace: String? = null,
+        val rating: Int? = null,
+        val review: String? = null) {
 
     companion object {
         private fun getActionWrapper(action: Action): ActionMongoWrapper {
@@ -92,7 +93,9 @@ internal data class DialogCol(
         userTimeline.applicationIds,
         groupId = dialog.groupId,
         test = userTimeline.userPreferences.test,
-        namespace = userTimeline.namespace
+        namespace = userTimeline.namespace,
+        review = dialog.review,
+        rating = dialog.rating
     )
 
     fun toDialog(storyDefinitionProvider: (String) -> StoryDefinition): Dialog {
@@ -103,6 +106,8 @@ internal data class DialogCol(
                 state.toState(stories.flatMap { it.actions }.map { it.toActionId() to it }.toMap()),
                 stories.toMutableList(),
                 groupId = groupId,
+                rating = rating,
+                review = review,
                 tickStates = this.tickStates.toMutableMap()
             )
         }
@@ -128,83 +133,85 @@ internal data class DialogCol(
                         }
                     )
 
-                    map { a ->
-                        if (a is SendSentenceNotYetLoaded) {
-                            a.setLoadedMessages(
-                                customMessagesMap[ConnectorMessageColId(a.toActionId(), a.dialogId)]
-                                    ?: emptyList()
-                            )
+                            map { a ->
+                                if (a is SendSentenceNotYetLoaded) {
+                                    a.setLoadedMessages(
+                                            customMessagesMap[ConnectorMessageColId(a.toActionId(), a.dialogId)]
+                                                    ?: emptyList()
+                                    )
+                                }
+                                ActionReport(
+                                        a.playerId,
+                                        a.recipientId,
+                                        a.date,
+                                        a.toMessage(),
+                                        a.state.targetConnectorType,
+                                        a.state.userInterface ?: textChat,
+                                        a.state.testEvent,
+                                        a.toActionId()
+                                )
+                            }
                         }
-                        ActionReport(
-                            a.playerId,
-                            a.recipientId,
-                            a.date,
-                            a.toMessage(),
-                            a.state.targetConnectorType,
-                            a.state.userInterface ?: textChat,
-                            a.state.testEvent,
-                            a.toActionId()
-                        )
-                    }
-                }
-                .toList(),
-            stories
-                .flatMap { it.actions }
-                .firstOrNull { it.state.userInterface != null }
-                ?.state?.userInterface
-                ?: textChat,
-            _id
+                        .toList(),
+                stories
+                        .flatMap { it.actions }
+                        .firstOrNull { it.state.userInterface != null }
+                        ?.state?.userInterface
+                        ?: textChat,
+                _id,
+                rating = rating,
+                review = review
         )
     }
 
     data class DialogStateMongoWrapper(
-        var currentIntent: Intent?,
-        @JsonDeserialize(contentAs = EntityStateValueWrapper::class)
-        val entityValues: Map<String, EntityStateValueWrapper>,
-        @JsonDeserialize(contentAs = AnyValueWrapper::class)
-        val context: Map<String, AnyValueWrapper?>,
-        var userLocation: UserLocation?,
-        var nextActionState: NextUserActionState?
+            var currentIntent: Intent?,
+            @JsonDeserialize(contentAs = EntityStateValueWrapper::class)
+            val entityValues: Map<String, EntityStateValueWrapper>,
+            @JsonDeserialize(contentAs = AnyValueWrapper::class)
+            val context: Map<String, AnyValueWrapper?>,
+            var userLocation: UserLocation?,
+            var nextActionState: NextUserActionState?
     ) {
 
         constructor(state: DialogState) : this(
-            state.currentIntent,
-            state.entityValues.mapValues { EntityStateValueWrapper(it.value) },
-            state.context.map { e -> e.key to AnyValueWrapper(e.value) }.toMap(),
-            state.userLocation,
-            state.nextActionState
+                state.currentIntent,
+                state.entityValues.mapValues { EntityStateValueWrapper(it.value) },
+                state.context.map { e -> e.key to AnyValueWrapper(e.value) }.toMap(),
+                state.userLocation,
+                state.nextActionState
         )
 
         fun toState(actionsMap: Map<Id<Action>, Action>): DialogState {
             return DialogState(
-                currentIntent,
-                entityValues.mapValues { it.value.toEntityStateValue(actionsMap) }.toMutableMap(),
-                context.filter { it.value != null && it.value!!.value != null }.mapValues { it.value!!.value!! }.toMutableMap(),
-                userLocation,
-                nextActionState
+                    currentIntent,
+                    entityValues.mapValues { it.value.toEntityStateValue(actionsMap) }.toMutableMap(),
+                    context.filter { it.value != null && it.value!!.value != null }.mapValues { it.value!!.value!! }.toMutableMap(),
+                    userLocation,
+                    nextActionState
             )
         }
     }
 
     data class EntityStateValueWrapper(
-        val value: EntityValue?,
-        val lastUpdate: Instant = now(),
-        val id: Id<EntityStateValue> = newId()
+            val value: EntityValue?,
+            val lastUpdate: Instant = now(),
+            val id: Id<EntityStateValue> = newId()
     ) {
 
         constructor(value: EntityStateValue) : this(
-            value.value,
-            value.lastUpdate,
-            value.stateValueId ?: newId()
+                value.value,
+                value.lastUpdate,
+                value.stateValueId ?: newId()
         )
 
         fun toEntityStateValue(actionsMap: Map<Id<Action>, Action>): EntityStateValue {
             return EntityStateValue(
-                value,
-                mutableListOf(),
-                lastUpdate,
-                id,
-                actionsMap
+                    value,
+                    mutableListOf(),
+                    lastUpdate,
+                    id,
+                    actionsMap
             )
         }
     }
@@ -212,35 +219,35 @@ internal data class DialogCol(
     @Data(internal = true)
     @JacksonData(internal = true)
     data class StoryMongoWrapper(
-        val storyDefinitionId: String,
-        var currentIntent: Intent?,
-        val currentStep: String?,
-        val actions: List<ActionMongoWrapper>
+            val storyDefinitionId: String,
+            var currentIntent: Intent?,
+            val currentStep: String?,
+            val actions: List<ActionMongoWrapper>
     ) {
 
         constructor(story: Story) : this(
-            story.definition.id,
-            story.starterIntent,
-            story.currentStep?.name,
-            story.actions.map { getActionWrapper(it) }
+                story.definition.id,
+                story.starterIntent,
+                story.currentStep?.name,
+                story.actions.map { getActionWrapper(it) }
         )
 
         fun toStory(dialogId: Id<Dialog>, storyDefinitionProvider: (String) -> StoryDefinition): Story {
             return Story(
-                storyDefinitionProvider.invoke(storyDefinitionId),
-                currentIntent ?: Intent.unknown,
-                currentStep,
-                actions.map { it.toAction(dialogId) }.toMutableList()
+                    storyDefinitionProvider.invoke(storyDefinitionId),
+                    currentIntent ?: Intent.unknown,
+                    currentStep,
+                    actions.map { it.toAction(dialogId) }.toMutableList()
             )
         }
     }
 
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
     @JsonSubTypes(
-        JsonSubTypes.Type(value = SendSentenceMongoWrapper::class, name = "sentence"),
-        JsonSubTypes.Type(value = SendChoiceMongoWrapper::class, name = "choice"),
-        JsonSubTypes.Type(value = SendAttachmentMongoWrapper::class, name = "attachment"),
-        JsonSubTypes.Type(value = SendLocationMongoWrapper::class, name = "location")
+            JsonSubTypes.Type(value = SendSentenceMongoWrapper::class, name = "sentence"),
+            JsonSubTypes.Type(value = SendChoiceMongoWrapper::class, name = "choice"),
+            JsonSubTypes.Type(value = SendAttachmentMongoWrapper::class, name = "attachment"),
+            JsonSubTypes.Type(value = SendLocationMongoWrapper::class, name = "location")
     )
     @Data(internal = true)
     abstract class ActionMongoWrapper {
@@ -268,88 +275,88 @@ internal data class DialogCol(
 
     @JsonTypeName(value = "sentence")
     data class SendSentenceMongoWrapper(
-        val text: String?,
-        val customMessage: Boolean = false,
-        val nlpStats: Boolean = false
+            val text: String?,
+            val customMessage: Boolean = false,
+            val nlpStats: Boolean = false
     ) : ActionMongoWrapper() {
 
         constructor(sentence: SendSentence) :
-            this(
-                sentence.stringText?.let {
-                    checkMaxLengthAllowed(it)
-                },
-                (sentence as? SendSentenceNotYetLoaded)?.hasCustomMessage ?: sentence.messages.isNotEmpty(),
-                (sentence as? SendSentenceNotYetLoaded)?.hasNlpStats ?: sentence.nlpStats != null
-            ) {
-                assignFrom(sentence)
-            }
+                this(
+                        sentence.stringText?.let {
+                            checkMaxLengthAllowed(it)
+                        },
+                        (sentence as? SendSentenceNotYetLoaded)?.hasCustomMessage ?: sentence.messages.isNotEmpty(),
+                        (sentence as? SendSentenceNotYetLoaded)?.hasNlpStats ?: sentence.nlpStats != null
+                ) {
+            assignFrom(sentence)
+        }
 
         override fun toAction(dialogId: Id<Dialog>): Action {
             return if (customMessage || nlpStats) {
                 SendSentenceNotYetLoaded(
-                    dialogId,
-                    playerId,
-                    applicationId,
-                    recipientId,
-                    text,
-                    id,
-                    date,
-                    state,
-                    botMetadata,
-                    customMessage,
-                    nlpStats
+                        dialogId,
+                        playerId,
+                        applicationId,
+                        recipientId,
+                        text,
+                        id,
+                        date,
+                        state,
+                        botMetadata,
+                        customMessage,
+                        nlpStats
                 )
             } else {
                 SendSentence(
-                    playerId,
-                    applicationId,
-                    recipientId,
-                    text,
-                    mutableListOf(),
-                    id,
-                    date,
-                    state,
-                    botMetadata
+                        playerId,
+                        applicationId,
+                        recipientId,
+                        text,
+                        mutableListOf(),
+                        id,
+                        date,
+                        state,
+                        botMetadata
                 )
             }
         }
     }
 
     @JsonTypeName(value = "choice")
-    class SendChoiceMongoWrapper private constructor (
-        val intentName: String,
-        val parameters: Map<String, String>
+    class SendChoiceMongoWrapper private constructor(
+            val intentName: String,
+            val parameters: Map<String, String>
     ) : ActionMongoWrapper() {
 
         constructor(choice: SendChoice) :
-            this(
-                choice.intentName,
-                if (choice.state.testEvent) choice.parameters else obfuscate(choice.parameters)
-            ) {
-                assignFrom(choice)
-            }
+                this(
+                        choice.intentName,
+                        if (choice.state.testEvent) choice.parameters else obfuscate(choice.parameters)
+                ) {
+            assignFrom(choice)
+        }
 
         override fun toAction(dialogId: Id<Dialog>): Action {
             return SendChoice(
-                playerId,
-                applicationId,
-                recipientId,
-                intentName,
-                parameters,
-                id,
-                date,
-                state,
-                botMetadata
+                    playerId,
+                    applicationId,
+                    recipientId,
+                    intentName,
+                    parameters,
+                    id,
+                    date,
+                    state,
+                    botMetadata
             )
         }
     }
 
     @JsonTypeName(value = "attachment")
     class SendAttachmentMongoWrapper(
-        val url: String,
-        @JsonProperty("attachment_type")
-        @JsonAlias("type")
-        val type: SendAttachment.AttachmentType
+            val url: String,
+            @JsonProperty("attachment_type")
+            @JsonAlias("type")
+            val type: SendAttachment.AttachmentType
     ) : ActionMongoWrapper() {
 
         constructor(attachment: SendAttachment) : this(attachment.url, attachment.type) {
@@ -358,15 +365,15 @@ internal data class DialogCol(
 
         override fun toAction(dialogId: Id<Dialog>): Action {
             return SendAttachment(
-                playerId,
-                applicationId,
-                recipientId,
-                url,
-                type,
-                id,
-                date,
-                state,
-                botMetadata
+                    playerId,
+                    applicationId,
+                    recipientId,
+                    url,
+                    type,
+                    id,
+                    date,
+                    state,
+                    botMetadata
             )
         }
     }
@@ -380,15 +387,24 @@ internal data class DialogCol(
 
         override fun toAction(dialogId: Id<Dialog>): Action {
             return SendLocation(
-                playerId,
-                applicationId,
-                recipientId,
-                location,
-                id,
-                date,
-                state,
-                botMetadata
+                    playerId,
+                    applicationId,
+                    recipientId,
+                    location,
+                    id,
+                    date,
+                    state,
+                    botMetadata
             )
         }
     }
+}
+
+@Data(internal = true)
+@JacksonData(internal = true)
+data class ParseRequestSatisfactionStatCol(
+        val rating: Int,
+        val count: Int = 1
+) {
+
 }

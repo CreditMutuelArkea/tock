@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.module.SimpleModule
 import java.time.Instant
 import kotlin.Boolean
+import kotlin.Int
 import kotlin.String
 import kotlin.collections.List
 import kotlin.collections.Map
@@ -50,6 +51,10 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
             var _test_set : Boolean = false
             var _namespace_: String? = null
             var _namespace_set : Boolean = false
+            var _rating_: Int? = null
+            var _rating_set : Boolean = false
+            var _review_: String? = null
+            var _review_set : Boolean = false
             var _token_ : JsonToken? = currentToken
             while (_token_?.isStructEnd != true) { 
                 if(_token_ != JsonToken.FIELD_NAME) {
@@ -110,6 +115,16 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                              else p.text;
                             _namespace_set = true
                             }
+                    "rating" -> {
+                            _rating_ = if(_token_ == JsonToken.VALUE_NULL) null
+                             else p.intValue;
+                            _rating_set = true
+                            }
+                    "review" -> {
+                            _review_ = if(_token_ == JsonToken.VALUE_NULL) null
+                             else p.text;
+                            _review_set = true
+                            }
                     else -> {
                             if (_token_?.isStructStart == true)
                             p.skipChildren()
@@ -120,11 +135,11 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                         } 
             return if(_playerIds_set && __id_set && _state_set && _tickStates_set && _stories_set &&
                     _applicationIds_set && _lastUpdateDate_set && _groupId_set && _test_set &&
-                    _namespace_set)
+                    _namespace_set && _rating_set && _review_set)
                     DialogCol(playerIds = _playerIds_!!, _id = __id_!!, state = _state_!!,
                             tickStates = _tickStates_!!, stories = _stories_!!, applicationIds =
                             _applicationIds_!!, lastUpdateDate = _lastUpdateDate_!!, groupId =
-                            _groupId_, test = _test_!!, namespace = _namespace_)
+                            _groupId_, test = _test_!!, namespace = _namespace_, rating = _rating_, review = _review_)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
                     if(_playerIds_set)
@@ -146,7 +161,11 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                     if(_test_set)
                     map[parameters.getValue("test")] = _test_
                     if(_namespace_set)
-                    map[parameters.getValue("namespace")] = _namespace_ 
+                    map[parameters.getValue("namespace")] = _namespace_
+                    if(_rating_set)
+                    map[parameters.getValue("rating")] = _rating_
+                    if(_review_set)
+                    map[parameters.getValue("review")] = _review_
                     primaryConstructor.callBy(map) 
                     }
         } 
@@ -167,7 +186,9 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                 primaryConstructor.findParameterByName("lastUpdateDate")!!, "groupId" to
                 primaryConstructor.findParameterByName("groupId")!!, "test" to
                 primaryConstructor.findParameterByName("test")!!, "namespace" to
-                primaryConstructor.findParameterByName("namespace")!!) }
+                primaryConstructor.findParameterByName("namespace")!!, "rating" to
+                primaryConstructor.findParameterByName("rating")!!, "review" to
+                primaryConstructor.findParameterByName("review")!!) }
 
         private val _playerIds__reference: TypeReference<Set<PlayerId>> = object :
                 TypeReference<Set<PlayerId>>() {}

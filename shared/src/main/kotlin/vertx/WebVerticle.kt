@@ -244,9 +244,8 @@ abstract class WebVerticle : AbstractVerticle() {
 
     fun addAuth(
         authProvider: TockAuthProvider = defaultAuthProvider(),
-        pathsToProtect: MutableSet<String> = protectedPaths().map { "$it/*" }.toMutableSet()
+        pathsToProtect: Set<String> = protectedPaths().map { "$it/*" }.toSet()
     ) {
-        pathsToProtect.addAll(protectedPaths())
         val https = !devEnvironment && booleanProperty("tock_https_env", true)
         val sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
             .setSessionTimeout(6 * 60 * 60 * 1000 /*6h*/)
@@ -798,7 +797,7 @@ abstract class WebVerticle : AbstractVerticle() {
     }
 
     inline fun <reified T : Any> RoutingContext.readJson(): T {
-        return mapper.readValue(this.bodyAsString)
+        return mapper.readValue(this.body().asString())
     }
 
     inline fun <reified T : Any> readJson(upload: FileUpload): T {
