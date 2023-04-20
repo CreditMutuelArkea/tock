@@ -139,7 +139,8 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                     DialogCol(playerIds = _playerIds_!!, _id = __id_!!, state = _state_!!,
                             tickStates = _tickStates_!!, stories = _stories_!!, applicationIds =
                             _applicationIds_!!, lastUpdateDate = _lastUpdateDate_!!, groupId =
-                            _groupId_, test = _test_!!, namespace = _namespace_, rating = _rating_, review = _review_)
+                            _groupId_, test = _test_!!, namespace = _namespace_, rating = _rating_,
+                            review = _review_)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
                     if(_playerIds_set)
@@ -165,7 +166,7 @@ internal class DialogCol_Deserializer : JsonDeserializer<DialogCol>(), JacksonMo
                     if(_rating_set)
                     map[parameters.getValue("rating")] = _rating_
                     if(_review_set)
-                    map[parameters.getValue("review")] = _review_
+                    map[parameters.getValue("review")] = _review_ 
                     primaryConstructor.callBy(map) 
                     }
         } 
