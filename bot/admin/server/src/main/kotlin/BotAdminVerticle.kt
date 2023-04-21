@@ -728,8 +728,16 @@ open class BotAdminVerticle : AdminVerticle() {
             if (query.i18nIds.isEmpty()) {
                 badRequest("no filter found on i18nIds")
             } else {
-                return@blockingJsonPost i18n.getLabelsByIds(query.i18nIds)
-                    .ifEmpty { notFound() }
+                return@blockingJsonPost BotI18nLabels(
+                    i18n.getLabelsByIds(query.i18nIds)
+                        .ifEmpty { notFound() }
+                        .map {
+                            BotI18nLabel(
+                                it,
+                                //stats not needed here
+                                emptyList()
+                            )
+                        })
             }
         }
 
