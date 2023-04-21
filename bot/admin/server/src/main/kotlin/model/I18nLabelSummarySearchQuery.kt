@@ -16,13 +16,7 @@
 
 package ai.tock.bot.admin.model
 
-import ai.tock.translator.I18nLocalizedLabel
-import java.util.LinkedHashSet
-import java.util.Locale
+import ai.tock.translator.I18nLabel
+import org.litote.kmongo.Id
 
-data class CreateI18nLabelRequest(
-    val label: String,
-    val locale: Locale,
-    val category: String,
-    val i18n: LinkedHashSet<I18nLocalizedLabel>? = null,
-)
+data class I18nLabelSummarySearchQuery(val i18nIds: Set<Id<I18nLabel>>)
