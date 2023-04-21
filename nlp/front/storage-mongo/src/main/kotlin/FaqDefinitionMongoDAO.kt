@@ -215,12 +215,13 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
     /**
      * @see FaqDefinitionDAO.makeMigration
      */
-    override fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String?) {
+    override fun makeMigration(appSupplier: (Id<ApplicationDefinition>) -> ApplicationDefinition?) {
 
         // Faq projection represents the old structure of FaqDefinition
         data class FaqProjection(
             val _id: Id<FaqDefinition> = newId(),
             val applicationId: Id<ApplicationDefinition>?,
+            val namespace: String?,
             val intentId: Id<IntentDefinition>,
             val i18nId: Id<I18nLabel>,
             val tags: List<String>,
@@ -229,19 +230,26 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
             val updateDate: Instant
         )
 
-        col.aggregate<FaqProjection>(match(FaqDefinition::botId exists false)).forEach { projection ->
+        col.aggregate<FaqProjection>(
+            match(
+                or(
+                    FaqDefinition::botId exists false
+                )
+            )
+        ).forEach { projection ->
             thread(true) {
 
                 if (projection.applicationId != null) {
                     with(projection) {
                         logger.info { "Migrate FaqDefinition with applicationId $applicationId and intendId $intentId" }
 
-                        val botId = botIdSupplier.invoke(applicationId!!)
+                        val app = appSupplier.invoke(applicationId!!)
                             ?: throw Exception("Fail to migrate Faq with intent $intentId  due to Application not found with id $applicationId")
 
                         FaqDefinition(
                             _id,
-                            botId,
+                            app.name,
+                            app.namespace,
                             intentId,
                             i18nId,
                             tags,

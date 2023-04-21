@@ -89,7 +89,7 @@ object FaqAdminService {
      */
     fun makeMigration() {
         faqDefinitionDAO.makeMigration {
-            applicationDAO.getApplicationById(it)?.name
+            applicationDAO.getApplicationById(it)
         }
     }
 
@@ -182,6 +182,7 @@ object FaqAdminService {
             FaqDefinition(
                 _id = existingFaq._id,
                 botId = existingFaq.botId,
+                namespace = existingFaq.namespace,
                 intentId = existingFaq.intentId,
                 i18nId = existingFaq.i18nId,
                 tags = query.tags,
@@ -193,6 +194,7 @@ object FaqAdminService {
             logger.info { "Creating FAQ \"${intent.label}\"" }
             FaqDefinition(
                 botId = application.name,
+                namespace = application.namespace,
                 intentId = intent._id,
                 i18nId = i18nLabel._id,
                 tags = query.tags,

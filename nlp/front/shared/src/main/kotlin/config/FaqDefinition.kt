@@ -20,6 +20,7 @@ import ai.tock.translator.I18nLabel
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import java.time.Instant
+import javax.xml.stream.events.Namespace
 
 data class FaqDefinition(
 
@@ -32,6 +33,11 @@ data class FaqDefinition(
      * The bot id (that corresponds to the application name).
      */
     val botId: String,
+
+    /**
+     * The namespace of the model.
+     */
+    val namespace: String,
 
     /**
      * The intent id.

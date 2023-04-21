@@ -75,7 +75,7 @@ interface FaqDefinitionDAO {
 
     /**
      * Make migration
-     * @param botIdSupplier : function that return a string (the botId) with a given Id<>
+     * @param appSupplier : function that return a ApplicationDefinition given Id<>
      */
-    fun makeMigration(botIdSupplier: (Id<ApplicationDefinition>) -> String?)
+    fun makeMigration(appSupplier: (Id<ApplicationDefinition>) -> ApplicationDefinition?)
 }
