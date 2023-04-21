@@ -751,7 +751,7 @@ open class AdminVerticle : WebVerticle() {
         blockingUploadJsonPost(
             "/dump/dictionary/:entityName",
             admin,
-            simpleLogger("Update Dictionary")
+            simpleLogger("Update Dictionary") // TODO MASS DUMP
         ) { context, dump: DictionaryData ->
             val data = dump.copy(namespace = context.organization, entityName = context.path("entityName"))
             front.save(data)

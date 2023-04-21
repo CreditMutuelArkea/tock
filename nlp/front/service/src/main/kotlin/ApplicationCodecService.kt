@@ -43,6 +43,7 @@ import ai.tock.nlp.front.shared.config.IntentDefinition
 import ai.tock.nlp.front.shared.config.SentencesQuery
 import ai.tock.shared.changeNamespace
 import ai.tock.shared.defaultLocale
+import ai.tock.shared.ensureUniqueIndex
 import ai.tock.shared.error
 import ai.tock.shared.injector
 import ai.tock.shared.name
@@ -162,6 +163,8 @@ internal object ApplicationCodecService : ApplicationCodec {
         logger.info { "Import dump..." }
         val report = ImportReport()
         try {
+            // TODO MASS : Add new entities and sub-entities if not present in receiving namespace (check by key="namespace:name").
+            // TODO MASS : Do nothing if they are already present
             dump.entityTypes.forEach { e ->
                 if (!entityTypeExists(e.newName(namespace))) {
                     val newEntity = e.copy(_id = newId(), name = e.newName(namespace))
@@ -204,6 +207,8 @@ internal object ApplicationCodecService : ApplicationCodec {
                         )
                         report.add(appToSave)
                         logger.debug { "Import application $appToSave" }
+                        // TODO MASS : Add new application if not present in receiving namespace (check by "namespace" and "name")
+                        // TODO MASS : Do nothing if it is already present
                         config.save(appToSave)
                     } else {
                         // a fresh empty model has been initialized before with the default locale
@@ -222,6 +227,9 @@ internal object ApplicationCodecService : ApplicationCodec {
                 }
             val appId = app._id
             val botId = app.name
+
+            // TODO MASS : Add new intent if not present in receiving namespace (check by "namespace" and "name")
+            // TODO MASS : Update intent if already present (Overwrite namespace + add application._Id to set of intent applications)
 
             val intentsToCreate = mutableListOf<IntentDefinition>()
             val intentsIdsMap = dump.intents.map { i ->
@@ -266,6 +274,9 @@ internal object ApplicationCodecService : ApplicationCodec {
             // add unknown intent to intent map
             intentsIdsMap[UNKNOWN_INTENT_NAME.toId()] = UNKNOWN_INTENT_NAME.toId()
 
+            // TODO MASS : Add new sentence if not present in receiving namespace (check by "application._id", "sentence.locale", "sentence.text")
+            // TODO MASS : Do nothing if it is already present
+
             dump.sentences.forEach { s ->
                 if (config.search(
                         SentencesQuery(
@@ -291,6 +302,13 @@ internal object ApplicationCodecService : ApplicationCodec {
                     config.save(sentence)
                 }
             }
+
+            // TODO MASS : Do nothing for the stories *!*
+            // TODO MASS : We shouldn't do anything for FAQs too *!*
+
+
+            // TODO MASS : Add new FAQ if not present in receiving namespace (check by "intent._id")
+            // TODO MASS : Update FAQ if already present (Overwrite enabled flag and tags)
 
             dump.faqs.forEach {
                 val intentDump = dump.intents.first { intent -> intent._id == it.intentId }
@@ -329,6 +347,9 @@ internal object ApplicationCodecService : ApplicationCodec {
         logger.info { "Import Sentences dump..." }
         val report = ImportReport()
         try {
+            // TODO MASS : Add new application (application of dump) if not present in receiving namespace (check by "namespace" and "name")
+            // TODO MASS : Do nothing if it is already present
+
             val appName = dump.applicationName.withoutNamespace()
             var app = config.getApplicationByNamespaceAndName(namespace, appName)
                 .let { app ->
@@ -360,6 +381,10 @@ internal object ApplicationCodecService : ApplicationCodec {
                     if (!app.supportedLocales.contains(locale)) {
                         app = config.save(app.copy(supportedLocales = app.supportedLocales + locale))
                     }
+
+                    // TODO MASS : Add new intent (intent of sentence) if not present in receiving namespace (check by "namespace" and "name")
+                    // TODO MASS : Update intent if already present (Do not overwrite namespace *!* + add application._Id (application of dump) to set of intent applications)
+
 
                     val intent: IntentDefinition? = if (s.intent == UNKNOWN_INTENT_NAME) {
                         null
@@ -394,6 +419,9 @@ internal object ApplicationCodecService : ApplicationCodec {
                                 }
                             }
 
+                        // TODO MASS : Attach entities (of sentence) (but not sub-entities *!*) to the intent (created or updated) if not already attached to intent (check by entity "name" and "role")
+                        // TODO MASS : Do nothing if it is already attached to intent
+
                         s.entities.forEach { e ->
                             val newName = e.entity.newName(namespace)
                             if (newIntent.entities.none { it.entityTypeName == newName && it.role == e.role }) {
@@ -410,6 +438,9 @@ internal object ApplicationCodecService : ApplicationCodec {
                         }
                         newIntent
                     }
+
+                    // TODO MASS : Add new sentence if not present in receiving namespace (check by "application._id", "sentence.locale", "sentence.text")
+                    // TODO MASS : Update if already present (Update all attributes *!*)
 
                     config.save(
                         ClassifiedSentence(
