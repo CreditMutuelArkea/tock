@@ -5,7 +5,7 @@ import { BehaviorSubject, forkJoin, iif, merge, Observable, of } from 'rxjs';
 import { map, tap, switchMap, filter, concatMap, take } from 'rxjs/operators';
 
 import { BotService } from '../../bot/bot-service';
-import { CreateI18nLabelRequest, I18nLabel, I18nLocalizedLabel } from '../../bot/model/i18n';
+import { CreateI18nLabelsRequest, I18nLabel, I18nLocalizedLabel } from '../../bot/model/i18n';
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { StateService } from '../../core-nlp/state.service';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
@@ -430,39 +430,21 @@ export class ScenarioService {
   }
 
   saveAnswers(answers: ScenarioAnswer[]): Observable<I18nLabel> {
-    let request = new CreateI18nLabelRequest('scenario', answers[0].answer, answers[0].locale);
-    let i18nLabel: I18nLabel;
+    const request = new CreateI18nLabelsRequest('scenario', answers[0].answer, answers[0].locale, this.createI18nLocalizedLabels(answers));
 
-    return this.botService.createI18nLabel(request).pipe(
-      tap((i18nLabelResponse: I18nLabel) => {
-        i18nLabel = i18nLabelResponse;
-      }),
-      concatMap((i18nLabel: I18nLabel) => {
-        return iif(() => !!(answers.length + 2), this.patchAnswer(i18nLabel, answers), of(false));
-      }),
-      map((_) => i18nLabel)
-    );
+    return this.botService.createI18nLabels(request);
   }
 
   patchAnswer(i18nLabel: I18nLabel, answers: ScenarioAnswer[]): Observable<boolean> {
-    let i18n: I18nLocalizedLabel[] = [];
-
-    answers.forEach((answerToPatch) => {
-      const i18nLocalizedLabel = new I18nLocalizedLabel(
-        answerToPatch.locale,
-        answerToPatch.interfaceType,
-        answerToPatch.answer,
-        true,
-        null,
-        []
-      );
-
-      i18n = [...i18n, i18nLocalizedLabel];
-    });
-
-    i18nLabel.i18n = i18n;
+    i18nLabel.i18n = this.createI18nLocalizedLabels(answers);
 
     return this.botService.saveI18nLabel(i18nLabel);
+  }
+
+  private createI18nLocalizedLabels(answers: ScenarioAnswer[]): I18nLocalizedLabel[] {
+    return answers.map(
+      (answerToPatch) => new I18nLocalizedLabel(answerToPatch.locale, answerToPatch.interfaceType, answerToPatch.answer, true, null, [])
+    );
   }
 
   private downloadScenarioGroup(scenarioGroup: ScenarioGroup): void {

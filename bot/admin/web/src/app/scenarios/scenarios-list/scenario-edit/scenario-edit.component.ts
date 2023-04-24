@@ -8,7 +8,7 @@ import { ScenarioService } from '../../services';
 import { ChoiceDialogComponent } from '../../../shared/components';
 import { StateService } from '../../../core-nlp/state.service';
 import { UserInterfaceType } from '../../../core/model/configuration';
-import { I18nLabel, I18nLabels } from '../../../bot/model/i18n';
+import { I18nLabel } from '../../../bot/model/i18n';
 import { BotService } from '../../../bot/bot-service';
 
 interface ScenarioGroupEditForm {
@@ -46,7 +46,7 @@ export class ScenarioEditComponent implements OnChanges {
 
   isSubmitted: boolean = false;
   categories: string[];
-  i18nLabels: I18nLabels;
+  i18nLabel: I18nLabel;
   categoriesAutocompleteValues: Observable<string[]>;
   tagsAutocompleteValues: Observable<string[]>;
   form = new FormGroup<ScenarioGroupEditForm>({
@@ -115,12 +115,11 @@ export class ScenarioEditComponent implements OnChanges {
     this.loading = true;
 
     this.botService
-      .i18nLabels()
+      .i18nLabel(unknownAnswerId)
       .pipe(take(1))
       .subscribe({
-        next: (i18nLabels: I18nLabels) => {
-          this.i18nLabels = i18nLabels;
-          const i18nLabel: I18nLabel = this.i18nLabels.labels.find((i) => i._id === unknownAnswerId);
+        next: (i18nLabel: I18nLabel) => {
+          this.i18nLabel = i18nLabel;
           if (i18nLabel) this.feedUnknownAnswers(i18nLabel);
           this.loading = false;
         },
@@ -230,7 +229,6 @@ export class ScenarioEditComponent implements OnChanges {
     if (this.canSave) {
       const enabled = typeof this.scenarioGroup.enabled === 'boolean' ? this.scenarioGroup.enabled : null;
       const { category, description, name, tags, unknownAnswers } = this.form.value;
-      const i18nLabel = this.i18nLabels?.labels.find((l) => l._id === this.scenarioGroup.unknownAnswerId);
 
       this.onSave.emit({
         redirect,
@@ -244,7 +242,7 @@ export class ScenarioEditComponent implements OnChanges {
           enabled
         },
         unknownAnswers: unknownAnswers as ScenarioAnswer[],
-        i18nLabel
+        i18nLabel: this.i18nLabel
       });
     }
   }
