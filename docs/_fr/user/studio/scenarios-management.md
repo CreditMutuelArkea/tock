@@ -111,7 +111,7 @@ Les informations suivantes sont à renseigner :
 
 Il existe 3 options pour la sauvegarde du scénario :
 * _Save_ : enregistre les informations du scénario et reste sur la page courante 
-* _Save a Design_ : enregistre les informations du scénario et bascule dans le designer
+* _Save & Design_ : enregistre les informations du scénario et bascule dans le designer
 * _Cancel_ : annule la création du scénario
 
 ## Scenario Designer
@@ -152,12 +152,12 @@ Cette phase permet d'identifier les différents ingrédients qui vont permettre 
 
 > Attention : ne pas utiliser une intention existante qui serait primaire sur une autre story en tant qu'intention primaire du scénario, il ne sera pas possible de le publier, une intention ne pouvant être primaire que pour une seule story.
   
-2- Ajout des phrases d'entrainement et des contextes en sortie : une fois l'intention définie, vous aller pouvoir ajouter des phrases d'entrainement, associer des entités que vous pourrez lier à des contextes et définir des contextes qui seront produits en sortie une fois l'intention reçue.
+2- Ajout des phrases d'entrainement et des contextes en sortie : une fois l'intention définie, vous allez pouvoir ajouter des phrases d'entrainement, associer des entités que vous pourrez lier à des contextes et définir des contextes qui seront produits en sortie une fois l'intention reçue.
 Les informations suivantes sont récapitulées dans la fenêtre :
 * _Name_ (Read only) : nom de l'intention permettant de comprendre la question/réponse qu'aura envoyé l'utilisateur
 * _Primary intent_ : permet de définir si l'intention est primaire ou secondaire (les intentions primaires déclenchent la story sous-jacente alors que les intentions secondaires ne sont reconnues qu'une fois entré dans la story)
 * _Sentences matching this Intent_ : un ensemble de phrases permettant d'entrainer l'intention. Sur les phrase, il est possible d'associer des entités en sélectionnant un mot et en cliquant sur _Add entity_. Il est possible d'associer un contexte à une entité en cliquant sur le mot et en choisissant le contexte à associer. Si, à la réception du message utilisateur, l'entité est détectée alors le contexte associé sera créé avec comme valeur le texte de l'entité.
-* _Output contexts_ : Associer un contexte en sortie : permet lorsque l'intention est suffisante pour déterminer qu'un contexte peut être créé sans nécessiter la détection d'une entité associée à l'intention (ex : les intentions génériques type 'oui' ou 'non')
+* _Output contexts_ : Associer un contexte en sortie : permet de définir un contexte lorsque l'intention est suffisante pour déterminer qu'un contexte peut être créé sans nécessiter la détection d'une entité associée à l'intention (ex : les intentions génériques type 'oui' ou 'non')
 
 ![schéma Tock](../../../img/scenarios_casting_intent.png "Création d'un' scénario - Casting - Intent")
 
@@ -192,7 +192,7 @@ Exemple de machines à état dans les 2 modes pour le même cas d'usage (Activat
 * Modélisation orientée objectif
 ![schéma Tock](../../../img/scenarios_sm_objectif.png "Création d'un' scénario - Production - SM Objectif")
 
-> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre, c'est le solveur du graphe qui déterminera à chaque round de la conversation quelle est la meilleure action à exécuter compte des informations disponibles.  
+> Tips : à retenir pour la modélisation sous forme d'objectif, pour une "boîte" donnée, il doit y avoir une action représentant l'objectif à atteindre ainsi que toutes les actions participant à la résolution de cet objectif. Au sein d'une "boîte", toutes les transitions (sauf rare exception) ramènent vers l'objectif à atteindre, c'est le solveur du graphe qui déterminera à chaque round de la conversation quelle est la meilleure action à exécuter compte tenu des informations disponibles.  
 
 ### Publishing
 
