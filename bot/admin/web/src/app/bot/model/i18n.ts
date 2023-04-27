@@ -225,6 +225,10 @@ export class CreateI18nLabelRequest {
   constructor(public category: string, public label: string, public locale: string) {}
 }
 
+export class CreateI18nLabelsRequest {
+  constructor(public category: string, public label: string, public locale: string, public i18n: I18nLocalizedLabel[]) {}
+}
+
 export enum I18nLabelStateQuery {
   ALL = 'ALL',
   VALIDATED = 'VALIDATED',
