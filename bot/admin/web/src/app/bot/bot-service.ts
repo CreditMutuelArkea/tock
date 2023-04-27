@@ -89,6 +89,10 @@ export class BotService {
     return this.rest.get(`/i18n/${id}`, I18nLabel.fromJSON);
   }
 
+  searchI18nLabels(i18nIds: string[]): Observable<I18nLabels> {
+    return this.rest.post('/i18n/search', { i18nIds: i18nIds }, I18nLabels.fromJSON);
+  }
+
   completeI18nLabels(labels: I18nLabel[]): Observable<TranslateReport> {
     return this.rest.post('/i18n/complete', labels, TranslateReport.fromJSON);
   }
