@@ -21,7 +21,7 @@ import model.indicator.metric.CustomMetricResponse
 import model.indicator.metric.Row
 
 /**
- * Map an [CustomMetric] to [CustomMetricResponse]
+ * Map a [CustomMetric] to [CustomMetricResponse]
  * @param customMetric a [CustomMetric] to map
  * @return [CustomMetricResponse]
  */
