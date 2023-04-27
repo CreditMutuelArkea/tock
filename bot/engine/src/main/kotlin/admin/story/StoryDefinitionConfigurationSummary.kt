@@ -32,7 +32,7 @@ data class StoryDefinitionConfigurationSummaryExtended(
     override val _id: Id<StoryDefinitionConfiguration>,
     override val storyId: String,
     val botId: String,
-    val intent: IntentWithoutNamespace,
+    override val intent: IntentWithoutNamespace,
     override val currentType: AnswerConfigurationType,
     override val name: String = storyId,
     override val category: String = "default",
@@ -47,6 +47,7 @@ data class StoryDefinitionConfigurationSummaryExtended(
 data class StoryDefinitionConfigurationSummaryMinimumMetrics(
     override val _id: Id<StoryDefinitionConfiguration>,
     override val storyId: String,
+    override val intent: IntentWithoutNamespace,
     override val currentType: AnswerConfigurationType,
     override val name: String = storyId,
     override val category: String = "default",
@@ -56,6 +57,7 @@ data class StoryDefinitionConfigurationSummaryMinimumMetrics(
 interface StoryDefinitionConfigurationSummaryBase {
     val _id: Id<StoryDefinitionConfiguration>
     val storyId: String
+    val intent: IntentWithoutNamespace
     val currentType: AnswerConfigurationType
     val name: String
     val category: String

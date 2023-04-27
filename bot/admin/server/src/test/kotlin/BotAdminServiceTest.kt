@@ -279,7 +279,7 @@ class BotAdminServiceTest : AbstractTest() {
             @Test
             internal fun `GIVEN a story for a given namespace WHEN summary search on it THEN the story is returned`() {
 
-                val mockedStoryList = listOf(StoryDefinitionConfigurationSummaryMinimumMetrics("Id".toId(),"storyId",simple, metricStory = false))
+                val mockedStoryList = listOf(StoryDefinitionConfigurationSummaryMinimumMetrics("Id".toId(),"storyId",intent= IntentWithoutNamespace("myIntent"), simple, metricStory = false))
                 every {
                     storyDefinitionDAO.searchStoryDefinitionSummaries(
                         SummaryStorySearchRequest("category").toSummaryRequest()

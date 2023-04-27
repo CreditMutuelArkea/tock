@@ -237,6 +237,7 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
             .projection(
                 StoryDefinitionConfigurationSummaryMinimumMetrics::_id,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::storyId,
+                StoryDefinitionConfigurationSummaryMinimumMetrics::intent,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::currentType,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::name,
                 StoryDefinitionConfigurationSummaryMinimumMetrics::category,
