@@ -272,8 +272,8 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
   }
 
   postNewEntity(task: DependencyUpdateJob, tempEntity: TempEntity): void {
-    this.nlp.createEntityType(tempEntity.type).subscribe(
-      (e) => {
+    this.nlp.createEntityType(tempEntity.type).subscribe({
+      next: (e) => {
         if (e) {
           // update of application entities
           const entities = this.stateService.entityTypes.getValue().slice(0);
@@ -284,10 +284,10 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           console.log(`Error when creating Entity Type ${tempEntity.type}`);
         }
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
       }
-    );
+    });
   }
 
   postNewSentence(task: DependencyUpdateJob, intent: Intent, tempSentence: TempSentence): void {
@@ -301,15 +301,15 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
         tempSentence.classification.entities.forEach((entity) => (entity.subEntities = []));
         sentence.classification.entities = tempSentence.classification.entities as ClassifiedEntity[];
         sentence.status = SentenceStatus.validated;
-        this.nlp.updateSentence(sentence).subscribe(
-          (_res) => {
+        this.nlp.updateSentence(sentence).subscribe({
+          next: (_res) => {
             task.item.intentDefinition.sentences = task.item.intentDefinition.sentences.filter((s) => s != tempSentence);
             this.processIntent(task);
           },
-          (error) => {
+          error: (error) => {
             console.log(error);
           }
-        );
+        });
       },
       (error) => {
         console.log(error);
@@ -372,8 +372,8 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
 
   postAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
     let request = new CreateI18nLabelRequest('scenario', answerTask.answer.answer, answerTask.answer.locale);
-    this.botService.createI18nLabel(request).subscribe(
-      (answer) => {
+    this.botService.createI18nLabel(request).subscribe({
+      next: (answer) => {
         if (unknownAnswer) {
           answerTask.item.actionDefinition.unknownAnswerId = answer._id;
         } else {
@@ -384,10 +384,10 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
         answerTask.done = true;
         this.processDependencies();
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
       }
-    );
+    });
   }
 
   patchAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
@@ -410,17 +410,17 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
       );
     }
 
-    this.botService.saveI18nLabel(i18nLabel).subscribe(
-      (result) => {
+    this.botService.saveI18nLabel(i18nLabel).subscribe({
+      next: (result) => {
         delete answerTask.answer.answerUpdate;
 
         answerTask.done = true;
         this.processDependencies();
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
       }
-    );
+    });
   }
 
   tickStoryPostSuccessfull: boolean = false;
@@ -430,8 +430,8 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
     this.tickStoryErrors = undefined;
     const story = this.compileTickStory();
 
-    this.scenarioService.postTickStory(story).subscribe(
-      (res) => {
+    this.scenarioService.postTickStory(story).subscribe({
+      next: (res) => {
         // Successful save. We pass the scenario state to "current" and save it
         this.scenario.state = SCENARIO_STATE.current;
         this.scenarioDesignerService.saveScenario(this.scenario).subscribe((data) => {
@@ -447,7 +447,7 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           setTimeout(() => this.scenarioDesignerService.exitDesigner(), 3000);
         });
       },
-      (error) => {
+      error: (error) => {
         // Errors have occurred, let's inform the user.
         this.tickStoryErrors = error.error?.errors
           ? error.error?.errors
@@ -455,7 +455,7 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           ? [{ message: error }]
           : [{ message: 'An unknown error occured' }];
       }
-    );
+    });
   }
 
   private compileTickStory(): TickStory {

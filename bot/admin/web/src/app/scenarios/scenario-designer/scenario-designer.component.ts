@@ -107,13 +107,19 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
 
         this.switchMode(this.scenarioVersion.data.mode || SCENARIO_MODE.writing);
 
-        this.botService
-          .i18nLabels()
-          .pipe(take(1))
-          .subscribe((results) => {
-            this.i18n = results;
-            this.checkDependencies();
-          });
+        const allAnswersIds = this.getAllAnswersIds();
+        if (allAnswersIds.length) {
+          this.botService
+            .searchI18nLabels(allAnswersIds)
+            .pipe(take(1))
+            .subscribe((results) => {
+              this.i18n = results;
+              this.checkDependencies();
+            });
+        } else {
+          this.i18n = { labels: [], localeBase: 'en' };
+          this.checkDependencies();
+        }
 
         this.updateScenarioBackup(this.scenarioVersion);
       });
@@ -206,6 +212,19 @@ export class ScenarioDesignerComponent implements OnInit, OnDestroy {
       .subscribe((stories: StoryDefinitionConfigurationSummary[]) => {
         this.availableStories = stories;
       });
+  }
+
+  private getAllAnswersIds(): string[] {
+    let answersIds = new Set<string>();
+    this.scenarioVersion.data.scenarioItems.forEach((item) => {
+      if (item.actionDefinition?.answerId) {
+        answersIds.add(item.actionDefinition.answerId);
+      }
+      if (item.actionDefinition?.unknownAnswerId) {
+        answersIds.add(item.actionDefinition.unknownAnswerId);
+      }
+    });
+    return [...answersIds];
   }
 
   private checkDependencies(): void {
