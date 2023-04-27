@@ -20,7 +20,7 @@ import { ScenarioService } from '../../services';
 import { ScenarioEditComponent } from './scenario-edit.component';
 import { AutocompleteInputComponent, FormControlComponent } from '../../../shared/components';
 import { StateService } from '../../../core-nlp/state.service';
-import { I18nLabels } from '../../../bot/model/i18n';
+import { I18nLabel, I18nLabels } from '../../../bot/model/i18n';
 import { UserInterfaceType } from '../../../core/model/configuration';
 import { TestingModule } from '../../../../testing';
 import { StubNbDialogService, StubStateService } from '../../../../testing/stubs';
@@ -38,8 +38,8 @@ class StubScenarioService {
 }
 
 class StubBotService {
-  i18nLabels() {
-    return of(mockI18nLabels);
+  i18nLabel() {
+    return of(mockI18nLabel);
   }
 }
 
@@ -52,39 +52,34 @@ const mockScenarioGroup = {
   unknownAnswerId: 'app_test_1'
 } as ScenarioGroup;
 
-const mockI18nLabels = {
-  labels: [
+const mockI18nLabel = {
+  _id: 'app_test_1',
+  namespace: 'app',
+  category: 'test',
+  i18n: [
     {
-      _id: 'app_test_1',
-      namespace: 'app',
-      category: 'test',
-      i18n: [
-        {
-          locale: 'en',
-          interfaceType: UserInterfaceType.textChat,
-          label: 'mockI18nLabels_2',
-          validated: true,
-          alternatives: []
-        },
-        {
-          locale: 'fr',
-          interfaceType: UserInterfaceType.textChat,
-          label: 'mockI18nLabels_1',
-          validated: true,
-          alternatives: []
-        },
-        {
-          locale: 'fr',
-          interfaceType: UserInterfaceType.voiceAssistant,
-          label: 'mockI18nLabels_3',
-          validated: true,
-          alternatives: []
-        }
-      ]
+      locale: 'en',
+      interfaceType: UserInterfaceType.textChat,
+      label: 'mockI18nLabels_2',
+      validated: true,
+      alternatives: []
+    },
+    {
+      locale: 'fr',
+      interfaceType: UserInterfaceType.textChat,
+      label: 'mockI18nLabels_1',
+      validated: true,
+      alternatives: []
+    },
+    {
+      locale: 'fr',
+      interfaceType: UserInterfaceType.voiceAssistant,
+      label: 'mockI18nLabels_3',
+      validated: true,
+      alternatives: []
     }
-  ],
-  localeBase: 'en'
-} as I18nLabels;
+  ]
+} as I18nLabel;
 
 describe('ScenarioEditComponent', () => {
   let component: ScenarioEditComponent;
@@ -312,7 +307,7 @@ describe('ScenarioEditComponent', () => {
         redirect: false,
         scenarioGroup,
         unknownAnswers,
-        i18nLabel: mockI18nLabels.labels[0]
+        i18nLabel: mockI18nLabel
       });
     });
 
@@ -350,7 +345,7 @@ describe('ScenarioEditComponent', () => {
         redirect: true,
         scenarioGroup,
         unknownAnswers,
-        i18nLabel: mockI18nLabels.labels[0]
+        i18nLabel: mockI18nLabel
       });
     });
   });
