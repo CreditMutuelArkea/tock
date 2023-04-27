@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,14 @@
 package ai.tock.bot.admin.verticle
 
 import ai.tock.bot.admin.indicators.IndicatorError
+import ai.tock.bot.admin.indicators.metric.MetricFilter
 import ai.tock.bot.admin.model.Valid
 import ai.tock.bot.admin.model.ValidationError
 import ai.tock.bot.admin.model.indicator.SaveIndicatorRequest
 import ai.tock.bot.admin.model.indicator.UpdateIndicatorRequest
+import ai.tock.bot.admin.model.indicator.metric.Requests
 import ai.tock.bot.admin.service.IndicatorService
+import ai.tock.bot.admin.service.MetricService
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import ai.tock.shared.exception.rest.NotFoundException
@@ -43,11 +46,13 @@ class IndicatorVerticle {
         const val PATH_PARAM_APPLICATION_NAME = "applicationName"
         const val PATH_PARAM_NAME = "name"
         private const val INDICATORS = "indicators"
+        private const val METRICS = "metrics"
         const val ALL_INDICATORS = "/$INDICATORS"
         private const val BOT = "bot"
         const val INDICATORS_BY_APPLICATION_NAME_PATH = "/$BOT/:$PATH_PARAM_APPLICATION_NAME/$INDICATORS"
         const val BY_APPLICATION_NAME_AND_BY_NAME_PATH =
             "/$BOT/:$PATH_PARAM_APPLICATION_NAME/$INDICATORS/:$PATH_PARAM_NAME"
+        const val METRICS_BY_APPLICATION_NAME_PATH = "/$BOT/:$PATH_PARAM_APPLICATION_NAME/$METRICS"
     }
 
     private val front = FrontClient
@@ -130,6 +135,13 @@ class IndicatorVerticle {
                     }
                 } ?: false
             }
+
+            blockingJsonPost(METRICS_BY_APPLICATION_NAME_PATH, authorizedRoles) {
+                    context: RoutingContext, request: Requests ->
+                checkNamespaceAndExecute(context, currentContextApp) {
+                    MetricService.filterAndGroupBy(createFilterMetric(it.name, request.filter), request.groupBy)
+                }
+            }
         }
     }
 
@@ -138,6 +150,14 @@ class IndicatorVerticle {
      * @param context : the vertx routing context
      */
     private fun getNamespace(context: RoutingContext) = (context.user() as TockUser).namespace
+
+    /**
+     * Merge botId on requested [MetricFilter]
+     * @param botId the bot id
+     * @param filter a given [MetricFilter]
+     */
+    private fun createFilterMetric(botId: String, filter: MetricFilter?)
+            = filter?.copy(botId) ?: MetricFilter(botId)
 }
 
 /**

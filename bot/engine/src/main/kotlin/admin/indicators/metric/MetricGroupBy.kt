@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@
 package ai.tock.bot.admin.indicators.metric
 
 /**
- * Type of [Metric]
+ * Metric group by attributes
  */
-enum class TypeMetric {
-    QUESTION_ASKED,
-    QUESTION_REPLIED,
-    STORY_HANDLED
+enum class MetricGroupBy {
+    TYPE,
+    EMITTER_STORY_ID,
+    TRACKED_STORY_ID,
+    INDICATOR_NAME,
+    INDICATOR_VALUE_NAME,
 }

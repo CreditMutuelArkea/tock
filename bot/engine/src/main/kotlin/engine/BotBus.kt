@@ -17,7 +17,7 @@
 package ai.tock.bot.engine
 
 import ai.tock.bot.admin.indicators.metric.Metric
-import ai.tock.bot.admin.indicators.metric.TypeMetric
+import ai.tock.bot.admin.indicators.metric.MetricType
 import ai.tock.bot.connector.Connector
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
@@ -451,7 +451,7 @@ interface BotBus : Bus<BotBus> {
      * @param indicatorName optional indicator name
      * @param indicatorValueName optional indicator value name
      */
-    fun createMetric(type: TypeMetric, indicatorName: String? = null, indicatorValueName: String? = null) =
+    fun createMetric(type: MetricType, indicatorName: String? = null, indicatorValueName: String? = null) =
         Metric(
             type = type,
             indicatorName = indicatorName,

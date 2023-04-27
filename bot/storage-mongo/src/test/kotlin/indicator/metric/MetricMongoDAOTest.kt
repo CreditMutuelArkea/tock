@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@
 package ai.tock.bot.mongo.indicator.metric
 
 import ai.tock.bot.admin.indicators.metric.Metric
-import ai.tock.bot.admin.indicators.metric.TypeMetric
-import ai.tock.bot.engine.dialog.Dialog
+import ai.tock.bot.admin.indicators.metric.MetricType
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.mongo.AbstractTest
-import indicators.IndicatorMongoDAO
-import indicators.metric.MetricMongoDAO
+import indicator.metric.MetricMongoDAO
 import io.mockk.clearAllMocks
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -40,7 +38,7 @@ class MetricMongoDAOTest : AbstractTest() {
     private val creationDate = Instant.now().truncatedTo(ChronoUnit.MILLIS)
 
     private val metric1 = Metric(
-        type = TypeMetric.QUESTION_REPLIED,
+        type = MetricType.QUESTION_REPLIED,
         indicatorName = "name1",
         indicatorValueName = "value1",
         emitterStoryId = "storyId1",
@@ -55,7 +53,7 @@ class MetricMongoDAOTest : AbstractTest() {
     )
 
     private val metric2 = Metric(
-        type = TypeMetric.QUESTION_REPLIED,
+        type = MetricType.QUESTION_REPLIED,
         indicatorName = "name2",
         indicatorValueName = "value2",
         emitterStoryId = "storyId3",
@@ -70,7 +68,7 @@ class MetricMongoDAOTest : AbstractTest() {
     )
 
     private val metric3 = Metric(
-        type = TypeMetric.QUESTION_REPLIED,
+        type = MetricType.QUESTION_REPLIED,
         indicatorName = "name3",
         indicatorValueName = "value3",
         emitterStoryId = "storyId4",
