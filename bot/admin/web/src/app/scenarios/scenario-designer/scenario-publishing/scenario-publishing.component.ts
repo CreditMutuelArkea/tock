@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 
@@ -33,7 +33,7 @@ import { ScenarioDesignerService } from '../scenario-designer.service';
   templateUrl: './scenario-publishing.component.html',
   styleUrls: ['./scenario-publishing.component.scss']
 })
-export class ScenarioPublishingComponent implements OnInit, OnDestroy {
+export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
   @Input() scenario: ScenarioVersionExtended;
   @Input() isReadonly: boolean;
   @Input() i18n: I18nLabels;
@@ -56,7 +56,8 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
 
   tickStoryJson: string;
 
-  ngOnInit(): void {
+  // we check the dependencies after each scenario save in order not to lose the reference of the involved objects
+  ngOnChanges(changes: SimpleChanges): void {
     if (!this.isReadonly) {
       this.checkDependencies();
     }
@@ -107,6 +108,14 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
     return unPublishable;
   }
 
+  getJobsType(jobs: DependencyUpdateJob[]): string {
+    return jobs[0].type;
+  }
+
+  areAllJobsTypeDone(jobs: DependencyUpdateJob[]): boolean {
+    return jobs.every((job) => job.done);
+  }
+
   dependencies: { [key: string]: DependencyUpdateJob[] } = {
     intentsToCreate: [],
     intentsToUpdate: [],
@@ -116,15 +125,16 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
     unknownAnswersToUpdate: []
   };
 
-  getJobsType(jobs: DependencyUpdateJob[]): string {
-    return jobs[0].type;
-  }
-
-  areAllJobsTypeDone(jobs: DependencyUpdateJob[]): boolean {
-    return jobs.every((job) => job.done);
+  resetDependencies(): void {
+    for (const attibute in this.dependencies) {
+      this.dependencies[attibute] = [];
+    }
   }
 
   checkDependencies(): void {
+    // We empty any dependencies already listed before redoing the inventory of changes to save
+    this.resetDependencies();
+
     getScenarioIntents(this.scenario).forEach((intent) => {
       if (!intent.intentDefinition.intentId && intent.intentDefinition.sentences?.length) {
         this.dependencies.intentsToCreate.push({
@@ -490,12 +500,11 @@ export class ScenarioPublishingComponent implements OnInit, OnDestroy {
 
     const actionsDefinitions = deepCopy(getScenarioActionDefinitions(this.scenario));
 
-    // If an action refers to a targetStory, we delete all that concerns the unknown answers and the output contexts which, in this case, are useless
+    // If an action refers to a targetStory, we delete everything concerning unknown answers
     actionsDefinitions.forEach((actionDef) => {
       if (actionDef.targetStory) {
         delete actionDef.unknownAnswerId;
         delete actionDef.unknownAnswers;
-        actionDef.outputContextNames = [];
       }
     });
 

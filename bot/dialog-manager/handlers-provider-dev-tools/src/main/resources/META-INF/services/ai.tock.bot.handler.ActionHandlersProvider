@@ -16,3 +16,4 @@
 #
 
 ai.tock.bot.DevToolsHandlersProvider
+ai.tock.bot.IAdvizeHandlersProvider

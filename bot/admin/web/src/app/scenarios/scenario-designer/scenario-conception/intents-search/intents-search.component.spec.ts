@@ -1,13 +1,13 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbDialogRef } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 import { of } from 'rxjs';
 
+import { IntentsSearchComponent } from './intents-search.component';
+import { ScenarioService } from '../../../services';
 import { StateService } from '../../../../core-nlp/state.service';
 import { NlpService } from '../../../../nlp-tabs/nlp.service';
-import { ScenarioService } from '../../../services';
-import { IntentsSearchComponent } from './intents-search.component';
+import { TestingModule } from '../../../../../testing';
 
 describe('IntentsSearchComponent', () => {
   let component: IntentsSearchComponent;

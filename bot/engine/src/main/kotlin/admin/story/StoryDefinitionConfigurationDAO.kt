@@ -63,7 +63,7 @@ interface StoryDefinitionConfigurationDAO {
     )
 
     fun getStoryDefinitionsByNamespaceAndBotId(namespace: String, botId: String): List<StoryDefinitionConfiguration>
-
+    fun getStoryDefinitionsByNamespaceAndBotIdWithFileAttached(namespace: String, botId: String): List<StoryDefinitionConfiguration>
     fun save(story: StoryDefinitionConfiguration)
 
     fun delete(story: StoryDefinitionConfiguration)
@@ -82,4 +82,9 @@ interface StoryDefinitionConfigurationDAO {
      * Get all story definitions with a given category
      */
     fun getStoryDefinitionByCategory(category: String): List<StoryDefinitionConfiguration>
+
+    /**
+     * Get all story definitions with a given category and a given storyId
+     */
+    fun getStoryDefinitionByCategoryAndStoryId(category: String, storyId: String): StoryDefinitionConfiguration?
 }

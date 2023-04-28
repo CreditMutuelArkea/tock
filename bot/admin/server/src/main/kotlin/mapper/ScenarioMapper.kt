@@ -34,7 +34,7 @@ import org.litote.kmongo.toId
  */
 object ScenarioMapper {
     /**
-     * Lambda to map an [ScenarioGroup] to a [ScenarioGroupResponse]
+     * Map an [ScenarioGroup] to a [ScenarioGroupResponse]
      */
     fun ScenarioGroup.toScenarioGroupResponse(): ScenarioGroupResponse {
         return ScenarioGroupResponse(
@@ -48,12 +48,13 @@ object ScenarioMapper {
             versions = versions.map {
                 it.toScenarioVersionWithoutData()
             },
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 
     /**
-     * Lambda to map an [ScenarioVersion] to a [ScenarioVersionResponse]
+     * Map an [ScenarioVersion] to a [ScenarioVersionResponse]
      */
     fun ScenarioVersion.toScenarioVersionResponse(): ScenarioVersionResponse {
         return ScenarioVersionResponse(
@@ -67,7 +68,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ScenarioVersion] to a [ScenarioVersionWithoutData]
+     * Map an [ScenarioVersion] to a [ScenarioVersionWithoutData]
      */
     fun ScenarioVersion.toScenarioVersionWithoutData(): ScenarioVersionWithoutData {
         return ScenarioVersionWithoutData(
@@ -80,7 +81,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ScenarioGroupRequest] to a [ScenarioGroup]
+     * Map an [ScenarioGroupRequest] to a [ScenarioGroup]
      * @param botId: id of the bot
      */
     fun ScenarioGroupRequest.toScenarioGroup(botId: String): ScenarioGroup {
@@ -88,7 +89,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ScenarioGroupRequest] to a [ScenarioGroup]
+     * Map an [ScenarioGroupRequest] to a [ScenarioGroup]
      * @param botId: id of the bot
      * @param scenarioGroupId: id of the scenario group
      */
@@ -101,12 +102,13 @@ object ScenarioMapper {
             tags = tags,
             description = description,
             versions = emptyList(),
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 
     /**
-     * Lambda to map an [ScenarioGroupWithVersionsRequest] to a [ScenarioGroup]
+     * Map an [ScenarioGroupWithVersionsRequest] to a [ScenarioGroup]
      * @param botId: id of the bot
      */
     fun ScenarioGroupWithVersionsRequest.toScenarioGroup(botId: String): ScenarioGroup {
@@ -114,7 +116,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ScenarioGroupWithVersionsRequest] to a [ScenarioGroup]
+     * Map an [ScenarioGroupWithVersionsRequest] to a [ScenarioGroup]
      * @param botId: id of the bot
      * @param scenarioGroupId: id of the scenario group
      */
@@ -127,12 +129,13 @@ object ScenarioMapper {
             tags = tags,
             description = description,
             versions = versions.map { it.toScenarioVersion(scenarioGroupId) },
-            enabled = enabled
+            enabled = enabled,
+            unknownAnswerId = unknownAnswerId
         )
     }
 
     /**
-     * Lambda to map an [ScenarioVersionRequest] to a [ScenarioVersion]
+     * Map an [ScenarioVersionRequest] to a [ScenarioVersion]
      * @param scenarioGroupId: id of the scenario group
      */
     fun ScenarioVersionRequest.toScenarioVersion(scenarioGroupId: String): ScenarioVersion {
@@ -140,7 +143,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ScenarioVersionRequest] to a [ScenarioVersion]
+     * Map an [ScenarioVersionRequest] to a [ScenarioVersion]
      * @param scenarioGroupId: id of the scenario group
      * @param scenarioVersionId: id of the scenario version
      */
@@ -155,7 +158,7 @@ object ScenarioMapper {
     }
 
     /**
-     * Lambda to map an [ActionHandler] to a [ScenarioActionHandlerResponse]
+     * Map an [ActionHandler] to a [ScenarioActionHandlerResponse]
      */
     fun ActionHandler.toScenarioActionHandlerResponse(): ScenarioActionHandlerResponse {
         return ScenarioActionHandlerResponse(

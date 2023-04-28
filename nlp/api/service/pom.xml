@@ -21,7 +21,7 @@
     <parent>
         <groupId>ai.tock</groupId>
         <artifactId>tock-nlp-api</artifactId>
-        <version>22.9.6-SNAPSHOT</version>
+        <version>23.3.1-SNAPSHOT</version>
     </parent>
 
     <artifactId>tock-nlp-api-service</artifactId>
@@ -32,11 +32,6 @@
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-shared</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.jasypt</groupId>
-            <artifactId>jasypt</artifactId>
-            <version>${jasypt}</version>
         </dependency>
         <dependency>
             <groupId>ai.tock</groupId>

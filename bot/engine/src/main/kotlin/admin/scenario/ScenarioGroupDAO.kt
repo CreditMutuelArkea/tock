@@ -49,7 +49,7 @@ interface ScenarioGroupDAO {
     /**
      * Update a given scenario group and returns the updated scenario group
      * @param scenarioGroup: the scenario group to update
-     * @throws [ScenarioGroupNotFoundException] if the [scenarioGroup] was not found
+     * @throws [ScenarioGroupNotFoundException] if the [ScenarioVersion] was not found
      */
     fun updateOne(scenarioGroup: ScenarioGroup): ScenarioGroup
 
@@ -60,4 +60,9 @@ interface ScenarioGroupDAO {
      */
     fun deleteOneById(id: Id<ScenarioGroup>)
 
+    /**
+     * Listen any change on scenario group collection
+     * @param listener: the listener to call when a change occurs
+     */
+    fun listenChanges(listener: (ScenarioGroup) -> Unit)
 }

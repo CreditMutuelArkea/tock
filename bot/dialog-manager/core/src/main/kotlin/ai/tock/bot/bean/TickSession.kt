@@ -18,13 +18,17 @@ package ai.tock.bot.bean
 
 import java.time.Instant
 
+/**
+ * A session for tick story processor
+ */
 data class TickSession(
     val currentState: String? = null,
     val contexts: Map<String, String?> = emptyMap(),
     val ranHandlers: List<String> = emptyList(),
     val objectivesStack: List<String> = emptyList(),
-    val init: Instant = Instant.now(),
+    val initDate: Instant = Instant.now(),
     val unknownHandlingStep: UnknownHandlingStep? = null,
-    val handlingStep: TickActionHandlingStep? = null
+    val handlingStep: TickActionHandlingStep? = null,
+    val finished: Boolean = false
 )
 

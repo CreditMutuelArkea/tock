@@ -31,17 +31,17 @@ data class ScenarioVersion(
 ) {
 
     /**
-     * Return true when scenario version state is draft
+     * Return true when scenario version state is [ScenarioVersionState.DRAFT]
      */
     fun isDraft(): Boolean = isState(ScenarioVersionState.DRAFT)
 
     /**
-     * Return true when scenario version state is current
+     * Return true when scenario version state is [ScenarioVersionState.CURRENT]
      */
     fun isCurrent(): Boolean = isState(ScenarioVersionState.CURRENT)
 
-    /*
-     * Return true when state is the specified state
+    /**
+     * Return true when state is the specified state [ScenarioVersionState]
      */
     private fun isState(stateRequired: ScenarioVersionState): Boolean {
         return state === stateRequired

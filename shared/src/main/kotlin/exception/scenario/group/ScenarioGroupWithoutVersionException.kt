@@ -18,4 +18,4 @@ package ai.tock.shared.exception.scenario.group
 
 import ai.tock.shared.exception.scenario.ScenarioException
 
-class ScenarioGroupWithoutVersionException : ScenarioException("The Scenario group has no versions")
+class ScenarioGroupWithoutVersionException : ScenarioException("The scenario group has no versions")

@@ -24,6 +24,9 @@ import ai.tock.shared.security.TockUserRole
 import ai.tock.shared.vertx.WebVerticle
 import io.vertx.ext.web.RoutingContext
 
+/**
+ * [ScenarioSettingsVerticle] contains all the routes and actions associated with the scenario settings
+ */
 class ScenarioSettingsVerticle {
 
     companion object {
@@ -52,7 +55,9 @@ class ScenarioSettingsVerticle {
                 val id = context.pathId<ApplicationDefinition>(PATH_PARAM_APPLICATION_ID)
                 val applicationDefinition = front.getApplicationById(id)
                 if (context.organization == applicationDefinition?.namespace) {
-                    ScenarioSettingsService.getScenarioSettingsByApplicationId(id.toString())?.toScenarioSettingsQuery()
+                    ScenarioSettingsService.getScenarioSettingsByBotId(applicationDefinition.name)?.let {
+                     ScenarioSettingsQuery(it.actionRepetitionNumber, it.redirectStoryId)
+                    }
                 } else {
                     WebVerticle.unauthorized()
                 }

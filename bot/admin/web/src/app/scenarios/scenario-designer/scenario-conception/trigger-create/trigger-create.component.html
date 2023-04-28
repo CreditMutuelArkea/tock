@@ -26,6 +26,7 @@
         [hasMargin]="false"
       >
         <input
+          tockAutofocusElement
           nbInput
           formControlName="trigger"
           fullWidth
@@ -33,7 +34,6 @@
           type="text"
           placeholder="Enter new event"
           (keyup)="formatTriggerName()"
-          autofocusElement
           data-testid="trigger"
         />
       </tock-form-control>

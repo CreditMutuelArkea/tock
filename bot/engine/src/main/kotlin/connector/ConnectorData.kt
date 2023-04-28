@@ -44,6 +44,10 @@ open class ConnectorData(
      * An optional referer.
      */
     val referer: String? = null,
+    /**
+     * optional metadata metadata from connector
+     */
+    val metadata: Map<String, String> = emptyMap(),
 
     /**
      * A conversation key/value data.

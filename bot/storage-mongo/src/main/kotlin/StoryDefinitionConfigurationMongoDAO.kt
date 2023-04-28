@@ -52,13 +52,11 @@ import org.litote.jackson.data.JacksonData
 import org.litote.kmongo.Data
 import org.litote.kmongo.Id
 import org.litote.kmongo.aggregate
-import org.litote.kmongo.and
 import org.litote.kmongo.ascending
 import org.litote.kmongo.contains
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.document
 import org.litote.kmongo.eq
-import org.litote.kmongo.fields
 import org.litote.kmongo.find
 import org.litote.kmongo.findOne
 import org.litote.kmongo.findOneById
@@ -78,6 +76,9 @@ import org.litote.kmongo.save
 import org.litote.kmongo.withDocumentClass
 import java.time.Instant
 import java.time.ZonedDateTime
+import com.mongodb.client.model.Filters.and
+import com.mongodb.client.model.Filters.exists
+
 
 /**
  *
@@ -124,6 +125,16 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
 
     override fun getStoryDefinitionById(id: Id<StoryDefinitionConfiguration>): StoryDefinitionConfiguration? {
         return col.findOneById(id)
+    }
+
+    override fun getStoryDefinitionsByNamespaceAndBotIdWithFileAttached(
+        namespace: String,
+        botId: String
+    ): List<StoryDefinitionConfiguration> {
+        return col.find(
+            Namespace eq namespace, BotId eq botId,
+            exists("answers.answers.mediaMessage.file.id", true)
+        ).toList()
     }
 
     override fun getRuntimeStorySettings(namespace: String, botId: String): List<StoryDefinitionConfiguration> {
@@ -267,6 +278,18 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
 
     override fun getStoryDefinitionByCategory(category: String): List<StoryDefinitionConfiguration> {
        return col.find(Category eq category).toList()
+    }
+
+    override fun getStoryDefinitionByCategoryAndStoryId(
+        category: String,
+        storyId: String
+    ): StoryDefinitionConfiguration? {
+        return col.findOne {
+         and(
+            Category eq category,
+            StoryId eq storyId
+         )
+        }
     }
 }
 

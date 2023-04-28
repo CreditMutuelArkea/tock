@@ -2,15 +2,15 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbSpinnerModule, NbToastrService, NbToggleModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { NbToastrServiceMock } from '@tock/testing/mockedClass';
 import { of, Subject } from 'rxjs';
 
+import { FaqTrainingComponent, SentenceExtended } from './faq-training.component';
+import { Action } from '../models';
 import { StateService } from '../../core-nlp/state.service';
 import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../model/nlp';
 import { NlpService } from '../../nlp-tabs/nlp.service';
-import { Action } from '../models';
-import { FaqTrainingComponent, SentenceExtended } from './faq-training.component';
+import { TestingModule } from '../../../testing';
+import { StubNbToastrService } from '../../../testing/stubs';
 
 const mockSentences: SentenceExtended[] = [
   {
@@ -114,7 +114,7 @@ describe('FaqTrainingComponent', () => {
       providers: [
         { provide: NlpService, useClass: NlpServiceMock },
         { provide: StateService, useClass: StateServiceMock },
-        { provide: NbToastrService, useClass: NbToastrServiceMock }
+        { provide: NbToastrService, useClass: StubNbToastrService }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     }).compileComponents();

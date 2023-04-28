@@ -16,18 +16,18 @@
 package ai.tock.bot.graphsolver
 
 import ai.tock.bot.bean.TickAction
+import ai.tock.bot.exception.NoClyngorResultsFound
+import ai.tock.shared.property
+import ai.tock.shared.resource
 import jep.SharedInterpreter
-import mu.KotlinLogging
 
 /**
  * Class that handles the call to the Clyngor python library
  */
 object GraphSolver {
 
-    private val logger = KotlinLogging.logger {}
-    private const val pythonPath = "/tmp/python"
-    private const val pythonScriptPath = "$pythonPath/script"
-    private const val pythonLogPath = "$pythonPath/log"
+    private val pythonPath = property("tock_bot_dialog_manager_python_path", resource("/python").path)
+    private val pythonScriptPath = "$pythonPath/script"
 
     fun solve(
         debugEnabled: Boolean = false,
@@ -35,7 +35,7 @@ object GraphSolver {
         actions: Set<TickAction>,
         contexts: Map<String, String?>,
         objective: TickAction,
-        ran_handlers: Set<String?>?
+        ranHandlers: Set<String?>?
     ): List<String> {
 
         // Preparation of input data (Data conversion)
@@ -55,7 +55,6 @@ object GraphSolver {
 
         val results = SharedInterpreter().use { interp ->
             interp.set("pythonScriptPath", pythonScriptPath)
-            interp.set("pythonLogPath", pythonLogPath)
 
             interp.runScript("$pythonScriptPath/graph-solver.py")
             interp.invoke(
@@ -65,18 +64,16 @@ object GraphSolver {
                 botActions,
                 target,
                 availableContexts,
-                ran_handlers
+                ranHandlers
             )
         }
-
-        logger.debug("Clyngor results: $results")
 
         return (results as List<String>).getIfNotEmpty()
     }
 
     private fun List<String>.getIfNotEmpty(): List<String>{
         if(this.isEmpty()) {
-            error("No clyngor results found !")
+            throw NoClyngorResultsFound("No clyngor results found !")
         }
         return this
     }

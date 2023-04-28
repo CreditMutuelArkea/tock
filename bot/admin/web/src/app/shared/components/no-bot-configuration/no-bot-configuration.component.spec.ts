@@ -1,8 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbAlertModule, NbIconModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { NoBotConfigurationComponent } from './no-bot-configuration.component';
+import { TestingModule } from '../../../../testing';
 
 describe('NoBotConfigurationComponent', () => {
   let component: NoBotConfigurationComponent;

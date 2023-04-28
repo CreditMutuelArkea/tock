@@ -15,7 +15,6 @@ import {
   NbSelectModule,
   NbTooltipModule
 } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 import { BehaviorSubject } from 'rxjs';
 
 import { Classification, SentenceStatus } from '../../../model/nlp';
@@ -24,6 +23,7 @@ import { Pagination, PaginationComponent } from '../../../shared/components';
 import { FaqTrainingComponent, SentenceExtended } from '../faq-training.component';
 import { FaqTrainingListComponent } from './faq-training-list.component';
 import { Action } from '../../models';
+import { TestingModule } from '../../../../testing';
 
 const mockSentences: SentenceExtended[] = [
   {

@@ -47,6 +47,7 @@ import { MediaDialogComponent } from './story/media/media-dialog.component';
 import { ThemeModule } from '../theme/theme.module';
 import {
   NbAccordionModule,
+  NbAutocompleteModule,
   NbBadgeModule,
   NbButtonModule,
   NbCardModule,
@@ -71,6 +72,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { I18nExportComponent } from './i18n/i18n-export.component';
 import { I18nImportComponent } from './i18n/i18n-import.component';
 import { ApplicationFeaturesTableComponent } from './feature/application-features-table.component';
+import {DocumentsStoryComponent} from "./story/documents-story.component";
 
 const routes: Routes = [
   {
@@ -102,6 +104,10 @@ const routes: Routes = [
       {
         path: 'story-rules',
         component: FeatureComponent
+      },
+      {
+        path: 'story-documents',
+        component: DocumentsStoryComponent
       }
     ]
   }
@@ -114,63 +120,73 @@ const routes: Routes = [
 export class BotRoutingModule {}
 
 @NgModule({
-    imports: [
-        CommonModule,
-        SharedModule,
-        BotSharedModule,
-        BotRoutingModule,
-        InfiniteScrollModule,
-        MomentModule,
-        NlpModule,
-        FileUploadModule,
-        BotConfigurationModule,
-        ThemeModule,
-        NbRouteTabsetModule,
-        NbBadgeModule,
-        NbCardModule,
-        NbSpinnerModule,
-        NbCheckboxModule,
-        NbAccordionModule,
-        NbSelectModule,
-        NbTooltipModule,
-        NbInputModule,
-        NbRadioModule,
-        MatCardModule,
-        MatIconModule,
-        MatGridListModule,
-        NbFormFieldModule,
-        NbIconModule,
-        NbButtonModule
-    ],
-    declarations: [
-        BotTabsComponent,
-        CreateStoryComponent,
-        SearchStoryComponent,
-        I18nComponent,
-        I18nLabelComponent,
-        I18nExportComponent,
-        I18nImportComponent,
-        FeatureComponent,
-        StoryComponent,
-        AnswerComponent,
-        SimpleAnswerComponent,
-        ScriptAnswerComponent,
-        StoryDialogComponent,
-        AnswerDialogComponent,
-        MandatoryEntitiesDialogComponent,
-        SelectEntityDialogComponent,
-        StepDialogComponent,
-        StepComponent,
-        StepsComponent,
-        MediaDialogComponent,
-        ApplicationFeatureComponent,
-        ApplicationFeaturesTableComponent,
-        StoryRuleComponent,
-        StoryRuntimeSettingsComponent,
-        StoryTagComponent
-    ],
-    exports: [],
-    providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard]
+  imports: [
+    CommonModule,
+    SharedModule,
+    BotSharedModule,
+    BotRoutingModule,
+    InfiniteScrollModule,
+    MomentModule,
+    NlpModule,
+    FileUploadModule,
+    BotConfigurationModule,
+    ThemeModule,
+    NbRouteTabsetModule,
+    NbBadgeModule,
+    NbCardModule,
+    NbSpinnerModule,
+    NbCheckboxModule,
+    NbAccordionModule,
+    NbSelectModule,
+    NbTooltipModule,
+    NbInputModule,
+    NbRadioModule,
+    MatCardModule,
+    MatIconModule,
+    MatGridListModule,
+    NbFormFieldModule,
+    NbIconModule,
+    NbButtonModule,
+    NbAutocompleteModule
+  ],
+  declarations: [
+    BotTabsComponent,
+    CreateStoryComponent,
+    SearchStoryComponent,
+    DocumentsStoryComponent,
+    I18nComponent,
+    I18nLabelComponent,
+    I18nExportComponent,
+    I18nImportComponent,
+    FeatureComponent,
+    StoryComponent,
+    AnswerComponent,
+    SimpleAnswerComponent,
+    ScriptAnswerComponent,
+    StoryDialogComponent,
+    AnswerDialogComponent,
+    MandatoryEntitiesDialogComponent,
+    SelectEntityDialogComponent,
+    StepDialogComponent,
+    StepComponent,
+    StepsComponent,
+    MediaDialogComponent,
+    ApplicationFeatureComponent,
+    ApplicationFeaturesTableComponent,
+    StoryRuleComponent,
+    StoryRuntimeSettingsComponent,
+    StoryTagComponent
+  ],
+  exports: [],
+  providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard],
+  entryComponents: [
+    StoryDialogComponent,
+    AnswerDialogComponent,
+    MandatoryEntitiesDialogComponent,
+    SelectEntityDialogComponent,
+    StepDialogComponent,
+    MediaDialogComponent
+  ]
 })
 export class BotModule {
   constructor() {}

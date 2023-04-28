@@ -29,10 +29,20 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.event.MetadataEvent
 import ai.tock.bot.engine.event.TypingOnEvent
-import ai.tock.bot.engine.user.*
+import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.engine.user.UserLock
+import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.bot.engine.user.UserTimelineDAO
 import ai.tock.bot.processor.debugEnabled
-import ai.tock.shared.*
+import ai.tock.shared.Executor
+import ai.tock.shared.booleanProperty
+import ai.tock.shared.error
+import ai.tock.shared.injector
+import ai.tock.shared.intProperty
 import ai.tock.shared.jackson.mapper
+import ai.tock.shared.longProperty
+import ai.tock.shared.provide
 import ai.tock.stt.STT
 import com.github.salomonbrys.kodein.instance
 import io.vertx.core.Future
@@ -82,7 +92,7 @@ internal class TockConnectorController constructor(
                     connector.register(this)
 
                     if(debugEnabled) {
-                        // TODO MASS: JIRA DERCBOT-321
+                        // FIXME (WITH DERCBOT-321)
                         exposePythonLog()
                     }
                 }
@@ -257,7 +267,7 @@ internal class TockConnectorController constructor(
     override fun toString(): String = configuration.toString()
 
 
-    // TODO MASS : do rollback when front debug is ready
+    // FIXME (WITH DERCBOT-321)
     // ----------------------------------- DEBUG -------------------------------------
     fun exposePythonLog() {
         val path = "/dialog-manager"
@@ -279,7 +289,7 @@ internal class TockConnectorController constructor(
                 ScenarioDebugResponse("")
             }
             else {
-                val inputStream: InputStream = FileInputStream("/tmp/python/log/action-graph-full-new.png")
+                val inputStream: InputStream = FileInputStream("/tmp/action-graph-full-new.png")
                 val buffer = ByteArray(8192 * 4)
                 var bytesRead: Int
                 val output = ByteArrayOutputStream()

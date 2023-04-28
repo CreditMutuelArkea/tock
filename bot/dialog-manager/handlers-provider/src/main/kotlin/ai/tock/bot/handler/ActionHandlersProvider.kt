@@ -28,6 +28,8 @@ interface ActionHandlersProvider {
      */
     fun getActionHandlers(): Set<ActionHandler>
 
+    fun getActionHandlerById(id: String): ActionHandler? = getActionHandlers().firstOrNull { it.id == id }
+
     fun getNameSpace(): HandlerNamespace
 
     fun createActionHandler(

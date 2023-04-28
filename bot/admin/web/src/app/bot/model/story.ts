@@ -137,7 +137,8 @@ export class StoryDefinitionConfigurationSummary {
     public name: string = storyId,
     public _id: string,
     public description: string = '',
-    public lastEdited: Date
+    public lastEdited: Date,
+    public answers: AnswerConfiguration
   ) {}
 
   static fromJSON(json: any): StoryDefinitionConfigurationSummary {
@@ -717,6 +718,7 @@ export class MediaAction extends Media {
     const value = Object.create(MediaAction.prototype);
     const result = Object.assign(value, json, {
       title: I18nLabel.fromJSON(json.title),
+      internalId : Math.random(),
       type: MediaType.action
     });
     return result;

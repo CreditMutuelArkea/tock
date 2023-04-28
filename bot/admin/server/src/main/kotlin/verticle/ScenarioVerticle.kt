@@ -35,41 +35,41 @@ import mu.KLogger
 import mu.KotlinLogging
 
 /**
- * ScenarioVerticle contains all the routes and actions associated with the scenarios
+ * [ScenarioVerticle] contains all the routes and actions associated with the scenarios
  */
-open class ScenarioVerticle {
+class ScenarioVerticle {
 
-    private val logger: KLogger = KotlinLogging.logger {}
-    //private val ScenarioServiceImpl: ScenarioServiceImpl by injector.instance()
+    companion object {
+        private val logger: KLogger = KotlinLogging.logger {}
 
-    private val botId = "botId"
-    private val groupId = "groupId"
-    private val versionId = "versionId"
-    private val tickStoryId = "tickStoryId"
+        private const val botId = "botId"
+        private const val groupId = "groupId"
+        private const val versionId = "versionId"
 
-    private val importOneScenarioGroupPath    = "/bot/:$botId/scenarios/import/groups"
-    private val importManyScenarioVersionPath = "/bot/:$botId/scenarios/import/groups/:$groupId/versions"
-    private val createOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups"
-    private val createOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions"
+        private const val importOneScenarioGroupPath    = "/bot/:$botId/scenarios/import/groups"
+        private const val importManyScenarioVersionPath = "/bot/:$botId/scenarios/import/groups/:$groupId/versions"
+        private const val createOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups"
+        private const val createOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions"
 
-    private val getAllScenarioGroupPath       = "/bot/:$botId/scenarios/groups"
-    private val getOneScenarioGroupPath       = "/bot/:$botId/scenarios/groups/:$groupId"
-    private val getAllScenarioVersionPath     = "/bot/:$botId/scenarios/groups/:$groupId/versions"
-    private val getOneScenarioVersionPath     = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
+        private const val getAllScenarioGroupPath       = "/bot/:$botId/scenarios/groups"
+        private const val getOneScenarioGroupPath       = "/bot/:$botId/scenarios/groups/:$groupId"
+        private const val getAllScenarioVersionPath     = "/bot/:$botId/scenarios/groups/:$groupId/versions"
+        private const val getOneScenarioVersionPath     = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
 
-    private val updateOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups/:$groupId"
-    private val updateOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
+        private const val updateOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups/:$groupId"
+        private const val updateOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
 
-    private val deleteOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups/:$groupId"
-    private val deleteOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
+        private const val deleteOneScenarioGroupPath    = "/bot/:$botId/scenarios/groups/:$groupId"
+        private const val deleteOneScenarioVersionPath  = "/bot/:$botId/scenarios/groups/:$groupId/versions/:$versionId"
 
-    private val getAllActionHandlerPath     = "/bot/:$botId/dialog-manager/action-handlers"
+        private const val getAllActionHandlerPath       = "/bot/:$botId/dialog-manager/action-handlers"
+    }
 
     /**
      * Declaration of routes and their appropriate handlers
      */
     fun configureScenario(webVerticle: WebVerticle) {
-        logger.info { "Configure Scenario Verticle" }
+        logger.info { "Configure ScenarioVerticle" }
         with(webVerticle) {
             // Create
             blockingJsonPost(importOneScenarioGroupPath, setOf(botUser), handler = importOneScenarioGroup)

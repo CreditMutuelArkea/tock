@@ -3,16 +3,16 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { of, Subject } from 'rxjs';
-import { StateServiceMock } from '../../../testing/mockedClass';
+import { of } from 'rxjs';
 
-import { BotService } from '../../bot/bot-service';
-import { StateService } from '../../core-nlp/state.service';
-import { ScenarioVersionExtended, SCENARIO_ITEM_FROM_CLIENT, SCENARIO_MODE, SCENARIO_STATE } from '../models';
-import { ScenarioService } from '../services';
 import { ScenarioDesignerComponent } from './scenario-designer.component';
 import { ScenarioDesignerService } from './scenario-designer.service';
+import { ScenarioVersionExtended, SCENARIO_ITEM_FROM_CLIENT, SCENARIO_MODE, SCENARIO_STATE } from '../models';
+import { BotService } from '../../bot/bot-service';
+import { StateService } from '../../core-nlp/state.service';
+import { ScenarioService } from '../services';
+import { TestingModule } from '../../../testing';
+import { StubStateService } from '../../../testing/stubs';
 
 const testScenario: ScenarioVersionExtended = {
   id: '5',
@@ -52,7 +52,7 @@ describe('ScenarioDesignerComponent', () => {
         { provide: NbToastrService, useValue: {} },
         {
           provide: StateService,
-          useClass: StateServiceMock
+          useClass: StubStateService
         },
         {
           provide: ScenarioDesignerService,

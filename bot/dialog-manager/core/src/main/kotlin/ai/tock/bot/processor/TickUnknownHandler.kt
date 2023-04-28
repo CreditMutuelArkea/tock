@@ -19,7 +19,7 @@ package ai.tock.bot.processor
 import ai.tock.bot.bean.TickStorySettings
 import ai.tock.bot.bean.UnknownHandlingStep
 import ai.tock.bot.bean.unknown.ConfigMismatchedError
-import ai.tock.bot.bean.unknown.RetryExceededError
+import ai.tock.bot.bean.unknown.TickUnknownAnswerConfig
 import ai.tock.bot.bean.unknown.TickUnknownConfiguration
 import ai.tock.bot.sender.TickSender
 
@@ -33,6 +33,9 @@ object TickUnknownHandler {
         val redirectStoryId: String? = null
     )
 
+    /**
+     * Manage the unknown intent for a tick story
+     */
     fun handle(
         lastExecutedActionName: String,
         unknownConfiguration: TickUnknownConfiguration,
@@ -40,43 +43,35 @@ object TickUnknownHandler {
         unknownHandlingStep: UnknownHandlingStep?,
         storySettings: TickStorySettings
     ): UnknownHandleResult =
-        /*
-        Get the unknownAnswerConfig for the lastExecutedAction name
-        */
-        unknownConfiguration.unknownAnswerConfigs
-            .firstOrNull { it.action == lastExecutedActionName }
+
+        // Get the unknownAnswerConfig for the lastExecutedAction name
+        (unknownConfiguration.unknownAnswerConfigs.firstOrNull { it.action == lastExecutedActionName }
+            ?: storySettings.unknownAnswerId?.let { answerId ->
+                        TickUnknownAnswerConfig(action = lastExecutedActionName, answerId = answerId)
+            })
             ?.let { answerConfig ->
                 (
-                        /*
-                        If a not null unknownHandlingStep is provided
-                        */
+                        // If a not null unknownHandlingStep is provided
                         unknownHandlingStep?.let { step ->
-                            /*
-                            Check that the step (when it's not null) has an answerConfig
-                            equal to the unknownAnswerConfig linked to the lastExecutedAction
-                             */
-                            if(step.answerConfig notEq answerConfig) throw ConfigMismatchedError()
 
-                            /*
-                            When the answer's repetitionNb is not exceeded,
-                                increment the repeated property of the step by calling the next() method on it
-                            Else set the step to null and return the redirectStoryId
-                            */
+                            // Check that the step (when it's not null) has an answerConfig
+                            // equal to the unknownAnswerConfig linked to the lastExecutedAction
+                            if (step.answerConfig notEq answerConfig) throw ConfigMismatchedError()
+
+                            // When the answer's repetitionNb is not exceeded,
+                            // then increment the repeated property of the step by calling the next() method on it
+                            // Else set the step to null and return the redirectStoryId
                             if (storySettings.repetitionNb > step.repeated)
                                 UnknownHandleResult(handlingStep = step.next() as UnknownHandlingStep)
                             else
-                                storySettings.redirectStory?.let { UnknownHandleResult(redirectStoryId = it) } ?: throw RetryExceededError()
-
+                                UnknownHandleResult(redirectStoryId = storySettings.redirectStory)
                         } ?:
-                        /*
-                        If no unknownHandlingStep has provided, create a new Step
-                        */
-                        UnknownHandleResult(handlingStep = UnknownHandlingStep(answerConfig =  answerConfig))
+
+                        // If no unknownHandlingStep has provided, create a new Step
+                        UnknownHandleResult(handlingStep = UnknownHandlingStep(answerConfig = answerConfig))
                         )
                     .also { result ->
                         result.handlingStep?.let { step -> sender.endById(step.answerConfig.answerId) }
                     }
             } ?: UnknownHandleResult()
-
-
 }

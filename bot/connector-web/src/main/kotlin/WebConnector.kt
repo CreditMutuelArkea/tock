@@ -57,6 +57,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.listProperty
 import ai.tock.shared.longProperty
+import ai.tock.shared.propertyOrNull
 import ai.tock.shared.provide
 import ai.tock.shared.vertx.vertx
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -88,7 +89,9 @@ private val cookieAuth = booleanProperty("tock_web_cookie_auth", false)
 
 private val webConnectorBridgeEnabled = booleanProperty("tock_web_connector_bridge_enabled", false)
 
-private val webConnectorExtraHeaders = listProperty("tock_web_connector_extra_headers", emptyList())
+val webConnectorExtraHeaders = listProperty("tock_web_connector_extra_headers", emptyList())
+val webConnectorUseExtraHeadersAsMetadata: Boolean =
+    booleanProperty("tock_web_connector_use_extra_header_as_metadata_request", false)
 
 class WebConnector internal constructor(
     val applicationId: String,
@@ -103,7 +106,12 @@ class WebConnector internal constructor(
                 addSerializer(CharSequence::class.java, ToStringSerializer())
             }
         )
-        private val channels by lazy { Channels(ChannelMongoDAO) }
+        private val messageProcessor = WebMessageProcessor(
+            processMarkdown = propertyOrNull("tock_web_enable_markdown")?.toBoolean()
+            // Fallback to previous property name for backward compatibility
+            ?: propertyOrNull("allow_markdown").toBoolean()
+        )
+        private val channels by lazy { Channels(ChannelMongoDAO, messageProcessor) }
     }
 
     private val executor: Executor get() = injector.provide()
@@ -226,21 +234,46 @@ class WebConnector internal constructor(
                     applicationId
 
             val event = request.toEvent(applicationId)
-            WebRequestInfosByEvent.put(event.id.toString(), WebRequestInfos(context.request()))
+            val requestInfos = WebRequestInfos(context.request())
+            WebRequestInfosByEvent.put(event.id.toString(), requestInfos)
             val callback = WebConnectorCallback(
                 applicationId = applicationId,
                 locale = request.locale,
                 context = context,
                 webMapper = webMapper,
-                eventId = event.id.toString()
+                eventId = event.id.toString(),
+                messageProcessor = messageProcessor
             )
-            controller.handle(event, ConnectorData(callback))
+            controller.handle(
+                event,
+                ConnectorData(
+                    callback = callback,
+                    metadata = extraHeadersAsMetadata(requestInfos)
+                )
+            )
         } catch (t: Throwable) {
             BotRepository.requestTimer.throwable(t, timerData)
             context.fail(t)
         } finally {
             BotRepository.requestTimer.end(timerData)
         }
+    }
+
+    /**
+     * add extra configured Header to Metadata
+     * accessible if "tock_web_connector_use_extra_header_as_metadata_request" is true
+     * @param requestInfos [WebRequestInfos]
+     */
+    private fun extraHeadersAsMetadata(requestInfos: WebRequestInfos): Map<String, String> {
+        val metaDataExtraHeaders: MutableMap<String, String> = mutableMapOf()
+        if (webConnectorUseExtraHeadersAsMetadata) {
+            webConnectorExtraHeaders.forEach { header ->
+                requestInfos.firstHeader(header)?.let {
+                    metaDataExtraHeaders.putIfAbsent(header, it)
+                }
+            }
+        }
+        return metaDataExtraHeaders
     }
 
     private fun handleProxy(

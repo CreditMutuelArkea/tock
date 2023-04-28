@@ -60,7 +60,7 @@ interface ScenarioVersionDAO {
     /**
      * Update a given scenario version and returns the updated scenario version
      * @param scenarioVersion: the scenario version to update.
-     * @throws [ScenarioVersionNotFoundException] if the [scenarioVersion] was not found.
+     * @throws [ScenarioVersionNotFoundException] if the [ScenarioVersion] was not found.
      */
     fun updateOne(scenarioVersion: ScenarioVersion): ScenarioVersion
 

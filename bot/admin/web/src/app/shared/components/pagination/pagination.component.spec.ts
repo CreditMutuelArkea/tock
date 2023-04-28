@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbButtonModule, NbIconModule, NbSelectComponent, NbSelectModule, NbTooltipModule } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 
 import { Pagination, PaginationComponent } from './pagination.component';
+import { TestingModule } from '../../../../testing';
 
 describe('PaginationComponent', () => {
   let component: PaginationComponent;

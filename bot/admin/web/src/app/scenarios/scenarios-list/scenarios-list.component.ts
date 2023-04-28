@@ -2,14 +2,14 @@ import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/c
 import { Router } from '@angular/router';
 import { NbDialogRef, NbDialogService, NbToastrService } from '@nebular/theme';
 import { Subject } from 'rxjs';
-import { first, switchMap, take, takeUntil, tap } from 'rxjs/operators';
+import { first, take, takeUntil } from 'rxjs/operators';
 
 import { Filter, ScenarioGroup, ScenarioGroupExtended, ScenarioGroupUpdate, ScenarioVersion, SCENARIO_STATE } from '../models';
 import { ScenarioService } from '../services';
 import { StateService } from '../../core-nlp/state.service';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
-import { ScenarioEditComponent } from './scenario-edit/scenario-edit.component';
+import { ScenarioEditComponent, ScenarioEditOnSave } from './scenario-edit/scenario-edit.component';
 import { OrderBy, orderBy } from '../../shared/utils';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ScenarioImportComponent } from './scenario-import/scenario-import.component';
@@ -17,6 +17,7 @@ import { ScenarioExportComponent } from './scenario-export/scenario-export.compo
 import { deepCopy } from '../../shared/utils';
 import { Pagination } from '../../shared/components';
 import { ScenariosSettingsComponent } from './scenarios-settings/scenarios-settings.component';
+import { I18nLabel, I18nLabels } from '../../bot/model/i18n';
 
 @Component({
   selector: 'tock-scenarios-list',
@@ -38,6 +39,7 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
   scenarioGroupEdit?: ScenarioGroup;
   categoriesCache: string[] = [];
   tagsCache: string[] = [];
+  i18nLabels: I18nLabels;
 
   isSidePanelOpen = {
     edit: false,
@@ -132,7 +134,8 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
       category: '',
       description: '',
       name: '',
-      tags: []
+      tags: [],
+      unknownAnswerId: ''
     } as ScenarioGroup;
     this.isSidePanelOpen.edit = true;
   }
@@ -253,19 +256,50 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
       });
   }
 
-  saveScenarioGroup(result: { scenarioGroup: ScenarioGroup; redirect: boolean }): void {
+  saveScenarioGroupUnknownAnswers({ scenarioGroup, unknownAnswers, redirect, i18nLabel }: ScenarioEditOnSave): void {
     this.loading.edit = true;
 
-    if (!result.scenarioGroup.id) {
+    if (scenarioGroup.unknownAnswerId && i18nLabel) {
       this.scenarioService
-        .postScenarioGroup(result.scenarioGroup)
+        .patchAnswer(i18nLabel, unknownAnswers)
+        .pipe(take(1))
+        .subscribe({
+          next: (_) => {
+            this.saveScenarioGroup(scenarioGroup, redirect);
+          },
+          error: () => {
+            this.loading.edit = false;
+            this.toastrService.danger('The update of the unknown answers did not proceed correctly', 'Error');
+          }
+        });
+    } else {
+      this.scenarioService
+        .saveAnswers(unknownAnswers)
+        .pipe(take(1))
+        .subscribe({
+          next: (i18nLabel: I18nLabel) => {
+            scenarioGroup.unknownAnswerId = i18nLabel._id;
+            this.saveScenarioGroup(scenarioGroup, redirect);
+          },
+          error: () => {
+            this.loading.edit = false;
+            this.toastrService.danger('The addition of the unknown answers did not proceed correctly', 'Error');
+          }
+        });
+    }
+  }
+
+  saveScenarioGroup(scenarioGroup: ScenarioGroup, redirect: boolean): void {
+    if (!scenarioGroup.id) {
+      this.scenarioService
+        .postScenarioGroup(scenarioGroup)
         .pipe(first())
         .subscribe({
           next: (newScenarioGroup) => {
             this.loading.edit = false;
             this.toastrService.success(`Scenario group successfully created`, 'Creation', { duration: 5000 });
 
-            if (result.redirect) {
+            if (redirect) {
               const versionId: string = newScenarioGroup.versions[0].id;
               this.router.navigateByUrl(`/scenarios/${newScenarioGroup.id}/${versionId}`);
             } else {
@@ -278,13 +312,13 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
         });
     } else {
       this.scenarioService
-        .updateScenarioGroup(result.scenarioGroup)
+        .updateScenarioGroup(scenarioGroup)
         .pipe(first())
         .subscribe({
           next: (newScenarioGroup) => {
             this.loading.edit = false;
             this.toastrService.success(`Scenario group successfully updated`, 'Update', { duration: 5000 });
-            if (result.redirect) {
+            if (redirect) {
               this.scenarioService.redirectToDesigner(newScenarioGroup);
             } else {
               this.closeSidePanel('edit');
@@ -411,7 +445,8 @@ export class ScenariosListComponent implements OnInit, OnDestroy {
       category: scenarioGroup.category,
       description: scenarioGroup.description,
       enabled: !scenarioGroup.enabled,
-      tags: scenarioGroup.tags
+      tags: scenarioGroup.tags,
+      unknownAnswerId: scenarioGroup.unknownAnswerId
     };
 
     scenarioGroup._loading = true;

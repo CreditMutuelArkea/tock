@@ -32,7 +32,6 @@ import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.admin.scenario.ScenarioVersionState
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.ZonedDateTime
 import kotlin.test.assertEquals
@@ -41,6 +40,7 @@ import kotlin.test.assertNotEquals
 class ScenarioMapperTest {
 
     private val botId = "botId"
+    private val unknownAnswerId = "unknownAnswerId"
     private val scenarioGroupId   = "01234".toId<ScenarioGroup>()
     private val scenarioVersionId1 = "1-56789".toId<ScenarioVersion>()
     private val scenarioVersionId2 = "2-56789".toId<ScenarioVersion>()
@@ -78,7 +78,8 @@ class ScenarioMapperTest {
             description = "DESCRIPTION",
             versions = listOf(scenarioVersion1, scenarioVersion2),
             creationDate = creationDate,
-            updateDate = updateDate
+            updateDate = updateDate,
+            unknownAnswerId = unknownAnswerId
         )
 
         /**
@@ -143,7 +144,8 @@ class ScenarioMapperTest {
             name = "NAME",
             category = "CATEGORY",
             tags = listOf("TAG1"),
-            description = "DESCRIPTION"
+            description = "DESCRIPTION",
+            unknownAnswerId = "UNKNOWN_ANSWER_ID",
         )
 
         private val scenarioGroupWithVersionsRequest = ScenarioGroupWithVersionsRequest(
@@ -151,7 +153,8 @@ class ScenarioMapperTest {
             category = "CATEGORY",
             tags = listOf("TAG1"),
             description = "DESCRIPTION",
-            versions = listOf(scenarioVersionRequest1, scenarioVersionRequest2)
+            versions = listOf(scenarioVersionRequest1, scenarioVersionRequest2),
+            unknownAnswerId = unknownAnswerId
         )
 
         /**
@@ -192,6 +195,7 @@ class ScenarioMapperTest {
             assertEquals(scenarioGroupRequest.category, scenarioGroup.category)
             assertEquals(scenarioGroupRequest.tags, scenarioGroup.tags)
             assertEquals(scenarioGroupRequest.description, scenarioGroup.description)
+            assertEquals(scenarioGroupRequest.unknownAnswerId, scenarioGroup.unknownAnswerId)
         }
     }
 

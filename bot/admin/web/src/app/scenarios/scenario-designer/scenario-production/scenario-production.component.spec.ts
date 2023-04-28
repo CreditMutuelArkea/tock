@@ -1,11 +1,12 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NbDialogService } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
-import { deepCopy } from '../../../shared/utils';
-import { ScenarioVersionExtended, SCENARIO_ITEM_FROM_BOT, SCENARIO_ITEM_FROM_CLIENT, SCENARIO_MODE, SCENARIO_STATE } from '../../models';
+
 import { ScenarioProductionComponent } from './scenario-production.component';
 import { ScenarioProductionService } from './scenario-production.service';
+import { ScenarioVersionExtended, SCENARIO_ITEM_FROM_BOT, SCENARIO_ITEM_FROM_CLIENT, SCENARIO_MODE, SCENARIO_STATE } from '../../models';
+import { deepCopy } from '../../../shared/utils';
+import { TestingModule } from '../../../../testing';
 
 const testScenario: ScenarioVersionExtended = {
   id: '63eb951b0bf5327dd6862bf7',

@@ -17,10 +17,11 @@
 package ai.tock.bot.handler
 
 import ai.tock.bot.HandlerNamespace
+import ai.tock.bot.exception.TickActionHandlerException
 import ai.tock.bot.provider.SupportedActionHandlersProvider
 
 /**
- * A handler repository, it contains all available handlers
+ * A handler repository, it contains all available handlers by namespace
  */
 object ActionHandlersRepository {
 
@@ -35,6 +36,7 @@ object ActionHandlersRepository {
 
     /**
      * Subscription of handlers provider
+     * @param provider : the action handlers provider
      */
     private fun subscribe(provider: ActionHandlersProvider) {
         provider.getActionHandlers().forEach(::add)
@@ -42,10 +44,11 @@ object ActionHandlersRepository {
 
     /**
      * Add a handler if it does not exist, or throws error exception
+     * @param actionHandler : the action handler
      */
     private fun add(actionHandler: ActionHandler) {
         if(actionHandlers.contains(actionHandler.name)) {
-            error("Action handler <${actionHandler.name}> already exists")
+            throw TickActionHandlerException("Action handler <${actionHandler.name}> already exists")
         }
 
         actionHandlers[actionHandler.name] = actionHandler
@@ -53,29 +56,27 @@ object ActionHandlersRepository {
 
     /**
      * Invoke a handler if it exists, or throws error exception
+     * @param handlerName : the handler name
+     * @param contexts : input contexts of invoked handler
      */
     fun invoke(handlerName: String, contexts: Map<String, String?>): Map<String, String?> {
-        val handlerCallback = actionHandlers[handlerName]?.handler
-        handlerCallback ?: error("TickAction handler <$handlerName> not found")
+        val handlerCallback = actionHandlers[handlerName]
+        handlerCallback ?: throw TickActionHandlerException("TickAction handler <$handlerName> not found")
 
-        return handlerCallback.invoke(contexts)
+        return handlerCallback.invokeHandler(contexts)
     }
 
     /**
      * Checks if the map handlers contains the given handler name.
+     * @param handlerName : the handler name
      */
     fun contains(handlerName: String) = actionHandlers.contains(handlerName)
 
     /**
-     * Get action handlers
+     * Get action handlers by namespace
+     * @param namespace : the handler namespace
      */
     fun getActionHandlers(namespace: HandlerNamespace = HandlerNamespace.UNKNOWN): Set<ActionHandler> {
         return actionHandlers.values.filter { it.namespace == namespace || it.namespace.shared }.toSet()
     }
-}
-
-fun main() {
-    // TODO MASS
-    val handlers = ActionHandlersRepository.getActionHandlers()
-    println(handlers)
 }

@@ -2,13 +2,13 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { NbDialogRef } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
 import { EMPTY } from 'rxjs';
 
+import { IntentCreateComponent } from './intent-create.component';
+import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE } from '../../../models';
 import { StateService } from '../../../../core-nlp/state.service';
 import { AutocompleteInputComponent } from '../../../../shared/components';
-import { ScenarioVersion, ScenarioItemFrom, SCENARIO_MODE, SCENARIO_STATE } from '../../../models';
-import { IntentCreateComponent } from './intent-create.component';
+import { TestingModule } from '../../../../../testing';
 
 const scenario = {
   id: '62fcbb7ae4d25c16a44071a1',

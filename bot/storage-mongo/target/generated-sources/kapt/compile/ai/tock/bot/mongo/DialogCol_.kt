@@ -6,6 +6,7 @@ import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerId_Col
 import java.time.Instant
 import kotlin.Boolean
+import kotlin.Int
 import kotlin.String
 import kotlin.Suppress
 import kotlin.collections.Collection
@@ -40,6 +41,10 @@ private val __Test: KProperty1<DialogCol, Boolean?>
     get() = DialogCol::test
 private val __Namespace: KProperty1<DialogCol, String?>
     get() = DialogCol::namespace
+private val __Rating: KProperty1<DialogCol, Int?>
+    get() = DialogCol::rating
+private val __Review: KProperty1<DialogCol, String?>
+    get() = DialogCol::review
 internal class DialogCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*, DialogCol?>) :
         KPropertyPath<T, DialogCol?>(previous,property) {
     val playerIds: PlayerId_Col<T>
@@ -72,6 +77,12 @@ internal class DialogCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty
     val namespace: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Namespace)
 
+    val rating: KPropertyPath<T, Int?>
+        get() = KPropertyPath(this,__Rating)
+
+    val review: KPropertyPath<T, String?>
+        get() = KPropertyPath(this,__Review)
+
     companion object {
         val PlayerIds: PlayerId_Col<DialogCol>
             get() = PlayerId_Col(null,__PlayerIds)
@@ -92,7 +103,11 @@ internal class DialogCol_<T>(previous: KPropertyPath<T, *>?, property: KProperty
         val Test: KProperty1<DialogCol, Boolean?>
             get() = __Test
         val Namespace: KProperty1<DialogCol, String?>
-            get() = __Namespace}
+            get() = __Namespace
+        val Rating: KProperty1<DialogCol, Int?>
+            get() = __Rating
+        val Review: KProperty1<DialogCol, String?>
+            get() = __Review}
 }
 
 internal class DialogCol_Col<T>(previous: KPropertyPath<T, *>?, property: KProperty1<*,
@@ -127,6 +142,12 @@ internal class DialogCol_Col<T>(previous: KPropertyPath<T, *>?, property: KPrope
 
     val namespace: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Namespace)
+
+    val rating: KPropertyPath<T, Int?>
+        get() = KPropertyPath(this,__Rating)
+
+    val review: KPropertyPath<T, String?>
+        get() = KPropertyPath(this,__Review)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): DialogCol_<T> = DialogCol_(this,
@@ -163,6 +184,12 @@ internal class DialogCol_Map<T, K>(previous: KPropertyPath<T, *>?, property: KPr
 
     val namespace: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__Namespace)
+
+    val rating: KPropertyPath<T, Int?>
+        get() = KPropertyPath(this,__Rating)
+
+    val review: KPropertyPath<T, String?>
+        get() = KPropertyPath(this,__Review)
 
     @Suppress("UNCHECKED_CAST")
     override fun memberWithAdditionalPath(additionalPath: String): DialogCol_<T> = DialogCol_(this,

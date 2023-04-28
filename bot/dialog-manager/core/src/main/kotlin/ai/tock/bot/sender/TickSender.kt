@@ -21,16 +21,28 @@ package ai.tock.bot.sender
  */
 interface TickSender {
 
+    /**
+     * Send bot response by answer id
+     */
     fun sendById(id: String)
 
+    /**
+     * End bot response by answer id
+     */
     fun endById(id: String)
 
-    fun sendPlainText(text: String = "")
-
-    fun endPlainText(text: String = "")
+    /**
+     * Send bot response with a plain text
+     */
+    fun sendPlainText(text: String)
 
     /**
-     * Give control back to the user without any message text
+     * End bot response with a plain text
+     */
+    fun endPlainText(text: String)
+
+    /**
+     * End bot response without any message text
      */
     fun end()
 }

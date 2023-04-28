@@ -18,20 +18,21 @@ package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
+import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
 import ai.tock.shared.injector
-import com.github.salomonbrys.kodein.instance
+import ai.tock.shared.provide
 import org.litote.kmongo.toId
 
 /**
  * Service that manage the scenario groups
  */
 object ScenarioGroupService {
-    private val scenarioGroupDAO: ScenarioGroupDAO by injector.instance()
+    private val scenarioGroupDAO: ScenarioGroupDAO get() = injector.provide()
 
     /**
      * Returns all scenario groups by botId with their scenario versions
-     * @param botId: if of the bot
+     * @param botId: id of the bot
      */
     fun findAllByBotId(botId: String): List<ScenarioGroup> {
         return scenarioGroupDAO.findAllByBotId(botId)
@@ -42,17 +43,14 @@ object ScenarioGroupService {
      * @param scenarioGroupId : id of the scenario group
      * @throws [ScenarioGroupNotFoundException] if the scenario group was not found
      */
-    fun findOneById(scenarioGroupId: String): ScenarioGroup{
-        val scenarioGroup = scenarioGroupDAO.findOneById(scenarioGroupId.toId())
-        scenarioGroup ?: throw ScenarioGroupNotFoundException(scenarioGroupId)
-
-        return scenarioGroup
-    }
+    fun findOneById(scenarioGroupId: String): ScenarioGroup =
+        scenarioGroupDAO.findOneById(scenarioGroupId.toId())
+            ?: throw ScenarioGroupNotFoundException(scenarioGroupId)
 
     /**
      * Create a new scenario group and returns the created scenario group
      * @param scenarioGroup: the scenario group to create
-     * @throws [DuplicateKeyScenarioGroupException] if the scenario group name is already in use
+     * @throws [ScenarioGroupDuplicatedException] if the scenario group name is already in use
      */
     fun createOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         return scenarioGroupDAO.createOne(scenarioGroup)
@@ -61,7 +59,7 @@ object ScenarioGroupService {
     /**
      * Update a given scenario group and returns the updated scenario group
      * @param scenarioGroup: the scenario group to update
-     * @throws [ScenarioGroupNotFoundException] if the [scenarioGroup] was not found
+     * @throws [ScenarioGroupNotFoundException] if the [ScenarioVersion] was not found
      */
     fun updateOne(scenarioGroup: ScenarioGroup): ScenarioGroup {
         return scenarioGroupDAO.updateOne(scenarioGroup)
@@ -74,6 +72,14 @@ object ScenarioGroupService {
      */
     fun deleteOneById(id: String) {
         scenarioGroupDAO.deleteOneById(id.toId())
+    }
+
+    /**
+     * Listen changes on scenario groups
+     * @param listener: the listener to call when a scenario group changes
+     */
+    fun listenChanges(listener: (ScenarioGroup) -> Unit) {
+        scenarioGroupDAO.listenChanges(listener)
     }
 
 }

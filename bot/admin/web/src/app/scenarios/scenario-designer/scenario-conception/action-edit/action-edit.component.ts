@@ -32,9 +32,14 @@ interface ActionEditForm {
   targetStory: FormControl<string>;
   final: FormControl<boolean>;
   answers: FormArray<FormControl<ScenarioAnswer>>;
-  unknownAnswers: FormArray<FormControl<ScenarioAnswer>>;
+  unknownAnswers: FormArray<FormGroup<ScenarioAnswerForm>>;
 }
 
+interface ScenarioAnswerForm {
+  locale: FormControl<string>;
+  answer: FormControl<string>;
+  interfaceType: FormControl<number>;
+}
 @Component({
   selector: 'tock-scenario-action-edit',
   templateUrl: './action-edit.component.html',
@@ -103,9 +108,6 @@ export class ActionEditComponent implements OnInit {
   get answers(): FormArray {
     return this.form.get('answers') as FormArray;
   }
-  get currentLocaleAnswer(): FormControl {
-    return this.form.get('answers').value.find((a) => a.locale === this.currentLocale) as FormControl;
-  }
   get inputContextNames(): FormArray {
     return this.form.get('inputContextNames') as FormArray;
   }
@@ -154,11 +156,11 @@ export class ActionEditComponent implements OnInit {
     this.triggers = this.scenario.data.triggers || [];
 
     this.item.actionDefinition?.answers?.forEach((ua) => {
-      this.answers.push(new FormControl(deepCopy(ua)));
+      this.answers.push(this.addLocaleAnswer(ua.locale, ua.answer));
     });
 
     this.item.actionDefinition?.unknownAnswers?.forEach((ua) => {
-      this.unknownAnswers.push(new FormControl(deepCopy(ua)));
+      this.unknownAnswers.push(this.addLocaleAnswer(ua.locale, ua.answer));
     });
 
     this.supportedLocales.forEach((sl) => {
@@ -170,22 +172,28 @@ export class ActionEditComponent implements OnInit {
         this.unknownAnswers.push(this.addLocaleAnswer(sl));
       }
     });
+
+    // we sort the answers formArray so that the currentLocale is always displayed first
+    const answers = this.answers.value.sort((a, b) => {
+      if (a.locale === this.currentLocale) return -1;
+      if (b.locale === this.currentLocale) return 1;
+      return 0;
+    });
+    this.answers.patchValue(answers);
   }
 
-  private addLocaleAnswer(locale: string): FormControl {
-    return new FormControl({
-      locale: locale,
-      interfaceType: UserInterfaceType.textChat
+  private addLocaleAnswer(locale: string, answer = ''): FormGroup<ScenarioAnswerForm> {
+    return new FormGroup({
+      locale: new FormControl(locale),
+      interfaceType: new FormControl(UserInterfaceType.textChat),
+      answer: new FormControl(answer)
     });
   }
 
-  removeLocaleAnswerDef(localeAnswerDef) {
-    const unknownAnswers = this.unknownAnswers.value;
-    const index = unknownAnswers.findIndex((al) => {
-      return al.locale === localeAnswerDef.locale && al.answer === localeAnswerDef.answer;
-    });
-    unknownAnswers[index].answer = '';
-    this.unknownAnswers.patchValue(unknownAnswers);
+  resetLocaleUnknownAnswer(i: number): void {
+    this.unknownAnswers.at(i).get('answer').reset();
+    this.form.markAsDirty();
+    this.form.markAsTouched();
   }
 
   private isActionNameUnic(): ValidatorFn {
@@ -218,10 +226,14 @@ export class ActionEditComponent implements OnInit {
     };
   }
 
-  targetStoryWasDeleted() {
+  targetStoryWasDeleted(): boolean {
     if (this.targetStory.value && !this.availableStories.find((as) => as.storyId === this.targetStory.value)) return true;
 
     return false;
+  }
+
+  findStory(id: string): StoryDefinitionConfigurationSummary | undefined {
+    return this.availableStories.find((availableStorie) => availableStorie.storyId === id);
   }
 
   copyDescToAnswer(): void {

@@ -16,12 +16,8 @@
 
 package ai.tock.bot
 
-enum class HandlerNamespace(val key: String, val shared: Boolean = true) { // TODO MASS : false as default
+enum class HandlerNamespace(val key: String, val shared: Boolean = false) {
     DEV_TOOLS(key = "dev-tools", shared = true),
-    MAX(key = "max"),
-    SURAVENIR_ASSURANCES(key = "suravenir-assurances"),
-    AVENIR_ASSURANCE(key = "avenir-assurance"), // TODO MASS : to delete
-    JOIGNABILITE(key = "joignabilite"),
     UNKNOWN(key = "UNKNOWN");
 
     companion object {

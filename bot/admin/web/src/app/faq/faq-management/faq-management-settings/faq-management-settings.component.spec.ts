@@ -21,8 +21,8 @@ import { FaqService } from '../../services/faq.service';
 import { FaqManagementSettingsComponent } from './faq-management-settings.component';
 import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
 import { Settings } from '../../models';
-import { NbDialogServiceMock, NbToastrServiceMock, StateServiceMock } from '../../../../testing/mockedClass';
-import { TestingModule } from '@tock/testing';
+import { TestingModule } from '../../../../testing';
+import { StubNbDialogService, StubNbToastrService, StubStateService } from '../../../../testing/stubs';
 
 const mockStories = [
   { _id: '1', name: 'story 1', category: 'category' } as StoryDefinitionConfigurationSummary,
@@ -67,10 +67,10 @@ describe('FaqManagementSettingsComponent', () => {
       ],
       providers: [
         { provide: BotService, useClass: BotServiceMock },
-        { provide: StateService, useClass: StateServiceMock },
+        { provide: StateService, useClass: StubStateService },
         { provide: FaqService, useClass: FaqServiceMock },
-        { provide: NbDialogService, useClass: NbDialogServiceMock },
-        { provide: NbToastrService, useClass: NbToastrServiceMock }
+        { provide: NbDialogService, useClass: StubNbDialogService },
+        { provide: NbToastrService, useClass: StubNbToastrService }
       ]
     }).compileComponents();
   });

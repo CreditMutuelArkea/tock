@@ -19,13 +19,14 @@ package ai.tock.bot.bean.unknown
 import java.util.TreeSet
 
 /**
- * TickUnknownConfiguration
+ * Configuration to customize unknown intent handling in tick stories
+ * @param unknownAnswerConfigs unkown answer configurations
  */
 @kotlinx.serialization.Serializable
 data class TickUnknownConfiguration(
-    val unknownAnswerConfigs: Set<UnknownAnswerConfig> = TreeSet()
+    val unknownAnswerConfigs: Set<TickUnknownAnswerConfig> = TreeSet()
 ){
-    fun unknownIntents() = unknownAnswerConfigs.map { it.intent }.distinct()
+    fun unknownIntents() = unknownAnswerConfigs.map { it.intent }.plus(UNKNOWN).distinct()
 }
 
 

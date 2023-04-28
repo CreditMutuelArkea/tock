@@ -16,7 +16,8 @@
 
 package ai.tock.bot.connector.alcmeon
 
-import ai.tock.bot.engine.event.Event
+import ai.tock.bot.engine.event.ExitEvent
 
-class AlcmeonExitEvent(applicationId: String, val exitReason: String, val delayInMs: Long = 0L) : Event(applicationId)
+class AlcmeonExitEvent(applicationId: String, val exitReason: String, val delayInMs: Long = 0L) :
+    ExitEvent(applicationId)
 

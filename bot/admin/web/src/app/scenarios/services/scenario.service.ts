@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, forkJoin, iif, merge, Observable, of } from 'rxjs';
 import { map, tap, switchMap, filter, concatMap, take } from 'rxjs/operators';
 
+import { BotService } from '../../bot/bot-service';
+import { CreateI18nLabelsRequest, I18nLabel, I18nLocalizedLabel } from '../../bot/model/i18n';
 import { ApplicationService } from '../../core-nlp/applications.service';
 import { StateService } from '../../core-nlp/state.service';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
@@ -14,7 +16,6 @@ import { NlpService } from '../../nlp-tabs/nlp.service';
 import { deepCopy, exportJsonDump } from '../../shared/utils';
 import { normalizedSnakeCase, stringifiedCleanObject } from '../commons/utils';
 import {
-  ScenarioDebug,
   ScenarioVersion,
   TickStory,
   ScenarioVersionExtended,
@@ -24,7 +25,8 @@ import {
   SCENARIO_STATE,
   ScenarioGroupUpdate,
   Handler,
-  TempSentence
+  TempSentence,
+  ScenarioAnswer
 } from '../models';
 import { ScenarioApiService } from './scenario.api.service';
 
@@ -50,6 +52,7 @@ export class ScenarioService {
   state$: Observable<ScenarioState>;
 
   constructor(
+    private botService: BotService,
     private scenarioApiService: ScenarioApiService,
     private applicationService: ApplicationService,
     private datePipe: DatePipe,
@@ -374,7 +377,7 @@ export class ScenarioService {
         exportableGroup.group.versions = exportableGroup.group.versions.filter((v) => exportableGroup.versionsIds.includes(v.id));
 
         exportableGroup.group.versions.forEach((version: ScenarioVersion) => {
-          version.data.scenarioItems.forEach((item) => {
+          version.data?.scenarioItems.forEach((item) => {
             if (item.intentDefinition?.intentId) {
               const existingIntent: Intent = this.stateService.findIntentById(item.intentDefinition.intentId);
 
@@ -404,7 +407,7 @@ export class ScenarioService {
               exportableGroups.forEach((exportableGroup) => {
                 exportableGroup.versionsIds.forEach((versionId) => {
                   const version: ScenarioVersion = exportableGroup.group.versions.find((v) => v.id === versionId);
-                  version.data.scenarioItems.forEach((item) => {
+                  version.data?.scenarioItems.forEach((item) => {
                     const intentId = item.intentDefinition?.intentId;
                     if (intentId === sentence.classification.intentId) {
                       const app = this.stateService.currentApplication;
@@ -424,6 +427,24 @@ export class ScenarioService {
         });
       }
     });
+  }
+
+  saveAnswers(answers: ScenarioAnswer[]): Observable<I18nLabel> {
+    const request = new CreateI18nLabelsRequest('scenario', answers[0].answer, answers[0].locale, this.createI18nLocalizedLabels(answers));
+
+    return this.botService.createI18nLabels(request);
+  }
+
+  patchAnswer(i18nLabel: I18nLabel, answers: ScenarioAnswer[]): Observable<boolean> {
+    i18nLabel.i18n = this.createI18nLocalizedLabels(answers);
+
+    return this.botService.saveI18nLabel(i18nLabel);
+  }
+
+  private createI18nLocalizedLabels(answers: ScenarioAnswer[]): I18nLocalizedLabel[] {
+    return answers.map(
+      (answerToPatch) => new I18nLocalizedLabel(answerToPatch.locale, answerToPatch.interfaceType, answerToPatch.answer, true, null, [])
+    );
   }
 
   private downloadScenarioGroup(scenarioGroup: ScenarioGroup): void {

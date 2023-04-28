@@ -2,7 +2,6 @@
   <configuration default="false" name="NlpService" type="JetRunConfigurationType">
     <envs>
       <env name="nlpverticle_port" value="8888" />
-      <env name="tock_encrypt_pass" value="test123" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="ai.tock.nlp.api.StartNlpServiceKt" />
     <module name="tock-nlp-api-service" />

@@ -1,18 +1,37 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbTagComponent, NbTagInputAddEvent } from '@nebular/theme';
-import { Observable, of } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 
-import { ScenarioGroup } from '../../models';
+import { ScenarioAnswer, ScenarioGroup } from '../../models';
 import { ScenarioService } from '../../services';
 import { ChoiceDialogComponent } from '../../../shared/components';
+import { StateService } from '../../../core-nlp/state.service';
+import { UserInterfaceType } from '../../../core/model/configuration';
+import { I18nLabel } from '../../../bot/model/i18n';
+import { BotService } from '../../../bot/bot-service';
 
 interface ScenarioGroupEditForm {
   category: FormControl<string>;
   description: FormControl<string>;
   name: FormControl<string>;
   tags: FormArray<FormControl<string>>;
+  unknownAnswers: FormArray<FormGroup<ScenarioUnknownAnswerForm>>;
 }
+
+interface ScenarioUnknownAnswerForm {
+  locale: FormControl<string>;
+  answer: FormControl<string>;
+  interfaceType: FormControl<number>;
+}
+
+export type ScenarioEditOnSave = {
+  scenarioGroup: ScenarioGroup;
+  unknownAnswers: ScenarioAnswer[];
+  redirect: boolean;
+  i18nLabel?: I18nLabel;
+};
+
 @Component({
   selector: 'tock-scenario-edit',
   templateUrl: './scenario-edit.component.html',
@@ -20,18 +39,22 @@ interface ScenarioGroupEditForm {
 })
 export class ScenarioEditComponent implements OnChanges {
   @Input() loading: boolean;
-  @Input() scenarioGroup?: ScenarioGroup;
+  @Input() scenarioGroup!: ScenarioGroup;
 
   @Output() onClose = new EventEmitter<boolean>();
-  @Output() onSave = new EventEmitter<{ scenarioGroup: Partial<ScenarioGroup>; redirect: boolean }>();
+  @Output() onSave = new EventEmitter<ScenarioEditOnSave>();
 
   isSubmitted: boolean = false;
-
+  categories: string[];
+  i18nLabel: I18nLabel;
+  categoriesAutocompleteValues: Observable<string[]>;
+  tagsAutocompleteValues: Observable<string[]>;
   form = new FormGroup<ScenarioGroupEditForm>({
     category: new FormControl(),
     description: new FormControl(),
     name: new FormControl(undefined, Validators.required),
-    tags: new FormArray([])
+    tags: new FormArray([]),
+    unknownAnswers: new FormArray([])
   });
 
   get category(): FormControl {
@@ -50,37 +73,102 @@ export class ScenarioEditComponent implements OnChanges {
     return this.form.get('tags') as FormArray;
   }
 
+  get unknownAnswers(): FormArray<FormGroup<ScenarioUnknownAnswerForm>> {
+    return this.form.get('unknownAnswers') as FormArray;
+  }
+
   get canSave(): boolean {
     return this.isSubmitted ? this.form.valid : this.form.dirty;
   }
 
-  constructor(private nbDialogService: NbDialogService, private scenarioService: ScenarioService) {}
-
-  categories: string[];
-  categoriesAutocompleteValues: Observable<string[]>;
-  tagsAutocompleteValues: Observable<string[]>;
+  constructor(
+    private botService: BotService,
+    private nbDialogService: NbDialogService,
+    private scenarioService: ScenarioService,
+    private stateService: StateService
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
+    if (!this.unknownAnswers.value.length) this.initUnknownAnswer();
+
     if (changes.scenarioGroup?.currentValue) {
       const scenarioGroup: ScenarioGroup = changes.scenarioGroup.currentValue;
 
-      this.form.reset();
-      this.tags.clear();
+      this.resetForm();
       this.isSubmitted = false;
+      this.form.patchValue(scenarioGroup);
 
-      if (scenarioGroup) {
-        this.form.patchValue(scenarioGroup);
-
-        if (scenarioGroup.tags?.length) {
-          scenarioGroup.tags.forEach((tag) => {
-            this.tags.push(new FormControl(tag));
-          });
-        }
+      if (scenarioGroup.tags?.length) {
+        scenarioGroup.tags.forEach((tag) => {
+          this.tags.push(new FormControl(tag));
+        });
       }
+
+      if (scenarioGroup.unknownAnswerId) this.loadI18nLabels(scenarioGroup.unknownAnswerId);
     }
 
     this.categories = [...this.scenarioService.getState().categories];
     this.tagsAutocompleteValues = of([...this.scenarioService.getState().tags]);
+  }
+
+  private loadI18nLabels(unknownAnswerId: string): void {
+    this.loading = true;
+
+    this.botService
+      .i18nLabel(unknownAnswerId)
+      .pipe(take(1))
+      .subscribe({
+        next: (i18nLabel: I18nLabel) => {
+          this.i18nLabel = i18nLabel;
+          if (i18nLabel) this.feedUnknownAnswers(i18nLabel);
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
+  }
+
+  private resetForm(): void {
+    this.name.reset();
+    this.category.reset();
+    this.description.reset();
+    this.tags.reset();
+    this.unknownAnswers.controls.forEach((unknownAnswer) => {
+      unknownAnswer.get('answer').reset();
+    });
+  }
+
+  private initUnknownAnswer(): void {
+    this.stateService.currentApplication.supportedLocales.forEach((supportedLocale: string) => {
+      if (!this.unknownAnswers.value.find((answer: ScenarioAnswer) => answer.locale === supportedLocale)) {
+        this.unknownAnswers.push(this.addLocaleAnswer(supportedLocale));
+      }
+    });
+  }
+
+  private addLocaleAnswer(locale: string): FormGroup {
+    return new FormGroup<ScenarioUnknownAnswerForm>({
+      locale: new FormControl(locale),
+      interfaceType: new FormControl(UserInterfaceType.textChat),
+      answer: new FormControl(null, Validators.required)
+    });
+  }
+
+  private feedUnknownAnswers(i18nLabel: I18nLabel): void {
+    this.unknownAnswers.controls.forEach((unknownAnswer) => {
+      const unknownAnswerLabel = i18nLabel.i18n.find(
+        (i) => i.locale === unknownAnswer.get('locale').value && i.interfaceType === unknownAnswer.get('interfaceType').value
+      )?.label;
+
+      if (unknownAnswerLabel) unknownAnswer.get('answer').setValue(unknownAnswerLabel);
+    });
+  }
+
+  resetLocaleUnknownAnswer(i: number): void {
+    this.unknownAnswers.at(i).get('answer').reset();
+    this.form.markAsDirty();
+    this.form.markAsTouched();
   }
 
   updateTagsAutocompleteValues(event: any): void {
@@ -140,10 +228,21 @@ export class ScenarioEditComponent implements OnChanges {
 
     if (this.canSave) {
       const enabled = typeof this.scenarioGroup.enabled === 'boolean' ? this.scenarioGroup.enabled : null;
+      const { category, description, name, tags, unknownAnswers } = this.form.value;
 
       this.onSave.emit({
-        redirect: redirect,
-        scenarioGroup: { id: this.scenarioGroup.id, ...this.form.value, enabled }
+        redirect,
+        scenarioGroup: {
+          id: this.scenarioGroup.id,
+          unknownAnswerId: this.scenarioGroup.unknownAnswerId,
+          category,
+          description,
+          name,
+          tags,
+          enabled
+        },
+        unknownAnswers: unknownAnswers as ScenarioAnswer[],
+        i18nLabel: this.i18nLabel
       });
     }
   }

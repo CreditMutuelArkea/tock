@@ -16,10 +16,10 @@
 
 package ai.tock.bot.admin.service
 
+import ai.tock.bot.admin.scenario.ScenarioSettings
+import ai.tock.bot.admin.scenario.ScenarioSettingsDAO
 import ai.tock.bot.test.*
-import ai.tock.nlp.front.service.storage.ScenarioSettingsDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
-import ai.tock.nlp.front.shared.config.ScenarioSettings
 import ai.tock.nlp.front.shared.config.ScenarioSettingsQuery
 import ai.tock.shared.tockInternalInjector
 import com.github.salomonbrys.kodein.Kodein
@@ -41,8 +41,8 @@ import kotlin.test.assertTrue
 
 private const val ID = "id"
 
-private const val DB_RESULT_APP_ID = "dbAppId"
-private const val APP_ID = "appId"
+private const val DB_RESULT_APP_NAME = "dbAppId"
+private const val APP_NAME = "appId"
 
 private const val QUERY_REPEAT_NB = 1
 
@@ -65,8 +65,6 @@ class ScenarioSettingsServiceTest {
         }
 
         private val dao: ScenarioSettingsDAO = mockk(relaxed = true)
-
-
         private val settingsSlot = slot<ScenarioSettings>()
     }
 
@@ -84,7 +82,7 @@ class ScenarioSettingsServiceTest {
         }
 
         val mockBehaviours : TRunnable = {
-            every { dao.getScenarioSettingsByApplicationId(any()) } returns dbResult()
+            every { dao.getScenarioSettingsByBotId(any()) } returns dbResult()
             every { dao.save(capture(settingsSlot)) } returns Unit
         }
 
@@ -95,7 +93,7 @@ class ScenarioSettingsServiceTest {
         val checkSlot : TConsumer<Unit?> = {
             assertTrue { settingsSlot.isCaptured }
             with(settingsSlot.captured) {
-                assertEquals(DB_RESULT_APP_ID, applicationId.toString())
+                assertEquals(DB_RESULT_APP_NAME, botId)
                 assertEquals(QUERY_REPEAT_NB, actionRepetitionNumber)
                 assertEquals(QUERY_REDIRECT_STORY, redirectStoryId)
             }
@@ -121,7 +119,7 @@ class ScenarioSettingsServiceTest {
 
         val mockBehaviours : TRunnable = {
             settingsSlot.clear()
-            every { dao.getScenarioSettingsByApplicationId(any()) } returns null
+            every { dao.getScenarioSettingsByBotId(any()) } returns null
             every { dao.save(capture(settingsSlot)) } returns Unit
         }
 
@@ -132,7 +130,7 @@ class ScenarioSettingsServiceTest {
         val checkSlot : TConsumer<Unit?> = {
             assertTrue { settingsSlot.isCaptured }
             with(settingsSlot.captured) {
-                assertEquals(APP_ID, applicationId.toString())
+                assertEquals(APP_NAME, botId)
                 assertEquals(QUERY_REPEAT_NB, actionRepetitionNumber)
                 assertEquals(QUERY_REDIRECT_STORY, redirectStoryId)
             }
@@ -153,20 +151,20 @@ class ScenarioSettingsServiceTest {
     fun `get existing scenario settings by application id`() {
 
         val appId : TSupplier<String> = {
-            DB_RESULT_APP_ID
+            DB_RESULT_APP_NAME
         }
 
         val mockBehaviours : TRunnable = {
-            every { dao.getScenarioSettingsByApplicationId(any()) } returns dbResult()
+            every { dao.getScenarioSettingsByBotId(any()) } returns dbResult()
         }
 
         val callService : TFunction<String?, ScenarioSettings?> = {
-            ScenarioSettingsService.getScenarioSettingsByApplicationId(it!!)
+            ScenarioSettingsService.getScenarioSettingsByBotId(it!!)
         }
 
         val checkResult : TConsumer<ScenarioSettings?> = {
             assertNotNull(it)
-            assertEquals(DB_RESULT_APP_ID, it.applicationId.toString())
+            assertEquals(DB_RESULT_APP_NAME, it.botId)
             assertEquals(ID, it._id.toString())
         }
 
@@ -182,15 +180,15 @@ class ScenarioSettingsServiceTest {
     fun `try to get non existing scenario settings by application id`() {
 
         val appId : TSupplier<String> = {
-            DB_RESULT_APP_ID
+            DB_RESULT_APP_NAME
         }
 
         val mockBehaviours : TRunnable = {
-            every { dao.getScenarioSettingsByApplicationId(DB_RESULT_APP_ID.toId()) } returns null
+            every { dao.getScenarioSettingsByBotId(DB_RESULT_APP_NAME) } returns null
         }
 
         val callService : TFunction<String?, ScenarioSettings?> = {
-            ScenarioSettingsService.getScenarioSettingsByApplicationId(it!!)
+            ScenarioSettingsService.getScenarioSettingsByBotId(it!!)
         }
 
         val checkResult : TConsumer<ScenarioSettings?> = {
@@ -210,12 +208,12 @@ class ScenarioSettingsServiceTest {
         actionRepetitionNumber = DB_RESULT_REPEAT_NB,
         updateDate = Instant.now(),
         creationDate = Instant.now(),
-        applicationId = DB_RESULT_APP_ID.toId()
+        botId = DB_RESULT_APP_NAME
     )
 
     private fun appDef() = ApplicationDefinition(
-        _id = APP_ID.toId(),
-        name = "name",
+        _id = APP_NAME.toId(),
+        name = APP_NAME,
         namespace = "namespace"
     )
 

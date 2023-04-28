@@ -17,4 +17,4 @@
 package ai.tock.bot.bean
 
 data class TickUserAction(val intentName: String,
-                          val entities: Map<String, String?>)
+                          val entities: Map<String, String?> = emptyMap())

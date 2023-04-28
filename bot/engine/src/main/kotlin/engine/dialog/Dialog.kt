@@ -52,11 +52,15 @@ data class Dialog(
      */
     val groupId: String? = null,
 
+    var rating: Int? = null,
+
+    var review: String? = null,
+
     /**
      * the tick states
-     * FIXME : à mettre dans DialogState ?
      */
     val tickStates: MutableMap<String, TickState> = mutableMapOf()
+
 ) {
 
     companion object {
@@ -77,6 +81,8 @@ data class Dialog(
                         s
                     }
                 ).toMutableList(),
+                rating = dialog.rating,
+                review = dialog.review,
                 tickStates = dialog.tickStates
             )
         }
@@ -115,6 +121,6 @@ data class Dialog(
     /**
      * Current number of actions in dialog history.
      */
-    val actionsSize: Int get() = stories.sumBy { it.actions.size }
+    val actionsSize: Int get() = stories.sumOf { it.actions.size }
 
 }

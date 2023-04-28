@@ -1,7 +1,8 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { TestingModule } from '@tock/testing';
+
 import { BotService } from '../../../bot/bot-service';
 import { StateService } from '../../../core-nlp/state.service';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
@@ -18,8 +19,8 @@ import { ScenarioService } from '../../services';
 import { ScenarioDesignerService } from '../scenario-designer.service';
 import { ScenarioPublishingComponent } from './scenario-publishing.component';
 import { DependencyUpdateJob } from '../../models/designer.model';
-import { By } from '@angular/platform-browser';
 import { deepCopy } from '../../../shared/utils';
+import { TestingModule } from '../../../../testing';
 
 const testScenario: ScenarioVersionExtended = {
   id: '63eb951b0bf5327dd6862bf7',

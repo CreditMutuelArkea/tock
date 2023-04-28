@@ -17,13 +17,20 @@
 package ai.tock.bot.bean
 
 import ai.tock.bot.bean.unknown.DEFAULT_RETRY_NB
+import ai.tock.bot.bean.unknown.UNKNOWN
 
+/**
+ * Global settings of tick story
+ * @param repetitionNb maximum number of action executions
+ * @param redirectStory story to trigger when allowed repeats are exceeded
+ */
 @kotlinx.serialization.Serializable
 data class TickStorySettings(
     val repetitionNb: Int,
-    val redirectStory: String? = null
+    val redirectStory: String,
+    val unknownAnswerId: String? = null
 ) {
     companion object {
-        val default = TickStorySettings(DEFAULT_RETRY_NB)
+        val default = TickStorySettings(DEFAULT_RETRY_NB, UNKNOWN)
     }
 }

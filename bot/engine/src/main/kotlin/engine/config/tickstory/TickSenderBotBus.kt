@@ -24,7 +24,7 @@ import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.Translator
 
 /**
- * A bot bus tick sender, it uses a BotBus to send messages
+ * A bot bus tick sender, it uses a [BotBus] to send messages
  */
 class TickSenderBotBus(private val botBus: BotBus): TickSender {
 
@@ -40,7 +40,7 @@ class TickSenderBotBus(private val botBus: BotBus): TickSender {
         botBus.end { null }
     }
 
-    private fun translateId(id: String,): ActionWrappedMessage {
+    private fun translateId(id: String): ActionWrappedMessage {
         val label = Translator.getLabel(id)
         label ?: throw IllegalStateException("Label $id not found")
 

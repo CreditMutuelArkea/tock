@@ -16,10 +16,12 @@
 
 package ai.tock.bot.mongo
 
+import ai.tock.bot.admin.dialog.DialogRating
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.admin.dialog.DialogReportDAO
 import ai.tock.bot.admin.dialog.DialogReportQuery
 import ai.tock.bot.admin.dialog.DialogReportQueryResult
+import ai.tock.bot.admin.dialog.RatingReportQueryResult
 import ai.tock.bot.admin.user.AnalyticsQuery
 import ai.tock.bot.admin.user.UserAnalytics
 import ai.tock.bot.admin.user.UserReportDAO
@@ -35,7 +37,6 @@ import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.dialog.EntityStateValue
 import ai.tock.bot.engine.dialog.LastDialogState
 import ai.tock.bot.engine.dialog.Snapshot
-import ai.tock.bot.engine.dialog.TickState
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
@@ -71,13 +72,8 @@ import ai.tock.shared.jackson.AnyValueWrapper
 import ai.tock.shared.longProperty
 import com.github.salomonbrys.kodein.instance
 import com.mongodb.ReadPreference.secondaryPreferred
-import com.mongodb.client.model.CountOptions
 import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.ReplaceOptions
-import java.time.Instant
-import java.time.Instant.now
-import java.time.ZoneOffset
-import java.util.concurrent.TimeUnit.DAYS
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.MongoOperator.and
@@ -88,7 +84,9 @@ import org.litote.kmongo.addEachToSet
 import org.litote.kmongo.addToSet
 import org.litote.kmongo.aggregate
 import org.litote.kmongo.and
+import org.litote.kmongo.ascending
 import org.litote.kmongo.ascendingSort
+import org.litote.kmongo.avg
 import org.litote.kmongo.bson
 import org.litote.kmongo.contains
 import org.litote.kmongo.deleteOneById
@@ -98,7 +96,9 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.find
 import org.litote.kmongo.findOne
 import org.litote.kmongo.findOneById
+import org.litote.kmongo.from
 import org.litote.kmongo.getCollection
+import org.litote.kmongo.group
 import org.litote.kmongo.gt
 import org.litote.kmongo.`in`
 import org.litote.kmongo.json
@@ -112,11 +112,14 @@ import org.litote.kmongo.replaceOneWithFilter
 import org.litote.kmongo.save
 import org.litote.kmongo.setValue
 import org.litote.kmongo.sort
+import org.litote.kmongo.sum
 import org.litote.kmongo.toId
 import org.litote.kmongo.updateOneById
 import org.litote.kmongo.upsert
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeUnit.SECONDS
+import java.time.Instant
+import java.time.Instant.now
+import java.time.ZoneOffset
+import java.util.concurrent.TimeUnit.DAYS
 
 /**
  *
@@ -605,7 +608,8 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
                 if (from == null) null else DialogCol_.LastUpdateDate gt from?.toInstant(),
                 if (to == null) null else DialogCol_.LastUpdateDate lt to?.toInstant(),
                 if (connectorType == null) null else Stories.actions.state.targetConnectorType.id eq connectorType!!.id,
-                if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName
+                if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName,
+                if (!query.ratings.isNullOrEmpty()) DialogCol_.Rating `in` query.ratings!!.toSet() else null
             )
             logger.debug("dialog search query: $filter")
             val c = dialogCol.withReadPreference(secondaryPreferred())
@@ -623,6 +627,70 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
             } else {
                 DialogReportQueryResult(0, 0, 0, emptyList())
             }
+        }
+    }
+
+    override fun findBotDialogStatsByRating(query: DialogReportQuery): List<DialogRating> {
+        return with(query) {
+            val applicationsIds = getApplicationIds(query.namespace, query.nlpModel)
+            dialogCol.aggregate<ParseRequestSatisfactionStatCol>(
+                match(
+                    and(
+                        DialogCol_.ApplicationIds `in` applicationsIds.filter { it.isNotEmpty() },
+                        Namespace eq query.namespace,
+                        if (query.playerId != null || query.displayTests) null else DialogCol_.Test eq false,
+                        if (query.playerId == null) null else PlayerIds.id eq query.playerId!!.id,
+                        if (query.dialogId == null) null else _id eq query.dialogId!!.toId(),
+                        if (from == null) null else DialogCol_.LastUpdateDate gt from?.toInstant(),
+                        if (to == null) null else DialogCol_.LastUpdateDate lt to?.toInstant(),
+                        if (connectorType == null) null else Stories.actions.state.targetConnectorType.id eq connectorType!!.id,
+                        if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName,
+                        DialogCol_.Rating `in` setOf(1, 2, 3, 4, 5)
+                    )
+                ),
+                group(
+                    DialogCol_.Rating from DialogCol_.Rating,
+                    ParseRequestSatisfactionStatCol_.Count sum 1,
+                    ParseRequestSatisfactionStatCol_.Rating avg ParseRequestSatisfactionStatCol_.Rating
+                ),
+                sort(
+                    ascending(
+                        ParseRequestSatisfactionStatCol_.Rating,
+                    )
+                )
+            ).map { DialogRating(it.rating, it.count) }.toList()
+        }
+    }
+
+    override fun findBotDialogStats(query: DialogReportQuery): RatingReportQueryResult? {
+        return with(query) {
+            val applicationsIds = getApplicationIds(query.namespace, query.nlpModel)
+            dialogCol.aggregate<ParseRequestSatisfactionStatCol>(
+                match(
+                    and(
+                        DialogCol_.ApplicationIds `in` applicationsIds.filter { it.isNotEmpty() },
+                        Namespace eq query.namespace,
+                        if (query.playerId != null || query.displayTests) null else DialogCol_.Test eq false,
+                        if (query.playerId == null) null else PlayerIds.id eq query.playerId!!.id,
+                        if (query.dialogId == null) null else _id eq query.dialogId!!.toId(),
+                        if (from == null) null else DialogCol_.LastUpdateDate gt from?.toInstant(),
+                        if (to == null) null else DialogCol_.LastUpdateDate lt to?.toInstant(),
+                        if (connectorType == null) null else Stories.actions.state.targetConnectorType.id eq connectorType!!.id,
+                        if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName,
+                        DialogCol_.Rating `in` setOf(1, 2, 3, 4, 5)
+                    )
+                ),
+                group(
+                    null,
+                    ParseRequestSatisfactionStatCol_.Count sum 1,
+                    ParseRequestSatisfactionStatCol_.Rating avg ParseRequestSatisfactionStatCol_.Rating
+                ),
+                sort(
+                    ascending(
+                        ParseRequestSatisfactionStatCol_.Rating,
+                    )
+                )
+            ).map { RatingReportQueryResult(it.rating, it.count, emptyList()) }.first()
         }
     }
 

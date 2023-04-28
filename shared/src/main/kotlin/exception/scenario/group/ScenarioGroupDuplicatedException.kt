@@ -18,4 +18,4 @@ package ai.tock.shared.exception.scenario.group
 
 import ai.tock.shared.exception.scenario.ScenarioException
 
-class ScenarioGroupDuplicatedException: ScenarioException("Duplicate scenario group")
+class ScenarioGroupDuplicatedException: ScenarioException("Duplicated scenario group")
