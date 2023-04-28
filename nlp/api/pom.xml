@@ -40,6 +40,11 @@
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-entity-value</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-nlp-entity-rest</artifactId>
+            <version>${version}</version>
+        </dependency>
     </dependencies>
 
 </project>
