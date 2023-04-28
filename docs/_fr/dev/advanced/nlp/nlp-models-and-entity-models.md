@@ -55,7 +55,7 @@ DucklingEntityTypeProvider ..|> EntityTypeProvider
 <<interface>> EntityTypeProvider
 ```
 ## Utiliser `tock-nlp-entity-rest`
-- Ajouter dans le pom.xml de `nlp-api-service` (mode 1) ou `nlp-api-client` (mode 2), `${version}` va prendre la valeur de tock déjà présente dans `nlp-api-service`
+- Ajouter dans le pom.xml de tock-nlp-api la dépendance, ainsi `${version}` va prendre la valeur de tock déjà présente dans `nlp-api-service`
 ```
         <dependency>
             <groupId>ai.tock</groupId>
@@ -63,8 +63,9 @@ DucklingEntityTypeProvider ..|> EntityTypeProvider
             <version>${version}</version>
         </dependency>
 ```
-- Ou bien Aller dans `Project structure`>`nlp-api-service`> et ajouter le module `tock-nlp-entity-rest`
-- Lancer NlpService et si besoin mettre à jour la valeur : `tock_nlp_entity_type_url` (par exemple pour tester avec `tock-flair`) mettre égal à  `http://localhost:5000/api/v1/`
+- Ou bien Aller dans `Project structure`>`tock-nlp-api`> et ajouter le module `tock-nlp-entity-rest`
+- Lancer le projet externe d'entités rest : par exemple [Tock-flair](https://github.com/theopenconversationkit/tock-flair)
+- Redémarrer BotAdmin et NlpService et si besoin mettre à jour la valeur : `tock_nlp_entity_type_url` (par exemple pour tester avec `tock-flair`) mettre égal à  `http://localhost:5000/api/v1/`
 
 ## Structure de RestEntityProvider
 ```mermaid
