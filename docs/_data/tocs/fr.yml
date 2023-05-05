@@ -97,6 +97,8 @@ content:
         url: 'fr/admin/supervision'
       - title: 'Cloud'
         url: 'fr/admin/cloud'
+      - title: 'Partage de modèles'
+        url: 'fr/admin/shared-model'
   - title: 'A propos'
     children:
       - title: 'Pourquoi Tock'

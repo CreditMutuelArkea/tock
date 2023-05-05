@@ -59,6 +59,7 @@ title: Table des matières
     - [Disponibilité](../admin/disponibilite)
     - [Supervision](../admin/supervision)
     - [Cloud](../admin/cloud)
+    - [Partage de modèles](../admin/shared-model)
 
 - A propos de Tock :
     - [Pourquoi Tock](../apropos/pourquoi)
