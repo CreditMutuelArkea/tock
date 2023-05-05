@@ -231,6 +231,79 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
     }
   }
 
+  processAnswer(answerTask: DependencyUpdateJob): void {
+    if (!answerTask.item.actionDefinition.answerId) {
+      this.postAnswer(answerTask);
+    } else {
+      this.patchAnswer(answerTask);
+    }
+  }
+
+  processUnknownAnswer(answerTask: DependencyUpdateJob): void {
+    if (!answerTask.item.actionDefinition.unknownAnswerId) {
+      this.postAnswer(answerTask, true);
+    } else {
+      this.patchAnswer(answerTask, true);
+    }
+  }
+
+  postAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
+    let answersLocalesVersions = answerTask.item.actionDefinition.answers;
+    if (unknownAnswer) {
+      answersLocalesVersions = answerTask.item.actionDefinition.unknownAnswers;
+    }
+
+    this.scenarioService.saveAnswers(answersLocalesVersions).subscribe({
+      next: (answer) => {
+        if (unknownAnswer) {
+          answerTask.item.actionDefinition.unknownAnswerId = answer._id;
+        } else {
+          answerTask.item.actionDefinition.answerId = answer._id;
+        }
+        this.i18n.labels.push(answer);
+
+        for (let index = 0; index < answersLocalesVersions.length; index++) {
+          delete answersLocalesVersions[index].answerUpdate;
+        }
+
+        answerTask.done = true;
+        this.processDependencies();
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+  }
+
+  patchAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
+    let existingId = answerTask.item.actionDefinition.answerId;
+    if (unknownAnswer) {
+      existingId = answerTask.item.actionDefinition.unknownAnswerId;
+    }
+
+    const i18nLabel: I18nLabel = this.i18n.labels.find((i) => {
+      return i._id === existingId;
+    });
+
+    let answersLocalesVersions = answerTask.item.actionDefinition.answers;
+    if (unknownAnswer) {
+      answersLocalesVersions = answerTask.item.actionDefinition.unknownAnswers;
+    }
+
+    this.scenarioService.patchAnswer(i18nLabel, answersLocalesVersions).subscribe({
+      next: (result) => {
+        for (let index = 0; index < answersLocalesVersions.length; index++) {
+          delete answersLocalesVersions[index].answerUpdate;
+        }
+        answerTask.done = true;
+        this.processDependencies();
+      },
+      error: (error) => {
+        console.log(error);
+      }
+    });
+  }
+
   processIntent(intentTask: DependencyUpdateJob): void {
     const intentDefinition = intentTask.item.intentDefinition;
 
@@ -272,8 +345,8 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
   }
 
   postNewEntity(task: DependencyUpdateJob, tempEntity: TempEntity): void {
-    this.nlp.createEntityType(tempEntity.type).subscribe(
-      (e) => {
+    this.nlp.createEntityType(tempEntity.type).subscribe({
+      next: (e) => {
         if (e) {
           // update of application entities
           const entities = this.stateService.entityTypes.getValue().slice(0);
@@ -284,10 +357,10 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           console.log(`Error when creating Entity Type ${tempEntity.type}`);
         }
       },
-      (error) => {
+      error: (error) => {
         console.log(error);
       }
-    );
+    });
   }
 
   postNewSentence(task: DependencyUpdateJob, intent: Intent, tempSentence: TempSentence): void {
@@ -301,15 +374,15 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
         tempSentence.classification.entities.forEach((entity) => (entity.subEntities = []));
         sentence.classification.entities = tempSentence.classification.entities as ClassifiedEntity[];
         sentence.status = SentenceStatus.validated;
-        this.nlp.updateSentence(sentence).subscribe(
-          (_res) => {
+        this.nlp.updateSentence(sentence).subscribe({
+          next: (_res) => {
             task.item.intentDefinition.sentences = task.item.intentDefinition.sentences.filter((s) => s != tempSentence);
             this.processIntent(task);
           },
-          (error) => {
+          error: (error) => {
             console.log(error);
           }
-        );
+        });
       },
       (error) => {
         console.log(error);
@@ -354,75 +427,6 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
       );
   }
 
-  processAnswer(answerTask: DependencyUpdateJob): void {
-    if (!answerTask.item.actionDefinition.answerId) {
-      this.postAnswer(answerTask);
-    } else {
-      this.patchAnswer(answerTask);
-    }
-  }
-
-  processUnknownAnswer(answerTask: DependencyUpdateJob): void {
-    if (!answerTask.item.actionDefinition.unknownAnswerId) {
-      this.postAnswer(answerTask, true);
-    } else {
-      this.patchAnswer(answerTask, true);
-    }
-  }
-
-  postAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
-    let request = new CreateI18nLabelRequest('scenario', answerTask.answer.answer, answerTask.answer.locale);
-    this.botService.createI18nLabel(request).subscribe(
-      (answer) => {
-        if (unknownAnswer) {
-          answerTask.item.actionDefinition.unknownAnswerId = answer._id;
-        } else {
-          answerTask.item.actionDefinition.answerId = answer._id;
-        }
-        this.i18n.labels.push(answer);
-
-        answerTask.done = true;
-        this.processDependencies();
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
-  patchAnswer(answerTask: DependencyUpdateJob, unknownAnswer = false): void {
-    let existingId = answerTask.item.actionDefinition.answerId;
-    if (unknownAnswer) {
-      existingId = answerTask.item.actionDefinition.unknownAnswerId;
-    }
-
-    const i18nLabel: I18nLabel = this.i18n.labels.find((i) => {
-      return i._id === existingId;
-    });
-    const i18n = i18nLabel.i18n.find((i) => {
-      return i.interfaceType === answerTask.answer.interfaceType && i.locale === answerTask.answer.locale;
-    });
-
-    if (i18n) i18n.label = answerTask.answer.answer;
-    else {
-      i18nLabel.i18n.push(
-        new I18nLocalizedLabel(answerTask.answer.locale, answerTask.answer.interfaceType, answerTask.answer.answer, true, null, [])
-      );
-    }
-
-    this.botService.saveI18nLabel(i18nLabel).subscribe(
-      (result) => {
-        delete answerTask.answer.answerUpdate;
-
-        answerTask.done = true;
-        this.processDependencies();
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
   tickStoryPostSuccessfull: boolean = false;
   tickStoryErrors: string[];
 
@@ -430,8 +434,8 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
     this.tickStoryErrors = undefined;
     const story = this.compileTickStory();
 
-    this.scenarioService.postTickStory(story).subscribe(
-      (res) => {
+    this.scenarioService.postTickStory(story).subscribe({
+      next: (res) => {
         // Successful save. We pass the scenario state to "current" and save it
         this.scenario.state = SCENARIO_STATE.current;
         this.scenarioDesignerService.saveScenario(this.scenario).subscribe((data) => {
@@ -447,7 +451,7 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           setTimeout(() => this.scenarioDesignerService.exitDesigner(), 3000);
         });
       },
-      (error) => {
+      error: (error) => {
         // Errors have occurred, let's inform the user.
         this.tickStoryErrors = error.error?.errors
           ? error.error?.errors
@@ -455,7 +459,7 @@ export class ScenarioPublishingComponent implements OnChanges, OnDestroy {
           ? [{ message: error }]
           : [{ message: 'An unknown error occured' }];
       }
-    );
+    });
   }
 
   private compileTickStory(): TickStory {
