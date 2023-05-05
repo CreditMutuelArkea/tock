@@ -1,0 +1,27 @@
+.main-card-body {
+  overflow: visible;
+}
+
+.dimension-chart {
+  border-top: 1px solid var(--color-basic-transparent-400);
+  padding-top: 1rem;
+}
+
+.stats-line {
+  border-bottom: 1px solid var(--color-basic-transparent-400);
+}
+
+.help-badge {
+  display: inline-block;
+  border-radius: 10rem;
+  background-color: var(--text-danger-color);
+  color: white;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.8rem;
+  line-height: 1rem;
+  font-weight: bold;
+}
+
+.help-modal {
+  max-width: 90vw;
+}

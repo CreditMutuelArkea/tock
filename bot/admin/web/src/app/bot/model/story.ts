@@ -195,7 +195,8 @@ export class StoryDefinitionConfiguration extends AnswerContainer {
     public description: string = '',
     public tags: string[] = [],
     public configuredAnswers: BotConfiguredAnswer[] = [],
-    public configuredSteps: BotConfiguredSteps[] = []
+    public configuredSteps: BotConfiguredSteps[] = [],
+    public metricStory: boolean = false
   ) {
     super(currentType, answers, category);
   }
@@ -250,7 +251,8 @@ export class StoryDefinitionConfiguration extends AnswerContainer {
       this.description,
       this.tags,
       this.configuredAnswers,
-      this.configuredSteps
+      this.configuredSteps,
+      this.metricStory
     );
   }
 
@@ -338,6 +340,11 @@ export class MandatoryEntity extends AnswerContainer {
   }
 }
 
+export interface StoryStepMetric {
+  indicatorName: string;
+  indicatorValueName: string;
+}
+
 export class StoryStep extends AnswerContainer {
   constructor(
     public name: string,
@@ -349,7 +356,8 @@ export class StoryStep extends AnswerContainer {
     public userSentence: I18nLabel,
     public children: StoryStep[],
     public level: number,
-    public entity?: EntityStepSelection
+    public entity?: EntityStepSelection,
+    public metrics?: StoryStepMetric[]
   ) {
     super(currentType, answers, category);
   }

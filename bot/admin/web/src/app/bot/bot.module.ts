@@ -23,10 +23,10 @@ import { AuthGuard } from '../core-nlp/auth/auth.guard';
 import { BotSharedModule } from '../shared/bot-shared.module';
 import { BotConfigurationModule } from '../configuration/configuration.module';
 import { MomentModule } from 'ngx-moment';
-import { CreateStoryComponent } from './story/create-story.component';
+import { CreateStoryComponent } from './story/create-story/create-story.component';
 import { BotService } from './bot-service';
 import { BotTabsComponent } from './bot-tabs.component';
-import { BackButtonHolder, SearchStoryComponent, SearchStoryNavigationGuard } from './story/search-story.component';
+import { BackButtonHolder, SearchStoryComponent, SearchStoryNavigationGuard } from './story/search-story/search-story.component';
 import { NlpModule } from '../nlp-tabs/nlp.module';
 import { ApplicationResolver } from '../core-nlp/application.resolver';
 import { I18nComponent } from './i18n/i18n.component';
@@ -34,44 +34,43 @@ import { FileUploadModule } from 'ng2-file-upload';
 import { I18nLabelComponent } from './i18n/i18n-label.component';
 import { FeatureComponent } from './feature/feature.component';
 import { StoryComponent } from './story/story.component';
-import { AnswerComponent } from './story/answer.component';
-import { SimpleAnswerComponent } from './story/simple-answer.component';
-import { ScriptAnswerComponent } from './story/script-answer.component';
-import { AnswerDialogComponent } from './story/answer-dialog.component';
-import { StoryDialogComponent } from './story/story-dialog.component';
-import { MandatoryEntitiesDialogComponent } from './story/mandatory-entities-dialog.component';
-import { StepDialogComponent } from './story/step-dialog.component';
-import { StepsComponent } from './story/steps.component';
-import { StepComponent } from './story/step.component';
+import { AnswerComponent, AnswerDialogComponent, ScriptAnswerComponent, SimpleAnswerComponent } from './story/answer';
+import { StoryDialogComponent } from './story/story-dialog/story-dialog.component';
+import { MandatoryEntitiesDialogComponent } from './story/mandatory-entities/mandatory-entities-dialog.component';
+import { StepComponent, StepDialogComponent, StepsComponent } from './story/action';
 import { MediaDialogComponent } from './story/media/media-dialog.component';
 import { ThemeModule } from '../theme/theme.module';
 import {
   NbAccordionModule,
+  NbAlertModule,
   NbAutocompleteModule,
   NbBadgeModule,
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
+  NbDialogModule,
   NbFormFieldModule,
   NbIconModule,
   NbInputModule,
+  NbListModule,
   NbRadioModule,
   NbRouteTabsetModule,
   NbSelectModule,
   NbSpinnerModule,
+  NbTagModule,
   NbTooltipModule
 } from '@nebular/theme';
 import { ApplicationFeatureComponent } from './feature/application-feature.component';
 import { StoryRuleComponent } from './feature/story-rule.component';
-import { SelectEntityDialogComponent } from './story/select-entity-dialog.component';
+import { SelectEntityDialogComponent } from './story/select-entity-dialog/select-entity-dialog.component';
 import { StoryRuntimeSettingsComponent } from './feature/story-runtime-settings.component';
-import { StoryTagComponent } from './story/story-tag.component';
-import { MatCardModule } from '@angular/material/card';
+import { StoryTagComponent } from './story/story-tag/story-tag.component';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { I18nExportComponent } from './i18n/i18n-export.component';
 import { I18nImportComponent } from './i18n/i18n-import.component';
 import { ApplicationFeaturesTableComponent } from './feature/application-features-table.component';
+import { NlpService } from '../nlp-tabs/nlp.service';
 import {DocumentsStoryComponent} from "./story/documents-story.component";
 
 const routes: Routes = [
@@ -141,13 +140,17 @@ export class BotRoutingModule {}
     NbTooltipModule,
     NbInputModule,
     NbRadioModule,
-    MatCardModule,
     MatIconModule,
     MatGridListModule,
     NbFormFieldModule,
     NbIconModule,
     NbButtonModule,
-    NbAutocompleteModule
+    NbDialogModule,
+    NbAutocompleteModule,
+    NbBadgeModule,
+    NbListModule,
+    NbTagModule,
+    NbAlertModule
   ],
   declarations: [
     BotTabsComponent,
@@ -178,7 +181,7 @@ export class BotRoutingModule {}
     StoryTagComponent
   ],
   exports: [],
-  providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard],
+  providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard, NlpService],
   entryComponents: [
     StoryDialogComponent,
     AnswerDialogComponent,

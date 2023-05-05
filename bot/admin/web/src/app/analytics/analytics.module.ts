@@ -51,7 +51,7 @@ import {
   NbDialogModule,
   NbRadioModule
 } from '@nebular/theme';
-import {ReactiveFormsModule} from "@angular/forms";
+import { ReactiveFormsModule } from "@angular/forms";
 import { ChartComponent } from './chart/chart.component';
 import { ChartDialogComponent } from './chart-dialog/chart-dialog.component';
 import { ActivityComponent } from './activity/activity.component';
@@ -61,9 +61,9 @@ import { FlowComponent } from './flow/flow.component';
 import { CytoComponent } from './flow/cyto.component';
 import { PreferencesComponent } from './preferences/preferences.component';
 import { NgxEchartsModule } from 'ngx-echarts';
-import { SatisfactionComponent} from "./satisfaction/satisfaction.component";
-import {ActivateSatisfactionComponent} from "./satisfaction/activate-satisfaction/activate-satisfaction.component";
-import {SatisfactionDetailsComponent} from "./satisfaction/satisfaction-details/satisfaction-details.component";
+import { SatisfactionComponent } from "./satisfaction/satisfaction.component";
+import { ActivateSatisfactionComponent } from "./satisfaction/activate-satisfaction/activate-satisfaction.component";
+import { SatisfactionDetailsComponent } from "./satisfaction/satisfaction-details/satisfaction-details.component";
 
 export function importEcharts() {
   return import('echarts');
