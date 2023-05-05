@@ -16,6 +16,7 @@
 
 package ai.tock.shared.exception.rest
 
+import ai.tock.shared.exception.error.ErrorMessage
 import ai.tock.shared.exception.error.ErrorMessageWrapper
 import io.netty.handler.codec.http.HttpResponseStatus
 
@@ -24,6 +25,7 @@ import io.netty.handler.codec.http.HttpResponseStatus
  */
 class ConflictException(httpResponseBody: ErrorMessageWrapper)
     : RestException(httpResponseBody, HttpResponseStatus.CONFLICT) {
+    constructor(errorCode: Int, message: String) : this(ErrorMessageWrapper(setOf(ErrorMessage(errorCode.toString(), message))))
     constructor(message: String) : this(ErrorMessageWrapper(message))
 }
 

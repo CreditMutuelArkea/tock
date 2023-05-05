@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2023 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-.container {
-  display: flex;
-  flex-direction: column;
-}
+package ai.tock.bot.admin.indicators.metric
 
-.container > * {
-  width: 100%;
-}
-
-.steps {
-  margin-left: -20px;
-  margin-right: 100px;
-}
-
-.submit-button {
-  margin-left: 20px;
+/**
+ * Metric group by attributes
+ */
+enum class MetricGroupBy {
+    TYPE,
+    EMITTER_STORY_ID,
+    TRACKED_STORY_ID,
+    INDICATOR_NAME,
+    INDICATOR_VALUE_NAME,
 }

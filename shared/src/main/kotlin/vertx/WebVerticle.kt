@@ -64,14 +64,13 @@ import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
-
+import java.util.Locale
+import java.util.ServiceLoader
 import kotlin.LazyThreadSafetyMode.PUBLICATION
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
-import java.util.Locale
-import java.util.ServiceLoader
 
 /**
  * Base class for web Tock [io.vertx.core.Verticle]s. Provides utility methods.
@@ -244,8 +243,9 @@ abstract class WebVerticle : AbstractVerticle() {
 
     fun addAuth(
         authProvider: TockAuthProvider = defaultAuthProvider(),
-        pathsToProtect: Set<String> = protectedPaths().map { "$it/*" }.toSet()
+        pathsToProtect: MutableSet<String> = protectedPaths().map { "$it/*" }.toMutableSet()
     ) {
+        pathsToProtect.addAll(protectedPaths())
         val https = !devEnvironment && booleanProperty("tock_https_env", true)
         val sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
             .setSessionTimeout(6 * 60 * 60 * 1000 /*6h*/)
@@ -330,6 +330,7 @@ abstract class WebVerticle : AbstractVerticle() {
         basePath: String = rootPath,
         handler: (RoutingContext) -> Unit
     ) {
+
         router.route(method, "$basePath$path")
             .handler { context ->
                 val user = context.user()
@@ -896,11 +897,13 @@ abstract class WebVerticle : AbstractVerticle() {
         get() = user?.user ?: error("no user in session")
 
     private fun HttpServerResponse.endJson(result: Any?) {
+
+        if (ended()) return
+
+        this.putHeader("content-type", "application/json; charset=utf-8")
+
         if (result == null) {
             statusCode = 204
-        }
-        this.putHeader("content-type", "application/json; charset=utf-8")
-        if (result == null) {
             end()
         } else {
             val output = mapper.writeValueAsString(result)
@@ -913,7 +916,7 @@ abstract class WebVerticle : AbstractVerticle() {
      * See https://vertx.io/docs/vertx-web/java/#_route_match_failures
      */
     open fun defaultErrorHandler(statusCode: Int): Handler<RoutingContext> = Handler<RoutingContext> { event ->
-        logger.error { "Error  $statusCode: ${event.request().path()}" }
+        logger.error { "Error $statusCode: ${event.request().path()}" }
         tockErrorHandler.handle(event)
     }
 }

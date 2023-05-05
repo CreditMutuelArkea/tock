@@ -70,13 +70,16 @@ import io.mockk.unmockkObject
 import io.mockk.verify
 import org.apache.commons.lang3.StringUtils
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
@@ -90,7 +93,6 @@ class FaqAdminServiceTest : AbstractTest() {
         val i18nDAO: I18nDAO = mockk(relaxed = false)
         val faqSettingsDAO: FaqSettingsDAO = mockk(relaxed = true)
 
-
         init {
             // IOC
             tockInternalInjector = KodeinInjector()
@@ -101,14 +103,12 @@ class FaqAdminServiceTest : AbstractTest() {
                 bind<IntentDefinitionDAO>() with provider { intentDAO }
                 bind<I18nDAO>() with provider { i18nDAO }
                 bind<FaqSettingsDAO>() with provider { faqSettingsDAO }
-                //bind<StoryService>() with provider { storyService }
             }
             tockInternalInjector.inject(Kodein {
                 import(defaultModulesBinding())
                 import(specificModule)
             })
         }
-
 
         private val applicationId = newId<ApplicationDefinition>()
         private val botId = "botId"
@@ -1095,6 +1095,7 @@ class FaqAdminServiceTest : AbstractTest() {
             val faqResult = faqAdminService.searchFAQ(faqSearchRequest, applicationDefinition)
 
             assertEquals(faqResult.total, 2, "There should be two faq found when searching for a label question")
+
         }
 
         @Test

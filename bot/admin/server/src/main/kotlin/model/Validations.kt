@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,34 +14,24 @@
  * limitations under the License.
  */
 
-.container {
-  display: flex;
-  flex-direction: column;
-  min-width: 400px;
+package ai.tock.bot.admin.model
+
+interface ToValidate {
+    fun validate() : List<String>
 }
 
-.container > * {
-  width: 100%;
+/**
+ * Validate the request, if any bad request add error into the list
+ * if no errors return an empty list
+ * otherwise return a list of errors
+ */
+data class Valid<T: ToValidate> (val data: T) {
+    init {
+        data.validate().let {
+            if (it.isNotEmpty()) throw ValidationError(it.joinToString("\n"))
+        }
+    }
 }
 
-.submit-button {
-  margin-left: 20px;
-}
+data class ValidationError(override val message: String?) : Exception(message)
 
-.table {
-  display: table;
-}
-
-.line {
-  display: table-row;
-}
-
-.entity-button {
-  padding-right: 10px;
-  padding-left: 10px;
-  display: table-cell;
-}
-
-.answer {
-  max-width: 300px;
-}
