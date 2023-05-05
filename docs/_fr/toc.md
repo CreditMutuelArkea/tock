@@ -43,6 +43,14 @@ title: Table des matières
     - [Internationalisation (_i18n_)](../dev/i18n)
     - [Liste des APIs Tock](../dev/api)
     - [Exemples de code](../dev/exemples-code)
+    - [Avancé](../dev/advanced) :
+        - [Explications principales](../dev/advanced/main-classes-explanation)
+        - [Bot Api](../dev/advanced/bot-api-advanced)
+        - [Collections Mongo](../dev/advanced/collections)
+        - [Les différents modules](../dev/advanced/packages)
+        - [Nlp](../dev/advanced/nlp) :
+          - [Les modèles nlp et les modèles d'entités diagramme](../dev/advanced/nlp/nlp-intents-and-entities-evaluation-simplifed-diagram)
+          - [Les modèles nlp et les modèles d'entités](../dev/advanced/nlp/nlp-models-and-entity-models)
 
 - Administrer Tock :
     - [Architecture fonctionnelle et technique](../admin/architecture)

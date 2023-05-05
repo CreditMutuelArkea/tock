@@ -70,15 +70,13 @@ content:
       - title: 'Avancé'
         children:
           - title: 'Explication principales'
-            permalink: "fr/dev/advanced/main-classes"
+            url: 'fr/dev/advanced/main-classes-explanation'
           - title: 'Bot Api'
-            url: "fr/dev/advanced/bot-api-advanced"
+            url: "fr/dev/advanced/bot-api"
           - title: 'Collections Mongo'
             url: "fr/dev/advanced/collections"
           - title: "Les différents modules"
             url: "fr/dev/advanced/packages"
-          - title: 'Les différents modules toto'
-            url: 'fr/dev/advanced/toto'
           - title: 'Nlp'
             url : 'fr/dev/advanced/nlp'
             children:
