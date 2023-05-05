@@ -34,7 +34,8 @@
     <div *ngIf="!loading">
       <nb-card *ngFor="let deduplicatedIntent of deduplicatedIntents">
         <nb-card-header>
-          {{ deduplicatedIntent.intent?.label }}
+          <span *ngIf="!doesIntentBelongToCurrentNameSpace(deduplicatedIntent.intent)">{{ deduplicatedIntent.intent.namespace }}:</span
+          >{{ deduplicatedIntent.intent?.label }}
           <span *ngIf="!deduplicatedIntent.intent?.label">
             {{ deduplicatedIntent.intent?.name }}
           </span>

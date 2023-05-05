@@ -22,7 +22,8 @@ import {
   ScenarioContext,
   ScenarioVersionExtended,
   ACTION_OR_CONTEXT_NAME_MINLENGTH,
-  ScenarioIntentDefinitionForm
+  ScenarioIntentDefinitionForm,
+  ScenarioIntentDefinition
 } from '../../../models';
 import { entityColor, EntityDefinition, Intent, qualifiedName, qualifiedRole, Sentence } from '../../../../model/nlp';
 import { Token } from '../../../../sentence-analysis/highlight/highlight.component';
@@ -198,7 +199,7 @@ export class IntentEditComponent implements OnInit, OnDestroy {
 
     this._sentences.forEach((_sentence) => {
       if (_sentence.classification) {
-        const intent = this.stateService.currentApplication.intentById(_sentence.classification.intentId);
+        const intent = this.stateService.findSharedNamespaceIntentById(_sentence.classification.intentId);
         intents.add(intent);
       }
     });
@@ -307,6 +308,18 @@ export class IntentEditComponent implements OnInit, OnDestroy {
 
   getContextEntityContrast(context: ScenarioContext): string | undefined {
     if (context.entityType) return getContrastYIQ(entityColor(qualifiedRole(context.entityType, context.entityRole)));
+  }
+
+  getIntentDefinitionIntent(intentDefinition: ScenarioIntentDefinition): Intent {
+    if (!intentDefinition.intentId) return null;
+    const intent = this.stateService.findSharedNamespaceIntentById(intentDefinition.intentId);
+    return intent ?? null;
+  }
+
+  doesIntentBelongToCurrentNameSpace(intentDefinition: ScenarioIntentDefinition): boolean {
+    const intent = this.getIntentDefinitionIntent(intentDefinition);
+    if (!intent) return true;
+    return intent.namespace === this.stateService.currentApplication.namespace;
   }
 
   save(): void {
