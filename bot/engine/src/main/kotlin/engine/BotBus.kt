@@ -56,6 +56,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabelValue
+import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
 
 /**
