@@ -23,8 +23,7 @@
       *ngIf="displayEntities"
       [sentence]="sentence"
     ></tock-highlight>
-    <span style="float: right;">{{sentence.configuration}}</span>
-
+    <span style="float: right">{{ sentence.configuration }}</span>
   </nb-card-header>
   <nb-card-body (click)="displayAllView()">
     <div
@@ -33,10 +32,17 @@
     >
       <span
         class="update-intent"
-        title="Modify the Intent"
         (click)="focusOnIntentSelect(); $event.stopPropagation()"
-        >{{ sentence.getIntentLabel(this.state) }}
-        <nb-icon icon="edit-2-outline"></nb-icon>
+      >
+        <span
+          *ngIf="state.isOtherNamespaceIntent(selectedIntent)"
+          nbTooltip="Namespace"
+          >{{ selectedIntent.namespace }}:</span
+        >{{ selectedIntentLabel }}
+        <nb-icon
+          icon="edit-2-outline"
+          nbTooltip="Edit"
+        ></nb-icon>
       </span>
       <span
         *ngIf="displayStatus"
@@ -63,6 +69,7 @@
         shape="semi-round"
         class="btn"
         (click)="onValidate(); $event.stopPropagation()"
+        [disabled]="state.isOtherNamespaceIntent(selectedIntent)"
       >
         Validate
       </button>
