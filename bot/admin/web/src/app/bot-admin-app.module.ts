@@ -69,6 +69,10 @@ const routes: Routes = [
     path: 'faq',
     loadChildren: () => import('./faq/faq.module').then((m) => m.FaqModule)
   },
+  {
+    path: 'sources-management',
+    loadChildren: () => import('./sources-management/sources-management.module').then((m) => m.SourcesManagementModule)
+  },
   { path: '**', redirectTo: '/nlp/inbox' }
 ];
 
