@@ -142,7 +142,7 @@
         </tock-form-control>
       </div>
 
-      <div *ngIf="currentTab == 'question'">
+      <div *ngIf="currentTab == faqTabs.QUESTION">
         <div *ngIf="showGenerateSentencesV2">
           <tock-sentences-generation-content
             [closable]="true"
@@ -212,7 +212,7 @@
                 ></nb-icon>
               </button>
 
-              <button
+              <!-- <button
                 nbButton
                 type="button"
                 nbTooltip="Generate sentences V2"
@@ -224,7 +224,7 @@
                   icon="bulb-outline"
                   status="success"
                 ></nb-icon>
-              </button>
+              </button> -->
             </div>
           </tock-form-control>
 
@@ -335,7 +335,7 @@
         </div>
       </div>
 
-      <div *ngIf="currentTab == 'answer'">
+      <div *ngIf="currentTab == faqTabs.ANSWER">
         <tock-form-control
           label="Answer"
           name="answer"
