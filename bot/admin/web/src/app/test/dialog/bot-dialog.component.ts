@@ -31,6 +31,7 @@ import { AnalyticsService } from '../../analytics/analytics.service';
 import { APP_BASE_HREF } from '@angular/common';
 import { ScenarioService } from 'src/app/scenarios/services/scenario.service';
 import { EventType } from '../../core/model/configuration';
+
 import { NlpService } from '../../nlp-tabs/nlp.service';
 import { SearchQuery } from '../../model/nlp';
 import { ChatUiComponent } from '../../shared/components';

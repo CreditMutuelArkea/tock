@@ -40,7 +40,10 @@ export class TestService {
   }
 
   getDebugLog(namespace: String, botApplicationConfigurationId: String): Observable<ScenarioDebug> {
-    return this.rest.get(`/test/talk/debug?namespace=${namespace}&botApplicationConfigurationId=${botApplicationConfigurationId}`, ScenarioDebug.fromJSON);
+    return this.rest.get(
+      `/test/talk/debug?namespace=${namespace}&botApplicationConfigurationId=${botApplicationConfigurationId}`,
+      ScenarioDebug.fromJSON
+    );
   }
 
   getTestPlans(): Observable<TestPlan[]> {
