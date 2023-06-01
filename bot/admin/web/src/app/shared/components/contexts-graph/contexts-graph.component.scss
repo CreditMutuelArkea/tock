@@ -1,6 +1,10 @@
-@import '../scenario-conception//scenario-conception-item.component.scss';
 @import '@nebular/theme/styles/theming';
 @import '@nebular/theme/styles/themes';
+
+// @import '../scenario-conception//scenario-conception-item.component.scss';
+$bot-color: #90c3ea;
+$bot-final-color: #43abf5;
+$client-color: white;
 
 #modal-body {
   padding: 0;

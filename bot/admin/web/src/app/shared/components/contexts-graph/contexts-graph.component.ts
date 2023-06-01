@@ -3,10 +3,10 @@ import { NbDialogRef } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { Edge, GraphEdge, graphlib, layout, Node } from 'dagre';
 
-import { getScenarioActionDefinitions } from '../../commons/utils';
-import { ScenarioActionDefinition, ScenarioVersionExtended } from '../../models';
+import { getScenarioActionDefinitions } from '../../../scenarios/commons/utils';
+import { ScenarioActionDefinition, ScenarioVersionExtended } from '../../../scenarios/models';
 import { svgPathRoundedCorners } from './utils';
-import { CanvaAction, OffsetPosition } from '../../../shared/canvas/models';
+import { CanvaAction, OffsetPosition } from '../../canvas/models';
 import { StateService } from '../../../core-nlp/state.service';
 
 type GraphNode = Node & { name?: string; actionDef?: ScenarioActionDefinition; type?: string };

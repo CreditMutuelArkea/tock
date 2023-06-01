@@ -24,7 +24,7 @@ import {
   removeSmStateById
 } from '../../commons/utils';
 import { ContextCreateComponent } from './context-create/context-create.component';
-import { ContextsGraphComponent } from '../contexts-graph/contexts-graph.component';
+import { ContextsGraphComponent } from '../../../shared/components/contexts-graph/contexts-graph.component';
 import { TriggerCreateComponent } from './trigger-create/trigger-create.component';
 import { ChoiceDialogComponent } from '../../../shared/components';
 import { OffsetPosition } from '../../../shared/canvas/models';

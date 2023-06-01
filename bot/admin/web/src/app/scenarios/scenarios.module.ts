@@ -52,7 +52,7 @@ import { ScenarioExportComponent } from './scenarios-list/scenario-export/scenar
 import { NlpService } from '../nlp-tabs/nlp.service';
 import { ScenarioFiltersComponent } from './scenarios-list/scenario-filters/scenario-filters.component';
 import { ScenarioDesignerService } from './scenario-designer/scenario-designer.service';
-import { ContextsGraphComponent } from './scenario-designer/contexts-graph/contexts-graph.component';
+import { ContextsGraphComponent } from '../shared/components/contexts-graph/contexts-graph.component';
 import { ScenarioCanvasWrapperComponent } from './scenario-designer/scenario-canvas-wrapper/scenario-canvas-wrapper.component';
 import { TriggerCreateComponent } from './scenario-designer/scenario-conception/trigger-create/trigger-create.component';
 import { ScenariosSettingsComponent } from './scenarios-list/scenarios-settings/scenarios-settings.component';
