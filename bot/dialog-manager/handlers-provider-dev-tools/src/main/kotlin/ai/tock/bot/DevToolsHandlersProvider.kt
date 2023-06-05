@@ -26,11 +26,16 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
 
     private enum class HandlerId {
         DO_NOTHING,
-        SET_CONTEXT
+        SET_CONTEXT,
+        GET_BIRTH_DATE,
+        CHECK_ELIGIBILITY
     }
 
     private enum class ContextName {
-        DEV_CONTEXT
+        DEV_CONTEXT,
+        BIRTH_DATE,
+        ELIGIBLE,
+        INELIGIBLE
     }
 
     override fun getActionHandlers(): Set<ActionHandler> =
@@ -38,7 +43,26 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
             createActionHandler(
                 id = HandlerId.DO_NOTHING.name,
                 description = "Handler witch does nothing. It is used to force the next round",
-                handler = { emptyMap() })
+                handler = { emptyMap() }),
+            createActionHandler(
+                id = HandlerId.GET_BIRTH_DATE.name,
+                outputContexts = setOf(ContextName.BIRTH_DATE.name),
+                handler = {
+                    // API CALL
+                    mapOf(ContextName.BIRTH_DATE.name to "03/03/1998")
+                }
+            ),
+            createActionHandler(
+                id = HandlerId.CHECK_ELIGIBILITY.name,
+                inputContexts = setOf(ContextName.BIRTH_DATE.name),
+                outputContexts = setOf(ContextName.ELIGIBLE.name, ContextName.INELIGIBLE.name),
+                handler = {
+                    if(it[ContextName.BIRTH_DATE.name] == "03/03/1998")
+                        mapOf(ContextName.ELIGIBLE.name to null)
+                    else
+                        mapOf(ContextName.INELIGIBLE.name to null)
+                }
+            )
         ).plus(
             (1..7).map { counter ->
                 createActionHandler(
@@ -49,5 +73,6 @@ class DevToolsHandlersProvider : ActionHandlersProvider {
                 )
             }
         )
+
 
 }

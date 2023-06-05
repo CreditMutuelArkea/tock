@@ -36,7 +36,7 @@ import mu.KotlinLogging
 import java.util.Stack
 
 // FIXME (WITH DERCBOT-321)
-val debugEnabled = booleanProperty("tock_bot_dialog_manager_debug_enabled", false)
+val debugEnabled = booleanProperty("tock_bot_dialog_manager_debug_enabled", true)
 
 /**
  * A processor of tick story, it orchestrates the use of the state machine and the solver.
