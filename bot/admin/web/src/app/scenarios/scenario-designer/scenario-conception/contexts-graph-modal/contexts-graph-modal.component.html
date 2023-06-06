@@ -1,0 +1,16 @@
+<nb-card>
+  <nb-card-body id="modal-body">
+    <button
+      id="closeButton"
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Close"
+      (click)="close()"
+    >
+      <nb-icon icon="close-outline"></nb-icon>
+    </button>
+
+    <tock-scenario-contexts-graph [scenario]="scenario"></tock-scenario-contexts-graph>
+  </nb-card-body>
+</nb-card>

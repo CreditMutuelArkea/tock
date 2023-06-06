@@ -14,8 +14,8 @@
   ~ limitations under the License.
   -->
 
-<div class="flex-container">
-  <nb-card class="dialog">
+<div class="d-flex mt-2">
+  <nb-card class="flex-grow-1">
     <nb-card-header>
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-1">
         <h4>
@@ -290,9 +290,21 @@
   </nb-card>
 
   <div
-    class="graph"
-    *ngIf="imgBase64"
+    class="graph-wrapper"
+    *ngIf="graphScenario"
   >
-    <img src="data:image/png;base64,{{ imgBase64 }}" />
+    <nb-card>
+      <tock-scenario-contexts-graph
+        [scenario]="graphScenario"
+        [showCanvasControls]="false"
+      ></tock-scenario-contexts-graph>
+    </nb-card>
   </div>
 </div>
+
+<!-- <div
+  class="graph"
+  *ngIf="imgBase64"
+>
+  <img src="data:image/png;base64,{{ imgBase64 }}" />
+</div> -->

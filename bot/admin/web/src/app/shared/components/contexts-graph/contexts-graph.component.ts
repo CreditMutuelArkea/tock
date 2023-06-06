@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NbDialogRef } from '@nebular/theme';
+// import { NbDialogRef } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { Edge, GraphEdge, graphlib, layout, Node } from 'dagre';
 
@@ -20,6 +20,7 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
   destroy = new Subject();
 
   @Input() scenario: ScenarioVersionExtended;
+  @Input() showCanvasControls: boolean = true;
   @ViewChild('canvasWrapperElem', { read: ElementRef }) canvasWrapperElem: ElementRef;
   @ViewChild('dummyContainer') dummyContainer: ElementRef;
 
@@ -32,7 +33,7 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
 
   readonly canvaAction: typeof CanvaAction = CanvaAction;
 
-  constructor(private dialogRef: NbDialogRef<ContextsGraphComponent>, private stateService: StateService) {}
+  constructor(private stateService: StateService) {}
 
   ngOnInit(): void {
     this.initNodesList();
@@ -181,9 +182,12 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
       offsetWidth: graphAttributes.width,
       offsetHeight: Math.min(graphAttributes.height, this.canvasWrapperElem.nativeElement.offsetHeight - 50)
     };
-
+    this.contentSize.width = graphAttributes.width;
+    this.contentSize.height = graphAttributes.height;
     this.graphReady = true;
   }
+
+  contentSize: { width: number; height: number } = { width: 0, height: 0 };
 
   getNodeTooltip(node: GraphNode): string {
     if (node.type == 'action') {
@@ -282,10 +286,6 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
       this.getNodeDescendants(p, stack);
     });
     return stack;
-  }
-
-  cancel(): void {
-    this.dialogRef.close();
   }
 
   ngOnDestroy(): void {

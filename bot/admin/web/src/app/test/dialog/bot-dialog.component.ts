@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TestService } from '../test.service';
 import { StateService } from '../../core-nlp/state.service';
 import { RestService } from '../../core-nlp/rest/rest.service';
@@ -27,14 +27,12 @@ import { Observable, of, Subscription } from 'rxjs';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { SentenceFilter } from '../../sentences-scroll/sentences-scroll.component';
 import { NbToastrService } from '@nebular/theme';
-import { AnalyticsService } from '../../analytics/analytics.service';
-import { APP_BASE_HREF } from '@angular/common';
-import { ScenarioService } from 'src/app/scenarios/services/scenario.service';
-import { EventType } from '../../core/model/configuration';
 
-import { NlpService } from '../../nlp-tabs/nlp.service';
 import { SearchQuery } from '../../model/nlp';
 import { ChatUiComponent } from '../../shared/components';
+import { ScenarioVersion } from '../../scenarios/models';
+import { scenario } from './scenario-mock';
+import { NlpService } from '../../nlp-tabs/nlp.service';
 
 @Component({
   selector: 'tock-bot-dialog',
@@ -69,7 +67,8 @@ export class BotDialogComponent implements OnInit, OnDestroy {
 
   @ViewChild('chatUi') private chatUi: ChatUiComponent;
 
-  imgBase64: String;
+  graphScenario: ScenarioVersion = scenario as ScenarioVersion;
+  // imgBase64: String;
 
   constructor(
     public state: StateService,
@@ -78,10 +77,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     private shared: BotSharedService,
     private toastrService: NbToastrService,
     private dialog: MatDialog,
-    private nlp: NlpService,
-
-    private scenarioService: ScenarioService, // TODO MASS : FIX ME !
-    @Inject(APP_BASE_HREF) public baseHref: string
+    private nlp: NlpService
   ) {}
 
   ngOnInit() {

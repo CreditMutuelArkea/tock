@@ -29,6 +29,7 @@ import { TriggerCreateComponent } from './trigger-create/trigger-create.componen
 import { ChoiceDialogComponent } from '../../../shared/components';
 import { OffsetPosition } from '../../../shared/canvas/models';
 import { StoryDefinitionConfigurationSummary } from '../../../bot/model/story';
+import { ContextsGraphModalComponent } from './contexts-graph-modal/contexts-graph-modal.component';
 
 const CANVAS_TRANSITION_TIMING: number = 300;
 
@@ -473,7 +474,7 @@ export class ScenarioConceptionComponent implements OnInit, OnDestroy {
   }
 
   displayGraph(): void {
-    this.nbDialogService.open(ContextsGraphComponent, {
+    this.nbDialogService.open(ContextsGraphModalComponent, {
       context: {
         scenario: this.scenario
       },

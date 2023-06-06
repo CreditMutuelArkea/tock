@@ -1,28 +1,16 @@
 @import '@nebular/theme/styles/theming';
 @import '@nebular/theme/styles/themes';
 
-// @import '../scenario-conception//scenario-conception-item.component.scss';
 $bot-color: #90c3ea;
 $bot-final-color: #43abf5;
 $client-color: white;
 
-#modal-body {
-  padding: 0;
-  position: relative;
-
-  #closeButton {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 2;
-  }
-}
-
 #canvas-wrapper {
   overflow: hidden;
-  min-height: 60vh;
-  max-height: 95vh;
-  height: 90vh;
+  min-height: 10rem;
+  // min-height: 60vh;
+  // max-height: 95vh;
+  // height: 90vh;
 }
 #canvas {
   z-index: 1;

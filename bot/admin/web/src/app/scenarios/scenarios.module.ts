@@ -57,6 +57,7 @@ import { ScenarioCanvasWrapperComponent } from './scenario-designer/scenario-can
 import { TriggerCreateComponent } from './scenario-designer/scenario-conception/trigger-create/trigger-create.component';
 import { ScenariosSettingsComponent } from './scenarios-list/scenarios-settings/scenarios-settings.component';
 import { ScenarioApiService, ScenarioService, ScenarioSettingsService } from './services';
+import { ContextsGraphModalComponent } from './scenario-designer/scenario-conception/contexts-graph-modal/contexts-graph-modal.component';
 
 @NgModule({
   imports: [
@@ -111,10 +112,11 @@ import { ScenarioApiService, ScenarioService, ScenarioSettingsService } from './
     ScenarioTransitionComponent,
     ScenarioImportComponent,
     ScenarioExportComponent,
-    ContextsGraphComponent,
+
     ScenarioCanvasWrapperComponent,
     TriggerCreateComponent,
-    ScenariosSettingsComponent
+    ScenariosSettingsComponent,
+    ContextsGraphModalComponent
   ],
   exports: [],
   providers: [

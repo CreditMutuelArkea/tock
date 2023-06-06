@@ -1,6 +1,6 @@
 <ng-content></ng-content>
 <tock-bottom-actions
-  *ngIf="canvas"
+  *ngIf="showControls && canvas"
   [hideActions]="hideActions"
   [isFullscreen]="isFullscreen"
   (onFullscreen)="fullscreen($event)"

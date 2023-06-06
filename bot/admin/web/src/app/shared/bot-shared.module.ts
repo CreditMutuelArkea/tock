@@ -50,6 +50,7 @@ import {
   ChatUiComponent,
   ChatUiMessageComponent,
   ChoiceDialogComponent,
+  ContextsGraphComponent,
   ErrorHelperComponent,
   FileUploadComponent,
   FormControlComponent,
@@ -114,7 +115,8 @@ import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-mes
     ChatUiMessageSentenceElementComponent,
     ChatUiMessageChoiceComponent,
     ChatUiMessageAttachmentComponent,
-    ChatUiMessageLocationComponent
+    ChatUiMessageLocationComponent,
+    ContextsGraphComponent
   ],
   exports: [
     AutocompleteInputComponent,
@@ -138,7 +140,8 @@ import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-mes
     FullscreenDirective,
     MouseWheelListnerDirective,
 
-    CanvasModule
+    CanvasModule,
+    ContextsGraphComponent
   ],
   providers: [BotSharedService],
   entryComponents: []

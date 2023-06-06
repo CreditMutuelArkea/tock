@@ -39,12 +39,13 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() isFullscreen: boolean = false;
   @Input() maxScale: number = MAX_SCALE;
   @Input() hideActions: Array<CanvaAction> = [];
+  @Input() showControls: boolean = true;
+  @Input() contentSize?: { width: number; height: number };
 
   @Output() onFullscreen = new EventEmitter<boolean>();
 
   private canvasPos = { x: 0, y: 0 };
   private canvasPosOffset = { x: 0, y: 0 };
-  private pointer = { x: 0, y: 0 };
   private canvasScale: number = 1;
   private isDragingCanvas: Position;
 
@@ -60,8 +61,14 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (this.canvas && changes.position?.currentValue && changes.position.currentValue !== changes.position.previousValue) {
-      this.centerOnElement(changes.position.currentValue);
+    console.log(changes);
+    if (this.canvas) {
+      if (changes.position?.currentValue && changes.position.currentValue !== changes.position.previousValue) {
+        this.centerOnElement(changes.position.currentValue);
+      }
+      if (changes.contentSize?.currentValue && changes.contentSize.currentValue !== changes.contentSize.previousValue) {
+        this.computeScale();
+      }
     }
   }
 
@@ -71,7 +78,9 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
       else this.canvas = this.wrapper.firstElementChild as HTMLElement;
 
       if (this.canvas) {
-        if (this.centerCanvasAtInitialisation) this.centerCanvas();
+        if (this.centerCanvasAtInitialisation) {
+          this.centerCanvas();
+        }
       } else {
         throw new Error('The container contains several elements. It is necessary to give a "canvas" identifier to the canvas element');
       }
@@ -87,12 +96,12 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
     if (!wheelEvent && !actionEvent) throw new Error('No event defined');
 
     // Get mouse offset
-    this.pointer.x = (wheelEvent?.clientX || actionEvent.clientX) - this.wrapper.offsetLeft;
-    this.pointer.y = (wheelEvent?.clientY || actionEvent.clientY) - this.wrapper.offsetTop;
+    const pointerX = (wheelEvent?.clientX || actionEvent.clientX) - this.wrapper.offsetLeft;
+    const pointerY = (wheelEvent?.clientY || actionEvent.clientY) - this.wrapper.offsetTop;
 
     // get the current position of the canvas at the current scale relative to the pointer position
-    this.canvasPosOffset.x = (this.pointer.x - this.canvasPos.x) / this.canvasScale;
-    this.canvasPosOffset.y = (this.pointer.y - this.canvasPos.y) / this.canvasScale;
+    this.canvasPosOffset.x = (pointerX - this.canvasPos.x) / this.canvasScale;
+    this.canvasPosOffset.y = (pointerY - this.canvasPos.y) / this.canvasScale;
 
     // set new scale
     const scale = wheelEvent ? wheelEvent.deltaY : actionEvent.scale;
@@ -103,8 +112,8 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
     if (this.canvasScale >= 1 - zoomOneMagnetism && this.canvasScale <= 1 + zoomOneMagnetism) this.canvasScale = 1;
 
     // set new position of the canvas
-    this.canvasPos.x = -this.canvasPosOffset.x * this.canvasScale + this.pointer.x;
-    this.canvasPos.y = -this.canvasPosOffset.y * this.canvasScale + this.pointer.y;
+    this.canvasPos.x = -this.canvasPosOffset.x * this.canvasScale + pointerX;
+    this.canvasPos.y = -this.canvasPosOffset.y * this.canvasScale + pointerY;
 
     this.setCanvasTransform();
   }
@@ -124,6 +133,12 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
       clientY: this.wrapper.offsetHeight / 2 + this.wrapper.offsetTop
     };
     this.zoomCanvas(null, actionEvent);
+  }
+
+  computeScale() {
+    console.log(this.contentSize);
+    console.log(this.wrapper.offsetWidth);
+    console.log(this.canvas);
   }
 
   centerCanvas(): void {
@@ -202,8 +217,7 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
         clientX: event.clientX,
         clientY: event.clientY
       };
-      let canvas = this.canvas;
-      canvas.style.transition = 'unset';
+      this.canvas.style.transition = 'unset';
     }
   }
 
@@ -218,8 +232,7 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
 
     if (event.button == 0) {
       this.isDragingCanvas = undefined;
-      let canvas = this.canvas;
-      canvas.style.transition = `transform .${CANVAS_TRANSITION_TIMING}s`;
+      this.canvas.style.transition = `transform .${CANVAS_TRANSITION_TIMING}s`;
     }
   }
 

@@ -9,3 +9,4 @@ export * from './json-previewer/json-previewer.component';
 export * from './no-bot-configuration/no-bot-configuration.component';
 export * from './no-data-found/no-data-found.component';
 export * from './pagination/pagination.component';
+export * from './contexts-graph/contexts-graph.component';

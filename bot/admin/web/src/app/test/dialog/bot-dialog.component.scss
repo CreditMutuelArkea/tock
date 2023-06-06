@@ -21,10 +21,6 @@
   margin-top: -12px;
 }
 
-.dialog {
-  margin-top: 20px;
-}
-
 #messagesWrapper {
   max-height: 50vh;
   overflow-y: auto;
@@ -71,11 +67,15 @@
   margin: 0 10px 0 10px;
 }
 
-.graph {
-  position: absolute;
-  top: 5rem;
-  left: 1rem;
-  IMG {
-    max-width: 15rem;
-  }
+.graph-wrapper {
+  min-width: 10rem;
 }
+
+// .graph {
+//   position: absolute;
+//   top: 5rem;
+//   left: 1rem;
+//   IMG {
+//     max-width: 15rem;
+//   }
+// }
