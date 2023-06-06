@@ -7,7 +7,7 @@ title: Custom Metrics
 Le menu _Custom Metrics_ permet de créer et visualiser des statistiques de consultation et d'usage des stories Tock.
 Il est destiné à un public métier qui souhaite monitorer la performance des stories (faqs, scénarios...) au sein d'une application Tock.
 
-> Pour accéder à cette page il faut bénéficier du rôle _faqBotUser_.
+> Pour accéder à cette page il faut bénéficier du rôle _botUser_ ou _faqBotUser_.
 
 ## Onglet _Metrics_
 
