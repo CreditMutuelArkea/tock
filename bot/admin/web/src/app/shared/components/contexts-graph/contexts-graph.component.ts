@@ -176,18 +176,15 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
     });
 
     const graphAttributes = this.graph.graph();
+
     this.canvasPosition = {
       offsetLeft: 0,
       offsetTop: 0,
       offsetWidth: graphAttributes.width,
       offsetHeight: Math.min(graphAttributes.height, this.canvasWrapperElem.nativeElement.offsetHeight - 50)
     };
-    this.contentSize.width = graphAttributes.width;
-    this.contentSize.height = graphAttributes.height;
     this.graphReady = true;
   }
-
-  contentSize: { width: number; height: number } = { width: 0, height: 0 };
 
   getNodeTooltip(node: GraphNode): string {
     if (node.type == 'action') {

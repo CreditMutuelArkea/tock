@@ -40,7 +40,6 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() maxScale: number = MAX_SCALE;
   @Input() hideActions: Array<CanvaAction> = [];
   @Input() showControls: boolean = true;
-  @Input() contentSize?: { width: number; height: number };
 
   @Output() onFullscreen = new EventEmitter<boolean>();
 
@@ -61,13 +60,9 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes);
     if (this.canvas) {
       if (changes.position?.currentValue && changes.position.currentValue !== changes.position.previousValue) {
         this.centerOnElement(changes.position.currentValue);
-      }
-      if (changes.contentSize?.currentValue && changes.contentSize.currentValue !== changes.contentSize.previousValue) {
-        this.computeScale();
       }
     }
   }
@@ -135,12 +130,6 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
     this.zoomCanvas(null, actionEvent);
   }
 
-  computeScale() {
-    console.log(this.contentSize);
-    console.log(this.wrapper.offsetWidth);
-    console.log(this.canvas);
-  }
-
   centerCanvas(): void {
     this.throwErrorUndefinedCanvas();
 
@@ -157,8 +146,17 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   centerOnElement(position: OffsetPosition): void {
     this.throwErrorUndefinedCanvas();
 
-    this.canvasPos.x = position.offsetLeft * this.canvasScale * -1 + (this.wrapper.offsetWidth - position.offsetWidth) / 2;
-    this.canvasPos.y = position.offsetTop * this.canvasScale * -1 + (this.wrapper.offsetHeight - position.offsetHeight) / 2;
+    if (position.offsetWidth > this.wrapper.offsetWidth * this.canvasScale) {
+      this.canvasScale = this.wrapper.offsetWidth / position.offsetWidth - 0.1;
+    }
+    if (position.offsetHeight > this.wrapper.offsetHeight * this.canvasScale) {
+      this.canvasScale = this.wrapper.offsetHeight / position.offsetHeight - 0.1;
+    }
+
+    this.canvasPos.x =
+      position.offsetLeft * this.canvasScale * -1 + (this.wrapper.offsetWidth - position.offsetWidth * this.canvasScale) / 2;
+    this.canvasPos.y =
+      position.offsetTop * this.canvasScale * -1 + (this.wrapper.offsetHeight - position.offsetHeight * this.canvasScale) / 2;
 
     this.setCanvasTransform();
   }
