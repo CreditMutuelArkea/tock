@@ -24,6 +24,7 @@ title: Table des matières
         - [Le menu _Stories & Answers_](../user/studio/stories-and-answers)
         - [Le menu _Test_](../user/studio/test)
         - [Le menu _Analytics_](../user/studio/analytics)
+        - [Le menu _Custom Metrics_](../user/studio/custom-metrics)
         - [Le menu _Model Quality_](../user/studio/nlu-qa)
         - [Le menu _Settings_](../user/studio/configuration)
         - [Le menu _FAQ Training_](../user/studio/faq-training)
