@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@import '@nebular/theme/styles/global/breakpoints';
 
 .stats {
   font-size: xx-small;
@@ -68,14 +69,16 @@
 }
 
 .graph-wrapper {
-  min-width: 30rem;
+  width: 48%;
+  #graphComponent {
+    min-width: 20rem;
+    min-height: 60vh;
+    height: calc(100vh - 362px);
+  }
 }
 
-// .graph {
-//   position: absolute;
-//   top: 5rem;
-//   left: 1rem;
-//   IMG {
-//     max-width: 15rem;
-//   }
-// }
+@include media-breakpoint-down(sm) {
+  .graph-wrapper {
+    min-width: 100%;
+  }
+}

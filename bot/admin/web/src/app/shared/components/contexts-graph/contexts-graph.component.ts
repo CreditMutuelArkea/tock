@@ -181,7 +181,7 @@ export class ContextsGraphComponent implements OnInit, OnDestroy {
       offsetLeft: 0,
       offsetTop: 0,
       offsetWidth: graphAttributes.width,
-      offsetHeight: Math.min(graphAttributes.height, this.canvasWrapperElem.nativeElement.offsetHeight - 50)
+      offsetHeight: graphAttributes.height
     };
     this.graphReady = true;
   }

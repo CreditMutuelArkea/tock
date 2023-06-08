@@ -5,12 +5,14 @@ $bot-color: #90c3ea;
 $bot-final-color: #43abf5;
 $client-color: white;
 
+:host {
+  display: block;
+}
+
 #canvas-wrapper {
   overflow: hidden;
-  min-height: 30rem;
-  // min-height: 60vh;
-  // max-height: 95vh;
-  // height: 90vh;
+  width: 100%;
+  height: 100%;
 }
 #canvas {
   z-index: 1;

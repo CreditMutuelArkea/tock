@@ -146,11 +146,14 @@ export class CanvasComponent implements OnInit, OnChanges, AfterViewInit {
   centerOnElement(position: OffsetPosition): void {
     this.throwErrorUndefinedCanvas();
 
-    if (position.offsetWidth > this.wrapper.offsetWidth * this.canvasScale) {
-      this.canvasScale = this.wrapper.offsetWidth / position.offsetWidth - 0.1;
+    if (position.offsetWidth * this.canvasScale > this.wrapper.offsetWidth) {
+      const ratio = this.wrapper.offsetWidth / position.offsetWidth - 0.1;
+      this.canvasScale = ratio - (ratio / 100) * 5;
     }
-    if (position.offsetHeight > this.wrapper.offsetHeight * this.canvasScale) {
-      this.canvasScale = this.wrapper.offsetHeight / position.offsetHeight - 0.1;
+
+    if (position.offsetHeight * this.canvasScale > this.wrapper.offsetHeight) {
+      const ratio = this.wrapper.offsetHeight / position.offsetHeight;
+      this.canvasScale = ratio - (ratio / 100) * 5;
     }
 
     this.canvasPos.x =

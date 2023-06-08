@@ -52,107 +52,8 @@
   </nb-card-header>
 </nb-card>
 
-<div class="d-flex gap-1 mt-2">
-  <nb-card class="flex-grow-1">
-    <nb-card-body
-      *ngIf="testContext"
-      id="test-saving-accordions"
-    >
-      <nb-accordion>
-        <nb-accordion-item>
-          <nb-accordion-item-header (click)="removeXrayTestName()">Save dialog in Xray</nb-accordion-item-header>
-          <nb-accordion-item-body>
-            <input
-              *ngIf="testContext"
-              nbInput
-              [status]="isXrayTestNameFilled ? 'basic' : 'danger'"
-              placeholder="Xray test name"
-              id="test-name"
-              [(ngModel)]="xrayTestName"
-              (ngModelChange)="updateSaveButtonStatus($event)"
-            />
-
-            <input
-              *ngIf="testContext"
-              nbInput
-              status="default"
-              placeholder="US identifier in Jira"
-              id="jira-name"
-              [(ngModel)]="jiraIdentifier"
-            />
-
-            <nb-select
-              *ngIf="testContext"
-              multiple
-              placeholder="Xray test plans"
-              class="test-plans-select"
-              name="testplans"
-              [(selected)]="selectTestPlans"
-              (selectedChange)="printSelectedTestPlans($event)"
-            >
-              <nb-option
-                *ngFor="let e of xrayTestPlans"
-                [value]="e.key"
-                [nbTooltip]="e.fields.summary"
-              >
-                {{ e.key }}
-              </nb-option>
-            </nb-select>
-
-            <button
-              *ngIf="testContext"
-              nbTooltip="Send dialog to Xray"
-              nbTooltipStatus="info"
-              [disabled]="!isXrayTestNameFilled"
-              id="save-button"
-              nbButton
-              outline
-              status="primary"
-              size="small"
-              (click)="saveDialogToXray()"
-            >
-              <nb-icon icon="save-outline"></nb-icon>
-            </button>
-          </nb-accordion-item-body>
-        </nb-accordion-item>
-
-        <nb-accordion-item>
-          <nb-accordion-item-header (click)="removeXrayTestIdentifier()">Update dialog in Xray</nb-accordion-item-header>
-          <nb-accordion-item-body>
-            <input
-              *ngIf="testContext"
-              nbInput
-              [status]="isXrayTestIdentifierFilled ? 'basic' : 'danger'"
-              placeholder="Xray test identifier"
-              id="test-identifier"
-              [(ngModel)]="xrayTestIdentifier"
-              (ngModelChange)="updateUpdateButtonStatus($event)"
-            />
-
-            <button
-              *ngIf="testContext"
-              nbTooltip="Update Xray test"
-              nbTooltipStatus="info"
-              [disabled]="!isXrayTestIdentifierFilled"
-              id="update-button"
-              nbButton
-              outline
-              status="primary"
-              size="small"
-              (click)="updateDialogXray()"
-            >
-              <nb-icon icon="save-outline"></nb-icon>
-            </button>
-          </nb-accordion-item-body>
-        </nb-accordion-item>
-
-        <nb-accordion-item disabled>
-          <nb-accordion-item-header>Save dialog in Tock</nb-accordion-item-header>
-          <nb-accordion-item-body> coming soon... </nb-accordion-item-body>
-        </nb-accordion-item>
-      </nb-accordion>
-    </nb-card-body>
-
+<div class="d-md-flex gap-1 mt-2">
+  <nb-card class="flex-grow-1 mb-2">
     <nb-card-body [nbSpinner]="loading">
       <!-- <table
         *ngIf="messages.length !== 0"
@@ -287,25 +188,115 @@
           <nb-icon icon="trash-2-outline"></nb-icon>
         </button>
       </div>
+
+      <div
+        *ngIf="testContext"
+        id="test-saving-accordions"
+      >
+        <nb-accordion>
+          <nb-accordion-item>
+            <nb-accordion-item-header (click)="removeXrayTestName()">Save dialog in Xray</nb-accordion-item-header>
+            <nb-accordion-item-body>
+              <input
+                *ngIf="testContext"
+                nbInput
+                [status]="isXrayTestNameFilled ? 'basic' : 'danger'"
+                placeholder="Xray test name"
+                id="test-name"
+                [(ngModel)]="xrayTestName"
+                (ngModelChange)="updateSaveButtonStatus($event)"
+              />
+
+              <input
+                *ngIf="testContext"
+                nbInput
+                status="default"
+                placeholder="US identifier in Jira"
+                id="jira-name"
+                [(ngModel)]="jiraIdentifier"
+              />
+
+              <nb-select
+                *ngIf="testContext"
+                multiple
+                placeholder="Xray test plans"
+                class="test-plans-select"
+                name="testplans"
+                [(selected)]="selectTestPlans"
+                (selectedChange)="printSelectedTestPlans($event)"
+              >
+                <nb-option
+                  *ngFor="let e of xrayTestPlans"
+                  [value]="e.key"
+                  [nbTooltip]="e.fields.summary"
+                >
+                  {{ e.key }}
+                </nb-option>
+              </nb-select>
+
+              <button
+                *ngIf="testContext"
+                nbTooltip="Send dialog to Xray"
+                nbTooltipStatus="info"
+                [disabled]="!isXrayTestNameFilled"
+                id="save-button"
+                nbButton
+                outline
+                status="primary"
+                size="small"
+                (click)="saveDialogToXray()"
+              >
+                <nb-icon icon="save-outline"></nb-icon>
+              </button>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+
+          <nb-accordion-item>
+            <nb-accordion-item-header (click)="removeXrayTestIdentifier()">Update dialog in Xray</nb-accordion-item-header>
+            <nb-accordion-item-body>
+              <input
+                *ngIf="testContext"
+                nbInput
+                [status]="isXrayTestIdentifierFilled ? 'basic' : 'danger'"
+                placeholder="Xray test identifier"
+                id="test-identifier"
+                [(ngModel)]="xrayTestIdentifier"
+                (ngModelChange)="updateUpdateButtonStatus($event)"
+              />
+
+              <button
+                *ngIf="testContext"
+                nbTooltip="Update Xray test"
+                nbTooltipStatus="info"
+                [disabled]="!isXrayTestIdentifierFilled"
+                id="update-button"
+                nbButton
+                outline
+                status="primary"
+                size="small"
+                (click)="updateDialogXray()"
+              >
+                <nb-icon icon="save-outline"></nb-icon>
+              </button>
+            </nb-accordion-item-body>
+          </nb-accordion-item>
+
+          <nb-accordion-item disabled>
+            <nb-accordion-item-header>Save dialog in Tock</nb-accordion-item-header>
+            <nb-accordion-item-body> coming soon... </nb-accordion-item-body>
+          </nb-accordion-item>
+        </nb-accordion>
+      </div>
     </nb-card-body>
   </nb-card>
 
-  <div
-    class="graph-wrapper"
-    *ngIf="graphScenario"
+  <nb-card
+    class="graph-wrapper mb-2"
+    *ngIf="debug && graphScenario"
   >
-    <nb-card>
-      <tock-scenario-contexts-graph
-        [scenario]="graphScenario"
-        [showCanvasControls]="false"
-      ></tock-scenario-contexts-graph>
-    </nb-card>
-  </div>
+    <tock-scenario-contexts-graph
+      id="graphComponent"
+      [scenario]="graphScenario"
+    ></tock-scenario-contexts-graph>
+  </nb-card>
 </div>
-
-<!-- <div
-  class="graph"
-  *ngIf="imgBase64"
->
-  <img src="data:image/png;base64,{{ imgBase64 }}" />
-</div> -->
