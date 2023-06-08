@@ -17,7 +17,9 @@ package scenario
 
 import ai.tock.bot.admin.scenario.ScenarioGroup
 import ai.tock.bot.admin.scenario.ScenarioGroupDAO
+import ai.tock.bot.admin.scenario.ScenarioVersion
 import ai.tock.bot.mongo.MongoBotConfiguration
+import ai.tock.shared.ensureIndex
 import ai.tock.shared.ensureUniqueIndex
 import ai.tock.shared.exception.scenario.group.ScenarioGroupDuplicatedException
 import ai.tock.shared.exception.scenario.group.ScenarioGroupNotFoundException
@@ -44,13 +46,16 @@ internal object ScenarioGroupMongoDAO : ScenarioGroupDAO {
     internal val collection =
         MongoBotConfiguration.database.
         getCollectionOfName<ScenarioGroup>("scenario_group")
+    private val collectionVersion =
+        MongoBotConfiguration.database.
+        getCollectionOfName<ScenarioGroup>("scenario_version")
 
     private val asyncCol = MongoBotConfiguration.asyncDatabase.getCollectionOfName<ScenarioGroup>("scenario_group")
 
     init {
         try {
-            collection.ensureUniqueIndex(
-                ScenarioGroup::botId, ScenarioGroup::name)
+            collection.ensureUniqueIndex(ScenarioGroup::botId, ScenarioGroup::name)
+            collectionVersion.ensureIndex(ScenarioVersion::scenarioGroupId)
         } catch (e: Exception) {
             logger.warn(e)
         }
