@@ -16,10 +16,12 @@ import {
 import { getContrastYIQ, getScenarioActionDefinitions, getScenarioActions, normalizedSnakeCaseUpper } from '../../../commons/utils';
 import { entityColor, qualifiedName, qualifiedRole } from '../../../../model/nlp';
 import { UserInterfaceType } from '../../../../core/model/configuration';
-import { deepCopy } from '../../../../shared/utils';
 import { StoryDefinitionConfigurationSummary } from '../../../../bot/model/story';
 
-type InputOrOutputContext = 'input' | 'output';
+enum InOrOut {
+  input = 'input',
+  output = 'output'
+}
 
 interface ActionEditForm {
   description: FormControl<string>;
@@ -211,6 +213,12 @@ export class ActionEditComponent implements OnInit {
         return { custom: 'This name is already used by another action' };
       }
 
+      for (let wich in InOrOut) {
+        if (this.getContextNamesRef(wich as InOrOut).value.find((ctxName) => ctxName === formatedValue)) {
+          return { custom: 'Action cannot have the same name as a context' };
+        }
+      }
+
       if (this.scenario.data.contexts.find((ctx) => ctx.name === formatedValue))
         return { custom: 'Action cannot have the same name as a context' };
 
@@ -289,22 +297,22 @@ export class ActionEditComponent implements OnInit {
     this.outputContextsAddError = {};
   }
 
-  getContextInputElemRef(wich: InputOrOutputContext): ElementRef {
-    if (wich === 'input') return this.inputContextsInput;
-    if (wich === 'output') return this.outputContextsInput;
+  getContextInputElemRef(wich: InOrOut): ElementRef {
+    if (wich === InOrOut.input) return this.inputContextsInput;
+    if (wich === InOrOut.output) return this.outputContextsInput;
   }
 
-  getContextNamesRef(wich: InputOrOutputContext): FormArray {
-    if (wich === 'input') return this.inputContextNames;
-    if (wich === 'output') return this.outputContextNames;
+  getContextNamesRef(wich: InOrOut): FormArray {
+    if (wich === InOrOut.input) return this.inputContextNames;
+    if (wich === InOrOut.output) return this.outputContextNames;
   }
 
-  getContextAddErrorRef(wich: InputOrOutputContext): { errors: {} } {
-    if (wich === 'input') return this.inputContextsAddError;
-    if (wich === 'output') return this.outputContextsAddError;
+  getContextAddErrorRef(wich: InOrOut): { errors: {} } {
+    if (wich === InOrOut.input) return this.inputContextsAddError;
+    if (wich === InOrOut.output) return this.outputContextsAddError;
   }
 
-  addContext(wich: InputOrOutputContext): void {
+  addContext(wich: InOrOut): void {
     const eventTarget = this.getContextInputElemRef(wich).nativeElement;
     const ctxName = normalizedSnakeCaseUpper(eventTarget.value);
 
@@ -325,13 +333,12 @@ export class ActionEditComponent implements OnInit {
       return;
     }
 
-    if (this.getContextNamesRef(wich).value.find((ctx: string) => ctx == ctxName)) {
+    if (this.getContextNamesRef(wich).value.find((ctx: string) => ctx === ctxName)) {
       this.getContextAddErrorRef(wich).errors = { custom: `This ${wich} context is already associated with this action` };
       return;
     }
-
-    const otherWich = wich == 'input' ? 'output' : 'input';
-    if (this.getContextNamesRef(otherWich).value.find((ctx: string) => ctx == ctxName)) {
+    const otherWich = wich === InOrOut.input ? InOrOut.output : InOrOut.input;
+    if (this.getContextNamesRef(otherWich).value.find((ctx: string) => ctx === ctxName)) {
       this.getContextAddErrorRef(wich).errors = {
         custom: `This context is already associated with the ${otherWich} contexts of this action`
       };
@@ -343,7 +350,7 @@ export class ActionEditComponent implements OnInit {
     this.form.markAsDirty();
   }
 
-  removeContext(wich: InputOrOutputContext, contextName: string): void {
+  removeContext(wich: InOrOut, contextName: string): void {
     const contextNamesArray = this.getContextNamesRef(wich);
     contextNamesArray.removeAt(contextNamesArray.value.findIndex((ctx: string) => ctx === contextName));
     this.form.markAsDirty();
