@@ -322,6 +322,13 @@ export class IntentEditComponent implements OnInit, OnDestroy {
     return intent.namespace === this.stateService.currentApplication.namespace;
   }
 
+  checkUnvalidatedInputs() {
+    if (this.addSentenceInput?.nativeElement?.value.trim().length) {
+      return false;
+    }
+    return true;
+  }
+
   save(): void {
     // here we use getRawValue because we need the value of the potentially disabled primary field
     this.saveModifications.emit(this.form.getRawValue());
