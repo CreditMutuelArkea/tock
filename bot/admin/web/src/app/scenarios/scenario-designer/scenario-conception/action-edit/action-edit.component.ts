@@ -388,8 +388,8 @@ export class ActionEditComponent implements OnInit {
   }
 
   checkUnvalidatedInputs() {
-    for (let wich in InOrOut) {
-      const ctxInput = this.getContextInputElemRef(wich as InOrOut)?.nativeElement;
+    for (let which in InOrOut) {
+      const ctxInput = this.getContextInputElemRef(which as InOrOut)?.nativeElement;
       if (ctxInput?.value.trim().length) {
         return false;
       }
