@@ -323,10 +323,7 @@ export class IntentEditComponent implements OnInit, OnDestroy {
   }
 
   checkUnvalidatedInputs() {
-    if (this.addSentenceInput?.nativeElement?.value.trim().length) {
-      return false;
-    }
-    return true;
+    return !this.addSentenceInput?.nativeElement?.value.trim().length 
   }
 
   save(): void {
