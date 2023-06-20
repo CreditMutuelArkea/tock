@@ -18,6 +18,7 @@ package ai.tock.nlp.front.service.storage
 
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
 import org.litote.kmongo.Id
+import java.util.Locale
 
 /**
  *
@@ -38,4 +39,6 @@ interface ApplicationDefinitionDAO {
     fun getApplicationById(id: Id<ApplicationDefinition>): ApplicationDefinition?
 
     fun getApplications(): List<ApplicationDefinition>
+
+    fun getSupportedLocalesById(id: Id<ApplicationDefinition>): Set<Locale>?
 }

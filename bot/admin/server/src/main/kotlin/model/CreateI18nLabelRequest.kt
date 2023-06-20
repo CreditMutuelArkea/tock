@@ -17,9 +17,14 @@
 package ai.tock.bot.admin.model
 
 import ai.tock.translator.I18nLocalizedLabel
+import com.fasterxml.jackson.annotation.JacksonAnnotation
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import java.util.LinkedHashSet
 import java.util.Locale
 
+@JsonIgnoreProperties(ignoreUnknown = false) //overrides default mapper which ignores unknown properties
 data class CreateI18nLabelRequest(
     val label: String,
     val locale: Locale,

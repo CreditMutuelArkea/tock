@@ -83,6 +83,7 @@ import ai.tock.nlp.front.shared.config.SentencesQuery
 import ai.tock.shared.Dice
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.injector
+import ai.tock.shared.jackson.mapper
 import ai.tock.shared.provide
 import ai.tock.shared.security.UserLogin
 import ai.tock.shared.vertx.WebVerticle.Companion.badRequest
@@ -90,6 +91,8 @@ import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.Translator
+import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
 import org.litote.kmongo.Id
@@ -951,7 +954,8 @@ object BotAdminService {
      */
     private fun createI18nRequestWithMultiLocales(request: CreateI18nLabelRequest, i18nLabel: I18nLabel) {
         if (request.i18n?.isNotEmpty() == true) {
-            Translator.completeAllLabels(listOf(i18nLabel.copy(i18n = request.i18n)))
+            val num = Translator.completeAllLabels(listOf(i18nLabel.copy(i18n = request.i18n)))
+            // check consistency
         }
     }
 

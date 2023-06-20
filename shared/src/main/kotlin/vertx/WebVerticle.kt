@@ -32,6 +32,8 @@ import ai.tock.shared.security.auth.PropertyBasedAuthProvider
 import ai.tock.shared.security.auth.TockAuthProvider
 import ai.tock.shared.security.auth.spi.CASAuthProviderFactory
 import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.vertx.core.AbstractVerticle
@@ -391,21 +393,27 @@ abstract class WebVerticle : AbstractVerticle() {
         path: String,
         roles: Set<TockUserRole>?,
         logger: RequestLogger = defaultRequestLogger,
-        crossinline handler: (RoutingContext, I) -> O
+        crossinline handler: (RoutingContext, I) -> O,
+        circumstantialReaderMapper: ObjectMapper? = null,
     ) {
         blocking(method, path, roles) { context ->
             var input: I? = null
             try {
-                input = context.readJson()
+                input = context.readJson(circumstantialReaderMapper)
 
                 val result = handler.invoke(context, input)
                 context.endJson(result)
                 logger.log(context, input)
             } catch (t: Throwable) {
-                if (t !is UnauthorizedException) {
+                if (t is UnrecognizedPropertyException) {
                     logger.log(context, input, true)
+                    throw BadRequestException(t.originalMessage)
+                } else {
+                    if (t !is UnauthorizedException) {
+                        logger.log(context, input, true)
+                    }
+                    throw t
                 }
-                throw t
             }
         }
     }
@@ -568,16 +576,18 @@ abstract class WebVerticle : AbstractVerticle() {
         path: String,
         roles: Set<TockUserRole>? = defaultRoles(),
         logger: RequestLogger = defaultRequestLogger,
-        crossinline handler: (RoutingContext, I) -> O
+        circumstantialMapper: ObjectMapper? = null,
+        crossinline handler: (RoutingContext, I) -> O,
     ) {
-        blockingWithBodyJson(POST, path, roles, logger, handler)
+        blockingWithBodyJson(POST, path, roles, logger, handler, circumstantialMapper)
     }
 
     inline fun <reified I : Any, O> blockingJsonPost(
         path: String,
         role: TockUserRole,
         logger: RequestLogger = defaultRequestLogger,
-        crossinline handler: (RoutingContext, I) -> O
+        circumstancialMapper: ObjectMapper? = null,
+        crossinline handler: (RoutingContext, I) -> O,
     ) {
         blockingWithBodyJson(POST, path, setOf(role), logger, handler)
     }
@@ -750,8 +760,9 @@ abstract class WebVerticle : AbstractVerticle() {
             .setMergeFormAttributes(false)
     }
 
-    inline fun <reified T : Any> RoutingContext.readJson(): T {
-        return mapper.readValue(this.body().asString())
+    inline fun <reified T : Any> RoutingContext.readJson(circumstantialReaderMapper: ObjectMapper? = null): T {
+        return circumstantialReaderMapper?.let { circumstantialReaderMapper.readValue(this.body().asString()) }
+            ?: mapper.readValue(this.body().asString())
     }
 
     inline fun <reified T : Any> readJson(upload: FileUpload): T {
@@ -811,7 +822,7 @@ abstract class WebVerticle : AbstractVerticle() {
         this.endJson(BooleanResponse(success))
     }
 
-    fun RoutingContext.endJson(result: Any?) {
+    fun RoutingContext.endJson(result: Any?, circumstancialMapper: ObjectMapper? = null) {
         if (result is Boolean) {
             endJson(result)
         } else {

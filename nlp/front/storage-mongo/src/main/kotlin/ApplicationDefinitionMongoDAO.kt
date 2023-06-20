@@ -35,6 +35,7 @@ import org.litote.kmongo.findOneById
 import org.litote.kmongo.getCollection
 import org.litote.kmongo.reactivestreams.getCollection
 import org.litote.kmongo.save
+import java.util.Locale
 
 /**
  *
@@ -83,4 +84,7 @@ internal object ApplicationDefinitionMongoDAO : ApplicationDefinitionDAO {
 
     fun getApplicationsByNamespace(namespace: String): List<ApplicationDefinition> =
         col.find(Namespace eq namespace).toList()
+
+    override fun getSupportedLocalesById(id: Id<ApplicationDefinition>): Set<Locale>? =
+        getApplicationById(id)?.supportedLocales
 }
