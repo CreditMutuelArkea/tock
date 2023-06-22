@@ -27,6 +27,7 @@
     "@nebular/eva-icons": "10.0.0",
     "@nebular/theme": "10.0.0",
     "@ng-bootstrap/ng-bootstrap": "^13.1.1",
+    "@svgdotjs/svg.js": "^3.1.2",
     "ang-jsoneditor": "^1.10.5",
     "angular-google-charts": "2.2.3",
     "bootstrap": "^4.4.1",
@@ -47,8 +48,8 @@
     "ngx-echarts": "^7.0.0",
     "ngx-infinite-scroll": "^8.0.2",
     "ngx-moment": "^6.0.2",
+    "papaparse": "^5.4.1",
     "rxjs": "^7.4.0",
-    "@svgdotjs/svg.js": "^3.1.2",
     "tslib": "^2.4.1",
     "zone.js": "~0.11.8"
   },
