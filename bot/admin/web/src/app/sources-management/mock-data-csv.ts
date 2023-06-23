@@ -1,9 +1,1632 @@
-export const normalization = {
-  answerIndex: 2,
-  sourceRefIndex: 24
-};
+export const csvMockNormalizedData = [
+  {
+    answer:
+      "Par mesure de sécurité, au-delà de trois essais de code erronés, votre carte est avalée par le distributeur automatique de billets. Ne vous inquiétez pas.  Pour récupérer votre carte, présentez-vous dans les 48 heures suivant l'incident dans l'établissement bancaire dont dépendait le distributeur automatique de billets muni(e) d'un justificatif d'identité. À savoir : Si votre carte ne peut être réactivée, demandez la fabrication d'une nouvelle carte à votre conseiller.",
+    sourceRef: '?question=carte-a-avalee-un-distributeur-automatique-billets-que-dois-je-faire'
+  },
+  {
+    answer:
+      'Non, le code confidentiel de votre carte ne peut pas être modifié. En effet, un code confidentiel est attribué pour chaque carte émise. Vous ne pouvez pas choisir votre code lors de la fabrication de la carte. Par contre, si vous possédez plusieurs cartes, vous pouvez demander à votre conseiller de conserver un code identique pour toutes vos cartes.',
+    sourceRef: '?question=code-confidentiel-ma-carte-bancaire-peut-il-etre-modifie'
+  },
+  {
+    answer:
+      "Vous avez bloqué l'utilisation de votre carte chez un commerçant suite à 3 codes faux ? Pour la débloquer, insérez-la dans un distributeur automatique de billets et saisissez votre code confidentiel. Si le retrait aboutit, la carte est automatiquement débloquée et peut être de nouveau utilisée. À savoir :  Ce déblocage est possible sur tous les distributeurs automatiques de billets en France.  Ce service fonctionne également à l'étranger à condition que le distributeur soit en mesure de lire la puce de la carte. Ceci est presque toujours le cas en Europe, mais pas forcément hors Europe, où de nombreux distributeurs fonctionnent encore en mode de lecture de piste magnétique.",
+    sourceRef: '?question=comment-debloquer-carte-suite-3-codes-faux'
+  },
+  {
+    answer:
+      'Si vous avez oublié votre code de carte, contactez votre conseiller en agence.  Nous procéderons à la réédition de votre code : un nouveau code vous sera alors expédié par courrier.  Cette réédition vous sera facturée conformément aux "Conditions Tarifaires" en vigueur.',
+    sourceRef: '?question=ai-oublie-mon-code-carte-bancaire-comment-faire'
+  },
+  {
+    answer:
+      'Il est possible de consulter et de modifier vos plafonds de carte depuis l’appli CMB, à condition d\'avoir associé votre mobile à votre espace client (appareil de confiance). Vous pouvez modifier vos plafonds de retrait, de paiement et Internet. Pour cela, connectez-vous à l\'appli CMB : Dans le "Menu", cliquez sur "Moyens de paiement". Choisissez la carte concernée. Puis cliquez en dessous sur "Gestion des plafonds".  À savoir  :  Découvrez également notre tutoriel : Modifier le plafond de vos paiements par carte bancaire.  Si vous souhaitez modifier les plafonds au-delà des valeurs qui vous sont proposées, votre conseiller se tient à votre disposition.',
+    sourceRef: '?question=comment-modifier-moi-meme-plafonds-lies-ma-carte-bancaire'
+  },
+  {
+    answer:
+      'Vous pouvez consulter les plafonds de votre carte depuis l’appli CMB ou depuis votre espace client sur le site internet.  Dans le menu, cliquez sur "MOYENS DE PAIEMENT". Puis sur "Mes cartes". Choisissez la carte concernée. Puis cliquez en dessous sur "Gérer les plafonds". À savoir : Vous pouvez également consulter les plafonds de votre carte dans "MES RACCOURCIS CARTE", disponibles sur la page d\'accueil de l\'espace client du site internet ou de l\'appli CMB.',
+    sourceRef: '?question=ou-puis-je-consulter-plafonds-ma-carte-bancaire'
+  },
+  {
+    answer:
+      "Vous recevrez votre carte à domicile sous une semaine environ. Suite à l'activation de votre carte en ligne dans votre espace personnel sur cmb.fr, vous récupérez votre code secret. Les instructions sont détaillées dans le courrier qui accompagne l'envoi de votre carte à domicile.",
+    sourceRef: '?question=viens-ouvrir-compte-quel-delai-faut-il-recevoir-carte-bancaire'
+  },
+  {
+    answer:
+      'Oui, votre carte CB Visa ou CB MasterCard® est internationale. Il n\'y a aucuns frais supplémentaires pour les paiements en euros, contrairement aux retraits.  À savoir : Pour plus d\'informations, consultez les "Conditions Tarifaires".',
+    sourceRef: '?question=puis-je-payer-ma-carte-bancaire-un-pays-zone-euro'
+  },
+  {
+    answer:
+      'L’activation de votre carte dépend de  votre situation : Vous souscrivez un nouveau contrat carte ou vous changez de type de carte L’activation de cette nouvelle carte se fait depuis votre espace client sur cmb.fr : Dans le menu, cliquez sur "MOYENS DE PAIEMENT". Puis sur "Mes cartes". Un bouton "Activer ma carte" sera présent sur l\'écran de la carte concernée. Il vous suffira de cliquer dessus pour l\'activer. Vous serez ensuite invité à dévoiler votre code confidentiel, présenté sous forme de 4 carrés noirs, à découvrir l’un après l’autre. À savoir : Pour des raisons de sécurité, ce code ne vous sera présenté qu’une seule fois : pensez à le mémoriser. Vous ne devez jamais écrire votre code sur un support, ni le confier à un proche. Si vous oubliez ce code, rapprochez-vous de votre conseiller : il vous adressera un courrier de réédition de code ; cette démarche est facturée selon les Conditions Tarifaires en vigueur. Découvrez également notre tutoriel "Activer votre carte bancaire en ligne". En cas de renouvellement, refabrication suite à une défaillance ou renouvellement anticipé Pour activer votre nouvelle carte, il vous suffit de réaliser un paiement ou un retrait avec votre code habituel. En saisissant votre code confidentiel une première fois, la carte deviendra active. À savoir : Par mesure de sécurité, il n\'est pas possible d\'activer votre carte bancaire par un paiement sans contact ou par un achat sur internet.',
+    sourceRef: '?question=comment-activer-carte-bancaire'
+  },
+  {
+    answer:
+      "Non, il n'est pas nécessaire de régler la totalité du coût de votre voyage pour profiter des prestations d'assurance et d'assistance : Pour les assurances, il suffit de payer tout ou partie du règlement avec votre carte pour que vous et votre famille bénéficiez des assurances.  Concernant l'assistance, le seul fait de posséder la carte permet d'utiliser les services d'assistance.",
+    sourceRef: '?question=dois-je-regler-totalite-du-montant-mon-voyage-ma-carte-bancaire-beneficier-prestations-assurance-dassistance'
+  },
+  {
+    answer:
+      "Oui, le renouvellement s'effectue automatiquement, sauf si vous vous y opposez. Votre carte a en effet une durée de vie limitée. Pour connaître sa date d'expiration (mois et année), reportez-vous au recto de votre carte. Vous la recevrez à votre domicile environ un mois avant la date d’échéance de votre carte actuelle. À savoir :  Vous conservez votre numéro de carte actuelle. Lors de la réception de votre carte, n’oubliez pas de la signer au dos.",
+    sourceRef: '?question=carte-bancaire-renouvelee-automatiquement-lecheance'
+  },
+  {
+    answer:
+      'Oui, vous pouvez renouveler votre carte avant son échéance. Il conviendra de demander à votre conseiller un renouvellement anticipé de votre carte. À savoir : Consultez nos "Conditions Tarifaires" pour connaître le coût de ce service.',
+    sourceRef: '?question=possible-renouveler-carte-bancaire-avant-son-echeance'
+  },
+  {
+    answer:
+      'Oui. Dans l\'espace Virtualis, vous pouvez accéder aux deux onglets suivants :  "achats" : après le choix de la carte réelle, vous accédez aux 50 derniers achats effectués avec les cartes virtuelles attachées à la carte réelle choisie. Vous retrouvez la date, le commerçant, le montant saisi et le montant effectivement payé.  "numéros virtuels actifs" : après le choix de la carte réelle, vous accédez ici aux numéros virtuels dont la date d\'échéance n\'est pas dépassée. Vous retrouvez le nom du commerçant si la carte a déjà été utilisée, le montant saisi et le montant restant sur la carte virtuelle.  À savoir : Pour retrouver tous les détails de la carte (entre autres le cryptogramme) afin de la réutiliser, sélectionnez-la et cliquez sur "Détail du numéro".',
+    sourceRef: '?question=puis-je-consulter-derniers-achats-effectues-un-numero-virtuel-mes-numeros-virtuels-actifs'
+  },
+  {
+    answer:
+      'Oui, ne pas disposer des facilités de cette fonction relève de votre choix. Dans ce cas, vous pouvez désactiver l\'option "sans contact" dans votre espace client. À savoir : Après la modification de cette option, vous devez réaliser un retrait avec saisie du code confidentiel afin de finaliser la désactivation de la fonctionnalité sans contact sur la puce de votre carte.  Les cartes "sans contact" répondent à des normes internationales de sécurité très élevées également certifiées par l\'Administration française.  Le "sans contact" c\'est aussi plus pratique et plus rapide pour tous les petits montants de la vie quotidienne.',
+    sourceRef: '?question=puis-je-desactiver-fonctionnalite-sans-contact-de-carte-bancaire'
+  },
+  {
+    answer:
+      'La fonction "sans contact" utilise une technologie dite de transmission par ondes courtes. Pour payer en mode "sans contact" : Vous posez votre carte sur l\'écran du terminal de paiement. Le pictogramme "sans contact" doit être présent. Sans composer votre code confidentiel, en moins d\'une seconde, le montant que le commerçant a préalablement composé (maximum 50 €) est validé.  Un bip sonore et un signal lumineux vous indiquent la fin de la transaction.  C\'est payé et vous récupérez un ticket de caisse, qui vous permettra ensuite de pointer le règlement sur votre relevé bancaire.  À savoir : Pour des raisons de sécurité, après plusieurs paiements "sans contact" consécutifs ou de manière aléatoire, il vous sera demandé d’insérer votre carte dans le Terminal de Paiement et de saisir votre code.',
+    sourceRef: '?question=comment-fonctionne-paiement-sans-contact-de-carte-bancaire'
+  },
+  {
+    answer:
+      'Pour protéger votre carte, pensez aux étuis porte-cartes.  Disponibles en agence, ils sont sécurisés : ils intègrent un film en aluminium qui empêche tout échange sans contact avec la puce de la carte.  Il est donc impossible de réaliser un paiement "sans contact" sans sortir la carte bancaire de son étui sécurisé.',
+    sourceRef: '?question=comment-puis-je-proteger-mieux-carte-sans-contact'
+  },
+  {
+    answer:
+      'Non, rassurez-vous, il est quasi impossible d\'effectuer un paiement "sans contact " sans le vouloir.  En effet, le paiement se déclenche uniquement si la carte est posée sur le terminal de paiement du commerçant, validant ainsi le montant inscrit. Au-delà d\'une distance de quelques centimètres, la puce de votre carte "sans contact" ne peut être activée. Vous restez donc maître de ce type de paiement.  À savoir : Notez par ailleurs que toute transaction sans contact se conclut, comme pour un paiement classique avec un code, par l\'émission d\'un ticket.',
+    sourceRef: '?question=puis-je-faire-transaction-sans-contact-sans-men-rendre-compte'
+  },
+  {
+    answer:
+      'Oui, si votre carte a été volée, des paiements "sans contact" et donc sans saisie du code confidentiel peuvent être effectués. Mais le plafond et les dispositifs de contrôle aléatoires limitent fortement les risques : Il n\'est pas possible de faire des achats de plus de 50 € en mode "sans contact" et donc sans code confidentiel, et ce dans la limite d\'un montant cumulé total de 100 €.  De plus, le risque est également limité par le fait, qu\'à tout moment, une demande aléatoire de code confidentiel peut être effectuée.',
+    sourceRef:
+      '?question=cas-perte-de-vol-ma-carte-est-il-possible-des-fraudeurs-effectuent-paiements-sans-contact-et-donc-code-confidentiel'
+  },
+  {
+    answer:
+      'Vous pouvez consulter les plafonds de votre carte depuis l’appli CMSO ou depuis votre espace client sur le site internet.  Dans le menu, cliquez sur "MOYENS DE PAIEMENT". Puis sur "Mes cartes". Choisissez la carte concernée. Puis cliquez en dessous sur "Gérer les plafonds". À savoir : Vous pouvez également consulter les plafonds de votre carte dans "MES RACCOURCIS CARTE", disponibles sur la page d\'accueil de l\'espace client du site internet ou de l\'appli CMSO.',
+    sourceRef: '?question=ou-pui'
+  },
+  {
+    answer:
+      'L’activation de votre carte dépend de  votre situation : Vous souscrivez un nouveau contrat carte ou vous changez de type de carte L’activation de cette nouvelle carte se fait depuis votre espace client sur cmso.com : Dans le menu, cliquez sur "MOYENS DE PAIEMENT". Puis sur "Mes cartes". Un bouton "Activer ma carte" sera présent sur l\'écran de la carte concernée. Il vous suffira de cliquer dessus pour l\'activer. Vous serez ensuite invité à dévoiler votre code confidentiel, présenté sous forme de 4 carrés noirs, à découvrir l’un après l’autre. À savoir : Pour des raisons de sécurité, ce code ne vous sera présenté qu’une seule fois : pensez à le mémoriser. Vous ne devez jamais écrire votre code sur un support, ni le confier à un proche. Si vous oubliez ce code, rapprochez-vous de votre conseiller : il vous adressera un courrier de réédition de code ; cette démarche est facturée selon les Conditions Tarifaires en vigueur. Découvrez également notre tutoriel "Activer votre carte bancaire en ligne". En cas de renouvellement, refabrication suite à une défaillance ou renouvellement anticipé  Pour activer votre nouvelle carte, il vous suffit de réaliser un paiement ou un retrait avec votre code habituel. En saisissant votre code confidentiel une première fois, la carte deviendra active. À savoir : Par mesure de sécurité, il n\'est pas possible d\'activer votre carte bancaire par un paiement sans contact ou par un achat sur internet.',
+    sourceRef: '?question=comment-activer-carte-bancaire-7452'
+  },
+  {
+    answer:
+      'La fonction "sans contact" utilise une technologie dite de transmission par ondes courtes. Pour payer en mode "sans contact" : Vous posez votre carte sur l\'écran du terminal de paiement. Le pictogramme "sans contact" doit être présent. Sans composer votre code confidentiel, en moins d\'une seconde, le montant que le commerçant a préalablement composé (maximum 50 €) est validé.  Un bip sonore et un signal lumineux vous indiquent la fin de la transaction.  C\'est payé et vous récupérez un ticket de caisse, qui vous permettra ensuite de pointer le règlement sur votre relevé bancaire. À savoir : Pour des raisons de sécurité, après plusieurs paiements "sans contact" consécutifs ou de manière aléatoire, il vous sera demandé d’insérer votre carte dans le Terminal de Paiement et de saisir votre code.',
+    sourceRef: '?question=comment-fonctionne-paiement-sans-contact-de-carte'
+  },
+  {
+    answer:
+      'Oui, vous pouvez renouveler votre carte avant son échéance. Il conviendra de demander à votre conseiller un renouvellement anticipé de votre carte. À savoir : Consultez nos "Conditions Tarifaires" pour connaître le coût de ce service.',
+    sourceRef: '?question=possible-renouveler-carte-avant-son-echeance'
+  },
+  {
+    answer:
+      'Oui, votre carte CB Visa ou CB MasterCard® est internationale. Il n\'y a aucuns frais supplémentaires pour les paiements en euros, contrairement aux retraits. À savoir : Pour plus d\'informations, consultez les "Conditions Tarifaires".',
+    sourceRef: '?question=puis-je-payer-ma-carte-bancaire-un-pays-zone-euro-10052'
+  },
+  {
+    answer:
+      'Il est possible de consulter et de modifier vos plafonds de carte depuis l’appli CMSO, à condition d\'avoir associé votre mobile à votre espace client (appareil de confiance). Vous pouvez modifier vos plafonds de retrait, de paiement et Internet. Pour cela, connectez-vous à l\'appli CMSO : Dans le "Menu", cliquez sur "Moyens de paiement". Choisissez la carte concernée. Puis cliquez en dessous sur "Gestion des plafonds". À savoir : Découvrez également notre tutoriel : Modifier le plafond de vos paiements par carte bancaire. Si vous souhaitez modifier les plafonds au-delà des valeurs qui vous sont proposées, votre conseiller se tient à votre disposition.',
+    sourceRef: '?question=comment-modifier-plafonds-carte-bancaire'
+  },
+  {
+    answer:
+      "Votre carte bancaire vous permet de bénéficier de garanties d'assistance et d'assurance. Pour contacter ces services d'assistance ou d'assurance liés à votre carte, consultez le verso de votre carte : vous y trouverez le numéro à composer pour les joindre.",
+    sourceRef: '?question=comment-contacter-assistance-liee-la-carte'
+  },
+  {
+    answer:
+      'Vous pouvez désactiver la "Protection Internet" de votre carte depuis l\'appli CMB ou depuis votre espace client sur le site internet. 1. Depuis l\'appli CMB : Depuis la barre de navigation en bas de votre écran, sélectionnez le "Menu". Dans "MOYENS DE PAIEMENT", sélectionnez "Mes cartes". Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton crayon afin de désactiver la "Protection Internet". Validez ensuite cette opération de désactivation de la "Protection Internet" par biométrie (empreinte, face id) ou par une saisie du code de sécurité. Un écran de confirmation vous informe que la "Protection Internet" est maintenant désactivée sur votre carte bancaire. 2. Depuis votre espace client sur le site internet : Depuis le menu, dans "MES MOYENS DE PAIEMENT", sélectionnez “Mes cartes”. Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton crayon afin de désactiver la "Protection Internet". Pour valider l’opération de désactivation de la "Protection Internet", vous allez recevoir un SMS (ou un message vocal) contenant un code. Renseignez ce code puis validez l’opération. Un écran de confirmation vous informe que la "Protection Internet" est maintenant désactivée sur votre carte bancaire. À savoir : En désactivant la "Protection internet", votre carte pourra être utilisée pour régler des achats sur internet. Pour plus de sécurité, n’oubliez pas de réactiver la "Protection internet" et créez des cartes virtuelles avec Virtualis pour protéger les règlements de vos achats sur internet.',
+    sourceRef: '?question=comment-desactiver-la-protection-internet-de-carte'
+  },
+  {
+    answer:
+      'Vous pouvez désactiver la "Protection Internet" de votre carte depuis l\'appli CMSO ou depuis votre espace client sur le site internet. 1. Depuis l\'appli CMSO : En bas de votre écran, accédez au "Menu" et cliquez sur "Moyens de paiement." Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton à droite afin de désactiver la "Protection Internet". Validez ensuite cette opération de désactivation de la "Protection Internet" par biométrie (empreinte, face id) ou par une saisie du code de sécurité. Un écran de confirmation vous informe que la "Protection Internet" est maintenant désactivée sur votre carte bancaire. 2. Depuis votre espace client sur le site internet : Depuis le menu, dans "MES MOYENS DE PAIEMENT", sélectionnez “Mes cartes”. Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton crayon afin de désactiver la "Protection Internet". Pour valider l’opération de désactivation de la "Protection Internet", vous allez recevoir un SMS (ou un message vocal) contenant un code. Renseignez ce code puis validez l’opération. Un écran de confirmation vous informe que la "Protection Internet" est maintenant désactivée sur votre carte bancaire. À savoir : En désactivant la "Protection internet", votre carte pourra être utilisée pour régler des achats sur internet. Pour plus de sécurité, n’oubliez pas de réactiver la "Protection internet" et créez des cartes virtuelles avec Virtualis pour protéger les règlements de vos achats sur internet.',
+    sourceRef: '?question=comment-desactiver-la-protection-internet-de-ma-carte'
+  },
+  {
+    answer:
+      "Dans les communes dépourvues de distributeur automatique de billets, rendez-vous chez vos commerçants de proximité pour effectuer un retrait d’espèces. Vous pouvez retirer jusqu'à 100 € par jour.  Les boulangeries, tabacs… peuvent proposer ce service gratuitement et en toute sécurité ; renseignez-vous auprès de la mairie de votre commune pour connaître nos commerçants partenaires. Vous insérez votre carte CMB dans le TPE, vous composez votre code confidentiel (comme pour un paiement par carte), puis le commerçant vous remet la somme demandée et votre ticket de carte bancaire.",
+    sourceRef: '?question=comment-retirer-de-l-argent-sans-distributeur-automatique-de-billets'
+  },
+  {
+    answer:
+      "Dans les communes dépourvues de distributeur automatique de billets, rendez-vous chez vos commerçants de proximité pour effectuer un retrait d’espèces. Vous pouvez retirer jusqu'à 100 € par jour. Les boulangeries, tabacs… peuvent proposer ce service gratuitement et en toute sécurité ; renseignez-vous auprès de la mairie de votre commune pour connaître nos commerçants partenaires. Vous insérez votre carte CMSO dans le TPE, vous composez votre code confidentiel (comme pour un paiement par carte), puis le commerçant vous remet la somme demandée et votre ticket de carte bancaire.",
+    sourceRef: '?question=comment-retirer-de-l-argent-sans-distributeur-automatique-de-billets-30919'
+  },
+  {
+    answer:
+      "Vous recevrez votre carte à domicile sous une semaine environ. Suite à l'activation de votre carte en ligne dans votre espace personnel sur cmso.com, vous récupérez votre code secret. Les instructions sont détaillées dans le courrier qui accompagne l'envoi de votre carte à domicile.",
+    sourceRef: '?question=je-viens-d-ouvrir-mon-compte-quel-delai-faut-il-pour-recevoir-ma-carte'
+  },
+  {
+    answer:
+      'Une offre groupée de services est une offre packagée de produits et services bancaires utiles au quotidien, liés à l’utilisation de votre compte. C’est un abonnement à cotisation mensuelle. Les produits et/ou services la composant peuvent être vendus séparément.  Notre offre standard comprend les services de base suivants : Une carte de paiement, L’expédition d’un chéquier à domicile en envoi simple, L’envoi d’un relevé de compte mensuel, La tenue de compte, L’accès illimité aux services de Banque à Distance. À savoir :  Le tarif de cette offre groupée de services standards varie en fonction du choix de votre carte de paiement. Consultez nos Conditions Tarifaires. La souscription d’une offre groupée de services ainsi que la délivrance de moyens de paiement sont soumises à l’acceptation de la banque.',
+    sourceRef: '?question=quels-sont-les-benefices-d-une-offre-groupee-de-services'
+  },
+  {
+    answer:
+      'Une offre groupée de services est une offre packagée de produits et services bancaires utiles au quotidien, liés à l’utilisation de votre compte. C’est un abonnement à cotisation mensuelle. Les produits et/ou services la composant peuvent être vendus séparément. Notre offre standard comprend les services de base suivants : Une carte de paiement, L’expédition d’un chéquier à domicile en envoi simple, L’envoi d’un relevé de compte mensuel, La tenue de compte, L’accès illimité aux services de Banque à Distance. À savoir : Le tarif de cette offre groupée de services standards varie en fonction du choix de votre carte de paiement. Consultez nos Conditions Tarifaires. La souscription d’une offre groupée de services ainsi que la délivrance de moyens de paiement sont soumises à l’acceptation de la banque.',
+    sourceRef: '?question=quels-sont-les-benefices-d-une-offre-groupee-de-services-47436'
+  },
+  {
+    answer:
+      "Si vous avez perdu votre carte bancaire ou votre chéquier ou s'ils vous ont été volés, faites opposition en ligne sur le site internet cmb.fr. Nous mettons en place un processus rapide à chaque opposition pour éviter une utilisation frauduleuse de votre carte ou chéquier. Vous recevrez ensuite votre nouveau moyen de paiement dans un délai maximum de huit jours. Vous pouvez gérer l'opposition en ligne depuis votre espace client sur le site internet (Vous ne pouvez pas faire opposition depuis l'appli CMB) : Dans le menu, cliquez sur \"MES MOYENS DE PAIEMENT\". Sélectionnez \"Opposition carte et chéquier\". Cliquez sur \"Accéder à la fonctionnalité\" puis suivez ensuite les instructions. À savoir : Un message de confirmation s'affiche suite à la validation de votre demande. L'opposition est alors déclenchée pour protéger votre compte. Vous pouvez également faire une mise en opposition par téléphone au 02 98 28 42 28 (ouvert 24 heures sur 24 et 7 jours sur 7) ou au +33 2 98 28 42 28 depuis l'étranger.  Il est aussi possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=comment-faire-opposition-ligne'
+  },
+  {
+    answer:
+      "Si vous avez perdu votre carte bancaire ou votre chéquier ou s'ils vous ont été volés, faites opposition en ligne sur le site internet cmso.com. Nous mettons en place un processus rapide à chaque opposition pour éviter une utilisation frauduleuse de votre carte ou chéquier. Vous recevrez ensuite votre nouveau moyen de paiement dans un délai maximum de huit jours. Pour gérer l'opposition en ligne, connectez-vous à votre espace client sur le site internet (Vous ne pouvez pas faire opposition depuis l'appli CMSO) : Dans le menu, cliquez sur \"MES MOYENS DE PAIEMENT\". Sélectionnez \"Opposition carte et chéquier\". Cliquez sur \"Accéder à la fonctionnalité\" puis suivez ensuite les instructions. À savoir : Un message de confirmation s'affiche suite à la validation de votre demande. L'opposition est alors déclenchée pour protéger votre compte. Vous pouvez également faire une mise en opposition par téléphone au 05 56 24 28 28 (ouvert 24 heures sur 24 et 7 jours sur 7) ou au +33 2 98 28 42 28 depuis l'étranger. Il est aussi possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=comment-faire-opposition'
+  },
+  {
+    answer: 'Nos Conditions Tarifaires sont accessibles en ligne sur le site cmb.fr.  Consultez-les à tout moment.',
+    sourceRef: '?question=quels-sont-les-tarifs-et-frais-appliques-par-ma-banque'
+  },
+  {
+    answer: 'Nos Conditions Tarifaires sont accessibles en ligne sur le site cmso.com. Consultez-les à tout moment.',
+    sourceRef: '?question=quels-sont-les-tarifs-et-frais-appliques-par-ma-banque-47183'
+  },
+  {
+    answer:
+      'Oui avec la même carte bancaire, vous pouvez payer en euros et en devises lorsque vous partez à l\'étranger.  Pour connaître le tarif de ce service, consultez nos "Conditions Tarifaires". À savoir : A l\'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère.',
+    sourceRef: '?question=ai-carte-cb-mastercard-r-ou-cb-visa-puis-je-payer-indifferemment-devises-en-euros'
+  },
+  {
+    answer:
+      'Tous les loueurs de véhicules n’ont pas les mêmes conditions : En effet, certains exigent une carte de "crédit" (c’est-à-dire une carte de paiement internationale à débit différé). Merci de vous référer aux conditions générales du loueur pour vous assurer des conditions de paiement.  À savoir :  Certains loueurs de voitures peuvent prélever des frais supplémentaires si la location est réglée avec une carte de "débit". N’hésitez pas à prendre contact avec votre conseiller pour tout complément d’information sur votre carte.',
+    sourceRef: '?question=pars-voyage-je-souhaite-louer-vehicule-place-quel-type-carte-dois-je-avoir-3004'
+  },
+  {
+    answer:
+      'Avant de partir à l’étranger, il est conseillé de se munir d’un minimum de devises du pays de destination, afin de payer les premières dépenses (taxi…).  Avant de partir, renseignez-vous sur les conditions dans lesquelles vous pourrez, une fois sur place, retirer des espèces en monnaie locale. À savoir : A l\'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère. Pour connaître les montants prélevés, veuillez vous référer aux "Conditions Tarifaires" en vigueur dans votre contrat.',
+    sourceRef: '?question=lors-dun-voyage-letranger-ai-je-interet-retirer-payer-euros-plutot-en-devise-locale-si-me-propose-3005'
+  },
+  {
+    answer:
+      "Deux situations sont possibles quand votre carte est bloquée et que vous êtes à l'étranger : Dans le cas où vous ne vous souvenez plus de votre code : vous pouvez faire une demande de réédition du code auprès de votre conseiller. Un nouveau code vous sera alors expédié par courrier (attention, une tarification sera appliquée).  Dans le cas où vous vous souvenez de votre code : vous pouvez débloquer votre carte en faisant un retrait grâce au libre-service bancaire.  À savoir :  À l'étranger, ce service n’est pas garanti et reste dépendant des conditions de fonctionnement de chaque automate et des règles bancaires locales.  Plus généralement, on constate pour l’Europe un fonctionnement relativement satisfaisant pour ce service, alors qu’en dehors de l’Europe ce déblocage est très aléatoire.",
+    sourceRef: '?question=comment-debloquer-carte-letranger-suite-trois-code-faux-3008'
+  },
+  {
+    answer:
+      "Si vous voyagez dans un pays de la zone euro, il n'y a aucuns frais supplémentaires pour les paiements en euros, contrairement aux retraits.  En fonction de votre type de carte, des frais pourront vous être appliqués si vous faites des retraits ou si vous payez à l'étranger.  Pour connaître les montants prélevés, veuillez vous référer aux \"Conditions Tarifaires\" en vigueur dans votre contrat.    À savoir :  A l'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère. En dehors de la zone euro, munissez-vous d’un minimum de devises du pays de destination, afin de payer les premières dépenses (taxi…).  Renseignez-vous avant de partir sur les conditions dans lesquelles vous pourrez, une fois sur place, retirer des espèces en monnaie locale.",
+    sourceRef: '?question=paiements-retraits-gratuits-letranger-3010'
+  },
+  {
+    answer:
+      'Selon votre type de carte, vous bénéficiez de niveaux de garanties d\'assurance et d\'assistance différents.  Consultez ces informations directement sur la notice de votre carte.  La notice est consultable en ligne : dans le menu, sélectionnez "Comptes et Cartes", puis "Cartes bancaires" et choisissez la carte qui vous intéresse.',
+    sourceRef: '?question=sont-garanties-assurance-dassistance-ma-carte-quand-suis-letranger-3011'
+  },
+  {
+    answer:
+      "Si vous voyagez dans un pays de la zone euro, il n'y a aucuns frais supplémentaires pour les paiements en euros, contrairement aux retraits. En fonction de votre type de carte, des frais pourront vous être appliqués si vous faites des retraits ou si vous payez à l'étranger. Pour connaître les montants prélevés, veuillez vous référer aux \"Conditions Tarifaires\" en vigueur dans votre contrat. À savoir : A l'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère. En dehors de la zone euro, munissez-vous d’un minimum de devises du pays de destination, afin de payer les premières dépenses (taxi…). Renseignez-vous avant de partir sur les conditions dans lesquelles vous pourrez, une fois sur place, retirer des espèces en monnaie locale.",
+    sourceRef: '?question=paiements-retraits-gratuits-letranger'
+  },
+  {
+    answer:
+      'Oui avec la même carte bancaire, vous pouvez payer en euros et en devises lorsque vous partez à l\'étranger.  Pour connaître le tarif de ce service, consultez nos "Conditions Tarifaires". À savoir : A l\'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère.',
+    sourceRef: '?question=ai-carte-cb-mastercard-r-ou-cb-visa-puis-je-payer-indifferemment-devises-en-euros-9986'
+  },
+  {
+    answer:
+      'Avant de partir à l’étranger, il est conseillé de se munir d’un minimum de devises du pays de destination, afin de payer les premières dépenses (taxi…). Avant de partir, renseignez-vous sur les conditions dans lesquelles vous pourrez, une fois sur place, retirer des espèces en monnaie locale. À savoir : A l\'aide du convertisseur Mastercard® ou Visa, estimez le montant total de votre transaction par carte bancaire en devise étrangère. Pour connaître les montants prélevés, veuillez vous référer aux "Conditions Tarifaires" en vigueur dans votre contrat.',
+    sourceRef: '?question=a-letranger-faut-il-privilegier-paiement-devise-locale'
+  },
+  {
+    answer:
+      'Vous avez égaré votre carte et vous pensez la retrouver ? Pensez au blocage temporaire de votre carte. Par contre, si vous l\'avez définitivement perdue, il faut faire opposition. Vous pouvez bloquer temporairement les paiements et retraits de votre carte depuis l\'appli CMB ou depuis votre espace client sur le site internet. Depuis l\'appli CMB Sur la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur "Bloquer". Sélectionnez la carte concernée. Cliquez sur "Blocage temporaire", puis sur "Bloquer la carte". Découvrez également notre tutoriel : Comment bloquer votre carte bancaire depuis l\'appli CMB ? Depuis le site internet cmb.fr  Sur la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur "Bloquer". Dans "MES CARTES", puis "MES CARTES PERSONNELLES", sélectionnez la carte concernée. Cliquez sur "Bloquer temporairement", "Continuer" et "Terminer".   À savoir :  Pour des raisons de sécurité, le déblocage de votre carte bancaire n’est disponible que depuis l\'appli CMB. Le blocage temporaire de votre carte est différent du service de "Protection Internet" qui bloque l\'utilisation de votre carte réelle pour des achats en ligne ; si vous effectuez un paiement sur Internet, il convient alors d\'utiliser le service Virtualis.',
+    sourceRef: '?question=comment-bloquer-temporairement-carte'
+  },
+  {
+    answer:
+      'Pour des raisons de sécurité, le déblocage de votre carte est à réaliser depuis l\'appli CMB. Pour cela : Connectez-vous à l\'appli CMB. Dans le Menu, sélectionnez "MOYENS DE PAIEMENT". Dans "Mes cartes", sélectionnez la carte concernée.  Cliquez ensuite sur "Débloquer ma carte". Insérez votre code de sécurité à 5 chiffres. Cliquer sur "Valider".   À savoir  :  Consultez également notre tutoriel  : Comment débloquer votre carte bancaire depuis l\'appli CMB ? (il se situe en-dessous du tutoriel "Comment bloquer votre carte bancaire depuis l\'appli CMB ?). Si vous n\'avez pas accès à l\'appli CMB, contactez votre conseiller pour débloquer votre carte.',
+    sourceRef: '?question=comment-lever-blocage-temporaire-ma-carte'
+  },
+  {
+    answer:
+      'Vous avez égaré votre carte et vous pensez la retrouver ? Pensez au blocage temporaire de votre carte. Par contre, si vous l\'avez définitivement perdue, il faut faire opposition. Vous pouvez bloquer temporairement les paiements et retraits de votre carte depuis l\'appli CMSO ou depuis votre espace client sur le site internet. Depuis l\'appli CMSO Sur la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur "Bloquer". Sélectionnez la carte concernée. Cliquez sur "Blocage temporaire", puis sur "Bloquer la carte". Découvrez également notre tutoriel : Comment bloquer votre carte bancaire depuis l\'appli CMSO ? Depuis votre espace client sur le site internet Sur la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur "Bloquer". Dans "MES CARTES", puis "MES CARTES PERSONNELLES", sélectionnez la carte concernée. Cliquez sur "Bloquer temporairement", "Continuer" et "Terminer". À savoir :  Pour des raisons de sécurité, le déblocage de votre carte bancaire n’est disponible que depuis l\'appli CMSO.  Le blocage temporaire de votre carte est différent du service de "Protection Internet" qui bloque l\'utilisation de votre carte réelle pour des achats en ligne : si vous effectuez un paiement sur Internet, il convient alors d\'utiliser le service Virtualis.',
+    sourceRef: '?question=comment-bloquer-temporairement-carte-7363'
+  },
+  {
+    answer:
+      'Pour des raisons de sécurité, le déblocage de votre carte est à réaliser depuis l\'appli CMSO. Pour cela :   Connectez-vous à l\'appli CMSO. Dans le Menu, sélectionnez "Moyens de paiement". Dans "Mes cartes", sélectionnez la carte concernée.  Cliquez ensuite sur "Débloquer la carte". Insérez votre code de sécurité à 5 chiffres. Cliquer sur "Valider".    À savoir  :  Consultez également notre tutoriel  : Comment débloquer votre carte bancaire depuis l\'appli CMSO ? (il se situe en-dessous du tutoriel "Comment bloquer votre carte bancaire depuis l\'appli CMSO ?). Si vous n\'avez pas accès à l\'appli CMSO, contactez votre conseiller pour débloquer votre carte.',
+    sourceRef: '?question=comment-lever-blocage-temporaire-ma-carte-7364'
+  },
+  {
+    answer:
+      "Un seul numéro est à votre disposition pour toutes les questions relatives à votre carte et ses services : assistance, assurance, SOS (opposition, vol...) : 02 98 28 42 28.  Depuis l'étranger, composez le : +33 2 98 28 42 28.",
+    sourceRef: '?question=comment-contacter-assistance-carte-lassurance-carte'
+  },
+  {
+    answer:
+      "Un seul numéro est à votre disposition pour toutes les questions relatives à votre carte et ses services : assistance, assurance, SOS (opposition, vol...) : 05 56 24 28 28. Depuis l'étranger, composez le : +33 2 98 28 42 28.",
+    sourceRef: '?question=comment-contacter-assistance-carte-lassurance-carte-7926'
+  },
+  {
+    answer:
+      'Vous pouvez activer ou désactiver la "Protection Internet" de votre carte depuis l\'appli CMB ou depuis votre espace client sur le site internet. Depuis l\'appli CMB En bas de votre écran, accédez au "Menu" et cliquez sur "Moyens de paiement". Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle activer/désactiver la "Protection Internet". Dans la section "Options de la carte", cliquez sur le bouton crayon afin d’activer/de désactiver la "Protection Internet". Pour activer la "Protection Internet", cliquez sur “Activer la protection internet”. Pour désactiver la "Protection Internet", valider l\'opération par biométrie (empreinte, face id) ou par une saisie du code de sécurité. Un écran de confirmation vous informe que la "Protection Internet" est maintenant activée/désactivée sur votre carte bancaire. Depuis votre espace client sur le site internet Depuis le menu, dans "MES MOYENS DE PAIEMENT", sélectionnez “Mes cartes”. Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle activer/désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton crayon afin d’activer/de désactiver la "Protection Internet". Pour activer la "Protection Internet", cliquez sur “Activer la protection internet”. Pour désactiver la "Protection Internet", renseignez le code reçu par SMS (ou par message vocal). Puis validez l’opération. Un écran de confirmation vous informe que la "Protection Internet" est maintenant activée/désactivée sur votre carte bancaire.   À savoir :  Lorsque vous activez la "Protection Internet," votre carte bancaire est bloquée pour tous les achats réalisés par internet. Il faudra alors créer une carte virtuelle avec Virtualis pour pouvoir payer vos achats en ligne. En désactivant la "Protection internet", votre carte pourra être utilisée pour régler des achats sur internet. Pour plus de sécurité, n’oubliez pas ensuite de réactiver la "Protection internet".',
+    sourceRef: '?question=comment-activer-la-protection-internet-de-carte'
+  },
+  {
+    answer:
+      'Vous pouvez activer ou désactiver la "Protection Internet" de votre carte depuis l\'appli CMSO ou depuis votre espace client sur le site internet. Depuis l\'appli CMSO En bas de votre écran, accédez au "Menu" et cliquez sur "Moyens de paiement". Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle activer/désactiver la "Protection Internet". Dans la section "Options de la carte", cliquez sur le bouton crayon afin d’activer/de désactiver la "Protection Internet". Pour activer la "Protection Internet", cliquez sur “Activer la protection internet”. Pour désactiver la "Protection Internet", valider l\'opération par biométrie (empreinte, face id) ou par une saisie du code de sécurité. Un écran de confirmation vous informe que la "Protection Internet" est maintenant activée/désactivée sur votre carte bancaire. Depuis votre espace client sur le site internet  Depuis le menu, dans "MES MOYENS DE PAIEMENT", sélectionnez “Mes cartes”. Si vous possédez plusieurs cartes, cliquez sur celle pour laquelle activer/désactiver la "Protection Internet". Dans la section “Options de la carte” cliquez sur le bouton crayon afin d’activer/de désactiver la "Protection Internet". Pour activer la "Protection Internet", cliquez sur “Activer la protection internet”. Pour désactiver la "Protection Internet", renseignez le code reçu par SMS (ou par message vocal). Puis validez l’opération. Un écran de confirmation vous informe que la "Protection Internet" est maintenant activée/désactivée sur votre carte bancaire. À savoir :  Lorsque vous activez la "Protection Internet," votre carte bancaire est bloquée pour tous les achats réalisés par internet. Il faudra alors créer une carte virtuelle avec Virtualis pour pouvoir payer vos achats en ligne en toute sécurité. En désactivant la "Protection Internet", votre carte pourra être utilisée pour régler des achats sur internet. Pour plus de sécurité, n’oubliez pas ensuite de réactiver la "Protection Internet".',
+    sourceRef: '?question=comment-activer-la-protection-internet-de-ma-carte'
+  },
+  {
+    answer:
+      'Avec le service Virtualis, sécurisez vos paiements en créant une carte virtuelle depuis votre espace client, sur l\'appli CMSO ou sur le site internet. Depuis l\'appli CMSO Depuis la barre de navigation en bas de votre écran, sélectionnez le raccourci "Virtualis". Choisissez la carte sur laquelle vous souhaitez créer un numéro. Renseignez le montant de votre achat et la durée de validité de la carte virtuelle (via le champ de saisie ou la réglette). Cliquez sur “Créer un numéro virtuel” pour générer la carte virtuelle. "Copier le numéro" via le bouton pour le coller ensuite sur le site du e-commerçant. Renseignez également la date d’expiration et le cryptogramme. Vérifiez sur le site du e-commerçant que votre achat est confirmé. Découvrez également notre tutoriel : Comment générer une carte virtuelle ? Depuis le site internet cmso.com Depuis la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur le raccourci "Virtualis". Choisissez la carte sur laquelle vous souhaitez créer un numéro. Saisissez le montant et la durée de validité (via le champ de saisie ou la réglette). Cliquez sur "Créer un numéro virtuel" pour générer la carte virtuelle. "Copier le numéro" via le bouton pour le coller ensuite sur le site du e-commerçant. Renseignez également la date d’expiration et le cryptogramme. Vérifiez sur le site du e-commerçant que votre achat est confirmé. Vous pouvez également visualiser notre tutoriel : Comment générer une carte virtuelle ? À savoir : Complétez la page de paiement du site marchand avec les données de la carte Virtualis créée, jamais avec celles de la carte réelle. Au moment de la création de la carte Virtualis, aucune somme n\'est prélevée de votre compte. Votre compte sera débité au moment où le paiement est pris en compte par le commerçant. Vous pouvez payer un abonnement en ligne avec votre carte virtuelle Virtualis. Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Adaptez le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant.',
+    sourceRef: '?question=comment-obtenir-numero-virtualis-site'
+  },
+  {
+    answer: 'Vous pouvez générer une carte Virtualis pour une durée allant de 1 à 24 mois. Vous pouvez en choisir la durée.',
+    sourceRef: '?question=combien-temps-valable-numero-virtualis'
+  },
+  {
+    answer:
+      'Pensez à vérifier, et au besoin, modifier vos plafonds de carte bancaire, avant d\'utiliser Virtualis. Il arrive également que certains commerçants en ligne refusent les cartes virtuelles : il vous faudra alors payer avec votre carte bancaire physique habituelle. Pour cela, vous pouvez momentanément désactiver la "Protection Internet" de votre carte depuis votre espace client sur le site internet ou sur votre appli CMB. Depuis le menu, cliquez sur "MES MOYENS DE PAIEMENT", puis "Mes cartes". Sélectionnez la carte sur laquelle vous souhaitez désactiver la "Protection Internet".  Dans "Options de la carte" cliquez sur le crayon sur la ligne "Protection Internet".  Vous acceptez alors de valider l\'opération de désactivation via un code reçu par SMS.   À savoir :  Une fois votre paiement réalisé, pensez à réactiver la "Protection Internet". Si vous rencontrez des difficultés, vous pouvez également contacter l\'assistance "paiement à distance" au 0969 320 819 .',
+    sourceRef: '?question=narrive-effectuer-paiement-site-virtualis'
+  },
+  {
+    answer:
+      'Depuis votre espace client sur le site internet ou sur l\'appli CMB, accédez au service Virtualis : Depuis le menu, cliquez sur "MOYENS DE PAIEMENT" puis "Virtualis". L\'onglet "Numéros virtuels actifs" vous permet de consulter vos n° Virtualis encore en vie : ceux dont le montant n\'a pas encore été entièrement consommé et dont la date d\'échéance n\'est pas atteinte. Si vous créez une carte virtuelle du montant exact de votre achat, une fois l\'achat réalisé, votre carte virtuelle ne sera plus visible dans l\'onglet "Numéros virtuels actifs" ; en effet, cette carte sera considérée comme "consommée entièrement".  Et cette même carte virtuelle sera visible sur l\'onglet "Historique des achats" quand votre compte aura été effectivement débité de votre achat.   À savoir : Si vous souhaitez que votre carte reste visible dans l\'onglet "Numéros virtuels actifs", nous vous suggérons de créer une carte  Virtualis d\'un montant arrondi à l\'euro supérieur de votre achat. Ainsi, même après la transaction, vous visualiserez toujours votre carte Virtualis, car celle-ci ne sera plus considérée comme entièrement consommée.',
+    sourceRef: '?question=ne-retrouve-la-carte-virtuelle-jai-creee-comment-faire'
+  },
+  {
+    answer:
+      'Avec le service Virtualis, sécurisez vos paiements en créant une carte virtuelle depuis votre espace client, sur l\'appli CMB ou sur le site internet. Depuis l\'appli CMB Depuis la barre de navigation en bas de votre écran, sélectionnez le raccourci "Virtualis". Choisissez la carte sur laquelle vous souhaitez créer un numéro. Renseignez le montant de votre achat et la durée de validité de la carte virtuelle (via le champ de saisie ou la réglette). Cliquez sur “Créer un numéro virtuel” pour générer la carte virtuelle. "Copier le numéro" via le bouton pour le coller ensuite sur le site du e-commerçant. Renseignez également la date d’expiration et le cryptogramme. Vérifiez sur le site du e-commerçant que votre achat est confirmé. Découvrez également notre tutoriel : Comment générer une carte virtuelle ? Sur le site internet cmb.fr Depuis la page d\'accueil, dans "MES RACCOURCIS CARTE", cliquez sur le raccourci "Virtualis". Choisissez la carte sur laquelle vous souhaitez créer un numéro. Saisissez le montant et la durée de validité (via le champ de saisie ou la réglette). Cliquez sur "Créer un numéro virtuel" pour générer la carte virtuelle. "Copier le numéro" via le bouton pour le coller ensuite sur le site du e-commerçant. Renseignez également la date d’expiration et le cryptogramme. Vérifiez sur le site du e-commerçant que votre achat est confirmé. Vous pouvez également visualiser notre tutoriel : Comment générer une carte virtuelle ? À savoir : Complétez la page de paiement du site marchand avec les données de la carte Virtualis créée, jamais avec celles de la carte réelle. Au moment de la création de la carte Virtualis, aucune somme n\'est prélevée de votre compte. Votre compte sera débité au moment où le paiement est pris en compte par le commerçant. Vous pouvez payer un abonnement en ligne avec votre carte virtuelle Virtualis. Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Adaptez le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant.',
+    sourceRef: '?question=comment-obtenir-numero-virtualis-site-7913'
+  },
+  {
+    answer:
+      'Pensez à vérifier, et au besoin, modifier vos plafonds de carte bancaire, avant d\'utiliser Virtualis. Il arrive également que certains commerçants en ligne refusent les cartes virtuelles : : il vous faudra alors payer avec votre carte bancaire physique habituelle. Pour cela, vous pouvez momentanément désactiver la "Protection Internet" de votre carte depuis votre espace client sur le site internet ou sur votre appli CMSO. Depuis le menu, cliquez sur "MES MOYENS DE PAIEMENT", puis "Mes cartes". Sélectionnez la carte sur laquelle vous souhaitez désactiver la "Protection Internet". Dans "Options de la carte" cliquez sur le crayon sur la ligne "Protection Internet". Vous acceptez alors de valider l\'opération de désactivation via un code reçu par SMS. À savoir : Une fois votre paiement réalisé, pensez à réactiver la "Protection Internet". Si vous rencontrez des difficultés, vous pouvez également contacter l\'assistance "paiement à distance" au 0969 320 819 .',
+    sourceRef: '?question=narrive-effectuer-paiement-site-virtualis-que-faire'
+  },
+  {
+    answer:
+      'Accédez au service Virtualis depuis votre espace client sur le site internet ou depuis l\'appli CMSO : Dans le menu, cliquez sur "MOYENS DE PAIEMENT" puis "Virtualis". L\'onglet "Numéros virtuels actifs" vous permet de consulter vos n° Virtualis encore en vie : ceux dont le montant n\'a pas encore été entièrement consommé et dont la date d\'échéance n\'est pas atteinte. Si vous créez une carte virtuelle du montant exact de votre achat, une fois l\'achat réalisé, votre carte virtuelle ne sera plus visible dans l\'onglet "Numéros virtuels actifs" ; en effet, cette carte sera considérée comme "consommée entièrement". Et cette même carte virtuelle sera visible sur l\'onglet "Historique des achats" quand votre compte aura été effectivement débité de votre achat. À savoir : Si vous souhaitez que votre carte reste visible dans l\'onglet "Numéros virtuels actifs", nous vous suggérons de créer une carte  Virtualis d\'un montant arrondi à l\'euro supérieur de votre achat. Ainsi, même après la transaction, vous visualiserez toujours votre carte Virtualis, car celle-ci ne sera plus considérée comme entièrement consommée.',
+    sourceRef: '?question=ne-retrouve-la-carte-virtuelle-jai-creee-comment-faire-10053'
+  },
+  {
+    answer:
+      'Vous pouvez commander un chéquier uniquement depuis votre espace client sur le site internet. Vous ne pouvez pas commander de chéquier depuis votre appli. Quelques étapes suffisent pour réaliser simplement votre commande en ligne : Dans le menu, cliquez sur "MES MOYENS DE PAIEMENT", puis "Commande de chéquier".  Suivez ensuite les instructions en cliquant sur "Accéder à la fonctionnalité".',
+    sourceRef: '?question=comment-commander-chequier'
+  },
+  {
+    answer:
+      "Pour encaisser un chèque, rendez-vous dans une agence CMB, pas nécessairement votre agence habituelle. A l'aide du distributeur automatique, vous pouvez déposer votre chèque 7 jours sur 7, 24 heures sur 24 en toute autonomie.  Insérez votre carte bancaire dans l'automate et saisissez votre code. L'écran affiche \"Choisissez une opération\" : sélectionnez \"Virement, Remise et autres opérations\". Choisissez ensuite \"Remise de chèques\". Choisissez le compte à créditer puis validez. L'automate vous propose d'insérer votre chèque : vérifiez bien que votre chèque est signé au dos et respectez le sens indiqué sur l'écran. L'écran affiche un scan de votre chèque : saisissez alors manuellement avec le clavier le montant du chèque puis validez. L'automate vous propose de déposer un autre chèque sur le même compte, sur un autre compte ou de faire une autre opération. Choisissez l'action qui vous convient. En fin de parcours, l'automate vous propose l'impression d'un reçu. À savoir :  Notez que certains automates ne permettent pas la remise de chèques : choisissez un automate dont la signalétique indique : \"Retraits-Remises\".  Vous pouvez également demander au conseiller disponible à l'accueil de vous aider : il déposera le chèque sur votre compte.",
+    sourceRef: '?question=comment-encaisser-cheque'
+  },
+  {
+    answer:
+      'Envoyez un chèque en ligne depuis votre espace client sur le site internet.  Dans le menu, cliquez sur "MES MOYENS DE PAIMENT", puis "Mes chéquiers".  En haut cliquez sur "Chèque en ligne".  Puis suivez les instructions en cliquant sur "Accéder à la fonctionnalité".   Vous validez votre demande selon les modalités qui vous sont indiquées. Le chèque est ensuite envoyé au bénéficiaire ou à vous-même sous 1 jour ouvré suivant la demande. L\'acheminement est ensuite effectué par voie postale dans les délais habituels.   À savoir :  Pour faciliter la gestion de votre compte, vous recevez un message dans votre messagerie "Mon Conseiller", récapitulant les caractéristiques du chèque. Vous pouvez également, à tout moment, suivre l’historique des chèques émis.',
+    sourceRef: '?question=comment-fonctionne-cheque-ligne'
+  },
+  {
+    answer:
+      "Le chèque en ligne est envoyé sous 1 jour ouvré suivant la demande. L'acheminement est ensuite effectué par voie postale dans les délais habituels.",
+    sourceRef: '?question=quand-vais-je-receptionner-cheque-ligne'
+  },
+  {
+    answer:
+      'Le chèque en ligne peut être expédié à l’adresse du bénéficiaire, si vous la connaissez.  Vous pouvez également le recevoir chez vous : cochez la case correspondante dans la partie "Destinataire du chèque".',
+    sourceRef: '?question=ou-puis-je-envoyer-cheque-ligne'
+  },
+  {
+    answer:
+      "Vous pouvez émettre un chèque en ligne à partir de tous les comptes (comptes courants et livrets d'épargne) dont vous êtes titulaire ou cotitulaire.",
+    sourceRef: '?question=a-partir-quels-comptes-puis-je-emettre-cheque-ligne'
+  },
+  {
+    answer:
+      "Vous pouvez demander l’expédition d’un chèque en ligne dans la limite de 1 000 €.    À savoir :  Pour toute demande d'un montant supérieur à 1 000 €, contactez votre conseiller.",
+    sourceRef: '?question=jusqua-quel-montant-puis-je-commander-cheque-ligne'
+  },
+  {
+    answer: 'Le chèque en ligne peut être adressé à une personne physique (un particulier), une entreprise ou une association.',
+    sourceRef: '?question=a-puis-je-envoyer-cheque-saisi-site'
+  },
+  {
+    answer: 'Non, le chèque en ligne ne pourra être expédié qu’en France métropolitaine ou dans les DOM-TOM.',
+    sourceRef: '?question=puis-je-envoyer-cheque-ligne-letranger'
+  },
+  {
+    answer:
+      'Le chèque de banque n’est pas un chèque classique : vous le demandez auprès de votre banque. Il est souvent exigé par un particulier qui vend un bien personnel d’un montant important, une voiture par exemple. Son intérêt ? Ce chèque sécurise pleinement la transaction pour le bénéficiaire : la somme demandée est isolée et réservée au profit du bénéficiaire, le chèque ne pourra pas être utilisé à d’autres fins. À savoir : Vous avez besoin d’un chèque de banque ?  Voici comment procéder.',
+    sourceRef: '?question=qu-est-ce-qu-un-cheque-de-banque'
+  },
+  {
+    answer:
+      'C’est très simple ! Pour obtenir un chèque de banque, contactez votre agence. Votre interlocuteur vous demandera 2 éléments pour préparer le chèque : Le montant du chèque, Le nom de son bénéficiaire. La banque vérifie également la disponibilité des fonds sur votre compte. Le chèque de banque est ensuite signé par la banque.  Le montant du chèque est débité de votre compte. Le chèque est alors disponible instantanément : vous pouvez venir le récupérer. À savoir : Il n’y a pas de plafond pour un chèque de banque. Pour anticiper un achat, vous pouvez demander la création d’un chèque de banque pour une date ultérieure. Le chèque de banque est un service payant : consultez nos “Conditions Tarifaires” pour connaître le coût de ce service.',
+    sourceRef: '?question=comment-obtenir-un-cheque-de-banque'
+  },
+  {
+    answer:
+      'C’est très simple ! Pour obtenir un chèque de banque, contactez votre agence. Votre interlocuteur vous demandera 2 éléments pour préparer le chèque : Le montant du chèque, Le nom de son bénéficiaire. La banque vérifie également la disponibilité des fonds sur votre compte. Le chèque de banque est ensuite signé par la banque.  Le montant du chèque est débité de votre compte. Le chèque est alors disponible instantanément : vous pouvez venir le récupérer. À savoir : Il n’ y a pas de plafond pour un chèque de banque. Pour anticiper un achat, vous pouvez demander la création d’un chèque de banque pour une date ultérieure. Le chèque de banque est un service payant : consultez nos “Conditions Tarifaires” pour connaître le coût de ce service.',
+    sourceRef: '?question=comment-obtenir-un-cheque-de-banque-30948'
+  },
+  {
+    answer:
+      'Le chèque de banque n’est pas un chèque classique : vous le demandez auprès de votre banque. Il est souvent exigé par un particulier qui vend un bien personnel d’un montant important, une voiture par exemple. Son intérêt ? Ce chèque sécurise pleinement la transaction pour le bénéficiaire : la somme demandée est isolée et réservée au profit du bénéficiaire, le chèque ne pourra pas être utilisé à d’autres fins. À savoir : Vous avez besoin d’un chèque de banque ?  Voici comment procéder.',
+    sourceRef: '?question=qu-est-ce-qu-un-cheque-de-banque-30950'
+  },
+  {
+    answer:
+      "Pour encaisser un chèque, rendez-vous dans une agence CMSO, pas nécessairement votre agence habituelle. A l'aide du distributeur automatique, vous pouvez déposer votre chèque 7 jours sur 7, 24 heures sur 24 en toute autonomie. Insérez votre carte bancaire dans l'automate et saisissez votre code. L'écran affiche \"Choisissez une opération\" : sélectionnez \"Virement, Remise et autres opérations\". Choisissez ensuite \"Remise de chèques\". Choisissez le compte à créditer puis validez. L'automate vous propose d'insérer votre chèque : vérifiez bien que votre chèque est signé au dos et respectez le sens indiqué sur l'écran. L'écran affiche un scan de votre chèque : saisissez alors manuellement avec le clavier le montant du chèque puis validez. L'automate vous propose de déposer un autre chèque sur le même compte, sur un autre compte ou de faire une autre opération. Choisissez l'action qui vous convient. En fin de parcours, l'automate vous propose l'impression d'un reçu. À savoir : Notez que certains automates ne permettent pas la remise de chèques : choisissez un automate dont la signalétique indique : \"Retraits-Remises\". Vous pouvez également demander au conseiller disponible à l'accueil de vous aider : il déposera le chèque sur votre compte.",
+    sourceRef: '?question=comment-encaisser-un-cheque-en-agence'
+  },
+  {
+    answer:
+      "En cas de perte ou de vol d'un chèque ou de votre chéquier :  Une mise en opposition devra être faite via votre espace client ou en appelant le : 02 98 28 42 28 (7 jours sur 7 et 24 heures sur 24). Depuis l'étranger, composez le +33 2 98 28 42 28. Si vous identifiez sur votre compte le débit d'un (ou plusieurs) chèque(s) que vous n'avez pas personnellement émis, contactez votre conseiller : il prendra en charge votre réclamation. À savoir : Il est également possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=faire-cas-fraude-cheque-chequier'
+  },
+  {
+    answer:
+      "En cas de perte ou de vol d'un chèque ou de votre chéquier : Une mise en opposition devra être faite via votre espace client ou en appelant le : 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24). Depuis l'étranger, composez le +33 2 98 28 42 28. Si vous identifiez sur votre compte le débit d'un (ou plusieurs) chèque(s) que vous n'avez pas personnellement émis, contactez votre conseiller : il prendra en charge votre réclamation. À savoir : Il est également possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=faire-cas-fraude-cheque-chequier-10012'
+  },
+  {
+    answer:
+      'Vous pouvez consulter ces comptes depuis votre espace client sur le site internet : Dans le menu, cliquez sur "COMPTES & EPARGNE", puis "Autres comptes (Enfants, tutelles, procurations)". Deux onglets vous sont alors proposés : "Enfants, tutelles, ..." et "Procurations" : cliquez sur celui qui vous concerne.  Vous visualisez ainsi la liste des comptes dont vous êtes responsable.',
+    sourceRef: '?question=comment-consulter-comptes-mes-enfants-tutelles-comptes-lesquels-suis-mandataire'
+  },
+  {
+    answer:
+      "Vous pouvez pointer vos comptes ou identifier une opération avec les libellés longs depuis votre espace client sur le site internet (service indisponible sur l'appli). Sur votre page d'accueil :  Cliquez sur le solde du compte que vous souhaitez pointer. En-dessous d' \"Opérations comptabilisées\", cliquez sur \"Afficher les options d'affichage\". Vous pouvez sélectionner une période, un ordre d'affichage ou l'affichage des libellés longs. Cliquez sur \"Pointer les opérations\" pour activer la fonctionnalité : Utilisez la coche pour pointer l'opération Utilisez le drapeau si vous avez besoin de vérifier cette opération",
+    sourceRef: '?question=comment-pointer-comptes-mettre-valeur-operation'
+  },
+  {
+    answer:
+      'Quelle que soit la période, l\'outil de recherche vous permet de retrouver facilement une opération effectuée sur l\'un de vos comptes : un virement, le paiement d\'une facture, un prélèvement des impôts, vos chèques débités, etc.   Deux options de recherche sont possibles depuis votre espace client : en accès rapide pour une recherche simple, ou en recherche avancée avec des filtres afin d\'affiner les résultats.  Depuis votre espace client sur le site internet :  Pour l\'accès rapide Sélectionnez le compte concerné par la recherche.  Vous arrivez dans votre "Détail compte" où se trouve un champ de recherche avec une loupe.  Tapez vos mots-clés de recherche puis cliquez sur "Rechercher". Les résultats s\'affichent alors juste en dessous. Pour la recherche avancée Cliquez sur "Recherche avancée et export d\'opérations" en-dessous du bouton rouge "Rechercher". Deux critères sont alors proposés :  le libellé de l\'opération et le montant de l\'opération. Trois filtres de recherche sont à votre disposition : "Comptes", "Période" et "Types d\'opérations". Vous avez la possibilité de télécharger le résultat. Exemple : Pour rechercher vos factures de téléphone depuis 1 an, saisissez le nom de votre prestataire téléphonique dans le libellé de l’opération et 1 an dans la période. Notez que vous n’êtes pas obligé de tout remplir pour lancer la recherche. Une partie des critères peut suffire pour retrouver l\'opération. Puis lancez la recherche : les résultats apparaissent directement en bas de la page !   À savoir : Vous bénéficiez de ce service sur tous les comptes et livrets pour lesquels vous êtes titulaire, cotitulaire, représentant légal et mandataire, et cela, sans frais supplémentaires.',
+    sourceRef: '?question=comment-rechercher-operation-mes-comptes'
+  },
+  {
+    answer:
+      'Vous pouvez consulter vos comptes sur votre espace client, depuis votre appli CMB ou depuis le site internet. Depuis l\'appli CMB Connectez-vous à votre appli CMB. Vous visualisez immédiatement le solde de votre compte chèques. Pour votre épargne, cliquez sur "TOUTE MON ÉPARGNE", juste en dessous de "MES RACCOURCIS CARTE" : vous accédez ainsi au solde de vos différents livrets d\'épargne. Depuis le site internet cmb.fr Une fois connecté, votre tableau de bord s\'affiche. En un coup d’œil, vous visualisez, au centre, vos comptes et votre épargne. Pour votre compte, le solde s\'affiche automatiquement. Pour votre épargne, cliquez sur "TOUTE MON EPARGNE" pour accéder au solde de vos livrets et placements.',
+    sourceRef: '?question=comment-connaitre-solde-mes-comptes'
+  },
+  {
+    answer:
+      "Si vous recevez une \"alerte\" Bud'JET, cela signifie qu'un événement lié au compte que vous avez paramétré sous Bud'JET vient de se produire :  Un prélèvement Ou un virement par exemple.",
+    sourceRef: '?question=est-quune-alerte-budjet'
+  },
+  {
+    answer:
+      'Votre "info solde" Bud\'JET vous informe du solde de votre compte quand vous en avez besoin.  Vous choisissez les jours et la tranche horaire que vous souhaitez pour recevoir cette information.  Vous pouvez également choisir le canal par lequel vous souhaitez la recevoir : par push notification ou par e-mail.',
+    sourceRef: '?question=est-que-info-solde-budjet'
+  },
+  {
+    answer:
+      'Votre "info solde" vous informe du solde de votre compte quand vous en avez besoin.  Vous choisissez les jours et la tranche horaire que vous souhaitez pour recevoir cette information.  Vous pouvez également choisir le canal par lequel vous souhaitez la recevoir : par push notification ou par e-mail.',
+    sourceRef: '?question=comment-connaitre-solde-automatiquement-budjet'
+  },
+  {
+    answer:
+      'En activant la visualisation de la catégorisation automatique de vos opérations, vous disposez d\'un outil de gestion de budget simple et pratique. Vous pouvez également créer des hashtags pour suivre des budgets personnalisés. La catégorisation vous permet :  D\'avoir un aperçu visuel de la répartition de vos dépenses et revenus dans votre "Détail compte".  D\'avoir la répartition précise de vos opérations par catégorie, sous-catégorie et hashtag via l\'onglet "Mon budget" de votre tableau de bord ou dans "PARAMETRAGE".  À savoir : Vous pouvez également comparer sur différentes périodes la répartition de vos dépenses et revenus pour connaître leur évolution.',
+    sourceRef: '?question=pourquoi-activer-categorisation-automatique'
+  },
+  {
+    answer:
+      'Vous visualisez la répartition de vos dépenses et revenus catégorisés automatiquement dans 5 grandes catégories :  "Ressources" "Mes charges fixes" "Mon quotidien" "Mouvements d\'épargne" "À catégoriser"',
+    sourceRef: '?question=sont-categories-existantes'
+  },
+  {
+    answer:
+      'Vos opérations sont automatiquement catégorisées et sous-catégorisées. Pour activer la visualisation de cette répartition, vous devez activer le service dans l\'onglet "Mon budget" de votre tableau de bord ou dans "PARAMETRAGE".   Si toutefois vous souhaitez changer la catégorie ou la sous-catégorie d\'une opération, il vous suffit de cliquer sur l\'opération. La liste des catégories et sous-catégories s\'affichera et vous sélectionnerez celle que vous souhaitez.  À savoir : Le service apprend et enregistre directement vos modifications pour les appliquer sur les prochaines opérations identiques.',
+    sourceRef: '?question=comment-categoriser-depense-un-revenu'
+  },
+  {
+    answer:
+      'Pour ajouter des catégories personnalisées, vous pouvez créer des hashtags. Depuis votre "Détail compte", cliquez sur une opération. Attribuez-lui le hashtag que vous souhaitez. Vous pouvez ainsi suivre un budget personnalisé.',
+    sourceRef: '?question=comment-creer-categories-personnalisees'
+  },
+  {
+    answer:
+      'Vous ne pouvez pas renommer une catégorie vous-même.  Par contre, pour suivre un budget spécifique, pensez à créer des catégories personnalisées à l\'aide des hashtags.  Depuis votre "Détail compte", cliquez sur une opération et attribuez-lui le hashtag que vous souhaitez.',
+    sourceRef: '?question=comment-renommer-categorie'
+  },
+  {
+    answer:
+      'Le hashtag vous permet d\'identifier les opérations liées à un même évènement, "vacances" par exemple.  Ainsi, en plus des catégories et sous-catégories automatiquement attribuées, vous pouvez suivre le budget alloué à cet évènement. Vous pouvez également suivre les catégories et sous-catégories que vous souhaitez en créant le hashtag correspondant.',
+    sourceRef: '?question=a-quoi-sert-hashtag'
+  },
+  {
+    answer:
+      'Vous pouvez créer des hashtags en toute simplicité :  Depuis votre "Détail compte", cliquez sur une opération. Attribuez-lui le hashtag que vous souhaitez.',
+    sourceRef: '?question=comment-ajouter-hashtag'
+  },
+  {
+    answer:
+      'Vous pouvez prendre rendez-vous avec votre conseiller depuis l\'appli CMB ou depuis votre espace client sur le site internet. Depuis l\'appli CMB Accédez au “Menu” et cliquez sur “Mon conseiller” Sélectionnez "Prendre rendez-vous". Vous accédez à l\'agenda de votre conseiller : choisissez un créneau disponible qui vous convient. Vous recevrez une confirmation et un rappel la veille du rendez-vous par mail et/ou SMS. Depuis le site internet cmb.fr Cliquez en haut à droite sur l\'icône "Mon conseiller, ma messagerie". Votre page d\'accueil "MON CONSEILLER" s\'ouvre. Trois onglets vous sont proposés : "Ma messagerie", "Mon agence", "Prendre rendez-vous". Cliquez sur "Prendre rendez-vous". Vous accédez à l\'agenda de votre conseiller : choisissez un créneau disponible qui vous convient. Vous recevrez une confirmation et un rappel la veille du rendez-vous par mail et/ou SMS.    À savoir  : Pour mieux visualiser le parcours, découvrez également notre tutoriel "Prendre rendez-vous en ligne".',
+    sourceRef: '?question=souhaite-prendre-rendez-vous-comment-faire'
+  },
+  {
+    answer:
+      'Vous pouvez, en toute autonomie, mettre à jour vos coordonnées (email, téléphone...) depuis votre espace client sur le site internet. Pour cela : Cliquez, en haut de l\'écran, sur votre nom. Sélectionnez l\'onglet "Mon Profil", puis "Mes Coordonnées". En cliquant sur le crayon, sélectionnez les informations personnelles à modifier. À savoir : Découvrez également notre tutoriel sur "Changer votre numéro de mobile en ligne".',
+    sourceRef: '?question=comment-modifier-coordonnees-personnelles'
+  },
+  {
+    answer:
+      'Vous pouvez consulter vos comptes sur votre espace client, depuis votre appli CMSO ou depuis le site internet. Depuis l\'appli CMSO Connectez-vous à votre appli CMSO. Vous visualisez immédiatement le solde de votre compte chèques. Pour votre épargne, cliquez sur "TOUTE MON ÉPARGNE", juste en dessous de "MES RACCOURCIS CARTE" : vous accédez ainsi au solde de vos différents livrets d\'épargne. Depuis le site internet cmso.com Une fois connecté, votre tableau de bord s\'affiche. En un coup d\'oeil, vous visualisez, au centre, vos comptes et votre épargne. Pour votre compte, le solde s\'affiche automatiquement. Pour votre épargne, cliquez sur "TOUTE MON EPARGNE" pour accéder au solde de vos livrets et placements.',
+    sourceRef: '?question=comment-consulter-solde-mes-comptes'
+  },
+  {
+    answer:
+      "Pour obtenir une information sur vos comptes par téléphone, contactez le numéro suivant : 09 74 75 10 11 (appel non surtaxé). Depuis l'étranger, composez le : +33 (0)1 41 86 82 86. À savoir : Vous pouvez accéder à vos comptes à tout moment en vous connectant à votre espace client.",
+    sourceRef: '?question=numero-contacter-obtenir-information-mes-comptes'
+  },
+  {
+    answer:
+      "Pour obtenir une information sur vos comptes par téléphone, contactez le numéro suivant : 09 74 75 10 12 (appel non surtaxé). Depuis l'étranger, composez le : +33 (0)1 41 86 21 55. À savoir : Vous pouvez accéder à vos comptes à tout moment en vous connectant à votre espace client.",
+    sourceRef: '?question=numero-contacter-obtenir-information-mes-comptes-12601'
+  },
+  {
+    answer:
+      'En cas de besoin, vous pouvez contacter le service relation clientèle : Par courrier : Crédit Mutuel de Bretagne - Service Relations Clientèle - 29808 Brest Cedex 9 Par téléphone : 08 00 00 30 92 Par e-mail : relations.clientele@cmb.fr',
+    sourceRef: '?question=comment-contacter-service-relation-clientele'
+  },
+  {
+    answer:
+      'En cas de besoin, vous pouvez contacter le service clientèle : Par courrier :  Crédit Mutuel du Sud-Ouest - Service Relations Clientèle - 14 avenue Antoine Becquerel - 33608 Pessac Cedex Téléphone : 05 56 07 57 31 E-mail : relations.clientele@cmso.com',
+    sourceRef: '?question=comment-contacter-service-relation-clientele-12603'
+  },
+  {
+    answer:
+      'Depuis votre espace client sur le site internet cmb.fr : À gauche dans le menu, sélectionnez “Comptes et Épargne”, puis “Recherche et export d’opérations”. Vous pouvez alors saisir le “Libellé de l’opération”, le “Montant en euros” et d’autres filtres de recherche : comptes, période, type d’opérations. Cliquez ensuite sur “Rechercher”. Le résultat de la recherche s’affiche en dessous. Cliquez sur l’opération qui vous interroge. Le détail s’affiche, et au niveau du “libellé long”, vous accédez à davantage de détails sur le prélèvement. À savoir : Si jamais le nom d’un fournisseur ne vous dit rien (acronyme, initiales ou nom méconnus), pensez à faire une recherche sur internet en saisissant le nom indiqué sur le “libellé long” de l’opération dans votre moteur de recherche. Vous pourrez ainsi parfois retrouver le prestataire à l’origine du prélèvement.',
+    sourceRef: '?question=comment-identifier-l-origine-d-une-operation-sur-mes-comptes'
+  },
+  {
+    answer:
+      'Depuis votre espace client sur le site internet cmso.com : À gauche dans le menu, sélectionnez “Comptes et Épargne”, puis “Recherche et export d’opérations”. Vous pouvez alors saisir le “Libellé de l’opération”, le “Montant en euros” et d’autres filtres de recherche : comptes, période, type d’opérations. Cliquez ensuite sur “Rechercher”. Le résultat de la recherche s’affiche en dessous. Cliquez sur l’opération qui vous interroge. Le détail s’affiche, et au niveau du “libellé long”, vous accédez à davantage de détails sur le prélèvement. À savoir : Si jamais le nom d’un fournisseur ne vous dit rien (acronyme, initiales ou nom méconnus), pensez à faire une recherche sur internet en saisissant le nom indiqué sur le “libellé long” de l’opération dans votre moteur de recherche. Vous pourrez ainsi parfois retrouver le prestataire à l’origine du prélèvement.',
+    sourceRef: '?question=comment-identifier-l-origine-d-une-operation-sur-mes-comptes-47180'
+  },
+  {
+    answer:
+      'Pour des prélèvements liés à nos services : assurances, crédits…. Vous avez constaté une différence sur le montant d’un prélèvement d’un mois sur l’autre ? Cela s’explique par rapport à la date à laquelle vous avez souscrit votre crédit, votre assurance ou autre produit ou service qui requiert un paiement mensuel. Cette différence de montant est notamment visible le premier mois de votre mensualisation ou le dernier mois de prélèvement, dans le cas d’un crédit par exemple. En effet, le montant prélevé se fait au prorata de la période couverte. Ainsi, pour une assurance auto souscrite le 15 novembre, vous payerez en novembre une demi- mensualité correspondant à la période du 15 au 30 novembre. Dès le mois suivant, la mensualité sera complète et couvrira le mois de décembre dans sa totalité. De même, pour un crédit qui se termine le 12 janvier, la mensualité du mois de janvier sera également plus faible que les précédentes : elle sera calculée au prorata des jours couverts par le crédit, soit : (12/31) * [la mensualité habituelle]. Pour des prélèvements externes type téléphonie, électricité, eau, etc. Nous vous conseillons de vérifier votre facture pour comprendre l’écart constaté et de vous rapprocher de votre fournisseur si vous souhaitez davantage d’explications.',
+    sourceRef: '?question=pourquoi-le-montant-de-certains-prelevements-peut-varier'
+  },
+  {
+    answer:
+      "Quand un prélèvement vous interpelle, nous vous conseillons dans un premier temps d’identifier son origine pour vous s’assurer de l’identité du créancier. Pour cela, accédez à la question : Comment identifier l’origine d’une opération sur mes comptes ? Si vous avez des prélèvements de la part d’un fournisseur, vous avez signé un mandat SEPA l’autorisant à venir débiter votre compte. Ainsi, si vous souhaitez contester un tel prélèvement , interrogez le prestataire ; il doit être en mesure de vous restituer ce mandat.  Par contre, si vous n'avez pas signé de mandat SEPA, vous pouvez contester le ou les prélèvements non autorisés dans un délai maximum de 13 mois suivant la date du débit en compte, en prenant contact avec votre conseiller. La demande doit être faite par écrit. À savoir : Mais sachez que dans ce cas, vous pouvez vous exposer à une situation délicate : fin de la prestation, mise en place d'une procédure de recouvrement par le créancier, etc. En effet, l’opposition à un prélèvement ou la contestation ne vous exonère pas de vos éventuelles obligations de paiement envers le créancier. De plus, en cas de contestation d’un prélèvement dans le délai de 13 mois, nous pourrons annuler le remboursement s’il s’avère finalement que vous aviez autorisé ce prélèvement (existence d’un mandat SEPA).",
+    sourceRef: '?question=je-souhaite-contester-un-prelevement-comment-proceder'
+  },
+  {
+    answer:
+      "Quand un prélèvement vous interpelle, nous vous conseillons dans un premier temps d’identifier son origine pour vous s’assurer de l’identité du créancier. Pour cela, accédez à la question : Comment identifier l’origine d’une opération sur mes comptes ? Si vous avez des prélèvements de la part d’un fournisseur, vous avez signé un mandat SEPA l’autorisant à venir débiter votre compte. Ainsi, si vous souhaitez contester un tel prélèvement , interrogez le prestataire ; il doit être en mesure de vous restituer ce mandat. Par contre, si vous n'avez pas signé de mandat SEPA, vous pouvez contester le ou les prélèvements non autorisés dans un délai maximum de 13 mois suivant la date du débit en compte, en prenant contact avec votre conseiller. La demande doit être faite par écrit. À savoir : Mais sachez que dans ce cas, vous pouvez vous exposer à une situation délicate : fin de la prestation, mise en place d'une procédure de recouvrement par le créancier, etc. En effet, l’opposition à un prélèvement ou la contestation ne vous exonère pas de vos éventuelles obligations de paiement envers le créancier. De plus, en cas de contestation d’un prélèvement dans le délai de 13 mois, nous pourrons annuler le remboursement s’il s’avère finalement que vous aviez autorisé ce prélèvement (existence d’un mandat SEPA).",
+    sourceRef: '?question=je-souhaite-contester-un-prelevement-comment-proceder-47280'
+  },
+  {
+    answer:
+      'Vous pouvez, en toute autonomie, mettre à jour vos coordonnées (email, téléphone...) depuis votre espace client sur le site internet. Pour cela : Cliquez, en haut de l\'écran, sur votre nom. Sélectionnez l\'onglet "Mon Profil", puis "Mes Coordonnées". En cliquant sur le crayon, sélectionnez les informations personnelles à modifier. À savoir : Découvrez également notre tutoriel sur "Changer votre numéro de mobile en ligne".',
+    sourceRef: '?question=comment-mettre-a-jour-mes-coordonnees'
+  },
+  {
+    answer:
+      'Si vous êtes déjà utilisateur de Digiposte (1) pour stocker vos documents tels que bulletins de salaire, factures (électricité, téléphonie, eau…), impôts… vous pouvez également activer ce service au Crédit Mutuel de Bretagne pour vos relevés bancaires.   (1) Le service Digiposte est un service de La Poste accessible via l’adresse Internet https://www.laposte.fr/digiposte/tous-mes-documents-partout-et-tout-le-temps ou via l’application mobile Digiposte.',
+    sourceRef: '?question=puis-je-utiliser-digiposte-pour-mes-documents-bancaires'
+  },
+  {
+    answer:
+      'Si vous êtes déjà utilisateur de Digiposte (1) pour stocker vos documents tels que bulletins de salaire, factures (électricité, téléphonie, eau…), impôts… vous pouvez également activer ce service au Crédit Mutuel du Sud-Ouest pour vos relevés bancaires. (1) Le service Digiposte est un service de La Poste accessible via l’adresse Internet https://www.laposte.fr/digiposte/tous-mes-documents-partout-et-tout-le-temps ou via l’application mobile Digiposte.',
+    sourceRef: '?question=puis-je-utiliser-digiposte-pour-mes-documents-bancaires-65605'
+  },
+  {
+    answer:
+      "Vous pouvez activer ou désactiver le service Digiposte(1) pour vos relevés bancaires depuis votre espace client, sur l'appli CMB ou sur le site internet. Depuis l'appli CMB Sélectionnez le menu en bas à droite de votre écran, puis cliquez tout en haut sur la tuile “Mes documents”. Saisissez votre code de sécurité puis Validez. En-dessous de la liste de vos derniers relevés, vous accédez à Digiposte : vous pouvez activer ou désactiver le service. Il vous faudra d’abord activer le service de dématérialisation. Depuis le site internet cmb.fr Dans le menu de gauche, accédez à “Mes documents” puis sélectionnez “Mes relevés et contrats”. Cette fonctionnalité est sécurisée par la saisie de votre code de sécurité ou d'un code reçu par sms. Activez la dématérialisation de vos relevés et contrats. Vous pouvez alors activer ou désactiver Digiposte. À savoir : L'activation de Digiposte requiert l’activation de la dématérialisation. Vous ne pouvez pas cumuler relevés papier et relevés stockés sur Digiposte. (1) Le service Digiposte est un service de La Poste accessible via l’adresse Internet https://www.laposte.fr/digiposte/tous-mes-documents-partout-et-tout-le-temps ou via l’application mobile Digiposte.",
+    sourceRef: '?question=comment-activer-desactiver-digiposte'
+  },
+  {
+    answer:
+      "Vous pouvez activer ou désactiver le service Digiposte(1) pour vos relevés bancaires depuis votre espace client, sur l'appli CMSO ou sur le site internet. Depuis l'appli CMSO Sélectionnez le menu en bas à droite de votre écran, puis cliquez tout en haut sur la tuile “Mes documents”. Saisissez votre code de sécurité puis Validez. En-dessous de la liste de vos derniers relevés, vous accédez à Digiposte : vous pouvez activer ou désactiver le service. Il vous faudra d’abord activer le service de dématérialisation. Depuis le site internet cmso.com Dans le menu de gauche, accédez à “Mes documents” puis sélectionnez “Mes relevés et contrats”. Cette fonctionnalité est sécurisée par la saisie de votre code de sécurité ou d'un code reçu par sms. Activez la dématérialisation de vos relevés et contrats. Vous pouvez alors activer ou désactiver Digiposte. À savoir : L'activation de Digiposte requiert l’activation de la dématérialisation. Vous ne pouvez pas cumuler relevés papier et relevés stockés sur Digiposte. (1) Le service Digiposte est un service de La Poste accessible via l’adresse Internet https://www.laposte.fr/digiposte/tous-mes-documents-partout-et-tout-le-temps ou via l’application mobile Digiposte.",
+    sourceRef: '?question=comment-activer-desactiver-digiposte-65613'
+  },
+  {
+    answer:
+      "Nous vous demandons régulièrement de mettre à jour vos informations personnelles : D’une part, pour satisfaire aux obligations légales et réglementaires : comme tout organisme financier, nous sommes soumis à un contrôle rigoureux de nos activités, auquel nous nous prêtons avec la plus grande transparence. ( exemple : lutter contre le blanchiment d’argent). D’autre part, afin de mieux vous connaître pour que vous receviez des recommandations personnalisées sur nos produits et services ; vous bénéficiez ainsi d'un accompagnement pour réaliser vos projets.",
+    sourceRef: '?question=pourquoi-mettre-a-jour-mes-informations-personnelles'
+  },
+  {
+    answer:
+      "Nous avons créé Bud'JET, un outil pour simplifier la gestion de votre budget au quotidien. Trois fonctionnalités principales sont proposées :   Vous recevez des alertes personnalisées, par exemple lorsque votre solde est inférieur au montant que vous avez défini ; consultez en vidéo les alertes personnalisées.  Vous gérez votre budget du bout des doigts grâce à la visualisation et la répartition de la catégorisation automatique de vos opérations.  Vous créez vos budgets personnalisés avec les hashtags #. Par exemple, vous partez en vacances avec vos amis et souhaitez suivre le budget de ce voyage : créez un #vacancesentreamis que vous ajoutez sur vos opérations (en plus des catégories existantes) : la nourriture, les sorties sur place... Vous avez ainsi une vision optimisée de votre budget avec la répartition et le classement de vos dépenses et ressources.",
+    sourceRef: '?question=comment-bien-gerer-budget'
+  },
+  {
+    answer:
+      'Nous avons créé Bud\'JET, un outil pour simplifier la gestion de votre budget au quotidien. Trois fonctionnalités principales sont proposées :   Vous recevez des alertes personnalisées, par exemple lorsque votre solde est inférieur au montant que vous avez défini ; consultez en vidéo les alertes personnalisées.  Vous gérez votre budget du bout des doigts grâce à la visualisation et la répartition de la catégorisation automatique de vos opérations.  Vous créez vos budgets personnalisés avec les hashtags #. Par exemple, vous partez en vacances avec vos amis et souhaitez suivre le budget de ce voyage : créez un "#vacancesentreamis" que vous ajoutez sur vos opérations (en plus des catégories existantes) : la nourriture, les sorties sur place... Vous avez ainsi une vision optimisée de votre budget avec la répartition et le classement de vos dépenses et ressources.',
+    sourceRef: '?question=comment-bien-gerer-budget-4137'
+  },
+  {
+    answer:
+      "Votre première connexion à l'espace client peut se faire depuis l'appli CMB ou depuis le site internet. Depuis l'appli CMB Cliquez sur le bouton “Se connecter” en bas de l’écran. Renseignez votre identifiant et votre premier mot de passe, puis cliquez sur “Se connecter”. Votre identifiant et votre premier mot de passe se trouvent sur le document que vous a remis votre conseiller lors de votre ouverture de compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Pour pouvoir utiliser l'appli CMB, enregistrez ensuite votre mobile comme appareil de confiance : cliquez sur le bouton “Enregistrer mon appareil” et suivez les indications qui apparaissent à l'écran : notre tutoriel complet peut également vous aider. Connectez-vous maintenant sur l'appli CMB en utilisant votre code de sécurité à 5 chiffres, votre empreinte digitale ou la reconnaissance faciale. Depuis le site internet Saisissez votre identifiant et votre \"mot de passe d'activation\" temporaire ; cet identifiant et ce \"mot de passe d'activation\" vous ont été transmis par votre conseiller lors de l'ouverture de votre compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Vous serez ensuite invité à créer votre mot de passe personnel que vous utiliserez lors de vos futures connexions. Notre tutoriel complet vous accompagne aussi pour cette première connexion à votre espace client sur mon.cmb.fr.",
+    sourceRef: '?question=comment-acceder-mes-comptes'
+  },
+  {
+    answer:
+      "Vous avez reçu votre identifiant de connexion suite à votre ouverture de compte. Cet identifiant vous permet d'accéder à votre espace client sur le site internet. Vous avez ouvert votre compte en agence ? Votre identifiant de connexion vous a été transmis sur papier par votre conseiller. Vous avez ouvert votre compte en ligne ? Votre identifiant de connexion vous a été communiqué par email. À savoir : Vous avez perdu ou oublié votre identifiant de connexion ? Rééditez votre identifiant. Vous pouvez également contacter l'assistance Banque à Distance au 09 69 36 02 20, accessible 7 jours sur 7, de 8 heures à 22 heures.",
+    sourceRef: '?question=ou-trouver-identifiant-mon-mot-passe'
+  },
+  {
+    answer:
+      'Vous pouvez débloquer votre accès depuis votre espace client, sur l\'appli CMB ou sur le site internet. Depuis l\'appli CMB  A l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?" Sélectionnez ensuite "Débloquer mon accès". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Depuis le site internet Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez ensuite "Débloquer mon accès". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". À savoir :  Pour des raisons de sécurité, l\'accès à vos comptes est bloqué au bout de trois tentatives de connexion erronées. Vous pouvez également contacter l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h.',
+    sourceRef: '?question=ai-bloque-lacces-mes-comptes-que-faire'
+  },
+  {
+    answer:
+      'Pour vous déconnecter de votre espace client sur le site internet :   Cliquez en haut à droite sur le bouton "Déconnexion" si vous êtes un client "Particuliers". Cliquez au bas du menu de gauche si vous êtes client "Professionnels, Agriculteurs ou Associations".  Vous serez immédiatement déconnecté.',
+    sourceRef: '?question=comment-deconnecter-mon-espace-client'
+  },
+  {
+    answer:
+      'Changez votre mot de passe depuis votre espace client sur le site internet :  Cliquez sur l\'icône "Profil" avec votre nom en haut de votre espace client. Votre page "MON PROFIL" s\'ouvre. Cliquez ensuite sur "Modifier mon mot de passe".   Renseignez ensuite votre mot de passe actuel, votre nouveau mot de passe et la confirmation de votre nouveau mot de passe.',
+    sourceRef: '?question=comment-changer-mot-passe'
+  },
+  {
+    answer:
+      'On appelle "authentification forte" (ou authentification cross-canal) une solution de confirmation de l\'identité du client qui s\'appuie sur la validation d\'au moins deux éléments d\'identification indépendants parmi les trois suivants : Quelque chose que l\'utilisateur "connaît" (mot de passe par exemple)  Quelque chose que l\'utilisateur "possède" (un smartphone par exemple) Quelque chose que l\'utilisateur "est" (empreinte digitale ou reconnaissance faciale).  À savoir : La réglementation Européenne (Directive Européenne sur les Services de Paiement dite DSP2) impose à toutes les banques de mettre en place cette "authentification forte" pour les accès et les paiements en ligne de leurs clients.',
+    sourceRef: '?question=est-ce-lauthentification-cross-canal-identification-forte'
+  },
+  {
+    answer:
+      "En enregistrant votre mobile comme appareil de confiance, vous permettez à notre système informatique de reconnaître votre smartphone comme étant un appareil qui vous appartient. Pour utiliser l’appli CMB et profiter de ses services, définir votre mobile comme appareil de confiance est obligatoire. En effet, la réglementation Européenne (Directive Européenne sur les Services de Paiement dite DSP2) impose à toutes les banques de mettre en place ce process d'authentification forte pour les accès et les paiements en ligne de leurs clients. En enregistrant votre smartphone comme appareil de confiance, vous bénéficiez également de fonctionnalités supplémentaires à partir de l'appli CMB : Modification du plafond de votre carte en temps réel Blocage/déblocage de votre carte Virement vers de nouveaux bénéficiaires en temps réel Connexion par empreinte digitale/reconnaissance faciale si votre mobile est compatible.",
+    sourceRef: '?question=pourquoi-associer-mobile-mon-espace-client'
+  },
+  {
+    answer:
+      'Enregistrer mon smartphone comme appareil de confiance Pour pouvoir utiliser l’appli CMB, il est obligatoire d\'enregistrer votre mobile comme appareil de confiance. Vous avez 2 possibilités pour réaliser cette opération : Tous les utilisateurs peuvent enregistrer leur mobile comme appareil de confiance par réception d\'un courrier à domicile. Découvrez notre tutoriel détaillé "Enregistrer votre appareil de confiance par courrier". En fonction de règles de sécurité, vous pouvez être éligible à l\'enregistrement de votre mobile comme appareil de confiance à l\'aide de votre carte bancaire. Découvrez notre tutoriel détaillé "Enregistrer votre appareil de confiance par Carte Bancaire". Supprimer mon smartphone comme appareil de confiance Pour supprimer votre terminal de confiance actuel, connectez-vous à votre espace client sur le site internet cmb.fr. Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMB. Cliquez sur "Paramétrage", puis "Ma sécurité bancaire" et "Mes terminaux de confiance". Sur cet écran, en fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h.',
+    sourceRef: '?question=comment-associer-mobile-mon-espace-client'
+  },
+  {
+    answer:
+      '1. Si vous changez de mobile, commencez par supprimer l’ancien mobile comme appareil de confiance.  Pour cela, connectez-vous à votre espace client sur le site internet cmb.fr.  Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMB. Cliquez sur "Paramétrage", puis "Ma sécurité bancaire" et "Mes terminaux de confiance".  Sur cet écran, en fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h. 2. Dans un deuxième temps, installez l’appli CMB sur votre nouveau mobile.  Connectez-vous avec votre identifiant et votre mot de passe. Puis suivez les instructions pour enregistrer votre nouveau mobile comme appareil de confiance. Pour plus de détails sur l\'enregistrement de votre mobile en appareil de confiance par carte bancaire, découvrez notre tutoriel.',
+    sourceRef: '?question=se-passe-t-il-si-change-mobile'
+  },
+  {
+    answer:
+      "Vous avez reçu votre identifiant de connexion suite à votre ouverture de compte. Cet identifiant vous permet d'accéder à votre espace client sur le site internet. Vous avez ouvert votre compte en agence ? Votre identifiant de connexion vous a été transmis sur papier par votre conseiller. Vous avez ouvert votre compte en ligne ? Votre identifiant de connexion vous a été communiqué par email.  À savoir :  Vous avez perdu ou oublié votre identifiant de connexion ? Rééditez votre identifiant. Vous pouvez également contacter l'assistance Banque à Distance au 09 69 32 04 40, accessible 7 jours sur 7, de 8h à 22h.",
+    sourceRef: '?question=ou-trouver-identifiant-mon-mot-passe-4118'
+  },
+  {
+    answer:
+      'Vous pouvez débloquer votre accès depuis votre espace client, sur l\'appli CMSO ou sur le site internet. Depuis l\'appli CMSO  A l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?" Sélectionnez ensuite "Débloquer mon accès". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Depuis le site internet Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez ensuite "Débloquer mon accès". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". À savoir :  Pour des raisons de sécurité, l\'accès à vos comptes est bloqué au bout de trois tentatives de connexion erronées. Vous pouvez également contacter l\'assistance Banque à Distance, au 0969 320 440, accessible 7j/7 de 8h à 22h.',
+    sourceRef: '?question=ai-bloque-lacces-mes-comptes-que-faire-4120'
+  },
+  {
+    answer:
+      "En enregistrant votre mobile comme appareil de confiance, vous permettez à notre système informatique de reconnaître votre smartphone comme étant un appareil qui vous appartient.  Pour utiliser l’appli CMSO et profiter de ses services, définir votre mobile comme appareil de confiance est obligatoire. En effet, la réglementation Européenne (Directive Européenne sur les Services de Paiement dite DSP2) impose à toutes les banques de mettre en place ce process d'authentification forte pour les accès et les paiements en ligne de leurs clients. En définissant votre smartphone comme appareil de confiance, vous bénéficiez également de fonctionnalités supplémentaires à partir de l'appli CMSO :   Modification du plafond de votre carte en temps réel Blocage/déblocage de votre carte Virement vers de nouveaux bénéficiaires en temps réel Connexion par empreinte digitale/reconnaissance faciale si votre mobile est compatible.",
+    sourceRef: '?question=pourquoi-associer-mobile-mon-espace-client-7360'
+  },
+  {
+    answer:
+      'Enregistrer mon smartphone comme appareil de confiance Pour pouvoir utiliser l’appli CMSO, il est obligatoire d\'enregistrer votre mobile comme appareil de confiance. Vous avez 2 possibilités pour réaliser cette opération : Tous les utilisateurs peuvent enregistrer leur mobile comme appareil de confiance par réception d\'un courrier à domicile. Découvrez notre tutoriel détaillé "Enregistrer votre appareil de confiance par courrier". En fonction de règles de sécurité, vous pouvez être éligible à l\'enregistrement de votre mobile comme appareil de confiance à l\'aide de votre carte bancaire. Découvrez notre tutoriel détaillé "Enregistrer votre appareil de confiance par Carte Bancaire". Supprimer mon smartphone comme appareil de confiance Pour supprimer votre terminal de confiance actuel, connectez-vous à votre espace client sur le site internet cmso.com. Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMSO. Cliquez sur "Paramétrage", puis "Ma sécurité bancaire" et "Mes terminaux de confiance". Sur cet écran, en fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h.',
+    sourceRef: '?question=comment-associer-mobile-mon-espace-client-7361'
+  },
+  {
+    answer:
+      '1. Si vous changez de mobile, commencez par supprimer l’ancien mobile comme appareil de confiance. Pour cela, connectez-vous à votre espace client sur le site internet cmso.com. Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMSO. Cliquez sur "Paramétrage", puis "Ma sécurité bancaire" et "Mes terminaux de confiance".  Sur cet écran, en fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h. 2. Dans un deuxième temps, installez l’appli CMSO sur votre nouveau mobile. Connectez-vous avec votre identifiant et votre mot de passe. Puis suivez les instructions pour enregistrer votre nouveau mobile comme appareil de confiance. Pour plus de détails sur l\'enregistrement de votre mobile en appareil de confiance par carte bancaire, découvrez notre tutoriel.',
+    sourceRef: '?question=se-passe-t-il-si-change-mobile-7362'
+  },
+  {
+    answer:
+      'Vous pouvez prendre rendez-vous avec votre conseiller depuis l\'appli CMSO ou depuis votre espace client sur le site internet. Depuis l\'appli CMSO Accédez au “Menu” et cliquez sur “Mon conseiller” Sélectionnez "Prendre rendez-vous". Vous accédez à l\'agenda de votre conseiller : choisissez un créneau disponible qui vous convient. Vous recevrez une confirmation et un rappel la veille du rendez-vous par mail et/ou SMS. Depuis le site internet cmso.com Cliquez en haut à droite sur l\'icône "Mon conseiller, ma messagerie". Votre page d\'accueil "MON CONSEILLER" s\'ouvre. Trois onglets vous sont proposés : "Ma messagerie", "Mon agence", "Prendre rendez-vous". Cliquez sur "Prendre rendez-vous". Vous accédez à l\'agenda de votre conseiller : choisissez un créneau disponible qui vous convient. Vous recevrez une confirmation et un rappel la veille du rendez-vous par mail et/ou SMS.   À savoir : Pour mieux visualiser le parcours, découvrez également notre tutoriel "Prendre rendez-vous en ligne".',
+    sourceRef: '?question=souhaite-prendre-rendez-vous-comment-faire-7492'
+  },
+  {
+    answer:
+      "Votre première connexion à l'espace client peut se faire depuis l'appli CMSO ou depuis le site internet. Depuis l'appli CMSO Cliquez sur le bouton “Se connecter” en bas de l’écran. Renseignez votre identifiant et votre premier mot de passe, puis cliquez sur “Se connecter”. Votre identifiant et votre premier mot de passe se trouvent sur le document que vous a remis votre conseiller lors de votre ouverture de compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Pour pouvoir utiliser l'appli CMSO, enregistrez ensuite votre mobile comme appareil de confiance : cliquez sur le bouton “Enregistrer mon appareil” et suivez les indications qui apparaissent à l'écran : notre tutoriel complet peut également vous aider. Connectez-vous maintenant sur l'appli CMSO en utilisant votre code de sécurité à 5 chiffres, votre empreinte digitale ou la reconnaissance faciale. Depuis le site internet Saisissez votre identifiant et votre \"mot de passe d'activation\" temporaire ; cet identifiant et ce \"mot de passe d'activation\" vous ont été transmis par votre conseiller lors de l'ouverture de votre compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Vous serez ensuite invité à créer votre mot de passe personnel que vous utiliserez lors de vos futures connexions. Notre tutoriel complet vous accompagne aussi pour cette première connexion à votre espace client sur mon.cmso.com.",
+    sourceRef: '?question=comment-connecter-mon-espace-client'
+  },
+  {
+    answer:
+      'Au quotidien, connectez-vous à votre espace client depuis l\'appli CMSO ou depuis le site internet. Depuis l\'appli CMSO  Ouvrez votre appli CMSO. Connectez-vous avec votre code de sécurité à 5 chiffres, votre empreinte digitale ou par reconnaissance faciale. Depuis le site internet Cliquez sur le bouton "Se connecter" en haut à droite du site. Vous arrivez sur la page d\'accès à votre espace client. Identifiez-vous avec votre identifiant et votre mot de passe. À savoir : Après avoir saisi votre identifiant, vous pouvez choisir la "connexion via mobile" (plutôt que par mot de passe) ; il vous faudra alors renseigner le code de sécurité de votre appli CMSO.',
+    sourceRef: '?question=comment-connecter-mon-espace-client-quotidien'
+  },
+  {
+    answer:
+      'Au quotidien, connectez-vous à votre espace client depuis l\'appli CMB ou depuis le site internet. Depuis l\'appli CMB Ouvrez votre appli CMB. Connectez-vous avec votre code de sécurité à 5 chiffres, votre empreinte digitale ou par reconnaissance faciale. Depuis le site internet Cliquez sur le bouton "Se connecter" en haut à droite du site. Vous arrivez sur la page d\'accès à votre espace client. Identifiez-vous avec votre identifiant et votre mot de passe. À savoir : Après avoir saisi votre identifiant, vous pouvez choisir la "connexion via mobile" (plutôt que par mot de passe) ; il vous faudra alors renseigner le code de sécurité de votre appli CMB.',
+    sourceRef: '?question=comment-connecter-mon-espace-client-quotidien-11758'
+  },
+  {
+    answer:
+      'Pour enregistrer votre mobile comme appareil de confiance et ainsi pouvoir utiliser l’appli CMB, vous avez reçu un courrier à votre domicile : sur ce document, vous trouvez un QR-code de validation et une clé sécurisée temporaire. Une fois connecté à l\'appli CMB, sélectionnez "Enregistrement par courrier". Cliquez sur "J\'ai reçu mes codes". Flashez le QR code en le prenant en photo à l’aide de votre mobile. Si vous ne parvenez pas à flasher le QR code, vous pouvez aussi renseigner le code se composant de lettres et de chiffres présent sur le courrier, à côté du QR code. À savoir : Découvrez également notre tutoriel sur : "Comment enregistrer votre mobile comme appareil de confiance par courrier".',
+    sourceRef: '?question=comment-utiliser-qr-code-validation-enregistrer-mobile-comme-appareil-confiance'
+  },
+  {
+    answer:
+      'Pour enregistrer votre mobile comme appareil de confiance et ainsi pouvoir utiliser l’appli CMSO, vous avez reçu un courrier à votre domicile : sur ce document, vous trouvez un QR-code de validation et une clé sécurisée temporaire. Une fois connecté à l\'appli CMSO, sélectionnez "Enregistrement par courrier". Cliquez sur "J\'ai reçu mes codes". Flashez le QR code en le prenant en photo à l’aide de votre mobile. Si vous ne parvenez pas à flasher le QR code, vous pouvez aussi renseigner le code se composant de lettres et de chiffres présent sur le courrier, à côté du QR code. À savoir : Découvrez également notre tutoriel sur : "Comment enregistrer votre mobile comme appareil de confiance par courrier".',
+    sourceRef: '?question=comment-utiliser-qr-code-validation-enregistrer-mobile-comme-appareil-confiance-29763'
+  },
+  {
+    answer:
+      'Vous pouvez récupérer votre identifiant depuis votre espace client, sur l\'appli CMSO ou sur le site internet. Depuis l\'appli CMSO  A l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?" Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. Depuis le site internet Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. À savoir : Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 32 04 40, accessible 7 jours sur 7 de 8 heures à 22 heures.',
+    sourceRef: '?question=identifiant-oublie'
+  },
+  {
+    answer:
+      'Vous pouvez récupérer votre identifiant depuis votre espace client, sur l\'appli CMB ou sur le site internet. Depuis l\'appli CMB À l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?". Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. Depuis le site internet  Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. À savoir : Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 36 02 20, accessible 7 jours sur 7 de 8 heures à 22 heures.',
+    sourceRef: '?question=identifiant-oublie-29954'
+  },
+  {
+    answer:
+      'Vous pouvez récupérer votre mot de passe depuis votre espace client, sur l\'appli CMSO ou sur le site internet. Depuis l\'appli CMSO A l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?" Sélectionnez "Réinitialiser mon mot de passe". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouveau mot de passe par courrier ou SMS. Depuis le site internet cmso.com Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Réinitialiser mon mot de passe". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouveau mot de passe par courrier ou SMS. À savoir :  Découvrez également notre tutoriel "Réinitialiser votre mot de passe" depuis votre espace client sur cmso.com. Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 32 04 40, accessible 7 jours sur 7 de 8 heures à 22 heures.',
+    sourceRef: '?question=mot-passe-oublie'
+  },
+  {
+    answer:
+      'Vous pouvez récupérer votre mot de passe depuis votre espace client, sur l\'appli CMB ou sur le site internet. Depuis l\'appli CMB A l\'ouverture de l\'appli, cliquez sur "Accès bloqué ?". Sélectionnez "Réinitialiser mon mot de passe". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouveau mot de passe par courrier ou SMS. Depuis le site internet cmb.fr Cliquez sur le bouton "Se connecter" en haut à droite du site. Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Réinitialiser mon mot de passe". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouveau mot de passe par courrier ou SMS. À savoir : Découvrez également notre tutoriel "Réinitialiser votre mot de passe" depuis votre espace client sur cmb.fr. Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 36 02 20, accessible 7 jours sur 7, de 8 heures à 22 heures.',
+    sourceRef: '?question=mot-passe-oublie-29966'
+  },
+  {
+    answer:
+      "Vous pouvez télécharger l'appli CMSO sur les téléphones et/ou tablettes disposant des systèmes d'exploitation suivants : Une version Android supérieure ou égale à la 6. Une version iOS supérieure ou égale à iOS 11. Si la version de votre appareil est plus ancienne, vous pouvez accéder à votre espace client sur le site internet cmso.com.",
+    sourceRef: '?question=sur-quels-appareils-peut-etre-telechargee-l-appli-cmso'
+  },
+  {
+    answer:
+      'Au quotidien, connectez-vous à votre espace client depuis l\'appli CMB ou depuis le site internet. Depuis l\'appli CMB Ouvrez votre appli CMB. Connectez-vous avec votre code de sécurité à 5 chiffres, votre empreinte digitale ou par reconnaissance faciale, puis cliquez sur "Connexion". Depuis le site internet Ouvrez votre appli CMB. Connectez-vous avec votre code de sécurité à 5 chiffres, votre empreinte digitale ou par reconnaissance faciale, puis cliquez sur "Connexion". Allez sur l\'espace client  Rendez-vous sur cmb.fr/connexion, Cliquez sur mot de passe oublié Veuillez vérifier votre boite de réception ainsi que vos spams Cliquez sur le lien du mail Vous allez ressaisir un nouveau mot de passe afin de vous connecter',
+    sourceRef: '?question=comment-se-connecter-test'
+  },
+  {
+    answer:
+      'Pour vous connecter à votre espace client la première fois depuis le site internet : Saisissez votre identifiant et votre "mot de passe d\'activation" temporaire ; cet identifiant et ce "mot de passe d\'activation" vous ont été transmis par votre conseiller lors de l\'ouverture de votre compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Vous serez ensuite invité à créer votre mot de passe personnel que vous utiliserez lors de vos futures connexions. Notre tutoriel complet vous accompagne aussi pour cette première connexion à votre espace client sur mon.cmb.fr.',
+    sourceRef: '?question=comment-se-connecter-a-mon-espace-client-la-premiere-fois'
+  },
+  {
+    answer:
+      'Pour vous connecter à votre espace client la première fois depuis le site internet : Saisissez votre identifiant et votre "mot de passe d\'activation" temporaire ; cet identifiant et ce "mot de passe d\'activation" vous ont été transmis par votre conseiller lors de l\'ouverture de votre compte en agence. Pour une ouverture de compte en ligne, ces éléments vous ont été communiqués par email. Vous serez ensuite invité à créer votre mot de passe personnel que vous utiliserez lors de vos futures connexions. Notre tutoriel complet vous accompagne aussi pour cette première connexion à votre espace client sur mon.cmso.com.',
+    sourceRef: '?question=comment-se-connecter-a-mon-espace-client-la-premiere-fois-52349'
+  },
+  {
+    answer:
+      'Depuis cette page, vous pouvez récupérer votre identifiant : Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. À savoir : Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 36 02 20, accessible 7 jours sur 7, de 8 heures à 22 heures.',
+    sourceRef: '?question=identifiant-oublie-52353'
+  },
+  {
+    answer:
+      'Depuis cette page, vous pouvez récupérer votre identifiant : Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Rééditer mon identifiant". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouvel identifiant par mail ou SMS. À savoir : Vous pouvez également contacter l\'assistance Banque à Distance, au 09 69 32 04 40, accessible 7 jours sur 7, de 8 heures à 22 heures.',
+    sourceRef: '?question=identifiant-oublie-52360'
+  },
+  {
+    answer:
+      'Depuis cette page, vous pouvez récupérer votre mot de passe : Cliquez sur "Codes d\'accès oubliés / Accès bloqué" sous le bouton "Suivant". Sélectionnez "Réinitialiser mon mot de passe". Un formulaire s\'ouvre : renseignez-le et cliquez sur "Continuer". Vous recevrez votre nouveau mot de passe par courrier ou SMS.',
+    sourceRef: '?question=mot-de-passe-oublie'
+  },
+  {
+    answer:
+      "Vous pouvez télécharger l'appli CMB sur les téléphones et/ou tablettes disposant des systèmes d'exploitation suivants : Une version Android supérieure ou égale à la 6. Une version iOS supérieure ou égale à iOS 11. Si la version de votre appareil est plus ancienne, vous pouvez accéder à votre espace client sur le site internet cmb.fr.",
+    sourceRef: '?question=sur-quels-appareils-peut-etre-telechargee-l-appli-cmb'
+  },
+  {
+    answer:
+      'Pour modifier le code de sécurité à 5 chiffres de votre appli CMB, vous pouvez suivre le parcours ci-dessous :  Connectez vous à votre appli CMB. Dans le Menu, sélectionnez "PARAMETRAGES". Dans "MA SECURITE BANCAIRE", sélectionnez "Modification du code de sécurité". Vous saisissez votre code de sécurité actuel, votre nouveau code, une confirmation de ce nouveau code. Cliquez sur "Valider".',
+    sourceRef: '?question=comment-modifier-code-securite-de-appli-cmb'
+  },
+  {
+    answer:
+      'Pour modifier le code de sécurité à 5 chiffres de votre appli CMSO, vous pouvez suivre le parcours ci-dessous :  Connectez vous à votre appli CMSO. Dans le Menu, sélectionnez "PARAMETRAGES". Dans "MA SECURITE BANCAIRE", sélectionnez "Modification du code de sécurité". Vous saisissez votre code de sécurité actuel, votre nouveau code, une confirmation de ce nouveau code. Cliquez sur "Valider".',
+    sourceRef: '?question=comment-modifier-code-securite-de-appli-cmso'
+  },
+  {
+    answer:
+      'En cas d\'oubli de votre code de sécurité à 5 chiffres pour vous connecter à l\'appli CMB, il vous faudra supprimer l\'appareil de confiance actuellement enregistré et renouveler la procédure d\'enregistrement. Pour cela, connectez-vous à votre espace client sur le site internet cmb.fr. Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMB. Cliquez sur "Paramétrage" (icône roue crantée). Dans "MA SECURITE BANCAIRE", cliquez sur "Mes terminaux de confiance". Choisissez l\'appareil concerné (si vous en avez plusieurs associés à votre espace client). En fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 360 220, accessible 7 jours sur 7, de 8h à 22h. Il vous faut ensuite enregistrer votre smartphone comme appareil de confiance.',
+    sourceRef: '?question=ai-oublie-mon-code-securite-pour-connecter-lappli-cmb-comment-recuperer'
+  },
+  {
+    answer:
+      'En cas d\'oubli de votre code de sécurité à 5 chiffres pour vous connecter à l\'appli CMSO, il vous faudra supprimer l\'appareil de confiance actuellement enregistré et renouveler la procédure d\'enregistrement. Pour cela, connectez-vous à votre espace client sur le site internet cmso.com. Vous ne pouvez pas supprimer votre terminal de confiance depuis l\'appli CMSO. Cliquez sur "Paramétrage" (icône roue crantée). Dans "MA SECURITE BANCAIRE", cliquez sur "Mes terminaux de confiance". Choisissez l\'appareil concerné (si vous en avez plusieurs associés à votre espace client). En fonction de règles de sécurité, vous pouvez avoir accès à la fonctionnalité "supprimer ce terminal". Si la fonctionnalité n\'apparaît pas, contactez l\'assistance Banque à Distance, au 0969 320 440, accessible 7 jours sur 7, de 8h à 22h. Il vous faut ensuite enregistrer votre smartphone comme appareil de confiance.',
+    sourceRef: '?question=ai-oublie-mon-code-securite-pour-connecter-lappli-cmso-comment-recuperer'
+  },
+  {
+    answer:
+      "Lorsque le plafond est atteint, votre livret continue de vivre !  Vous bénéficiez du cumul des intérêts au-delà du plafond défini.  Vous ne pouvez plus faire de versements, mais vous pouvez retirer de l'argent selon vos besoins.",
+    sourceRef: '?question=devient-livret-depargne-quand-plafond-atteint'
+  },
+  {
+    answer:
+      "Oui, toute personne physique, sans condition d'âge, peut ouvrir un Livret A.  La seule condition : ne pas détenir un autre Livret A ou Livret Bleu dans un autre établissement bancaire.  À savoir :  Votre enfant n'a pas encore eu un an ? Profitez-en pour lui ouvrir son Livret A : nous lui offrons un premier versement de 20 € (dans l'année qui suit sa naissance). Découvrez le Livret A en détails.",
+    sourceRef: '?question=possible-ouvrir-livret-a-ses-enfants-2778'
+  },
+  {
+    answer:
+      "Votre Livret Jeune se clôture le 31 décembre de l'année de vos 25 ans ; ainsi, avant d'entamer votre 26ème année, faites le point avec votre conseiller afin de placer votre épargne sur un ou plusieurs autres comptes rémunérés et sécurisés tels que :  Le Livret A, pour conserver la disponibilité Le Plan Epargne Logement, pour préparer un projet immobilier.",
+    sourceRef: '?question=devient-livret-jeune-apres-25-ans-2779'
+  },
+  {
+    answer:
+      'Oui, vous pouvez ouvrir plusieurs livrets mais de catégories différentes. Ainsi, par exemple:  Vous pouvez souscrire à la fois à un Livret A et à un Livret de Développement Durable et Solidaire. Par contre, vous ne pouvez pas détenir deux Livrets A, ni deux Livrets de Développement Durable et Solidaire.',
+    sourceRef: '?question=possible-ouvrir-plusieurs-livrets-depargne-2780'
+  },
+  {
+    answer:
+      "Il vous est possible d'ouvrir un Livret d'Épargne Populaire (LEP) si les revenus de votre foyer fiscal sont inférieurs ou égaux au plafond fixé par les pouvoirs publics.  Vous pouvez être éligible ou non, d’une année à l’autre. Si une année vos revenus dépassent les plafonds exigés, vous conservez votre Livret d'Épargne Populaire (LEP) à condition que vos revenus de l’année suivante redeviennent inférieurs.  À savoir :  Un justificatif de vos revenus vous sera demandé chaque année pour continuer à profiter des avantages du Livret d'Épargne Populaire (LEP).  Contactez votre conseiller : il vous indiquera si vous pouvez bénéficier du Livret d'Épargne Populaire (LEP).",
+    sourceRef: '?question=comment-savoir-si-peux-ouvrir-lep-2782'
+  },
+  {
+    answer:
+      "Oui, vous pouvez ouvrir un contrat d'assurance-vie à vos enfants.  Ainsi, dans quelques années, ils pourront réaliser leurs projets plus aisément (études, voiture, installation dans la vie active...) tout en bénéficiant d'un cadre fiscal avantageux. À savoir : Pour construire et préparer l'avenir, découvrez nos contrats d'assurance-vie.",
+    sourceRef: '?question=est-ce-possible-ouvrir-contrat-assurance-vie-ses-enfants-2783'
+  },
+  {
+    answer:
+      "Pour transmettre votre contrat d'assurance-vie, il convient de rédiger avec précision la clause bénéficiaire du contrat d'assurance-vie. C'est en effet elle qui détermine à qui sera transmis le capital du contrat en cas de décès.  À savoir : Votre conseiller peut vous accompagner : n'hésitez pas à le contacter.",
+    sourceRef: '?question=comment-transmettre-contrat-assurance-vie-2784'
+  },
+  {
+    answer:
+      "En assurance-vie, lors d'un retrait (rachat), seule la plus-value du contrat est soumise à l'impôt, jamais le capital versé sur le contrat.  De plus, si le contrat a plus de 8 ans, cette plus-value bénéficie d'un abattement annuel de 4 600 € pour une personne seule avant soumission à l'impôt (9 200 € pour un couple soumis à imposition commune).",
+    sourceRef: '?question=assurance-vie-soumise-limpot-revenu-2785'
+  },
+  {
+    answer: "Oui, vous pouvez clôturer votre contrat d'assurance-vie. Il suffit pour cela d'en faire la demande à votre conseiller.",
+    sourceRef: '?question=puis-je-cloturer-contrat-assurance-vie-2786'
+  },
+  {
+    answer: "Non, les versements sur un contrat d'assurance-vie ne sont pas plafonnés.",
+    sourceRef: '?question=contrats-assurance-vie-plafonnes-2787'
+  },
+  {
+    answer:
+      "Un plan d'épargne retraite est un produit d'épargne sur le long terme accessible à toute personne souhaitant se constituer une épargne pour préparer sa retraite.  Il n'y a pas d'âge spécifique pour ouvrir un plan d'épargne retraite.  Nous conseillons de le faire une fois entré dans la vie active et dès que vos revenus le permettent : vous économisez ainsi assez tôt pour obtenir à la retraite une rente viagère ou un capital qui viendront compléter le montant de votre retraite. À savoir : Découvrez nos solutions d'épargne retraite.",
+    sourceRef: '?question=a-partir-quel-age-conseille-douvrir-plan-depargne-retraite-2788'
+  },
+  {
+    answer:
+      "Une rente versée à vie et la sortie en capital sont les solutions de dénouement pour votre contrat d'épargne retraite.  L'option de sortie d'un contrat d'épargne retraite dépend, tout d'abord, de la nature du contrat et, ensuite, de paramètres plus personnels.  En effet, certains contrats ne proposent qu'une seule option de sortie. C’est le cas par exemple du contrat Madelin.  Pour les contrats qui proposent les deux options de sortie, comme le PERIN, le choix se fait en fonction de différents éléments.   À savoir : Pour faire le choix le plus judicieux et le plus adapté à votre situation, rapprochez-vous de votre conseiller.",
+    sourceRef: '?question=sont-solutions-lorsque-contrat-depargne-retraite-arrive-a-echeance-2789'
+  },
+  {
+    answer:
+      "Si votre achat immobilier ne se concrétise pas, vous pouvez clôturer votre Plan Épargne Logement (PEL) : ainsi, vous pouvez récupérer le capital à tout moment et l’utiliser pour tout autre projet. Selon la date de clôture de votre Plan Épargne Logement (PEL) , 3 situations s'offrent à vous : En cas de clôture avant la fin des 2 ans, les intérêts sont recalculés au taux du Compte Épargne Logement (CEL) et vous perdez les droits à prêts en cours d'acquisition.  En cas de clôture entre le jour de ses 2 ans et avant le 3ème anniversaire, le taux du Plan Épargne Logement (PEL) est maintenu mais vous perdez les droits à prêts en cours d'acquisition.  En cas de clôture entre le jour de ses 3 ans et avant le 4ème anniversaire, le taux du Plan Épargne Logement (PEL) reste maintenu ainsi que les droits acquis ; toutefois, la prime sera réduite de moitié en cas de prêt Plan Épargne Logement (PEL). À savoir : Si votre projet immobilier n'aboutit pas, vous pouvez également laisser votre Plan Épargne Logement (PEL) ouvert.",
+    sourceRef: '?question=si-projet-immobilier-se-concretise-pas-que-faire-mon-pel-2791'
+  },
+  {
+    answer:
+      "Non, vous ne pouvez pas détenir plusieurs Plans d'Épargne Logement (PEL). Mais votre conjoint peut aussi en ouvrir un à son nom pour maximiser vos avantages.   À savoir :  Dans le cas particulier d'une succession, vous pouvez détenir un ou plusieurs autres Plans d'Épargne Logement (PEL) à la condition exclusive de les recevoir par succession, et uniquement pour les Plans d'Épargne Logement (PEL) non échus.  Découvrez plus en détails le Plan Epargne Logement (PEL).",
+    sourceRef: '?question=est-ce-possible-avoir-plusieurs-pel-2792'
+  },
+  {
+    answer:
+      "Oui, vous pouvez transformer votre Plan d'Épargne Logement (PEL) en Compte Épargne Logement (CEL) à tout moment.  Toutefois, les intérêts acquis au taux du Plan d'Épargne Logement (PEL) seront recalculés au taux du Compte Épargne Logement (CEL) depuis l'origine du contrat Plan Épargne Logement (PEL). Ainsi, il est parfois plus intéressant de clôturer le Plan d'Épargne Logement (PEL) et de transférer les fonds sur le Compte Épargne Logement (CEL) (dans la limite du plafond de 15 300 €).",
+    sourceRef: '?question=si-ai-besoin-argent-avant-lecheance-puis-je-modifier-pel-2793'
+  },
+  {
+    answer:
+      "Les droits à prêt concernent les personnes titulaires d'un Compte Épargne Logement (CEL) ou d'un Plan Épargne Logement (PEL).  Ces personnes bénéficient, après une phase d'épargne, de la possibilité d'obtenir un prêt à des conditions avantageuses.  Le montant des droits à prêts correspond à l’ensemble des intérêts perçus.  Ces intérêts sont transférables au profit de ses enfants, de son conjoint ou d'un membre de sa famille ou de la famille de son conjoint.",
+    sourceRef: '?question=avantages-offrent-droits-pret-2794'
+  },
+  {
+    answer:
+      "Oui, vous pouvez ouvrir un PEL (Plan Épargne Logement) ou CEL (Compte Épargne Logement) à vos enfants dès leur naissance. Vous pouvez également leur ouvrir un Compte Épargne Logement (CEL) et un Plan Épargne Logement (PEL) à condition qu'ils soient domiciliés dans le même établissement bancaire. À savoir : Découvrez davantage de détails sur le Plan Épargne Logement (PEL) et le Compte Épargne Logement (CEL).",
+    sourceRef: '?question=est-ce-possible-ouvrir-cel-pel-ses-enfants-2795'
+  },
+  {
+    answer:
+      "L'imposition du Plan d'Épargne en Actions (PEA) dépend de sa durée de conservation. Si le Plan d'Épargne en Actions (PEA) est conservé au minimum 5 ans, il n'est pas imposable. À savoir : Découvrez plus en détails le Plan d'Epargne en Actions (PEA).",
+    sourceRef: '?question=pea-imposable-2796'
+  },
+  {
+    answer:
+      "L'imposition du Plan d'Épargne en Actions PME (PEA PME) dépend de sa durée de conservation. Si le Plan d'Épargne en Actions PME (PEA PME) est conservé au minimum 5 ans, il n'est pas imposable (hors prélèvements sociaux).",
+    sourceRef: '?question=pea-pme-imposable-2797'
+  },
+  {
+    answer:
+      'Pour ouvrir un Compte de Titres Ordinaire (CTO), 45 € suffisent. À savoir : Découvrez plus en détails le Compte de Titres Ordinaire.',
+    sourceRef: '?question=est-montant-minimal-verser-ouvrir-cto-2798'
+  },
+  {
+    answer:
+      "Concernant le Compte de titres ordinaire (CTO), la taxation des plus-values et des dividendes est soumise au prélèvement forfaitaire unique (PFU) de 30% depuis 2018 (prélèvements sociaux de 17,20% et taux forfaitaire de l'impôt sur les revenus de 12,80%). L'imposition au barème de l'impôt sur les revenus reste tout de même possible sur option pour la totalité des revenus du patrimoine. À savoir : Découvrez plus en détails le Compte de titres ordinaire (CTO).",
+    sourceRef: '?question=cto-imposable-2799'
+  },
+  {
+    answer:
+      "Oui, certaines épargnes (comme l'assurance-vie ou le Plan Epargne en Actions (PEA) par exemple) exigent une durée minimale de placement si vous voulez profiter des avantages fiscaux.  De façon plus générale, il est conseillé de respecter les durées indiquées sur les produits d'épargne et ainsi de bloquer votre épargne pendant quelques années pour optimiser vos placements.",
+    sourceRef: '?question=mon-epargne-risque-t-elle-detre-bloquee-pendant-plusieurs-annees-2800'
+  },
+  {
+    answer:
+      "La sélection des supports d'investissement de son contrat d'assurance-vie requiert du temps et des compétences financières.  Pour ceux qui n'ont aucune connaissance financière ou qui manquent de temps, l’idéal est de la confier à des spécialistes : ce service s’appelle la gestion déléguée. La sélection des supports d’investissement de votre contrat, comme les arbitrages, sont réalisés par des experts.",
+    sourceRef: '?question=comment-fonctionne-gestion-deleguee-2801'
+  },
+  {
+    answer:
+      'En choisissant la gestion déléguée, vous pouvez consulter à tout moment votre espace client afin de suivre l’évolution de votre contrat :  Valorisation Répartition Détail des opérations d’achat et de vente réalisées par les experts.  Vous recevez un avis à chaque opération réalisée, soit par courrier postal, soit dans votre coffre-fort. Des reportings de gestion sont également mis à votre disposition selon une périodicité fixe.',
+    sourceRef: '?question=choisissant-gestion-deleguee-ai-je-droit-regard-operations-2802'
+  },
+  {
+    answer:
+      'Alimentez votre Plan Épargne Action (PEA) depuis votre espace client : Cliquez dans le menu sur "LA BOURSE". Sur le bandeau du haut, cliquez sur “Portefeuille et infos”. Sélectionnez l’onglet “Versements”. Dans la liste déroulante “Sélectionnez une fonctionnalité”, choisissez “Versement exceptionnel”. Sélectionnez le Plan Épargne Action (PEA) à créditer. Renseigner “le montant du versement demandé”. Cliquez sur “Continuer” pour valider l’opération.',
+    sourceRef: '?question=comment-alimenter-pea'
+  },
+  {
+    answer:
+      'Dans votre espace client sur le site internet, vous pouvez mettre à jour votre profil "investisseur" et votre profil "contrat". Pour cela :  Cliquez dans le menu sur "LA BOURSE". Sur le bandeau du haut, cliquez sur "Profil investisseur". Vous accédez alors à vos deux questionnaires : "Mon questionnaire personne" pour consulter ou modifier votre profil investisseur. "Mon questionnaire contrat" pour consulter ou modifier les caractéristiques de votre ou vos Plans d\'Épargne en Actions (PEA).  À savoir : c’est également ici que vous accédez aux contrats pour lesquels vous êtes mandataire.',
+    sourceRef: '?question=comment-mettre-jour-profil-realiser-operation-bourse'
+  },
+  {
+    answer:
+      'Accédez au "carnet d\'ordres" depuis votre espace client sur le site internet : Cliquez dans le menu sur "LA BOURSE". Sur le bandeau du haut, cliquez sur “Portefeuille et infos”. Sélectionnez l’onglet “Portefeuille”. Dans la liste déroulante “Sélectionnez une fonctionnalité”, choisissez “Carnet”. Sélectionnez le compte sur lequel vous souhaitez visualiser les opérations effectuées. Vous accédez ainsi au “CARNET D’ORDRES” du Plan Épargne Action (PEA) choisi.',
+    sourceRef: '?question=comment-visualiser-carnet-ordres'
+  },
+  {
+    answer:
+      "Oui, toute personne physique, sans condition d'âge, peut ouvrir un Livret A. La seule condition : ne pas détenir un autre Livret A ou Livret Bleu dans un autre établissement bancaire. À savoir : Votre enfant n'a pas encore eu un an ? Profitez-en pour lui ouvrir son Livret A : nous lui offrons un premier versement de 20 € (dans l'année qui suit sa naissance). Découvrez le Livret A en détails.",
+    sourceRef: '?question=possible-ouvrir-livret-a-ses-enfants'
+  },
+  {
+    answer:
+      "Votre Livret Jeune se clôture le 31 décembre de l'année de vos 25 ans ; ainsi, avant d'entamer votre 26ème année, faites le point avec votre conseiller afin de placer votre épargne sur un ou plusieurs autres comptes rémunérés et sécurisés tels que : Le Livret A, pour conserver la disponibilité Le Plan Epargne Logement, pour préparer un projet immobilier.",
+    sourceRef: '?question=devient-livret-jeune-apres-25-ans'
+  },
+  {
+    answer:
+      "Il vous est possible d'ouvrir un Livret d'Épargne Populaire (LEP) si les revenus de votre foyer fiscal sont inférieurs ou égaux au plafond fixé par les pouvoirs publics. Vous pouvez être éligible ou non, d’une année à l’autre. Si une année vos revenus dépassent les plafonds exigés, vous conservez votre Livret d'Épargne Populaire (LEP) à condition que vos revenus de l’année suivante redeviennent inférieurs. À savoir : Un justificatif de vos revenus vous sera demandé chaque année pour continuer à profiter des avantages du Livret d'Épargne Populaire (LEP). Contactez votre conseiller : il vous indiquera si vous pouvez bénéficier du Livret d'Épargne Populaire (LEP).",
+    sourceRef: '?question=comment-savoir-si-peux-ouvrir-lep'
+  },
+  {
+    answer:
+      'Oui, vous pouvez ouvrir plusieurs livrets mais de catégories différentes. Ainsi, par exemple: Vous pouvez souscrire à la fois à un Livret A et à un Livret de Développement Durable et Solidaire. Par contre, vous ne pouvez pas détenir deux Livrets A, ni deux Livrets de Développement Durable et Solidaire.',
+    sourceRef: '?question=possible-ouvrir-plusieurs-livrets-depargne'
+  },
+  {
+    answer:
+      "Concernant le Compte de titres ordinaire (CTO), la taxation des plus-values et des dividendes est soumise au prélèvement forfaitaire unique (PFU) de 30% depuis 2018 (prélèvements sociaux de 17,20% et taux forfaitaire de l'impôt sur les revenus de 12,80%). L'imposition au barème de l'impôt sur les revenus reste tout de même possible sur option pour la totalité des revenus du patrimoine. À savoir : Découvrez plus en détails le Compte de titres ordinaire (CTO).",
+    sourceRef: '?question=cto-imposable'
+  },
+  {
+    answer:
+      "L'imposition du Plan d'Épargne en Actions (PEA) dépend de sa durée de conservation. Si le Plan d'Épargne en Actions (PEA) est conservé au minimum 5 ans, il n'est pas imposable. À savoir : Découvrez plus en détails le Plan d'Épargne en Actions (PEA).",
+    sourceRef: '?question=pea-imposable'
+  },
+  {
+    answer:
+      'Pour ouvrir un Compte de Titres Ordinaire (CTO), 45 € suffisent. À savoir : Découvrez plus en détails le Compte de Titres Ordinaire.',
+    sourceRef: '?question=est-montant-minimal-verser-ouvrir-cto'
+  },
+  {
+    answer:
+      "Non, vous ne pouvez pas détenir plusieurs Plans d'Épargne Logement (PEL). Mais votre conjoint peut aussi en ouvrir un à son nom pour maximiser vos avantages. À savoir : Dans le cas particulier d'une succession, vous pouvez détenir un ou plusieurs autres Plans d'Épargnes Logement (PEL) à la condition exclusive de les recevoir par succession, et uniquement pour les Plans d'Épargne Logement (PEL) non échus. Découvrez plus en détails le Plan Épargne Logement (PEL).",
+    sourceRef: '?question=est-ce-possible-avoir-plusieurs-pel'
+  },
+  {
+    answer:
+      "Oui, vous pouvez ouvrir un Plan Épargne Logement (PEL) ou Compte Épargne Logement (CEL) à vos enfants dès leur naissance. Vous pouvez également leur ouvrir un Compte Épargne Logement (CEL) et un Plan Épargne Logement (PEL) à condition qu'ils soient domiciliés dans le même établissement bancaire. À savoir : Découvrez davantage de détails sur le Plan Épargne Logement (PEL) et le Compte Épargne Logement (CEL).",
+    sourceRef: '?question=est-ce-possible-ouvrir-cel-pel-ses-enfants'
+  },
+  {
+    answer:
+      "Oui, vous pouvez ouvrir un contrat d'assurance-vie à vos enfants. Ainsi, dans quelques années, ils pourront réaliser leurs projets plus aisément (études, voiture, installation dans la vie active...) tout en bénéficiant d'un cadre fiscal avantageux. À savoir : Pour construire et préparer l'avenir, découvrez nos contrats d'assurance-vie.",
+    sourceRef: '?question=est-ce-possible-ouvrir-contrat-assurance-vie-ses-enfants'
+  },
+  {
+    answer:
+      "Un plan d'épargne retraite est un produit d'épargne sur le long terme accessible à toute personne souhaitant se constituer une épargne pour préparer sa retraite. Il n'y a pas d'âge spécifique pour ouvrir un plan d'épargne retraite. Nous conseillons de le faire une fois entré dans la vie active et dès que vos revenus le permettent : vous économisez ainsi assez tôt pour obtenir à la retraite une rente viagère ou un capital qui viendront compléter le montant de votre retraite. À savoir : Découvrez nos solutions d'épargne retraite.",
+    sourceRef: '?question=a-partir-quel-age-conseille-douvrir-plan-depargne-retraite'
+  },
+  {
+    answer:
+      'En choisissant la gestion déléguée, vous pouvez consulter à tout moment votre espace client afin de suivre l’évolution de votre contrat : Valorisation Répartition Détail des opérations d’achat et de vente réalisées par les experts. Vous recevez un avis à chaque opération réalisée, soit par courrier postal, soit dans votre coffre-fort. Des reportings de gestion sont également mis à votre disposition selon une périodicité fixe.',
+    sourceRef: '?question=choisissant-gestion-deleguee-ai-je-droit-regard-operations'
+  },
+  {
+    answer:
+      'L’imprimé fiscal unique (IFU), est un document qui synthétise tous les revenus des capitaux mobiliers (intérêts et/ou dividendes) perçus dans l’année. Vous pouvez ainsi vérifier les montants pré-remplis sur votre déclaration de revenus. Vous le recevez automatiquement : Soit par courrier : pour les Imprimés fiscaux uniques (IFU) concernant vos produits d’épargne, l’envoi se fait pendant le mois de mars, si vous êtes client chez nous. Pour vos contrats d’assurance-vie, les Imprimés fiscal unique (IFU) correspondant vous sont adressés pendant le mois d’avril. Soit dans votre espace client si vous avez choisi la dématérialisation de vos documents : dans le menu de gauche, cliquez sur la rubrique “Mes documents”, puis "Mes relevés et contrats". À  savoir : L’imprimé doit être conservé et peut servir de justificatif en cas de demande de l’administration fiscale. Si vous détenez des placements dans plusieurs établissements financiers, vous recevrez plusieurs Imprimés fiscal unique (IFU).',
+    sourceRef: '?question=comment-obtenir-ifu-imprime-fiscal-unique'
+  },
+  {
+    answer:
+      "Tous vos placements font l'objet d'un imprimé fiscal unique (IFU). Les produits d’épargne suivants sont concernés : Les Comptes de Titres, le Plan d'Épargne en Actions (PEA), le Plan d'Épargne en Actions - petites et moyennes entreprises (PEA-PME),  Les Plans d'Épargne Logement (PEL) ouverts à compter du 1er janvier 2018, ou les Plans d'Épargne Logement de plus de douze ans ouverts avant le 1er janvier 2018, ou pour les plans ouverts avant le 1er avril 1992, dont le terme est échu. Les Comptes Épargne Logement (CEL) de plus de 12 ans ouverts depuis 2018,  Les livrets d'épargne (hors Livret A, Livret de développement durable et solidaire (LDDS) et autres livrets d’épargne réglementés non imposables)... Les contrats d’Assurance-Vie et les Plans d'Épargne Retraite sont également concernés : l’Imprimé fiscal unique (IFU) correspondant vous sera transmis par Suravenir si vous êtes client chez nous.",
+    sourceRef: '?question=sont-produits-depargne-placements-concernes-lifu'
+  },
+  {
+    answer:
+      "Tous vos placements font l'objet d'un imprimé fiscal unique (IFU). Les produits d’épargne suivants sont concernés : Les Comptes de Titres, le Plan d'Épargne en Actions (PEA), le Plan d'Épargne en Actions - petites et moyennes entreprises (PEA-PME), Les Plans d'Épargne Logement (PEL) ouverts à compter du 1er janvier 2018, ou les Plans d'Épargne Logement (PEL) de plus de douze ans ouverts avant le 1er janvier 2018, ou pour les plans ouverts avant le 1er avril 1992, dont le terme est échu. Les Comptes Épargne Logement (CEL) de plus de 12 ans ouverts depuis 2018, Les livrets d'épargne (hors Livret A, Livret de développement durable et solidaire (LDDS) et autres livrets d’épargne réglementés non imposables)... Les contrats d’Assurance-Vie et les Plans d'Épargne Retraite sont également concernés : l’Imprimé fiscal unique (IFU) correspondant vous sera transmis par Suravenir si vous êtes client chez nous.",
+    sourceRef: '?question=sont-produits-depargne-placements-concernes-lifu-29139'
+  },
+  {
+    answer:
+      "Oui ! Vous pouvez cumuler ces deux livrets d’épargne à condition qu’ils soient ouverts dans le même établissement bancaire. S’ils diffèrent dans leur fonctionnement, ils vous permettent tous deux de bénéficier de conditions avantageuses dans le cadre de votre projet immobilier. Vous profitez notamment de droits à prêts : plus vous épargnez, plus vous pourrez emprunter (1). Un crédit vous engage et doit être remboursé. Veuillez vérifier vos capacités de remboursement avant de vous engager. À savoir : Découvrez davantage de détails sur le Plan Épargne Logement (PEL) et le Compte Épargne Logement (CEL). 1. Sous réserve d'acceptation de votre dossier par votre Caisse de Crédit Mutuel Arkéa, prêteur et des éventuelles garanties assortissant le prêt. Un crédit non garanti par une hypothèque ou une sûreté comparable et destiné exclusivement à financer des travaux est un crédit à la consommation. Un crédit destiné à financer une acquisition (avec ou sans travaux), une construction ou l'achat d'un terrain est un crédit immobilier. En cas de crédit immobilier, vous disposez d'un délai de réflexion de 10 jours à compter de la réception de l’offre. La vente est subordonnée à l'obtention du prêt. S'il n'est pas obtenu, le vendeur doit vous rembourser les sommes versées. En cas de crédit à la consommation, vous disposez d'un délai légal de rétractation de 14 jours à compter de la signature du contrat.",
+    sourceRef: '?question=est-il-possible-d-ouvrir-un-cel-et-un-pel'
+  },
+  {
+    answer:
+      "Oui ! Vous pouvez cumuler ces deux livrets d’épargne à condition qu’ils soient ouverts dans le même établissement bancaire. S’ils diffèrent dans leur fonctionnement, ils vous permettent tous deux de bénéficier de conditions avantageuses dans le cadre de votre projet immobilier. Vous profitez notamment de droits à prêts : plus vous épargnez, plus vous pourrez emprunter (1). Un crédit vous engage et doit être remboursé. Veuillez vérifier vos capacités de remboursement avant de vous engager. À savoir : Découvrez davantage de détails sur le Plan Épargne Logement (PEL) et le Compte Épargne Logement(CEL). 1. Sous réserve d'acceptation de votre dossier par votre Caisse de Crédit Mutuel Arkéa, prêteur et des éventuelles garanties assortissant le prêt. Un crédit non garanti par une hypothèque ou une sûreté comparable et destiné exclusivement à financer des travaux est un crédit à la consommation. Un crédit destiné à financer une acquisition (avec ou sans travaux), une construction ou l'achat d'un terrain est un crédit immobilier. En cas de crédit immobilier, vous disposez d'un délai de réflexion de 10 jours à compter de la réception de l’offre. La vente est subordonnée à l'obtention du prêt. S'il n'est pas obtenu, le vendeur doit vous rembourser les sommes versées. En cas de crédit à la consommation, vous disposez d'un délai légal de rétractation de 14 jours à compter de la signature du contrat.",
+    sourceRef: '?question=est-il-possible-d-ouvrir-un-cel-et-un-pel-39221'
+  },
+  {
+    answer:
+      'Il existe 2 types de livrets d’épargne : Les livrets "réglementés" dont les modalités de fonctionnement et les conditions de rémunération sont encadrées par les pouvoirs publics. Les intérêts bruts sont exonérés d’impôt sur le revenu et de prélèvements sociaux. Le Livret A, le Livret d’Épargne Populaire, le Livret de Développement Durable et Solidaire et le Livret Jeune sont les principaux  livrets réglementés. Les livrets "ordinaires" ou "non réglementés" : ils sont moins encadrés que les livrets “réglementés” en termes de taux, de plafonds ; les intérêts bruts sont soumis à l’impôt sur le revenu et aux prélèvements sociaux. Le Livret Librissime, le Grand Livret, le Livret La Vie d’Ici Jeunes Agris, le Livret La Vie d’Ici Innovation, le Livret Solidaire sont des exemples de livrets “ordinaires” proposés chez nous. À savoir :  Ces différents livrets sont cumulables entre eux. Selon vos projets, renseignez-vous auprès de votre conseiller pour savoir quel livret correspond le mieux à votre objectif d’épargne.',
+    sourceRef: '?question=quels-sont-les-differents-livrets-d-epargne'
+  },
+  {
+    answer:
+      'Il existe 2 types de livrets d’épargne : Les livrets "réglementés" dont les modalités de fonctionnement et les conditions de rémunération sont encadrées par les pouvoirs publics. Les intérêts bruts sont exonérés d’impôt sur le revenu et de prélèvements sociaux. Le Livret A, le Livret d’Épargne Populaire, le Livret de Développement Durable et Solidaire et le Livret Jeune sont les principaux livrets réglementés. Les livrets "ordinaires" ou "non réglementés" : ils sont moins encadrés que les livrets “réglementés” en termes de taux, de plafonds ; les intérêts bruts sont soumis à l’impôt sur le revenu et aux prélèvements sociaux. Le Livret Librissime, le Grand Livret, le Livret La Vie d’Ici Jeunes Agris, le Livret La Vie d’Ici Innovation, le Livret Solidaire sont des exemples de livrets “ordinaires” proposés chez nous. À savoir : Ces différents livrets sont cumulables entre eux. Selon vos projets, renseignez-vous auprès de votre conseiller pour savoir quel livret correspond le mieux à votre objectif d’épargne.',
+    sourceRef: '?question=quels-sont-les-differents-livrets-d-epargne-39225'
+  },
+  {
+    answer:
+      "Votre livret d’épargne est ouvert pour une durée illimitée et peut être clôturé à tout moment. Pour clôturer votre livret d’épargne, contactez votre conseiller. La clôture se fait sous quelques jours. Le jour de la clôture, vous récupérez le capital ainsi que les intérêts calculés depuis le début de l’année. À savoir : Lorsque le plafond est atteint, votre livret continue de vivre ! Vous n’êtes pas obligé de le clôturer.  Vous bénéficiez du cumul des intérêts au-delà du plafond défini. Vous ne pouvez plus faire de versements, mais vous pouvez retirer de l'argent selon vos besoins. Découvrez nos solutions d'épargne.",
+    sourceRef: '?question=comment-cloturer-mon-livret-d-epargne'
+  },
+  {
+    answer:
+      'Certains livrets d’épargne (Livret Jeune, Livret A, Livret Solidaire…) peuvent être souscrits 100 % en ligne à condition d’être client chez nous. Découvrez tous les livrets disponibles ; quand le bouton "Je souscris" est apparent, vous accédez à une souscription 100 % en ligne. Pour les autres livrets, contactez votre conseiller.',
+    sourceRef: '?question=comment-souscrire-un-livret-d-epargne'
+  },
+  {
+    answer:
+      'Certains livrets d’épargne (Livret Jeune, Livret A, Livret Solidaire…) peuvent être souscrits 100 % en ligne à condition d’être client chez nous. Découvrez tous les livrets disponibles ; quand le bouton "Je souscris" est apparent, vous accédez à une souscription 100 % en ligne. Pour les autres livrets, contactez votre conseiller.',
+    sourceRef: '?question=comment-souscrire-un-livret-d-epargne-39228'
+  },
+  {
+    answer:
+      'Pour réaliser un versement sur votre livret d’épargne, vous faites un virement depuis votre compte bancaire. De la même manière, les versements en espèces et dépôts de chèques doivent dans un premier temps être crédités sur votre compte bancaire ; vous pourrez ensuite virer la somme souhaitée sur votre livret d’épargne. À savoir : Vous ne pouvez pas faire de versement, directement, entre 2 livrets d’épargne : il faut passer par l’intermédiaire de votre compte bancaire.  Par exemple, si vous souhaitez virer 250 € de votre Livret A vers votre Livret de Développement Durable et Solidaire, deux étapes sont nécessaires pour réaliser cette opération : 1. Faites un virement de 250 € de votre Livret A vers votre compte bancaire. 2. Faites ensuite un nouveau virement de 250 € depuis votre compte bancaire vers votre Livret de Développement Durable et Solidaire.',
+    sourceRef: '?question=comment-realiser-un-versement-sur-mon-livret-d-epargne'
+  },
+  {
+    answer:
+      'Les intérêts sont calculés et capitalisés au 31 décembre de chaque année ; les intérêts sont ainsi reversés sur votre livret le 01 janvier qui suit. Le capital placé est valorisé au taux en vigueur à la date d\'ouverture du livret. En cas de clôture, les intérêts sont aussi restitués au client. Le calcul des intérêts se fait selon la méthode de calcul par quinzaine. Par exemple, pour un versement effectué du 01 au 15 du mois, la date de valeur est le 16 du mois. Pour un versement effectué du 16 au 31 du mois, la date de valeur est le 01 du mois suivant. À savoir : Les conditions de rémunération (taux, plafonds…) des livrets réglementés sont définies par les pouvoirs publics, alors que nous sommes libres de fixer les conditions de rémunération des livrets ordinaires. Elles sont susceptibles d’évolution et disponibles en ligne sur la page produit de chaque livret d’épargne.  Accédez à nos "Livrets Maison".',
+    sourceRef: '?question=comment-sont-calcules-les-interets-d-un-livret-d-epargne'
+  },
+  {
+    answer:
+      'Les intérêts sont calculés et capitalisés au 31 décembre de chaque année ; les intérêts sont ainsi reversés sur votre livret le 01 janvier qui suit. Le capital placé est valorisé au taux en vigueur à la date d\'ouverture du livret. En cas de clôture, les intérêts sont aussi restitués au client. Le calcul des intérêts se fait selon la méthode de calcul par quinzaine. Par exemple, pour un versement effectué du 01 au 15 du mois, la date de valeur est le 16 du mois. Pour un versement effectué du 16 au 31 du mois, la date de valeur est le 01 du mois suivant. À savoir : Les conditions de rémunération (taux, plafonds…) des livrets réglementés sont définies par les pouvoirs publics, alors que nous sommes libres de fixer les conditions de rémunération des livrets ordinaires. Elles sont susceptibles d’évolution et disponibles en ligne sur la page produit de chaque livret d’épargne. Accédez à nos "Livrets Maison".',
+    sourceRef: '?question=comment-sont-calcules-les-interets-d-un-livret-d-epargne-39317'
+  },
+  {
+    answer:
+      'Pour réaliser un virement périodique (hebdomadaire, mensuel, etc.) vers votre livret d’épargne, connectez-vous à votre espace client sur l’appli CMB ou sur le site internet. Vous ne pouvez pas faire de versement, directement, entre 2 livrets d’épargne : il faut passer par l’intermédiaire de votre compte bancaire. Depuis l\'appli CMB Cliquez sur l\'onglet "Virement" en bas de l\'écran, puis sélectionnez  “Nouveau virement”. Choisissez le compte à débiter puis le livret à créditer. Renseignez le montant. Cliquez sur le bouton “Périodique”, puis définissez la périodicité : hebdomadaire, mensuelle, etc. Renseignez également la date de début et de fin de l’opération. Le libellé est facultatif. Vérifiez les informations dans le récapitulatif et confirmez le virement. Depuis le site internet cmb.fr Sur la page d\'accueil, cliquez à gauche sur "VIREMENTS". Sélectionnez “Nouveau virement”. Choisissez le compte à débiter puis le livret à créditer. Renseignez le montant. Cliquez sur le bouton “Périodique”, puis définissez la périodicité : hebdomadaire, mensuelle, etc. Renseignez également la date de début et de fin de l’opération. Le libellé est facultatif. À savoir : 1. Pour annuler un versement automatique : Dans “VIREMENTS”, sélectionnez “mes virements”, puis "Mes virements à venir". Accéder au détail du virement de votre choix. Cliquez sur "Supprimer ce virement". 2. Certains produits d’épargne nécessitent un versement obligatoire. Ce versement peut être mensuel, trimestriel ou semestriel. C’est le cas du PEL : au minimum, vous devez y verser 45 € par mois, ou 135 € par trimestre ou 270 € par semestre. Il n’est donc pas possible d’annuler votre versement périodique vers un PEL.',
+    sourceRef: '?question=comment-realiser-un-versement-automatique-vers-mon-livret-d-epargne'
+  },
+  {
+    answer:
+      'Pour réaliser un virement périodique (hebdomadaire, mensuel, etc.) vers votre livret d’épargne, connectez-vous à votre espace client sur l’appli CMSO ou sur le site internet. Vous ne pouvez pas faire de versement, directement, entre 2 livrets d’épargne : il faut passer par l’intermédiaire de votre compte bancaire. Depuis l\'appli CMSO Cliquez sur l\'onglet "Virement" en bas de l\'écran, puis sélectionnez  “Nouveau virement”. Choisissez le compte à débiter puis le livret à créditer. Renseignez le montant. Cliquez sur le bouton “Périodique”, puis définissez la périodicité : hebdomadaire, mensuelle, etc. Renseignez également la date de début et de fin de l’opération. Le libellé est facultatif. Vérifiez les informations dans le récapitulatif et confirmez le virement. Depuis le site internet cmso.com Sur la page d\'accueil, cliquez à gauche sur "VIREMENTS". Sélectionnez “Nouveau virement”. Choisissez le compte à débiter puis le livret à créditer. Renseignez le montant. Cliquez sur le bouton “Périodique”, puis définissez la périodicité : hebdomadaire, mensuelle, etc. Renseignez également la date de début et de fin de l’opération. Le libellé est facultatif. À savoir : 1. Pour annuler un versement automatique : Dans “VIREMENTS”, sélectionnez “mes virements”, puis "Mes virements à venir". Accéder au détail du virement de votre choix. Cliquez sur "Supprimer ce virement". 2. Certains produits d’épargne nécessitent un versement obligatoire. Ce versement peut être mensuel, trimestriel ou semestriel. C’est le cas du PEL : au minimum, vous devez y verser 45 € par mois, ou 135 € par trimestre ou 270 € par semestre. Il n’est donc pas possible d’annuler votre versement périodique vers un PEL.',
+    sourceRef: '?question=comment-realiser-un-versement-automatique-vers-mon-livret-d-epargne-47237'
+  },
+  {
+    answer:
+      "Votre livret d’épargne est ouvert pour une durée illimitée et peut être clôturé à tout moment. Pour clôturer votre livret d’épargne, contactez votre conseiller. La clôture se fait sous quelques jours. Le jour de la clôture, vous récupérez le capital ainsi que les intérêts calculés depuis le début de l’année. À savoir : Lorsque le plafond est atteint, votre livret continue de vivre ! Vous n’êtes pas obligé de le clôturer. Vous bénéficiez du cumul des intérêts au-delà du plafond défini. Vous ne pouvez plus faire de versements, mais vous pouvez retirer de l'argent selon vos besoins. Découvrez nos solutions d'épargne.",
+    sourceRef: '?question=comment-cloturer-mon-livret-d-epargne-51019'
+  },
+  {
+    answer:
+      'Placer votre argent en Bourse, c’est investir de l’argent “non essentiel” dans l’objectif de gagner plus que sur un livret d’épargne tout en ayant conscience que le risque de perte en capital existe. Toutefois, cela dépend de votre situation personnelle et de vos projets à venir : avez-vous besoin de financer des investissements sur du court ou moyen terme, un projet immobilier par exemple ? Vous pourriez avoir besoin d’une partie de votre épargne pour concrétiser cet achat ; ainsi, il faut jauger quel montant garder à votre disposition (sur un livret d’épargne par exemple) et lequel vous pouvez placer. Pour répondre à vos questions sur l\'investissement en bourse, vous pouvez consulter nos différents supports dédiés : le guide bourse la fiche pratique "Les 9 bons réflexes en bourse" la fiche pratique "Les 8 erreurs de débutant en bourse" le lexique de la bourse. À savoir : Votre conseiller est également votre allié pour comprendre les rouages de la bourse. Il vous accompagne pour vous proposer des solutions d\'épargne personnalisées, adaptées à votre profil et à vos besoins.',
+    sourceRef: '?question=dans-quel-cas-investir-en-bourse'
+  },
+  {
+    answer:
+      'Placer votre argent en Bourse, c’est investir de l’argent “non essentiel” dans l’objectif de gagner plus que sur un livret d’épargne tout en ayant conscience que le risque de perte en capital existe. Toutefois, cela dépend de votre situation personnelle et de vos projets à venir : avez-vous besoin de financer des investissements sur du court ou moyen terme, un projet immobilier par exemple ? Vous pourriez avoir besoin d’une partie de votre épargne pour concrétiser cet achat ; ainsi, il faut jauger quel montant garder à votre disposition (sur un livret d’épargne par exemple) et lequel vous pouvez placer. Pour répondre à vos questions sur l\'investissement en bourse, vous pouvez consulter nos différents supports dédiés : le guide bourse la fiche pratique "Les 9 bons réflexes en bourse" la fiche pratique "Les 8 erreurs de débutant en bourse" le lexique de la bourse. À savoir : Votre conseiller est également votre allié pour comprendre les rouages de la bourse. Il vous accompagne pour vous proposer des solutions d\'épargne personnalisées, adaptées à votre profil et à vos besoins.',
+    sourceRef: '?question=dans-quel-cas-investir-en-bourse-55943'
+  },
+  {
+    answer:
+      "La réglementation IFR (Interchange Fees Regulation) autorise tout commerçant européen à refuser une carte en fonction du réseau (CB/Visa/MasterCard®) ou de la catégorie IFR (débit/crédit/commerciale/prépayée).  Par contre, ces restrictions doivent être affichées clairement par le commerçant.   À savoir : La réglementation IFR est une réglementation européenne qui vise à limiter les commissions d'interchange liées aux paiements par cartes bancaires au sein de l'Europe, en fonction des catégories de cartes.",
+    sourceRef: '?question=pourquoi-carte-peut-elle-etre-refusee-un-commercant-en-france'
+  },
+  {
+    answer:
+      "Selon le type de moyens de paiement, les règles de mise en opposition sont différentes : Pour les cartes, l'opposition en ligne doit être faite par le titulaire de la carte (nom et prénom inscrits sur la carte).  Pour les chèques, l'opposition en ligne peut être faite par le titulaire ou le cotitulaire du compte.",
+    sourceRef: '?question=peut-faire-opposition'
+  },
+  {
+    answer:
+      "Une fois l'opposition en ligne réalisée, une nouvelle carte bancaire va être automatiquement fabriquée.  Votre nouvelle carte sera disponible dans un délai maximum de 8 jours. Vous recevrez votre code confidentiel par courrier, votre carte sera à retirer en agence.",
+    sourceRef: '?question=apres-opposition-quand-vais-je-recevoir-nouvelle-carte-bancaire'
+  },
+  {
+    answer:
+      "Une fois l'opposition enregistrée, il n'est plus possible de payer avec votre carte ou votre chéquier en opposition. Si vous retrouvez votre carte ou votre chéquier, détruisez ce moyen de paiement : soit vous le faites vous-même, soit  vous le ramenez à l'agence pour le faire détruire.",
+    sourceRef: '?question=faire-si-retrouve-carte-mon-chequier'
+  },
+  {
+    answer:
+      "L'authentification par 3D secure peut vous demander l'entrée d'un ou plusieurs éléments d'authentification afin de confirmer le paiement sur un site Internet. La saisie de ces éléments permet de s'assurer que la personne effectuant le paiement est bien le titulaire de la carte. À savoir : Selon les sites Internet et leur localisation géographique, le 3D Secure peut ou non apparaître.",
+    sourceRef: '?question=quoi-service-3d-secure-securise-t-il-paiements-internet'
+  },
+  {
+    answer:
+      'Si vous n’avez pas reçu de code par SMS : Cliquez sur le lien "je n’ai pas reçu de code" dans la fenêtre vous le demandant. Puis laissez-vous guider. À savoir : Si vous n\'avez pas reçu de code, vérifiez que votre numéro de téléphone est correctement renseigné en contactant votre agence.',
+    sourceRef: '?question=jai-demande-lenvoi-dun-code-via-telephone-je-nai-toujours-rien-recu'
+  },
+  {
+    answer:
+      'Le "géoblocking" est un terme anglo-saxon qui signifie "blocage géographique".  En l\'occurrence, il s\'agit de bloquer toutes les transactions non sécurisées par la puce, hors Europe, réalisées avec une carte bancaire.',
+    sourceRef: '?question=est-ce-le-geoblocking'
+  },
+  {
+    answer:
+      'Vous pouvez à tout moment activer ou désactiver ce(s) service(s) depuis l\'appli CMB.  Cliquez sur le menu.  Sélectionnez dans MOYENS DE PAIEMENT "Mes cartes".  Cliquez sur la carte concernée.   Dans "Options de la carte", vous avez la possibilité d\'activer ou non le géoblocking et le géoalerting.  À savoir :  Vous pouvez également appeler le 02 98 28 42 28 (7 jours sur 7 et 24 heures sur 24) ou contacter votre conseiller. Découvrez plus d\'infos sur le Géoblocking et le Géoalerting.',
+    sourceRef: '?question=comment-gerer-alerte-sms-geoalerting-et-blocage-geographique-geoblocking'
+  },
+  {
+    answer:
+      "Tous les pays qui ne font pas partie de la liste des pays d'Europe sont concernés par l'alerte SMS et le blocage géographique. Ainsi, les pays suivants ne sont pas concernés (Pays d'Europe au sens large) :  Autriche, Belgique, Chypre, Danemark, Estonie, Finlande, Allemagne, Grèce, Irlande, Italie, Lettonie, Lituanie, Luxembourg, Malte, Pays-Bas, Portugal, Slovaquie, Slovénie, Espagne, Suède, Royaume Uni, France, Andorre, Croatie, République Tchèque, Gibraltar, Vatican, Hongrie, Islande, Israël, Liechtenstein, Monaco, Pologne, Roumanie, Saint Marin, Turquie, Guernesey, Jersey, Bulgarie, Iles Faeroe, Groenland, Norvège, Suisse, Albanie, Bosnie Herzégovine, Biélorussie, Moldavie, Ukraine, Macédoine, Yougoslavie, Guyane Française, Polynésie Française, Guadeloupe, Madagascar, Martinique, Saint Martin (partie française), Saint Pierre et Miquelon, Wallis et Futuna, Monténégro, Serbie, Kosovo.  Dès que votre carte bancaire est utilisée hors de ces pays pour une transaction non sécurisée par la puce, vous êtes informé en temps réel par SMS.",
+    sourceRef: '?question=sont-pays-concernes-lalerte-sms-le-geoblocking'
+  },
+  {
+    answer:
+      'Vous pouvez à tout moment activer ou désactiver ce(s) service(s) depuis l\'appli CMSO. Cliquez sur le menu.  Sélectionnez dans MOYENS DE PAIEMENT "Mes cartes".  Cliquez sur la carte concernée.   Dans "Options de la carte", vous avez la possibilité d\'activer ou non le géoblocking et le géoalerting.  À savoir :  Vous pouvez également appeler le 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24) ou contacter votre conseiller. Depuis l\'étranger, composez le +33 2 98 28 42 28. Découvrez plus d\'infos sur le Géoblocking et le Géoalerting.',
+    sourceRef: '?question=comment-gerer-alerte-sms-geoalerting-et-blocage-geographique-geoblocking-7450'
+  },
+  {
+    answer:
+      "Si vous constatez un mouvement sur votre compte (prélèvement ou virement) que vous n'avez pas autorisé, prenez contact avec votre conseiller. Contrairement à la carte bancaire ou aux chèques/chéquier, vous ne pouvez pas faire opposition par vous-même.",
+    sourceRef: '?question=comment-contester-prelevement-un-virement'
+  },
+  {
+    answer:
+      'En cas de perte ou de vol de votre carte bancaire, d\'un chèque ou d\'un chéquier, vous devez faire une mise en opposition.  1. Soit en ligne, depuis votre espace client. Dans le menu, cliquez sur :  "MES MOYENS DE PAIEMENT" "Opposition carte et chéquier" "Accéder à la fonctionnalité" puis suivez ensuite les instructions.  2. Soit par téléphone, en contactant SOS Cartes au 02 98 28 42 28 (24 heures sur 24 et 7 jours sur 7) ; depuis l\'étranger, composez le +33 2 98 28 42 28.  À savoir : Votre demande de mise en opposition devra être confirmée par écrit.  Puis, le cas échéant, faites une déclaration de vol au commissariat le plus proche ou au consulat si vous êtes à l\'étranger.  Notez que, dans le cas d\'un compte joint, seul le porteur de la carte (la personne dont le nom est inscrit sur la carte) est habilité à mettre en opposition sa carte de paiement. 3. Dans le cas où vous avez égaré votre carte et que vous pensez la retrouver : vous pouvez bloquer temporairement l\'usage de la carte. Contrairement à la mise en opposition qui est une action définitive, le blocage de la carte est temporaire.',
+    sourceRef: '?question=demarches-dois-je-realiser-cas-perte-de-vol-ma-carte-dun-cheque-de-chequier'
+  },
+  {
+    answer:
+      "En cas de fraude constatée sur votre carte bancaire : Votre carte devra être mise en opposition en appelant le +33 2 98 28 42 28 (7 jours sur 7 et 24 heures sur 24). Depuis l'étranger, composez le : +33 2 98 28 42 28. La ou les transaction(s) concernée(s) devra(ont) faire l'objet de votre part d'une contestation auprès de votre conseiller : vous pourrez ainsi être remboursé des paiements contestés. À savoir :  il est également possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=faire-cas-fraude-la-carte-bancaire'
+  },
+  {
+    answer:
+      "Si vous ne parvenez pas à faire opposition en ligne : Contactez SOS Cartes au 02 98 28 42 28 ; depuis l'étranger, composez le +33 2 98 28 42 28.  Ce service est ouvert 7 jours sur 7 et 24 heures sur 24.",
+    sourceRef: '?question=faire-si-narrive-me-connecter-site-internet-faire-opposition'
+  },
+  {
+    answer:
+      "La gestion de la \"zone d'utilisation géographique\" d'une carte permet de piloter le fonctionnement de la carte quand elle est utilisée pour des paiements de proximité ou des retraits non sécurisés par la puce en dehors de l'Europe.  Deux fonctionnalités sont proposées :  1. L'alerte SMS (\"géoalerting\") : si la carte est utilisée hors Europe, un SMS vous est envoyé sur votre téléphone portable préalablement enregistré.  Si vous ne vous déplacez jamais hors Europe, ce service vous permet donc d'être informé en temps réel de toute utilisation frauduleuse de votre carte et d'activer le géoblocking (voir ci-après) si vous n'êtes pas à l'origine de la transaction.  La transaction qui est à l'origine de l'alerte est déjà réalisée et ne peut donc plus être bloquée : elle devra faire l'objet d'une contestation auprès de votre conseiller et la carte devra être mise en opposition depuis votre espace client.  Vous pouvez aussi appeler le 02 98 28 42 28 (7 jours sur 7 et 24 heures sur 24).  Si vous vous rendez hors Europe, vous pouvez à tout moment désactiver ce service. 2. Le blocage géographique (\"géoblocking\") : après avoir activé ce service, toutes les transactions non sécurisées par la puce réalisées hors Europe (paiements de proximité et retraits) seront automatiquement refusées.  Votre carte ne pourra donc pas être utilisée hors Europe.  Vous pouvez à tout moment activer ou désactiver ce service via ce site ou en appelant le 02 98 28 42 28 (7 jours sur 7 et 24 heures sur 24). Ceci vous permet donc de limiter les risques de fraude liés à la contrefaçon de votre carte bancaire.",
+    sourceRef: '?question=est-ce-la-gestion-la-zone-utilisation-geographique-de-carte-bancaire'
+  },
+  {
+    answer:
+      "Vous avez reçu une alerte SMS car un paiement de proximité ou un retrait non sécurisé par la puce a été réalisé hors Europe ; le service d'alerte SMS est activé pour votre carte bancaire. Si vous n'êtes pas à l'origine de la transaction qui a déclenché l'envoi du SMS, cette transaction est déjà réalisée et ne peut plus être bloquée.   Cette transaction devra faire l'objet de votre part d'une contestation auprès de votre conseiller et la carte devra être mise en opposition sur ce site ou en appelant le 02 98 28 42 28 (7 jours sur 7 et 24 heures sur 24). À savoir : Nous vous conseillons d'activer le \"géoblocking\" pour que la carte refabriquée, suite à la mise en opposition, dispose de cette protection.",
+    sourceRef: '?question=ai-recu-alerte-sms-que-dois-je-faire'
+  },
+  {
+    answer:
+      "Nous renforçons la sécurité de vos achats effectués sur internet par carte bancaire en utilisant le 3D Secure. Ce système d’authentification vous permet d’effectuer vos achats sans risque d’utilisation frauduleuse de votre carte bancaire.  Découvrez également nos services :  Virtualis (Paiement sécurisé internet) : en quelques clics, vous obtenez un numéro de carte bancaire virtuelle pour effectuer vos achats en ligne.   La \"Protection Internet\" : vous pouvez l'activer à tout moment pour plus de sécurité. Elle empêche l'utilisation de votre carte bancaire sur internet et réduit ainsi les risques de fraude. Si vous l'activez, vous pouvez utiliser le service Virtualis pour réaliser vos achats en ligne.",
+    sourceRef: '?question=comment-acheter-internet-toute-securite-3016'
+  },
+  {
+    answer:
+      'Ce service protège votre carte bancaire de toute utilisation frauduleuse sur Internet. Avec la "Protection Internet" ou le "Blocage Internet", vous ne pouvez pas payer directement avec votre carte bancaire :  Vos achats en ligne doivent être réalisés avec le service Virtualis qui permet de générer un numéro de carte virtuelle. Votre numéro de carte bancaire réelle reste valable pour vos achats chez des commerçants de proximité (réseaux physiques).   Cas particuliers de certains sites Internet de location de voitures, de réservations d’hôtels, de billetterie et du site oui.sncf : excepté pour les e-billets SNCF, ces réservations peuvent nécessiter la présentation de la carte bancaire ayant servi au paiement pour obtenir ses titres de transport, ses billets ou accéder à une chambre d\'hôtel. Sur ces sites Internet, il convient donc d\'utiliser le numéro de votre carte bancaire réelle.',
+    sourceRef: '?question=a-quoi-correspond-protection-internet-ma-carte-bancaire-ou-blocage-internet'
+  },
+  {
+    answer:
+      "En cas de fraude constatée sur votre carte bancaire : Votre carte devra être mise en opposition en appelant le 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24). Depuis l'étranger, composez le : +33 2 98 28 42 28. La ou les transaction(s) concernée(s) devra(ont) faire l'objet de votre part d'une contestation auprès de votre conseiller : vous pourrez ainsi être remboursé des paiements contestés. À savoir :  il est également possible d'effectuer la mise en opposition par l'intermédiaire de votre conseiller.",
+    sourceRef: '?question=faire-cas-fraude-la-carte'
+  },
+  {
+    answer:
+      "Vous avez reçu une alerte SMS car un paiement de proximité ou un retrait non sécurisé par la puce a été réalisé hors Europe ; le service d'alerte SMS est activé pour votre carte bancaire. Si vous n'êtes pas à l'origine de la transaction qui a déclenché l'envoi du SMS, cette transaction est déjà réalisée et ne peut plus être bloquée. Cette transaction devra faire l'objet de votre part d'une contestation auprès de votre conseiller et la carte devra être mise en opposition depuis votre espace client ou en appelant le 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24). À savoir : Nous vous conseillons d'activer le \"géoblocking\" pour que la carte refabriquée, suite à la mise en opposition, dispose de cette protection.",
+    sourceRef: '?question=ai-recu-alerte-sms-que-dois-je-faire-7927'
+  },
+  {
+    answer:
+      "La gestion de la \"zone d'utilisation géographique\" d'une carte permet de piloter le fonctionnement de la carte quand elle est utilisée pour des paiements de proximité ou des retraits non sécurisés par la puce en dehors de l'Europe.  Deux fonctionnalités sont proposées : 1. L'alerte SMS (\"géoalerting\") : si la carte est utilisée hors Europe, un SMS vous est envoyé sur votre téléphone portable préalablement enregistré. Si vous ne vous déplacez jamais hors Europe, ce service vous permet donc d'être informé en temps réel de toute utilisation frauduleuse de votre carte et d'activer le géoblocking (voir ci-après) si vous n'êtes pas à l'origine de la transaction. La transaction qui est à l'origine de l'alerte est déjà réalisée et ne peut donc plus être bloquée : elle devra faire l'objet d'une contestation auprès de votre conseiller et la carte devra être mise en opposition sur ce site. Vous pouvez aussi appeler le 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24). Si vous vous rendez hors Europe, vous pouvez à tout moment désactiver ce service. 2. Le blocage géographique (\"géoblocking\") : après avoir activé ce service, toutes les transactions non sécurisées par la puce réalisées hors Europe (paiements de proximité et retraits) seront automatiquement refusées. Votre carte ne pourra donc pas être utilisée hors Europe. Vous pouvez à tout moment activer ou désactiver ce service via ce site ou en appelant le 05 56 24 28 28 (7 jours sur 7 et 24 heures sur 24). Ceci vous permet donc de limiter les risques de fraude liés à la contrefaçon de votre carte bancaire.",
+    sourceRef: '?question=estce'
+  },
+  {
+    answer:
+      'En cas de perte ou de vol de votre carte bancaire, d\'un chèque ou d\'un chéquier, vous devez faire une mise en opposition. 1. Soit en ligne : depuis votre espace client, dans le menu, cliquez sur : "MES MOYENS DE PAIEMENT" "Opposition carte et chéquier" "Accéder à la fonctionnalité" puis suivez ensuite les instructions. 2. Soit par téléphone, en contactant SOS Cartes au 05 56 24 28 28 (24 heures sur 24 et 7 jours sur 7) ; depuis l\'étranger, composez le +33 2 98 28 42 28. À savoir : Votre demande de mise en opposition devra être confirmée par écrit. Puis, le cas échéant, faites une déclaration de vol au commissariat le plus proche ou au consulat si vous êtes à l\'étranger. Notez que, dans le cas d´un compte joint, seul le porteur de la carte (la personne dont le nom est inscrit sur la carte) est habilité à mettre en opposition sa carte de paiement. 3. Dans le cas où vous avez égaré votre carte et que vous pensez la retrouver : vous pouvez bloquer temporairement l\'usage de la carte. Contrairement à la mise en opposition qui est une action définitive, le blocage de la carte est temporaire.',
+    sourceRef: '?question=cas-perte-de-vol-ma-carte-dun-cheque-de-chequier-quelles-demarches-effectuer'
+  },
+  {
+    answer:
+      "Si vous ne parvenez pas à faire opposition en ligne : Contactez SOS Cartes au 05 56 24 28 28 ; depuis l'étranger, composez le +33 2 98 28 42 28. Ce service est ouvert 7 jours sur 7 et 24 heures sur 24.",
+    sourceRef: '?question=faire-si-narrive-me-connecter-site-internet-faire-opposition-10014'
+  },
+  {
+    answer:
+      "Nous renforçons la sécurité de vos achats effectués sur internet par carte bancaire en utilisant le 3D Secure. Ce système d’authentification vous permet d’effectuer vos achats sans risque d’utilisation frauduleuse de votre carte bancaire. Découvrez également nos services : Virtualis (Paiement sécurisé internet) : en quelques clics, vous obtenez un numéro de carte bancaire virtuelle pour effectuer vos achats en ligne. La \"Protection Internet\" : vous pouvez l'activer à tout moment pour plus de sécurité. Elle empêche l'utilisation de votre carte bancaire sur internet et réduit ainsi les risques de fraude. Si vous l'activez, vous pouvez utiliser le service Virtualis pour réaliser vos achats en ligne.",
+    sourceRef: '?question=comment-acheter-sur-internet-en-toute-securite'
+  },
+  {
+    answer:
+      "Pour ne pas communiquer vos numéros réels de carte en ligne, le Crédit Mutuel de Bretagne propose le service Virtualis à tous ses clients titulaires d'une carte bancaire.  Vous pouvez accéder à Virtualis depuis l'appli CMB ou depuis votre espace client sur le site internet.",
+    sourceRef: '?question=comment-obtenir-numero-carte-bancaire-virtuelle-ne-divulguer-numeros-reels-ma-carte-bancaire-web'
+  },
+  {
+    answer:
+      "Pour ne pas communiquer vos numéros réels de carte en ligne, le Crédit Mutuel du Sud-Ouest propose le service Virtualis à tous ses clients titulaires d'une carte bancaire.  Vous pouvez accéder à Virtualis depuis l'appli CMSO ou depuis votre espace client sur le site internet.",
+    sourceRef: '?question=comment-obtenir-numero-carte-bancaire-virtuelle-ne-divulguer-numeros-reels-ma-carte-bancaire'
+  },
+  {
+    answer:
+      "Paylib fonctionne avec le paiement sans contact. Pour savoir si un commerçant accepte les paiements Paylib, repérez l’un des éléments visuels indiquant les paiements sans contact : ils sont visibles sur les vitrines des commerçants, à proximité des caisses ou sur les terminaux de paiement. Vous pouvez ainsi trouver :  Le logo sans contact   L'affiche sans contact sur la devanture du magasin. À savoir : La plupart des magasins sont désormais équipés de ce système.",
+    sourceRef: '?question=comment-savoir-si-commercant-accepte-paiements-paylib-magasin'
+  },
+  {
+    answer: 'Le service "Paylib en magasin" est gratuit.',
+    sourceRef: '?question=combien-coute-service-paylib-magasin'
+  },
+  {
+    answer:
+      'Il existe deux possibilités pour utiliser "Paylib en magasin" : 1. Paiement express : un seul passage sur le lecteur du terminal de paiement du commerçant.  Lancez le service "Paylib en magasin" dans l\'appli "CMB Paiements Mobile" sur votre smartphone. Cliquez sur le bandeau "PAIEMENT EXPRESS EN MAGASIN".  Autorisez le paiment par reconnaissance de votre empreinte digitale (*) ou en saisissant le code de sécurité.   Présentez le smartphone sur le terminal de paiement sans contact du commerçant pour réaliser le paiement.  2. Paiement confort : deux passages sur le lecteur du terminal de paiement du commerçant permettent de lancer votre application et de visualiser le montant de la transaction directement sur le smartphone. Présentez votre smartphone, écran déverrouillé, sur le terminal de paiement du commerçant pour initier automatiquement le service "Paylib en magasin". Authentifiez-vous en saisissant le code de sécurité, ou par reconnaissance de votre empreinte digitale (*) .  Présentez le smartphone sur le terminal de paiement sans contact du commerçant pour réaliser le paiement.    (*) Si vous choisissez l\'authentification par empreinte digitale, il se peut néanmoins que la saisie du code de sécurité vous soit demandée (en cas de non-reconnaissance de l\'empreinte ou pour des raisons de sécurité).',
+    sourceRef: '?question=comment-payer-paylib-magasin'
+  },
+  {
+    answer:
+      'La solution Apple Pay en France est indépendante du service "Paylib en magasin".  La politique d’Apple limite l’usage d\' Apple Pay uniquement aux mobiles Apple et aux solutions développées par Apple.',
+    sourceRef: '?question=est-difference-entre-paylib-magasin-apple-pay'
+  },
+  {
+    answer: 'Oui, le paiement est opérationnel même en cas de non-couverture du réseau téléphonique.',
+    sourceRef: '?question=puis-je-payer-paylib-magasin-reseau-telephonique'
+  },
+  {
+    answer:
+      'Voici les conditions pour pouvoir s\'inscrire à Paylib : Vous devez détenir une carte de paiement CB MasterCard® pour "Paylib en ligne" et "Paylib en magasin" ou Visa pour "Paylib en ligne".   Préalablement à votre inscription, votre mobile doit être enregistré en appareil de confiance. Vous pouvez facilement le faire en cliquant sur le bouton "Enregistrer mon appareil" depuis l\'appli CMB. Cet enregistrement est aujourd\'hui obligatoire pour pouvoir utiliser l\'appli CMB.  Pour utiliser Paylib, il faudra installer ensuite l\'appli "CMB Paiements Mobile" qui regroupe les fonctionnalités Paylib.',
+    sourceRef: '?question=sont-conditions-sinscrire-paylib'
+  },
+  {
+    answer:
+      "Vous avez effectué un paiement avec Paylib et vous demandez un remboursement ? Vous n'avez rien de particulier à faire : le montant de la transaction sera automatiquement crédité sur le compte associé à votre carte bancaire.",
+    sourceRef: '?question=comment-etre-rembourse-suite-un-paiement-paylib'
+  },
+  {
+    answer:
+      "Avec Paylib, vous pouvez envoyer de l'argent à toute personne qui dispose d’un compte bancaire domicilié en France ou à Monaco.  Votre bénéficiaire doit également avoir un numéro de téléphone mobile afin d'être notifié par SMS de la réception du paiement Paylib.",
+    sourceRef: '?question=a-puis-je-envoyer-argent-paylib'
+  },
+  {
+    answer:
+      'Deux cas de figure se présentent :  Si votre bénéficiaire a déjà activé Paylib, il n\'a rien à faire. Il recevra son paiement Paylib sous 3 jours maximum et probablement même en 10 secondes grâce au "Paylib instantané".   Si votre bénéficiaire n\'est pas encore utilisateur de Paylib, il a 7 jours pour récupérer son paiement Paylib en renseignant son IBAN sur le site de Paylib. Ensuite, son compte bancaire sera crédité sous 2 à 3 jours.',
+    sourceRef: '?question=ai-envoye-de-argent-un-ami-paylib-dans-delai-recevra-t-il-argent'
+  },
+  {
+    answer:
+      "Non. Lorsque vous avez validé l'envoi de votre paiement Paylib, vous ne pouvez plus l'annuler.  Soyez donc vigilant et vérifiez bien toutes les informations de votre paiement Paylib avant la validation : montant, motif, N° de téléphone de votre bénéficiaire... À savoir : L'envoi d'un paiement Paylib correspond à un virement ; ainsi, comme pour n’importe quel virement, vous avez la possibilité de rappeler vos fonds en contactant votre conseiller.",
+    sourceRef: '?question=puis-je-annuler-paylib'
+  },
+  {
+    answer:
+      "Après la validation, votre paiement Paylib est envoyé automatiquement au numéro que vous avez renseigné. Soyez particulièrement vigilant à cette information pour éviter ce problème.   Néanmoins, si cela arrive, nous vous invitons à contacter rapidement notre service d'assistance : 0 969 320 819.",
+    sourceRef: '?question=faire-si-me-trompe-de-numero-lors-envoi-mon-paylib'
+  },
+  {
+    answer:
+      'Avec "Paylib entre amis", vous pouvez saisir au maximum un montant de : 9999,99 €.  Les plafonds d’utilisation du service "Paylib entre amis" sont ceux de vos virements, mentionnés dans votre appli mobile (rubrique "Mes virements").',
+    sourceRef: '?question=montant-maximum-peut-on-envoyer-paylib-entre-amis'
+  },
+  {
+    answer:
+      'Si vous êtes équipé d’un mobile proposant l’authentification par biométrie, vous pouvez vous authentifier et valider vos paiements avec votre empreinte digitale.  Pour des questions de sécurité, une double authentification pourra vous être demandée.',
+    sourceRef: '?question=puis-je-valider-paiements-paylib-mon-empreinte-digitale'
+  },
+  {
+    answer:
+      "Pour recevoir l'argent, il faut activer Paylib. Si vous ne l'avez pas encore fait, voici comment procéder :  Vous avez dû recevoir un SMS avec un lien cliquable.  Cliquez sur ce lien qui vous redirigera vers le site web de Paylib.  Renseignez votre IBAN pour recevoir directement l'argent sur votre compte bancaire sous 3 jours maximum.  À savoir : Pour la suite et afin d'obtenir l'argent instantanément, le plus simple est d'activer Paylib dans l'appli CMB. Vous n'aurez alors rien à faire : votre paiement Paylib arrivera directement sur votre compte et vous serez notifié par SMS.",
+    sourceRef: '?question=ai-recu-paylib-comment-puis-je-recevoir-argent-mon-compte-bancaire'
+  },
+  {
+    answer:
+      'Si vous avez reçu un SMS, ne tardez pas !  Vous avez 7 jours pour cliquer sur ce lien, renseigner votre IBAN sur le site de Paylib et recevoir votre argent directement sur votre compte bancaire.',
+    sourceRef: '?question=ai-recu-sms-un-lien-cliquable-recuperer-paylib-combien-temps-valable'
+  },
+  {
+    answer:
+      "Oui !  Si vous n'avez pas encore activé Paylib, vous recevrez un SMS avec un lien cliquable.  Vous n'aurez qu'à cliquer sur ce lien qui vous redirigera vers le site web de Paylib.  Renseignez votre IBAN pour recevoir directement l'argent sur votre compte bancaire.  À savoir : Pour la suite et afin d'obtenir l'argent instantanément, le plus simple sera d'activer Paylib depuis l'application CMB Paiements Mobile. Votre Paylib arrivera directement sur votre compte et vous serez notifié par SMS.",
+    sourceRef: '?question=nai-encore-active-paylib-peut-on-tout-meme-envoyer-argent-paylib'
+  },
+  {
+    answer:
+      "Pas d'inquiétude si vous avez perdu votre téléphone ou qu'on vous l'a volé. Le système Paylib est doublement sécurisé grâce au verrouillage de votre téléphone et au mot de passe que vous saisissez pour tout paiement : en magasin au-dessus de 30 €, en ligne ou pour un paiement entre amis sans montant minimum.  Dans tous les cas, contactez votre opérateur pour les alerter du vol et bloquer votre ligne.  L'assistance \"paiement à distance\" se tient également à votre disposition au : 0 969 320 819 (appel non surtaxé). N'hésitez pas à les contacter pour désactiver Paylib et empêcher toute utilisation frauduleuse.",
+    sourceRef: '?question=ai-active-paylib-que-faire-si-ai-perdu-telephone-que-on-la-vole'
+  },
+  {
+    answer:
+      "Paylib est associé à votre carte bancaire : vous conservez donc l'ensemble des services d'assurance et d'assistance associés à votre carte. Voici quelques exemples de ces avantages qui sont maintenus : le débit différé de vos opérations si vous l'avez choisi, vos garanties d'assurance voyage pour les paiements réalisés avec une carte haut de gamme, etc...",
+    sourceRef: '?question=est-ce-les-assurances-assistances-ma-carte-bancaire-fonctionnent-mes-paiements-paylib'
+  },
+  {
+    answer:
+      'Pour vous inscrire à Paylib la première fois, suivez les étapes suivantes : Enregistrez votre mobile comme appareil de confiance. Cliquez sur "Activer Paylib" dans votre application "CMB Paiements Mobile".  Choisissez un identifiant (adresse e-mail) et un mot de passe Paylib.  Sélectionnez une carte bancaire préférentielle pour vos achats ; ce choix de carte est modifiable à tout moment. Sélectionnez un compte favori.  Sélectionnez le mode de validation de vos paiements : par code de sécurité ou empreinte digitale.  Une fois les conditions générales acceptées, vous serez alors inscrit à Paylib.   À savoir : Si votre mobile est éligible au paiement "Paylib en magasin", ce service sera activé d’office sur la carte préférentielle Paylib. Il sera opérationnel après installation de différents éléments sécurisés sur votre mobile : vous recevrez une notification dès que le service sera disponible.',
+    sourceRef: '?question=comment-inscrire-paylib'
+  },
+  {
+    answer:
+      'Si vous saisissez à trois reprises successives un code de sécurité faux, votre accès "Banque à Distance" sera bloqué.  Les services "Paylib en ligne" et "Paylib en magasin" seront indisponibles tant que votre accès restera bloqué. Pour le débloquer, contactez votre conseiller ou l’assistance Paylib au numéro Cristal : 0 969 320 819 (appel non surtaxé).',
+    sourceRef: '?question=faire-si-ai-bloque-mon-telephone-qui-associe-a-mon-espace-client'
+  },
+  {
+    answer:
+      "Si vous avez perdu votre montre Fitbit, vous avez 2 choix :  Supprimer la carte que vous avez ajoutée à l'appareil. Ou la suspendre.  Vous choisissez une de ces solutions à l'aide de la section \"Portefeuille\" de l'application Fitbit.   À savoir : Vous pouvez toujours effectuer des paiements en utilisant votre carte de débit ou de crédit physique.  Contactez votre banque en cas de perte ou de vol de la carte physique afin de faire opposition.   Personne ne peut utiliser votre montre pour effectuer un paiement sans avoir saisi dans un premier temps votre code PIN personnel à 4 chiffres : il est donc important de ne pas le divulguer.",
+    sourceRef: '?question=comment-faire-cas-perte-ma-montre-fitbit'
+  },
+  {
+    answer:
+      'Lorsque vous êtes prêt à payer, votre carte par défaut s\'affiche sur l\'écran de votre montre. Pour modifier votre carte par défaut :   Dans le tableau de bord de l\'application Fitbit, cliquez sur l\'icône "Compte".  Cliquez sur la vignette "Portefeuille".   Choisissez la carte que vous souhaitez utiliser par défaut.   Cliquez sur "Définir par défaut".',
+    sourceRef: '?question=comment-puis-je-modifier-carte-defaut-ma-montre'
+  },
+  {
+    answer:
+      "Non, vous n'avez pas besoin d'avoir votre téléphone à proximité pour utiliser Fitbit Pay.    Après avoir configuré votre montre et votre téléphone, vous pouvez effectuer des paiements depuis votre montre et laisser votre téléphone à la maison.",
+    sourceRef: '?question=ai-je-besoin-avoir-telephone-proximite-pour-utiliser-fitbit-pay'
+  },
+  {
+    answer:
+      'Si vous avez perdu votre montre Fitbit et votre téléphone, il faut supprimer les cartes que vous avez ajoutées à Fitbit Pay. Pour cela :  Connectez-vous à votre tableau de bord sur Fitbit.com depuis un téléphone, une tablette ou un ordinateur. Cliquez sur l\'icône en forme de roue dentée en haut à droite.   Cliquez sur Fitbit Pay.   Cliquez sur "Désactiver Fitbit Pay". Vos cartes sont supprimées de Fitbit Pay et ne peuvent plus être utilisées pour effectuer des paiements avec votre montre. À savoir : Vous pouvez, en revanche, toujours effectuer des paiements en utilisant les cartes de débit ou de crédit physiques.',
+    sourceRef: '?question=ai-perdu-2-appareils-ma-montre-fitbit-mon-telephone-que-dois-je-faire'
+  },
+  {
+    answer: "Absolument, le service Fitbit Pay est gratuit au téléchargement comme à l'utilisation.",
+    sourceRef: '?question=service-fitbit-pay-gratuit'
+  },
+  {
+    answer:
+      'Dans un premier temps, vous devez faire opposition sur votre carte. Pour cela, contactez "SOS Cartes" au 02 98 28 42 28 (depuis l\'étranger, composez le +33 2 98 28 42 28). En mettant votre carte en opposition, celle-ci ne peut plus être utilisée via Apple Pay.     En complément de votre mise en opposition, nous supprimerons automatiquement toutes les cartes virtuelles associées à la carte réelle.     Quand vous recevrez votre nouvelle carte, vous devrez enregistrer à nouveau cette nouvelle carte dans Apple Pay avant d\'effectuer des paiements avec votre iPhone, iPad ou Apple Watch.',
+    sourceRef: '?question=concernant-apple-pay-que-passe-t-il-cas-perte-de-vol-mon-appareil-apple'
+  },
+  {
+    answer: 'Non, le service Apple Pay est gratuit.',
+    sourceRef: '?question=service-apple-pay-payant'
+  },
+  {
+    answer:
+      "Le service Apple Pay est accessible pour tous les clients détenteurs d’une carte bancaire CB MasterCard® délivrée par le Crédit Mutuel de Bretagne. Les détenteurs d'une carte Visa ne peuvent pas bénéficier de ce service. À savoir :  Les clients mineurs (de plus de 13 ans) pourront enregistrer leur carte rechargeable. Découvrez comment s'enregistrer dans Apple Pay.",
+    sourceRef: '?question=cartes-sont-eligibles-service-apple-pay'
+  },
+  {
+    answer:
+      "Si vous remplacez votre appareil, vous devrez de nouveau enregistrer votre carte de paiement MasterCard®.    Pensez à bien supprimer vos cartes sur Apple Pay si vous changez d'appareil (voir la question : Comment supprimer une carte dans Apple Pay ? ).  Vous pouvez aussi utiliser iCloud pour supprimer toutes les cartes enregistrées, même si vous n’êtes plus en possession de votre appareil.",
+    sourceRef: '?question=se-passe-t-il-quand-remplace-appareil'
+  },
+  {
+    answer: 'Si vous désactivez le "sans contact" sur votre carte bancaire, Apple Pay continuera à fonctionner.',
+    sourceRef: '?question=se-passe-t-il-si-desactive-sans-contact-ma-carte-bancaire'
+  },
+  {
+    answer:
+      'Pour supprimer une carte dans Apple Pay, suivez les étapes ci-dessous : elles diffèrent selon l\'appareil Apple que vous utilisez.   1. Sur votre iPhone ou iPad :  Via l\'appli Apple Wallet : touchez une carte, puis le logo et "Supprimer la carte".  Via Réglages : ouvrez "Wallet & Apple Pay", touchez la carte que vous souhaitez supprimer, puis "Supprimer la carte".   2. Sur votre Apple Watch :  Ouvrez l\'application "Apple Watch" sur votre iPhone et accédez à l\'onglet "Ma montre".  Faites défiler vers le bas : touchez "Wallet et Apple Pay", puis la carte et "Supprimer la carte".  3. Sur votre MacBook Pro avec Touch ID :  Accédez à "Préférences System" puis "Wallet et Apple Pay".  Cliquez sur la carte que vous souhaitez supprimer puis cliquez sur le signe « moins » et confirmez.',
+    sourceRef: '?question=comment-supprimer-carte-apple-pay'
+  },
+  {
+    answer:
+      'Oui, mais seules les transactions effectuées via Apple Pay avec vos appareils Apple sont affichées.  Lorsque vous affichez vos cartes dans "Wallet", vous voyez la dernière opération effectuée à l\'aide de chaque carte.  Vous pouvez également voir les dix dernières transactions portées en activant l\'option dans l\'onglet "Transactions".    L\'historique des transactions est seulement disponible sur iPhone, iPad et MacBook Pro avec Touch ID. Vos transactions effectuées avec votre Apple Watch seront enregistrées sur votre iPhone.     Par ailleurs, comme les paiements effectués avec votre carte physique, tous les paiements via Apple Pay sont restitués sur votre relevé de compte.     À savoir :  L\'application "Wallet Apple" affiche en historique des paiements les montants de demande d\'autorisation et les montants compensés ; ainsi, lorsqu\'un paiement est effectué, il est visible à l\'état "en attente" avec le montant de la demande d\'autorisation.  Dans certains cas spécifiques, le montant de la demande d’autorisation peut être différent du montant réel (le paiement dans les stations essence par exemple). Puis, suite au mouvement de compensation, il est visible à l\'état  "accepté" avec le montant compensé.',
+    sourceRef: '?question=puis-je-consulter-mon-wallet-lhistorique-mes-transactions-reglees-partir-apple-pay'
+  },
+  {
+    answer:
+      "Le nombre de cartes que vous pouvez enregistrer dépend de l'appareil Apple que vous possédez : Sur Apple Watch Series 3, iPhone 8 et iPhone 8 Plus, ainsi que sur les modèles ultérieurs, vous pouvez ajouter jusqu'à 12 cartes sur un appareil.    Sur les modèles plus anciens, vous pouvez ajouter jusqu'à 8 cartes par appareil.    À savoir : Si vous souhaitez avoir la même carte sur différents appareils, il faut enregistrer votre carte sur chaque appareil.",
+    sourceRef: '?question=combien-cartes-puis-je-enregistrer-apple-pay'
+  },
+  {
+    answer:
+      "Si vous avez perdu votre appareil Apple ou qu'on vous l'a volé : Connectez-vous sur le site internet www.icloud.com. Utilisez la fonctionnalité \"Localiser mon iPhone\" afin d'indiquer votre appareil en mode \"Perdu\" ou d'effacer directement votre appareil via \"Effacer l'iPhone\".  Le mode \"Perdu\" suspendra vos cartes sur cet appareil et empêchera la personne en possession de votre appareil d'effectuer des achats.  La suppression de l'appareil entraînera la suppression totale des informations contenues dans l'appareil dont vos cartes enregistrées.     Vos cartes seront supprimées d'Apple Pay même si l'appareil n'est connecté à aucun réseau Wi-Fi ou de données mobiles.",
+    sourceRef: '?question=se-passe-t-il-cas-perte-de-vol-ma-carte-bancaire'
+  },
+  {
+    answer:
+      'Apple Pay est complètement décorrélé de la "Protection Internet".  Ainsi, vous pourrez effectuer vos paiements avec Apple Pay en ligne, même si vous avez activé la "Protection Internet" de votre carte.',
+    sourceRef: '?question=se-passe-t-il-si-ai-active-la-protection-internet-ma-carte'
+  },
+  {
+    answer:
+      'Le plafond maximal de dépense avec Apple Pay est le même que celui de votre carte bancaire. Vous pouvez le consulter en ligne depuis votre espace client. Il est toutefois possible que les commerçants aient défini leurs propres plafonds de montant.',
+    sourceRef: '?question=existe-t-il-limite-paiement-apple-pay'
+  },
+  {
+    answer:
+      'Pour la configuration de vos cartes bancaires dans Apple Pay, un identifiant iCloud, un code d\'accès ou un Touch ID ainsi que la dernière version iOS sont requis.    Selon votre appareil Apple, voici comment procéder :  Sur votre iPhone Via "Wallet" : Touchez "Ajoutez une carte bancaire" ou cliquez sur le signe "+" situé en haut à droite. Suivez ensuite les instructions d\'installation. Via "Réglages" : Ouvrez "Wallet > Apple Pay" et touchez "Ajoutez une carte bancaire". Suivez ensuite les instructions d\'installation. Sur votre Apple Watch Ouvrez l\'application "Apple Watch" sur votre iPhone et accédez à l\'onglet "Ma montre". Cliquez ensuite sur "Wallet et Apple Pay". Pour terminer, cliquez sur "Ajouter une nouvelle carte", puis suivez les instructions d\'installation. Sur votre iPad Ouvrez "Réglages" et cliquez sur "Wallet et Apple Pay". Sélectionnez ensuite "Ajouter une nouvelle carte" puis suivez les instructions d\'installation. Sur votre MacBook Pro avec Touch ID Accédez à "Préférences Système" puis cliquez sur "Wallet et Apple Pay". Sélectionnez ensuite "Ajouter une nouvelle carte" puis suivez les instructions d\'installation. À savoir :  Sur les modèles de Mac non équipés d\'un système Touch ID intégré :  vous pouvez seulement terminer votre achat avec Apple Pay à l\'aide de votre iPhone ou Apple Watch compatible. Dans ce cas : allez sur votre Mac, puis dans "Préférences système", cliquez ensuite sur "Wallet et Apple Pay" et activez "Autoriser les paiements sur Mac".   Pour plus d\'informations, consultez la page dédiée sur le site Internet d\'Apple.',
+    sourceRef: '?question=comment-enregistrer-apple-pay'
+  },
+  {
+    answer:
+      'La première carte que vous allez ajouter dans votre "Wallet" deviendra votre carte par défaut. Pour changer de carte par défaut, suivez les étapes ci-dessous : elles diffèrent selon l\'appareil Apple que vous utilisez.   1. Sur votre iPhone (y compris lorsque vous utilisez votre Apple Watch) :  Ouvrez l\'application "Wallet".   Maintenez votre doigt sur la carte que vous voulez paramétrer par défaut.   Déplacez votre carte en première position dans "Wallet".   2. Sur votre iPad : Allez dans "Réglages", puis "Wallet" et "Apple Pay". Cliquez sur "Carte par défaut". Choisissez une nouvelle carte et confirmez le changement.   3. Sur votre MacBook Pro avec Touch ID :  Ouvrez "System Préférences".  Sélectionnez "Wallet" et "Apple Pay".   Choisissez une nouvelle carte en utilisant le menu déroulant et confirmez le changement.    À savoir : pour plus d\'informations, accédez à la page dédiée sur le site Internet d\'Apple.',
+    sourceRef: '?question=comment-changer-carte-defaut-apple-pay'
+  },
+  {
+    answer: "Les détenteurs d'une carte de paiement particuliers MasterCard® pourront associer leur carte au service Garmin Pay.",
+    sourceRef: '?question=sont-cartes-eligibles-les-montres-garmin'
+  },
+  {
+    answer: "Absolument, le service Garmin Pay est gratuit au téléchargement comme à l'utilisation.",
+    sourceRef: '?question=service-garmin-pay-gratuit'
+  },
+  {
+    answer:
+      'La suspension de votre carte dans Garmin Pay s\'effectue via la section "Portefeuille" de votre application. La suspension permet de garder la carte dans le portefeuille sans pouvoir l’utiliser. Dans votre application, sur la page de votre montre, sélectionnez "Garmin Pay" puis "Gérer votre portefeuille" ; sélectionnez ensuite une option : Pour suspendre une carte spécifique, sélectionnez la carte, puis sélectionnez "Suspendre".   Pour suspendre temporairement toutes les cartes de votre portefeuille, sélectionnez "Suspendre le portefeuille". Pour annuler la suspension de votre portefeuille, sélectionnez "Annuler la suspension du portefeuille". À savoir : Retenez tout de même que personne ne peut effectuer de paiement sans le code PIN de la montre.',
+    sourceRef: '?question=comment-suspendre-carte-garmin-pay'
+  },
+  {
+    answer:
+      "Il n'est pas possible de consulter l'historique de vos transactions avec Garmin Pay.  Cependant, en consultant vos comptes, vous pouvez accéder aux transactions effectuées avec Garmin Pay : vous les verrez apparaître sur vos relevés de comptes ou en ligne dans votre espace client.",
+    sourceRef: '?question=ou-puis-je-voir-historique-mes-transactions-realisees-garmin-pay'
+  },
+  {
+    answer:
+      "Vous n'avez pas besoin d'avoir votre téléphone à proximité pour utiliser Garmin Pay.  Après les avoir configurés, vous pouvez effectuer des paiements depuis votre montre et laisser votre téléphone à la maison.",
+    sourceRef: '?question=ai-je-besoin-avoir-telephone-proximite-pour-utiliser-garmin-pay'
+  },
+  {
+    answer:
+      'Deux situations sont possibles : Pour supprimer une carte spécifique, sélectionnez-la dans votre portefeuille, puis sélectionnez "Supprimer".   Pour supprimer toutes les cartes de votre portefeuille, sélectionnez "Supprimer le portefeuille".  Votre portefeuille Garmin Pay et toutes les informations de carte associées sont supprimés.  À savoir : Vous ne pouvez pas payer à l\'aide de votre montre tant que vous n\'avez pas créé un nouveau portefeuille et ajouté de carte.',
+    sourceRef: '?question=comment-supprimer-carte-garmin-pay'
+  },
+  {
+    answer:
+      'Si vous perdez votre montre Garmin, vous pouvez supprimer la carte que vous aviez ajoutée à l\'aide de la section "Portefeuille" de l\'application Garmin Connect.    À savoir : Vous pourrez toujours effectuer des paiements en utilisant votre carte physique. Contactez "SOS Cartes" au 02 98 28 42 28 en cas de perte ou de vol de la carte physique afin de faire opposition (depuis l\'étranger, composez le +33 2 98 28 42 28).    Personne ne peut utiliser votre montre pour effectuer un paiement sans avoir saisi dans un premier temps votre code PIN personnel à 4 chiffres : il est donc important de ne pas le divulguer.',
+    sourceRef: '?question=comment-faire-cas-perte-ma-montre-garmin'
+  },
+  {
+    answer:
+      "Téléchargez l'application \"Garmin Connect\" sur l'App Store ou sur le Play Store. Sélectionnez votre type de montre pour la connecter et cliquez sur Garmin Pay. 1. Si vous n'avez pas encore configuré votre portefeuille Garmin Pay :  Cliquez sur \"Configurer Garmin Pay\". Acceptez les conditions d'utilisation du service. Sécurisez votre portefeuille grâce à un code à 4 chiffres.   2. Si vous avez déjà configuré votre portefeuille Garmin Pay : Cliquez ensuite sur \"Gérer mon portefeuille\". Sélectionnez le type de carte que vous souhaitez ajouter.  Saisissez les données de votre carte (ou scannez la), puis entrez vos coordonnées. Acceptez les conditions générales d'utilisation du service. Un code de vérification vous sera alors transmis par SMS : vous n'aurez plus qu'à le saisir et votre carte sera enregistrée.",
+    sourceRef: '?question=comment-configurer-garmin-pay'
+  },
+  {
+    answer:
+      'Afin de réinitialiser votre code PIN (code d\'accès à la montre Garmin), vous devez vous souvenir du mot de passe pour pouvoir en définir un nouveau.  Dans le tableau de bord de l\'application Garmin Pay, cliquez sur "Réinitialiser le code", puis suivez les instructions.',
+    sourceRef: '?question=comment-puis-je-reinitialiser-code-acces-garmin-pay'
+  },
+  {
+    answer:
+      'Pour vous inscrire à Paylib la première fois, suivez les étapes suivantes : Enregistrez votre mobile comme appareil de confiance. Cliquez sur "Activer Paylib" dans votre application "CMSO Paiements Mobile".  Choisissez un identifiant (adresse e-mail) et un mot de passe Paylib.  Sélectionnez une carte bancaire préférentielle pour vos achats ; ce choix de carte est modifiable à tout moment. Sélectionnez un compte favori. Sélectionnez le mode de validation de vos paiements : par code de sécurité ou empreinte digitale.  Une fois les conditions générales acceptées, vous serez alors inscrit à Paylib.   À savoir :  Si votre mobile est éligible au paiement "Paylib en magasin", ce service sera activé d’office sur la carte préférentielle Paylib. Il sera opérationnel après installation de différents éléments sécurisés sur votre mobile : vous recevrez une notification dès que le service sera disponible.',
+    sourceRef: '?question=comment-inscrire-paylib-7410'
+  },
+  {
+    answer:
+      'Si vous perdez votre montre Garmin, vous pouvez supprimer la carte que vous aviez ajoutée à l\'aide de la section "Portefeuille" de l\'application Garmin Connect. À savoir : Vous pourrez toujours effectuer des paiements en utilisant votre carte physique. Contactez "SOS Cartes" au 05 56 24 28 28 en cas de perte ou de vol de la carte physique afin de faire opposition (depuis l\'étranger, composez le +33 2 98 28 42 28). Personne ne peut utiliser votre montre pour effectuer un paiement sans avoir saisi dans un premier temps votre code PIN personnel à 4 chiffres : il est donc important de ne pas le divulguer.',
+    sourceRef: '?question=comment-faire-cas-perte-ma-montre-garmin-8106'
+  },
+  {
+    answer:
+      "Si vous remplacez votre appareil, vous devrez de nouveau enregistrer votre carte de paiement MasterCard®. Pensez à bien supprimer vos cartes sur Apple Pay si vous changez d'appareil (voir la question : Comment supprimer une carte dans Apple Pay ? ). Vous pouvez aussi utiliser iCloud pour supprimer toutes les cartes enregistrées, même si vous n’êtes plus en possession de votre appareil.",
+    sourceRef: '?question=se-passe-t-il-quand-remplace-appareil-8697'
+  },
+  {
+    answer:
+      'Il existe deux possibilités pour utiliser "Paylib en magasin" : 1. Paiement express : un seul passage sur le lecteur du terminal de paiement du commerçant. Lancez le service "Paylib en magasin" dans l\'appli "CMSO Paiements" sur votre smartphone. Cliquez sur le bandeau "PAIEMENT EXPRESS EN MAGASIN". Autorisez le paiment par reconnaissance de votre empreinte digitale (*) ou en saisissant le code de sécurité. Présentez le smartphone sur le terminal de paiement sans contact du commerçant pour réaliser le paiement.  2. Paiement confort : deux passages sur le lecteur du terminal de paiement du commerçant permettent de lancer votre application et de visualiser le montant de la transaction directement sur le smartphone. Présentez votre smartphone, écran déverrouillé, sur le terminal de paiement du commerçant pour initier automatiquement le service "Paylib en magasin". Authentifiez-vous en saisissant le code de sécurité, ou par reconnaissance de votre empreinte digitale (*).  Présentez le smartphone sur le terminal de paiement sans contact du commerçant pour réaliser le paiement. (*) Si vous choisissez l\'authentification par empreinte digitale, il se peut néanmoins que la saisie du code de sécurité vous soit demandée (en cas de non-reconnaissance de l\'empreinte ou pour des raisons de sécurité).',
+    sourceRef: '?question=comment-payer-avec-paylib-magasin'
+  },
+  {
+    answer:
+      "Le service Apple Pay est accessible pour tous les clients détenteurs d’une carte bancaire CB MasterCard® délivrée par le Crédit Mutuel du Sud-Ouest. Les détenteurs d'une carte Visa ne peuvent pas bénéficier de ce service. À savoir :  Les clients mineurs (de plus de 13 ans) pourront enregistrer leur carte rechargeable. Découvrez comment s'enregistrer dans Apple Pay.",
+    sourceRef: '?question=cartes-sont-eligibles-service-apple-pay-10040'
+  },
+  {
+    answer:
+      'Dans un premier temps, vous devez faire opposition sur votre carte. Pour cela, contactez "SOS Cartes" au 05 56 24 28 28 (depuis l\'étranger, composez le +33 2 98 28 42 28). En mettant votre carte en opposition, celle-ci ne peut plus être utilisée via Apple Pay. En complément de votre mise en opposition, nous supprimerons automatiquement toutes les cartes virtuelles associées à la carte réelle. Quand vous recevrez votre nouvelle carte, vous devrez enregistrer à nouveau cette nouvelle carte dans Apple Pay avant d\'effectuer des paiements avec votre iPhone, iPad ou Apple Watch.',
+    sourceRef: '?question=se-passe-t-il-cas-perte-de-vol-ma-carte-bancaire-associee-apple-pay'
+  },
+  {
+    answer:
+      'Voici les conditions pour pouvoir s\'inscrire à Paylib : Vous devez détenir une carte de paiement CB MasterCard® pour "Paylib en ligne" et "Paylib en magasin" ou Visa pour "Paylib en ligne".   Préalablement à votre inscription, votre mobile doit être enregistré en appareil de confiance. Vous pouvez facilement le faire en cliquant sur le bouton "Enregistrer mon appareil" depuis l\'appli CMSO. Cet enregistrement est aujourd\'hui obligatoire pour pouvoir utiliser l\'appli CMSO.  Pour utiliser Paylib, il faudra installer ensuite l\'appli "CMSO Paiements Mobile" qui regroupe les fonctionnalités Paylib.',
+    sourceRef: '?question=sont-conditions-sinscrire-paylib-10044'
+  },
+  {
+    answer:
+      "Pour recevoir l'argent, il faut activer Paylib. Si vous ne l'avez pas encore fait, voici comment procéder :  Vous avez dû recevoir un SMS avec un lien cliquable.  Cliquez sur ce lien qui vous redirigera vers le site web de Paylib.  Renseignez votre IBAN pour recevoir directement l'argent sur votre compte bancaire sous 3 jours maximum.  À savoir :  Pour la suite et afin d'obtenir l'argent instantanément, le plus simple est d'activer Paylib dans l'appli CMSO. Vous n'aurez alors rien à faire : votre paiement Paylib arrivera directement sur votre compte et vous serez notifié par SMS.",
+    sourceRef: '?question=ai-recu-paiement-paylib-comment-puis-je-recevoir-argent-mon-compte-bancaire'
+  },
+  {
+    answer:
+      "Oui !  Si vous n'avez pas encore activé Paylib, vous recevrez un SMS avec un lien cliquable.  Vous n'aurez qu'à cliquer sur ce lien qui vous redirigera vers le site web de Paylib.  Renseignez votre IBAN pour recevoir directement l'argent sur votre compte bancaire.  À savoir :  Pour la suite et afin d'obtenir l'argent instantanément, le plus simple sera d'activer Paylib depuis l'application CMSO Paiements Mobile. Votre Paylib arrivera directement sur votre compte et vous serez notifié par SMS.",
+    sourceRef: '?question=nai-encore-active-paylib-peut-on-tout-meme-envoyer-argent'
+  },
+  {
+    answer:
+      'Vous utilisez Paylib ou un objet connecté comme Apple Pay, Fitbit Pay ou Garmin Pay ? En cas de problème d’utilisation d’un de ces services, contactez l’assistance au numéro suivant : 0 969 320 819 (appel non surtaxé).',
+    sourceRef: '?question=numero-contacter-cas-probleme-un-moyen-paiement-connecte'
+  },
+  {
+    answer: "Les détenteurs d'une carte de paiement particuliers MasterCard® pourront associer leur carte au service Fitbit Pay.",
+    sourceRef: '?question=sont-cartes-eligibles-les-montres-fitbit'
+  },
+  {
+    answer:
+      'Avec "Paylib en magasin”, il n’y a pas de limite définie par le service Paylib. Le plafond d’utilisation du service "Paylib en magasin” est celui de votre carte bancaire. Ainsi, pensez à vérifier votre plafond de carte bancaire dans votre espace client. À savoir : Comment modifier votre plafond de carte bancaire ? Nous vous guidons pour le faire en toute autonomie depuis l’appli CMB.',
+    sourceRef: '?question=quel-montant-maximum-puis-je-payer-avec-paylib-en-magasin'
+  },
+  {
+    answer:
+      'Avec "Paylib en magasin”, il n’y a pas de limite définie par le service Paylib. Le plafond d’utilisation du service "Paylib en magasin” est celui de votre carte bancaire. Ainsi, pensez à vérifier votre plafond de carte bancaire dans votre espace client. À savoir : Comment modifier votre plafond de carte bancaire ? Nous vous guidons pour le faire en toute autonomie depuis l’appli CMSO.',
+    sourceRef: '?question=quel-montant-maximum-puis-je-payer-avec-paylib-en-magasin-47234'
+  },
+  {
+    answer:
+      'Vous pouvez télécharger un RIB ou IBAN depuis votre espace client, sur l\'appli CMB ou sur le site internet. Depuis l\'appli CMB Une fois connecté à l\'appli CMB, sélectionnez le raccourci "RIB" situé sous le compte concerné par votre demande de RIB. Pour des raisons de sécurité, cette action nécessite un contrôle renforcé. Validez cette opération avec votre code de sécurité à 5 chiffres, votre empreinte ou la reconnaissance faciale. Votre IBAN/BIC apparaît et vous pouvez le copier, le télécharger au format pdf ou le partager via les applications compatibles de votre téléphone ou tablette. Depuis le site internet cmb.fr Sur la page d\'accueil, en-dessous du solde de votre compte chèques, vous accédez au raccourci "RIB" (Pas besoin d\'aller dans le menu de gauche). Cliquez sur le raccourci "RIB" présent sous le compte qui vous intéresse. Vous accédez au "Détail compte". Cliquez à nouveau sur le raccourci "RIB" présent en dessous du solde de votre compte ou cliquez sur "Editer un IBAN/BIC" au niveau des "Actions". Cette opération sera validée par la saisie d\'un code reçu par SMS (Ne communiquez jamais par téléphone les codes que nous vous avons transmis). À savoir : Découvrez la procédure en images grâce à notre tutoriel "Télécharger un RIB" à partir de votre espace client sur le site cmb.fr.',
+    sourceRef: '?question=comment-obtenir-rib-iban-depuis-espace-client-ligne'
+  },
+  {
+    answer:
+      'Oui, vous pouvez ajouter un bénéficiaire en ligne, en France et dans 15 autres pays :  Allemagne, Autriche, Belgique, Espagne, Danemark, Finlande, Irlande, Islande, Italie, Norvège, Pays-Bas, Portugal, Royaume-Uni, Suède, Suisse.  Vous devez enregistrer ses coordonnées bancaires (RIB ou IBAN-BIC pour la France, IBAN-BIC pour les 15 autres pays).  Pour des raisons de sécurité, nous vous demandons de valider cette opération par un code à 6 chiffres que nous vous envoyons par SMS ou par message vocal sur votre téléphone fixe.  Bien entendu, vous pouvez modifier en ligne et à tout moment votre liste de bénéficiaires. Une fois connecté à votre espace client, vous pouvez gérer vos bénéficiaires par le menu « VIREMENTS » puis "Mes bénéficiaires".  Pour un bénéficiaire dans un autre pays, contactez votre conseiller.    À savoir : Pensez également à associer votre mobile à votre espace client : la création du nouveau bénéficiaire se fait alors en temps réel ; sinon, vous devrez attendre 48h.',
+    sourceRef: '?question=puis-je-ajouter-beneficiaire-ligne'
+  },
+  {
+    answer:
+      'Vous pouvez ajouter le RIB/IBAN d\'un nouveau bénéficiaire depuis l\'appli CMB ou depuis votre espace client sur le site internet. Ajouter depuis l\'appli CMB, en temps réel En bas de l\'écran, cliquez sur "Virement" , puis sélectionnez "Mes bénéficiaires". Cliquez sur "Ajouter un bénéficiaire" en bas de l\'écran et remplissez les caractéristiques du bénéficiaire. Renseignez votre code de sécurité à 5 chiffres puis cliquez sur "Valider". Vous pouvez également visualiser le tutoriel "Virements : comment ajouter un nouveau bénéficiaire depuis l\'appli CMB". Ajouter depuis votre espace client sur le site internet cmb.fr, sous 48h (si le bénéficiaire a son compte au CMB, l\'ajout est instantané) Cliquez à gauche sur "VIREMENTS". Trois onglets vous sont proposés en haut de page : sélectionnez "Mes bénéficiaires". Cliquez ensuite sur le bouton rouge "Ajouter un bénéficiaire" et remplissez les caractéristiques du bénéficiaire. Il est possible de préciser les libellés sur le compte à débiter et sur le compte à créditer. Vous pouvez également visualiser le tutoriel "Virements : comment ajouter un nouveau bénéficiaire depuis le site cmb.fr". À savoir :  Vous pouvez ajouter un bénéficiaire en ligne en France et dans 15 autres pays : Allemagne, Autriche, Belgique, Espagne, Danemark, Finlande, Irlande, Islande, Italie, Norvège, Pays-Bas, Portugal, Royaume-Uni, Suède, Suisse.  Si le pays du bénéficiaire n’est pas dans la liste, veuillez prendre contact avec votre conseiller.',
+    sourceRef: '?question=comment-ajouter-nouveau-beneficiaire'
+  },
+  {
+    answer:
+      'Le virement instantané ou encore paiement instantané est un virement en temps réel. Dès la validation du virement, moins de 10 secondes suffisent pour que les fonds soient crédités sur le compte du bénéficiaire.  Voici les caractéristiques du virement instantané :   Virement gratuit (1)  Virement instantané en euros Fonds utilisables en 10 secondes Disponible 24 heures sur 24, 7 jours sur 7, 365 jours et jours fériés compris Irrévocable Virement possible entre deux comptes français sous réserve que l’établissement bancaire du bénéficiaire soit ouvert au paiement instantané.  (1) Ces Services sont soumis au respect des dispositions des Conditions Générales des Comptes en vigueur et notamment aux conditions Générales applicables à la convention de compte de dépôt et aux Services de Banque à Distance. Tarification selon Conditions Tarifaires en vigueur.',
+    sourceRef: '?question=virement-instantane-quest-ce-cest'
+  },
+  {
+    answer:
+      "Le virement instantané vous permet d'envoyer jusqu'à 15 000 €.  Pensez à vérifier également vos plafonds de virement dans votre espace client.",
+    sourceRef: '?question=montant-maximum-puis-je-envoyer-virement-instantane'
+  },
+  {
+    answer:
+      'Le service de virement instantané est proposé sur le site internet et sur l\'appli CMSO dans la rubrique "VIREMENTS" de votre espace client.  Aucune démarche préalable n\'est nécessaire.',
+    sourceRef: '?question=comment-acceder-service-virement-instantane'
+  },
+  {
+    answer:
+      'En cas de rejet interbancaire du virement instantané, vous recevrez un mail pour vous prévenir que votre opération n’a pas pu aboutir.',
+    sourceRef: '?question=se-passe-t-il-si-virement-instantane-est-rejete'
+  },
+  {
+    answer:
+      'Vous pouvez réaliser un virement en France depuis votre espace client sur l\'appli CMB ou sur le site internet. En vous connectant à l\'appli CMB En bas de votre écran, cliquez sur "Virement", puis sélectionnez "Nouveau virement". Sélectionnez le compte à débiter. Sélectionnez ensuite le compte à créditer : vous pouvez choisir un de vos comptes, un bénéficiaire déjà enregistré ou ajouter un nouveau bénéficiaire. Saisissez le montant du virement puis cliquez sur "Suivant". Dans les caractéristiques, sélectionnez le "Type de virement" (Ponctuel, Différé ou Périodique). Le "Libellé du virement" est facultatif. Selon les caractéristiques de votre virement, le mode d’envoi "instantané" sera proposé par défaut si celui-ci est éligible. Dans le récapitulatif, vérifiez les éléments saisis pour le virement et cliquez sur "Confirmer". Depuis le site internet cmb.fr Sur la page d\'accueil, cliquez à gauche sur "VIREMENTS", et sélectionnez "Nouveau virement". Cliquez sur le compte à débiter. Cliquez ensuite le compte à créditer : vous pouvez sélectionner un de vos comptes ou un bénéficiaire déjà enregistré. Saisissez le montant du virement puis cliquez sur "Suivant". Dans les caractéristiques, sélectionnez le "Type de virement" (Ponctuel, Différé ou Périodique). Le "Libellé du virement" est facultatif. Choisissez un mode d\'envoi (si disponible) : instantané ou standard. Finalisez l\'action en cliquant sur "Confirmer". À savoir :  Depuis votre compte, vous pouvez réaliser un virement vers vos comptes et ceux de vos enfants (en tant que représentant légal) et vers les comptes sur lesquels vous avez une procuration (comptes mandataires). Pour réaliser un virement vers un livret, vous devez passer par l\'intermédiaire de votre compte. Vous souhaitez, par exemple, virer 250 € de votre Livret A vers votre Livret de Développement Durable et Solidaire  : deux étapes sont nécessaires pour réaliser cette opération : Faites un virement de 250 € de votre livret A vers votre compte. Virez ensuite les 250 € depuis votre compte vers votre Livret de Développement Durable et Solidaire.',
+    sourceRef: '?question=comment-realiser-virement-france'
+  },
+  {
+    answer:
+      "Un virement SEPA (Espace unique de paiements en Euro) est un virement en euros dans un des pays de La zone SEPA. Cette zone comprend les 27 pays de l'Union Européenne ainsi que  l'Islande, le Liechtenstein, la Norvège, la Suisse, le Royaume-Uni, le Vatican, Monaco, Saint-Marin et Andorre.  Dans la zone SEPA, tous les particuliers, entreprises, commerçants, associations et administrations  peuvent effectuer des virements en euros aussi simplement et dans les mêmes conditions de sécurité, de délai et de prix que dans leur propre pays.  Pour des raisons de sécurité, la liste des pays accessibles sur notre site Internet pour les virements SEPA reste limitée aux pays suivants : Allemagne, Belgique, Danemark, Espagne, France, Grèce, Irlande, Italie, Luxembourg, Pays-Bas, Portugal, Royaume-Uni. Si vous souhaitez faire un virement SEPA dans un des 15 autres pays de la zone SEPA, contactez votre conseiller. Votre virement sera de type SEPA sous les conditions suivantes (dans tous les autres cas il sera considéré comme un virement international) : La devise du compte à débiter est l'Euro. La devise du montant de l'opération est l'Euro. La devise du règlement de l'opération est l'Euro. Le format des coordonnées bancaires du compte bénéficiaire est l'IBAN-BIC. Le pays de la banque de destination appartient à la zone SEPA. La banque de destination adhère à SEPA. Le type de frais sélectionné est SHA (frais partagés).  À savoir : Au sein de la zone EEE (Espace Economique Européen), il est possible de faire un virement en devise au même tarif que celui de la zone SEPA en euros : pour cela, il faut que la devise soit celle du pays destinataire. Un exemple pour illustrer : Si je suis en France et que j'envoie un virement en zloty en Pologne, c'est le tarif SEPA qui s'applique. Par contre, si je suis en France et que j'envoie un virement en dollars en Pologne, c'est le tarif international qui s'applique car la devise ne correspond pas au pays destinataire.   Attention : la Suisse, Monaco, Andorre, le Vatican et San Marin ne sont pas dans la zone EEE.",
+    sourceRef: '?question=est-ce-un-virement-sepa'
+  },
+  {
+    answer:
+      'Pour des raisons de sécurité, la modification des plafonds de virement est possible depuis l’appli CMB. Il est nécessaire d\'associer auparavant votre mobile à votre espace client (appareil de confiance). Pour modifier vos plafonds de virement, connectez-vous à l\'appli CMB : Cliquez sur l\'icône "Virement" en bas de l’écran, puis sélectionnez "Plafonds de virements". Cliquez sur le bouton “Modifier”. Indiquez le plafond que vous souhaitez ainsi que sa durée, puis cliquez sur "Continuer". Renseignez votre code de sécurité à 5 chiffres afin de confirmer la prise en compte de ce nouveau plafond puis cliquez sur "Valider". Votre modification est immédiatement prise en compte. À savoir :  Découvrez également notre tutoriel : Modifier le plafond de vos virements. Si vous souhaitez modifier les plafonds au-delà des valeurs qui vous sont proposées (au-dessus de 10 000 €) , votre conseiller se tient à votre disposition.',
+    sourceRef: '?question=comment-modifier-plafonds-virement-8150'
+  },
+  {
+    answer:
+      'Vous pouvez ajouter le RIB/IBAN d\'un nouveau bénéficiaire depuis l\'appli CMSO ou depuis votre espace client sur le site internet. Ajouter depuis l\'appli CMSO, en temps réel En bas de l\'écran, cliquez sur "Virement", puis sélectionnez "Mes bénéficiaires". Cliquez sur "Ajouter un bénéficiaire" en bas de l\'écran et remplissez les caractéristiques du bénéficiaire. Renseignez votre code de sécurité à 5 chiffres puis cliquez sur "Valider". Vous pouvez également visualiser le tutoriel "Virements : comment ajouter un nouveau bénéficiaire depuis l\'appli CMSO". Ajouter depuis votre espace client sur le site internet cmso.com, sous 48h (si le bénéficiaire a son compte au CMSO, l\'ajout est instantané) Cliquez à gauche sur "VIREMENTS". Trois onglets vous sont proposés en haut de page : sélectionnez "Mes bénéficiaires". Cliquez ensuite sur le bouton rouge "Ajouter un bénéficiaire" et remplissez les caractéristiques du bénéficiaire. Il est possible de préciser les libellés sur le compte à débiter et sur le compte à créditer. Vous pouvez également visualiser le tutoriel "Virements : comment ajouter un nouveau bénéficiaire depuis le site cmso.com". À savoir : Vous pouvez ajouter un bénéficiaire en ligne en France et dans 15 autres pays : Allemagne, Autriche, Belgique, Espagne, Danemark, Finlande, Irlande, Islande, Italie, Norvège, Pays-Bas, Portugal, Royaume-Uni, Suède, Suisse. Si le pays du bénéficiaire n’est pas dans la liste, veuillez prendre contact avec votre conseiller.',
+    sourceRef: '?question=comment-ajouter-nouveau-beneficiaire-8194'
+  },
+  {
+    answer:
+      'Pour des raisons de sécurité, la modification des plafonds de virement est possible seulement depuis l’appli CMSO. Il est nécessaire d\'associer auparavant votre mobile à votre espace client (appareil de confiance).  Pour modifier vos plafonds de virement, connectez-vous à l\'appli CMSO : Cliquez sur l\'icône "Virement" en bas de l’écran, puis sélectionnez "Plafonds de virements". Cliquez sur le bouton “Modifier”. Indiquez le plafond que vous souhaitez ainsi que sa durée, puis cliquez sur "Continuer". Renseignez votre code de sécurité à 5 chiffres afin de confirmer la prise en compte de ce nouveau plafond puis cliquez sur "Valider". Votre modification est immédiatement prise en compte. À savoir :  Découvrez également notre tutoriel : Modifier le plafond de vos virements. Si vous souhaitez modifier les plafonds au-delà des valeurs qui vous sont proposées (au-dessus de 10 000 €), votre conseiller se tient à votre disposition.',
+    sourceRef: '?question=comment-modifier-plafonds-virement-8196'
+  },
+  {
+    answer:
+      'Vous pouvez réaliser un virement en France depuis votre espace client sur l\'appli CMSO ou sur le site internet. En vous connectant à l\'appli CMSO En bas de votre écran, cliquez sur "Virement", puis sélectionnez "Nouveau virement". Sélectionnez le compte à débiter. Sélectionnez ensuite le compte à créditer : vous pouvez choisir un de vos comptes, un bénéficiaire déjà enregistré ou ajouter un nouveau bénéficiaire. Saisissez le montant du virement puis cliquez sur "Suivant". Dans les caractéristiques, sélectionnez le "Type de virement" (Ponctuel, Différé ou Périodique). Le "Libellé du virement" est facultatif. Selon les caractéristiques de votre virement, le mode d’envoi "instantané" sera proposé par défaut si celui-ci est éligible. Dans le récapitulatif, vérifiez les éléments saisis pour le virement et cliquez sur "Confirmer". Depuis le site internet cmso.com Depuis la page d\'accueil, cliquez à gauche sur "VIREMENTS", et sélectionnez "Nouveau virement". Cliquez sur le compte à débiter. Cliquez ensuite le compte à créditer : vous pouvez sélectionner un de vos comptes ou un bénéficiaire déjà enregistré. Saisissez le montant du virement puis cliquez sur "Suivant". Dans les caractéristiques, sélectionnez le "Type de virement" (Ponctuel, Différé ou Périodique). Le "Libellé du virement" est facultatif. Choisissez un mode d\'envoi (si disponible) : instantané ou standard. Finalisez l\'action en cliquant sur "Confirmer". À savoir : Depuis votre compte, vous pouvez réaliser un virement vers vos comptes et ceux de vos enfants (en tant que représentant légal) et vers les comptes sur lesquels vous avez une procuration (comptes mandataires). Pour réaliser un virement vers un livret, vous devez passer par l\'intermédiaire de votre compte. Vous souhaitez, par exemple, virer 250 € de votre Livret A vers votre Livret de Développement Durable et Solidaire  : deux étapes sont nécessaires pour réaliser cette opération : Faites un virement de 250 € de votre livret A vers votre compte. Virez ensuite les 250 € depuis votre compte vers votre Livret de Développement Durable et Solidaire.',
+    sourceRef: '?question=comment-realiser-virement-france-8384'
+  },
+  {
+    answer:
+      'Le service de virement instantané est proposé sur le site internet et sur l\'appli CMB dans la rubrique "VIREMENTS" de votre espace client. Aucune démarche préalable n\'est nécessaire.',
+    sourceRef: '?question=comment-acceder-service-virement-instantane-9507'
+  },
+  {
+    answer:
+      'Vous pouvez télécharger un RIB ou IBAN depuis votre espace client, sur l\'appli CMSO ou sur le site internet. Depuis l\'appli CMSO Une fois connecté à l\'appli CMSO, sélectionnez le raccourci "RIB" situé sous le compte concerné par votre demande de RIB. Pour des raisons de sécurité, cette action nécessite un contrôle renforcé. Validez cette opération avec votre code de sécurité à 5 chiffres, votre empreinte ou la reconnaissance faciale. Votre IBAN/BIC apparaît et vous pouvez le copier, le télécharger au format pdf ou le partager via les applications compatibles de votre téléphone ou tablette. Depuis le site internet cmso.com Sur la page d\'accueil, en-dessous du solde de votre compte chèques, vous accédez au raccourci "RIB" (Pas besoin d\'aller dans le menu de gauche). Cliquez sur le raccourci "RIB" présent sous le compte qui vous intéresse. Vous accédez au "Détail compte". Cliquez à nouveau sur le raccourci "RIB" présent en dessous du solde de votre compte ou cliquez sur "Editer un IBAN/BIC" au niveau des "Actions". Cette opération sera validée par la saisie d\'un code reçu par SMS (Ne communiquez jamais par téléphone les codes que nous vous avons transmis). À savoir : Découvrez la procédure en images grâce à notre tutoriel "Télécharger un RIB" à partir de votre espace client sur le site cmso.com.',
+    sourceRef: '?question=comment-telecharger-rib-iban'
+  },
+  {
+    answer:
+      'Vous pouvez activer ou désactiver la fonctionnalité "sans contact", gratuitement et à tout moment depuis votre espace client sur le site internet :  Dans le menu, cliquez sur "MES MOYENS DE PAIEMENT", sélectionnez "Mes cartes".   Sélectionnez la carte sur laquelle vous souhaitez activer ou désactiver le paiement sans contact.  Dans "Options de la carte", puis "Paiement sans contact", vous pouvez activer ou désactiver le paiement sans contact en cliquant sur le crayon.   À savoir :  Pour finaliser l\'activation ou la désactivation de la fonctionnalité "sans contact", vous devez réaliser un retrait avec saisie du code confidentiel. Vous pouvez payer "sans contact" jusqu\'à 50 €.',
+    sourceRef: '?question=comment-activer-desactiver-paiement-contact-ma-carte-bancaire'
+  },
+  {
+    answer:
+      'Oui, certains sites marchands ont renforcé la sécurité des paiements en ligne :  Ces sites ont adhéré au programme 3D Secure proposé par Visa et MasterCard® ; ils sont facilement reconnaissables par les logos « Verified by Visa » et « Mastercard Securecode » qui apparaissent sur la page du paiement.  Ils exigent désormais un contrôle supplémentaire (comme par exemple votre date de naissance ou un code à usage unique reçu par SMS) en plus de votre numéro de carte. Pour pouvoir recevoir ce code, il est donc important que votre numéro de mobile soit renseigné. Pensez à vérifier ce point avec votre conseiller.',
+    sourceRef: '?question=certains-sites-marchands-demandent-date-naissance-plus-mon-numero-carte-est-ce-normal'
+  },
+  {
+    answer:
+      "Pour consulter vos comptes bancaires en toute sécurité, il est conseillé d'appliquer certaines règles :  Connectez-vous toujours à votre site bancaire depuis un ordinateur équipé d'un pare-feu et d'un anti-virus à jour. Evitez de vous connecter depuis un ordinateur public (exemple : cybercafé, salle de jeux, etc) : vous ne pouvez pas savoir si celui-ci est infecté ou non par un virus.  Contrôlez systématiquement que l'adresse de votre site bancaire commence bien par HTTPS://  Vérifiez l'authenticité et la validité du certificat de sécurité du site auquel vous accédez en cliquant sur le petit cadenas situé à côté de la barre d'adresse du navigateur avant même de saisir vos identifiant et mot de passe.  Si le mode d'authentification de votre site bancaire a subitement changé et que vous n'avez pas été informé au préalable, faites-vous confirmer ce changement en contactant l'assistance au : 0969 360 220.  Saisissez toujours votre mot de passe à l'abri des regards.  Pour quitter votre site bancaire, utilisez toujours le bouton \"Déconnexion\" ou \"Quitter\" mis à disposition.",
+    sourceRef: '?question=comment-acceder-toute-securite-a-mon-espace-client-ligne'
+  },
+  {
+    answer:
+      "Le mot de passe est l'élément qui garantit l'accès à vos données. Lors de sa création, il est conseillé d'appliquer certaines règles afin de garantir sa solidité. Ainsi, comment choisir un mot de passe robuste et aisément mémorisable ?     Une des meilleures techniques consiste à convertir une phrase en code alphanumérique, c'est à dire en alternant les chiffres et les lettres selon une méthode phonétique.    Exemples :   \"J'ai acheté un canot neuf\" peut être converti par \"ghet1kno9\".  \"Un oiseau a deux ailes\" peut être converti par \"1ouazoa2L\".       N'employez pas de noms communs évidents, de dates historiques, votre date de naissance, ou encore 1234567 ou ABCDEF. Cela constitue en effet une suite logique rapidement piratable.   Pour vous garantir un niveau d'accès à vos comptes hautement sécurisé, votre mot de passe doit être personnalisé et choisi méticuleusement.  Il doit contenir de 10 à 16 caractères, combinant des chiffres ET des lettres (les caractères spéciaux ne sont pas autorisés).   Nous vous invitons également à le modifier régulièrement et à ne pas utiliser une combinaison qui pourrait être facilement devinée par quelqu'un vous connaissant.   A savoir : N'hésitez pas à consulter tous nos conseils sur notre site dédié pour optimiser votre sécurité numérique.",
+    sourceRef: '?question=comment-bien-choisir-personnaliser-mot-passe'
+  },
+  {
+    answer:
+      "Le niveau de sécurité est renforcé sur les applications mobiles, ce qui vous permet de profiter de fonctionnalités supplémentaires : la modification de plafond de virement et de carte, l’ajout instantané de nouveaux bénéficiaires… En enregistrant votre smartphone/tablette en tant qu'appareil de confiance, un lien sécurisé s’établit entre notre système informatique interne et votre appareil que nous identifions de manière unique et infalsifiable.",
+    sourceRef: '?question=est-niveau-securite-des-applications-mobiles'
+  },
+  {
+    answer:
+      "Nous vous invitons à nous signaler toute anomalie en contactant sans délai votre conseiller en agence.  Vous y trouverez ses coordonnées sur la page d'accueil de votre espace client : vous pouvez le joindre via sa messagerie ou par téléphone.",
+    sourceRef: '?question=faire-si-constate-anomalie-mon-compte'
+  },
+  {
+    answer:
+      "Le plus souvent, les émetteurs de ces e-mails frauduleux se font passer :  Soit pour votre établissement bancaire Soit pour une société au nom et à la réputation largement reconnus, généralement issue du commerce électronique.    Sous un faux prétexte (exemple : mise à jour de vos données), le mail vous invite à cliquer sur un lien et à vous authentifier à l'aide de vos identifiant et mot de passe.    Pour en savoir plus sur les mails frauduleux ou le phishing, renseignez-vous sur notre site dédié.",
+    sourceRef: '?question=comment-reconnaitre-e-mail-frauduleux'
+  },
+  {
+    answer:
+      "De manière générale, nous vous rappelons que, par mesure de sécurité, nous ne vous demanderons jamais de saisir des informations de votre carte bancaire par e-mail, ou par téléphone.   Si jamais vous recevez un e-mail vous invitant à saisir des données personnelles​ : Ne répondez pas à ce e-mail, il s'agit d'une tentative d'arnaque.   Supprimez-le de votre messagerie.   Si vous avez répondu à ce mail, nous vous conseillons de prendre contact par téléphone avec votre conseiller en agence.",
+    sourceRef: '?question=ai-recu-mail-me-demande-indiquer-coordonnees-bancaires-que-dois-je-faire'
+  },
+  {
+    answer:
+      "Tout internaute a la possibilité de lutter contre les attaques de phishing en dénonçant l'adresse du site frauduleux.   Nous vous conseillons de signaler ce site / cette URL suspect(e) auprès d'analystes certifiés : Signal-Spam ou Phishing-initiative.   L'adresse fera l'objet d'une validation puis d'un blocage dans les navigateurs participants.",
+    sourceRef: '?question=ai-detecte-un-site-une-url-frauduleux-que-dois-je-faire'
+  },
+  {
+    answer:
+      "Vous trouverez ci-dessous des réflexes à avoir pour éviter d'être victime de phishing :  Ne communiquez jamais vos identifiants et coordonnées bancaires par mail ou sur une page web accessible depuis un e-mail. Une exception cependant : si vous avez initié un dossier dématérialisé dans le cadre de signatures électroniques et de transfert de pièces justificatives.   Employez un navigateur récent équipé d'un filtre anti-phishing : Internet Explorer 10 et plus(1), Firefox 36 et plus(2), Chrome(3) ou Opera 12 et plus(4), Safari(5). Le mode d'authentification de votre site a subitement changé et vous n'avez pas été averti au préalable : ne saisissez aucune donnée et prenez contact avec l'assistance téléphonique de votre site bancaire.  Avant de saisir vos identifiant et mot de passe, assurez-vous que l'adresse de votre site bancaire commence bien par le terme \"https://\" et vérifiez son authenticité (certificat de sécurité) en cliquant sur le petit cadenas situé en bas à droite ou dans la barre d'adresse de votre navigateur. Ne communiquez jamais vos identifiant et mot de passe, ni vos codes de validation reçus par SMS.  À savoir : Si vous avez un doute...  Ne saisissez aucun code ou mot de passe.  Contactez l'assistance technique de votre site de banque à distance par téléphone et/ou par formulaire.  Changez votre mot de passe.",
+    sourceRef: '?question=comment-premunir-phishing-hameconnage'
+  },
+  {
+    answer:
+      "Le mot de passe est l'élément qui garantit l'accès à vos données. Lors de sa création, il est conseillé d'appliquer certaines règles afin de garantir sa solidité. Ainsi, comment choisir un mot de passe robuste et aisément mémorisable ?   Une des meilleures techniques consiste à convertir une phrase en code alphanumérique, c'est à dire en alternant les chiffres et les lettres selon une méthode phonétique.    Exemples :   \"J'ai acheté un canot neuf\" peut être converti par \"ghet1kno9\".  \"Un oiseau a deux ailes\" peut être converti par \"1ouazoa2L\".    N'employez pas de noms communs évidents, de dates historiques, votre date de naissance, ou encore 1234567 ou ABCDEF. Cela constitue en effet une suite logique rapidement piratable.   Pour vous garantir un niveau d'accès à vos comptes hautement sécurisé, votre mot de passe doit être personnalisé et choisi méticuleusement.  Il doit contenir de 10 à 16 caractères, combinant des chiffres ET des lettres (les caractères spéciaux ne sont pas autorisés).   Nous vous invitons également à le modifier régulièrement et à ne pas utiliser une combinaison qui pourrait être facilement devinée par quelqu'un vous connaissant.   À savoir : N'hésitez pas à consulter tous nos conseils sur notre site dédié pour optimiser votre sécurité numérique.",
+    sourceRef: '?question=comment-bien-choisir-personnaliser-mot-passe-10015'
+  },
+  {
+    answer:
+      "Le plus souvent, les émetteurs de ces e-mails frauduleux se font passer :  Soit, pour votre établissement bancaire Soit, pour une société au nom et à la réputation largement reconnus, généralement issue du commerce électronique.    Sous un faux prétexte (exemple : mise à jour de vos données), le mail vous invite à cliquer sur un lien et à vous authentifier à l'aide de vos identifiant et mot de passe.    Pour en savoir plus sur les mails frauduleux ou le phishing, renseignez-vous sur notre site dédié.",
+    sourceRef: '?question=comment-reconnaitre-e-mail-frauduleux-10025'
+  },
+  {
+    answer: "Oui. Les garanties d'assistance et d'assurance s'appliquent également aux paiements réalisés via le service Virtualis.",
+    sourceRef: '?question=utilisation-dune-carte-virtuelle-permet-elle-beneficier-garanties-assistance-dassurance-liees-ma-carte'
+  },
+  {
+    answer:
+      "Non, sur certains sites internet, il convient d'utiliser le numéro de votre carte bancaire réelle.  Il s'agit, par exemple des sites de réservation de billets de train ou de chambres d'hôtel. Votre carte bancaire prouve ainsi votre identité ; pour le commerçant, il s'agit de s'assurer que vous paierez bien votre ticket de transport ou votre chambre d'hôtel.",
+    sourceRef: '?question=puis-je-utiliser-numero-carte-virtuelle-tous-sites-internet'
+  },
+  {
+    answer:
+      'Oui.  Un remboursement est toujours possible avec Virtualis, même si la date de validité de votre numéro virtuel est dépassée.',
+    sourceRef: '?question=puis-je-obtenir-remboursement-achat-mon-e-commercant-si-reglement-a-effectue-avec-numero-carte-virtuelle'
+  },
+  {
+    answer:
+      "L'option Virtualis vous permet de faire vos achats sur Internet (ou par téléphone) en toute sécurité, sans partager votre numéro de carte bancaire réelle, évitant ainsi que vos données bancaires soient utilisées de manière frauduleuse. Un nouveau numéro de carte virtuelle est ainsi généré à chaque achat en ligne. L'achat avec ce numéro est par ailleurs limité en durée et montant. Cette option vous permet également de payer un abonnement prélevé tous les mois par exemple. À savoir : Découvrez comment créer une carte virtuelle. Découvrez davantage d'informations sur la sécurité de vos paiements avec Virtualis.",
+    sourceRef: '?question=est-interet-virtualis'
+  },
+  {
+    answer:
+      "Selon le type d'achat, les informations à renseigner diffèrent pour obtenir une carte Virtualis :  1. Vous souhaitez un numéro de carte virtuelle ? Précisez uniquement le montant maximum de l'achat : le numéro sera valable entre 1 et 24 mois.  L'achat peut être inférieur au montant saisi. 2. Vous souhaitez un numéro pour un achat de type \"abonnement\" avec des règlements étalés sur plusieurs mois et vous connaissez le montant global ? Indiquez le montant total de l'achat et la durée de validité du numéro (au maximum 24 mois). Le compte sera débité à chaque échéance fixée par le commerçant, du montant de l'abonnement, jusqu'à atteindre le montant total indiqué. Si l'un des deux critères (montant ou durée) est atteint, le numéro Virtualis ne sera plus valide. À savoir : Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Il suffit d’adapter le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant.",
+    sourceRef: '?question=informations-dois-je-renseigner-obtenir-numero-virtualis'
+  },
+  {
+    answer:
+      "Si le numéro de carte vous est demandé avant le calcul du prix total de votre achat (par exemple, sur certains sites étrangers, les frais de livraison sont inclus après la demande du n° de carte), renseignez un montant supérieur à votre achat.  Il s’agira du montant maximal possible, Virtualis n’ayant pas besoin du montant exact pour fonctionner. À savoir : Complétez la page de paiement du site marchand avec les données de la carte Virtualis créée, jamais avec celles de la carte réelle. Au moment de la création de la carte Virtualis, aucune somme n'est prélevée de votre compte. Votre compte sera débité au moment où le paiement est pris en compte par le commerçant. Vous pouvez payer un abonnement en ligne avec votre carte virtuelle Virtualis. Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Adaptez le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant.",
+    sourceRef: '?question=comment-utiliser-virtualis-connaitre-montant-exact-mon-achat'
+  },
+  {
+    answer:
+      "Oui, Virtualis vous permet de régler des achats en plusieurs fois (ex : abonnement). Il faut alors adapter le montant et la durée de votre carte virtuelle Virtualis à cet achat : Le montant à saisir correspond au montant total de l'achat (12 mensualités par exemple pour un abonnement sur 12 mois). La durée de vie de votre carte Virtualis doit coïncider avec la durée totale des paiements (ou de votre abonnement).",
+    sourceRef: '?question=puis-je-utiliser-virtualis-payer-abonnement-reglements-etales-plusieurs-mois'
+  },
+  {
+    answer:
+      "Oui, vous pouvez utiliser Virtualis sur Paypal. Deux situations sont possibles selon votre fréquence d'utilisation de Paypal : Vous utilisez régulièrement Paypal ? Nous vous conseillons d'utiliser un numéro Virtualis d'une durée de 24 mois sur lequel Paypal pourra prélever vos différents achats. Vous utilisez Paypal occasionnellement ? Vous pouvez utiliser un numéro différent à chaque fois.",
+    sourceRef: '?question=puis-je-utiliser-virtualis-paypal'
+  },
+  {
+    answer:
+      'Oui. Si vous possédez plusieurs cartes bancaires, vous pouvez choisir celle que vous voulez utiliser lors de la création de la carte virtuelle.  Les garanties d’assurance appliquées seront alors celles de la carte que vous avez choisie tout comme les plafonds spécifiques.',
+    sourceRef: '?question=puis-je-choisir-carte-laquelle-cree-le-numero-virtualis'
+  },
+  {
+    answer:
+      'Oui, Virtualis vous permet également de payer des achats sur internet ou par téléphone. D’ailleurs, nous vous conseillons fortement d\'utiliser ce service afin de protéger votre carte bancaire réelle. À savoir : Complétez la page de paiement du site marchand avec les données de la carte Virtualis créée, jamais avec celles de la carte réelle. Au moment de la création de la carte Virtualis, aucune somme n\'est prélevée de votre compte. Votre compte sera débité au moment où le paiement est pris en compte par le commerçant. Vous pouvez payer un abonnement en ligne avec votre carte virtuelle Virtualis. Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Adaptez le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant. Pour payer auprès des commerçants en ligne qui refusent les cartes virtuelles, vous devez renseigner les informations de votre carte réelle. Rendez-vous dans votre espace client pour désactiver momentanément la "Protection Internet de votre carte". Une fois votre paiement réalisé, pensez à réactiver la protection internet.',
+    sourceRef: '?question=puis-je-utiliser-virtualis-mes-achats-distance-telephone-par-correspondance'
+  },
+  {
+    answer:
+      "L'option Virtualis vous permet de faire vos achats sur Internet (ou par téléphone) en toute sécurité, sans partager votre numéro de carte bancaire réelle, évitant ainsi que vos données bancaires soient utilisées de manière frauduleuse. Un nouveau numéro de carte virtuelle est ainsi généré à chaque achat en ligne. L'achat avec ce numéro est par ailleurs limité en durée et montant. Cette option vous permet également de payer un abonnement prélevé tous les mois par exemple. À savoir :  Découvrez comment créer une carte virtuelle. Découvrez davantage d'informations sur la sécurité de vos paiements avec Virtualis.",
+    sourceRef: '?question=est-interet-virtualis-9509'
+  },
+  {
+    answer:
+      'Oui, Virtualis vous permet également de payer des achats sur internet ou par téléphone. D’ailleurs, nous vous conseillons fortement d\'utiliser ce service afin de protéger votre carte bancaire réelle. À savoir :  Complétez la page de paiement du site marchand avec les données de la carte Virtualis créée, jamais avec celles de la carte réelle. Au moment de la création de la carte Virtualis, aucune somme n\'est prélevée de votre compte. Votre compte sera débité au moment où le paiement est pris en compte par le commerçant. Vous pouvez payer un abonnement en ligne avec votre carte virtuelle Virtualis. Pour faciliter des paiements récurrents, vous pouvez enregistrer les données de votre carte Virtualis (sur un site commerçant qui le propose). Adaptez le montant et la durée de votre carte virtuelle à l’usage que vous aurez auprès de ce commerçant. Pour payer auprès des commerçants en ligne qui refusent les cartes virtuelles, vous devez renseigner les informations de votre carte réelle. Rendez-vous dans votre espace client pour désactiver momentanément la "Protection Internet de votre carte". Une fois votre paiement réalisé, pensez à réactiver la protection internet.',
+    sourceRef: '?question=puis-je-utiliser-virtualis-mes-achats-distance'
+  }
+];
 
-export const rawData = {
+export const csvMockRawData = {
   data: [
     [
       'Question ID',

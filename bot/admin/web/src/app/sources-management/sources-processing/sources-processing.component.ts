@@ -7,8 +7,6 @@ import { Fragment, Source } from '../models';
 import { SourceManagementService } from '../source-management.service';
 import { SelectByLengthComponent } from './select-by-length/select-by-length.component';
 
-import { cleanedData } from './sourceData';
-
 @Component({
   selector: 'tock-sources-processing',
   templateUrl: './sources-processing.component.html',
@@ -34,15 +32,18 @@ export class SourcesProcessingComponent implements OnInit, OnDestroy {
   }
 
   private loadSource(routeParams: Params) {
-    this.sourcesService.getSource(routeParams.sourceId).subscribe((data: Source) => {
-      this.fragments = SourceManagementService.getSourceFragments(data) as Fragment[];
-
-      this.onScroll();
+    this.sourcesService.getSource(routeParams.sourceId).subscribe((source: Source) => {
+      if (!source.normalizedData) {
+        this.router.navigate([`sources-management/board`]);
+      } else {
+        this.fragments = source.normalizedData;
+        this.onScroll(15);
+      }
     });
   }
 
-  onScroll(): void {
-    this.scrolledFragmentsIndex += 5;
+  onScroll(index = 5): void {
+    this.scrolledFragmentsIndex += index;
     this.scrolledFragments = this.fragments.slice(0, this.scrolledFragmentsIndex);
   }
 
@@ -103,18 +104,22 @@ export class SourcesProcessingComponent implements OnInit, OnDestroy {
 
   submitModalRef;
   submit(modalTemplateRef) {
-    this.submitModalRef = this.nbDialogService.open(modalTemplateRef);
+    // this.submitModalRef = this.nbDialogService.open(modalTemplateRef);
+    this.generateQuestions();
   }
 
-  cancelNextStep() {
-    this.submitModalRef.close();
-  }
+  // cancelNextStep() {
+  //   this.submitModalRef.close();
+  // }
 
   generateQuestions() {
     const selection = this.fragments.filter((f) => f.use);
-    this.sourcesService.sendPocSource(selection);
-    this.cancelNextStep();
-    // this.router.navigate([`sources-management/board`], { state: { action: 'splitting' } });
+
+    // this.router.navigate([`sources-management/board`], { state: { action: 'done' } });
+    this.sourcesService.sendPocSource(selection).subscribe((res) => {
+      // this.cancelNextStep();
+      this.router.navigate([`sources-management/board`], { state: { action: 'done' } });
+    });
   }
 
   private readonly document = inject(DOCUMENT);

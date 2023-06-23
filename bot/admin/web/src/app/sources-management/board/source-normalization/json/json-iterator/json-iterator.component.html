@@ -1,0 +1,56 @@
+<ng-container *ngFor="let list of recursiveList | keyvalue; let i = index">
+  <ul [class.root]="isRoot">
+    <li>
+      <div class="d-flex align-items-center justify-content-between">
+        <span>
+          <div
+            class="array font-weight-bold"
+            *ngIf="isArray(list.value)"
+          >
+            {{ list.key }}
+          </div>
+          <div
+            class="array"
+            *ngIf="!isArray(list.value) && !isPrimitive(list.value)"
+          >
+            {{ parentKey }} <span class="font-weight-bold">[{{ list.key }}]</span>
+          </div>
+          <span
+            class="font-weight-bold"
+            *ngIf="isPrimitive(list.value)"
+            >{{ list.key }}</span
+          >
+        </span>
+
+        <nb-select
+          placeholder="Select a data type"
+          size="tiny"
+          *ngIf="isPrimitive(list.value)"
+          (selectedChange)="selectDataType($event, list.key)"
+          class="my-2"
+        >
+          <nb-option
+            *ngFor="let dataType of dataTypesDefinition"
+            [value]="dataType.type"
+            >{{ dataType.label }}</nb-option
+          >
+        </nb-select>
+      </div>
+
+      <div
+        *ngIf="isPrimitive(list.value)"
+        class="pb-2"
+      >
+        {{ list.value }}
+      </div>
+      <tock-json-iterator
+        *ngIf="isRoot || i <= 5"
+        [dataTypesDefinition]="dataTypesDefinition"
+        [recursiveList]="list.value"
+        [parentKey]="list.key"
+        (riseSelection)="upriseSelection($event)"
+        isRoot="false"
+      ></tock-json-iterator>
+    </li>
+  </ul>
+</ng-container>

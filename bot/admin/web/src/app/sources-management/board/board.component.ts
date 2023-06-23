@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ComponentFactoryResolver, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbDialogService } from '@nebular/theme';
 import { Subject, takeUntil } from 'rxjs';
@@ -9,7 +9,8 @@ import { Source, sourceTypes } from '../models';
 import { SourceManagementService } from '../source-management.service';
 import { NewSourceComponent } from './new-source/new-source.component';
 import { SourceImportComponent } from './source-import/source-import.component';
-import { SourceNormalizationComponent } from './source-normalization/source-normalization.component';
+import { SourceNormalizationCsvComponent } from './source-normalization/csv/source-normalization-csv.component';
+import { SourceNormalizationJsonComponent } from './source-normalization/json/source-normalization-json.component';
 
 @Component({
   selector: 'tock-board',
@@ -27,11 +28,18 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   sources: Source[];
 
+  steps = [
+    { id: 'import', label: 'Source import', icon: 'file-add-outline', view: 'board' },
+    { id: 'splitting', label: 'Source selection', icon: 'scissors-outline', view: 'processing' },
+    { id: 'done', label: 'Source indexation', icon: 'checkmark-outline' }
+  ];
+
   constructor(
     private botConfiguration: BotConfigurationService,
     private nbDialogService: NbDialogService,
     private router: Router,
-    private sourcesService: SourceManagementService
+    private sourcesService: SourceManagementService,
+    private resolver: ComponentFactoryResolver
   ) {
     this.actionProcessing = this.router.getCurrentNavigation().extras?.state?.action;
   }
@@ -55,16 +63,16 @@ export class BoardComponent implements OnInit, OnDestroy {
         // tmp
         if (this.actionProcessing) {
           this.sources[0].isProcessing = this.actionProcessing;
-          switch (this.actionProcessing) {
-            case 'nlg':
-              this.sources[0].step = 'splitting';
-              break;
-            case 'faq':
-              this.sources[0].step = 'nlg';
-              break;
+          this.sources[0].step = this.actionProcessing;
+          if (this.actionProcessing === 'done') {
+            setTimeout(() => {
+              this.sources[0].isProcessing = undefined;
+            }, 3000);
           }
         }
         // //tmp
+
+        this.normalizeSource(this.sources[1]);
       });
   }
 
@@ -105,20 +113,13 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  steps = [
-    { id: 'import', label: 'Sources import', icon: 'file-add-outline', view: 'board' },
-    { id: 'splitting', label: 'Sources selection', icon: 'scissors-outline', view: 'processing' },
-    { id: 'done', label: 'Source imported', icon: 'checkmark-outline' }
-  ];
-  // { id: 'faq', label: 'Faqs creation', icon: 'book-open-outline', view: 'faqs-generation' }
-
   isStepDone(source: Source, stepId: string): boolean {
     const stepIndex = this.steps.findIndex((stp) => stp.id === stepId);
     const sourceStepIndex = this.steps.findIndex((stp) => stp.id === source.step);
     return sourceStepIndex >= stepIndex;
   }
 
-  stepAction(source: Source, stepId: string) {
+  stepAction(source: Source, stepId: string): void {
     if (source.isProcessing) {
       this.nbDialogService.open(ConfirmDialogComponent, {
         context: {
@@ -155,27 +156,38 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
   }
 
-  importSource(source: Source) {
+  importSource(source: Source): void {
     const modal = this.nbDialogService.open(SourceImportComponent, {
       context: {
         source: source
       }
     });
-    modal.componentRef.instance.onImport.subscribe((sourceRawData) => {
-      source.rawData = sourceRawData;
+    modal.componentRef.instance.onImport.subscribe((result) => {
+      source.fileFormat = result.fileFormat;
+      source.rawData = result.data;
       this.normalizeSource(source);
     });
   }
 
-  normalizeSource(source: Source) {
-    const modal = this.nbDialogService.open(SourceNormalizationComponent, {
-      context: {
-        source: source
-      }
-    });
-    modal.componentRef.instance.onNormalize.subscribe((normalization) => {
-      console.log(normalization);
-      source.normalization = normalization;
+  normalizeSource(source: Source): void {
+    let modal;
+    if (source.fileFormat === 'csv') {
+      modal = this.nbDialogService.open(SourceNormalizationCsvComponent, {
+        context: {
+          source: source
+        }
+      });
+    } else if (source.fileFormat === 'json') {
+      modal = this.nbDialogService.open(SourceNormalizationJsonComponent, {
+        context: {
+          source: source
+        }
+      });
+    }
+
+    modal.componentRef.instance.onNormalize.subscribe((normalizedData) => {
+      console.log(normalizedData);
+      source.normalizedData = normalizedData;
       source.step = 'import';
       modal.close();
       this.stepAction(source, 'splitting');

@@ -42,6 +42,27 @@
       </tock-form-control>
 
       <tock-form-control
+        label="id"
+        name="sourceId"
+        [controls]="sourceId"
+        [showError]="isSubmitted"
+      >
+        <nb-select
+          placeholder="Select the id column name"
+          formControlName="sourceId"
+          [fullWidth]="true"
+          [optionsListClass]="'option-list--break-word'"
+        >
+          <nb-option
+            *ngFor="let header of getColumnNames()"
+            [value]="header"
+          >
+            {{ header }}
+          </nb-option>
+        </nb-select>
+      </tock-form-control>
+
+      <tock-form-control
         label="Source reference"
         name="sourceRef"
         [controls]="sourceRef"

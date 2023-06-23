@@ -75,3 +75,8 @@ export function exportJsonDump(obj: Object, fileName: string): void {
 export function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
+
+export function isPrimitive(arg) {
+  var type = typeof arg;
+  return arg == null || (type != 'object' && type != 'function');
+}

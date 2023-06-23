@@ -24,13 +24,16 @@
         size="medium"
         (click)="submit(confirmNextStepModal)"
       >
-        Submit
+        Save
         <nb-icon icon="checkmark-outline"></nb-icon>
       </button>
     </div>
   </div>
 
-  <section class="py-2 mb-2 d-flex justify-content-between gap-1">
+  <section
+    class="py-2 mb-2 d-flex justify-content-between gap-1"
+    *ngIf="fragments"
+  >
     <div>{{ selectedFragments?.length }} / {{ fragments.length }} fragments selected</div>
 
     <div class="d-flex gap-1">

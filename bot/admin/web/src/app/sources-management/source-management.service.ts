@@ -1,26 +1,27 @@
-import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
-import { deepCopy } from '../shared/utils';
-import { normalization, rawData } from './mock-data';
+import { csvMockNormalizedData, csvMockRawData } from './mock-data-csv';
+import { jsonMockData } from './mock-data-json';
 import { Source, sourceTypes } from './models';
 
 const TMPsources: Source[] = [
   {
     id: '1234567879',
-    name: 'ArkInfo',
+    name: 'CMB Faqs',
     type: sourceTypes.file,
     step: 'import',
-    normalization: normalization,
-    rawData: rawData
+    fileFormat: 'csv',
+    rawData: csvMockRawData.data,
+    normalizedData: csvMockNormalizedData
   },
   {
     id: '987654321',
-    name: 'CMB Faqs',
-    type: sourceTypes.remote,
-    url: new URL('https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq')
+    name: 'ArkInfo',
+    type: sourceTypes.file,
+    fileFormat: 'json',
+    rawData: jsonMockData
   }
 ];
 
@@ -71,18 +72,6 @@ export class SourceManagementService {
     );
   }
 
-  static getSourceFragments(source: Source) {
-    const importData: [] = deepCopy(source.rawData.data);
-    importData.splice(0, 1);
-    return importData.map((entry) => {
-      const frag = {};
-      Object.entries(source.normalization).forEach((norm) => {
-        if (norm[1]) frag[norm[0].replace('Index', '')] = entry[norm[1]];
-      });
-      return frag;
-    });
-  }
-
   sendPocSource(selection) {
     const payload = selection.map((sel, index) => {
       return {
@@ -97,8 +86,6 @@ export class SourceManagementService {
     // /import-data-csv?source_name=application._id
     // const params = new HttpParams().set('source_name', this.stateService.currentApplication._id)
 
-    this.rest.post(`/import-data-csv`, payload).subscribe((res) => {
-      console.log(res);
-    });
+    return this.rest.post(`/import-data-csv`, payload);
   }
 }

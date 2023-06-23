@@ -7,12 +7,19 @@
       shape="round"
       nbTooltip="Cancel"
       (click)="cancel()"
+      *ngIf="!uploading"
     >
       <nb-icon icon="close-outline"></nb-icon>
     </button>
   </nb-card-header>
 
-  <nb-card-body>
+  <nb-card-body *ngIf="uploading">
+    Please wait during file processing.
+    <br />
+    {{ uploadProgress }} file<span *ngIf="uploadProgress > 1">s</span> processed.
+  </nb-card-body>
+
+  <nb-card-body *ngIf="!uploading">
     <span *ngIf="source.type === sourceTypes.remote"> Import sources now ? </span>
 
     <form

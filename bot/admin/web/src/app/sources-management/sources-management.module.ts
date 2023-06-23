@@ -21,7 +21,9 @@ import { FaqsGenerationComponent } from './faqs-generation/faqs-generation.compo
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { SelectByLengthComponent } from './sources-processing/select-by-length/select-by-length.component';
 import { SourceImportComponent } from './board/source-import/source-import.component';
-import { SourceNormalizationComponent } from './board/source-normalization/source-normalization.component';
+import { SourceNormalizationCsvComponent } from './board/source-normalization/csv/source-normalization-csv.component';
+import { SourceNormalizationJsonComponent } from './board/source-normalization/json/source-normalization-json.component';
+import { JsonIteratorComponent } from './board/source-normalization/json/json-iterator/json-iterator.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +34,9 @@ import { SourceNormalizationComponent } from './board/source-normalization/sourc
     FaqsGenerationComponent,
     SelectByLengthComponent,
     SourceImportComponent,
-    SourceNormalizationComponent
+    SourceNormalizationCsvComponent,
+    SourceNormalizationJsonComponent,
+    JsonIteratorComponent
   ],
   imports: [
     CommonModule,
