@@ -1,4 +1,4 @@
-import { Component, ComponentFactoryResolver, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NbDialogService } from '@nebular/theme';
 import { Subject, takeUntil } from 'rxjs';
@@ -38,8 +38,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     private botConfiguration: BotConfigurationService,
     private nbDialogService: NbDialogService,
     private router: Router,
-    private sourcesService: SourceManagementService,
-    private resolver: ComponentFactoryResolver
+    private sourcesService: SourceManagementService
   ) {
     this.actionProcessing = this.router.getCurrentNavigation().extras?.state?.action;
   }
@@ -72,7 +71,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
         // //tmp
 
-        this.normalizeSource(this.sources[1]);
+        // this.normalizeSource(this.sources[2]);
       });
   }
 
@@ -186,7 +185,6 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     modal.componentRef.instance.onNormalize.subscribe((normalizedData) => {
-      console.log(normalizedData);
       source.normalizedData = normalizedData;
       source.step = 'import';
       modal.close();

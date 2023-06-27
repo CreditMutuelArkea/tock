@@ -1,5 +1,9 @@
-<ng-container *ngFor="let list of recursiveList | keyvalue; let i = index">
-  <ul [class.root]="isRoot">
+<ng-container *ngFor="let list of getSampleData() | keyvalue; let i = index">
+  <ul
+    [class.root]="isRoot"
+    [class.container]="!isPrimitive(list.value)"
+    [class.primitive]="isPrimitive(list.value)"
+  >
     <li>
       <div class="d-flex align-items-center justify-content-between">
         <span>
@@ -18,15 +22,17 @@
           <span
             class="font-weight-bold"
             *ngIf="isPrimitive(list.value)"
-            >{{ list.key }}</span
           >
+            {{ list.key }}
+          </span>
         </span>
 
         <nb-select
           placeholder="Select a data type"
-          size="tiny"
+          size="small"
           *ngIf="isPrimitive(list.value)"
           (selectedChange)="selectDataType($event, list.key)"
+          [selected]="isSelected(list.key)"
           class="my-2"
         >
           <nb-option
@@ -43,14 +49,25 @@
       >
         {{ list.value }}
       </div>
+
       <tock-json-iterator
         *ngIf="isRoot || i <= 5"
         [dataTypesDefinition]="dataTypesDefinition"
+        [associations]="associations"
         [recursiveList]="list.value"
         [parentKey]="list.key"
+        [parentType]="getType(recursiveList)"
+        [upstreamPath]="path"
         (riseSelection)="upriseSelection($event)"
         isRoot="false"
       ></tock-json-iterator>
     </li>
   </ul>
 </ng-container>
+
+<div
+  *ngIf="truncatedDataLengthAlert"
+  class="text-muted font-italic"
+>
+  Plus {{ truncatedDataLengthAlert - 5 }} more entries...
+</div>

@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
+import { Source, sourceTypes } from './models';
 import { csvMockNormalizedData, csvMockRawData } from './mock-data-csv';
 import { jsonMockData } from './mock-data-json';
-import { Source, sourceTypes } from './models';
+import { jsonMockData2 } from './mock-data-json-2';
 
 const TMPsources: Source[] = [
   {
@@ -22,6 +23,13 @@ const TMPsources: Source[] = [
     type: sourceTypes.file,
     fileFormat: 'json',
     rawData: jsonMockData
+  },
+  {
+    id: '654',
+    name: 'Other kind of json source format',
+    type: sourceTypes.file,
+    fileFormat: 'json',
+    rawData: jsonMockData2
   }
 ];
 

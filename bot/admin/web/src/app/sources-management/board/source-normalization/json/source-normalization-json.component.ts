@@ -1,8 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
-import { isPrimitive } from '../../../../shared/utils';
+import { includesArray, isPrimitive } from '../../../../shared/utils';
 import { dataTypesDefinition, ImportDataTypes, Source } from '../../../models';
+
+export type JsonImportAssociation = { type: ImportDataTypes; paths: string[][] };
 
 @Component({
   selector: 'tock-source-normalization-json',
@@ -16,7 +18,7 @@ export class SourceNormalizationJsonComponent {
 
   dataTypesDefinition = dataTypesDefinition;
 
-  associations: { type: ImportDataTypes; paths: string[][] }[];
+  associations: JsonImportAssociation[];
 
   constructor(public dialogRef: NbDialogRef<SourceNormalizationJsonComponent>) {
     this.associations = this.dataTypesDefinition.map((dt) => {
@@ -24,41 +26,40 @@ export class SourceNormalizationJsonComponent {
     });
   }
 
-  form: FormGroup = new FormGroup({
-    answer: new FormControl<string>(null, Validators.required),
-    sourceRef: new FormControl<string>(null),
-    sourceId: new FormControl<string>(null)
-  });
-
-  get answer(): FormControl {
-    return this.form.get('answer') as FormControl;
-  }
-  get sourceRef(): FormControl {
-    return this.form.get('sourceRef') as FormControl;
-  }
-  get sourceId(): FormControl {
-    return this.form.get('sourceId') as FormControl;
-  }
-
   get canSave(): boolean {
-    return this.isSubmitted ? this.form.valid : this.form.dirty;
+    const type = this.associations.find((a) => a.type === ImportDataTypes.answer);
+    return type.paths.length > 0;
   }
 
-  isSubmitted;
+  upriseSelection(info: { dataType: ImportDataTypes; path: string[] }): void {
+    this.associations.forEach((asso) => {
+      if (includesArray(asso.paths, info.path)) {
+        asso.paths = asso.paths.filter((path) => {
+          return !path.every((o, i) => Object.is(info.path[i], o));
+        });
+      }
+    });
+
+    const type = this.associations.find((a) => a.type === info.dataType);
+    type.paths.push(info.path);
+  }
+
+  invalidFormMessage;
 
   submit(): void {
-    const data = this.gatherData(this.source.rawData);
-    console.log(data);
-    // this.isSubmitted = true;
-    // if (this.canSave) {
-    //   this.gatherData();
-    // }
+    this.invalidFormMessage = undefined;
+    if (!this.canSave) {
+      this.invalidFormMessage = 'Please indicate at least the key corresponding to the "Answer" data type.';
+    } else {
+      const data = this.gatherData(this.source.rawData);
+      this.onNormalize.emit(data);
+    }
   }
 
   gatherData(data): [] {
     let reducedData;
     this.dataTypesDefinition.map((dataType) => {
-      let gatheredTypeData = this.gatherTypeData(data, dataType.type);
+      let gatheredTypeData = this.gatherDataByType(data, dataType.type);
 
       if (gatheredTypeData) {
         if (!reducedData) {
@@ -78,12 +79,11 @@ export class SourceNormalizationJsonComponent {
     return reducedData;
   }
 
-  gatherTypeData(data, type: ImportDataTypes): [] {
+  gatherDataByType(data, type: ImportDataTypes): [] {
     const answerType = this.associations.find((a) => a.type === type);
     let previousWalk;
     answerType.paths.forEach((path) => {
       let walk = this.walk(data, path);
-      console.log(walk);
       if (previousWalk) {
         walk.forEach((line, index) => {
           previousWalk[index] = previousWalk[index] + ' ' + line;
@@ -96,31 +96,26 @@ export class SourceNormalizationJsonComponent {
     return previousWalk;
   }
 
-  walk(data, path: string[], pathindex: number = 0): any {
+  walk(data, path: string[], pathIndex: number = 0): any {
     if (isPrimitive(data)) return data;
 
-    const space = path[pathindex];
+    const space = path[pathIndex];
     if (data[space]) {
       const pointer = data[space];
       if (Array.isArray(pointer)) {
         return pointer.map((line) => {
-          return this.walk(line, path, pathindex + 1);
+          return this.walk(line, path, pathIndex + 1);
         });
-      } else {
+      } else if (isPrimitive(pointer)) {
         return pointer;
+      } else {
+        return this.walk(pointer, path, pathIndex + 1);
       }
     } else {
       console.log('!!!!!!!!!!!!!!!!!ca va pas');
+      console.log(data);
+      console.log(space);
     }
-  }
-
-  upriseSelection(info: { dataType: ImportDataTypes; path: string[] }): void {
-    const includesArray = (data, arr) => {
-      return data.some((e) => Array.isArray(e) && e.every((o, i) => Object.is(arr[i], o)));
-    };
-
-    const type = this.associations.find((a) => a.type === info.dataType);
-    if (!includesArray(type.paths, info.path)) type.paths.push(info.path);
   }
 
   cancel(): void {

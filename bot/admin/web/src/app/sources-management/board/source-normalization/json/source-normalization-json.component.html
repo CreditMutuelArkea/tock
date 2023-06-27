@@ -15,18 +15,21 @@
   <nb-card-body>
     <p>Indicate which data types the entries in your document correspond to :</p>
 
-    <!-- <form
-      [formGroup]="form"
-      (submit)="submit()"
-    ></form> -->
-
     <tock-json-iterator
       [recursiveList]="source.rawData"
+      [associations]="associations"
       (riseSelection)="upriseSelection($event)"
     ></tock-json-iterator>
   </nb-card-body>
 
   <nb-card-footer>
+    <div
+      *ngIf="invalidFormMessage"
+      class="text-danger text-center mb-2"
+    >
+      {{ invalidFormMessage }}
+    </div>
+
     <div class="d-flex justify-content-between">
       <button
         type="button"
