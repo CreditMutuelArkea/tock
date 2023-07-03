@@ -1,6 +1,5 @@
 <ng-container *ngFor="let list of getSampleData() | keyvalue; let i = index">
   <ul
-    [class.root]="isRoot"
     [class.container]="!isPrimitive(list.value)"
     [class.primitive]="isPrimitive(list.value)"
   >
@@ -35,6 +34,11 @@
           [selected]="isSelected(list.key)"
           class="my-2"
         >
+          <nb-option
+            value="null"
+            class="text-muted font-italic"
+            >None</nb-option
+          >
           <nb-option
             *ngFor="let dataType of dataTypesDefinition"
             [value]="dataType.type"

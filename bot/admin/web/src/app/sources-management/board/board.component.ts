@@ -52,7 +52,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  loadSources() {
+  loadSources(): void {
     this.sourcesService
       .getSources()
       .pipe(takeUntil(this.destroy$))
@@ -71,7 +71,7 @@ export class BoardComponent implements OnInit, OnDestroy {
         }
         // //tmp
 
-        // this.normalizeSource(this.sources[2]);
+        // this.normalizeSource(this.sources[1]);
       });
   }
 
@@ -192,7 +192,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
   }

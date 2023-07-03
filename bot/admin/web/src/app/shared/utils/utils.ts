@@ -76,11 +76,11 @@ export function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function isPrimitive(arg) {
+export function isPrimitive(arg): boolean {
   var type = typeof arg;
   return arg == null || (type != 'object' && type != 'function');
 }
 
-export function includesArray(data, arr) {
+export function includesArray(data, arr): boolean {
   return data.some((e) => Array.isArray(e) && e.every((o, i) => Object.is(arr[i], o)));
 }

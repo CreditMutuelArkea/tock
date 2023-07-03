@@ -5,9 +5,9 @@ export enum ImportDataTypes {
 }
 
 export const dataTypesDefinition = [
-  { label: 'Answer', type: ImportDataTypes.answer, formCtrl: 'answer' },
-  { label: 'Id', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' },
-  { label: 'Source reference', type: ImportDataTypes.sourceRef, formCtrl: 'sourceRef' }
+  { label: 'Text (answer, question...)', type: ImportDataTypes.answer, formCtrl: 'answer' },
+  { label: 'Id (unic identifier of the entry)', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' },
+  { label: 'Source reference (public url of the source)', type: ImportDataTypes.sourceRef, formCtrl: 'sourceRef' }
 ];
 
 export enum sourceTypes {

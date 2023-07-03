@@ -26,11 +26,6 @@ export class SourceNormalizationJsonComponent {
     });
   }
 
-  get canSave(): boolean {
-    const type = this.associations.find((a) => a.type === ImportDataTypes.answer);
-    return type.paths.length > 0;
-  }
-
   upriseSelection(info: { dataType: ImportDataTypes; path: string[] }): void {
     this.associations.forEach((asso) => {
       if (includesArray(asso.paths, info.path)) {
@@ -41,10 +36,15 @@ export class SourceNormalizationJsonComponent {
     });
 
     const type = this.associations.find((a) => a.type === info.dataType);
-    type.paths.push(info.path);
+    if (type) type.paths.push(info.path);
   }
 
-  invalidFormMessage;
+  get canSave(): boolean {
+    const type = this.associations.find((a) => a.type === ImportDataTypes.answer);
+    return type.paths.length > 0;
+  }
+
+  invalidFormMessage: string;
 
   submit(): void {
     this.invalidFormMessage = undefined;
@@ -111,10 +111,6 @@ export class SourceNormalizationJsonComponent {
       } else {
         return this.walk(pointer, path, pathIndex + 1);
       }
-    } else {
-      console.log('!!!!!!!!!!!!!!!!!ca va pas');
-      console.log(data);
-      console.log(space);
     }
   }
 

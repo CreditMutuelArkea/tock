@@ -36,23 +36,25 @@ export class JsonIteratorComponent implements OnInit {
     return arg && typeof arg === 'object' && !Array.isArray(arg);
   }
 
-  truncatedDataLengthAlert;
+  truncatedDataLengthAlert: number;
 
-  getSampleData() {
-    if (this.isArray(this.recursiveList) && this.recursiveList.length > 5) {
-      this.truncatedDataLengthAlert = this.recursiveList.length;
-      return this.recursiveList.slice(0, 5);
+  maxSampleDataPreview: number = 5;
+
+  getSampleData(): any {
+    if (this.isArray(this.recursiveList) && this.recursiveList.length > this.maxSampleDataPreview) {
+      this.truncatedDataLengthAlert = this.recursiveList.length - this.maxSampleDataPreview;
+      return this.recursiveList.slice(0, this.maxSampleDataPreview);
     }
     return this.recursiveList;
   }
 
-  getType(arg: any) {
+  getType(arg: any): 'primitive' | 'array' | 'object' {
     if (this.isPrimitive(arg)) return 'primitive';
     if (this.isArray(arg)) return 'array';
     return 'object';
   }
 
-  isSelected(key: string) {
+  isSelected(key: string): ImportDataTypes | null {
     let leafPath = deepCopy(this.path);
     leafPath.push(key);
     for (let i = 0; i < this.associations.length; i++) {

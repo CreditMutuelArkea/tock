@@ -34,9 +34,9 @@ export class SourceImportComponent {
     return this.isImportSubmitted ? this.importForm.valid : this.importForm.dirty;
   }
 
-  uploadProgress = 0;
+  uploadProgress: number = 0;
 
-  import() {
+  import(): void {
     this.isImportSubmitted = true;
     if (this.canSaveImport) {
       const file = this.filesSources.value[0];
