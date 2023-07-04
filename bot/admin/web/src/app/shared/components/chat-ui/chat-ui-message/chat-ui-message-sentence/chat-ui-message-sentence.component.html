@@ -5,7 +5,7 @@
     class="userInterface"
     nbTooltip="{{ sentence.userInterface }}"
   />
-  {{ sentence.text }}
+  <span [innerHTML]="linkifyHtml(sentence.text)"></span>
 </ng-container>
 
 <ng-container *ngIf="!sentence.text">
@@ -25,7 +25,6 @@
   </ng-container>
 
   <ng-container *ngIf="sentence.messages.length > 1">
-    MULTIPLE MESSAGES !
     <ul>
       <li *ngFor="let e of sentence.messages">
         ({{ e.connectorType.id }})

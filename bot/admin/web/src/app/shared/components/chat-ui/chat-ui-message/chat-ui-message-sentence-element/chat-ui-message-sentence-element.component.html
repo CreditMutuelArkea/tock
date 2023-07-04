@@ -44,7 +44,8 @@
       <tock-chat-ui-message-location [location]="l"></tock-chat-ui-message-location>
     </div>
     <div *ngFor="let entry of element.texts | mapToIterable">
-      {{ entry.value }} <span class="text-category">({{ entry.key }})</span>
+      <span [innerHTML]="linkifyHtml(entry.value)"></span>
+      <span class="text-category">({{ entry.key }})</span>
     </div>
     <div *ngIf="element.choices.length !== 0">
       <!-- <tock-bot-message-choice
