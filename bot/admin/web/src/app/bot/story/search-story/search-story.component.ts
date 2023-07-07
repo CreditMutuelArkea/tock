@@ -27,6 +27,7 @@ import { CanDeactivate } from '@angular/router';
 import { LocationStrategy } from '@angular/common';
 import { NbToastrService } from '@nebular/theme';
 import { DialogService } from 'src/app/core-nlp/dialog.service';
+import { StoriesFilters } from './stories-filter/stories-filter.component';
 
 interface TreeNode<T> {
   data: T;
@@ -86,6 +87,36 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
     this.subscription = this.state.configurationChange.subscribe((_) => this.search());
   }
 
+  storiesFilters: StoriesFilters;
+
+  filteredStories: StoryDefinitionConfigurationSummary[];
+
+  onFilterChange(filters) {
+    console.log(filters);
+    this.storiesFilters = filters;
+    if (this.storiesFilters.search?.length || this.storiesFilters.categories.length) {
+      this.filterStories();
+    } else {
+      this.filteredStories = undefined;
+    }
+  }
+
+  filterStories() {
+    this.filteredStories = this.stories.filter((story) => {
+      return true;
+    });
+  }
+
+  expandedCategory: string = 'default';
+
+  isCategoryExpanded(category): boolean {
+    return category.category.toLowerCase() === this.expandedCategory.toLowerCase();
+  }
+
+  collapsedChange(category): void {
+    this.expandedCategory = category.category;
+  }
+
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
   }
@@ -117,29 +148,32 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
     dialogRef.onClose.subscribe((result) => {
       if (result === 'remove') {
         this.bot.deleteStory(story._id).subscribe((_) => {
-          this.delete(story.storyId);
+          // this.delete(story.storyId);
+          this.search();
           this.toastrService.show(`Story deleted`, 'Delete', { duration: 3000, status: 'success' });
         });
       }
     });
   }
 
-  private keepExpandableState() {
-    if (this.selectedStory) {
-      this.lastExpandableState = new Map<string, boolean>();
-      this.lastExpandableState.set(this.selectedStory.category, true);
-    }
-  }
+  // private keepExpandableState() {
+  //   if (this.selectedStory) {
+  //     this.lastExpandableState = new Map<string, boolean>();
+  //     this.lastExpandableState.set(this.selectedStory.category, true);
+  //   }
+  // }
 
-  delete(storyDefinitionId: string) {
-    this.selectedStory = null;
-    this.keepExpandableStateAndSearch();
-  }
+  // delete(storyDefinitionId: string) {
+  //   this.selectedStory = null;
+  //   this.keepExpandableStateAndSearch();
+  // }
 
-  keepExpandableStateAndSearch() {
-    this.keepExpandableState();
-    this.search();
-  }
+  // keepExpandableStateAndSearch() {
+  //   this.keepExpandableState();
+  //   this.search();
+  // }
+
+  storyCategories;
 
   search() {
     if (this.category === '_all_') this.category = '';
@@ -159,11 +193,32 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
           this.onlyConfigured
         )
       )
-      .subscribe((s) => {
+      .subscribe((stories) => {
+        const storyCategoriesMap = new Map<string, StoryDefinitionConfigurationSummary[]>();
+        stories.forEach((story) => {
+          let a = storyCategoriesMap.get(story.category);
+          if (!a) {
+            a = [];
+            storyCategoriesMap.set(story.category, a);
+          }
+          a.push(story);
+        });
+
+        const storyCategories = [];
+        storyCategoriesMap.forEach((strs, cat) => {
+          storyCategories.push({
+            category: cat,
+            stories: strs
+          });
+        });
+        this.storyCategories = storyCategories.sort((a, b) => (a.category.toLowerCase() > b.category.toLowerCase() ? 1 : -1));
+
+        // old stuff
+
         if (this.lastFilter === filter) {
           this.selectedStory = null;
           const storyByCategories = new Map<string, StoryDefinitionConfigurationSummary[]>();
-          s.forEach((story) => {
+          stories.forEach((story) => {
             let a = storyByCategories.get(story.category);
             if (!a) {
               a = [];
@@ -184,7 +239,7 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
             }
           });
 
-          this.stories = s.sort((a, b) => {
+          this.stories = stories.sort((a, b) => {
             let fa = a.lastEdited,
               fb = b.lastEdited;
             if (fa < fb) {
@@ -199,7 +254,7 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
           this.nodes = Array.from(sortedMap, ([key, value]) => {
             return {
               expanded:
-                s.length < 100 &&
+                stories.length < 100 &&
                 (this.categories.length < 2 || this.category != '' || this.filter !== '' || this.lastExpandableState.get(key) === true),
               data: {
                 category: key,
@@ -262,7 +317,7 @@ export class SearchStoryNavigationGuard implements CanDeactivate<any> {
         component instanceof SearchStoryComponent &&
         (component as SearchStoryComponent).selectedStory != null
       ) {
-        (component as SearchStoryComponent).keepExpandableStateAndSearch();
+        // (component as SearchStoryComponent).keepExpandableStateAndSearch();
         return false;
       }
       return true;

@@ -13,6 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.no-shadow {
+  box-shadow: none;
+}
+
+.compensate-accordion-item-padding {
+  margin-top: -1.5rem;
+  margin-bottom: -1rem;
+}
+
+// old stuff
 
 .intent {
   width: 820px;
@@ -68,9 +78,8 @@
 .toggle {
   position: relative;
   top: 10px;
-  margin-right:1em;
+  margin-right: 1em;
 }
-
 
 .mat-table {
   width: 100%;

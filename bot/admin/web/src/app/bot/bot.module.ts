@@ -71,6 +71,9 @@ import { I18nExportComponent } from './i18n/i18n-export.component';
 import { I18nImportComponent } from './i18n/i18n-import.component';
 import { ApplicationFeaturesTableComponent } from './feature/application-features-table.component';
 import { NlpService } from '../nlp-tabs/nlp.service';
+import { StoriesListComponent } from './story/search-story/stories-list/stories-list.component';
+import { StoriesFilterComponent } from './story/search-story/stories-filter/stories-filter.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -115,6 +118,7 @@ export class BotRoutingModule {}
 
 @NgModule({
   imports: [
+    ReactiveFormsModule,
     CommonModule,
     SharedModule,
     BotSharedModule,
@@ -172,7 +176,9 @@ export class BotRoutingModule {}
     ApplicationFeaturesTableComponent,
     StoryRuleComponent,
     StoryRuntimeSettingsComponent,
-    StoryTagComponent
+    StoryTagComponent,
+    StoriesListComponent,
+    StoriesFilterComponent
   ],
   exports: [],
   providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard, NlpService]

@@ -1,3 +1,55 @@
+<tock-stories-filter
+  [categories]="categories"
+  (onFilter)="onFilterChange($event)"
+></tock-stories-filter>
+
+<div
+  *ngIf="filteredStories && !filteredStories.length"
+  class="text-center font-italic mt-3"
+>
+  No story found
+</div>
+
+<nb-card
+  class="mt-2 mb-2"
+  *ngIf="filteredStories?.length"
+>
+  <nb-card-body>
+    <tock-stories-list
+      [stories]="filteredStories"
+      (onEditStory)="editStory($event)"
+      (onDownloadStory)="downloadStory($event)"
+      (onDeleteStory)="deleteStory($event)"
+    ></tock-stories-list>
+  </nb-card-body>
+</nb-card>
+
+<nb-accordion
+  class="no-shadow mb-4"
+  *ngIf="storyCategories && !filteredStories"
+>
+  <nb-accordion-item
+    *ngFor="let category of storyCategories"
+    [expanded]="isCategoryExpanded(category)"
+    (collapsedChange)="collapsedChange(category)"
+  >
+    <nb-accordion-item-header class="h4 text-capitalize">
+      {{ category.category }}
+    </nb-accordion-item-header>
+
+    <nb-accordion-item-body class="accordion-item-body">
+      <div class="compensate-accordion-item-padding">
+        <tock-stories-list
+          [stories]="category.stories"
+          (onEditStory)="editStory($event)"
+          (onDownloadStory)="downloadStory($event)"
+          (onDeleteStory)="deleteStory($event)"
+        ></tock-stories-list>
+      </div>
+    </nb-accordion-item-body>
+  </nb-accordion-item>
+</nb-accordion>
+
 <!--
   ~ Copyright (C) 2017/2021 e-voyageurs technologies
   ~
@@ -116,6 +168,7 @@
     </button>
   </nb-card-footer>
 </nb-card>
+
 <nb-card *ngIf="!sortedByDate && nodes && !selectedStory">
   <nb-card-body>
     <table [nbTreeGrid]="nodes">
