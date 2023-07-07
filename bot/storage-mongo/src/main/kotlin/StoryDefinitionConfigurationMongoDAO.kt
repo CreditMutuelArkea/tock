@@ -90,7 +90,7 @@ import com.mongodb.client.model.Filters.exists
 internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurationDAO {
 
     private val logger = KotlinLogging.logger {}
-
+    private const val LIMIT_MAX_WORDS = 10
     @Data(internal = true)
     @JacksonData(internal = true)
     data class StoryDefinitionConfigurationHistoryCol(
@@ -210,6 +210,18 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
         return col.find(and(Namespace eq namespace, BotId eq botId)).toList()
     }
 
+    fun customRegexToFindWord(textSearch: String) = if (textSearch.trim().isEmpty()) {
+        ""
+    } else {
+        textSearch
+            .trim()
+            .split("\\s+".toRegex())
+            .filter { it.isNotEmpty() }
+            .joinToString("", "^", "\$", LIMIT_MAX_WORDS) { wordTextSearch ->
+                "(.*?(${allowDiacriticsInRegexp(wordTextSearch)})[^\$]*)"
+            }
+    }
+
     override fun searchStoryDefinitionSummariesExtended(request: StoryDefinitionConfigurationExtendedSummaryRequest): List<StoryDefinitionConfigurationSummaryExtended> {
         //get last date from history
         val dateById = historyCol
@@ -231,7 +243,7 @@ internal object StoryDefinitionConfigurationMongoDAO : StoryDefinitionConfigurat
                 // specific filters for extended
                     .plusElement(
                         request.textSearch?.takeUnless { it.isBlank() }
-                            ?.let { Name.regex(allowDiacriticsInRegexp(it.trim()), "i") }
+                            ?.let { Name.regex(customRegexToFindWord(request.textSearch ?: ""), "i") }
                     )
                     .plusElement(
                         if (request.onlyConfiguredStory) CurrentType ne AnswerConfigurationType.builtin else null

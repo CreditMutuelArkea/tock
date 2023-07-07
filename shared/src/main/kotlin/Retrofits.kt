@@ -122,6 +122,7 @@ fun retrofitBuilderWithTimeoutAndLogger(
         takeIf { proxy != null }
             ?.proxy(proxy)
     }
+    .apply(TockProxyAuthenticator::install)
 
     .build()
     .let {

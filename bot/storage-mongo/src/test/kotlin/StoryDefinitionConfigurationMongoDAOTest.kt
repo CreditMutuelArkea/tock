@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.nlp.entity.date
+package ai.tock.bot.mongo
 
-import ai.tock.nlp.entity.Value
+import ai.tock.bot.mongo.StoryDefinitionConfigurationMongoDAO.customRegexToFindWord
+import junit.framework.TestCase.assertEquals
 import org.junit.jupiter.api.Test
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
-import java.time.temporal.ChronoUnit.MINUTES
-import kotlin.test.assertEquals
 
-/**
- *
- */
-class DateEntityValueDateSerializationTest {
+
+class StoryDefinitionConfigurationMongoDAOTest: AbstractTest() {
 
     @Test
-    fun testSerializeAndDeserialize() {
-        val v = DateEntityValue(ZonedDateTime.now(ZoneId.of("Z")), DateEntityGrain.day)
-        val s = mapper.writeValueAsString(v)
-        assertEquals(v, mapper.readValue(s, Value::class.java))
+    fun `TEST custom Text Search`() {
+        assertEquals(customRegexToFindWord("Action"),"^(.*?([aàáâãä][cç]t[iìíîï][oòóôõöø][nñ])[^\$]*)\$")
+        assertEquals(customRegexToFindWord("story action "),"^(.*?(st[oòóôõöø]ry)[^\$]*)(.*?([aàáâãä][cç]t[iìíîï][oòóôõöø][nñ])[^\$]*)\$")
+        assertEquals(customRegexToFindWord(""),"")
     }
 }
