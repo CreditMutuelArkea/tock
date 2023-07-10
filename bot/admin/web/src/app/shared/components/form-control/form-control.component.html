@@ -3,30 +3,27 @@
   [class.mb-3]="hasMargin"
   data-testid="form-control"
 >
-  <div class="d-flex align-items-center justify-content-between">
-    <label
-      *ngIf="label"
-      [ngClass]="{ 'font-weight-bold': boldLabel, 'text-mitigated': true, required: required, hasError: showError && controls.invalid }"
-      [for]="name"
-      data-testid="label"
+  <label
+    *ngIf="label"
+    [ngClass]="{ 'font-weight-bold': boldLabel, 'text-mitigated': true, required: required, hasError: showError && controls.invalid }"
+    [for]="name"
+    data-testid="label"
+  >
+    <abbr
+      *ngIf="required"
+      title="Required"
     >
-      <abbr
-        *ngIf="required"
-        title="Required"
-      >
-        *
-      </abbr>
-      {{ label }}
-    </label>
+      *
+    </abbr>
+    {{ label }}
+
     <nb-icon
-      *ngIf="information"
-      class="control-info"
+      *ngIf="help"
       icon="info-outline"
-      size="small"
-      status="info"
-      [nbTooltip]="information"
+      [nbTooltip]="help"
+      class="align-bottom"
     ></nb-icon>
-  </div>
+  </label>
   <ng-content></ng-content>
   <tock-error-helper
     *ngIf="showError"
