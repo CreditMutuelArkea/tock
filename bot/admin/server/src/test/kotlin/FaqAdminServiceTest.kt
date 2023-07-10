@@ -132,7 +132,7 @@ class FaqAdminServiceTest : AbstractTest() {
 
         private const val userLogin: UserLogin = "userLogin"
 
-        private val faqDefinition = FaqDefinition(faqId, botId, intentId, i18nId, tagList, true, now, now)
+        private val faqDefinition = FaqDefinition(faqId, botId, namespace, intentId, i18nId, tagList, true, now, now)
 
         val applicationDefinition =
             ApplicationDefinition(botId, namespace = namespace, supportedLocales = setOf(Locale.FRENCH))
@@ -366,7 +366,7 @@ class FaqAdminServiceTest : AbstractTest() {
                 fun `GIVEN save faq WHEN and saving the same story THEN update the story`() {
                     val faqAdminService = spyk<FaqAdminService>(recordPrivateCalls = true)
                     val savedFaqDefinition =
-                        FaqDefinition(faqId, botId, intentId, i18nId, listOf("NEW TAG"), true, now, now)
+                        FaqDefinition(faqId, botId, namespace, intentId, i18nId, listOf("NEW TAG"), true, now, now)
 
                     every {
                         faqAdminService["createOrUpdateFaqIntent"](
@@ -703,6 +703,7 @@ class FaqAdminServiceTest : AbstractTest() {
             val existingFaqSharedIntentDefinition = FaqDefinition(
                 faqId2,
                 OTHER_APP_NAME,
+                namespace,
                 intentId,
                 i18nId,
                 existingSecondBotFaqSharedIntentRequest.tags,
@@ -794,6 +795,7 @@ class FaqAdminServiceTest : AbstractTest() {
             val existingFaqSharedIntentDefinition = FaqDefinition(
                 faqId2,
                 OTHER_APP_NAME,
+                namespace,
                 intentId,
                 i18nId,
                 existingSecondBotFaqSharedIntentRequest.tags,
@@ -1225,6 +1227,7 @@ class FaqAdminServiceTest : AbstractTest() {
             return FaqQueryResult(
                 faqId,
                 botId,
+                namespace,
                 intentId,
                 i18nId,
                 tagList,
