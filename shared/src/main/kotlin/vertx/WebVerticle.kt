@@ -330,7 +330,6 @@ abstract class WebVerticle : AbstractVerticle() {
         basePath: String = rootPath,
         handler: (RoutingContext) -> Unit
     ) {
-
         router.route(method, "$basePath$path")
             .handler { context ->
                 val user = context.user()
@@ -896,7 +895,7 @@ abstract class WebVerticle : AbstractVerticle() {
     val RoutingContext.userLogin: String
         get() = user?.user ?: error("no user in session")
 
-    private fun HttpServerResponse.endJson(result: Any?) {
+        private fun HttpServerResponse.endJson(result: Any?) {
 
         if (ended()) return
 
@@ -916,7 +915,7 @@ abstract class WebVerticle : AbstractVerticle() {
      * See https://vertx.io/docs/vertx-web/java/#_route_match_failures
      */
     open fun defaultErrorHandler(statusCode: Int): Handler<RoutingContext> = Handler<RoutingContext> { event ->
-        logger.error { "Error $statusCode: ${event.request().path()}" }
+        logger.info { "Error $statusCode: ${event.request().path()}" }
         tockErrorHandler.handle(event)
     }
 }

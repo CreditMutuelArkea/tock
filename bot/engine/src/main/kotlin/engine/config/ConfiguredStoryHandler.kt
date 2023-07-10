@@ -79,21 +79,21 @@ internal class ConfiguredStoryHandler(
             val role = entity.role
             val entityTypeName = entity.entityTypeName
             if (role != entityTypeName &&
-                bus.entityValueDetails(role) == null &&
-                bus.hasActionEntity(entityTypeName)
+                    bus.entityValueDetails(role) == null &&
+                    bus.hasActionEntity(entityTypeName)
             ) {
                 bus.dialog.state.changeValue(
-                    role,
-                    bus.entityValueDetails(entityTypeName)
-                        ?.let { v ->
-                            v.copy(entity = Entity(v.entity.entityType, role))
-                        }
+                        role,
+                        bus.entityValueDetails(entityTypeName)
+                                ?.let { v ->
+                                    v.copy(entity = Entity(v.entity.entityType, role))
+                                }
                 )
                 bus.removeEntityValue(entityTypeName)
             }
 
             if (bus.entityValueDetails(role) == null && entity.hasCurrentAnswer()) {
-                // if the role is generic and there is an other role in the entity list: skip
+                // if the role is generic and there is another role in the entity list: skip
                 if (role != entityTypeName || bus.entities.none { entity.entityType == it.value.value?.entity?.entityType?.name }) {
                     // else send entity question
                     entity.send(bus)
@@ -132,8 +132,8 @@ internal class ConfiguredStoryHandler(
 
         val configurationName = BotRepository.getConfigurationByApplicationId(BotApplicationConfigurationKey(bus))?.name
         val answerContainer =
-            configurationName?.let { name -> configuration.configuredAnswers.firstOrNull { it.botConfiguration == name } }
-                ?: configuration
+                configurationName?.let { name -> configuration.configuredAnswers.firstOrNull { it.botConfiguration == name } }
+                        ?: configuration
         removeAskAgainProcess(bus)
 
         // When sending the answer, a redirection (switch to another type of story) can be performed
@@ -214,7 +214,7 @@ internal class ConfiguredStoryHandler(
     /**
      * Remove the ask again process to the last story if no more ask again round available
      */
-    private fun removeAskAgainProcess(bus: BotBus){
+    private fun removeAskAgainProcess(bus: BotBus) {
         if (bus.dialog.stories.lastOrNull()?.definition?.hasTag(StoryTag.ASK_AGAIN) == true && bus.dialog.state.hasCurrentAskAgainProcess && bus.dialog.state.askAgainRound == 0) {
             bus.dialog.state.hasCurrentAskAgainProcess = false
         }

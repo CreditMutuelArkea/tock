@@ -94,7 +94,6 @@ import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
 import ai.tock.translator.Translator
-import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
@@ -114,21 +113,21 @@ object BotAdminService {
     private val front = FrontClient
 
     private class BotStoryDefinitionConfigurationDumpController(
-            override val targetNamespace: String,
-            override val botId: String,
-            val story: StoryDefinitionConfigurationDump,
-            val application: ApplicationDefinition,
-            val mainLocale: Locale,
-            val user: UserLogin
+        override val targetNamespace: String,
+        override val botId: String,
+        val story: StoryDefinitionConfigurationDump,
+        val application: ApplicationDefinition,
+        val mainLocale: Locale,
+        val user: UserLogin
     ) : StoryDefinitionConfigurationDumpController {
 
         override fun keepFeature(feature: StoryDefinitionConfigurationFeatureDump): Boolean =
-                feature.botApplicationConfigurationId == null ||
-                        getBotConfigurationById(feature.botApplicationConfigurationId!!)?.namespace == targetNamespace
+            feature.botApplicationConfigurationId == null ||
+                    getBotConfigurationById(feature.botApplicationConfigurationId!!)?.namespace == targetNamespace
 
         override fun buildScript(
-                script: ScriptAnswerVersionedConfigurationDump,
-                compile: Boolean
+            script: ScriptAnswerVersionedConfigurationDump,
+            compile: Boolean
         ): ScriptAnswerVersionedConfiguration {
             return if (compile && !KotlinCompilerClient.compilerDisabled) {
                 val fileName = "T${Dice.newId()}.kt"
@@ -352,7 +351,6 @@ object BotAdminService {
     }
 
 
-
     private fun loadStory(namespace: String, conf: StoryDefinitionConfiguration?): BotStoryDefinitionConfiguration? {
         if (conf?.namespace == namespace) {
             val botConf = getBotConfigurationsByNamespaceAndBotId(namespace, conf.botId).firstOrNull()
@@ -460,11 +458,23 @@ object BotAdminService {
         )
     }
 
+    fun deleteStory(namespace: String, storyDefinitionId: String): Boolean {
+        val story = storyDefinitionDAO.getStoryDefinitionById(storyDefinitionId.toId())
+        if (story != null) {
+            val botConf = getBotConfigurationsByNamespaceAndBotId(namespace, story.botId).firstOrNull()
+            if (botConf != null) {
+                storyDefinitionDAO.delete(story)
+            }
+        }
+        return false
+    }
+
     fun createStory(
         namespace: String,
         request: CreateStoryRequest,
         user: UserLogin
     ): IntentDefinition? {
+
         val botConf =
             getBotConfigurationsByNamespaceAndBotId(namespace, request.story.botId).firstOrNull()
         return if (botConf != null) {
@@ -645,13 +655,13 @@ object BotAdminService {
                 var newIntent = front.getIntentByNamespaceAndName(app.namespace, intentName)
                 if (newIntent == null) {
                     newIntent = IntentDefinition(
-                            intentName,
-                            app.namespace,
-                            setOf(app._id),
-                            emptySet(),
-                            label = intentDefinition.label,
-                            category = intentDefinition.category,
-                            description = intentDefinition.description
+                        intentName,
+                        app.namespace,
+                        setOf(app._id),
+                        emptySet(),
+                        label = intentDefinition.label,
+                        category = intentDefinition.category,
+                        description = intentDefinition.description
                     )
                     front.save(newIntent)
                 } else if (!newIntent.applications.contains(app._id)) {

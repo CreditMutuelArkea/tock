@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NbDialogRef, NbToastrService } from '@nebular/theme';
 import { FileItem, FileUploader, ParsedResponseHeaders } from 'ng2-file-upload';
 
@@ -37,6 +37,13 @@ export class MediaDialogComponent implements OnInit {
   fileUpload: string = 'upload';
   fileExternalUrl: string;
   uploader: FileUploader;
+
+  @ViewChild('titleElement') titleElement: ElementRef;
+  private loading: boolean;
+
+  private loadingSubtitle: boolean;
+
+  private loadingDescription : boolean;
 
   constructor(
     public dialogRef: NbDialogRef<MediaDialogComponent>,
@@ -111,6 +118,7 @@ export class MediaDialogComponent implements OnInit {
       });
     } else {
       if (this.isTitle()) {
+        this.loading = true;
         if (this.media.title) {
           this.botService
             .saveI18nLabel(this.media.title.changeDefaultLabelForLocale(this.stateService.currentLocale, this.media.titleLabel.trim()))
@@ -125,6 +133,7 @@ export class MediaDialogComponent implements OnInit {
       }
 
       if (this.isSubtitle()) {
+        this.loadingSubtitle = true;
         if (this.media.subTitle) {
           this.botService
             .saveI18nLabel(
@@ -134,28 +143,37 @@ export class MediaDialogComponent implements OnInit {
         } else {
           this.botService
             .createI18nLabel(new CreateI18nLabelRequest(this.category, this.media.subTitleLabel.trim(), this.stateService.currentLocale))
-            .subscribe((i18n) => (this.media.subTitle = i18n));
+            .subscribe((i18n) => {
+              this.media.subTitle = i18n;
+              this.loadingSubtitle = false;
+              this.closeModal();
+            });
         }
       } else {
         this.media.subTitle = null;
       }
 
       if (this.isDescription()) {
+        this.loadingDescription = true;
         if (this.media.file && this.media.file.description) {
           this.botService
             .saveI18nLabel(
-              this.media.file.description.changeDefaultLabelForLocale(
-                this.stateService.currentLocale,
-                this.media.file.descriptionLabel.trim()
-              )
+              this.media.file.description.changeDefaultLabelForLocale(this.stateService.currentLocale, this.media.file.descriptionLabel.trim())
             )
-            .subscribe((_) => {});
+            .subscribe((_) => {
+              this.loadingDescription = false;
+              this.closeModal();
+            });
         } else {
           this.botService
             .createI18nLabel(
               new CreateI18nLabelRequest(this.category, this.media.file.descriptionLabel.trim(), this.stateService.currentLocale)
             )
-            .subscribe((i18n) => (this.media.file.description = i18n));
+            .subscribe((i18n) => {
+              this.media.file.description = i18n;
+              this.loadingDescription = false;
+              this.closeModal();
+            });
         }
       } else if (this.media.file) {
         this.media.file.description = null;
@@ -175,7 +193,12 @@ export class MediaDialogComponent implements OnInit {
           }
           return a;
         });
+    }
+    this.closeModal();
+  }
 
+  private closeModal() {
+    if (!this.loading && !this.loadingSubtitle && !this.loadingDescription) {
       this.dialogRef.close({
         media: this.media
       });
