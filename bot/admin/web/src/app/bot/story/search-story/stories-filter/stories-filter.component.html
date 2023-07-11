@@ -56,8 +56,27 @@
         [checked]="sortStoriesByModificationDate.value"
         formControlName="sortStoriesByModificationDate"
       >
-        Sort by modification date
+        Sort by edition date
       </nb-checkbox>
+
+      <button
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="Export Stories"
+        (click)="download()"
+      >
+        <nb-icon icon="download-outline"></nb-icon>
+      </button>
+      <button
+        nbButton
+        ghost
+        shape="round"
+        nbTooltip="Import Stories"
+        (click)="prepareUpload()"
+      >
+        <nb-icon icon="upload-outline"></nb-icon>
+      </button>
     </form>
   </nb-card-body>
 </nb-card>

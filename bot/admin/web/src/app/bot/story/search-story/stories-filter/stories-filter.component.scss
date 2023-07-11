@@ -3,12 +3,12 @@
 .grid {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 100%;
   align-items: center;
+  grid-template-columns: 1fr 1fr;
 }
 
-@include media-breakpoint-up(sm) {
+@include media-breakpoint-up(lg) {
   .grid {
-    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    grid-template-columns: 4fr 4fr 5fr 5fr 1fr 1fr;
   }
 }

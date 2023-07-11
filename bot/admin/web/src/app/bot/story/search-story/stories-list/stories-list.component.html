@@ -12,7 +12,10 @@
   *ngFor="let story of stories"
 >
   <div class="table-list-entry">
-    <div class="font-weight-bold">
+    <div
+      class="font-weight-bold ellipsis"
+      [nbTooltip]="story.name"
+    >
       <nb-icon
         *ngIf="story.isBuiltIn()"
         class="valign-middle"
@@ -36,7 +39,10 @@
     <span class="text-muted">{{ story.description }}</span>
   </div>
 
-  <div class="table-list-entry bordered text-center">
+  <div
+    class="table-list-entry bordered text-center ellipsis"
+    [nbTooltip]="story.intent.getIntentLabel(state)"
+  >
     {{ story.intent.getIntentLabel(state) }}
   </div>
 

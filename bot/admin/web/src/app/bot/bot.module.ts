@@ -26,7 +26,7 @@ import { MomentModule } from 'ngx-moment';
 import { CreateStoryComponent } from './story/create-story/create-story.component';
 import { BotService } from './bot-service';
 import { BotTabsComponent } from './bot-tabs.component';
-import { BackButtonHolder, SearchStoryComponent, SearchStoryNavigationGuard } from './story/search-story/search-story.component';
+import { SearchStoryComponent } from './story/search-story/search-story.component';
 import { NlpModule } from '../nlp-tabs/nlp.module';
 import { ApplicationResolver } from '../core-nlp/application.resolver';
 import { I18nComponent } from './i18n/i18n.component';
@@ -74,6 +74,8 @@ import { NlpService } from '../nlp-tabs/nlp.service';
 import { StoriesListComponent } from './story/search-story/stories-list/stories-list.component';
 import { StoriesFilterComponent } from './story/search-story/stories-filter/stories-filter.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { EditStoryComponent } from './story/edit-story/edit-story.component';
+import { StoriesUploadComponent } from './story/search-story/stories-upload/stories-upload.component';
 
 const routes: Routes = [
   {
@@ -95,8 +97,11 @@ const routes: Routes = [
       },
       {
         path: 'story-search',
-        component: SearchStoryComponent,
-        canDeactivate: [SearchStoryNavigationGuard]
+        component: SearchStoryComponent
+      },
+      {
+        path: 'story-edit/:storyId',
+        component: EditStoryComponent
       },
       {
         path: 'i18n',
@@ -178,10 +183,11 @@ export class BotRoutingModule {}
     StoryRuntimeSettingsComponent,
     StoryTagComponent,
     StoriesListComponent,
-    StoriesFilterComponent
+    StoriesFilterComponent,
+    EditStoryComponent,
+    StoriesUploadComponent
   ],
-  exports: [],
-  providers: [BotService, BackButtonHolder, SearchStoryNavigationGuard, NlpService]
+  exports: []
 })
 export class BotModule {
   constructor() {}

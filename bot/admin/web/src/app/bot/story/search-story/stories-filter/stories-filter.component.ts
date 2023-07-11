@@ -26,6 +26,8 @@ export class StoriesFilterComponent implements OnInit {
 
   @Input() categories;
   @Output() onFilter = new EventEmitter<StoriesFilters>();
+  @Output() onDownload = new EventEmitter();
+  @Output() onPrepareUpload = new EventEmitter();
 
   form = new FormGroup<StoriesFiltersForm>({
     search: new FormControl(),
@@ -54,6 +56,14 @@ export class StoriesFilterComponent implements OnInit {
 
   clearSearch(): void {
     this.search.reset();
+  }
+
+  download() {
+    this.onDownload.emit();
+  }
+
+  prepareUpload() {
+    this.onPrepareUpload.emit();
   }
 
   ngOnDestroy(): void {
