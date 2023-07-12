@@ -235,9 +235,11 @@ object FaqDefinitionMongoDAO : FaqDefinitionDAO {
 
                 with(projection) {
 
-                   logger.info { "Migrate FaqDefinition ${projection._id} with namespace "}
+
                     val namespace = intentIdSupplier.invoke(intentId)
                         ?: throw Exception("Fail to migrate Faq with intent $intentId  due to namespace not found with id $intentId")
+
+                    logger.info { "Migrate FaqDefinition ${projection._id} with namespace $namespace"}
 
                     FaqDefinition(
                         _id,
