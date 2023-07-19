@@ -1,4 +1,7 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { StateService } from '../../../../core-nlp/state.service';
+import { TestSharedModule } from '../../../../shared/test-shared.module';
 
 import { StoriesListComponent } from './stories-list.component';
 
@@ -8,9 +11,16 @@ describe('StoriesListComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ StoriesListComponent ]
-    })
-    .compileComponents();
+      imports: [TestSharedModule],
+      declarations: [StoriesListComponent],
+      providers: [
+        {
+          provide: StateService,
+          useValue: {}
+        }
+      ],
+      schemas: [NO_ERRORS_SCHEMA]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(StoriesListComponent);
     component = fixture.componentInstance;

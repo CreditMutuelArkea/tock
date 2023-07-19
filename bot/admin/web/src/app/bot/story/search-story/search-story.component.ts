@@ -29,6 +29,8 @@ import { BotConfigurationService } from '../../../core/bot-configuration.service
 import { BotApplicationConfiguration } from '../../../core/model/configuration';
 import { StoriesUploadComponent } from './stories-upload/stories-upload.component';
 
+export type StoriesByCategory = { category: string; stories: StoryDefinitionConfigurationSummary[] };
+
 @Component({
   selector: 'tock-search-story',
   templateUrl: './search-story.component.html',
@@ -48,7 +50,7 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
 
   displayStoriesByCategory: boolean = true;
   categories: string[] = [];
-  storyCategories: { category: string; stories: StoryDefinitionConfigurationSummary[] }[];
+  storyCategories: StoriesByCategory[];
 
   constructor(
     public state: StateService,
@@ -75,6 +77,26 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
         this.storyCategories = undefined;
       }
     });
+  }
+
+  search() {
+    this.loading = true;
+    this.bot
+      .searchStories(
+        new StorySearchQuery(
+          this.state.currentApplication.namespace,
+          this.state.currentApplication.name,
+          this.state.currentLocale,
+          0,
+          10000
+        )
+      )
+      .subscribe((stories) => {
+        this.stories = stories;
+        this.filterStories();
+        this.computeStoriesCategories();
+        this.loading = false;
+      });
   }
 
   onFilterChange(filters) {
@@ -146,26 +168,6 @@ export class SearchStoryComponent implements OnInit, OnDestroy {
     });
 
     this.storyCategories = storyCategories.sort((a, b) => (a.category.toLocaleLowerCase() > b.category.toLocaleLowerCase() ? 1 : -1));
-  }
-
-  search() {
-    this.loading = true;
-    this.bot
-      .searchStories(
-        new StorySearchQuery(
-          this.state.currentApplication.namespace,
-          this.state.currentApplication.name,
-          this.state.currentLocale,
-          0,
-          10000
-        )
-      )
-      .subscribe((stories) => {
-        this.stories = stories;
-        this.filterStories();
-        this.computeStoriesCategories();
-        this.loading = false;
-      });
   }
 
   expandedCategory: string = 'default';
