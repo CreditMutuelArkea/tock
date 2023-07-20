@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit.MILLISECONDS
  * @param baseUrl the service base url
  * @param timeout the timeout value - default is 20000ms.
  */
-fun retrofit(baseUrl: String, timeout: Long = longProperty("tock_nlp_client_request_timeout_ms", 20000)): Retrofit {
+fun retrofit(baseUrl: String, timeout: Long = longProperty("tock_nlp_client_request_timeout_ms", 200000000)): Retrofit {
     return Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(JacksonConverterFactory.create(mapper))

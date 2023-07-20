@@ -57,6 +57,11 @@ open class ConnectorData(
 
     companion object {
         const val CONVERSATION_ID = "CONVERSATION_ID"
+        // the operator id (=chatbotId) prefixed with the iAdvize environment
+        const val OPERATOR_ID = "OPERATOR_ID"
+        const val CHAT_BOT_ID = "CHAT_BOT_ID"
+        // iAdvize environment sd- or ha-
+        const val IADVIZE_ENV = "IADVIZE_ENV"
     }
 
     /**

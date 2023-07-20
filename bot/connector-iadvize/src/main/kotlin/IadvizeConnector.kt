@@ -296,6 +296,11 @@ class IadvizeConnector internal constructor(
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
                 controller.handle(event, ConnectorData(callback, conversationData = mapOf(
                     ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
+                    ConnectorData.OPERATOR_ID to iadvizeRequest.idOperator,
+                    // the operator id (=chatbotId) prefixed with the iAdvize environment
+                    ConnectorData.CHAT_BOT_ID to iadvizeRequest.idOperator.split("-")[0],
+                    // iAdvize environment sd- or ha-
+                    ConnectorData.IADVIZE_ENV to iadvizeRequest.idOperator.split("-")[1],
                 )))
             }
 

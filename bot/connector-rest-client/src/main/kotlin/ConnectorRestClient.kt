@@ -60,7 +60,7 @@ class ConnectorRestClient(
             mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
             mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true)
 
-            val timeout = longProperty("tock_bot_rest_client_request_timeout_ms", 20000)
+            val timeout = longProperty("tock_bot_rest_client_request_timeout_ms", 200000000)
             val retrofit = Retrofit.Builder()
                 .baseUrl("$baseUrl/$p/")
                 .addConverterFactory(JacksonConverterFactory.create(mapper))

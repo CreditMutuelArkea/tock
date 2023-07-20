@@ -18,6 +18,7 @@ package ai.tock.nlp.api.client
 
 import ai.tock.nlp.api.client.model.NlpQuery
 import ai.tock.nlp.api.client.model.NlpResult
+import ai.tock.nlp.api.client.model.PocConvQaServiceQuery
 import ai.tock.nlp.api.client.model.dump.ApplicationDefinition
 import ai.tock.nlp.api.client.model.dump.ApplicationDump
 import ai.tock.nlp.api.client.model.dump.CreateApplicationQuery
@@ -40,11 +41,18 @@ import retrofit2.http.Query
 
 internal data class BooleanResponse(val success: Boolean = true)
 
+//data class PocConvQaServiceQuery(
+//    val query: String,
+//)
+//
 /**
  *
  */
 internal interface NlpService {
 
+//    @POST("unknown")
+//    fun markAsUnknown(@Body query: PocConvQaServiceQuery): Call<ResponseBody>
+//
     @POST("parse")
     fun parse(@Body query: NlpQuery): Call<NlpResult>
 

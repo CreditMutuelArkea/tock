@@ -32,7 +32,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit.SECONDS
 import mu.KotlinLogging
 
-private val timeoutInSeconds: Long = longProperty("tock_api_timout_in_s", 10)
+private val timeoutInSeconds: Long = longProperty("tock_api_timout_in_s", 100)
 
 private class WSHolder(
     @Volatile

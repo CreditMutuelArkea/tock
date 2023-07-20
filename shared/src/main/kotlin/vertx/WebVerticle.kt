@@ -248,7 +248,7 @@ abstract class WebVerticle : AbstractVerticle() {
     ) {
         val https = !devEnvironment && booleanProperty("tock_https_env", true)
         val sessionHandler = SessionHandler.create(LocalSessionStore.create(vertx))
-            .setSessionTimeout(6 * 60 * 60 * 1000 /*6h*/)
+            .setSessionTimeout(6 * 60 * 60 * 10000 /*6h*/)
             .setNagHttps(https)
             .setCookieHttpOnlyFlag(https)
             .setCookieSecureFlag(https)

@@ -68,7 +68,7 @@ class TockNlpClient(baseUrl: String = System.getenv("tock_nlp_service_url") ?: "
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
         mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true)
 
-        val timeout = longProperty("tock_nlp_client_request_timeout_ms", 20000)
+        val timeout = longProperty("tock_nlp_client_request_timeout_ms", 200000000)
         val retrofit = Retrofit.Builder()
             .baseUrl("$baseUrl/rest/nlp/")
             .addConverterFactory(JacksonConverterFactory.create(mapper))

@@ -33,6 +33,8 @@ data class RequestContext(
     val botId: PlayerId,
     val user: UserData,
     val metadata: Map<String, String> = emptyMap(),
+    // TODO : metadata vs conversationData. it's equivalent ?!
+    val conversationData: Map<String, String> = emptyMap(),
     val actionsHistory: ActionsHistory? = null
 )
 

@@ -117,7 +117,7 @@ class RestEntityTypeClient(targetUrl: String = property("tock_nlp_entity_type_ur
         }
 
     companion object {
-        private val timeoutInSeconds = longProperty("tock_bot_rest_timeout_in_ms", 10000L)
+        private val timeoutInSeconds = longProperty("tock_bot_rest_timeout_in_ms", 10000000L)
 
         private val logger = KotlinLogging.logger {}
     }
