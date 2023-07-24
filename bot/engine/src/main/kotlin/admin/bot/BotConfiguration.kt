@@ -40,6 +40,10 @@ data class BotConfiguration(
      */
     val nlpModel: String,
     /**
+     * The RAG configuration
+     */
+    val ragConfiguration: RAGConfiguration = RAGConfiguration(),
+    /**
      * The api key.
      */
     val apiKey: String = UUID.randomUUID().toString(),
