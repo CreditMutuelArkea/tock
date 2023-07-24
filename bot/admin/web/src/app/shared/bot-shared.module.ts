@@ -35,12 +35,16 @@ import {
   NbSelectModule,
   NbTooltipModule,
   NbPopoverModule,
-  NbButtonModule
+  NbButtonModule,
+  NbAlertModule,
+  NbAutocompleteModule,
+  NbOverlayModule
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 
 import {
+  AutocompleteInputComponent,
   ChatUiComponent,
   ChatUiMessageComponent,
   ChoiceDialogComponent,
@@ -51,56 +55,70 @@ import {
 } from './components';
 
 import { AutofocusDirective } from './directives';
+import { ChatUiMessageSentenceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence/chat-ui-message-sentence.component';
+import { ChatUiMessageSentenceElementComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence-element/chat-ui-message-sentence-element.component';
+import { ChatUiMessageChoiceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-choice/chat-ui-message-choice.component';
+import { ChatUiMessageAttachmentComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-attachment/chat-ui-message-attachment.component';
+import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-location/chat-ui-message-location';
 
 @NgModule({
-    imports: [
-        CommonModule,
-        SharedModule,
-        MomentModule,
-        NbCalendarRangeModule,
-        NbCardModule,
-        NbSelectModule,
-        NbTooltipModule,
-        NbIconModule,
-        NbPopoverModule,
-        NbButtonModule
-    ],
-    declarations: [
-        BotMessageComponent,
-        SentenceElementComponent,
-        BotMessageSentenceComponent,
-        BotMessageChoiceComponent,
-        BotMessageLocationComponent,
-        BotMessageAttachmentComponent,
-        DisplayDialogComponent,
-        SelectBotComponent,
-        DateRangeCalendarComponent,
-        InfoButtonComponent,
-        ConfirmationDialogComponent,
-        ErrorHelperComponent,
-        PaginationComponent,
-        NoDataFoundComponent,
-        FormControlComponent,
-        ChatUiComponent,
-        ChatUiMessageComponent,
-        ChoiceDialogComponent,
-        AutofocusDirective
-    ],
-    exports: [
-        BotMessageComponent,
-        DisplayDialogComponent,
-        SelectBotComponent,
-        DateRangeCalendarComponent,
-        InfoButtonComponent,
-        ErrorHelperComponent,
-        PaginationComponent,
-        NoDataFoundComponent,
-        FormControlComponent,
-        ChatUiComponent,
-        ChatUiMessageComponent,
-        ChoiceDialogComponent,
-        AutofocusDirective
-    ],
-    providers: [BotSharedService]
+  imports: [
+    CommonModule,
+    SharedModule,
+    MomentModule,
+    NbAlertModule,
+    NbAutocompleteModule,
+    NbCalendarRangeModule,
+    NbCardModule,
+    NbSelectModule,
+    NbTooltipModule,
+    NbIconModule,
+    NbPopoverModule,
+    NbButtonModule
+  ],
+  declarations: [
+    AutocompleteInputComponent,
+    BotMessageComponent,
+    SentenceElementComponent,
+    BotMessageSentenceComponent,
+    BotMessageChoiceComponent,
+    BotMessageLocationComponent,
+    BotMessageAttachmentComponent,
+    DisplayDialogComponent,
+    SelectBotComponent,
+    DateRangeCalendarComponent,
+    InfoButtonComponent,
+    ConfirmationDialogComponent,
+    ErrorHelperComponent,
+    PaginationComponent,
+    NoDataFoundComponent,
+    FormControlComponent,
+    ChoiceDialogComponent,
+    ChatUiComponent,
+    ChatUiMessageComponent,
+    ChatUiMessageSentenceComponent,
+    ChatUiMessageSentenceElementComponent,
+    ChatUiMessageChoiceComponent,
+    ChatUiMessageAttachmentComponent,
+    ChatUiMessageLocationComponent,
+    AutofocusDirective
+  ],
+  exports: [
+    AutocompleteInputComponent,
+    BotMessageComponent,
+    DisplayDialogComponent,
+    SelectBotComponent,
+    DateRangeCalendarComponent,
+    InfoButtonComponent,
+    ErrorHelperComponent,
+    PaginationComponent,
+    NoDataFoundComponent,
+    FormControlComponent,
+    ChoiceDialogComponent,
+    ChatUiComponent,
+    ChatUiMessageComponent,
+    AutofocusDirective
+  ],
+  providers: [BotSharedService]
 })
 export class BotSharedModule {}
