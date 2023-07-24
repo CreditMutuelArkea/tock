@@ -31,6 +31,8 @@ internal class BotConfiguration_Deserializer : JsonDeserializer<BotConfiguration
             var _namespace_set : Boolean = false
             var _nlpModel_: String? = null
             var _nlpModel_set : Boolean = false
+            var _ragConfiguration_: RAGConfiguration? = null
+            var _ragConfiguration_set : Boolean = false
             var _apiKey_: String? = null
             var _apiKey_set : Boolean = false
             var _webhookUrl_: String? = null
@@ -67,6 +69,11 @@ internal class BotConfiguration_Deserializer : JsonDeserializer<BotConfiguration
                              else p.text;
                             _nlpModel_set = true
                             }
+                    "ragConfiguration" -> {
+                            _ragConfiguration_ = if(_token_ == JsonToken.VALUE_NULL) null
+                             else p.readValueAs(RAGConfiguration::class.java);
+                            _ragConfiguration_set = true
+                            }
                     "apiKey" -> {
                             _apiKey_ = if(_token_ == JsonToken.VALUE_NULL) null
                              else p.text;
@@ -90,11 +97,13 @@ internal class BotConfiguration_Deserializer : JsonDeserializer<BotConfiguration
                     } 
                 _token_ = currentToken
                         } 
-            return if(_name_set && _botId_set && _namespace_set && _nlpModel_set && _apiKey_set &&
-                    _webhookUrl_set && _supportedLocales_set)
+            return if(_name_set && _botId_set && _namespace_set && _nlpModel_set &&
+                    _ragConfiguration_set && _apiKey_set && _webhookUrl_set &&
+                    _supportedLocales_set)
                     BotConfiguration(name = _name_!!, botId = _botId_!!, namespace = _namespace_!!,
-                            nlpModel = _nlpModel_!!, apiKey = _apiKey_!!, webhookUrl = _webhookUrl_,
-                            supportedLocales = _supportedLocales_!!)
+                            nlpModel = _nlpModel_!!, ragConfiguration = _ragConfiguration_!!, apiKey
+                            = _apiKey_!!, webhookUrl = _webhookUrl_, supportedLocales =
+                            _supportedLocales_!!)
                     else {
                     val map = mutableMapOf<KParameter, Any?>()
                     if(_name_set)
@@ -105,6 +114,8 @@ internal class BotConfiguration_Deserializer : JsonDeserializer<BotConfiguration
                     map[parameters.getValue("namespace")] = _namespace_
                     if(_nlpModel_set)
                     map[parameters.getValue("nlpModel")] = _nlpModel_
+                    if(_ragConfiguration_set)
+                    map[parameters.getValue("ragConfiguration")] = _ragConfiguration_
                     if(_apiKey_set)
                     map[parameters.getValue("apiKey")] = _apiKey_
                     if(_webhookUrl_set)
@@ -125,7 +136,8 @@ internal class BotConfiguration_Deserializer : JsonDeserializer<BotConfiguration
                 kotlin.collections.mapOf("name" to primaryConstructor.findParameterByName("name")!!,
                 "botId" to primaryConstructor.findParameterByName("botId")!!, "namespace" to
                 primaryConstructor.findParameterByName("namespace")!!, "nlpModel" to
-                primaryConstructor.findParameterByName("nlpModel")!!, "apiKey" to
+                primaryConstructor.findParameterByName("nlpModel")!!, "ragConfiguration" to
+                primaryConstructor.findParameterByName("ragConfiguration")!!, "apiKey" to
                 primaryConstructor.findParameterByName("apiKey")!!, "webhookUrl" to
                 primaryConstructor.findParameterByName("webhookUrl")!!, "supportedLocales" to
                 primaryConstructor.findParameterByName("supportedLocales")!!) }

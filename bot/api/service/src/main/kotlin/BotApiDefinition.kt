@@ -85,11 +85,14 @@ internal class BotApiDefinition(
         //map stories to SimpleStoryDefinition otherwise empty list
         ?.map { it.mapToSimpleStoryDefinition(handler) } ?: emptyList(),
     configuration.nlpModel,
-    FallbackStoryDefinition(defaultUnknownStory, handler)
+    FallbackStoryDefinition(defaultUnknownStory, handler),
+    ragConfigurationEnabled = configuration.ragConfiguration.enabled,
 ) {
     override fun findIntent(intent: String, applicationId: String): Intent =
         super.findIntent(intent, applicationId).let {
-            if (it.wrap(Intent.unknown)) {
+            if (it.wrap(Intent.ragexcluded)) {
+                Intent(intent)
+            } else if (it.wrap(Intent.unknown)) {
                 Intent(intent)
             } else {
                 it
