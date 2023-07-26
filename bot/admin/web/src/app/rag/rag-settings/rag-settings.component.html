@@ -17,6 +17,7 @@
         name="engine"
         [controls]="engine"
         [required]="true"
+        [showError]="isSubmitted"
       >
         <nb-radio-group
           formControlName="engine"
@@ -24,7 +25,7 @@
         >
           <nb-radio
             *ngFor="let engine of LlmEngines"
-            [value]="engine.value"
+            [value]="engine.key"
           >
             {{ engine.label }}
           </nb-radio>
@@ -42,9 +43,10 @@
             <tock-form-control
               [label]="param.label"
               [name]="param.key"
-              [controls]="param.key"
+              [controls]="getFormControlByName(param.key)"
               [required]="true"
               [boldLabel]="false"
+              [showError]="isSubmitted"
             >
               <ng-container *ngIf="param.type === 'string'">
                 <input
@@ -77,18 +79,93 @@
         name="temperature"
         [controls]="temperature"
         [required]="true"
+        [showError]="isSubmitted"
       >
-        <div class="d-flex align-items-center justify-content-between range-slider">
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            formControlName="temperature"
-          />
-          <div class="range-slider-value">{{ temperature.value }}</div>
-        </div>
+        <tock-slider
+          min="0"
+          max="1"
+          step="0.05"
+          formControlName="temperature"
+        ></tock-slider>
       </tock-form-control>
+
+      <tock-form-control
+        label="Embedding Engine"
+        name="embeddingEngine"
+        [controls]="embeddingEngine"
+        [required]="true"
+        [showError]="isSubmitted"
+      >
+        <nb-select
+          formControlName="embeddingEngine"
+          class="d-flex"
+        >
+          <nb-option
+            *ngFor="let embedding of EmbeddingEngines"
+            [value]="embedding"
+          >
+            {{ embedding }}
+          </nb-option>
+        </nb-select>
+      </tock-form-control>
+
+      <tock-form-control
+        label="Prompt"
+        name="prompt"
+        [controls]="prompt"
+        [required]="true"
+        [showError]="isSubmitted"
+        [hasMargin]="false"
+      >
+        <textarea
+          formControlName="prompt"
+          nbInput
+          fullWidth
+          rows="8"
+          placeholder="Enter prompt string"
+        ></textarea>
+      </tock-form-control>
+
+      <div class="d-flex justify-content-between mt-1 mb-3">
+        <button
+          nbButton
+          size="tiny"
+          (click)="restoreDefaultPrompt()"
+        >
+          Restore default prompt
+        </button>
+
+        <div class="d-flex">
+          <small> No answer story redirection </small>
+
+          <nb-select
+            formControlName="noAnswerRedirection"
+            size="tiny"
+            class="ml-3"
+          >
+            <nb-option
+              class="text-muted"
+              value=""
+            >
+              none
+            </nb-option>
+
+            <nb-option
+              *ngFor="let story of availableStories"
+              [value]="story.storyId"
+            >
+              {{ story.name }}
+            </nb-option>
+          </nb-select>
+        </div>
+      </div>
+
+      <button
+        nbButton
+        (click)="submit()"
+      >
+        submit
+      </button>
     </nb-card-body>
   </nb-card>
 </form>
