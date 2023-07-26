@@ -1,0 +1,77 @@
+<ng-container *ngFor="let list of getSampleData() | keyvalue; let i = index">
+  <ul
+    [class.container]="!isPrimitive(list.value)"
+    [class.primitive]="isPrimitive(list.value)"
+  >
+    <li>
+      <div class="d-flex align-items-center justify-content-between">
+        <span>
+          <div
+            class="array font-weight-bold"
+            *ngIf="isArray(list.value)"
+          >
+            {{ list.key }}
+          </div>
+          <div
+            class="array"
+            *ngIf="!isArray(list.value) && !isPrimitive(list.value)"
+          >
+            {{ parentKey }} <span class="font-weight-bold">[{{ list.key }}]</span>
+          </div>
+          <span
+            class="font-weight-bold"
+            *ngIf="isPrimitive(list.value)"
+          >
+            {{ list.key }}
+          </span>
+        </span>
+
+        <nb-select
+          placeholder="Select a data type"
+          size="small"
+          *ngIf="isPrimitive(list.value)"
+          (selectedChange)="selectDataType($event, list.key)"
+          [selected]="isSelected(list.key)"
+          class="my-2"
+        >
+          <nb-option
+            value="null"
+            class="text-muted font-italic"
+            >None</nb-option
+          >
+          <nb-option
+            *ngFor="let dataType of dataTypesDefinition"
+            [value]="dataType.type"
+            >{{ dataType.label }}</nb-option
+          >
+        </nb-select>
+      </div>
+
+      <div
+        *ngIf="isPrimitive(list.value)"
+        class="pb-2"
+      >
+        {{ list.value }}
+      </div>
+
+      <tock-json-iterator
+        *ngIf="isRoot || i <= 5"
+        [dataTypesDefinition]="dataTypesDefinition"
+        [associations]="associations"
+        [recursiveList]="list.value"
+        [parentKey]="list.key"
+        [parentType]="getType(recursiveList)"
+        [upstreamPath]="path"
+        (riseSelection)="upriseSelection($event)"
+        isRoot="false"
+      ></tock-json-iterator>
+    </li>
+  </ul>
+</ng-container>
+
+<div
+  *ngIf="truncatedDataLengthAlert"
+  class="text-muted font-italic"
+>
+  Plus {{ truncatedDataLengthAlert - 5 }} more entries...
+</div>

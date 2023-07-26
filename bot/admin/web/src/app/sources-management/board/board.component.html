@@ -1,0 +1,48 @@
+<div class="d-flex flex-wrap mb-2">
+  <h1 class="flex-grow-1">Sources Management</h1>
+
+  <div>
+    <button
+      nbButton
+      status="primary"
+      size="medium"
+      [disabled]="!configurations?.length"
+      (click)="addSource()"
+    >
+      <nb-icon icon="plus-outline"></nb-icon>
+      NEW SOURCE
+    </button>
+  </div>
+</div>
+
+<section>
+  <nb-alert
+    *ngIf="configurations?.length === 0"
+    class="alert-config flex-row align-items-center"
+    accent="warning"
+  >
+    <nb-icon
+      class="mr-1"
+      icon="alert-triangle-outline"
+      status="warning"
+    ></nb-icon>
+    No bot configuration detected
+  </nb-alert>
+
+  <div *ngIf="configurations?.length && sources?.length">
+    <tock-no-data-found
+      *ngIf="!sources.length"
+      title="No Source found"
+      message="You may create a new one using above button &#34;NEW SOURCE&#34;."
+    ></tock-no-data-found>
+
+    <ng-container *ngFor="let source of sources">
+      <tock-source-entry
+        [source]="source"
+        (onEdit)="editSource($event)"
+        (onDelete)="deleteSource($event)"
+        (onToggleEnabled)="toggleEnabledSource($event)"
+      ></tock-source-entry>
+    </ng-container>
+  </div>
+</section>
