@@ -1,0 +1,166 @@
+<div
+  class="fixed-section"
+  [ngClass]="{ 'fixed-section-shadow': showScrollToTopButton$ | async }"
+>
+  <div class="d-flex justify-content-between flex-wrap align-items-center mb-2">
+    <div>
+      <h1 class="mb-0">Sources Management</h1>
+      <h6 class="mb-0">Questions generation</h6>
+    </div>
+
+    <div class="d-flex gap-1">
+      <button
+        nbButton
+        status="basic"
+        size="medium"
+        routerLink="/sources-management/board"
+      >
+        Cancel
+      </button>
+
+      <button
+        nbButton
+        status="primary"
+        size="medium"
+        (click)="submit(confirmNextStepModal)"
+      >
+        Submit
+        <nb-icon icon="checkmark-outline"></nb-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<section
+  infiniteScroll
+  [infiniteScrollDistance]="2"
+  [infiniteScrollThrottle]="50"
+  (scrolled)="onScroll()"
+>
+  <nb-card
+    class="mb-2"
+    *ngFor="let fragment of scrolledFragments"
+  >
+    <nb-card-body>
+      <div class="questions mb-2">
+        <div
+          *ngFor="let question of fragment.questions"
+          class="question d-flex justify-content-between gap-1 font-weight-bold"
+        >
+          <span *ngIf="!question._edit">
+            {{ question.value }}
+          </span>
+
+          <div
+            class="flex-grow-1"
+            *ngIf="question._edit"
+          >
+            <textarea
+              nbInput
+              fullWidth
+              fieldSize="small"
+              [(ngModel)]="questionEditionValue"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <button
+              nbButton
+              ghost
+              shape="round"
+              nbTooltip="Edit"
+              (click)="edit(fragment, question)"
+              *ngIf="!question._edit"
+            >
+              <nb-icon icon="edit-outline"></nb-icon>
+            </button>
+            <button
+              nbButton
+              ghost
+              shape="round"
+              nbTooltip="Delete"
+              (click)="delete(fragment, question)"
+              *ngIf="!question._edit"
+            >
+              <nb-icon icon="trash-2-outline"></nb-icon>
+            </button>
+
+            <button
+              *ngIf="question._edit"
+              type="button"
+              nbButton
+              nbTooltip="Validate changes"
+              shape="round"
+              size="small"
+              status="success"
+              (click)="validateEditQuestion(fragment, question)"
+            >
+              <nb-icon icon="checkmark-outline"></nb-icon>
+            </button>
+
+            <button
+              *ngIf="question._edit"
+              type="button"
+              nbButton
+              nbTooltip="Cancel changes"
+              ghost
+              shape="round"
+              size="small"
+              (click)="cancelEditQuestion(fragment, question)"
+            >
+              <nb-icon icon="close-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="answer">
+        {{ fragment.text }}
+      </div>
+    </nb-card-body>
+  </nb-card>
+</section>
+
+<div
+  class="top-scroller"
+  *ngIf="showScrollToTopButton$ | async"
+  (click)="onScrollToTop()"
+  nbTooltip="Scroll to page top"
+>
+  <nb-icon icon="chevron-up-outline"></nb-icon>
+</div>
+
+<ng-template #confirmNextStepModal>
+  <nb-card>
+    <nb-card-header class="d-flex justify-content-between align-items-start gap-1">
+      <span> Create Faqs ? </span>
+    </nb-card-header>
+
+    <nb-card-body> Do you want to create the Faqs now ? </nb-card-body>
+
+    <nb-card-footer>
+      <div class="d-flex justify-content-between">
+        <button
+          type="button"
+          nbButton
+          outline
+          status="primary"
+          size="small"
+          (click)="cancelNextStep()"
+        >
+          Later
+        </button>
+        <button
+          type="button"
+          nbButton
+          status="primary"
+          size="small"
+          (click)="createFaqs()"
+        >
+          Create Faqs
+        </button>
+      </div>
+    </nb-card-footer>
+  </nb-card>
+</ng-template>

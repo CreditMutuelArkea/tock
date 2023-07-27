@@ -1,0 +1,137 @@
+<div class="d-flex flex-wrap mb-2">
+  <h1 class="flex-grow-1">Sources Management</h1>
+
+  <div>
+    <button
+      nbButton
+      status="primary"
+      size="medium"
+      [disabled]="!configurations?.length"
+      (click)="addSource()"
+    >
+      <nb-icon icon="plus-outline"></nb-icon>
+      NEW SOURCE
+    </button>
+  </div>
+</div>
+
+<section>
+  <nb-alert
+    *ngIf="configurations?.length === 0"
+    class="alert-config flex-row align-items-center"
+    accent="warning"
+  >
+    <nb-icon
+      class="mr-1"
+      icon="alert-triangle-outline"
+      status="warning"
+    ></nb-icon>
+    No bot configuration detected
+  </nb-alert>
+
+  <div *ngIf="configurations?.length && sources?.length">
+    <tock-no-data-found
+      *ngIf="!sources.length"
+      title="No Source found"
+      message="You may create a new one using above button &#34;NEW SOURCE&#34;."
+    ></tock-no-data-found>
+
+    <nb-card
+      *ngFor="let source of sources"
+      class="mb-2"
+    >
+      <nb-card-body>
+        <div class="d-flex justify-content-between gap-1">
+          <div class="source-icon">
+            <nb-icon
+              icon="file-text-outline"
+              *ngIf="source.type === sourceTypes.file"
+            ></nb-icon>
+            <nb-icon
+              icon="link-2-outline"
+              *ngIf="source.type === sourceTypes.remote"
+            ></nb-icon>
+          </div>
+
+          <div class="flex-grow-1">
+            <strong class="lead">
+              {{ source.name }}
+            </strong>
+            <div>
+              Type : {{ source.type }}
+              <span *ngIf="source.type === sourceTypes.remote">({{ source.url }})</span>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-between">
+            <button
+              nbButton
+              ghost
+              shape="round"
+              nbTooltip="Edit source"
+              class="mb-2"
+              (click)="editSource(source)"
+            >
+              <nb-icon icon="edit-outline"></nb-icon>
+            </button>
+
+            <button
+              nbButton
+              ghost
+              shape="round"
+              nbTooltip="Delete source"
+              class="mb-2"
+              (click)="deleteSource(source)"
+              data-testid="delete"
+            >
+              <nb-icon icon="trash-2-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+        <hr />
+        <div class="stepper mt-3">
+          <div *ngFor="let step of steps; let i = index; let l = last">
+            <button
+              nbButton
+              ghost
+              size="small"
+              shape="round"
+              class="step"
+              [ngClass]="{ done: isStepDone(source, step.id), processing: source.isProcessing === step.id }"
+              (click)="stepAction(source, step.id)"
+            >
+              <div
+                class="done-mark"
+                *ngIf="isStepDone(source, step.id) && source.isProcessing !== step.id"
+              >
+                <nb-icon
+                  class="success"
+                  icon="checkmark-circle-2-outline"
+                ></nb-icon>
+              </div>
+              <div class="label-index">
+                <nb-icon
+                  [icon]="step.icon"
+                  *ngIf="source.isProcessing !== step.id"
+                ></nb-icon>
+                <nb-icon
+                  icon="sync-outline"
+                  *ngIf="source.isProcessing === step.id"
+                ></nb-icon>
+              </div>
+              <span class="label">{{ step.label }}</span>
+            </button>
+            <div
+              *ngIf="!l"
+              class="connector"
+              [class.connectorpassed]="isStepDone(source, step.id)"
+            >
+              <div class="line"></div>
+              <div class="arrow"></div>
+            </div>
+          </div>
+        </div>
+      </nb-card-body>
+    </nb-card>
+  </div>
+</section>
