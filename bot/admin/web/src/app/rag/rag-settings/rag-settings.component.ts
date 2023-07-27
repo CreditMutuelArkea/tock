@@ -24,13 +24,14 @@ interface RagSettingsParamsForm {
   embeddingApiVersion?: FormControl<string>;
 }
 interface RagSettingsForm {
-  _id: FormControl<string>;
+  id: FormControl<string>;
   enabled: FormControl<boolean>;
   engine: FormControl<string>;
   temperature: FormControl<number>;
   embeddingEngine: FormControl<string>;
   prompt: FormControl<string>;
-  noAnswerRedirection: FormControl<string>;
+  noAnswerSentence: FormControl<string>;
+  noAnswerStoryId: FormControl<string>;
   params: FormGroup<RagSettingsParamsForm>;
 }
 
@@ -80,13 +81,14 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
 
   form = new FormGroup<RagSettingsForm>({
-    _id: new FormControl(null),
+    id: new FormControl(null),
     enabled: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
     engine: new FormControl(undefined, [Validators.required]),
     temperature: new FormControl(undefined, [Validators.required]),
     embeddingEngine: new FormControl(undefined, [Validators.required]),
     prompt: new FormControl(DefaultPrompt, [Validators.required]),
-    noAnswerRedirection: new FormControl(undefined),
+    noAnswerSentence: new FormControl(undefined, [Validators.required]),
+    noAnswerStoryId: new FormControl(undefined),
     params: new FormGroup<RagSettingsParamsForm>({
       apiKey: new FormControl(undefined, [this.formEngineParamValidator('apiKey')]),
       modelName: new FormControl(undefined, [this.formEngineParamValidator('modelName')]),
@@ -106,7 +108,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     this.rest
       .get<RagSettings>(url, (settings: RagSettings) => settings)
       .subscribe((settings: RagSettings) => {
-        if (settings?._id) {
+        if (settings?.id) {
           this.settingsBackup = settings;
           this.form.patchValue(settings as unknown);
           this.form.markAsPristine();
@@ -158,8 +160,11 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   get prompt(): FormControl {
     return this.form.get('prompt') as FormControl;
   }
-  get noAnswerRedirection(): FormControl {
-    return this.form.get('noAnswerRedirection') as FormControl;
+  get noAnswerSentence(): FormControl {
+    return this.form.get('noAnswerSentence') as FormControl;
+  }
+  get noAnswerStoryId(): FormControl {
+    return this.form.get('noAnswerStoryId') as FormControl;
   }
 
   get apiKey(): FormControl {

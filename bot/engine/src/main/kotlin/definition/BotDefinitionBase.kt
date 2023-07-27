@@ -16,9 +16,11 @@
 
 package ai.tock.bot.definition
 
+import ai.tock.bot.admin.bot.BotRAGConfiguration
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.config.rag.RagAnswerHandler
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.deleteKeyword
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.endTestContextKeyword
@@ -53,8 +55,9 @@ open class BotDefinitionBase(
     override val keywordStory: StoryDefinition = defaultKeywordStory,
     override val flowDefinition: DialogFlowDefinition? = null,
     override val botEnabledListener: (Action) -> Unit = {},
-    override val ragConfigurationEnabled: Boolean = false,
     override val ragExcludedStory: StoryDefinition = defaultRagExcludedStory,
+    override val ragStory: StoryDefinition = defaultRagStory,
+    override val ragConfiguration: BotRAGConfiguration? = null
 ) : BotDefinition {
 
     companion object {
@@ -87,6 +90,21 @@ open class BotDefinitionBase(
                     }
                 },
                 setOf(Intent.ragexcluded)
+            )
+
+        val defaultRagStory =
+            // TODO MASS : use RagStoryDefinition
+            SimpleStoryDefinition(
+                "tock_rag_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        bus.markAsUnknown()
+                            // TODO MASS : use RagAnswerHandler
+                            bus.send("RAG - IA answer")
+                            RagAnswerHandler.handle(bus)
+                    }
+                },
+                setOf(Intent.unknown)
             )
 
         /**

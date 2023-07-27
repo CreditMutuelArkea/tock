@@ -37,7 +37,8 @@ fun main() {
         BotRepository.registerBotProvider(BotApiDefinitionProvider(it, daoRag.findByNamespaceAndBotId(it.namespace, it.botId)))
     }
     BotRepository.installBots(emptyList())
-    dao.listenBotChanges {
+
+    val updateChanges = {
         logger.info("reload bot configurations")
         dao.getBotConfigurations().forEach {
             val provider = BotApiDefinitionProvider(it, daoRag.findByNamespaceAndBotId(it.namespace, it.botId))
@@ -45,4 +46,7 @@ fun main() {
         }
         BotRepository.checkBotConfigurations()
     }
+
+    dao.listenBotChanges { updateChanges() }
+    daoRag.listenChanges { updateChanges() }
 }

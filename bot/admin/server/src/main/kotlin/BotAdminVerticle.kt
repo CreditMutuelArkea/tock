@@ -23,7 +23,6 @@ import ai.tock.bot.admin.BotAdminService.getBotConfigurationsByNamespaceAndBotId
 import ai.tock.bot.admin.BotAdminService.importStories
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotConfiguration
-import ai.tock.bot.admin.bot.BotRAGConfiguration
 import ai.tock.bot.admin.constants.Properties
 import ai.tock.bot.admin.dialog.DialogReportQuery
 import ai.tock.bot.admin.model.BotAdminConfiguration
@@ -40,10 +39,11 @@ import ai.tock.bot.admin.model.FaqDefinitionRequest
 import ai.tock.bot.admin.model.FaqSearchRequest
 import ai.tock.bot.admin.model.Feature
 import ai.tock.bot.admin.model.I18LabelQuery
-import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.StorySearchRequest
+import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.module.satisfactionContentModule
+import ai.tock.bot.admin.service.RagService
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.admin.test.TestPlanService
 import ai.tock.bot.admin.test.findTestService
@@ -445,14 +445,17 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingJsonPost("/configuration/bots/:botId/rag", setOf(botUser, faqBotUser)) { context, configuration: BotRAGConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
-                BotAdminService.saveRAGConfiguration(configuration.toBotRAGConfiguration())
+                RagService.saveRag(configuration)
             } else {
                 unauthorized()
             }
         }
 
         blockingJsonGet("/configuration/bots/:botId/rag", setOf(botUser, faqBotUser)) { context  ->
-            BotAdminService.getRAGConfiguration(context.organization, context.path("botId"))
+            RagService.getRAGConfiguration(context.organization, context.path("botId"))
+                ?.let {
+                    BotRAGConfigurationDTO(it)
+                }
         }
 
         blockingJsonPost(

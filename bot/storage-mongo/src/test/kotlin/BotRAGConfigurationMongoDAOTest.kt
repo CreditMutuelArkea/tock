@@ -17,18 +17,9 @@
 package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.bot.BotRAGConfiguration
-import ai.tock.bot.admin.bot.RAGConfiguration
-import ai.tock.bot.admin.user.UserReportQuery
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.user.PlayerId
-import ai.tock.bot.engine.user.PlayerType
-import ai.tock.bot.engine.user.UserTimeline
-import ai.tock.shared.defaultNamespace
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.litote.kmongo.deleteMany
 import org.litote.kmongo.newId
-import java.util.Locale
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
 import kotlin.test.assertNull

@@ -17,33 +17,48 @@
 package ai.tock.bot.admin.model
 
 import ai.tock.bot.admin.bot.BotRAGConfiguration
-import org.litote.kmongo.Id
 import org.litote.kmongo.newId
+import org.litote.kmongo.toId
 
 data class BotRAGConfigurationDTO(
-    val _id: Id<BotRAGConfiguration>?,
+    val id: String?,
     val namespace: String,
     val botId: String,
-    val enabled: Boolean?,
+    val enabled: Boolean = false,
     val engine: String,
     val embeddingEngine: String,
     val temperature: String,
     val prompt: String,
     val params: Map<String, String>,
-    val noAnswerRedirection: String,
-
+    val noAnswerSentence: String,
+    val noAnswerStoryId: String?
 ) {
+    constructor(configuration: BotRAGConfiguration): this(
+        configuration._id.toString(),
+        configuration.namespace,
+        configuration.botId,
+        configuration.enabled,
+        configuration.engine,
+        configuration.embeddingEngine,
+        configuration.temperature,
+        configuration.prompt,
+        configuration.params,
+        configuration.noAnswerSentence,
+        configuration.noAnswerStoryId?.toString()
+
+    )
     fun toBotRAGConfiguration(): BotRAGConfiguration =
         BotRAGConfiguration(
-            _id ?: newId(),
+            id?.toId() ?: newId(),
             namespace,
             botId,
-            enabled ?: false,
+            enabled,
             engine,
             embeddingEngine,
             temperature,
             prompt,
             params,
-            noAnswerRedirection
+            noAnswerSentence = noAnswerSentence,
+            noAnswerStoryId = noAnswerStoryId?.toId()
         )
 }
