@@ -1,58 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
-import { take } from 'rxjs';
+import { debounceTime, Subject, take, takeUntil } from 'rxjs';
 import { BotService } from '../../bot/bot-service';
 import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../bot/model/story';
 import { StateService } from '../../core-nlp/state.service';
-
-const AzureOpenAiApiVersions = ['2023-03-15-preview', '2022-12-01', '2023-05-15', '2023-06-01-preview'];
-const OpenAiModels = ['gpt-4', 'gpt-4-32k'];
-
-const EmbeddingEngines = [
-  'text-embedding-ada-002',
-  'text-search-davinci-*-001',
-  'text-search-curie-*-001',
-  'text-search-babbage-*-001',
-  'text-search-ada-*-001'
-];
-
-export interface LlmEngineConfiguration {
-  label: string;
-}
-
-const LlmEngines = [
-  {
-    label: 'OpenAi',
-    key: 'openAi',
-    params: [
-      { key: 'apiKey', label: 'Api key', type: 'string' },
-      { key: 'modelName', label: 'Model name', type: 'list', source: OpenAiModels }
-    ]
-  },
-  {
-    label: 'Azure OpenAi',
-    key: 'azureOpenAi',
-    params: [
-      { key: 'modelName', label: 'Model name', type: 'list', source: OpenAiModels },
-      { key: 'deploymentName', label: 'Deployment name', type: 'string' },
-      { key: 'privateEndpointBaseUrl', label: 'Private endpoint base url', type: 'string' },
-      { key: 'apiVersion', label: 'Api version', type: 'list', source: AzureOpenAiApiVersions }
-    ]
-  }
-];
-
-const DefaultPrompt = `Use the following context to answer the question at the end.
-If you dont know the answer, just say {no_answer}.
-
-Context:
-{context}
-
-Question:
-{question}
-
-Answer in {locale}:`;
+import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './configurations';
+import { LlmEngineConfiguration, LlmEngineConfigurationParams } from './models';
 
 interface RagSettingsForm {
+  activation: FormControl<boolean>;
   engine: FormControl<string>;
   temperature: FormControl<number>;
   embeddingEngine: FormControl<string>;
@@ -70,17 +26,28 @@ interface RagSettingsForm {
   templateUrl: './rag-settings.component.html',
   styleUrls: ['./rag-settings.component.scss']
 })
-export class RagSettingsComponent implements OnInit {
-  LlmEngines = LlmEngines;
-  EmbeddingEngines = EmbeddingEngines;
+export class RagSettingsComponent implements OnInit, OnDestroy {
+  destroy: Subject<unknown> = new Subject();
 
-  isSubmitted: boolean = false;
+  LlmEngines: LlmEngineConfiguration[] = LlmEngines;
+
+  EmbeddingEngines: string[] = EmbeddingEngines;
 
   availableStories: StoryDefinitionConfigurationSummary[];
 
+  isSubmitted: boolean = false;
+
   constructor(private botService: BotService, private state: StateService) {}
 
+  ngOnInit(): void {
+    this.loadAvailableStories();
+    this.form.valueChanges.pipe(takeUntil(this.destroy), debounceTime(300)).subscribe(() => {
+      this.setActivationDisabledState();
+    });
+  }
+
   form = new FormGroup<RagSettingsForm>({
+    activation: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
     engine: new FormControl(undefined, [Validators.required]),
     temperature: new FormControl(undefined, [Validators.required]),
     embeddingEngine: new FormControl(undefined, [Validators.required]),
@@ -92,6 +59,18 @@ export class RagSettingsComponent implements OnInit {
     privateEndpointBaseUrl: new FormControl(undefined, [this.formEngineParamValidator('privateEndpointBaseUrl')]),
     apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')])
   });
+
+  canRagBeActivated(): boolean {
+    return this.form ? this.form.valid : false;
+  }
+
+  setActivationDisabledState(): void {
+    if (this.canRagBeActivated()) {
+      this.activation.enable();
+    } else {
+      this.activation.disable();
+    }
+  }
 
   private formEngineParamValidator(paramKey): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -107,6 +86,9 @@ export class RagSettingsComponent implements OnInit {
     };
   }
 
+  get activation(): FormControl {
+    return this.form.get('activation') as FormControl;
+  }
   get engine(): FormControl {
     return this.form.get('engine') as FormControl;
   }
@@ -147,11 +129,7 @@ export class RagSettingsComponent implements OnInit {
     return this.isSubmitted ? this.form.valid : this.form.dirty;
   }
 
-  ngOnInit(): void {
-    this.loadAvailableStories();
-  }
-
-  get currentEngine() {
+  get currentEngine(): LlmEngineConfiguration {
     return LlmEngines.find((e) => e.key === this.engine.value);
   }
 
@@ -160,12 +138,12 @@ export class RagSettingsComponent implements OnInit {
     return this.currentEngine.label;
   }
 
-  get currentEngineParams() {
+  get currentEngineParams(): LlmEngineConfigurationParams[] {
     if (!this.currentEngine) return null;
     return this.currentEngine.params;
   }
 
-  restoreDefaultPrompt() {
+  restoreDefaultPrompt(): void {
     this.prompt.setValue(DefaultPrompt);
   }
 
@@ -189,11 +167,20 @@ export class RagSettingsComponent implements OnInit {
       });
   }
 
-  submit() {
+  submit(): void {
     console.log(this.form.value);
     this.isSubmitted = true;
     if (this.canSave) {
-      console.log('SUBMIT !');
+      alert('TODO');
     }
+  }
+
+  cancel(): void {
+    console.log('TODO');
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+    this.destroy.complete();
   }
 }

@@ -1,17 +1,20 @@
 <form [formGroup]="form">
   <nb-card class="mt-3">
-    <nb-card-header class="d-flex flex-wrap align-items-center justify-content-between">
-      Retrieval Augmented Generation settings
-
-      <nb-toggle
-        class="m-2"
-        nbTooltip="Activate/deactivate Rag"
-      >
-        Activate/deactivate Rag
-      </nb-toggle>
-    </nb-card-header>
+    <nb-card-header> Retrieval Augmented Generation settings </nb-card-header>
 
     <nb-card-body>
+      <tock-form-control
+        label="Activate RAG"
+        name="activation"
+        [controls]="activation"
+        [showError]="isSubmitted"
+      >
+        <nb-toggle formControlName="activation">
+          <span *ngIf="activation.value">Rag activated</span>
+          <span *ngIf="!activation.value">Rag deactivated</span>
+        </nb-toggle>
+      </tock-form-control>
+
       <tock-form-control
         label="LLM Engine"
         name="engine"
@@ -38,7 +41,7 @@
       >
         <div class="font-weight-bold mb-3">{{ currentEngineLabel }} parameters</div>
 
-        <div class="engine-params">
+        <div class="engine-params mb-3">
           <div *ngFor="let param of currentEngineParams">
             <tock-form-control
               [label]="param.label"
@@ -47,6 +50,7 @@
               [required]="true"
               [boldLabel]="false"
               [showError]="isSubmitted"
+              [hasMargin]="false"
             >
               <ng-container *ngIf="param.type === 'string'">
                 <input
@@ -115,7 +119,6 @@
         [controls]="prompt"
         [required]="true"
         [showError]="isSubmitted"
-        [hasMargin]="false"
       >
         <textarea
           formControlName="prompt"
@@ -124,48 +127,63 @@
           rows="8"
           placeholder="Enter prompt string"
         ></textarea>
+
+        <div class="mt-1">
+          <button
+            nbButton
+            size="tiny"
+            (click)="restoreDefaultPrompt()"
+          >
+            Restore default prompt
+          </button>
+        </div>
       </tock-form-control>
 
-      <div class="d-flex justify-content-between mt-1 mb-3">
-        <button
-          nbButton
-          size="tiny"
-          (click)="restoreDefaultPrompt()"
-        >
-          Restore default prompt
-        </button>
-
-        <div class="d-flex">
-          <small> No answer story redirection </small>
-
-          <nb-select
-            formControlName="noAnswerRedirection"
-            size="tiny"
-            class="ml-3"
-          >
-            <nb-option
-              class="text-muted"
-              value=""
-            >
-              none
-            </nb-option>
-
-            <nb-option
-              *ngFor="let story of availableStories"
-              [value]="story.storyId"
-            >
-              {{ story.name }}
-            </nb-option>
-          </nb-select>
-        </div>
-      </div>
-
-      <button
-        nbButton
-        (click)="submit()"
+      <tock-form-control
+        label="No answer story redirection"
+        name="noAnswerRedirection"
+        [controls]="noAnswerRedirection"
+        [showError]="isSubmitted"
       >
-        submit
-      </button>
+        <nb-select formControlName="noAnswerRedirection">
+          <nb-option
+            class="text-muted"
+            value="null"
+          >
+            none
+          </nb-option>
+
+          <nb-option
+            *ngFor="let story of availableStories"
+            [value]="story.storyId"
+          >
+            {{ story.name }}
+          </nb-option>
+        </nb-select>
+      </tock-form-control>
+
+      <div class="grid-button mt-3">
+        <button
+          type="button"
+          nbButton
+          outline
+          status="primary"
+          size="small"
+          (click)="cancel()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          nbButton
+          status="primary"
+          size="small"
+          [disabled]="!canSave"
+          (click)="submit()"
+        >
+          Save
+        </button>
+      </div>
     </nb-card-body>
   </nb-card>
 </form>
