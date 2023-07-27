@@ -45,11 +45,11 @@
           <div class="source-icon">
             <nb-icon
               icon="file-text-outline"
-              *ngIf="source.type === sourceTypes.file"
+              *ngIf="source.source_type === sourceTypes.file"
             ></nb-icon>
             <nb-icon
               icon="link-2-outline"
-              *ngIf="source.type === sourceTypes.remote"
+              *ngIf="source.source_type === sourceTypes.remote"
             ></nb-icon>
           </div>
 
@@ -58,8 +58,8 @@
               {{ source.name }}
             </strong>
             <div>
-              Type : {{ source.type }}
-              <span *ngIf="source.type === sourceTypes.remote">({{ source.url }})</span>
+              Type : {{ source.source_type }}
+              <span *ngIf="source.source_type === sourceTypes.remote">({{ source.url }})</span>
             </div>
           </div>
 

@@ -27,7 +27,7 @@
       (submit)="import()"
     >
       <tock-form-control
-        *ngIf="source.type === sourceTypes.file"
+        *ngIf="source.source_type === sourceTypes.file"
         label="Scenario dump files"
         name="importFile"
         required="true"

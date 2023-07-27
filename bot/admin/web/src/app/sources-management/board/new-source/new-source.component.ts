@@ -5,6 +5,7 @@ import { Source, sourceTypes } from '../../models';
 
 interface NewSourceForm {
   name: FormControl<string>;
+  description: FormControl<string>;
   type: FormControl<sourceTypes>;
   url?: FormControl<URL>;
 }
@@ -42,12 +43,17 @@ export class NewSourceComponent implements OnInit {
 
   form = new FormGroup<NewSourceForm>({
     name: new FormControl(undefined, [Validators.required, Validators.minLength(6), Validators.maxLength(40)]),
+    description: new FormControl(undefined),
     type: new FormControl(undefined, [Validators.required]),
     url: new FormControl(undefined)
   });
 
   get name(): FormControl {
     return this.form.get('name') as FormControl;
+  }
+
+  get description(): FormControl {
+    return this.form.get('description') as FormControl;
   }
 
   get type(): FormControl {

@@ -162,7 +162,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       }
     });
     modal.componentRef.instance.onImport.subscribe((result) => {
-      source.fileFormat = result.fileFormat;
+      source.file_format = result.fileFormat;
       source.rawData = result.data;
       this.normalizeSource(source);
     });
@@ -170,13 +170,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   normalizeSource(source: Source): void {
     let modal;
-    if (source.fileFormat === 'csv') {
+    if (source.file_format === 'csv') {
       modal = this.nbDialogService.open(SourceNormalizationCsvComponent, {
         context: {
           source: source
         }
       });
-    } else if (source.fileFormat === 'json') {
+    } else if (source.file_format === 'json') {
       modal = this.nbDialogService.open(SourceNormalizationJsonComponent, {
         context: {
           source: source

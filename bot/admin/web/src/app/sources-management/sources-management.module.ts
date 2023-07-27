@@ -10,6 +10,7 @@ import {
   NbInputModule,
   NbRadioModule,
   NbSelectModule,
+  NbTagModule,
   NbTooltipModule
 } from '@nebular/theme';
 import { NewSourceComponent } from './board/new-source/new-source.component';
@@ -52,6 +53,7 @@ import { JsonIteratorComponent } from './board/source-normalization/json/json-it
     NbCheckboxModule,
     NbSelectModule,
     NbTooltipModule,
+    NbTagModule,
     InfiniteScrollModule
   ]
 })

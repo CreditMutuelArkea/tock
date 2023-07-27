@@ -34,6 +34,21 @@
       </tock-form-control>
 
       <tock-form-control
+        label="Source description"
+        name="description"
+        [controls]="description"
+        [showError]="isSubmitted"
+      >
+        <textarea
+          nbInput
+          formControlName="description"
+          fullWidth
+          type="text"
+          placeholder="Enter source description"
+        ></textarea>
+      </tock-form-control>
+
+      <tock-form-control
         label="Source type"
         name="type"
         [controls]="type"

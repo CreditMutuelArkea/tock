@@ -11,24 +11,27 @@ const TMPsources: Source[] = [
   {
     id: '1234567879',
     name: 'CMB Faqs',
-    type: sourceTypes.file,
+    description: '',
+    source_type: sourceTypes.file,
     step: 'import',
-    fileFormat: 'csv',
+    file_format: 'csv',
     rawData: csvMockRawData.data,
     normalizedData: csvMockNormalizedData
   },
   {
     id: '987654321',
     name: 'ArkInfo',
-    type: sourceTypes.file,
-    fileFormat: 'json',
+    description: '',
+    source_type: sourceTypes.file,
+    file_format: 'json',
     rawData: jsonMockData
   },
   {
     id: '654',
     name: 'Other kind of json source format',
-    type: sourceTypes.file,
-    fileFormat: 'json',
+    description: '',
+    source_type: sourceTypes.file,
+    file_format: 'json',
     rawData: jsonMockData2
   }
 ];
