@@ -16,17 +16,19 @@
 
 package ai.tock.bot.admin.bot
 
+import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import org.litote.kmongo.Id
 
 data class BotRAGConfiguration(
     val _id: Id<BotRAGConfiguration>,
     val namespace: String,
     val botId: String,
-    val enabled: Boolean?,
+    val enabled: Boolean,
     val engine: String,
     val embeddingEngine: String,
     val temperature: String,
     val prompt: String,
     val params: Map<String, String>,
-    val noAnswerRedirection: String,
+    val noAnswerSentence: String,
+    val noAnswerStoryId: Id<StoryDefinitionConfiguration>? = null,
 )

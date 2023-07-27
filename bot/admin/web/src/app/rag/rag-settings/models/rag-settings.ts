@@ -1,5 +1,5 @@
 export interface RagSettings {
-  _id: string;
+  id: string;
   namespace: string;
   botId: string;
   enabled: boolean;
@@ -7,7 +7,8 @@ export interface RagSettings {
   temperature: number;
   embeddingEngine: string;
   prompt: string;
-  noAnswerRedirection: string;
+  noAnswerSentence: string;
+  noAnswerStoryId: string;
   params: RagSettingsParams[];
 }
 

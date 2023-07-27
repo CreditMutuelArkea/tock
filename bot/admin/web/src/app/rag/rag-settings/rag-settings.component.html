@@ -157,12 +157,27 @@
       </tock-form-control>
 
       <tock-form-control
-        label="No answer story redirection"
-        name="noAnswerRedirection"
-        [controls]="noAnswerRedirection"
+        label="No answer sentence"
+        name="noAnswerSentence"
+        [controls]="noAnswerSentence"
+        [required]="true"
         [showError]="isSubmitted"
       >
-        <nb-select formControlName="noAnswerRedirection">
+        <input
+          nbInput
+          fullWidth
+          formControlName="noAnswerSentence"
+        />
+
+      </tock-form-control>
+
+      <tock-form-control
+        label="No answer story redirection"
+        name="noAnswerStoryId"
+        [controls]="noAnswerStoryId"
+        [showError]="isSubmitted"
+      >
+        <nb-select formControlName="noAnswerStoryId">
           <nb-option
             class="text-muted"
             value="null"
@@ -172,7 +187,7 @@
 
           <nb-option
             *ngFor="let story of availableStories"
-            [value]="story.storyId"
+            [value]="story._id"
           >
             {{ story.name }}
           </nb-option>

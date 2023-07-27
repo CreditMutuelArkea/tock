@@ -55,6 +55,7 @@ import ai.tock.bot.admin.model.StorySearchRequest
 import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.model.UserSearchQueryResult
+import ai.tock.bot.admin.service.RagService
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationByBotStep
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
@@ -69,10 +70,12 @@ import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationFeatureDump
 import ai.tock.bot.admin.user.UserReportDAO
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.IntentWithoutNamespace
+import ai.tock.bot.definition.RagStoryDefinition
 import ai.tock.bot.engine.dialog.DialogFlowDAO
 import ai.tock.bot.engine.feature.FeatureDAO
 import ai.tock.bot.engine.feature.FeatureState
 import ai.tock.nlp.admin.AdminService
+import ai.tock.nlp.core.Intent
 import ai.tock.nlp.front.client.FrontClient
 import ai.tock.nlp.front.service.applicationDAO
 import ai.tock.nlp.front.shared.config.ApplicationDefinition
@@ -90,6 +93,7 @@ import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.security.UserLogin
 import ai.tock.shared.vertx.WebVerticle.Companion.badRequest
+import ai.tock.shared.withoutNamespace
 import ai.tock.translator.I18nKeyProvider
 import ai.tock.translator.I18nLabel
 import ai.tock.translator.I18nLabelValue
@@ -286,10 +290,6 @@ object BotAdminService {
         }
     }
 
-    fun saveRAGConfiguration(conf: BotRAGConfiguration): BotRAGConfiguration {
-        return ragConfigurationDAO.save(conf)
-    }
-
     fun getRAGConfiguration(namespace: String, botId: String): BotRAGConfiguration? {
         return ragConfigurationDAO.findByNamespaceAndBotId(namespace, botId)
     }
@@ -418,7 +418,9 @@ object BotAdminService {
                 storyDefinitionDAO.delete(it)
             }
         }
-
+        // TODO MASS : Si la RAG est activée, et que la story importée est unknown :
+        // - doit on désactiver cette story importée avant de l'injecter,
+        // - ou bien on fait rien, et donc elle prendra le dessus sur la RAG story ?
         storyDefinitionDAO.save(story.copy(_id = existingStory1?._id ?: existingStory2?._id ?: story._id))
 
         val mainIntent = createOrGetIntent(
@@ -728,6 +730,9 @@ object BotAdminService {
         createdIntent: IntentDefinition? = null
     ): BotStoryDefinitionConfiguration? {
 
+        // Manage unknown story when RAG is enabled
+        manageUnknownStory(story)
+
         if (!story.validateMetrics()) {
             badRequest("Story is not valid : Metric story must have at least one step that handles at least one metric.")
         }
@@ -863,6 +868,19 @@ object BotAdminService {
             BotStoryDefinitionConfiguration(newStory, story.userSentenceLocale)
         } else {
             null
+        }
+    }
+
+    /**
+     * Manage unknown story when RAG is enabled
+     */
+    private fun manageUnknownStory(story: BotStoryDefinitionConfiguration) {
+        if(Intent.UNKNOWN_INTENT.name.withoutNamespace() == story.intent.name.withoutNamespace()) {
+            ragConfigurationDAO.findByNamespaceAndBotId(story.namespace, story.botId)?.let {
+                if (it.enabled) {
+                    badRequest("It is not allowed to create or update unknown story when RAG is enabled.")
+                }
+            }
         }
     }
 

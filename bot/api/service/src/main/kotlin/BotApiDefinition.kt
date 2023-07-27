@@ -88,7 +88,7 @@ internal class BotApiDefinition(
         ?.map { it.mapToSimpleStoryDefinition(handler) } ?: emptyList(),
     configuration.nlpModel,
     FallbackStoryDefinition(defaultUnknownStory, handler),
-    ragConfigurationEnabled = ragConfiguration?.enabled ?: false,
+    ragConfiguration = ragConfiguration
 ) {
     override fun findIntent(intent: String, applicationId: String): Intent =
         super.findIntent(intent, applicationId).let {
