@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
-import { Source, sourceTypes } from './models';
+import { IndexingSessionStatus, Source, sourceTypes } from './models';
 import { csvMockNormalizedData, csvMockRawData } from './mock-data-csv';
 import { jsonMockData } from './mock-data-json';
 import { jsonMockData2 } from './mock-data-json-2';
@@ -10,29 +10,74 @@ import { jsonMockData2 } from './mock-data-json-2';
 const TMPsources: Source[] = [
   {
     id: '1234567879',
+    enabled: true,
     name: 'CMB Faqs',
     description: '',
     source_type: sourceTypes.file,
-    step: 'import',
-    file_format: 'csv',
-    rawData: csvMockRawData.data,
-    normalizedData: csvMockNormalizedData
+    source_parameters: {
+      file_format: 'csv'
+    },
+    current_indexing_session_id: '987654',
+    indexing_sessions: [
+      {
+        id: '987654',
+        job_id: '778899',
+        start_date: new Date('2023-07-24T12:06:11.106Z'),
+        end_date: new Date('2023-07-24T14:22:07.106Z'),
+        embeding_engine: 'text-embedding-ada-002',
+        status: IndexingSessionStatus.complete
+      },
+      {
+        id: '4654654',
+        job_id: '',
+        start_date: new Date('2023-07-21T12:06:11.106Z'),
+        end_date: new Date('2023-07-21T12:06:11.106Z'),
+        embeding_engine: 'text-embedding-ada-002',
+        status: IndexingSessionStatus.complete
+      }
+    ]
+  },
+  {
+    id: '555654654',
+    name: 'Faqs CMSO',
+    enabled: true,
+    description: 'Faqs en ligne CMSO',
+    source_type: sourceTypes.remote,
+    source_parameters: {
+      source_url: new URL('https://www.cmso.com/reseau-bancaire-cooperatif/web/aide/faq')
+    },
+    current_indexing_session_id: undefined,
+    indexing_sessions: [
+      {
+        id: '321321',
+        job_id: '778899',
+        start_date: new Date('2023-07-24T12:06:11.106Z'),
+        end_date: new Date('2023-07-24T14:22:07.106Z'),
+        embeding_engine: 'text-embedding-ada-002',
+        status: IndexingSessionStatus.running
+      }
+    ]
   },
   {
     id: '987654321',
+    enabled: true,
     name: 'ArkInfo',
     description: '',
     source_type: sourceTypes.file,
-    file_format: 'json',
-    rawData: jsonMockData
+    source_parameters: {
+      file_format: 'json'
+    }
   },
   {
     id: '654',
+    enabled: false,
     name: 'Other kind of json source format',
     description: '',
     source_type: sourceTypes.file,
-    file_format: 'json',
-    rawData: jsonMockData2
+
+    source_parameters: {
+      file_format: 'json'
+    }
   }
 ];
 

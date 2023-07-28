@@ -1,9 +1,24 @@
-export interface IndexingSessionVersion {
-  id: string;
-  job_id: string;
-  start_date: Date;
-  end_date: Date;
-  embeding_engine: string;
+export enum sourceTypes {
+  file = 'file',
+  remote = 'remote'
+}
+
+export interface SourceParameters {}
+
+export interface FileSourceParameters extends SourceParameters {
+  file_format: 'csv' | 'json';
+
+  source_url?: never;
+  exclusion_urls?: never;
+  xpaths?: never;
+}
+
+export interface RemoteSourceParameters extends SourceParameters {
+  file_format?: never;
+
+  source_url: URL;
+  exclusion_urls?: URL[];
+  xpaths?: string[];
 }
 
 export interface Source {
@@ -12,15 +27,29 @@ export interface Source {
   description: string;
   source_type: sourceTypes;
 
-  current_indexing_session_version?: IndexingSessionVersion;
-  indexing_session_versions?: IndexingSessionVersion[];
+  enabled: boolean;
 
-  url?: URL;
-  step?: string;
-  isProcessing?: string;
+  current_indexing_session_id?: string;
+  indexing_sessions?: IndexingSession[];
+
+  source_parameters: FileSourceParameters | RemoteSourceParameters;
+
   rawData?: any;
-  file_format?: 'csv' | 'json';
-  normalizedData?: any;
+}
+
+export interface IndexingSession {
+  id: string;
+  job_id: string;
+  status: IndexingSessionStatus;
+  start_date: Date;
+  end_date: Date;
+  embeding_engine: string;
+}
+
+export enum IndexingSessionStatus {
+  running = 'running',
+  complete = 'complete',
+  error = 'error'
 }
 
 export enum ImportDataTypes {
@@ -34,8 +63,3 @@ export const dataTypesDefinition = [
   { label: 'Id (unic identifier of the entry)', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' },
   { label: 'Source reference (public url of the source)', type: ImportDataTypes.sourceRef, formCtrl: 'sourceRef' }
 ];
-
-export enum sourceTypes {
-  file = 'file',
-  remote = 'remote'
-}

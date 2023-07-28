@@ -6,8 +6,11 @@ import { Source, sourceTypes } from '../../models';
 interface NewSourceForm {
   name: FormControl<string>;
   description: FormControl<string>;
-  type: FormControl<sourceTypes>;
-  url?: FormControl<URL>;
+  source_type: FormControl<sourceTypes>;
+  source_parameters: FormGroup<SourceParametersForm>;
+}
+interface SourceParametersForm {
+  source_url?: FormControl<URL>;
 }
 
 @Component({
@@ -25,27 +28,29 @@ export class NewSourceComponent implements OnInit {
   constructor(public dialogRef: NbDialogRef<NewSourceComponent>) {}
 
   ngOnInit(): void {
-    this.type.valueChanges.subscribe((type) => {
+    this.source_type.valueChanges.subscribe((type) => {
       const validators = [Validators.required, this.isUrl.bind(this)];
       if (type === this.sourceTypes.remote) {
-        this.url.addValidators(validators);
+        this.source_url.addValidators(validators);
       } else {
-        this.url.clearValidators();
+        this.source_url.clearValidators();
       }
-      this.url.updateValueAndValidity();
+      this.source_url.updateValueAndValidity();
     });
 
     if (this.source) {
       this.form.patchValue(this.source);
-      this.type.disable();
+      this.source_type.disable();
     }
   }
 
   form = new FormGroup<NewSourceForm>({
     name: new FormControl(undefined, [Validators.required, Validators.minLength(6), Validators.maxLength(40)]),
     description: new FormControl(undefined),
-    type: new FormControl(undefined, [Validators.required]),
-    url: new FormControl(undefined)
+    source_type: new FormControl(undefined, [Validators.required]),
+    source_parameters: new FormGroup<SourceParametersForm>({
+      source_url: new FormControl(undefined)
+    })
   });
 
   get name(): FormControl {
@@ -56,12 +61,12 @@ export class NewSourceComponent implements OnInit {
     return this.form.get('description') as FormControl;
   }
 
-  get type(): FormControl {
-    return this.form.get('type') as FormControl;
+  get source_type(): FormControl {
+    return this.form.get('source_type') as FormControl;
   }
 
-  get url(): FormControl {
-    return this.form.get('url') as FormControl;
+  get source_url(): FormControl {
+    return this.form.controls.source_parameters.get('source_url') as FormControl;
   }
 
   get canSave(): boolean {
@@ -83,6 +88,7 @@ export class NewSourceComponent implements OnInit {
     this.isSubmitted = true;
 
     if (this.canSave) {
+      console.log(this.form.value);
       this.onSave.emit(this.form.value);
       this.cancel();
     }

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SelectByLengthComponent } from './select-by-length.component';
+import { SourceEntryComponent } from './source-entry.component';
 
-describe('SelectByLengthComponent', () => {
-  let component: SelectByLengthComponent;
-  let fixture: ComponentFixture<SelectByLengthComponent>;
+describe('SourceEntryComponent', () => {
+  let component: SourceEntryComponent;
+  let fixture: ComponentFixture<SourceEntryComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SelectByLengthComponent ]
+      declarations: [ SourceEntryComponent ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(SelectByLengthComponent);
+    fixture = TestBed.createComponent(SourceEntryComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

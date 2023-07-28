@@ -51,33 +51,34 @@
       <tock-form-control
         label="Source type"
         name="type"
-        [controls]="type"
+        [controls]="source_type"
         [showError]="isSubmitted"
         [required]="true"
       >
-        <nb-radio-group [formControl]="type">
+        <nb-radio-group [formControl]="source_type">
           <nb-radio [value]="sourceTypes.file"> File import </nb-radio>
           <nb-radio [value]="sourceTypes.remote"> Remote source </nb-radio>
         </nb-radio-group>
       </tock-form-control>
 
-      <tock-form-control
-        *ngIf="type.value === sourceTypes.remote"
-        label="Source url"
-        name="url"
-        [controls]="url"
-        [showError]="isSubmitted"
-        [required]="true"
-      >
-        <input
-          nbInput
-          formControlName="url"
-          id="url"
-          fullWidth
-          type="url"
-          placeholder="Enter source url"
-        />
-      </tock-form-control>
+      <div formGroupName="source_parameters">
+        <tock-form-control
+          *ngIf="source_type.value === sourceTypes.remote"
+          label="Source url"
+          name="source_url"
+          [controls]="source_url"
+          [showError]="isSubmitted"
+          [required]="true"
+        >
+          <input
+            nbInput
+            formControlName="source_url"
+            fullWidth
+            type="url"
+            placeholder="Enter source url"
+          />
+        </tock-form-control>
+      </div>
     </form>
   </nb-card-body>
 

@@ -1,5 +1,4 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { NbDialogService } from '@nebular/theme';
 import { Subject, takeUntil } from 'rxjs';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
@@ -24,24 +23,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   sourceTypes = sourceTypes;
 
-  actionProcessing: string;
-
   sources: Source[];
-
-  steps = [
-    { id: 'import', label: 'Source import', icon: 'file-add-outline', view: 'board' },
-    { id: 'splitting', label: 'Source selection', icon: 'scissors-outline', view: 'processing' },
-    { id: 'done', label: 'Source indexation', icon: 'checkmark-outline' }
-  ];
 
   constructor(
     private botConfiguration: BotConfigurationService,
     private nbDialogService: NbDialogService,
-    private router: Router,
     private sourcesService: SourceManagementService
-  ) {
-    this.actionProcessing = this.router.getCurrentNavigation().extras?.state?.action;
-  }
+  ) {}
 
   ngOnInit(): void {
     this.botConfiguration.configurations.pipe(takeUntil(this.destroy$)).subscribe((confs) => {
@@ -58,20 +46,6 @@ export class BoardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((sources: Source[]) => {
         this.sources = sources;
-
-        // tmp
-        if (this.actionProcessing) {
-          this.sources[0].isProcessing = this.actionProcessing;
-          this.sources[0].step = this.actionProcessing;
-          if (this.actionProcessing === 'done') {
-            setTimeout(() => {
-              this.sources[0].isProcessing = undefined;
-            }, 3000);
-          }
-        }
-        // //tmp
-
-        // this.normalizeSource(this.sources[1]);
       });
   }
 
@@ -112,48 +86,7 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  isStepDone(source: Source, stepId: string): boolean {
-    const stepIndex = this.steps.findIndex((stp) => stp.id === stepId);
-    const sourceStepIndex = this.steps.findIndex((stp) => stp.id === source.step);
-    return sourceStepIndex >= stepIndex;
-  }
-
-  stepAction(source: Source, stepId: string): void {
-    if (source.isProcessing) {
-      this.nbDialogService.open(ConfirmDialogComponent, {
-        context: {
-          title: `Treatment in progress`,
-          subtitle: 'Please be patient',
-          action: 'Ok'
-        }
-      });
-      return;
-    }
-
-    const stepIndex = this.steps.findIndex((stp) => stp.id === stepId);
-
-    if (stepIndex === 0) {
-      this.importSource(source);
-    } else {
-      const sourceStepIndex = this.steps.findIndex((stp) => stp.id === source.step);
-      if (stepIndex - sourceStepIndex > 1) {
-        this.nbDialogService.open(ConfirmDialogComponent, {
-          context: {
-            title: `Stage inaccessible`,
-            subtitle: 'A preliminary step must be taken first.',
-            action: 'Ok'
-          }
-        });
-      } else {
-        const targetStep = this.steps[stepIndex];
-        if (!targetStep.view) {
-          return;
-        }
-
-        this.router.navigate([`sources-management/${targetStep.view}/${source.id}`]);
-      }
-    }
-  }
+  toggleEnabledSource(source: Source): void {}
 
   importSource(source: Source): void {
     const modal = this.nbDialogService.open(SourceImportComponent, {
@@ -162,7 +95,7 @@ export class BoardComponent implements OnInit, OnDestroy {
       }
     });
     modal.componentRef.instance.onImport.subscribe((result) => {
-      source.file_format = result.fileFormat;
+      source.source_parameters.file_format = result.fileFormat;
       source.rawData = result.data;
       this.normalizeSource(source);
     });
@@ -170,13 +103,13 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   normalizeSource(source: Source): void {
     let modal;
-    if (source.file_format === 'csv') {
+    if (source.source_parameters.file_format === 'csv') {
       modal = this.nbDialogService.open(SourceNormalizationCsvComponent, {
         context: {
           source: source
         }
       });
-    } else if (source.file_format === 'json') {
+    } else if (source.source_parameters.file_format === 'json') {
       modal = this.nbDialogService.open(SourceNormalizationJsonComponent, {
         context: {
           source: source
@@ -185,10 +118,8 @@ export class BoardComponent implements OnInit, OnDestroy {
     }
 
     modal.componentRef.instance.onNormalize.subscribe((normalizedData) => {
-      source.normalizedData = normalizedData;
-      source.step = 'import';
+      console.log(normalizedData);
       modal.close();
-      this.stepAction(source, 'splitting');
     });
   }
 
