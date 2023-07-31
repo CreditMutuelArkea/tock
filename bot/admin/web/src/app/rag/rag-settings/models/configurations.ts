@@ -1,4 +1,4 @@
-import { LlmEngineConfiguration } from './models';
+import { LlmEngineConfiguration } from '.';
 
 export const AzureOpenAiApiVersions = ['2023-03-15-preview', '2022-12-01', '2023-05-15', '2023-06-01-preview'];
 
