@@ -7,6 +7,7 @@ import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './models/configurations';
 import { LlmEngineConfiguration, LlmEngineConfigurationParams, RagSettings } from './models';
+import { NbToastrService } from '@nebular/theme';
 
 interface RagSettingsParamsForm {
   apiKey?: FormControl<string>;
@@ -46,7 +47,12 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   settingsBackup: RagSettings;
 
-  constructor(private botService: BotService, private state: StateService, private rest: RestService) {}
+  constructor(
+    private botService: BotService,
+    private state: StateService,
+    private rest: RestService,
+    private toastrService: NbToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadAvailableStories();
@@ -214,6 +220,11 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
         this.form.patchValue(this.settingsBackup as unknown);
         this.form.markAsPristine();
         this.isSubmitted = false;
+
+        this.toastrService.success(`Rag settings succesfully saved`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
       });
     }
   }
