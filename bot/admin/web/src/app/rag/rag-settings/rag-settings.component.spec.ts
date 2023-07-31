@@ -1,7 +1,9 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NbToastrService } from '@nebular/theme';
 import { of } from 'rxjs';
 import { BotService } from '../../bot/bot-service';
+import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 
 import { RagSettingsComponent } from './rag-settings.component';
@@ -29,6 +31,14 @@ describe('RagSettingsComponent', () => {
               name: 'testName'
             }
           }
+        },
+        {
+          provide: RestService,
+          useValue: { get: () => of() }
+        },
+        {
+          provide: NbToastrService,
+          useValue: { success: () => {} }
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

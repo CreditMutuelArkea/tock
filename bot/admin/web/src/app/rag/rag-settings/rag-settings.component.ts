@@ -3,22 +3,28 @@ import { AbstractControl, FormControl, FormGroup, ValidationErrors, ValidatorFn,
 import { debounceTime, Subject, take, takeUntil } from 'rxjs';
 import { BotService } from '../../bot/bot-service';
 import { StoryDefinitionConfigurationSummary, StorySearchQuery } from '../../bot/model/story';
+import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
-import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './configurations';
-import { LlmEngineConfiguration, LlmEngineConfigurationParams } from './models';
+import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './models/configurations';
+import { LlmEngineConfiguration, LlmEngineConfigurationParams, RagSettings } from './models';
+import { NbToastrService } from '@nebular/theme';
 
-interface RagSettingsForm {
-  activation: FormControl<boolean>;
-  engine: FormControl<string>;
-  temperature: FormControl<number>;
-  embeddingEngine: FormControl<string>;
-  prompt: FormControl<string>;
-  noAnswerRedirection: FormControl<string>;
+interface RagSettingsParamsForm {
   apiKey?: FormControl<string>;
   modelName?: FormControl<string>;
   deploymentName?: FormControl<string>;
   privateEndpointBaseUrl?: FormControl<string>;
   apiVersion?: FormControl<string>;
+}
+interface RagSettingsForm {
+  _id: FormControl<string>;
+  enabled: FormControl<boolean>;
+  engine: FormControl<string>;
+  temperature: FormControl<number>;
+  embeddingEngine: FormControl<string>;
+  prompt: FormControl<string>;
+  noAnswerRedirection: FormControl<string>;
+  params: FormGroup<RagSettingsParamsForm>;
 }
 
 @Component({
@@ -37,28 +43,55 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   isSubmitted: boolean = false;
 
-  constructor(private botService: BotService, private state: StateService) {}
+  loading: boolean = true;
+
+  settingsBackup: RagSettings;
+
+  constructor(
+    private botService: BotService,
+    private state: StateService,
+    private rest: RestService,
+    private toastrService: NbToastrService
+  ) {}
 
   ngOnInit(): void {
     this.loadAvailableStories();
     this.form.valueChanges.pipe(takeUntil(this.destroy), debounceTime(300)).subscribe(() => {
       this.setActivationDisabledState();
     });
+    this.load();
   }
 
   form = new FormGroup<RagSettingsForm>({
-    activation: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
+    _id: new FormControl(null),
+    enabled: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
     engine: new FormControl(undefined, [Validators.required]),
     temperature: new FormControl(undefined, [Validators.required]),
     embeddingEngine: new FormControl(undefined, [Validators.required]),
     prompt: new FormControl(DefaultPrompt, [Validators.required]),
     noAnswerRedirection: new FormControl(undefined),
-    apiKey: new FormControl(undefined, [this.formEngineParamValidator('apiKey')]),
-    modelName: new FormControl(undefined, [this.formEngineParamValidator('modelName')]),
-    deploymentName: new FormControl(undefined, [this.formEngineParamValidator('deploymentName')]),
-    privateEndpointBaseUrl: new FormControl(undefined, [this.formEngineParamValidator('privateEndpointBaseUrl')]),
-    apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')])
+    params: new FormGroup<RagSettingsParamsForm>({
+      apiKey: new FormControl(undefined, [this.formEngineParamValidator('apiKey')]),
+      modelName: new FormControl(undefined, [this.formEngineParamValidator('modelName')]),
+      deploymentName: new FormControl(undefined, [this.formEngineParamValidator('deploymentName')]),
+      privateEndpointBaseUrl: new FormControl(undefined, [this.formEngineParamValidator('privateEndpointBaseUrl')]),
+      apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')])
+    })
   });
+
+  private load() {
+    const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
+    this.rest
+      .get<RagSettings>(url, (settings: RagSettings) => settings)
+      .subscribe((settings: RagSettings) => {
+        this.loading = false;
+        if (settings) {
+          this.settingsBackup = settings;
+          this.form.patchValue(settings as unknown);
+          this.form.markAsPristine();
+        }
+      });
+  }
 
   canRagBeActivated(): boolean {
     return this.form ? this.form.valid : false;
@@ -66,9 +99,9 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   setActivationDisabledState(): void {
     if (this.canRagBeActivated()) {
-      this.activation.enable();
+      this.enabled.enable();
     } else {
-      this.activation.disable();
+      this.enabled.disable();
     }
   }
 
@@ -86,8 +119,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     };
   }
 
-  get activation(): FormControl {
-    return this.form.get('activation') as FormControl;
+  get enabled(): FormControl {
+    return this.form.get('enabled') as FormControl;
   }
   get engine(): FormControl {
     return this.form.get('engine') as FormControl;
@@ -106,23 +139,23 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
 
   get apiKey(): FormControl {
-    return this.form.get('apiKey') as FormControl;
+    return this.form.controls.params.get('apiKey') as FormControl;
   }
   get modelName(): FormControl {
-    return this.form.get('modelName') as FormControl;
+    return this.form.controls.params.get('modelName') as FormControl;
   }
   get deploymentName(): FormControl {
-    return this.form.get('deploymentName') as FormControl;
+    return this.form.controls.params.get('deploymentName') as FormControl;
   }
   get privateEndpointBaseUrl(): FormControl {
-    return this.form.get('privateEndpointBaseUrl') as FormControl;
+    return this.form.controls.params.get('privateEndpointBaseUrl') as FormControl;
   }
   get apiVersion(): FormControl {
-    return this.form.get('apiVersion') as FormControl;
+    return this.form.controls.params.get('apiVersion') as FormControl;
   }
 
   getFormControlByName(paramKey: string): FormControl {
-    return this.form.get(paramKey) as FormControl;
+    return this.form.controls.params.get(paramKey) as FormControl;
   }
 
   get canSave(): boolean {
@@ -168,15 +201,39 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    console.log(this.form.value);
     this.isSubmitted = true;
-    if (this.canSave) {
-      alert('TODO');
+    if (this.canSave && this.form.dirty) {
+      const currentEngine = this.currentEngine;
+      const formValue: RagSettings = JSON.parse(JSON.stringify(this.form.value));
+      const formValueParams = formValue.params;
+
+      for (let param in formValueParams) {
+        if (!currentEngine.params.find((configParam) => configParam.key === param)) delete formValueParams[param];
+      }
+
+      formValue.namespace = this.state.currentApplication.namespace;
+      formValue.botId = this.state.currentApplication.name;
+
+      const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
+      this.rest.post(url, formValue).subscribe((ragSettings: RagSettings) => {
+        this.settingsBackup = ragSettings;
+        this.form.patchValue(this.settingsBackup as unknown);
+        this.form.markAsPristine();
+        this.isSubmitted = false;
+
+        this.toastrService.success(`Rag settings succesfully saved`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+      });
     }
   }
 
   cancel(): void {
-    console.log('TODO');
+    if (this.settingsBackup) {
+      this.form.patchValue(this.settingsBackup as unknown);
+      this.form.markAsPristine();
+    }
   }
 
   ngOnDestroy(): void {
