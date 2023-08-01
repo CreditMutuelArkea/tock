@@ -1,4 +1,4 @@
-export enum sourceTypes {
+export enum SourceTypes {
   file = 'file',
   remote = 'remote'
 }
@@ -11,6 +11,9 @@ export interface FileSourceParameters extends SourceParameters {
   source_url?: never;
   exclusion_urls?: never;
   xpaths?: never;
+
+  periodic_update?: never;
+  periodic_update_frequency?: never;
 }
 
 export interface RemoteSourceParameters extends SourceParameters {
@@ -19,13 +22,16 @@ export interface RemoteSourceParameters extends SourceParameters {
   source_url: URL;
   exclusion_urls?: URL[];
   xpaths?: string[];
+
+  periodic_update?: boolean;
+  periodic_update_frequency?: number;
 }
 
 export interface Source {
   id: string;
   name: string;
   description: string;
-  source_type: sourceTypes;
+  source_type: SourceTypes;
 
   enabled: boolean;
 

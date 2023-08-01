@@ -1,7 +1,18 @@
 <div class="d-flex flex-wrap mb-2">
   <h1 class="flex-grow-1">Sources Management</h1>
 
-  <div>
+  <div class="d-flex">
+    <button
+      nbButton
+      ghost
+      status="primary"
+      size="medium"
+      class="mr-1"
+      routerLink="/configuration/rag"
+    >
+      <nb-icon icon="bulb-outline"></nb-icon>
+      RAG SETTINGS
+    </button>
     <button
       nbButton
       status="primary"
@@ -41,6 +52,7 @@
         [source]="source"
         (onEdit)="editSource($event)"
         (onDelete)="deleteSource($event)"
+        (onUpdate)="updateSource($event)"
         (onToggleEnabled)="toggleEnabledSource($event)"
       ></tock-source-entry>
     </ng-container>

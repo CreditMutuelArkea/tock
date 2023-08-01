@@ -3,7 +3,7 @@ import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationEr
 import { NbDialogRef } from '@nebular/theme';
 import { readFileAsText } from '../../../shared/utils';
 import { FileValidators } from '../../../shared/validators';
-import { Source, sourceTypes } from '../../models';
+import { Source, SourceTypes } from '../../models';
 import Papa from 'papaparse';
 
 @Component({
@@ -16,7 +16,7 @@ export class SourceImportComponent {
 
   @Output() onImport = new EventEmitter();
 
-  sourceTypes = sourceTypes;
+  sourceTypes = SourceTypes;
   isImportSubmitted: boolean = false;
   uploading: boolean = false;
 

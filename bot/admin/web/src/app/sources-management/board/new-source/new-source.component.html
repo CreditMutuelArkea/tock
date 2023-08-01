@@ -54,6 +54,7 @@
         [controls]="source_type"
         [showError]="isSubmitted"
         [required]="true"
+        information="Source content can be retrieved in two different ways: By downloading a file in Csv or Json format, or by automatically retrieving the textual content of a website."
       >
         <nb-radio-group [formControl]="source_type">
           <nb-radio [value]="sourceTypes.file"> File import </nb-radio>
@@ -67,16 +68,162 @@
           label="Source url"
           name="source_url"
           [controls]="source_url"
-          [showError]="isSubmitted"
+          [showError]="true"
           [required]="true"
+          information="Initial Url from which the target website is to be browsed"
         >
           <input
             nbInput
+            id="source_url"
             formControlName="source_url"
             fullWidth
             type="url"
             placeholder="Enter source url"
           />
+        </tock-form-control>
+
+        <tock-form-control
+          *ngIf="source_type.value === sourceTypes.remote"
+          label="Exclusion urls"
+          name="addExclusionUrlInputControl"
+          [controls]="addExclusionUrlInputControl"
+          [showError]="addExclusionUrlIsSubmitted"
+          [hasMargin]="false"
+          information="Urls that should not be browsed"
+        >
+          <div class="d-flex mt-2">
+            <input
+              #addExclusionUrlInput
+              nbInput
+              id="addExclusionUrlInputControl"
+              formControlName="addExclusionUrlInputControl"
+              fullWidth
+              type="url"
+              placeholder="Enter an exclusion url and press ADD"
+              (keyup.enter)="addExclusionUrl()"
+            />
+
+            <button
+              type="button"
+              nbButton
+              ghost
+              size="small"
+              class="active-add-context-button ml-1"
+              [disabled]="!addExclusionUrlInput.value.length"
+              (click)="addExclusionUrl()"
+            >
+              ADD
+            </button>
+          </div>
+        </tock-form-control>
+
+        <div class="entries-list mb-3">
+          <div
+            *ngFor="let exclusionUrl of exclusion_urls.value; let index = index"
+            class="d-flex justify-content-between align-items-center"
+          >
+            {{ exclusionUrl }}
+            <button
+              nbButton
+              ghost
+              shape="round"
+              status="danger"
+              nbTooltip="Delete exclusion url"
+              type="button"
+              (click)="removeExclusionUrl(index)"
+            >
+              <nb-icon icon="trash-2-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+
+        <tock-form-control
+          *ngIf="source_type.value === sourceTypes.remote"
+          label="xPaths"
+          name="addXPathInputControl"
+          [controls]="addXPathInputControl"
+          [showError]="addXPathIsSubmitted"
+          [hasMargin]="false"
+          information="XML Path Language expressions used to target the parts of target documents containing the useful information to be retrieved"
+        >
+          <div class="d-flex mt-2">
+            <input
+              #addXPathInput
+              nbInput
+              id="addXPathInputControl"
+              formControlName="addXPathInputControl"
+              fullWidth
+              placeholder="Enter an xPath and press ADD"
+              (keyup.enter)="addXPath()"
+            />
+
+            <button
+              type="button"
+              nbButton
+              ghost
+              size="small"
+              class="active-add-context-button ml-1"
+              [disabled]="!addXPathInput.value.length"
+              (click)="addXPath()"
+            >
+              ADD
+            </button>
+          </div>
+        </tock-form-control>
+
+        <div class="entries-list mb-3">
+          <div
+            *ngFor="let xpath of xpaths.value; let index = index"
+            class="d-flex justify-content-between align-items-center"
+          >
+            {{ xpath }}
+            <button
+              nbButton
+              ghost
+              shape="round"
+              status="danger"
+              nbTooltip="Delete xPath"
+              type="button"
+              (click)="removeXPath(index)"
+            >
+              <nb-icon icon="trash-2-outline"></nb-icon>
+            </button>
+          </div>
+        </div>
+
+        <tock-form-control
+          *ngIf="source_type.value === sourceTypes.remote"
+          label="Periodic update"
+          name="periodic_update_frequency"
+          [controls]="periodic_update_frequency"
+          information="Automatically update source data"
+          [showError]="true"
+        >
+          <nb-checkbox
+            id="periodic_update"
+            formControlName="periodic_update"
+            >Enable periodic updates</nb-checkbox
+          >
+
+          <nb-form-field
+            *ngIf="periodic_update.value"
+            class="mt-2"
+          >
+            <input
+              nbInput
+              id="periodic_update_frequency"
+              formControlName="periodic_update_frequency"
+              type="number"
+              step="1"
+              placeholder="Frequency in days"
+            />
+            <div
+              nbSuffix
+              class="mx-2"
+            >
+              days
+            </div>
+          </nb-form-field>
         </tock-form-control>
       </div>
     </form>

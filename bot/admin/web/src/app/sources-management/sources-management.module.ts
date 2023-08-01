@@ -5,6 +5,7 @@ import {
   NbButtonModule,
   NbCardModule,
   NbCheckboxModule,
+  NbFormFieldModule,
   NbIconModule,
   NbInputModule,
   NbListModule,
@@ -58,6 +59,7 @@ import { SourceEntryComponent } from './board/source-entry/source-entry.componen
     NbToggleModule,
     NbAccordionModule,
     NbListModule,
+    NbFormFieldModule,
     InfiniteScrollModule
   ]
 })

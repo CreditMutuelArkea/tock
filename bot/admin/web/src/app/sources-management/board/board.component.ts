@@ -4,7 +4,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
 import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { Source, sourceTypes } from '../models';
+import { Source, SourceTypes } from '../models';
 import { SourceManagementService } from '../source-management.service';
 import { NewSourceComponent } from './new-source/new-source.component';
 import { SourceImportComponent } from './source-import/source-import.component';
@@ -21,7 +21,7 @@ export class BoardComponent implements OnInit, OnDestroy {
 
   configurations: BotApplicationConfiguration[];
 
-  sourceTypes = sourceTypes;
+  sourceTypes = SourceTypes;
 
   sources: Source[];
 
@@ -87,6 +87,31 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   toggleEnabledSource(source: Source): void {}
+
+  updateSource(source: Source): void {
+    if (source.source_type === SourceTypes.remote) {
+      this.confirmCrawlSource(source);
+    }
+
+    if (source.source_type === SourceTypes.file) {
+      this.importSource(source);
+    }
+  }
+
+  confirmCrawlSource(source: Source): void {
+    const dialogRef = this.nbDialogService.open(ConfirmDialogComponent, {
+      context: {
+        title: `Update the source '${source.name}'`,
+        subtitle: 'Are you sure?',
+        action: 'Update'
+      }
+    });
+    dialogRef.onClose.subscribe((result) => {
+      if (result === 'remove') {
+        console.log('TODO');
+      }
+    });
+  }
 
   importSource(source: Source): void {
     const modal = this.nbDialogService.open(SourceImportComponent, {

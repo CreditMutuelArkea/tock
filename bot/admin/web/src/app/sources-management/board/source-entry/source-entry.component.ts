@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { IndexingSession, IndexingSessionStatus, Source, sourceTypes } from '../../models';
+import { IndexingSession, IndexingSessionStatus, Source, SourceTypes } from '../../models';
 
 interface StepDefinition {
   id: string;
@@ -22,9 +22,10 @@ export class SourceEntryComponent implements OnInit, OnDestroy {
 
   @Output() onEdit = new EventEmitter<Source>();
   @Output() onDelete = new EventEmitter<Source>();
+  @Output() onUpdate = new EventEmitter<Source>();
   @Output() onToggleEnabled = new EventEmitter<Source>();
 
-  sourceTypes = sourceTypes;
+  sourceTypes = SourceTypes;
 
   constructor(private nbDialogService: NbDialogService) {}
 
@@ -115,6 +116,11 @@ export class SourceEntryComponent implements OnInit, OnDestroy {
   deleteSource(event: PointerEvent): void {
     event.stopPropagation();
     this.onDelete.emit(this.source);
+  }
+
+  updateSource(event: PointerEvent): void {
+    event.stopPropagation();
+    this.onUpdate.emit(this.source);
   }
 
   toggleSourceEnabled(): void {

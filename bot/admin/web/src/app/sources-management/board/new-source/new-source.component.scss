@@ -7,3 +7,9 @@
   min-width: 50vw;
   max-height: 90vh;
 }
+
+.entries-list {
+  DIV {
+    border-bottom: var(--list-item-divider-width) var(--list-item-divider-style) var(--list-item-divider-color);
+  }
+}

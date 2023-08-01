@@ -2,10 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, switchMap } from 'rxjs';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { StateService } from '../core-nlp/state.service';
-import { IndexingSessionStatus, Source, sourceTypes } from './models';
-import { csvMockNormalizedData, csvMockRawData } from './mock-data-csv';
-import { jsonMockData } from './mock-data-json';
-import { jsonMockData2 } from './mock-data-json-2';
+import { IndexingSessionStatus, Source, SourceTypes } from './models';
 
 const TMPsources: Source[] = [
   {
@@ -13,7 +10,7 @@ const TMPsources: Source[] = [
     enabled: true,
     name: 'CMB Faqs',
     description: '',
-    source_type: sourceTypes.file,
+    source_type: SourceTypes.file,
     source_parameters: {
       file_format: 'csv'
     },
@@ -42,9 +39,16 @@ const TMPsources: Source[] = [
     name: 'Faqs CMSO',
     enabled: true,
     description: 'Faqs en ligne CMSO',
-    source_type: sourceTypes.remote,
+    source_type: SourceTypes.remote,
     source_parameters: {
-      source_url: new URL('https://www.cmso.com/reseau-bancaire-cooperatif/web/aide/faq')
+      source_url: new URL('https://www.cmso.com/reseau-bancaire-cooperatif/web/aide/faq'),
+      exclusion_urls: [
+        new URL('https://www.arkea.com/banque/assurance/credit/accueil'),
+        new URL('https://www.cmso.com/reseau-bancaire-cooperatif/web/communiques-de-presse-1')
+      ],
+      xpaths: ['//*[@id="st-faq-root"]/section/div/div[2]'],
+      periodic_update: true,
+      periodic_update_frequency: 30
     },
     current_indexing_session_id: undefined,
     indexing_sessions: [
@@ -63,7 +67,7 @@ const TMPsources: Source[] = [
     enabled: true,
     name: 'ArkInfo',
     description: '',
-    source_type: sourceTypes.file,
+    source_type: SourceTypes.file,
     source_parameters: {
       file_format: 'json'
     }
@@ -73,7 +77,7 @@ const TMPsources: Source[] = [
     enabled: false,
     name: 'Other kind of json source format',
     description: '',
-    source_type: sourceTypes.file,
+    source_type: SourceTypes.file,
 
     source_parameters: {
       file_format: 'json'
