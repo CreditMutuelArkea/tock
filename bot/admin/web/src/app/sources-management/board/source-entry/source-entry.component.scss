@@ -44,12 +44,12 @@
 
     &.done {
       .icon-wrapper {
-        border-color: nb-theme(color-primary-active);
-        background-color: nb-theme(color-primary-active);
+        border-color: nb-theme(color-primary-400);
+        background-color: nb-theme(color-primary-400);
         color: nb-theme(text-control-color);
       }
       .label {
-        color: nb-theme(color-primary-active);
+        color: nb-theme(color-primary-400);
       }
     }
 
@@ -93,17 +93,27 @@
 
     .line {
       height: 1px;
-      background-color: nb-theme(color-basic-600);
+      background-color: nb-theme(color-basic-500);
       flex: auto;
     }
 
     .arrow {
       display: inline-block;
-      border: solid nb-theme(color-basic-600);
+      border: solid nb-theme(color-basic-500);
       border-width: 0 1px 1px 0;
       padding: 3px;
       margin-left: -6px;
       transform: rotate(-45deg);
+    }
+
+    &.active {
+      .line {
+        background-color: nb-theme(color-primary-400);
+      }
+
+      .arrow {
+        border-color: nb-theme(color-primary-400);
+      }
     }
   }
 

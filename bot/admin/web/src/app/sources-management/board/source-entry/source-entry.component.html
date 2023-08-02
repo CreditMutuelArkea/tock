@@ -1,4 +1,4 @@
-<nb-accordion class="mb-3">
+<nb-accordion class="mb-4">
   <nb-accordion-item>
     <nb-accordion-item-header>
       <div class="flex-grow-1 pr-4">
@@ -20,7 +20,7 @@
             </strong>
             <div>
               Type : {{ source.source_type }}
-              <span *ngIf="source.source_type === sourceTypes.remote">({{ source.source_parameters.source_url }})</span>
+              <!-- <span *ngIf="source.source_type === sourceTypes.remote">({{ source.source_parameters.source_url }})</span> -->
             </div>
 
             <div *ngIf="source.description">Description : {{ source.description }}</div>
@@ -53,7 +53,7 @@
             <nb-toggle
               class="mx-2"
               nbTooltip="Activate/deactivate source"
-              [ngModel]="source.enabled"
+              [(ngModel)]="source.enabled"
               (click)="$event.stopPropagation()"
               (mousedown)="toggleSourceEnabled()"
             >
@@ -63,16 +63,20 @@
               nbButton
               shape="round"
               status="primary"
+              size="small"
               nbTooltip="Update source"
               class="ml-2 mb-2"
               (click)="updateSource($event)"
             >
-              <nb-icon icon="sync-outline"></nb-icon>
+              <nb-icon icon="sync-outline"></nb-icon> Update source
             </button>
           </div>
         </div>
 
-        <div class="stepper mt-3 ml-2">
+        <div
+          class="stepper mt-3 ml-2"
+          *ngIf="source.enabled"
+        >
           <div *ngFor="let step of getSourceSteps(); let i = index; let last = last">
             <div
               class="step"
@@ -97,6 +101,7 @@
             <div
               *ngIf="!last"
               class="connector"
+              [ngClass]="{ active: isStepDone(source, step.id) }"
             >
               <div class="line"></div>
               <div class="arrow"></div>

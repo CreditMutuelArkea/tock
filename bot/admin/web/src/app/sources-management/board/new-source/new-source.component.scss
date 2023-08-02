@@ -10,6 +10,14 @@
 
 .entries-list {
   DIV {
-    border-bottom: var(--list-item-divider-width) var(--list-item-divider-style) var(--list-item-divider-color);
+    border: var(--list-item-divider-width) var(--list-item-divider-style) var(--list-item-divider-color);
+    background-color: var(--layout-background-color);
+    border-radius: 5px;
+    padding: 0 0 0 0.5rem;
+    margin: 0.5rem 0;
+
+    button {
+      margin: 0.1rem 0.1rem 0.1rem 1rem;
+    }
   }
 }

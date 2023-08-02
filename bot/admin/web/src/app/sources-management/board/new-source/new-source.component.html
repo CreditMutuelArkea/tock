@@ -56,7 +56,10 @@
         [required]="true"
         information="Source content can be retrieved in two different ways: By downloading a file in Csv or Json format, or by automatically retrieving the textual content of a website."
       >
-        <nb-radio-group [formControl]="source_type">
+        <nb-radio-group
+          [formControl]="source_type"
+          class="d-flex"
+        >
           <nb-radio [value]="sourceTypes.file"> File import </nb-radio>
           <nb-radio [value]="sourceTypes.remote"> Remote source </nb-radio>
         </nb-radio-group>
@@ -127,6 +130,7 @@
               nbButton
               ghost
               shape="round"
+              size="small"
               status="danger"
               nbTooltip="Delete exclusion url"
               type="button"
@@ -181,6 +185,7 @@
               nbButton
               ghost
               shape="round"
+              size="small"
               status="danger"
               nbTooltip="Delete xPath"
               type="button"
@@ -199,31 +204,36 @@
           information="Automatically update source data"
           [showError]="true"
         >
-          <nb-checkbox
-            id="periodic_update"
-            formControlName="periodic_update"
-            >Enable periodic updates</nb-checkbox
-          >
-
-          <nb-form-field
-            *ngIf="periodic_update.value"
-            class="mt-2"
-          >
-            <input
-              nbInput
-              id="periodic_update_frequency"
-              formControlName="periodic_update_frequency"
-              type="number"
-              step="1"
-              placeholder="Frequency in days"
-            />
-            <div
-              nbSuffix
-              class="mx-2"
+          <div class="d-flex align-items-center">
+            <nb-checkbox
+              id="periodic_update"
+              formControlName="periodic_update"
+              >Enable periodic updates</nb-checkbox
             >
-              days
+
+            <div
+              class="d-flex align-items-center ml-4 small"
+              *ngIf="periodic_update.value"
+            >
+              Update source every
+              <nb-form-field class="ml-2">
+                <input
+                  nbInput
+                  id="periodic_update_frequency"
+                  formControlName="periodic_update_frequency"
+                  type="number"
+                  step="1"
+                  placeholder="Frequency in days"
+                />
+                <div
+                  nbSuffix
+                  class="mx-2"
+                >
+                  days
+                </div>
+              </nb-form-field>
             </div>
-          </nb-form-field>
+          </div>
         </tock-form-control>
       </div>
     </form>
@@ -248,6 +258,9 @@
         size="small"
         [disabled]="!canSave"
         (click)="saveNewSource()"
+        [nbTooltip]="getUnvalidatedInputsWarning()"
+        [nbTooltipDisabled]="checkUnvalidatedInputs()"
+        nbTooltipStatus="warning"
       >
         Save
       </button>

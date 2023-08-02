@@ -193,6 +193,22 @@ export class NewSourceComponent implements OnInit {
     }
   }
 
+  checkUnvalidatedInputs() {
+    return !this.addExclusionUrlInput?.nativeElement?.value.trim().length && !this.addXPathInput?.nativeElement?.value.trim().length;
+  }
+
+  getUnvalidatedInputsWarning() {
+    if (this.addExclusionUrlInput?.nativeElement?.value.trim().length && this.addXPathInput?.nativeElement?.value.trim().length) {
+      return 'You have entered an exclusion url and an xPath but have not added them. Click SAVE to ignore.';
+    }
+    if (this.addExclusionUrlInput?.nativeElement?.value.trim().length) {
+      return 'You have entered an exclusion url but not added it. Click SAVE to ignore.';
+    }
+    if (this.addXPathInput?.nativeElement?.value.trim().length) {
+      return 'You have entered an xPath but not added it. Click SAVE to ignore.';
+    }
+  }
+
   cancel(): void {
     this.dialogRef.close();
   }
