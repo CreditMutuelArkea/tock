@@ -36,5 +36,5 @@ data class UpdateSentencesQuery(
 ) : ApplicationScopedQuery() {
 
     val unknownNewIntent: Boolean get() = UNKNOWN_INTENT_NAME == newIntentId?.toString()
-    val rageExcludedNewIntent: Boolean get() = RAG_EXCLUDED_INTENT_NAME == newIntentId?.toString()
+    val ragExcludedNewIntent: Boolean get() = RAG_EXCLUDED_INTENT_NAME == newIntentId?.toString()
 }

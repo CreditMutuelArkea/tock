@@ -239,7 +239,7 @@ object ApplicationConfigurationService :
             }
             .distinct()
 
-        // 2 create entities where there are not present in the new intent (except if it's the unknown intent)
+        // 2 create entities where there are not present in the new intent (except if it's the unknown or ragexcluded intent)
         if (targetIntentId.toString() != UNKNOWN_INTENT_NAME
             && targetIntentId.toString() != RAG_EXCLUDED_INTENT_NAME) {
             val intent = getIntentById(targetIntentId)!!

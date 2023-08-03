@@ -88,7 +88,7 @@ object AdminService {
             front.search(query.searchQuery.toSentencesQuery(application._id)).sentences
         }
         return if (query.newIntentId != null &&
-            (query.unknownNewIntent || query.rageExcludedNewIntent || application.intents.contains(query.newIntentId))
+            (query.unknownNewIntent || query.ragExcludedNewIntent || application.intents.contains(query.newIntentId))
         ) {
             val nbUpdates = front.switchSentencesIntent(sentences, application, query.newIntentId)
             UpdateSentencesReport(nbUpdates)
