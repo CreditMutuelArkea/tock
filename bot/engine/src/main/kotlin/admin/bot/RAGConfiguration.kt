@@ -19,7 +19,7 @@ package ai.tock.bot.admin.bot
 import ai.tock.shared.booleanProperty
 
 // TODO : DERCBOT-647
-val RAG_ENABLED: Boolean =booleanProperty("RAG_ENABLED", false)
+val RAG_ENABLED: Boolean =booleanProperty("tock_rag_enabled", false)
 
 data class RAGConfiguration(
     val enabled: Boolean = RAG_ENABLED,
