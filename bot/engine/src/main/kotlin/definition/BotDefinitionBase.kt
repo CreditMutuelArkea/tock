@@ -55,6 +55,7 @@ open class BotDefinitionBase(
     override val botEnabledListener: (Action) -> Unit = {},
     override val ragConfigurationEnabled: Boolean = false,
     override val ragExcludedStory: StoryDefinition = defaultRagExcludedStory,
+    override val ragStory: StoryDefinition? = null,
 ) : BotDefinition {
 
     companion object {
@@ -84,6 +85,21 @@ open class BotDefinitionBase(
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
                         bus.end(bus.botDefinition.defaultRAGExcludedAnswer)
+                    }
+                },
+                setOf(Intent.ragexcluded)
+            )
+
+        /**
+         * The default [ragExcludedStory].
+         * TODO : not needed
+         */
+        val defaultRagStory =
+            SimpleStoryDefinition(
+                "tock_rag_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        bus.end("Please create your Rag Story")
                     }
                 },
                 setOf(Intent.ragexcluded)

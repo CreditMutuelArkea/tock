@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.answer
+package ai.tock.bot.definition
 
 /**
- * The types of [AnswerConfiguration] available.
+ * [RagStoryDefinition] implementation witch extends [StoryDefinitionBase]
  */
-enum class AnswerConfigurationType {
-    simple,
-    message,
-    script,
-    builtin,
-    //retrieval augmented generation type
-    rag
-}
+class RagStoryDefinition(
+    name: String,
+    handler: StoryHandler,
+) : StoryDefinitionBase(
+    name,
+    handler
+)

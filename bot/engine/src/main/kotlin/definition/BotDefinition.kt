@@ -172,6 +172,11 @@ interface BotDefinition : I18nKeyProvider {
     val unknownStory: StoryDefinition
 
     /**
+     * The Retrieval Augmented Generation Story. Used when rag is active
+     */
+    val ragStory: StoryDefinition?
+
+    /**
      * The ragExcluded Story. Used where ragexcluded intent is found.
      */
     val ragExcludedStory: StoryDefinition
