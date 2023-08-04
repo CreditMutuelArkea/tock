@@ -5,6 +5,7 @@ import { isUrl } from '../../../shared/utils';
 import { Source, SourceTypes } from '../../models';
 
 interface NewSourceForm {
+  id?: FormControl<string>;
   name: FormControl<string>;
   description: FormControl<string>;
   source_type: FormControl<SourceTypes>;
@@ -80,6 +81,7 @@ export class NewSourceComponent implements OnInit {
   }
 
   form = new FormGroup<NewSourceForm>({
+    id: new FormControl(undefined),
     name: new FormControl(undefined, [Validators.required, Validators.minLength(6), Validators.maxLength(40)]),
     description: new FormControl(undefined, [Validators.maxLength(80)]),
     source_type: new FormControl(undefined, [Validators.required]),

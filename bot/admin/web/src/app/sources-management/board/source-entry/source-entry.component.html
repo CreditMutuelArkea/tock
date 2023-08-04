@@ -3,7 +3,14 @@
     <nb-accordion-item-header>
       <div class="flex-grow-1 pr-4">
         <div class="d-flex justify-content-between gap-1">
-          <div class="source-icon">
+          <div
+            class="source-icon"
+            [ngClass]="{
+              'text-primary': source.status === ProcessAdvancement.complete,
+              'text-success': source.status === ProcessAdvancement.running,
+              'text-danger': source.status === ProcessAdvancement.error
+            }"
+          >
             <nb-icon
               icon="file-text-outline"
               *ngIf="source.source_type === sourceTypes.file"
@@ -34,6 +41,7 @@
               nbTooltip="Edit source"
               class="mb-2"
               (click)="editSource($event)"
+              *ngIf="!hasIndexingSessionRunning()"
             >
               <nb-icon icon="edit-outline"></nb-icon>
             </button>
@@ -46,6 +54,7 @@
               nbTooltip="Delete source"
               class="mb-2"
               (click)="deleteSource($event)"
+              *ngIf="!hasIndexingSessionRunning()"
             >
               <nb-icon icon="trash-2-outline"></nb-icon>
             </button>
@@ -53,9 +62,10 @@
             <nb-toggle
               class="mx-2"
               nbTooltip="Activate/deactivate source"
-              [(ngModel)]="source.enabled"
+              [checked]="source.enabled"
               (click)="$event.stopPropagation()"
               (mousedown)="toggleSourceEnabled()"
+              *ngIf="!hasIndexingSessionRunning()"
             >
             </nb-toggle>
 
@@ -67,24 +77,24 @@
               nbTooltip="Update source"
               class="ml-2 mb-2"
               (click)="updateSource($event)"
+              *ngIf="!hasIndexingSessionRunning()"
             >
               <nb-icon icon="sync-outline"></nb-icon> Update source
             </button>
           </div>
         </div>
-
         <div
           class="stepper mt-3 ml-2"
-          *ngIf="source.enabled"
+          *ngIf="source.enabled && hasIndexingSessionRunning()"
         >
-          <div *ngFor="let step of getSourceSteps(); let i = index; let last = last">
+          <div *ngFor="let task of getRunningIndexingSessionTasks(); let i = index; let last = last">
             <div
               class="step"
-              [ngClass]="{ done: isStepDone(source, step.id) }"
+              [ngClass]="{ done: isStepComplete(task.type), running: isStepRunning(task.type) }"
             >
               <div
                 class="done-mark"
-                *ngIf="isStepDone(source, step.id)"
+                *ngIf="isStepComplete(task.type)"
               >
                 <nb-icon
                   class="success"
@@ -92,16 +102,22 @@
                 ></nb-icon>
               </div>
               <div class="icon-wrapper">
-                <nb-icon [icon]="step.icon"></nb-icon>
-                <!-- <nb-icon icon="sync-outline"></nb-icon> -->
+                <nb-icon
+                  [icon]="task.icon"
+                  *ngIf="!isStepRunning(task.type)"
+                ></nb-icon>
+                <nb-icon
+                  icon="sync-outline"
+                  *ngIf="isStepRunning(task.type)"
+                ></nb-icon>
               </div>
-              <span class="label">{{ step.label }}</span>
+              <span class="label">{{ task.label }}</span>
             </div>
 
             <div
               *ngIf="!last"
               class="connector"
-              [ngClass]="{ active: isStepDone(source, step.id) }"
+              [ngClass]="{ active: isStepComplete(task.type) }"
             >
               <div class="line"></div>
               <div class="arrow"></div>
@@ -114,10 +130,10 @@
     <nb-accordion-item-body>
       <div class="sessions sessions-header small font-weight-bold font-italic">
         <div>Session</div>
-        <div>Current job</div>
         <div>Embedding engine</div>
         <div>Start date</div>
         <div>End date</div>
+        <div>Status</div>
       </div>
 
       <div
@@ -135,9 +151,7 @@
         <div>
           {{ session.id }}
         </div>
-        <div>
-          {{ session.job_id }}
-        </div>
+
         <div>
           {{ session.embeding_engine }}
         </div>
@@ -146,6 +160,15 @@
         </div>
         <div>
           {{ session.end_date | date: 'HH:mm:ss y/MM/dd' }}
+        </div>
+        <div
+          [ngClass]="{
+            'text-primary': session.status === ProcessAdvancement.complete,
+            'text-success': session.status === ProcessAdvancement.running,
+            'text-danger': session.status === ProcessAdvancement.error
+          }"
+        >
+          {{ session.status }}
         </div>
 
         <div>
@@ -158,7 +181,7 @@
 
           <div
             class="d-flex"
-            *ngIf="!isCurrentIndexingSession(session)"
+            *ngIf="!isCurrentIndexingSession(session) && !hasIndexingSessionRunning()"
           >
             <button
               nbButton

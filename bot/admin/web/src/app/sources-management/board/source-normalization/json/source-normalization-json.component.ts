@@ -39,7 +39,7 @@ export class SourceNormalizationJsonComponent {
   }
 
   get canSave(): boolean {
-    const type = this.associations.find((a) => a.type === ImportDataTypes.answer);
+    const type = this.associations.find((a) => a.type === ImportDataTypes.content);
     return type.paths.length > 0;
   }
 

@@ -30,6 +30,8 @@ import { SourceNormalizationCsvComponent } from './board/source-normalization/cs
 import { SourceNormalizationJsonComponent } from './board/source-normalization/json/source-normalization-json.component';
 import { JsonIteratorComponent } from './board/source-normalization/json/json-iterator/json-iterator.component';
 import { SourceEntryComponent } from './board/source-entry/source-entry.component';
+import { SourceManagementService } from './source-management.service';
+import { SourceManagementApiService } from './source-management.api.service';
 
 @NgModule({
   declarations: [
@@ -61,6 +63,7 @@ import { SourceEntryComponent } from './board/source-entry/source-entry.componen
     NbListModule,
     NbFormFieldModule,
     InfiniteScrollModule
-  ]
+  ],
+  providers: [SourceManagementService, SourceManagementApiService]
 })
 export class SourcesManagementModule {}

@@ -3,6 +3,13 @@ export enum SourceTypes {
   remote = 'remote'
 }
 
+export enum ProcessAdvancement {
+  pristine = 'pristine',
+  running = 'running',
+  complete = 'complete',
+  error = 'error'
+}
+
 export interface SourceParameters {}
 
 export interface FileSourceParameters extends SourceParameters {
@@ -35,6 +42,8 @@ export interface Source {
 
   enabled: boolean;
 
+  status: ProcessAdvancement;
+
   current_indexing_session_id?: string;
   indexing_sessions?: IndexingSession[];
 
@@ -45,27 +54,35 @@ export interface Source {
 
 export interface IndexingSession {
   id: string;
-  job_id: string;
-  status: IndexingSessionStatus;
+  status: ProcessAdvancement;
   start_date: Date;
   end_date: Date;
   embeding_engine: string;
+  tasks?: IndexingSessionTask[];
 }
 
-export enum IndexingSessionStatus {
-  running = 'running',
-  complete = 'complete',
-  error = 'error'
+export interface IndexingSessionTask {
+  id: string;
+  type: IndexingSessionTaskTypes;
+  status: ProcessAdvancement;
+}
+
+export enum IndexingSessionTaskTypes {
+  initialization = 'initialization',
+  crawling = 'crawling',
+  fetching = 'fetching',
+  chunking = 'chunking',
+  embeddings = 'embeddings'
 }
 
 export enum ImportDataTypes {
-  answer = 'answer',
-  sourceId = 'sourceId',
+  content = 'content',
   sourceRef = 'sourceRef'
+  // sourceId = 'sourceId',
 }
 
 export const dataTypesDefinition = [
-  { label: 'Text (answer, question...)', type: ImportDataTypes.answer, formCtrl: 'answer' },
-  { label: 'Id (unic identifier of the entry)', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' },
+  { label: 'Content (question, answer...)', type: ImportDataTypes.content, formCtrl: 'content' },
   { label: 'Source reference (public url of the source)', type: ImportDataTypes.sourceRef, formCtrl: 'sourceRef' }
+  // { label: 'Id (unic identifier of the entry)', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' }
 ];

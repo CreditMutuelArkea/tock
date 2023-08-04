@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NbDialogService } from '@nebular/theme';
-import { Subject, takeUntil } from 'rxjs';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { distinctUntilChanged, Subject, take, takeUntil } from 'rxjs';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
 import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { Source, SourceTypes } from '../models';
+import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
+import { IndexingSession, ProcessAdvancement, Source, SourceTypes } from '../models';
 import { SourceManagementService } from '../source-management.service';
 import { NewSourceComponent } from './new-source/new-source.component';
 import { SourceImportComponent } from './source-import/source-import.component';
@@ -28,7 +29,8 @@ export class BoardComponent implements OnInit, OnDestroy {
   constructor(
     private botConfiguration: BotConfigurationService,
     private nbDialogService: NbDialogService,
-    private sourcesService: SourceManagementService
+    private sourcesService: SourceManagementService,
+    private toastrService: NbToastrService
   ) {}
 
   ngOnInit(): void {
@@ -40,20 +42,68 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
   }
 
+  runningSessionsWatcher: { source: Source; session: IndexingSession }[];
+
   loadSources(): void {
     this.sourcesService
       .getSources()
-      .pipe(takeUntil(this.destroy$))
+      .pipe(distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((sources: Source[]) => {
         this.sources = sources;
+        this.listRunningSessions();
       });
+  }
+
+  listRunningSessions() {
+    this.runningSessionsWatcher = [];
+    this.sources.forEach((source) => {
+      const runningSession = getSourceMostRecentRunningIndexingSession(source);
+      if (runningSession) {
+        this.runningSessionsWatcher.push({
+          source: source,
+          session: runningSession
+        });
+      }
+    });
+
+    if (this.runningSessionsWatcher.length) {
+      this.watchRunningSessions();
+    }
+  }
+
+  watchRunningSessions() {
+    let RunningProcesses = false;
+    this.runningSessionsWatcher.forEach((rs) => {
+      this.sourcesService
+        .getIndexingSession(rs.source, rs.session)
+        .pipe(take(1))
+        .subscribe((indexingSession) => {
+          if ([ProcessAdvancement.pristine, ProcessAdvancement.running].includes(indexingSession.status)) {
+            RunningProcesses = true;
+          }
+        });
+    });
+
+    if (RunningProcesses) {
+      setTimeout(() => {
+        this.watchRunningSessions();
+      }, 200);
+    }
+  }
+
+  hasSessionRunning(source: Source) {
+    return getSourceMostRecentRunningIndexingSession(source);
   }
 
   addSource(): void {
     const modal = this.nbDialogService.open(NewSourceComponent);
     modal.componentRef.instance.onSave.subscribe((form) => {
-      form.id = Math.random().toString().replace('.', '');
-      this.sources.push(form);
+      this.sourcesService.postSource(form).subscribe((newSource) => {
+        this.toastrService.success(`New source succesfully created`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+      });
     });
   }
 
@@ -64,29 +114,62 @@ export class BoardComponent implements OnInit, OnDestroy {
       }
     });
     modal.componentRef.instance.onSave.subscribe((form) => {
-      const srcIndex = this.sources.findIndex((src) => src === source);
-      this.sources[srcIndex] = { ...this.sources[srcIndex], ...form };
+      this.sourcesService.updateSource(form).subscribe((modifiedSource) => {
+        this.toastrService.success(`Source succesfully updated`, 'Success', {
+          duration: 5000,
+          status: 'success'
+        });
+      });
     });
   }
 
   deleteSource(source: Source): void {
+    const actionLabel = 'Remove';
     const dialogRef = this.nbDialogService.open(ConfirmDialogComponent, {
       context: {
         title: `Remove the source '${source.name}'`,
         subtitle: 'Are you sure?',
-        action: 'Remove'
+        action: actionLabel
       }
     });
     dialogRef.onClose.subscribe((result) => {
-      if (result === 'remove') {
-        this.sources = this.sources.filter((src) => {
-          return source !== src;
+      if (result.toLowerCase() === actionLabel.toLowerCase()) {
+        this.sourcesService.deleteSource(source.id).subscribe((res) => {
+          this.toastrService.success(`Source succesfully deleted`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
         });
       }
     });
   }
 
-  toggleEnabledSource(source: Source): void {}
+  toggleEnabledSource(source: Source): void {
+    this.sourcesService.updateSource({ id: source.id, enabled: !source.enabled }).subscribe((modifiedSource) => {
+      this.toastrService.success(`Source succesfully updated`, 'Success', {
+        duration: 5000,
+        status: 'success'
+      });
+    });
+  }
+
+  deleteIndexingSession(args: { source: Source; session: IndexingSession }): void {
+    this.sourcesService.deleteIndexingSession(args.source, args.session).subscribe((res) => {
+      this.toastrService.success(`Indexing session succesfully deleted`, 'Success', {
+        duration: 5000,
+        status: 'success'
+      });
+    });
+  }
+
+  setIndexingSessionAsCurrent(args: { source: Source; session: IndexingSession }): void {
+    this.sourcesService.updateSource({ id: args.source.id, current_indexing_session_id: args.session.id }).subscribe((res) => {
+      this.toastrService.success(`Indexing session succesfully deleted`, 'Success', {
+        duration: 5000,
+        status: 'success'
+      });
+    });
+  }
 
   updateSource(source: Source): void {
     if (source.source_type === SourceTypes.remote) {
@@ -99,16 +182,23 @@ export class BoardComponent implements OnInit, OnDestroy {
   }
 
   confirmCrawlSource(source: Source): void {
+    const actionLabel = 'Update';
     const dialogRef = this.nbDialogService.open(ConfirmDialogComponent, {
       context: {
         title: `Update the source '${source.name}'`,
         subtitle: 'Are you sure?',
-        action: 'Update'
+        action: actionLabel
       }
     });
     dialogRef.onClose.subscribe((result) => {
-      if (result === 'remove') {
-        console.log('TODO');
+      if (result.toLowerCase() === actionLabel.toLowerCase()) {
+        this.sourcesService.postIndexingSession(source).subscribe((indexingSession) => {
+          this.listRunningSessions();
+          this.toastrService.success(`Source update successfully launched`, 'Success', {
+            duration: 5000,
+            status: 'success'
+          });
+        });
       }
     });
   }

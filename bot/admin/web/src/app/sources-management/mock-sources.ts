@@ -1,4 +1,4 @@
-import { IndexingSessionStatus, Source, SourceTypes } from './models';
+import { ProcessAdvancement, Source, SourceTypes } from './models';
 
 export const TMPsources: Source[] = [
   {
@@ -7,6 +7,7 @@ export const TMPsources: Source[] = [
     name: 'CMB Faqs',
     description: '',
     source_type: SourceTypes.file,
+    status: ProcessAdvancement.complete,
     source_parameters: {
       file_format: 'csv'
     },
@@ -14,19 +15,17 @@ export const TMPsources: Source[] = [
     indexing_sessions: [
       {
         id: '987654',
-        job_id: '778899',
         start_date: new Date('2023-07-24T12:06:11.106Z'),
         end_date: new Date('2023-07-24T14:22:07.106Z'),
         embeding_engine: 'text-embedding-ada-002',
-        status: IndexingSessionStatus.complete
+        status: ProcessAdvancement.complete
       },
       {
         id: '4654654',
-        job_id: '',
         start_date: new Date('2023-07-21T12:06:11.106Z'),
         end_date: new Date('2023-07-21T12:06:11.106Z'),
         embeding_engine: 'text-embedding-ada-002',
-        status: IndexingSessionStatus.complete
+        status: ProcessAdvancement.complete
       }
     ]
   },
@@ -36,6 +35,7 @@ export const TMPsources: Source[] = [
     enabled: true,
     description: 'Faqs en ligne CMSO',
     source_type: SourceTypes.remote,
+    status: ProcessAdvancement.complete,
     source_parameters: {
       source_url: new URL('https://www.cmso.com/reseau-bancaire-cooperatif/web/aide/faq'),
       exclusion_urls: [
@@ -50,11 +50,17 @@ export const TMPsources: Source[] = [
     indexing_sessions: [
       {
         id: '321321',
-        job_id: '778899',
         start_date: new Date('2023-07-24T12:06:11.106Z'),
         end_date: new Date('2023-07-24T14:22:07.106Z'),
         embeding_engine: 'text-embedding-ada-002',
-        status: IndexingSessionStatus.running
+        status: ProcessAdvancement.complete
+      },
+      {
+        id: '999999',
+        start_date: new Date('2023-07-25T12:06:11.106Z'),
+        end_date: new Date('2023-07-25T14:22:07.106Z'),
+        embeding_engine: 'text-embedding-ada-002',
+        status: ProcessAdvancement.running
       }
     ]
   },
@@ -64,6 +70,7 @@ export const TMPsources: Source[] = [
     name: 'ArkInfo',
     description: '',
     source_type: SourceTypes.file,
+    status: ProcessAdvancement.pristine,
     source_parameters: {
       file_format: 'json'
     }
@@ -74,7 +81,7 @@ export const TMPsources: Source[] = [
     name: 'Other kind of json source format',
     description: '',
     source_type: SourceTypes.file,
-
+    status: ProcessAdvancement.error,
     source_parameters: {
       file_format: 'json'
     }

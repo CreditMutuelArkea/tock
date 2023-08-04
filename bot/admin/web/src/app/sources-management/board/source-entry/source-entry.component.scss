@@ -53,10 +53,10 @@
       }
     }
 
-    &.processing {
+    &.running {
       .icon-wrapper {
-        border-color: nb-theme(color-warning-active);
-        background-color: nb-theme(color-warning-active);
+        border-color: nb-theme(color-success-active);
+        background-color: nb-theme(color-success-active);
         color: nb-theme(text-control-color);
         animation: rotation 2s infinite linear;
         nb-icon {
@@ -64,7 +64,7 @@
         }
       }
       .label {
-        color: nb-theme(color-warning-active);
+        color: nb-theme(color-success-active);
       }
     }
 
@@ -139,7 +139,7 @@
 .sessions {
   display: grid;
   grid-column-gap: 1rem;
-  grid-template-columns: 1fr 1fr 2fr 2fr 2fr 5rem;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 5rem;
 
   &.sessions-header {
     border-bottom: var(--list-item-divider-width) var(--list-item-divider-style) var(--list-item-divider-color);
