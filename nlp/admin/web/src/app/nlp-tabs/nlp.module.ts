@@ -170,7 +170,7 @@ export class NlpRoutingModule {}
     IntentsFiltersComponent,
     IntentsListComponent
   ],
-  exports: [SentenceAnalysisComponent, HighlightComponent],
+  exports: [SentenceAnalysisComponent, HighlightComponent, SentencesScrollComponent],
   providers: [NlpService]
 })
 export class NlpModule {}

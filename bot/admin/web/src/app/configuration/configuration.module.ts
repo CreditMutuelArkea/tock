@@ -40,7 +40,8 @@ import {
   NbTabsetModule,
   NbToastrModule,
   NbTooltipModule,
-  NbStepperModule
+  NbStepperModule,
+  NbRadioModule
 } from '@nebular/theme';
 import { NewBotComponent } from './bot/new-bot.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -159,7 +160,8 @@ export class BotApplicationConfig implements ApplicationConfig {
     NbToastrModule.forRoot(),
     NbIconModule,
     NbSelectModule,
-    NbStepperModule
+    NbStepperModule,
+    NbRadioModule
   ],
   providers: [
     {
