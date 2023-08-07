@@ -93,6 +93,35 @@ open class BotDefinitionBase(
             )
 
         val defaultRagStory =
+            // TODO MASS : use RagStoryDefinition
+            SimpleStoryDefinition(
+                "tock_rag_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        bus.markAsUnknown()
+                            // TODO MASS : use RagAnswerHandler
+                            bus.send("RAG - IA answer")
+                            RagAnswerHandler.handle(bus)
+                    }
+                },
+                setOf(Intent.unknown)
+            )
+
+        /**
+         * The default [ragExcludedStory].
+         */
+        val defaultRagExcludedStory =
+            SimpleStoryDefinition(
+                "tock_ragexcluded_story",
+                object : SimpleStoryHandlerBase() {
+                    override fun action(bus: BotBus) {
+                        bus.end(bus.botDefinition.defaultRagExcludedAnswer)
+                    }
+                },
+                setOf(Intent.ragexcluded)
+            )
+
+        val defaultRagStory =
            RagStoryDefinition(
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
