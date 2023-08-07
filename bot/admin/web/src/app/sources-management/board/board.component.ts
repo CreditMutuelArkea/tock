@@ -5,7 +5,7 @@ import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
 import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
-import { IndexingSession, ProcessAdvancement, Source, SourceTypes } from '../models';
+import { IndexingSession, ProcessAdvancement, Source, SourceImportParams, SourceTypes } from '../models';
 import { SourceManagementService } from '../source-management.service';
 import { NewSourceComponent } from './new-source/new-source.component';
 import { SourceImportComponent } from './source-import/source-import.component';
@@ -192,14 +192,18 @@ export class BoardComponent implements OnInit, OnDestroy {
     });
     dialogRef.onClose.subscribe((result) => {
       if (result.toLowerCase() === actionLabel.toLowerCase()) {
-        this.sourcesService.postIndexingSession(source).subscribe((indexingSession) => {
-          this.listRunningSessions();
-          this.toastrService.success(`Source update successfully launched`, 'Success', {
-            duration: 5000,
-            status: 'success'
-          });
-        });
+        this.postIndexingSession(source);
       }
+    });
+  }
+
+  postIndexingSession(source: Source, data?: SourceImportParams) {
+    this.sourcesService.postIndexingSession(source).subscribe((indexingSession) => {
+      this.listRunningSessions();
+      this.toastrService.success(`Source update successfully launched`, 'Success', {
+        duration: 5000,
+        status: 'success'
+      });
     });
   }
 
@@ -232,8 +236,8 @@ export class BoardComponent implements OnInit, OnDestroy {
       });
     }
 
-    modal.componentRef.instance.onNormalize.subscribe((normalizedData) => {
-      console.log(normalizedData);
+    modal.componentRef.instance.onNormalize.subscribe((data: SourceImportParams) => {
+      this.postIndexingSession(source, data);
       modal.close();
     });
   }

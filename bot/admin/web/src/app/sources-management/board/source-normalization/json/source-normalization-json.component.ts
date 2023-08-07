@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
 import { includesArray, isPrimitive } from '../../../../shared/utils';
-import { dataTypesDefinition, ImportDataTypes, Source } from '../../../models';
+import { dataTypesDefinition, ImportDataTypes, Source, SourceImportParams } from '../../../models';
 
 export type JsonImportAssociation = { type: ImportDataTypes; paths: string[][] };
 
@@ -13,7 +13,7 @@ export type JsonImportAssociation = { type: ImportDataTypes; paths: string[][] }
 export class SourceNormalizationJsonComponent {
   @Input() source?: Source;
 
-  @Output() onNormalize = new EventEmitter();
+  @Output() onNormalize = new EventEmitter<SourceImportParams>();
 
   dataTypesDefinition = dataTypesDefinition;
 
@@ -51,7 +51,15 @@ export class SourceNormalizationJsonComponent {
       this.invalidFormMessage = 'Please indicate at least the key corresponding to the "Answer" data type.';
     } else {
       const data = this.gatherData(this.source.rawData);
-      this.onNormalize.emit(data);
+
+      const contentPath = this.associations.find((asso) => asso.type === ImportDataTypes.content);
+      const sourcePath = this.associations.find((asso) => asso.type === ImportDataTypes.source_ref);
+
+      this.onNormalize.emit({
+        content_path: contentPath.paths,
+        source_path: sourcePath.paths,
+        content: data
+      });
     }
   }
 

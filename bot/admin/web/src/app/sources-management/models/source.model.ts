@@ -77,12 +77,21 @@ export enum IndexingSessionTaskTypes {
 
 export enum ImportDataTypes {
   content = 'content',
-  sourceRef = 'sourceRef'
-  // sourceId = 'sourceId',
+  source_ref = 'source_ref'
 }
 
 export const dataTypesDefinition = [
-  { label: 'Content (question, answer...)', type: ImportDataTypes.content, formCtrl: 'content' },
-  { label: 'Source reference (public url of the source)', type: ImportDataTypes.sourceRef, formCtrl: 'sourceRef' }
-  // { label: 'Id (unic identifier of the entry)', type: ImportDataTypes.sourceId, formCtrl: 'sourceId' }
+  { label: 'Content (question, answer...)', type: ImportDataTypes.content, formCtrl: ImportDataTypes.content },
+  { label: 'Source reference (public url of the source)', type: ImportDataTypes.source_ref, formCtrl: ImportDataTypes.source_ref }
 ];
+
+export interface SourceImportData {
+  content: string;
+  source_ref: string;
+}
+
+export interface SourceImportParams {
+  content_path: string | string[][];
+  source_path: string | string[][];
+  content: SourceImportData[];
+}

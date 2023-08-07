@@ -3,7 +3,7 @@ import { Observable, of, switchMap } from 'rxjs';
 import { ApplicationService } from '../core-nlp/applications.service';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { Application } from '../model/application';
-import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source } from './models';
+import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source, SourceImportParams } from './models';
 import { TMPsources } from './mock-sources';
 import { deepCopy } from '../shared/utils';
 
@@ -33,7 +33,7 @@ export class SourceManagementApiService {
     );
   }
 
-  postIndexingSession(source: Source, data?): Observable<IndexingSession> {
+  postIndexingSession(source: Source, data?: SourceImportParams): Observable<IndexingSession> {
     // MOCKING
     this.TEMP_counter = -1;
     // //MOCKING

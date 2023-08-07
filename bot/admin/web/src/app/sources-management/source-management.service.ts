@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, map, merge, Observable, switchMap, tap, throwError } from 'rxjs';
 import { RestService } from '../core-nlp/rest/rest.service';
 import { SourceManagementApiService } from './source-management.api.service';
-import { IndexingSession, ProcessAdvancement, Source } from './models';
+import { IndexingSession, ProcessAdvancement, Source, SourceImportParams } from './models';
 
 interface SourcesManagementState {
   loaded: boolean;
@@ -121,7 +121,7 @@ export class SourceManagementService {
     );
   }
 
-  postIndexingSession(source: Source, data?): Observable<IndexingSession> {
+  postIndexingSession(source: Source, data?: SourceImportParams): Observable<IndexingSession> {
     const state = this.getState();
     const existingSource = state.sources.find((s) => s.id === source.id);
     const existingSourceIndex = state.sources.indexOf(existingSource);
@@ -170,22 +170,5 @@ export class SourceManagementService {
         this.setState(state);
       })
     );
-  }
-
-  sendPocSource(selection) {
-    const payload = selection.map((sel, index) => {
-      return {
-        page_content: sel.answer,
-        metadata: {
-          source: sel.sourceRef,
-          row: index
-        }
-      };
-    });
-    console.log(payload);
-    // /import-data-csv?source_name=application._id
-    // const params = new HttpParams().set('source_name', this.stateService.currentApplication._id)
-
-    return this.rest.post(`/import-data-csv`, payload);
   }
 }

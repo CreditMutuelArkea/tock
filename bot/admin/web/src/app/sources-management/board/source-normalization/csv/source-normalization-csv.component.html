@@ -20,36 +20,15 @@
       (submit)="submit()"
     >
       <tock-form-control
-        label="Answer"
-        name="answer"
+        label="Textual content"
+        name="content"
         required="true"
-        [controls]="answer"
+        [controls]="content"
         [showError]="isSubmitted"
       >
         <nb-select
-          placeholder="Select the answer column name"
-          formControlName="answer"
-          [fullWidth]="true"
-          [optionsListClass]="'option-list--break-word'"
-        >
-          <nb-option
-            *ngFor="let header of getColumnNames()"
-            [value]="header"
-          >
-            {{ header }}
-          </nb-option>
-        </nb-select>
-      </tock-form-control>
-
-      <tock-form-control
-        label="id"
-        name="sourceId"
-        [controls]="sourceId"
-        [showError]="isSubmitted"
-      >
-        <nb-select
-          placeholder="Select the id column name"
-          formControlName="sourceId"
+          placeholder="Select the content column name"
+          formControlName="content"
           [fullWidth]="true"
           [optionsListClass]="'option-list--break-word'"
         >
@@ -64,12 +43,12 @@
 
       <tock-form-control
         label="Source reference"
-        name="sourceRef"
-        [controls]="sourceRef"
+        name="source_ref"
+        [controls]="source_ref"
       >
         <nb-select
           placeholder="Select the source reference column name "
-          formControlName="sourceRef"
+          formControlName="source_ref"
           [fullWidth]="true"
           [optionsListClass]="'option-list--break-word'"
         >
