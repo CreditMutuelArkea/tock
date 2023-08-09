@@ -49,6 +49,10 @@ data class Intent(
          */
         val keyword: Intent = Intent("$TOCK_NAMESPACE:keyword")
         /**
+         * The unknown intent.
+         */
+        val rag: Intent = Intent("$TOCK_NAMESPACE:rag")
+        /**
          * The RAG excluded subject intent.
          */
         val ragexcluded: Intent = Intent("$TOCK_NAMESPACE:ragexcluded")

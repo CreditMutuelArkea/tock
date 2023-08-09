@@ -19,6 +19,8 @@ package ai.tock.bot.definition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.config.rag.client.RagServiceApiClient
+import ai.tock.bot.engine.config.rag.client.dto.RagQuery
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.deleteKeyword
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.endTestContextKeyword
@@ -26,12 +28,14 @@ import ai.tock.bot.engine.nlp.BuiltInKeywordListener.testContextKeyword
 import ai.tock.bot.engine.nlp.keywordServices
 import ai.tock.bot.engine.user.UserTimelineDAO
 import ai.tock.shared.error
+import ai.tock.shared.exception.rest.RestException
 import ai.tock.shared.injector
 import ai.tock.shared.vertx.vertx
 import ai.tock.translator.I18nKeyProvider.Companion.generateKey
 import ai.tock.translator.I18nLabelValue
 import com.github.salomonbrys.kodein.instance
 import mu.KotlinLogging
+import java.net.ConnectException
 
 /**
  * Base implementation of [BotDefinition].
@@ -55,24 +59,73 @@ open class BotDefinitionBase(
     override val botEnabledListener: (Action) -> Unit = {},
     override val ragConfigurationEnabled: Boolean = false,
     override val ragExcludedStory: StoryDefinition = defaultRagExcludedStory,
-    override val ragStory: StoryDefinition? = null,
+    override val ragStory: StoryDefinition = defaultUnknownStory
 ) : BotDefinition {
 
     companion object {
         private val logger = KotlinLogging.logger {}
 
         /**
+         * Default Handler for unknown
+         */
+        private val unknownDefaultStoryHandler = object : SimpleStoryHandlerBase() {
+            override fun action(bus: BotBus) {
+                bus.markAsUnknown()
+                bus.end(bus.botDefinition.defaultUnknownAnswer)
+            }
+        }
+
+        /**
+         * Handler for unknown when [ragConfigurationEnabled] is enabled
+         *
+         */
+        private val unknownWithRagStoryHandler = object : SimpleStoryHandlerBase() {
+            override fun action(bus: BotBus) {
+                //handler dédié semble nécessaire ?
+                    bus.markAsUnknown()
+                    bus.end {
+                        //TODO wrapper et module spécifique pas d'appel direct
+                        try {
+                            val response =
+                                RagServiceApiClient().ask(RagQuery(userText.toString(), applicationId, userId.id))
+
+                            if (response != null) {
+                                // TODO check la config du bot ?
+                                response.answer
+                            } else {
+                                bus.botDefinition.defaultUnknownAnswer
+                            }
+                        }catch (conn: ConnectException){
+                            logger.error { "failed to connect to ${conn.message}" }
+                            bus.end(bus.botDefinition.defaultUnknownAnswer)
+                        } catch (e: RestException){
+                            logger.error { "error during rag call ${e.message}" }
+                            bus.end(bus.botDefinition.defaultUnknownAnswer)
+                        }
+                    }
+            }
+        }
+
+        /**
          * The default [unknownStory].
+         * If [ragConfigurationEnabled] triggers the retrieval augmented generation LLM
          */
         val defaultUnknownStory =
             SimpleStoryDefinition(
                 "tock_unknown_story",
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
-                        bus.markAsUnknown()
-                        bus.end(bus.botDefinition.defaultUnknownAnswer)
+                        logger.error { "is rag enabled ${bus.botDefinition.ragConfigurationEnabled}"}
+                        // TODO : attention la configuration du rag si géré via botDefinition ne peut pas être modifiée en l'état après création.
+                        // TODO : check avec DERCBOT-647
+                        if (bus.botDefinition.ragConfigurationEnabled) {
+                            unknownWithRagStoryHandler.action(bus)
+                        } else {
+                            unknownDefaultStoryHandler.action(bus)
+                        }
                     }
-                },
+                }
+              ,
                 setOf(Intent.unknown)
             )
 
@@ -85,21 +138,6 @@ open class BotDefinitionBase(
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
                         bus.end(bus.botDefinition.defaultRAGExcludedAnswer)
-                    }
-                },
-                setOf(Intent.ragexcluded)
-            )
-
-        /**
-         * The default [ragExcludedStory].
-         * TODO : not needed
-         */
-        val defaultRagStory =
-            SimpleStoryDefinition(
-                "tock_rag_story",
-                object : SimpleStoryHandlerBase() {
-                    override fun action(bus: BotBus) {
-                        bus.end("Please create your Rag Story")
                     }
                 },
                 setOf(Intent.ragexcluded)
@@ -246,6 +284,7 @@ open class BotDefinitionBase(
      * The default ragExcluded answer.
      */
     override val defaultRAGExcludedAnswer: I18nLabelValue get() = i18n("Sorry, I can't answer your question (Topic not covered)")
+
 
     override fun toString(): String {
         return botId

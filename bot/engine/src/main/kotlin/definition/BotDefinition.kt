@@ -116,6 +116,7 @@ interface BotDefinition : I18nKeyProvider {
 
     /**
      * Is the RAG enabled ?
+     * TODO : transform to ragconfiguration dto when DERCBOT-647 is mergerd
      */
     val ragConfigurationEnabled: Boolean
 
@@ -171,10 +172,11 @@ interface BotDefinition : I18nKeyProvider {
      */
     val unknownStory: StoryDefinition
 
+
     /**
-     * The Retrieval Augmented Generation Story. Used when rag is active
+     * The rag story. Used where no valid intent is found.
      */
-    val ragStory: StoryDefinition?
+    val ragStory: StoryDefinition
 
     /**
      * The ragExcluded Story. Used where ragexcluded intent is found.
