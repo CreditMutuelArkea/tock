@@ -97,3 +97,9 @@ nb-icon[pack='material-icons'] {
 .divider {
   background-color: var(--color-basic-transparent-200);
 }
+
+.cdk-global-overlay-wrapper nb-dialog-container nb-card {
+  max-width: 95vw;
+  max-height: 95vh;
+  margin: 0;
+}

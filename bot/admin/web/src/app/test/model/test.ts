@@ -32,7 +32,13 @@ export class BotDialogRequest extends ApplicationScopedQuery {
 }
 
 export class BotDialogResponse {
-  constructor(public messages: BotMessage[], public hasNlpStats: boolean, public userActionId?: string, public userLocale?: string) {}
+  constructor(
+    public messages: BotMessage[],
+    public hasNlpStats: boolean,
+    public userActionId?: string,
+    public userLocale?: string,
+    public debug?: any
+  ) {}
 
   static fromJSON(json?: any): BotDialogResponse {
     const value = Object.create(BotDialogResponse.prototype);
@@ -40,7 +46,6 @@ export class BotDialogResponse {
     const result = Object.assign(value, json, {
       messages: BotMessage.fromJSONArray(json.messages)
     });
-
     return result;
   }
 }
@@ -51,7 +56,8 @@ export class TestMessage {
     public message?: BotMessage,
     public locale?: string,
     public actionId?: string,
-    public hasNlpStats?: boolean
+    public hasNlpStats?: boolean,
+    public debug?: any
   ) {}
 }
 

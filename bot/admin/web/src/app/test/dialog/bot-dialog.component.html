@@ -63,6 +63,7 @@
         <tock-chat-ui-message
           *ngFor="let m of messages"
           [message]="m.message"
+          [debug]="m.debug"
           [reply]="m.bot"
           [avatar]="getUserAvatar(m.bot)"
           (sendMessage)="onNewMessage($event)"

@@ -1,6 +1,8 @@
 import { Component, EventEmitter, HostBinding, Input, Output } from '@angular/core';
 import { DomSanitizer, SafeStyle } from '@angular/platform-browser';
+import { NbDialogService } from '@nebular/theme';
 import { BotMessage } from '../../../model/dialog-data';
+import { DebugViewerComponent } from '../../debug-viewer/debug-viewer.component';
 
 @Component({
   selector: 'tock-chat-ui-message',
@@ -12,6 +14,8 @@ export class ChatUiMessageComponent {
   @Input() replay: boolean = false;
   @Input() sender: string;
   @Input() date: Date;
+  @Input() debug?: any;
+
   @Input()
   set avatar(value: string) {
     this.avatarStyle = value ? this.domSanitizer.bypassSecurityTrustStyle(`url(${value})`) : null;
@@ -36,9 +40,17 @@ export class ChatUiMessageComponent {
 
   @Output() sendMessage: EventEmitter<BotMessage> = new EventEmitter();
 
-  constructor(protected domSanitizer: DomSanitizer) {}
+  constructor(protected domSanitizer: DomSanitizer, private nbDialogService: NbDialogService) {}
 
   replyMessage(message: BotMessage) {
     this.sendMessage.emit(message);
+  }
+
+  showDebug() {
+    this.nbDialogService.open(DebugViewerComponent, {
+      context: {
+        debug: this.debug
+      }
+    });
   }
 }

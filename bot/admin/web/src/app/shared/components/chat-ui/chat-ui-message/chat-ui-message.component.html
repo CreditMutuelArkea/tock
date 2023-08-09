@@ -41,6 +41,12 @@
         ></tock-chat-ui-message-location>
       </div>
     </div>
+    <small
+      class="debug-link"
+      *ngIf="debug"
+      (click)="showDebug()"
+      >View debug infos</small
+    >
   </div>
 </div>
 <ng-content></ng-content>

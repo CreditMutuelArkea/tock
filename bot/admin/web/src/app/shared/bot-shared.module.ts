@@ -47,6 +47,7 @@ import {
   ChatUiComponent,
   ChatUiMessageComponent,
   ChoiceDialogComponent,
+  DebugViewerComponent,
   ErrorHelperComponent,
   FormControlComponent,
   NoDataFoundComponent,
@@ -60,6 +61,7 @@ import { ChatUiMessageSentenceElementComponent } from './components/chat-ui/chat
 import { ChatUiMessageChoiceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-choice/chat-ui-message-choice.component';
 import { ChatUiMessageAttachmentComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-attachment/chat-ui-message-attachment.component';
 import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-location/chat-ui-message-location';
+import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json-iterator/debug-json-iterator.component';
 
 @NgModule({
   imports: [
@@ -102,7 +104,9 @@ import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-mes
     ChatUiMessageAttachmentComponent,
     ChatUiMessageLocationComponent,
     AutofocusDirective,
-    SliderComponent
+    SliderComponent,
+    DebugViewerComponent,
+    DebugJsonIteratorComponent
   ],
   exports: [
     AutocompleteInputComponent,
@@ -123,7 +127,8 @@ import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-mes
     ChoiceDialogComponent,
     ChatUiComponent,
     ChatUiMessageComponent,
-    AutofocusDirective
+    AutofocusDirective,
+    DebugViewerComponent
   ],
   providers: [BotSharedService]
 })
