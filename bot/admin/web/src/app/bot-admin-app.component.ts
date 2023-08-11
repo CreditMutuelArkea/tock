@@ -120,7 +120,7 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
         children: [
           {
             link: '/rag/sources',
-            title: 'Sources management',
+            title: 'Rag sources',
             icon: 'cloud-download-outline'
           },
           {
