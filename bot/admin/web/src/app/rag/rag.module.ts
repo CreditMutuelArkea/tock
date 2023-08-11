@@ -20,13 +20,13 @@ import { RagRoutingModule } from './rag-routing.module';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NlpModule } from '../nlp-tabs/nlp.module';
 import { RagExcludedComponent } from './rag-excluded/rag-excluded.component';
-import { BoardComponent } from './sources-management/board/board.component';
-import { NewSourceComponent } from './sources-management/board/new-source/new-source.component';
-import { SourceEntryComponent } from './sources-management/board/source-entry/source-entry.component';
-import { SourceImportComponent } from './sources-management/board/source-import/source-import.component';
-import { SourceNormalizationCsvComponent } from './sources-management/board/source-normalization/csv/source-normalization-csv.component';
-import { SourceNormalizationJsonComponent } from './sources-management/board/source-normalization/json/source-normalization-json.component';
-import { JsonIteratorComponent } from './sources-management/board/source-normalization/json/json-iterator/json-iterator.component';
+import { RagSourcesBoardComponent } from './sources-management/rag-sources-board.component';
+import { NewSourceComponent } from './sources-management/new-source/new-source.component';
+import { SourceEntryComponent } from './sources-management/source-entry/source-entry.component';
+import { SourceImportComponent } from './sources-management/source-import/source-import.component';
+import { SourceNormalizationCsvComponent } from './sources-management/source-normalization/csv/source-normalization-csv.component';
+import { SourceNormalizationJsonComponent } from './sources-management/source-normalization/json/source-normalization-json.component';
+import { JsonIteratorComponent } from './sources-management/source-normalization/json/json-iterator/json-iterator.component';
 import { SourceManagementService } from './sources-management/source-management.service';
 import { SourceManagementApiService } from './sources-management/source-management.api.service';
 
@@ -53,7 +53,7 @@ import { SourceManagementApiService } from './sources-management/source-manageme
     RagTabsComponent,
     RagSettingsComponent,
     RagExcludedComponent,
-    BoardComponent,
+    RagSourcesBoardComponent,
     NewSourceComponent,
     SourceEntryComponent,
     SourceImportComponent,

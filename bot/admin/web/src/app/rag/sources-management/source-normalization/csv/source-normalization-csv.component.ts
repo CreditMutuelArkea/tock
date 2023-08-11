@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
-import { Source, SourceImportData, SourceImportParams } from '../../../models';
+import { Source, SourceImportData, SourceImportParams } from '../../models';
 
 @Component({
   selector: 'tock-source-normalization-csv',

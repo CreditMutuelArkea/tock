@@ -5,7 +5,7 @@ import { AuthGuard } from '../core-nlp/auth/auth.guard';
 import { RagExcludedComponent } from './rag-excluded/rag-excluded.component';
 import { RagSettingsComponent } from './rag-settings/rag-settings.component';
 import { RagTabsComponent } from './rag-tabs/rag-tabs.component';
-import { BoardComponent } from './sources-management/board/board.component';
+import { RagSourcesBoardComponent } from './sources-management/rag-sources-board.component';
 
 const routes: Routes = [
   {
@@ -18,7 +18,7 @@ const routes: Routes = [
     children: [
       {
         path: 'sources',
-        component: BoardComponent
+        component: RagSourcesBoardComponent
       },
       {
         path: 'exclusions',

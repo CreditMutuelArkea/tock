@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { deepCopy, includesArray, isPrimitive } from '../../../../../../shared/utils';
-import { dataTypesDefinition, ImportDataTypes } from '../../../../models';
+import { deepCopy, includesArray, isPrimitive } from '../../../../../shared/utils';
+import { dataTypesDefinition, ImportDataTypes } from '../../../models';
 import { JsonImportAssociation } from '../source-normalization-json.component';
 
 @Component({

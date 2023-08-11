@@ -1,23 +1,24 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { distinctUntilChanged, Subject, take, takeUntil } from 'rxjs';
-import { BotConfigurationService } from '../../../core/bot-configuration.service';
-import { BotApplicationConfiguration } from '../../../core/model/configuration';
-import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
-import { IndexingSession, ProcessAdvancement, Source, SourceImportParams, SourceTypes } from '../models';
-import { SourceManagementService } from '../source-management.service';
+import { BotConfigurationService } from '../../core/bot-configuration.service';
+import { BotApplicationConfiguration } from '../../core/model/configuration';
+import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { getSourceMostRecentRunningIndexingSession } from './commons/utils';
+
+import { IndexingSession, ProcessAdvancement, Source, SourceImportParams, SourceTypes } from './models';
 import { NewSourceComponent } from './new-source/new-source.component';
 import { SourceImportComponent } from './source-import/source-import.component';
+import { SourceManagementService } from './source-management.service';
 import { SourceNormalizationCsvComponent } from './source-normalization/csv/source-normalization-csv.component';
 import { SourceNormalizationJsonComponent } from './source-normalization/json/source-normalization-json.component';
 
 @Component({
-  selector: 'tock-board',
-  templateUrl: './board.component.html',
-  styleUrls: ['./board.component.scss']
+  selector: 'tock-rag-sources-board',
+  templateUrl: './rag-sources-board.component.html',
+  styleUrls: ['./rag-sources-board.component.scss']
 })
-export class BoardComponent implements OnInit, OnDestroy {
+export class RagSourcesBoardComponent implements OnInit, OnDestroy {
   destroy$ = new Subject();
 
   configurations: BotApplicationConfiguration[];

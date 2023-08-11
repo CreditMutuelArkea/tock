@@ -125,12 +125,12 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
           },
           {
             link: '/rag/exclusions',
-            title: 'Exclusions',
+            title: 'Rag exclusions',
             icon: 'alert-triangle-outline'
           },
           {
             link: '/rag/settings',
-            title: 'Settings',
+            title: 'Rag settings',
             icon: 'settings-outline'
           }
         ]

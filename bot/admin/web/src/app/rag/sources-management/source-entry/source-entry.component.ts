@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { NbDialogService } from '@nebular/theme';
 import { Subject } from 'rxjs';
-import { ConfirmDialogComponent } from '../../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { getSourceMostRecentRunningIndexingSession } from '../../commons/utils';
-import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source, SourceTypes } from '../../models';
+import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
+import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source, SourceTypes } from '../models';
 
 interface TaskDefinition {
   type: IndexingSessionTaskTypes;
