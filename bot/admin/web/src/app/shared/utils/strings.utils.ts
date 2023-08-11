@@ -24,3 +24,8 @@ export function normalizedCamelCase(str: string): string {
     })
     .replace(/[^A-Za-z0-9]*/g, '');
 }
+
+export function isUrl(str: string): boolean {
+  const reg = new RegExp('(http|https)://([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?');
+  return reg.test(str);
+}

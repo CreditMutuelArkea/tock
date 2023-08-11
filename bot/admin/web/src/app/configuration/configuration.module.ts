@@ -50,6 +50,7 @@ import { NamespacesComponent } from '../applications/namespace/namespaces.compon
 import { BotSharedService } from '../shared/bot-shared.service';
 import { ApplicationConfig } from '../applications/application.config';
 import { SelectBotConfigurationDialogComponent } from './bot/selection-dialog/select-bot-configuration-dialog.component';
+import { RagSettingsComponent } from '../rag/rag-settings/rag-settings.component';
 
 const routes: Routes = [
   {
@@ -112,6 +113,10 @@ const routes: Routes = [
       {
         path: 'namespaces',
         component: NamespacesComponent
+      },
+      {
+        path: 'rag',
+        component: RagSettingsComponent
       }
     ]
   }
@@ -139,7 +144,8 @@ export class BotApplicationConfig implements ApplicationConfig {
     BotConfigurationsComponent,
     BotConfigurationComponent,
     NewBotComponent,
-    SelectBotConfigurationDialogComponent
+    SelectBotConfigurationDialogComponent,
+    RagSettingsComponent
   ],
   imports: [
     CommonModule,

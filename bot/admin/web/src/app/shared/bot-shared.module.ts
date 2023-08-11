@@ -45,6 +45,7 @@ import {
   ChatUiMessageComponent,
   ChoiceDialogComponent,
   ErrorHelperComponent,
+  FileUploadComponent,
   FormControlComponent,
   NoDataFoundComponent,
   PaginationComponent,
@@ -86,6 +87,7 @@ import { AutofocusDirective } from './directives';
     ChatUiMessageComponent,
     ChoiceDialogComponent,
     AutofocusDirective,
+    FileUploadComponent,
     SliderComponent
   ],
   exports: [
@@ -102,6 +104,7 @@ import { AutofocusDirective } from './directives';
     ChatUiMessageComponent,
     ChoiceDialogComponent,
     AutofocusDirective,
+    FileUploadComponent,
     SliderComponent
   ],
   providers: [BotSharedService]
