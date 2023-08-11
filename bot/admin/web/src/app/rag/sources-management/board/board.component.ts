@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { distinctUntilChanged, Subject, take, takeUntil } from 'rxjs';
-import { BotConfigurationService } from '../../core/bot-configuration.service';
-import { BotApplicationConfiguration } from '../../core/model/configuration';
-import { ConfirmDialogComponent } from '../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { BotConfigurationService } from '../../../core/bot-configuration.service';
+import { BotApplicationConfiguration } from '../../../core/model/configuration';
+import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
 import { IndexingSession, ProcessAdvancement, Source, SourceImportParams, SourceTypes } from '../models';
 import { SourceManagementService } from '../source-management.service';

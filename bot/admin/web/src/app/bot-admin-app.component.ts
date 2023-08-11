@@ -119,6 +119,11 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
         icon: 'bulb-outline',
         children: [
           {
+            link: '/rag/sources',
+            title: 'Sources management',
+            icon: 'cloud-download-outline'
+          },
+          {
             link: '/rag/exclusions',
             title: 'Exclusions',
             icon: 'alert-triangle-outline'
@@ -129,12 +134,6 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
             icon: 'settings-outline'
           }
         ]
-      },
-      {
-        title: 'Sources management',
-        icon: 'cloud-download-outline',
-        link: '/sources-management/board',
-        hidden: !this.state.hasRole(UserRole.faqBotUser)
       },
       {
         title: 'Answers',

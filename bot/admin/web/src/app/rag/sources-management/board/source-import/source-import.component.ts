@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AbstractControl, AsyncValidatorFn, FormControl, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
-import { readFileAsText } from '../../../shared/utils';
-import { FileValidators } from '../../../shared/validators';
+import { readFileAsText } from '../../../../shared/utils';
+import { FileValidators } from '../../../../shared/validators';
 import { Source, SourceTypes } from '../../models';
 import Papa from 'papaparse';
 

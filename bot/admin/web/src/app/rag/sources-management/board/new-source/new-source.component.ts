@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormArray, FormControl, FormGroup, Validators } from '@angular/forms';
 import { NbDialogRef } from '@nebular/theme';
-import { isUrl } from '../../../shared/utils';
+import { isUrl } from '../../../../shared/utils';
 import { Source, SourceTypes } from '../../models';
 
 interface NewSourceForm {

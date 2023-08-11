@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
-import { includesArray, isPrimitive } from '../../../../shared/utils';
+import { includesArray, isPrimitive } from '../../../../../shared/utils';
 import { dataTypesDefinition, ImportDataTypes, Source, SourceImportParams } from '../../../models';
 
 export type JsonImportAssociation = { type: ImportDataTypes; paths: string[][] };

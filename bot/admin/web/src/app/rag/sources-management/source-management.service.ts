@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, filter, map, merge, Observable, switchMap, tap, throwError } from 'rxjs';
-import { RestService } from '../core-nlp/rest/rest.service';
+import { RestService } from '../../core-nlp/rest/rest.service';
 import { SourceManagementApiService } from './source-management.api.service';
 import { IndexingSession, ProcessAdvancement, Source, SourceImportParams } from './models';
 

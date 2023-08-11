@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { TabLink } from '../../shared/utils';
 
 const tabLinks = [
+  new TabLink('sources', 'Sources management', 'cloud-download-outline'),
   new TabLink('exclusions', 'Exclusions', 'alert-triangle-outline'),
   new TabLink('settings', 'Settings', 'settings-outline')
 ];

@@ -77,10 +77,6 @@ const routes: Routes = [
     path: 'rag',
     loadChildren: () => import('./rag/rag.module').then((m) => m.RagModule)
   },
-  {
-    path: 'sources-management',
-    loadChildren: () => import('./sources-management/sources-management.module').then((m) => m.SourcesManagementModule)
-  },
   { path: '**', redirectTo: '/nlp/inbox' }
 ];
 

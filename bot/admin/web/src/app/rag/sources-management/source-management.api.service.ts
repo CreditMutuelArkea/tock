@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, switchMap } from 'rxjs';
-import { ApplicationService } from '../core-nlp/applications.service';
-import { RestService } from '../core-nlp/rest/rest.service';
-import { Application } from '../model/application';
+import { ApplicationService } from '../../core-nlp/applications.service';
+import { RestService } from '../../core-nlp/rest/rest.service';
+import { Application } from '../../model/application';
 import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source, SourceImportParams } from './models';
 import { TMPsources } from './mock-sources';
-import { deepCopy } from '../shared/utils';
+import { deepCopy } from '../../shared/utils';
 
 @Injectable()
 export class SourceManagementApiService {
