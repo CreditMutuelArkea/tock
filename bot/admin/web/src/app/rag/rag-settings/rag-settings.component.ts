@@ -16,6 +16,11 @@ interface RagSettingsParamsForm {
   deploymentName?: FormControl<string>;
   privateEndpointBaseUrl?: FormControl<string>;
   apiVersion?: FormControl<string>;
+
+  embeddingDeploymentName?: FormControl<string>;
+  embeddingModelName?: FormControl<string>;
+  embeddingApiKey?: FormControl<string>;
+  embeddingApiVersion?: FormControl<string>;
 }
 interface RagSettingsForm {
   _id: FormControl<string>;
@@ -86,7 +91,12 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       modelName: new FormControl(undefined, [this.formEngineParamValidator('modelName')]),
       deploymentName: new FormControl(undefined, [this.formEngineParamValidator('deploymentName')]),
       privateEndpointBaseUrl: new FormControl(undefined, [this.formEngineParamValidator('privateEndpointBaseUrl')]),
-      apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')])
+      apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')]),
+
+      embeddingDeploymentName: new FormControl(undefined, [this.formEngineParamValidator('embeddingDeploymentName')]),
+      embeddingModelName: new FormControl(undefined, [this.formEngineParamValidator('embeddingModelName')]),
+      embeddingApiKey: new FormControl(undefined, [this.formEngineParamValidator('embeddingApiKey')]),
+      embeddingApiVersion: new FormControl(undefined, [this.formEngineParamValidator('embeddingApiVersion')])
     })
   });
 
@@ -165,6 +175,19 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
   get apiVersion(): FormControl {
     return this.form.controls.params.get('apiVersion') as FormControl;
+  }
+
+  get embeddingDeploymentName(): FormControl {
+    return this.form.controls.params.get('embeddingDeploymentName') as FormControl;
+  }
+  get embeddingModelName(): FormControl {
+    return this.form.controls.params.get('embeddingModelName') as FormControl;
+  }
+  get embeddingApiKey(): FormControl {
+    return this.form.controls.params.get('embeddingApiKey') as FormControl;
+  }
+  get embeddingApiVersion(): FormControl {
+    return this.form.controls.params.get('embeddingApiVersion') as FormControl;
   }
 
   getFormControlByName(paramKey: string): FormControl {
