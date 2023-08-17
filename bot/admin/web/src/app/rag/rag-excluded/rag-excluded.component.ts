@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Intent, SentenceStatus } from '../../model/nlp';
-import { SentenceFilter } from '../../sentences-scroll/sentences-scroll.component';
+import { SentenceTrainingMode } from '../../shared/components/sentence-training/models';
 
 @Component({
   selector: 'tock-rag-excluded',
@@ -8,7 +7,7 @@ import { SentenceFilter } from '../../sentences-scroll/sentences-scroll.componen
   styleUrls: ['./rag-excluded.component.scss']
 })
 export class RagExcludedComponent implements OnInit {
-  filter: SentenceFilter = new SentenceFilter(null, Intent.ragExcluded, [SentenceStatus.validated, SentenceStatus.model]);
+  SentenceTrainingMode = SentenceTrainingMode;
 
   constructor() {}
 

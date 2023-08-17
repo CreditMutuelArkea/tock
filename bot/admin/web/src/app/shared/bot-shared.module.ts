@@ -35,7 +35,12 @@ import {
   NbSelectModule,
   NbTooltipModule,
   NbPopoverModule,
-  NbButtonModule
+  NbButtonModule,
+  NbSpinnerModule,
+  NbCheckboxModule,
+  NbInputModule,
+  NbFormFieldModule,
+  NbAutocompleteModule
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
@@ -49,15 +54,23 @@ import {
   FormControlComponent,
   NoDataFoundComponent,
   PaginationComponent,
+  SentenceTrainingComponent,
+  SentenceTrainingDialogComponent,
+  SentenceTrainingFiltersComponent,
+  SentenceTrainingListComponent,
   SliderComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AnalyticsService } from '../analytics/analytics.service';
 
 @NgModule({
   imports: [
     CommonModule,
     SharedModule,
+    ReactiveFormsModule,
     MomentModule,
     NbCalendarRangeModule,
     NbCardModule,
@@ -65,7 +78,13 @@ import { AutofocusDirective } from './directives';
     NbTooltipModule,
     NbIconModule,
     NbPopoverModule,
-    NbButtonModule
+    NbButtonModule,
+    NbSpinnerModule,
+    NbCheckboxModule,
+    NbInputModule,
+    NbFormFieldModule,
+    InfiniteScrollModule,
+    NbAutocompleteModule
   ],
   declarations: [
     BotMessageComponent,
@@ -88,7 +107,11 @@ import { AutofocusDirective } from './directives';
     ChoiceDialogComponent,
     AutofocusDirective,
     FileUploadComponent,
-    SliderComponent
+    SliderComponent,
+    SentenceTrainingComponent,
+    SentenceTrainingDialogComponent,
+    SentenceTrainingFiltersComponent,
+    SentenceTrainingListComponent
   ],
   exports: [
     BotMessageComponent,
@@ -105,8 +128,9 @@ import { AutofocusDirective } from './directives';
     ChoiceDialogComponent,
     AutofocusDirective,
     FileUploadComponent,
-    SliderComponent
+    SliderComponent,
+    SentenceTrainingComponent
   ],
-  providers: [BotSharedService]
+  providers: [BotSharedService, AnalyticsService]
 })
 export class BotSharedModule {}
