@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { Subject, Subscription } from 'rxjs';
+import { debounceTime, takeUntil } from 'rxjs/operators';
 
-import { FaqTrainingFilter, SentenceTrainingMode } from './../models';
+import { SentenceTrainingFilter, SentenceTrainingMode } from './../models';
 
 interface FaqTrainingFilterForm {
   search: FormControl<string>;
@@ -16,12 +16,12 @@ interface FaqTrainingFilterForm {
   styleUrls: ['./sentence-training-filters.component.scss']
 })
 export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
+  private readonly destroy$: Subject<boolean> = new Subject();
+
   @Input() sentenceTrainingMode: SentenceTrainingMode;
   SentenceTrainingMode = SentenceTrainingMode;
 
-  @Output() onFilter = new EventEmitter<FaqTrainingFilter>();
-
-  private _subscription = new Subscription();
+  @Output() onFilter = new EventEmitter<SentenceTrainingFilter>();
 
   form = new FormGroup<FaqTrainingFilterForm>({
     search: new FormControl(),
@@ -37,20 +37,21 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this._subscription = this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
-      this.onFilter.emit(this.form.value as FaqTrainingFilter);
+    this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe(() => {
+      this.onFilter.emit(this.form.value as SentenceTrainingFilter);
     });
-  }
-
-  ngOnDestroy(): void {
-    this._subscription.unsubscribe();
   }
 
   clearSearch(): void {
     this.search.reset();
   }
 
-  updateFilter(filter: FaqTrainingFilter): void {
+  updateFilter(filter: SentenceTrainingFilter): void {
     this.form.patchValue(filter);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

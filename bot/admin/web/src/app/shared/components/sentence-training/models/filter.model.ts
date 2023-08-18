@@ -1,11 +1,4 @@
-export interface FaqFilter {
-  enabled: boolean;
-  search: string;
-  tags: Array<string>;
-  sort;
-}
-
-export interface FaqTrainingFilter {
+export interface SentenceTrainingFilter {
   search: string;
   showUnknown: boolean;
 }

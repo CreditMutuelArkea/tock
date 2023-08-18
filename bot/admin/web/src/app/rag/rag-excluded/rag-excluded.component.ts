@@ -6,10 +6,6 @@ import { SentenceTrainingMode } from '../../shared/components/sentence-training/
   templateUrl: './rag-excluded.component.html',
   styleUrls: ['./rag-excluded.component.scss']
 })
-export class RagExcludedComponent implements OnInit {
-  SentenceTrainingMode = SentenceTrainingMode;
-
-  constructor() {}
-
-  ngOnInit(): void {}
+export class RagExcludedComponent {
+  mode = SentenceTrainingMode.RAGEXCLUDED;
 }

@@ -9,7 +9,7 @@ import { PaginatedQuery, truncate } from '../../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { Pagination } from '..';
-import { Action, FaqTrainingFilter, SentenceTrainingMode } from './models';
+import { Action, SentenceTrainingFilter, SentenceTrainingMode } from './models';
 import { SentenceTrainingListComponent } from './sentence-training-list/sentence-training-list.component';
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
@@ -28,9 +28,9 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   @Input() sentenceTrainingMode: SentenceTrainingMode;
 
-  @ViewChild('faqTrainingList') faqTrainingList: SentenceTrainingListComponent;
-  @ViewChild('faqTrainingDialog') faqTrainingDialog: SentenceTrainingDialogComponent;
-  @ViewChild('faqTrainingFilter') faqTrainingFilter: SentenceTrainingFiltersComponent;
+  @ViewChild('sentenceTrainingList') sentenceTrainingList: SentenceTrainingListComponent;
+  @ViewChild('sentenceTrainingDialog') sentenceTrainingDialog: SentenceTrainingDialogComponent;
+  @ViewChild('sentenceTrainingFilter') sentenceTrainingFilter: SentenceTrainingFiltersComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
   Action: typeof Action = Action;
@@ -38,7 +38,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     search: null,
     sort: [{ first: 'creationDate', second: false }],
     intentId: null,
-    status: [1, 2],
+    status: [],
     onlyToReview: false,
     maxIntentProbability: 100,
     minIntentProbability: 0
@@ -52,13 +52,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   constructor(private nlp: NlpService, private state: StateService, private toastrService: NbToastrService) {}
 
   ngOnInit(): void {
-    if (this.sentenceTrainingMode === SentenceTrainingMode.RAGEXCLUDED) {
-      this.filters.intentId = Intent.ragExcluded;
-    }
-
-    if ([Intent.unknown, Intent.ragExcluded].includes(this.filters.intentId)) {
-      this.filters.status = [SentenceStatus.inbox, SentenceStatus.model];
-    }
+    this.initFilters();
     this.loadData();
     this.state.configurationChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.loadData();
@@ -66,23 +60,43 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next(true);
-    this.destroy$.complete();
-  }
-
-  filterFaqTraining(filters: FaqTrainingFilter): void {
-    this.selection.clear();
-
+  filterSentenceTraining(filters: SentenceTrainingFilter): void {
     this.isFilteredUnknown = filters.showUnknown;
-    const intentId = filters.showUnknown ? Intent.unknown : null;
-    const status = filters.showUnknown ? [1, 2] : [0];
 
-    this.filters = { ...this.filters, ...filters, intentId, status };
+    this.selection.clear();
+    this.initFilters();
+
+    // const intentId = filters.showUnknown ? Intent.unknown : null;
+    // const status = filters.showUnknown ? [SentenceStatus.validated, SentenceStatus.model] : [SentenceStatus.inbox];
+
+    // this.filters = { ...this.filters, ...filters, intentId, status };
+
+    this.filters = { ...this.filters, ...filters };
     this.loadData();
   }
 
-  sortFaqTraining(sort: boolean): void {
+  initFilters() {
+    if (this.sentenceTrainingMode === SentenceTrainingMode.INBOX) {
+      this.filters = { ...this.filters, ...{ intentId: null } };
+      this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
+    }
+
+    if (this.sentenceTrainingMode === SentenceTrainingMode.UNKNOWN || this.isFilteredUnknown) {
+      this.filters = { ...this.filters, ...{ intentId: Intent.unknown } };
+    }
+
+    if (this.sentenceTrainingMode === SentenceTrainingMode.RAGEXCLUDED) {
+      this.filters = { ...this.filters, ...{ intentId: Intent.ragExcluded } };
+    }
+
+    if ([Intent.unknown, Intent.ragExcluded].includes(this.filters.intentId)) {
+      this.filters = { ...this.filters, ...{ status: [SentenceStatus.validated, SentenceStatus.model] } };
+    } else {
+      this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
+    }
+  }
+
+  sortSentenceTraining(sort: boolean): void {
     this.selection.clear();
     this.filters.sort[0].second = sort;
     this.loadData();
@@ -306,9 +320,9 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     if (exists) {
       this.unselectAllSentences();
       exists._selected = true;
-      this.faqTrainingDialog.updateSentence(sentence);
+      this.sentenceTrainingDialog.updateSentence(sentence);
       setTimeout(() => {
-        this.faqTrainingList.scrollToSentence(sentence);
+        this.sentenceTrainingList.scrollToSentence(sentence);
       }, 200);
     } else {
       if (this.pagination.size * tryCount < 50) {
@@ -322,10 +336,15 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         }
       }
 
-      this.faqTrainingFilter.updateFilter({
+      this.sentenceTrainingFilter.updateFilter({
         search: sentence.text,
         showUnknown: false
       });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }
