@@ -1,6 +1,6 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FaqTrainingComponent, SentenceExtended } from './faq-training.component';
+import { FaqTrainingComponent } from './faq-training.component';
 
 describe('FaqTrainingComponent', () => {
   let component: FaqTrainingComponent;

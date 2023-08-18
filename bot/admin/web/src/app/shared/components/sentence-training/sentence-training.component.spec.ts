@@ -4,12 +4,12 @@ import { By } from '@angular/platform-browser';
 import { NbSpinnerModule, NbToastrService, NbToggleModule } from '@nebular/theme';
 import { of, Subject } from 'rxjs';
 
-import { StateService } from '../../core-nlp/state.service';
-import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../model/nlp';
-import { NlpService } from '../../nlp-tabs/nlp.service';
-import { TestSharedModule } from '../../shared/test-shared.module';
-import { Action } from '../models';
-import { FaqTrainingComponent, SentenceExtended } from './sentence-training.component';
+import { StateService } from '../../../core-nlp/state.service';
+import { Classification, Intent, PaginatedResult, Sentence, SentenceStatus } from '../../../model/nlp';
+import { NlpService } from '../../../nlp-tabs/nlp.service';
+import { TestSharedModule } from '../../../shared/test-shared.module';
+import { Action } from './models';
+import { SentenceTrainingComponent, SentenceExtended } from './sentence-training.component';
 
 const mockSentences: SentenceExtended[] = [
   {
@@ -102,13 +102,13 @@ class NlpServiceMock {
   }
 }
 
-describe('FaqTrainingComponent', () => {
-  let component: FaqTrainingComponent;
-  let fixture: ComponentFixture<FaqTrainingComponent>;
+describe('SentenceTrainingComponent', () => {
+  let component: SentenceTrainingComponent;
+  let fixture: ComponentFixture<SentenceTrainingComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FaqTrainingComponent],
+      declarations: [SentenceTrainingComponent],
       imports: [TestSharedModule, NbSpinnerModule, NbToggleModule],
       providers: [
         { provide: NlpService, useClass: NlpServiceMock },
@@ -120,7 +120,7 @@ describe('FaqTrainingComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FaqTrainingComponent);
+    fixture = TestBed.createComponent(SentenceTrainingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -131,9 +131,9 @@ describe('FaqTrainingComponent', () => {
 
   it('should render filters and list component when the component is loaded successfully', () => {
     const noDataComponent = fixture.debugElement.query(By.css('tock-no-data-found'));
-    const filtersComponent = fixture.debugElement.query(By.css('tock-faq-training-filters'));
-    const listComponent = fixture.debugElement.query(By.css('tock-faq-training-list'));
-    const dialogComponent = fixture.debugElement.query(By.css('tock-faq-training-dialog'));
+    const filtersComponent = fixture.debugElement.query(By.css('tock-sentence-training-filters'));
+    const listComponent = fixture.debugElement.query(By.css('tock-sentence-training-list'));
+    const dialogComponent = fixture.debugElement.query(By.css('tock-sentence-training-dialog'));
 
     expect(dialogComponent).toBeFalsy();
     expect(noDataComponent).toBeFalsy();
@@ -145,8 +145,8 @@ describe('FaqTrainingComponent', () => {
     component.sentences = [];
     fixture.detectChanges();
     const noDataComponent = fixture.debugElement.query(By.css('tock-no-data-found'));
-    const filtersComponent = fixture.debugElement.query(By.css('tock-faq-training-filters'));
-    const listComponent = fixture.debugElement.query(By.css('tock-faq-training-list'));
+    const filtersComponent = fixture.debugElement.query(By.css('tock-sentence-training-filters'));
+    const listComponent = fixture.debugElement.query(By.css('tock-sentence-training-list'));
 
     expect(listComponent).toBeFalsy();
     expect(filtersComponent).toBeTruthy();
@@ -156,7 +156,7 @@ describe('FaqTrainingComponent', () => {
   it('should show the dialog component when the dialog sentence is informed', () => {
     component.dialogDetailsSentence = component.sentences[0];
     fixture.detectChanges();
-    const dialogComponent = fixture.debugElement.query(By.css('tock-faq-training-dialog'));
+    const dialogComponent = fixture.debugElement.query(By.css('tock-sentence-training-dialog'));
 
     expect(dialogComponent).toBeTruthy();
   });

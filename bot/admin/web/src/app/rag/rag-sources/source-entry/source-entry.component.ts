@@ -16,7 +16,7 @@ interface TaskDefinition {
   templateUrl: './source-entry.component.html',
   styleUrls: ['./source-entry.component.scss']
 })
-export class SourceEntryComponent implements OnInit, OnDestroy {
+export class SourceEntryComponent implements OnDestroy {
   destroy$ = new Subject();
 
   @Input() source: Source;
@@ -42,8 +42,6 @@ export class SourceEntryComponent implements OnInit, OnDestroy {
     { type: IndexingSessionTaskTypes.chunking, label: 'Text processing', icon: 'scissors-outline' },
     { type: IndexingSessionTaskTypes.embeddings, label: 'Word embedding', icon: 'menu-arrow-outline' }
   ];
-
-  ngOnInit(): void {}
 
   getRunningIndexingSessionTasks(): TaskDefinition[] {
     const indexingSession = getSourceMostRecentRunningIndexingSession(this.source);

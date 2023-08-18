@@ -17,13 +17,13 @@ import {
 } from '@nebular/theme';
 import { BehaviorSubject } from 'rxjs';
 
-import { Classification, SentenceStatus } from '../../../model/nlp';
-import { StateService } from '../../../core-nlp/state.service';
-import { Pagination, PaginationComponent } from '../../../shared/components';
-import { TestSharedModule } from '../../../shared/test-shared.module';
-import { FaqTrainingComponent, SentenceExtended } from '../sentence-training.component';
-import { FaqTrainingListComponent } from './sentence-training-list.component';
-import { Action } from '../../models';
+import { Classification, SentenceStatus } from '../../../../model/nlp';
+import { StateService } from '../../../../core-nlp/state.service';
+import { Pagination, PaginationComponent } from '../../../../shared/components';
+import { TestSharedModule } from '../../../../shared/test-shared.module';
+import { SentenceTrainingComponent, SentenceExtended } from '../sentence-training.component';
+import { SentenceTrainingListComponent } from './sentence-training-list.component';
+import { Action } from './../models';
 
 const mockSentences: SentenceExtended[] = [
   {
@@ -94,17 +94,17 @@ class StateServiceMock {
 @Component({})
 class MockFaqManagementComponent {}
 
-describe('FaqTrainingListComponent', () => {
-  let component: FaqTrainingListComponent;
-  let fixture: ComponentFixture<FaqTrainingListComponent>;
+describe('SentenceTrainingListComponent', () => {
+  let component: SentenceTrainingListComponent;
+  let fixture: ComponentFixture<SentenceTrainingListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FaqTrainingListComponent, PaginationComponent],
+      declarations: [SentenceTrainingListComponent, PaginationComponent],
       imports: [
         TestSharedModule,
         RouterTestingModule.withRoutes([
-          { path: 'faq/training', component: FaqTrainingComponent },
+          { path: 'faq/training', component: SentenceTrainingComponent },
           { path: 'faq/management', component: MockFaqManagementComponent }
         ] as Routes),
         NbAutocompleteModule,
@@ -126,7 +126,7 @@ describe('FaqTrainingListComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FaqTrainingListComponent);
+    fixture = TestBed.createComponent(SentenceTrainingListComponent);
     component = fixture.componentInstance;
     component.selection = new SelectionModel();
     component.pagination = {

@@ -1,11 +1,11 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { Subject, Subscription } from 'rxjs';
+import { Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 
 import { SentenceTrainingFilter, SentenceTrainingMode } from './../models';
 
-interface FaqTrainingFilterForm {
+interface SentenceTrainingFilterForm {
   search: FormControl<string>;
   showUnknown: FormControl<boolean>;
 }
@@ -23,7 +23,7 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   @Output() onFilter = new EventEmitter<SentenceTrainingFilter>();
 
-  form = new FormGroup<FaqTrainingFilterForm>({
+  form = new FormGroup<SentenceTrainingFilterForm>({
     search: new FormControl(),
     showUnknown: new FormControl(false)
   });

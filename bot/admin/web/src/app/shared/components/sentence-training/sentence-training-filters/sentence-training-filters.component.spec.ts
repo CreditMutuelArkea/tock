@@ -10,16 +10,16 @@ import {
   NbTooltipModule
 } from '@nebular/theme';
 
-import { TestSharedModule } from '../../../shared/test-shared.module';
-import { FaqTrainingFiltersComponent } from './sentence-training-filters.component';
+import { TestSharedModule } from '../../../../shared/test-shared.module';
+import { SentenceTrainingFiltersComponent } from './sentence-training-filters.component';
 
-describe('FaqTrainingFiltersComponent', () => {
-  let component: FaqTrainingFiltersComponent;
-  let fixture: ComponentFixture<FaqTrainingFiltersComponent>;
+describe('SentenceTrainingFiltersComponent', () => {
+  let component: SentenceTrainingFiltersComponent;
+  let fixture: ComponentFixture<SentenceTrainingFiltersComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FaqTrainingFiltersComponent],
+      declarations: [SentenceTrainingFiltersComponent],
       imports: [
         TestSharedModule,
         NbButtonModule,
@@ -34,7 +34,7 @@ describe('FaqTrainingFiltersComponent', () => {
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FaqTrainingFiltersComponent);
+    fixture = TestBed.createComponent(SentenceTrainingFiltersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

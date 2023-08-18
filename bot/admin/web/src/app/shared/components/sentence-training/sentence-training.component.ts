@@ -66,11 +66,6 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     this.selection.clear();
     this.initFilters();
 
-    // const intentId = filters.showUnknown ? Intent.unknown : null;
-    // const status = filters.showUnknown ? [SentenceStatus.validated, SentenceStatus.model] : [SentenceStatus.inbox];
-
-    // this.filters = { ...this.filters, ...filters, intentId, status };
-
     this.filters = { ...this.filters, ...filters };
     this.loadData();
   }
