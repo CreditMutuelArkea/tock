@@ -5,6 +5,7 @@ import {
   NbAccordionModule,
   NbButtonModule,
   NbCardModule,
+  NbCheckboxModule,
   NbIconModule,
   NbInputModule,
   NbRadioModule,
@@ -47,7 +48,8 @@ import { SourceManagementApiService } from './rag-sources/source-management.api.
     NlpModule,
     NbIconModule,
     NbAccordionModule,
-    NbTooltipModule
+    NbTooltipModule,
+    NbCheckboxModule
   ],
   declarations: [
     RagTabsComponent,

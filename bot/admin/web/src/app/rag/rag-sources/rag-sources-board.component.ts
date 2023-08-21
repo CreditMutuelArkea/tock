@@ -192,7 +192,7 @@ export class RagSourcesBoardComponent implements OnInit, OnDestroy {
       }
     });
     dialogRef.onClose.subscribe((result) => {
-      if (result.toLowerCase() === actionLabel.toLowerCase()) {
+      if (result?.toLowerCase() === actionLabel.toLowerCase()) {
         this.postIndexingSession(source);
       }
     });
