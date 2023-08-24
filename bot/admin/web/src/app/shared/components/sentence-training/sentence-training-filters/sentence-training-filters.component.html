@@ -30,7 +30,7 @@
         </button>
       </nb-form-field>
 
-      <div>
+      <div *ngIf="sentenceTrainingMode !== SentenceTrainingMode.RAGEXCLUDED">
         <nb-toggle
           class="mb-n2 mr-2"
           nbTooltip="Show unknown sentences"

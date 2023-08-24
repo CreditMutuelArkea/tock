@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NbDialogRef } from '@nebular/theme';
 
 import { NewSourceComponent } from './new-source.component';
 
@@ -8,9 +9,9 @@ describe('NewSourceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ NewSourceComponent ]
-    })
-    .compileComponents();
+      declarations: [NewSourceComponent],
+      providers: [{ provide: NbDialogRef, useValue: { close: () => {} } }]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(NewSourceComponent);
     component = fixture.componentInstance;

@@ -5,6 +5,7 @@ import { of } from 'rxjs';
 import { BotService } from '../../bot/bot-service';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
+import { BotConfigurationService } from '../../core/bot-configuration.service';
 
 import { RagSettingsComponent } from './rag-settings.component';
 
@@ -39,6 +40,10 @@ describe('RagSettingsComponent', () => {
         {
           provide: NbToastrService,
           useValue: { success: () => {} }
+        },
+        {
+          provide: BotConfigurationService,
+          useValue: { configurations: of([]) }
         }
       ],
       schemas: [NO_ERRORS_SCHEMA]

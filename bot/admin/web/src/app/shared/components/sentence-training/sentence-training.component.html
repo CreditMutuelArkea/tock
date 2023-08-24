@@ -1,0 +1,47 @@
+<section [class.grid]="dialogDetailsSentence">
+  <div class="main">
+    <tock-sentence-training-filters
+      #sentenceTrainingFilter
+      [sentenceTrainingMode]="sentenceTrainingMode"
+      (onFilter)="filterSentenceTraining($event)"
+      class="d-block mb-2"
+    ></tock-sentence-training-filters>
+
+    <div
+      class="loading"
+      [nbSpinner]="loading"
+      infinite-scroll
+      [infiniteScrollDistance]="1"
+      (scrolled)="onScroll()"
+    >
+      <tock-no-data-found
+        *ngIf="!loading && !sentences?.length"
+        title="No sentences found"
+      ></tock-no-data-found>
+
+      <tock-sentence-training-list
+        #sentenceTrainingList
+        *ngIf="sentences?.length"
+        [isFilteredUnknown]="isFilteredUnknown"
+        [sentences]="sentences"
+        [selection]="selection"
+        [sentenceTrainingMode]="sentenceTrainingMode"
+        (onDetails)="showDetails($event)"
+        (onAction)="handleAction($event)"
+        (onBatchAction)="handleBatchAction($event)"
+        (onSort)="sortSentenceTraining($event)"
+        [pagination]="pagination"
+        (onPaginationChange)="paginationChange($event)"
+      ></tock-sentence-training-list>
+    </div>
+  </div>
+
+  <tock-sentence-training-dialog
+    #sentenceTrainingDialog
+    *ngIf="dialogDetailsSentence"
+    class="aside"
+    [sentence]="dialogDetailsSentence"
+    (onClose)="closeDetails()"
+    (onSearchSentence)="retrieveSentence($event)"
+  ></tock-sentence-training-dialog>
+</section>
