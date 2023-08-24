@@ -16,12 +16,17 @@
 
 package ai.tock.bot.admin.bot
 
-data class RAGConfiguration(
-    val activation: Boolean?,
+import org.litote.kmongo.Id
+
+data class BotRAGConfiguration(
+    val _id: Id<BotRAGConfiguration>,
+    val namespace: String,
+    val botId: String,
+    val enabled: Boolean?,
     val engine: String,
     val embeddingEngine: String,
     val temperature: String,
     val prompt: String,
     val params: Map<String, String>,
-    val noAnswerRedirection: String
+    val noAnswerRedirection: String,
 )

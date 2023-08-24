@@ -59,7 +59,6 @@ open class BotDefinitionBase(
     override val botEnabledListener: (Action) -> Unit = {},
     override val ragConfigurationEnabled: Boolean = false,
     override val ragExcludedStory: StoryDefinition = defaultRagExcludedStory,
-    override val ragStory: StoryDefinition = defaultUnknownStory
 ) : BotDefinition {
 
     companion object {

@@ -116,7 +116,6 @@ interface BotDefinition : I18nKeyProvider {
 
     /**
      * Is the RAG enabled ?
-     * TODO : transform to ragconfiguration dto when DERCBOT-647 is mergerd
      */
     val ragConfigurationEnabled: Boolean
 

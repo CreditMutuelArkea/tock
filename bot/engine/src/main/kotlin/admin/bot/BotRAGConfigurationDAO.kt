@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package ai.tock.bot.admin.bot
 
-data class RAGConfiguration(
-    val activation: Boolean?,
-    val engine: String,
-    val embeddingEngine: String,
-    val temperature: String,
-    val prompt: String,
-    val params: Map<String, String>,
-    val noAnswerRedirection: String
-)
+import org.litote.kmongo.Id
+
+interface BotRAGConfigurationDAO {
+
+    fun listenChanges(listener: () -> Unit)
+
+    fun save(conf: BotRAGConfiguration): BotRAGConfiguration
+
+    fun findByNamespaceAndBotId(namespace: String, botId: String): BotRAGConfiguration?
+
+    fun delete(id: Id<BotRAGConfiguration>)
+}
