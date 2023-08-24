@@ -24,6 +24,7 @@ import ai.tock.bot.api.model.message.bot.BotMessage
 import ai.tock.bot.api.model.message.bot.Card
 import ai.tock.bot.api.model.message.bot.Carousel
 import ai.tock.bot.api.model.message.bot.CustomMessage
+import ai.tock.bot.api.model.message.bot.Debug
 import ai.tock.bot.api.model.message.bot.I18nText
 import ai.tock.bot.api.model.message.bot.Sentence
 import ai.tock.bot.api.model.message.bot.Suggestion
@@ -60,7 +61,8 @@ class TockClientBus(
     override val test: Boolean = request.context.user.test
     override val userLocale: Locale = request.context.language
     override val userInterfaceType: UserInterfaceType = request.context.userInterface
-    override val targetConnectorType: ConnectorType = request.context.connectorType
+    override val sourceConnectorType: ConnectorType = request.context.sourceConnectorType
+    override val targetConnectorType: ConnectorType = request.context.targetConnectorType
     override val contextId: String? = request.context.userId.id
     private var _currentAnswerIndex: Int = 0
     override val currentAnswerIndex: Int get() = _currentAnswerIndex
@@ -116,6 +118,16 @@ class TockClientBus(
         addMessage(plainText?.raw, delay)
         return this
     }
+
+    override fun sendDebugData(title: String, data: Any?): ClientBus {
+        // Debug messages are only added for test connector
+        if(ConnectorType.rest == sourceConnectorType) {
+            messages.add(Debug(title, data))
+        }
+        return this
+    }
+
+
 
     override fun send(i18nText: CharSequence, suggestions: List<Suggestion>, delay: Long, vararg i18nArgs: Any?): ClientBus {
         addMessage(translate(i18nText, i18nArgs), delay, suggestions)

@@ -43,7 +43,12 @@ interface I18nTranslator : I18nKeyProvider {
     val userInterfaceType: UserInterfaceType
 
     /**
-     * The [ConnectorType] used for the response.
+     * The source [ConnectorType] used for the response.
+     */
+    val sourceConnectorType: ConnectorType
+
+    /**
+     * The target [ConnectorType] used for the response.
      */
     val targetConnectorType: ConnectorType
 
