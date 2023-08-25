@@ -62,6 +62,7 @@ import { ChatUiMessageChoiceComponent } from './components/chat-ui/chat-ui-messa
 import { ChatUiMessageAttachmentComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-attachment/chat-ui-message-attachment.component';
 import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-location/chat-ui-message-location';
 import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json-iterator/debug-json-iterator.component';
+import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-debug/chat-ui-message-debug.component';
 
 @NgModule({
   imports: [
@@ -103,6 +104,7 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     ChatUiMessageChoiceComponent,
     ChatUiMessageAttachmentComponent,
     ChatUiMessageLocationComponent,
+    ChatUiMessageDebugComponent,
     AutofocusDirective,
     SliderComponent,
     DebugViewerComponent,

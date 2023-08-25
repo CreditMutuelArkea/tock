@@ -141,7 +141,7 @@ export class BotDialogComponent implements OnInit, OnDestroy {
         userAction.hasNlpStats = r.hasNlpStats;
         userAction.actionId = r.userActionId;
         r.messages.forEach((m) => {
-          this.messages.push(new TestMessage(true, m, undefined, undefined, undefined, r.debug));
+          this.messages.push(new TestMessage(true, m, undefined, undefined, undefined));
 
           setTimeout(() => this.chatUi.scrollToBottom());
         });

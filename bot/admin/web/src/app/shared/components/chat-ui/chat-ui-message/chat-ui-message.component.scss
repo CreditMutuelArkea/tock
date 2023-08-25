@@ -2,19 +2,13 @@
 @import '@nebular/theme/styles/themes';
 
 :host {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
 
   .wrapper {
     display: flex;
     flex-direction: row;
     .message {
       flex: 1;
-
-      .debug-link {
-        font-size: xx-small;
-        text-decoration: underline;
-        cursor: pointer;
-      }
     }
 
     .avatar {

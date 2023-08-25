@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NbDialogService } from '@nebular/theme';
-import { BotMessage, Sentence } from '../../../model/dialog-data';
+import { Sentence } from '../../../model/dialog-data';
 
 import { ChatUiMessageComponent } from './chat-ui-message.component';
 
@@ -19,12 +18,6 @@ describe('ChatUiMessageComponent', () => {
           provide: DomSanitizer,
           useValue: {
             bypassSecurityTrustStyle: (str) => str
-          }
-        },
-        {
-          provide: NbDialogService,
-          useValue: {
-            open: () => {}
           }
         }
       ]

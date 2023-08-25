@@ -1,4 +1,7 @@
-<div class="wrapper">
+<div
+  class="wrapper"
+  *ngIf="!message.isDebug()"
+>
   <div
     class="avatar"
     [style.background-image]="avatarStyle"
@@ -41,12 +44,12 @@
         ></tock-chat-ui-message-location>
       </div>
     </div>
-    <small
-      class="debug-link"
-      *ngIf="debug"
-      (click)="showDebug()"
-      >View debug infos</small
-    >
   </div>
 </div>
+
+<tock-chat-ui-message-debug
+  *ngIf="message.isDebug()"
+  [message]="message"
+></tock-chat-ui-message-debug>
+
 <ng-content></ng-content>

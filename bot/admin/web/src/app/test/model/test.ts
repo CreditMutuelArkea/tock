@@ -46,6 +46,7 @@ export class BotDialogResponse {
     const result = Object.assign(value, json, {
       messages: BotMessage.fromJSONArray(json.messages)
     });
+
     return result;
   }
 }
@@ -56,8 +57,7 @@ export class TestMessage {
     public message?: BotMessage,
     public locale?: string,
     public actionId?: string,
-    public hasNlpStats?: boolean,
-    public debug?: any
+    public hasNlpStats?: boolean
   ) {}
 }
 
