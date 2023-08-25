@@ -121,7 +121,8 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
           {
             link: '/rag/sources',
             title: 'Rag sources',
-            icon: 'cloud-download-outline'
+            icon: 'cloud-download-outline',
+            hidden: !this.state.hasRole(UserRole.admin)
           },
           {
             link: '/rag/exclusions',
