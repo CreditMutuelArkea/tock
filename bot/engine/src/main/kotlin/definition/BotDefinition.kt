@@ -170,13 +170,6 @@ interface BotDefinition : I18nKeyProvider {
      * The unknown story. Used where no valid intent is found.
      */
     val unknownStory: StoryDefinition
-
-
-    /**
-     * The rag story. Used where no valid intent is found.
-     */
-    val ragStory: StoryDefinition
-
     /**
      * The ragExcluded Story. Used where ragexcluded intent is found.
      */
