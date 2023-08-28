@@ -28,6 +28,9 @@ internal class BotConfiguration_Serializer :
         gen.writeFieldName("nlpModel")
         val _nlpModel_ = value.nlpModel
         gen.writeString(_nlpModel_)
+        gen.writeFieldName("ragConfiguration")
+        val _ragConfiguration_ = value.ragConfiguration
+        serializers.defaultSerializeValue(_ragConfiguration_, gen)
         gen.writeFieldName("apiKey")
         val _apiKey_ = value.apiKey
         gen.writeString(_apiKey_)
