@@ -219,7 +219,11 @@ export class SentenceAnalysisComponent implements OnInit {
   }
 
   private createIntent(name: string, label: string, description: string, category: string): boolean {
-    if (StateService.intentExistsInApp(this.state.currentApplication, name) || name === nameFromQualifiedName(Intent.unknown)) {
+    if (
+      StateService.intentExistsInApp(this.state.currentApplication, name) ||
+      name === nameFromQualifiedName(Intent.unknown) ||
+      name === nameFromQualifiedName(Intent.ragExcluded)
+    ) {
       this.dialog.notify(`Intent ${name} already exists`);
       return false;
     } else {
