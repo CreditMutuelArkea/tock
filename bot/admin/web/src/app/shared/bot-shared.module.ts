@@ -51,8 +51,7 @@ import {
   ErrorHelperComponent,
   FormControlComponent,
   NoDataFoundComponent,
-  PaginationComponent,
-  SliderComponent
+  PaginationComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
@@ -69,8 +68,6 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     CommonModule,
     SharedModule,
     MomentModule,
-    NbAlertModule,
-    NbAutocompleteModule,
     NbCalendarRangeModule,
     NbCardModule,
     NbSelectModule,
@@ -80,7 +77,6 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     NbButtonModule
   ],
   declarations: [
-    AutocompleteInputComponent,
     BotMessageComponent,
     SentenceElementComponent,
     BotMessageSentenceComponent,
@@ -96,22 +92,12 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     PaginationComponent,
     NoDataFoundComponent,
     FormControlComponent,
-    ChoiceDialogComponent,
     ChatUiComponent,
     ChatUiMessageComponent,
-    ChatUiMessageSentenceComponent,
-    ChatUiMessageSentenceElementComponent,
-    ChatUiMessageChoiceComponent,
-    ChatUiMessageAttachmentComponent,
-    ChatUiMessageLocationComponent,
-    ChatUiMessageDebugComponent,
-    AutofocusDirective,
-    SliderComponent,
-    DebugViewerComponent,
-    DebugJsonIteratorComponent
+    ChoiceDialogComponent,
+    AutofocusDirective
   ],
   exports: [
-    AutocompleteInputComponent,
     BotMessageComponent,
     DisplayDialogComponent,
     SelectBotComponent,
@@ -124,13 +110,7 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     ChatUiComponent,
     ChatUiMessageComponent,
     ChoiceDialogComponent,
-    AutofocusDirective,
-    SliderComponent,
-    ChoiceDialogComponent,
-    ChatUiComponent,
-    ChatUiMessageComponent,
-    AutofocusDirective,
-    DebugViewerComponent
+    AutofocusDirective
   ],
   providers: [BotSharedService]
 })

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { StateService } from '../../core-nlp/state.service';
 import { UserRole } from '../../model/auth';
 import { TabLink } from '../../shared/utils';
@@ -15,7 +16,7 @@ export class FaqTabsComponent implements OnInit {
   UserRole = UserRole;
   tabLinks = [];
 
-  constructor(private state: StateService) {}
+  constructor(private router: Router, public state: StateService) {}
 
   ngOnInit() {
     if (this.state.hasRole(UserRole.faqBotUser)) this.tabLinks.push(managementTab);
