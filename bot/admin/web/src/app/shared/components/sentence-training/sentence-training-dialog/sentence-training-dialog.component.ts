@@ -2,18 +2,18 @@ import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Outpu
 import { Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
-import { AnalyticsService } from '../../../analytics/analytics.service';
-import { DialogReportQuery } from '../../../analytics/dialogs/dialogs';
-import { StateService } from '../../../core-nlp/state.service';
-import { ActionReport, DialogReport, Sentence } from '../../../shared/model/dialog-data';
-import { SentenceExtended } from '../faq-training.component';
+import { AnalyticsService } from '../../../../analytics/analytics.service';
+import { DialogReportQuery } from '../../../../analytics/dialogs/dialogs';
+import { StateService } from '../../../../core-nlp/state.service';
+import { ActionReport, DialogReport, Sentence } from '../../../../shared/model/dialog-data';
+import { SentenceExtended } from '../sentence-training.component';
 
 @Component({
-  selector: 'tock-faq-training-dialog',
-  templateUrl: './faq-training-dialog.component.html',
-  styleUrls: ['./faq-training-dialog.component.scss']
+  selector: 'tock-sentence-training-dialog',
+  templateUrl: './sentence-training-dialog.component.html',
+  styleUrls: ['./sentence-training-dialog.component.scss']
 })
-export class FaqTrainingDialogComponent implements OnChanges, OnDestroy {
+export class SentenceTrainingDialogComponent implements OnChanges, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
 
   @Input() sentence!: SentenceExtended;

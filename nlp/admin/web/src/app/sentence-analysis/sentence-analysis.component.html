@@ -23,8 +23,7 @@
       *ngIf="displayEntities"
       [sentence]="sentence"
     ></tock-highlight>
-    <span style="float: right;">{{sentence.configuration}}</span>
-
+    <span style="float: right">{{ sentence.configuration }}</span>
   </nb-card-header>
   <nb-card-body (click)="displayAllView()">
     <div
@@ -232,13 +231,13 @@
     </button>
     <button
       nbButton
-      status="warning"
+      status="info"
       size="small"
       shape="semi-round"
       class="btn"
       (click)="onRagExcluded()"
-      *ngIf="displayUnknownButton"
-      nbTooltip="Set as ragexcluded to use later"
+      *ngIf="displayRagExcludedButton"
+      nbTooltip="Set as ragexcluded. Will not trigger LLM detection"
     >
       RAG Excluded
     </button>
