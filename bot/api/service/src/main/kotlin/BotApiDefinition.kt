@@ -77,7 +77,7 @@ internal class BotApiDefinition(
     configuration: BotConfiguration,
     clientConfiguration: ClientConfiguration?,
     handler: BotApiHandler,
-    ragConfiguration: BotRAGConfiguration? = null // TODO MASS
+    ragConfiguration: BotRAGConfiguration? = null
 ) : BotDefinitionBase(
     configuration.botId,
     configuration.namespace,

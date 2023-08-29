@@ -20,8 +20,6 @@ private val __Namespace: KProperty1<BotConfiguration, String?>
     get() = BotConfiguration::namespace
 private val __NlpModel: KProperty1<BotConfiguration, String?>
     get() = BotConfiguration::nlpModel
-private val __RagConfiguration: KProperty1<BotConfiguration, RAGConfiguration?>
-    get() = BotConfiguration::ragConfiguration
 private val __ApiKey: KProperty1<BotConfiguration, String?>
     get() = BotConfiguration::apiKey
 private val __WebhookUrl: KProperty1<BotConfiguration, String?>
@@ -42,9 +40,6 @@ class BotConfiguration_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<
     val nlpModel: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__NlpModel)
 
-    val ragConfiguration: KPropertyPath<T, RAGConfiguration?>
-        get() = KPropertyPath(this,__RagConfiguration)
-
     val apiKey: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApiKey)
 
@@ -63,8 +58,6 @@ class BotConfiguration_<T>(previous: KPropertyPath<T, *>?, property: KProperty1<
             get() = __Namespace
         val NlpModel: KProperty1<BotConfiguration, String?>
             get() = __NlpModel
-        val RagConfiguration: KProperty1<BotConfiguration, RAGConfiguration?>
-            get() = __RagConfiguration
         val ApiKey: KProperty1<BotConfiguration, String?>
             get() = __ApiKey
         val WebhookUrl: KProperty1<BotConfiguration, String?>
@@ -87,9 +80,6 @@ class BotConfiguration_Col<T>(previous: KPropertyPath<T, *>?, property: KPropert
 
     val nlpModel: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__NlpModel)
-
-    val ragConfiguration: KPropertyPath<T, RAGConfiguration?>
-        get() = KPropertyPath(this,__RagConfiguration)
 
     val apiKey: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApiKey)
@@ -118,9 +108,6 @@ class BotConfiguration_Map<T, K>(previous: KPropertyPath<T, *>?, property: KProp
 
     val nlpModel: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__NlpModel)
-
-    val ragConfiguration: KPropertyPath<T, RAGConfiguration?>
-        get() = KPropertyPath(this,__RagConfiguration)
 
     val apiKey: KPropertyPath<T, String?>
         get() = KPropertyPath(this,__ApiKey)
