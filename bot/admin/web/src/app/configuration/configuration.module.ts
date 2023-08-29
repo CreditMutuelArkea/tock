@@ -145,7 +145,6 @@ export class BotApplicationConfig implements ApplicationConfig {
     BotConfigurationComponent,
     NewBotComponent,
     SelectBotConfigurationDialogComponent,
-    RagSettingsComponent
   ],
   imports: [
     CommonModule,
