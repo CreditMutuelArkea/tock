@@ -4,23 +4,25 @@ import { Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IntentsCategory } from '../../../model/nlp';
-import { StateService } from '../../../core-nlp/state.service';
-import { UserRole } from '../../../model/auth';
-import { Action } from '../../models';
-import { Pagination } from '../../../shared/components';
-import { SentenceExtended } from '../faq-training.component';
+import { IntentsCategory } from '../../../../model/nlp';
+import { StateService } from '../../../../core-nlp/state.service';
+import { UserRole } from '../../../../model/auth';
+import { Action, SentenceTrainingMode } from '../models';
+import { Pagination } from '../..';
+import { SentenceExtended } from '../sentence-training.component';
 
 @Component({
-  selector: 'tock-faq-training-list',
-  templateUrl: './faq-training-list.component.html',
-  styleUrls: ['./faq-training-list.component.scss']
+  selector: 'tock-sentence-training-list',
+  templateUrl: './sentence-training-list.component.html',
+  styleUrls: ['./sentence-training-list.component.scss']
 })
-export class FaqTrainingListComponent implements OnInit, OnDestroy {
+export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   @Input() isFilteredUnknown!: boolean;
   @Input() pagination!: Pagination;
   @Input() sentences: SentenceExtended[] = [];
   @Input() selection!: SelectionModel<SentenceExtended>;
+  @Input() sentenceTrainingMode: SentenceTrainingMode;
+  SentenceTrainingMode = SentenceTrainingMode;
 
   @Output() onDetails = new EventEmitter<SentenceExtended>();
   @Output() onAction = new EventEmitter<{ action: Action; sentence: SentenceExtended }>();

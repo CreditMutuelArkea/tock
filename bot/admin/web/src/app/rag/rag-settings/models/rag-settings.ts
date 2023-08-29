@@ -1,11 +1,3 @@
-export interface RagSettingsParams {
-  apiKey?: string;
-  modelName?: string;
-  deploymentName?: string;
-  privateEndpointBaseUrl?: string;
-  apiVersion?: string;
-}
-
 export interface RagSettings {
   _id: string;
   namespace: string;
@@ -17,4 +9,17 @@ export interface RagSettings {
   prompt: string;
   noAnswerRedirection: string;
   params: RagSettingsParams[];
+}
+
+export interface RagSettingsParams {
+  apiKey?: string;
+  modelName?: string;
+  deploymentName?: string;
+  privateEndpointBaseUrl?: string;
+  apiVersion?: string;
+
+  embeddingDeploymentName?: string;
+  embeddingModelName?: string;
+  embeddingApiKey?: string;
+  embeddingApiVersion?: string;
 }

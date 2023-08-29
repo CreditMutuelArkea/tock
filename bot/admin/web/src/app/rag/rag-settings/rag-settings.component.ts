@@ -8,6 +8,7 @@ import { StateService } from '../../core-nlp/state.service';
 import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './models/configurations';
 import { LlmEngineConfiguration, LlmEngineConfigurationParams, RagSettings } from './models';
 import { NbToastrService } from '@nebular/theme';
+import { BotConfigurationService } from '../../core/bot-configuration.service';
 
 interface RagSettingsParamsForm {
   apiKey?: FormControl<string>;
@@ -15,6 +16,11 @@ interface RagSettingsParamsForm {
   deploymentName?: FormControl<string>;
   privateEndpointBaseUrl?: FormControl<string>;
   apiVersion?: FormControl<string>;
+
+  embeddingDeploymentName?: FormControl<string>;
+  embeddingModelName?: FormControl<string>;
+  embeddingApiKey?: FormControl<string>;
+  embeddingApiVersion?: FormControl<string>;
 }
 interface RagSettingsForm {
   _id: FormControl<string>;
@@ -33,7 +39,7 @@ interface RagSettingsForm {
   styleUrls: ['./rag-settings.component.scss']
 })
 export class RagSettingsComponent implements OnInit, OnDestroy {
-  destroy: Subject<unknown> = new Subject();
+  destroy$: Subject<unknown> = new Subject();
 
   LlmEngines: LlmEngineConfiguration[] = LlmEngines;
 
@@ -51,14 +57,24 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     private botService: BotService,
     private state: StateService,
     private rest: RestService,
-    private toastrService: NbToastrService
+    private toastrService: NbToastrService,
+    private botConfiguration: BotConfigurationService
   ) {}
 
   ngOnInit(): void {
-    this.loadAvailableStories();
-    this.form.valueChanges.pipe(takeUntil(this.destroy), debounceTime(300)).subscribe(() => {
+    this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(300)).subscribe(() => {
       this.setActivationDisabledState();
     });
+
+    this.botConfiguration.configurations.pipe(takeUntil(this.destroy$)).subscribe((confs) => {
+      if (confs.length) {
+        this.loading = true;
+        this.loadAvailableStories();
+        this.load();
+      }
+    });
+
+    this.loadAvailableStories();
     this.load();
   }
 
@@ -75,7 +91,12 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       modelName: new FormControl(undefined, [this.formEngineParamValidator('modelName')]),
       deploymentName: new FormControl(undefined, [this.formEngineParamValidator('deploymentName')]),
       privateEndpointBaseUrl: new FormControl(undefined, [this.formEngineParamValidator('privateEndpointBaseUrl')]),
-      apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')])
+      apiVersion: new FormControl(undefined, [this.formEngineParamValidator('apiVersion')]),
+
+      embeddingDeploymentName: new FormControl(undefined, [this.formEngineParamValidator('embeddingDeploymentName')]),
+      embeddingModelName: new FormControl(undefined, [this.formEngineParamValidator('embeddingModelName')]),
+      embeddingApiKey: new FormControl(undefined, [this.formEngineParamValidator('embeddingApiKey')]),
+      embeddingApiVersion: new FormControl(undefined, [this.formEngineParamValidator('embeddingApiVersion')])
     })
   });
 
@@ -84,12 +105,14 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     this.rest
       .get<RagSettings>(url, (settings: RagSettings) => settings)
       .subscribe((settings: RagSettings) => {
-        this.loading = false;
-        if (settings) {
+        if (settings?._id) {
           this.settingsBackup = settings;
           this.form.patchValue(settings as unknown);
           this.form.markAsPristine();
+        } else {
+          this.form.reset();
         }
+        this.loading = false;
       });
   }
 
@@ -152,6 +175,19 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
   get apiVersion(): FormControl {
     return this.form.controls.params.get('apiVersion') as FormControl;
+  }
+
+  get embeddingDeploymentName(): FormControl {
+    return this.form.controls.params.get('embeddingDeploymentName') as FormControl;
+  }
+  get embeddingModelName(): FormControl {
+    return this.form.controls.params.get('embeddingModelName') as FormControl;
+  }
+  get embeddingApiKey(): FormControl {
+    return this.form.controls.params.get('embeddingApiKey') as FormControl;
+  }
+  get embeddingApiVersion(): FormControl {
+    return this.form.controls.params.get('embeddingApiVersion') as FormControl;
   }
 
   getFormControlByName(paramKey: string): FormControl {
@@ -237,7 +273,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy.next(true);
-    this.destroy.complete();
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

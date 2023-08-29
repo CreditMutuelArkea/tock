@@ -28,7 +28,11 @@ export const LlmEngines: LlmEngineConfiguration[] = [
       { key: 'modelName', label: 'Model name', type: 'list', source: OpenAiModels },
       { key: 'deploymentName', label: 'Deployment name', type: 'string' },
       { key: 'privateEndpointBaseUrl', label: 'Private endpoint base url', type: 'string' },
-      { key: 'apiVersion', label: 'Api version', type: 'list', source: AzureOpenAiApiVersions }
+      { key: 'apiVersion', label: 'Api version', type: 'list', source: AzureOpenAiApiVersions },
+      { key: 'embeddingDeploymentName', label: 'Embedding deployment name', type: 'string' },
+      { key: 'embeddingModelName', label: 'Embedding model name', type: 'list', source: EmbeddingEngines },
+      { key: 'embeddingApiKey', label: 'Embedding OpenAI API Key', type: 'string' },
+      { key: 'embeddingApiVersion', label: 'Embedding OpenAI API version', type: 'list', source: AzureOpenAiApiVersions }
     ]
   }
 ];
