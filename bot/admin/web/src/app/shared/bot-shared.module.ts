@@ -45,7 +45,13 @@ import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-
 import {
   AutocompleteInputComponent,
   ChatUiComponent,
+  ChatUiMessageAttachmentComponent,
+  ChatUiMessageChoiceComponent,
   ChatUiMessageComponent,
+  ChatUiMessageDebugComponent,
+  ChatUiMessageLocationComponent,
+  ChatUiMessageSentenceComponent,
+  ChatUiMessageSentenceElementComponent,
   ChoiceDialogComponent,
   DebugViewerComponent,
   ErrorHelperComponent,
@@ -55,13 +61,7 @@ import {
 } from './components';
 
 import { AutofocusDirective } from './directives';
-import { ChatUiMessageSentenceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence/chat-ui-message-sentence.component';
-import { ChatUiMessageSentenceElementComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-sentence-element/chat-ui-message-sentence-element.component';
-import { ChatUiMessageChoiceComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-choice/chat-ui-message-choice.component';
-import { ChatUiMessageAttachmentComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-attachment/chat-ui-message-attachment.component';
-import { ChatUiMessageLocationComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-location/chat-ui-message-location';
 import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json-iterator/debug-json-iterator.component';
-import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-message/chat-ui-message-debug/chat-ui-message-debug.component';
 
 @NgModule({
   imports: [
@@ -74,7 +74,9 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     NbTooltipModule,
     NbIconModule,
     NbPopoverModule,
-    NbButtonModule
+    NbButtonModule,
+    NbAutocompleteModule,
+    NbAlertModule
   ],
   declarations: [
     BotMessageComponent,
@@ -94,8 +96,17 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     FormControlComponent,
     ChatUiComponent,
     ChatUiMessageComponent,
+    ChatUiMessageSentenceComponent,
+    ChatUiMessageSentenceElementComponent,
+    ChatUiMessageChoiceComponent,
+    ChatUiMessageAttachmentComponent,
+    ChatUiMessageLocationComponent,
+    ChatUiMessageDebugComponent,
     ChoiceDialogComponent,
-    AutofocusDirective
+    AutofocusDirective,
+    AutocompleteInputComponent,
+    DebugJsonIteratorComponent,
+    DebugViewerComponent
   ],
   exports: [
     BotMessageComponent,
@@ -110,7 +121,9 @@ import { ChatUiMessageDebugComponent } from './components/chat-ui/chat-ui-messag
     ChatUiComponent,
     ChatUiMessageComponent,
     ChoiceDialogComponent,
-    AutofocusDirective
+    AutofocusDirective,
+    AutocompleteInputComponent,
+    DebugViewerComponent
   ],
   providers: [BotSharedService]
 })
