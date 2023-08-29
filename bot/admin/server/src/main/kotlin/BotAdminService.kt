@@ -287,7 +287,6 @@ object BotAdminService {
     }
 
     fun saveRAGConfiguration(conf: BotRAGConfiguration): BotRAGConfiguration {
-        // TODO MASS - Control before saving
         return ragConfigurationDAO.save(conf)
     }
 
