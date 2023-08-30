@@ -1,3 +1,7 @@
+<div *ngIf="isRoot && isPrimitive(data)">
+  {{ data }}
+</div>
+
 <div
   *ngIf="parentKey"
   (click)="switchDeployed()"
