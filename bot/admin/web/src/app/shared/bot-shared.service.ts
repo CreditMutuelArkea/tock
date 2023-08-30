@@ -23,6 +23,10 @@ import { ConnectorType, ConnectorTypeConfiguration } from '../core/model/configu
 import { NlpCallStats } from './model/dialog-data';
 import { AdminConfiguration } from './model/conf';
 
+export interface TockSimpleSessionStorage {
+  test: { debug: boolean };
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -69,5 +73,14 @@ export class BotSharedService {
       }
       return this.getConfigurationPending;
     }
+  }
+
+  private _session_storage: TockSimpleSessionStorage;
+  set session_storage(value: TockSimpleSessionStorage) {
+    this._session_storage = value;
+  }
+
+  get session_storage(): TockSimpleSessionStorage {
+    return this._session_storage;
   }
 }

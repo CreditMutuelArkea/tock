@@ -45,8 +45,6 @@ export class BotDialogComponent implements OnInit, OnDestroy {
   userMessage: string = '';
   messages: TestMessage[] = [];
 
-  debug: boolean = false;
-
   xrayAvailable: boolean = false;
   xrayTestName: string = '';
   isXrayTestNameFilled: boolean = false;
@@ -62,6 +60,16 @@ export class BotDialogComponent implements OnInit, OnDestroy {
   private userModifierId: string = randomString();
 
   testContext = false;
+
+  _debug: boolean = false;
+
+  set debug(value: boolean) {
+    this._debug = value;
+    this.shared.session_storage = { ...this.shared.session_storage, ...{ test: { debug: value } } };
+  }
+  get debug() {
+    return this._debug;
+  }
 
   @ViewChild('chatUi') private chatUi: ChatUiComponent;
 
@@ -80,6 +88,10 @@ export class BotDialogComponent implements OnInit, OnDestroy {
     this.state.configurationChange.pipe(takeUntil(this.destroy)).subscribe((_) => this.clear());
     this.fillTestPlanFilter();
     this.getRecentSentences();
+
+    if (this.shared.session_storage?.test?.debug) {
+      this._debug = this.shared.session_storage.test.debug;
+    }
   }
 
   private fillTestPlanFilter(): void {
