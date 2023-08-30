@@ -5,7 +5,11 @@
     class="userInterface"
     nbTooltip="{{ sentence.userInterface }}"
   />
-  <span [innerHTML]="linkifyHtml(sentence.text)"></span>
+  <span
+    *ngIf="reply"
+    [innerHTML]="linkifyHtml(sentence.text)"
+  ></span>
+  <span *ngIf="!reply">{{ sentence.text }}</span>
 </ng-container>
 
 <ng-container *ngIf="!sentence.text">

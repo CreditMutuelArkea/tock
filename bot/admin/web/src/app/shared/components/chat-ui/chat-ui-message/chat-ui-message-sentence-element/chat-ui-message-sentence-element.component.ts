@@ -11,7 +11,7 @@ export class ChatUiMessageSentenceElementComponent {
 
   @Input() replay: boolean;
 
-  @Input() reply: boolean;
+  @Input() reply: boolean = false;
 
   @Output() sendMessage: EventEmitter<BotMessage> = new EventEmitter();
 

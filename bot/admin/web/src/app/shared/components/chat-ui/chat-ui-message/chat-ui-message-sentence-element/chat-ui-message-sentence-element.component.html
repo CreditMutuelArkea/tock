@@ -36,24 +36,20 @@
 
   <ng-container *ngIf="!element.isEmptyElement()">
     <div *ngFor="let a of element.attachments">
-      <!-- <tock-bot-message-attachment [attachment]="a"></tock-bot-message-attachment> -->
       <tock-chat-ui-message-attachment [attachment]="a"></tock-chat-ui-message-attachment>
     </div>
     <div *ngFor="let l of element.locations">
-      <!-- <tock-bot-message-location [location]="l"></tock-bot-message-location> -->
       <tock-chat-ui-message-location [location]="l"></tock-chat-ui-message-location>
     </div>
     <div *ngFor="let entry of element.texts | mapToIterable">
-      <span [innerHTML]="linkifyHtml(entry.value)"></span>
+      <span
+        *ngIf="reply"
+        [innerHTML]="linkifyHtml(entry.value)"
+      ></span>
+      <span *ngIf="!reply">{{ entry.value }}</span>
       <span class="text-category">({{ entry.key }})</span>
     </div>
     <div *ngIf="element.choices.length !== 0">
-      <!-- <tock-bot-message-choice
-        *ngFor="let c of element.choices"
-        [choice]="c"
-        [user]="user"
-        (sendMessage)="reply($event)"
-      ></tock-bot-message-choice> -->
       <tock-chat-ui-message-choice
         *ngFor="let c of element.choices"
         [choice]="c"

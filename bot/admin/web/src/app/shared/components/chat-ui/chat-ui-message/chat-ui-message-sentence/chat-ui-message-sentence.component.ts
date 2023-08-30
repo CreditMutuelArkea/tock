@@ -12,6 +12,8 @@ export class ChatUiMessageSentenceComponent {
 
   @Input() replay: boolean;
 
+  @Input() reply: boolean = false;
+
   @Output() sendMessage: EventEmitter<BotMessage> = new EventEmitter();
 
   linkifyHtml(str) {
