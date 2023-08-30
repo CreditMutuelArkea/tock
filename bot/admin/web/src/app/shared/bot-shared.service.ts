@@ -75,12 +75,11 @@ export class BotSharedService {
     }
   }
 
-  private _session_storage: TockSimpleSessionStorage;
   set session_storage(value: TockSimpleSessionStorage) {
-    this._session_storage = value;
+    sessionStorage.setItem('TockSimpleSessionStorage', JSON.stringify(value));
   }
 
   get session_storage(): TockSimpleSessionStorage {
-    return this._session_storage;
+    return JSON.parse(sessionStorage.getItem('TockSimpleSessionStorage'));
   }
 }
