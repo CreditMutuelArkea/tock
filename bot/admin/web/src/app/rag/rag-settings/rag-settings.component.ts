@@ -9,6 +9,7 @@ import { DefaultPrompt, EmbeddingEngines, LlmEngines } from './models/configurat
 import { LlmEngineConfiguration, LlmEngineConfigurationParams, RagSettings } from './models';
 import { NbToastrService } from '@nebular/theme';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
+import { deepCopy } from '../../shared/utils';
 
 interface RagSettingsParamsForm {
   apiKey?: FormControl<string>;
@@ -240,7 +241,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     this.isSubmitted = true;
     if (this.canSave && this.form.dirty) {
       const currentEngine = this.currentEngine;
-      const formValue: RagSettings = JSON.parse(JSON.stringify(this.form.value));
+
+      const formValue: RagSettings = deepCopy(this.form.value) as RagSettings;
       const formValueParams = formValue.params;
 
       for (let param in formValueParams) {

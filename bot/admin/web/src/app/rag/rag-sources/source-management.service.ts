@@ -4,7 +4,7 @@ import { RestService } from '../../core-nlp/rest/rest.service';
 import { SourceManagementApiService } from './source-management.api.service';
 import { IndexingSession, ProcessAdvancement, Source, SourceImportParams } from './models';
 
-interface SourcesManagementState {
+export interface SourcesManagementState {
   loaded: boolean;
   loading: boolean;
   sources: Source[];
@@ -95,7 +95,7 @@ export class SourceManagementService {
 
   updateSource(sourcePartial: Partial<Source>): Observable<Source> {
     if (!sourcePartial.id?.trim().length) {
-      return throwError(() => new Error(' Source Id required for modification'));
+      return throwError(() => new Error('Source Id required for modification'));
     }
 
     const state = this.getState();
