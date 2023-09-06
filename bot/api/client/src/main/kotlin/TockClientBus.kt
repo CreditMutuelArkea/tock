@@ -61,8 +61,12 @@ class TockClientBus(
     override val test: Boolean = request.context.user.test
     override val userLocale: Locale = request.context.language
     override val userInterfaceType: UserInterfaceType = request.context.userInterface
+
+    // Source connector : is the connector which initialize a conversation
     override val sourceConnectorType: ConnectorType = request.context.sourceConnectorType
+    // Target connector : is the connector for which the message is produced
     override val targetConnectorType: ConnectorType = request.context.targetConnectorType
+
     override val contextId: String? = request.context.userId.id
     private var _currentAnswerIndex: Int = 0
     override val currentAnswerIndex: Int get() = _currentAnswerIndex
@@ -119,15 +123,20 @@ class TockClientBus(
         return this
     }
 
+    /**
+     * Add a debug data message for the test connector only
+     * @param title title of debug message
+     * @param data object corresponding to the debugging data
+     */
     override fun sendDebugData(title: String, data: Any?): ClientBus {
-        // Debug messages are only added for test connector
+        // The test connector is a rest connector (source),
+        // but it invokes the engine with a target connector,
+        // to receive the corresponding messages
         if(ConnectorType.rest == sourceConnectorType) {
             messages.add(Debug(title, data))
         }
         return this
     }
-
-
 
     override fun send(i18nText: CharSequence, suggestions: List<Suggestion>, delay: Long, vararg i18nArgs: Any?): ClientBus {
         addMessage(translate(i18nText, i18nArgs), delay, suggestions)

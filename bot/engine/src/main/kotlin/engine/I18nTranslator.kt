@@ -44,11 +44,13 @@ interface I18nTranslator : I18nKeyProvider {
 
     /**
      * The source [ConnectorType] used for the response.
+     * The connector which initialize a conversation
      */
     val sourceConnectorType: ConnectorType
 
     /**
      * The target [ConnectorType] used for the response.
+     * The connector used to fabric messages (bot responses)
      */
     val targetConnectorType: ConnectorType
 
