@@ -35,7 +35,7 @@ export class RagSourcesBoardComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.botConfiguration.configurations.pipe(takeUntil(this.destroy$)).subscribe((confs) => {
+    this.botConfiguration.configurations.pipe(takeUntil(this.destroy$)).subscribe((confs: BotApplicationConfiguration[]) => {
       this.configurations = confs;
       if (confs.length) {
         this.loadSources();

@@ -17,7 +17,7 @@ const sourcesMock = [
   {
     id: '987654321',
     enabled: true,
-    name: 'ArkInfo',
+    name: 'Data source',
     description: '',
     source_type: SourceTypes.file,
     status: ProcessAdvancement.pristine,
