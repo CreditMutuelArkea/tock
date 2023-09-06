@@ -44,7 +44,7 @@ import ai.tock.bot.admin.model.SummaryStorySearchRequest
 import ai.tock.bot.admin.model.UserSearchQuery
 import ai.tock.bot.admin.module.satisfactionContentModule
 import ai.tock.bot.admin.service.RagService
-import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
+import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpImport
 import ai.tock.bot.admin.test.TestPlanService
 import ai.tock.bot.admin.test.findTestService
 import ai.tock.bot.admin.verticle.IndicatorVerticle
@@ -689,16 +689,16 @@ open class BotAdminVerticle : AdminVerticle() {
             exportStory?.let { listOf(it) } ?: emptyList()
         }
 
-        blockingUploadJsonPost(
+        blockingJsonPost(
             "/bot/story/:appName/:locale/import",
             botUser,
             simpleLogger("JSON Import Response Labels")
-        ) { context, stories: List<StoryDefinitionConfigurationDump> ->
+        ) { context, dump: StoryDefinitionConfigurationDumpImport ->
             importStories(
                 context.organization,
                 context.path("appName"),
                 context.pathToLocale("locale"),
-                stories,
+                dump,
                 context.userLogin
             )
         }
