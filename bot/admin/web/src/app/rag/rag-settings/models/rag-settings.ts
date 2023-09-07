@@ -1,5 +1,5 @@
 export interface RagSettings {
-  _id: string;
+  id: string;
   namespace: string;
   botId: string;
   enabled: boolean;

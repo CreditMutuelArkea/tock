@@ -108,7 +108,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     this.rest
       .get<RagSettings>(url, (settings: RagSettings) => settings)
       .subscribe((settings: RagSettings) => {
-        if (settings?._id) {
+        if (settings?.id) {
           this.settingsBackup = settings;
           this.form.patchValue(settings as unknown);
           this.form.markAsPristine();

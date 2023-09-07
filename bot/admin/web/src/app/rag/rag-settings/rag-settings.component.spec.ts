@@ -29,7 +29,7 @@ const stories = [
 ];
 
 const settings = {
-  _id: 'abcdefghijkl123456789',
+  id: 'abcdefghijkl123456789',
   namespace: 'app',
   botId: 'new_assistant',
   enabled: true,
@@ -48,7 +48,8 @@ const settings = {
     embeddingApiKey: 'Embedding OpenAI API Key',
     embeddingApiVersion: '2023-03-15-preview'
   },
-  noAnswerRedirection: 'null'
+  noAnswerSentence: 'No answer sentence',
+  noAnswerStoryId: 'null'
 } as unknown as RagSettings;
 
 describe('RagSettingsComponent', () => {
@@ -103,6 +104,7 @@ describe('RagSettingsComponent', () => {
   it('should load stories', () => {
     expect(component.availableStories).toEqual(stories);
   });
+
   it('should load settings', () => {
     expect(component.settingsBackup).toEqual(settings);
 
