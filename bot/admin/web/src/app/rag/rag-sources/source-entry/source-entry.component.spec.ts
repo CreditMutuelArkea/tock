@@ -45,7 +45,7 @@ const sourceMock = {
   ]
 };
 
-fdescribe('SourceEntryComponent', () => {
+describe('SourceEntryComponent', () => {
   let component: SourceEntryComponent;
   let fixture: ComponentFixture<SourceEntryComponent>;
 

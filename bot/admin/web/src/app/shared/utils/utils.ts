@@ -68,18 +68,29 @@ export function exportJsonDump(obj: Object, fileName: string): void {
 
 /**
  * Makes a deep copy of the object. (types and circular dependencies are not preserved).
- * @param {Object} obj
+ * @param {Object} obj Object to copy
  * @returns {Object} copy of the object
  */
 export function deepCopy<T>(obj: T): T {
   return JSON.parse(JSON.stringify(obj));
 }
 
-export function isPrimitive(arg): boolean {
+/**
+ * Evaluate if argument is of primitive type.
+ * @param {any} arg variable to evaluate
+ * @returns {boolean} return true if arg is a primitive
+ */
+export function isPrimitive(arg: any): boolean {
   var type = typeof arg;
   return arg == null || (type != 'object' && type != 'function');
 }
 
-export function includesArray(data, arr): boolean {
+/**
+ * Check if an array contains a given array.
+ * @param {Array} data the array to look in
+ * @param {Array} arr the array to find
+ * @returns {boolean} return true if the data object contains the given array
+ */
+export function includesArray(data: any[], arr: any[]): boolean {
   return data.some((e) => Array.isArray(e) && e.every((o, i) => Object.is(arr[i], o)));
 }

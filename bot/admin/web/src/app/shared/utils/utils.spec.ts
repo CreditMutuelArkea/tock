@@ -1,4 +1,4 @@
-import { orderBy } from './utils';
+import { includesArray, isPrimitive, orderBy } from './utils';
 
 describe('OrderBy', () => {
   describe('should return type error if the argument is not an array', () => {
@@ -151,5 +151,44 @@ describe('OrderBy', () => {
         expect(orderBy(item.arrayToSort, 'category', false, 'name')).toEqual(item.expectedResult);
       });
     });
+  });
+});
+
+describe('isPrimitive', () => {
+  it('should detect strings, numbers, booleans, null and other primitives', () => {
+    expect(isPrimitive(0)).toBeTrue();
+    expect(isPrimitive(1e21)).toBeTrue();
+    expect(isPrimitive('1e21')).toBeTrue();
+    expect(isPrimitive('*/-')).toBeTrue();
+    expect(isPrimitive(true)).toBeTrue();
+    expect(isPrimitive(null)).toBeTrue();
+    expect(isPrimitive(Symbol('test'))).toBeTrue();
+    expect(isPrimitive(BigInt('0x1fffffffffffff'))).toBeTrue();
+  });
+
+  it('should not detect objects and functions', () => {
+    expect(isPrimitive({})).toBeFalse();
+    expect(isPrimitive([])).toBeFalse();
+    expect(isPrimitive(new Map())).toBeFalse();
+    expect(isPrimitive(() => {})).toBeFalse();
+  });
+});
+
+describe('includesArray', () => {
+  it('should detect that the array contains the array', () => {
+    expect(includesArray([[1, 2, 3]], [1, 2, 3])).toBeTrue();
+    expect(includesArray([[1, 2, 3]], [3, 2, 1])).toBeFalse();
+    expect(
+      includesArray(
+        [
+          [1, 2, 3],
+          [3, 2, 1]
+        ],
+        [3, 2, 1]
+      )
+    ).toBeTrue();
+    expect(includesArray([[1, 2, 3], [[3, 2, 1]]], [3, 2, 1])).toBeFalse();
+    expect(includesArray([{ arr: [1, 2, 3] }], [1, 2, 3])).toBeFalse();
+    expect(includesArray([[{ a: 1 }]], [{ a: 1 }])).toBeFalse();
   });
 });
