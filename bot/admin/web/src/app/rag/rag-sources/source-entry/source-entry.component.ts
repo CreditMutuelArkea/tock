@@ -5,7 +5,7 @@ import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confi
 import { getSourceMostRecentRunningIndexingSession } from '../commons/utils';
 import { IndexingSession, IndexingSessionTaskTypes, ProcessAdvancement, Source, SourceTypes } from '../models';
 
-interface TaskDefinition {
+export interface TaskDefinition {
   type: IndexingSessionTaskTypes;
   label: string;
   icon: string;
@@ -71,7 +71,7 @@ export class SourceEntryComponent implements OnDestroy {
   isStepComplete(type: IndexingSessionTaskTypes): boolean {
     const currentSession = getSourceMostRecentRunningIndexingSession(this.source);
     if (type === IndexingSessionTaskTypes.initialization) {
-      return currentSession.tasks.some((task) => task.status === ProcessAdvancement.running);
+      return currentSession.tasks?.some((task) => task.status === ProcessAdvancement.running);
     }
     return currentSession.tasks.find((task) => task.type === type).status === ProcessAdvancement.complete;
   }
@@ -79,7 +79,7 @@ export class SourceEntryComponent implements OnDestroy {
   isStepRunning(type: IndexingSessionTaskTypes): boolean {
     const currentSession = getSourceMostRecentRunningIndexingSession(this.source);
     if (type === IndexingSessionTaskTypes.initialization) {
-      return !currentSession.tasks.some((task) => task.status === ProcessAdvancement.running);
+      return !currentSession.tasks?.some((task) => task.status === ProcessAdvancement.running);
     }
     return currentSession.tasks.find((task) => task.type === type).status === ProcessAdvancement.running;
   }
