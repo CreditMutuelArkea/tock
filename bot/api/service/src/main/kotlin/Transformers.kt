@@ -81,6 +81,8 @@ private fun BotBus.toRequestContext(): RequestContext =
         botId,
         userPreferences.toUserData(),
         connectorData.metadata,
+        // TODO: remplacer la conversationData par les metadata
+        connectorData.conversationData,
         if (action.metadata.returnsHistory || booleanProperty("tock_bot_api_actions_history_to_client_bus", false))
             toActionsHistory() else null
     )
