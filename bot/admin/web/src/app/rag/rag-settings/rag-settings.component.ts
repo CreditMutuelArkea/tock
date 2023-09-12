@@ -112,8 +112,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
           this.settingsBackup = settings;
           this.form.patchValue(settings as unknown);
           this.form.markAsPristine();
-        } else {
-          this.form.reset();
         }
         this.loading = false;
       });

@@ -86,6 +86,15 @@ export function isPrimitive(arg: any): boolean {
 }
 
 /**
+ * Evaluate if argument is of object type.
+ * @param {any} arg variable to evaluate
+ * @returns {boolean} return true if arg is an object
+ */
+export function isObject(arg: any): boolean {
+  return arg && typeof arg === 'object' && !Array.isArray(arg);
+}
+
+/**
  * Check if an array contains a given array.
  * @param {Array} data the array to look in
  * @param {Array} arr the array to find

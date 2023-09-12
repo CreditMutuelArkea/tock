@@ -63,7 +63,7 @@ export class SourceNormalizationJsonComponent {
     }
   }
 
-  gatherData(data): [] {
+  gatherData(data): any {
     let reducedData;
     this.dataTypesDefinition.map((dataType) => {
       let gatheredTypeData = this.gatherDataByType(data, dataType.type);
@@ -87,9 +87,9 @@ export class SourceNormalizationJsonComponent {
   }
 
   gatherDataByType(data, type: ImportDataTypes): [] {
-    const answerType = this.associations.find((a) => a.type === type);
+    const associationType = this.associations.find((a) => a.type === type);
     let previousWalk;
-    answerType.paths.forEach((path) => {
+    associationType.paths.forEach((path) => {
       let walk = this.walk(data, path);
       if (previousWalk) {
         walk.forEach((line, index) => {

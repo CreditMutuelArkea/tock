@@ -26,6 +26,6 @@ export function normalizedCamelCase(str: string): string {
 }
 
 export function isUrl(str: string): boolean {
-  const reg = new RegExp('(http|https)://([\\da-z.-]+)\\.([a-z.]{2,6})[/\\w .-]*/?');
+  const reg = /^(?:http(s)?:\/\/)[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/;
   return reg.test(str);
 }
