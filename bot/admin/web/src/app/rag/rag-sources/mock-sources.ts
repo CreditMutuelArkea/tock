@@ -73,7 +73,9 @@ export const TMPsources: Source[] = [
     status: ProcessAdvancement.pristine,
     source_parameters: {
       file_format: 'json'
-    }
+    },
+    current_indexing_session_id: undefined,
+    indexing_sessions: []
   },
   {
     id: '654',
@@ -84,6 +86,8 @@ export const TMPsources: Source[] = [
     status: ProcessAdvancement.error,
     source_parameters: {
       file_format: 'json'
-    }
+    },
+    current_indexing_session_id: undefined,
+    indexing_sessions: []
   }
 ];

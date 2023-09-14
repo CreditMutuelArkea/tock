@@ -103,7 +103,7 @@ export class StoriesUploadComponent implements OnInit {
     const story = stories.find((story) => {
       return story.intent.name === unknownIntentName;
     });
-    console.log(story);
+
     const ragOff = 'Deactivate the RAG';
     const ragOn = "Deactivate the 'unknown' story";
     const dialogRef = this.dialogService.openDialog(ChoiceDialogComponent, {
