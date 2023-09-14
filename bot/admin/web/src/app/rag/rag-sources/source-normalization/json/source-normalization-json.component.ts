@@ -63,7 +63,12 @@ export class SourceNormalizationJsonComponent {
     }
   }
 
-  gatherData(data): [] {
+  /**
+   * Collects values corresponding to user-specified nodes for each expected data type.
+   * @param {any} data Raw data structure extracted from imported json
+   * @returns {Array<SourceImportData>} The collected data
+   */
+  gatherData(data: any) {
     let reducedData;
     this.dataTypesDefinition.map((dataType) => {
       let gatheredTypeData = this.gatherDataByType(data, dataType.type);
@@ -86,10 +91,16 @@ export class SourceNormalizationJsonComponent {
     return reducedData;
   }
 
-  gatherDataByType(data, type: ImportDataTypes): [] {
-    const answerType = this.associations.find((a) => a.type === type);
+  /**
+   * Collects values corresponding to user-specified nodes for a given data type. If multiple paths exist for the same data type, concatenate the values found for the different paths indicated.
+   * @param {any} data Raw data structure extracted from imported json
+   * @param {ImportDataTypes} type The data type to collect
+   * @returns {Array<string>} An array of collected data
+   */
+  gatherDataByType(data: any, type: ImportDataTypes): [] {
+    const associationType = this.associations.find((a) => a.type === type);
     let previousWalk;
-    answerType.paths.forEach((path) => {
+    associationType.paths.forEach((path) => {
       let walk = this.walk(data, path);
       if (previousWalk) {
         walk.forEach((line, index) => {
@@ -103,7 +114,14 @@ export class SourceNormalizationJsonComponent {
     return previousWalk;
   }
 
-  walk(data, path: string[], pathIndex: number = 0): any {
+  /**
+   * Recursively traverses the dataset according to the paths provided until a primitive is found, and returns its value
+   * @param {any} data Raw data structure extracted from imported json
+   * @param {Array<string>} path The path to the node specified by the user
+   * @param {number} pathIndex An index of the path array to walk
+   * @returns {any} If a primitive is found, return its value, otherwise returns the object found for the path index given
+   */
+  walk(data: any, path: string[], pathIndex: number = 0): any {
     if (isPrimitive(data)) return data;
 
     const space = path[pathIndex];

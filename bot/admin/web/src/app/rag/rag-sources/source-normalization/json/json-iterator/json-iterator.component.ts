@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { deepCopy, includesArray, isPrimitive } from '../../../../../shared/utils';
+import { deepCopy, includesArray, isObject, isPrimitive } from '../../../../../shared/utils';
 import { dataTypesDefinition, ImportDataTypes } from '../../../models';
 import { JsonImportAssociation } from '../source-normalization-json.component';
 
@@ -28,12 +28,10 @@ export class JsonIteratorComponent implements OnInit {
 
   isPrimitive = isPrimitive;
 
+  isObject = isObject;
+
   isArray(arg: any): boolean {
     return arg && Array.isArray(arg);
-  }
-
-  isObject(arg: any): boolean {
-    return arg && typeof arg === 'object' && !Array.isArray(arg);
   }
 
   truncatedDataLengthAlert: number;
