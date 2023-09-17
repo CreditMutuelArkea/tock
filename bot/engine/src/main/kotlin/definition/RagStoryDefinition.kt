@@ -24,13 +24,13 @@ package ai.tock.bot.definition
  */
 
 class RagStoryDefinition(handler: StoryHandler) : SimpleStoryDefinition(
-    id = RAG_STORY_NAME,
+    id = INTERNAL_RAG_STORY_NAME,
     starterIntents = setOf(Intent.unknown),
     storyHandler = handler,
 ) {
 
     companion object {
-        const val RAG_STORY_NAME = "UnknownRagStory"
+        const val INTERNAL_RAG_STORY_NAME = "tock_rag_story"
     }
 
 }

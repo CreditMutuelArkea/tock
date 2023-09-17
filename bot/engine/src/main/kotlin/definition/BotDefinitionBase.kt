@@ -93,18 +93,13 @@ open class BotDefinitionBase(
             )
 
         val defaultRagStory =
-            // TODO MASS : use RagStoryDefinition
-            SimpleStoryDefinition(
-                "tock_rag_story",
+           RagStoryDefinition(
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
                         bus.markAsUnknown()
-                            // TODO MASS : use RagAnswerHandler
-                            bus.send("RAG - IA answer")
-                            RagAnswerHandler.handle(bus)
+                        RagAnswerHandler.handle(bus)
                     }
                 },
-                setOf(Intent.unknown)
             )
 
         /**

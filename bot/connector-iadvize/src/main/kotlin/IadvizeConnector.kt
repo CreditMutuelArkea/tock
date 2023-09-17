@@ -19,6 +19,7 @@ package ai.tock.bot.connector.iadvize
 import ai.tock.bot.connector.ConnectorBase
 import ai.tock.bot.connector.ConnectorCallback
 import ai.tock.bot.connector.ConnectorData
+import ai.tock.bot.connector.ConnectorFeature
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
@@ -39,12 +40,21 @@ import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
 import ai.tock.bot.connector.media.MediaMessage
+import ai.tock.bot.definition.IntentAware
+import ai.tock.bot.definition.StoryHandlerDefinition
+import ai.tock.bot.definition.StoryStep
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 
 import ai.tock.bot.engine.action.Action
+import ai.tock.bot.engine.action.ActionNotificationType
+import ai.tock.bot.engine.event.Event
+import ai.tock.bot.engine.user.PlayerId
+import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.defaultLocale
-
+import ai.tock.shared.error
+import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.jackson.mapper
 import ai.tock.shared.exception.rest.BadRequestException
 import com.fasterxml.jackson.annotation.JsonInclude
@@ -63,6 +73,10 @@ private const val QUERY_ID_CONVERSATION: String = "idConversation"
 private const val TYPE_TEXT: String = "text"
 private const val ROLE_OPERATOR: String = "operator"
 
+private const val CONVERSATION_ID = "CONVERSATION_ID"
+private const val CHAT_BOT_ID = "CHAT_BOT_ID"
+private const val PROACTIVE_MESSAGE = "PROACTIVE_MESSAGE"
+
 /**
  *
  */
@@ -75,7 +89,7 @@ class IadvizeConnector internal constructor(
     val secretToken: String?,
     val distributionRuleUnvailableMessage: String,
     val localeCode: String?
-) : ConnectorBase(IadvizeConnectorProvider.connectorType) {
+) : ConnectorBase(IadvizeConnectorProvider.connectorType, setOf(ConnectorFeature.PROACTIVE_MESSAGE)) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -336,6 +350,68 @@ class IadvizeConnector internal constructor(
         } catch (e: Exception) {
             logger.error(e)
             null
+        }
+    }
+
+    override fun notify(
+        controller: ConnectorController,
+        recipientId: PlayerId,
+        intent: IntentAware,
+        step: StoryStep<out StoryHandlerDefinition>?,
+        parameters: Map<String, String>,
+        notificationType: ActionNotificationType?,
+        errorListener: (Throwable) -> Unit
+    ) {
+        if (validateNotifyParameters(parameters)) {
+            logger.info { "proactive notification to iadvize : ${parameters[PROACTIVE_MESSAGE]}}" }
+            IadvizeGraphQLClient().sendProactiveMessage(
+                parameters[CONVERSATION_ID]!!,
+                parameters[CHAT_BOT_ID]?.toInt()!!,
+                parameters[PROACTIVE_MESSAGE]!!
+            )
+        }
+    }
+
+    /**
+     * Validate parameters expected are filled
+     * @param parameters Map<String,String>
+     * @throws [BadRequestException]
+     */
+    private fun validateNotifyParameters(parameters: Map<String, String>): Boolean {
+        return if (
+            parameters.isNotEmpty()
+            && parameters.containsKey(CHAT_BOT_ID) && parameters[CHAT_BOT_ID]!!.isNotBlank()
+            && parameters.containsKey(CONVERSATION_ID) && parameters[CONVERSATION_ID]!!.isNotBlank()
+            && parameters.containsKey(PROACTIVE_MESSAGE) && parameters[PROACTIVE_MESSAGE]!!.isNotBlank()
+        ) {
+            true
+        } else {
+            //TODO : à revoir
+            val unfilledParameters = arrayListOf<String>()
+            val message =
+                if (parameters.isEmpty()) {
+                    "Parameters are empty"
+                } else {
+                    if (!parameters.containsKey(CHAT_BOT_ID) && parameters[CHAT_BOT_ID].isNullOrEmpty() && parameters[CHAT_BOT_ID].toString()
+                            .toIntOrNull() != null
+                    ) {
+                        unfilledParameters.add(CHAT_BOT_ID)
+                    }
+                    if (!parameters.containsKey(CONVERSATION_ID) && parameters[CONVERSATION_ID].isNullOrEmpty()) {
+                        unfilledParameters.add(CONVERSATION_ID)
+                    }
+                    if (!parameters.containsKey(PROACTIVE_MESSAGE) && parameters[PROACTIVE_MESSAGE].isNullOrEmpty()) {
+                        unfilledParameters.add(PROACTIVE_MESSAGE)
+                    }
+
+                    if (unfilledParameters.size > 1) {
+                        "The following parameters are not as expected $unfilledParameters"
+                    } else {
+                        "The following parameter is not as expected $unfilledParameters"
+                    }
+                }
+
+            throw BadRequestException(message)
         }
     }
 }

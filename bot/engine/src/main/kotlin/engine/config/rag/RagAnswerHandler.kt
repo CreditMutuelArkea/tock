@@ -16,16 +16,20 @@
 
 package ai.tock.bot.engine.config.rag
 
+import ai.tock.bot.connector.ConnectorData
+import ai.tock.bot.connector.ConnectorFeature
+import ai.tock.bot.definition.Parameters
+import ai.tock.bot.definition.notify
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.llm.rag.core.client.RagClient
 import ai.tock.bot.llm.rag.core.client.models.RagQuery
 import ai.tock.shared.exception.rest.RestException
 import ai.tock.shared.injector
+import ai.tock.shared.longProperty
 import ai.tock.shared.provide
 import mu.KotlinLogging
 import java.net.ConnectException
 
-// TODO MASS : A finaliser dans le ticket qui ajout la feature notify au bus
 /**
  * Handler of a rag story answer
  */
@@ -36,45 +40,95 @@ object RagAnswerHandler {
 
 
     internal fun handle(
-            botBus: BotBus
+        botBus: BotBus
     ) {
         with(botBus) {
-                try {
-                    logger.debug { "Rag config : ${botDefinition.ragConfiguration}" }
-                    val response =
-                            ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
+            try {
+                if (this.underlyingConnector.hasFeature(ConnectorFeature.PROACTIVE_MESSAGE, targetConnectorType)) {
+                    //free the call
+                    val connectorData = this.connectorData.conversationData
 
-                    //handle rag response
-                    response?.answer?.let {
-                        if (!it.contains(botDefinition.ragConfiguration!!.noAnswerSentence)) {
-                            //TODO to format per connector or other ?
-                            end(
-                                    "$it " +
-                                            "${response.sourceDocuments}"
-                            )
-                            // TODO MASS : get langchain debug data
-                        } else {
-                            logger.debug { "no answer found in documents" }
-                            if (botDefinition.ragConfiguration?.noAnswerStoryId != null) {
-                                manageNoAnswerRedirection(this)
-                            } else {
-                                end(it)
-                            }
-                        }
-                    } ?: manageNoAnswerRedirection(this)
-                    // TODO MASS
-                    // Comment définir le fait que le RAG n'a pas pu trouver une réponse :
-                    // - Pas de documents sources retournés
-                    // - Avoir "noAnswerSentence" dans la réponse (est paramètré dans le RAG setting)
-                    // - Ko technique lors de l'appel de la stack python
-                } catch (conn: ConnectException) {
-                    logger.error { "failed to connect to ${conn.message}" }
-                    manageNoAnswerRedirection(this)
-                } catch (e: RestException) {
-                    logger.error { "error during rag call ${e.message}" }
-                    manageNoAnswerRedirection(this)
+                    val parameters = Parameters().copy(
+                        entries = mutableListOf(
+                            Pair(
+                                ConnectorData.CHAT_BOT_ID,
+                                connectorData[ConnectorData.CHAT_BOT_ID]!!
+                            ),
+                            Pair(
+                                ConnectorData.CONVERSATION_ID,
+                                connectorData[ConnectorData.CONVERSATION_ID]!!
+                            ),
+                            Pair(ConnectorData.PROACTIVE_MESSAGE, "IADVIZE-AI MESSAGE")
+                        ).toMap()
+                    )
+
+                    notify(
+                        applicationId = applicationId,
+                        namespace = this.botDefinition.namespace,
+                        botId = this.botDefinition.botId,
+                        recipientId = this.userId,
+                        intent = this.currentIntent!!,
+                        parameters = parameters,
+//                        stateModifier = NotifyBotStateModifier.ACTIVATE_ONLY_FOR_THIS_NOTIFICATION
+                    )
+                    callLLM(botBus)
+
+                } else {
+//                    runBlocking {
+//                        val stopWatch = StopWatch.createStarted()
+//                        launch {
+//                            delay(3000L)
+//                            stopWatch.stop()
+//                            println("Function in scheduleWithCoroutine executed with delay " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.time))
+//                        }
+//                    end()
+
+                    logger.warn { "Connector does not support proactive message" }
+//                    callLLM(timeoutWaitingLLM)
                 }
+
+
+                // TODO MASS
+                // Comment définir le fait que le RAG n'a pas pu trouver une réponse :
+                // - Pas de documents sources retournés
+                // - Avoir "noAnswerSentence" dans la réponse (est paramètré dans le RAG setting)
+                // - Ko technique lors de l'appel de la stack python
+            } catch (conn: ConnectException) {
+                logger.error { "failed to connect to ${conn.message}" }
+                manageNoAnswerRedirection(this)
+            } catch (e: RestException) {
+                logger.error { "error during rag call ${e.message}" }
+                manageNoAnswerRedirection(this)
+            }
         }
+    }
+
+    private fun callLLM(botBus: BotBus) {
+        with(botBus) {
+            logger.debug { "Rag config : ${botBus.botDefinition.ragConfiguration}" }
+            val response =
+                    ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
+
+            //handle rag response
+            response?.answer?.let {
+                if (!it.contains(botDefinition.ragConfiguration!!.noAnswerSentence)) {
+                    //TODO to format per connector or other ?
+                    end(
+                            "$it " +
+                                    "${response.sourceDocuments}"
+                    )
+                    // TODO MASS : get langchain debug data
+                } else {
+                    logger.debug { "no answer found in documents" }
+                    if (botDefinition.ragConfiguration?.noAnswerStoryId != null) {
+                        manageNoAnswerRedirection(this)
+                    } else {
+                        end(it)
+                    }
+                }
+            }
+        }
+//                            ?: manageNoAnswerRedirection(this)
     }
 
     /**
