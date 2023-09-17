@@ -362,13 +362,17 @@ class IadvizeConnector internal constructor(
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit
     ) {
-        if (validateNotifyParameters(parameters)) {
-            logger.info { "proactive notification to iadvize : ${parameters[PROACTIVE_MESSAGE]}}" }
-            IadvizeGraphQLClient().sendProactiveMessage(
-                parameters[CONVERSATION_ID]!!,
-                parameters[CHAT_BOT_ID]?.toInt()!!,
-                parameters[PROACTIVE_MESSAGE]!!
-            )
+        try {
+            if (validateNotifyParameters(parameters)) {
+                logger.info { "proactive notification to iadvize : ${parameters[PROACTIVE_MESSAGE]}}" }
+                IadvizeGraphQLClient().sendProactiveMessage(
+                    parameters[CONVERSATION_ID]!!,
+                    parameters[CHAT_BOT_ID]?.toInt()!!,
+                    parameters[PROACTIVE_MESSAGE]!!
+                )
+            }
+        } catch (t: Throwable) {
+            errorListener.invoke(t)
         }
     }
 

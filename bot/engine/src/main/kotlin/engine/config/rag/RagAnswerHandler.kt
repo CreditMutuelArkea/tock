@@ -23,10 +23,14 @@ import ai.tock.bot.definition.notify
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.llm.rag.core.client.RagClient
 import ai.tock.bot.llm.rag.core.client.models.RagQuery
+import ai.tock.bot.llm.rag.core.client.models.RagResult
+import ai.tock.shared.exception.error.ErrorMessageWrapper
 import ai.tock.shared.exception.rest.RestException
 import ai.tock.shared.injector
-import ai.tock.shared.longProperty
 import ai.tock.shared.provide
+import io.netty.handler.codec.http.HttpResponseStatus
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.net.ConnectException
 
@@ -38,27 +42,15 @@ object RagAnswerHandler {
     private val logger = KotlinLogging.logger {}
     private val ragClient: RagClient = injector.provide()
 
-
     internal fun handle(
         botBus: BotBus
     ) {
         with(botBus) {
             try {
                 if (this.underlyingConnector.hasFeature(ConnectorFeature.PROACTIVE_MESSAGE, targetConnectorType)) {
-                    //free the call
-                    val connectorData = this.connectorData.conversationData
-
-                    val parameters = Parameters().copy(
-                        entries = mutableListOf(
-                            Pair(
-                                ConnectorData.CHAT_BOT_ID,
-                                connectorData[ConnectorData.CHAT_BOT_ID]!!
-                            ),
-                            Pair(
-                                ConnectorData.CONVERSATION_ID,
-                                connectorData[ConnectorData.CONVERSATION_ID]!!
-                            ),
-                            Pair(ConnectorData.PROACTIVE_MESSAGE, "IADVIZE-AI MESSAGE")
+                    val parameters = Parameters(
+                        this.connectorData.conversationData.plus(
+                            (Pair(ConnectorData.PROACTIVE_MESSAGE, callLLM(botBus)))
                         ).toMap()
                     )
 
@@ -69,66 +61,58 @@ object RagAnswerHandler {
                         recipientId = this.userId,
                         intent = this.currentIntent!!,
                         parameters = parameters,
-//                        stateModifier = NotifyBotStateModifier.ACTIVATE_ONLY_FOR_THIS_NOTIFICATION
+                        // error listener managing Throwable Exceptions
+                        errorListener = { manageNoAnswerRedirection(this) }
                     )
-                    callLLM(botBus)
-
                 } else {
-//                    runBlocking {
-//                        val stopWatch = StopWatch.createStarted()
-//                        launch {
-//                            delay(3000L)
-//                            stopWatch.stop()
-//                            println("Function in scheduleWithCoroutine executed with delay " + TimeUnit.MILLISECONDS.toSeconds(stopWatch.time))
-//                        }
-//                    end()
-
-                    logger.warn { "Connector does not support proactive message" }
-//                    callLLM(timeoutWaitingLLM)
+                    runBlocking {
+                        launch {
+                            end(callLLM(botBus))
+                        }
+                    }
                 }
-
-
-                // TODO MASS
-                // Comment définir le fait que le RAG n'a pas pu trouver une réponse :
-                // - Pas de documents sources retournés
-                // - Avoir "noAnswerSentence" dans la réponse (est paramètré dans le RAG setting)
-                // - Ko technique lors de l'appel de la stack python
+                //        TODO : check if error Listener is doing its job : seems NOT
             } catch (conn: ConnectException) {
                 logger.error { "failed to connect to ${conn.message}" }
                 manageNoAnswerRedirection(this)
             } catch (e: RestException) {
-                logger.error { "error during rag call ${e.message}" }
+                if (e.httpResponseStatus.code() / 100 != 2) {
+                    logger.error { "error during rag call ${e.message}" }
+                }
                 manageNoAnswerRedirection(this)
             }
         }
     }
 
-    private fun callLLM(botBus: BotBus) {
+
+    /**
+     * Call the LLM
+     * @param botBus
+     * @return a specified answer from the LLM or close the conversation by managing noAnswer
+     */
+    private fun callLLM(botBus: BotBus): String {
         with(botBus) {
             logger.debug { "Rag config : ${botBus.botDefinition.ragConfiguration}" }
-            val response =
-                    ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
+            val response: RagResult? =
+                ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
 
-            //handle rag response
+            // TODO MASS
+            // Comment définir le fait que le RAG n'a pas pu trouver une réponse :
+            // - Pas de documents sources retournés
+            // - Avoir "noAnswerSentence" dans la réponse (est paramètré dans le RAG setting)
+            // - Ko technique lors de l'appel de la stack python
             response?.answer?.let {
                 if (!it.contains(botDefinition.ragConfiguration!!.noAnswerSentence)) {
                     //TODO to format per connector or other ?
-                    end(
-                            "$it " +
-                                    "${response.sourceDocuments}"
-                    )
+                    return "$it " +
+                            "${response.sourceDocuments}"
                     // TODO MASS : get langchain debug data
                 } else {
-                    logger.debug { "no answer found in documents" }
-                    if (botDefinition.ragConfiguration?.noAnswerStoryId != null) {
-                        manageNoAnswerRedirection(this)
-                    } else {
-                        end(it)
-                    }
+                    throw RagNotFoundAnswerException()
                 }
-            }
+            } ?: throw RagNoAnswerException()
         }
-//                            ?: manageNoAnswerRedirection(this)
+
     }
 
     /**
@@ -139,7 +123,6 @@ object RagAnswerHandler {
      */
     private fun manageNoAnswerRedirection(botBus: BotBus) {
         with(botBus) {
-            // handle rag redirection in case answer is not known
             val noAnswerStory = botDefinition.ragConfiguration?.noAnswerStoryId?.let { noAnswerStoryId ->
                 botBus.botDefinition.stories.firstOrNull { it.id == noAnswerStoryId.toString() }
             }
@@ -148,5 +131,16 @@ object RagAnswerHandler {
             noAnswerStory.storyHandler.handle(this)
         }
     }
-
 }
+
+/**
+ * Unique Exception that throws a 204 code because RAG found no content
+ * TODO : enhance the behavior
+ */
+class RagNotFoundAnswerException :
+    RestException(ErrorMessageWrapper("No answer found in the documents"), HttpResponseStatus.NO_CONTENT)
+
+class RagNoAnswerException : RestException(
+    ErrorMessageWrapper("An error seems to occurs : No answer from the Rag"),
+    HttpResponseStatus.SERVICE_UNAVAILABLE
+)
