@@ -62,7 +62,7 @@ object RagAnswerHandler {
                         recipientId = this.userId,
                         intent = this.currentIntent!!,
                         parameters = parameters,
-                        // error listener managing Throwable Exceptions
+                        // TODO : error listener managing Throwable Exceptions : seems to not work as expected
                         errorListener = { manageNoAnswerRedirection(this) }
                     )
                 } else {
@@ -72,7 +72,7 @@ object RagAnswerHandler {
                         }
                     }
                 }
-                //        TODO : check if error Listener is doing its job : seems NOT
+                //   TODO : check if error Listener is doing its job : seems NOT so let the following below
             } catch (conn: ConnectException) {
                 logger.error { "failed to connect to ${conn.message}" }
                 manageNoAnswerRedirection(this)
@@ -111,7 +111,7 @@ object RagAnswerHandler {
                 } else {
                     throw RagNotFoundAnswerException()
                 }
-            } ?: throw RagNoAnswerException()
+            } ?: throw RagUnavailableException()
         }
 
     }
@@ -141,7 +141,7 @@ object RagAnswerHandler {
 class RagNotFoundAnswerException :
     RestException(ErrorMessageWrapper("No answer found in the documents"), HttpResponseStatus.NO_CONTENT)
 
-class RagNoAnswerException : RestException(
-    ErrorMessageWrapper("An error seems to occurs : No answer from the Rag"),
+class RagUnavailableException : RestException(
+    ErrorMessageWrapper("An error seems to occurs : No answer from the service"),
     HttpResponseStatus.SERVICE_UNAVAILABLE
 )
