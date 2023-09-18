@@ -48,19 +48,16 @@ open class ConnectorData(
      * optional metadata metadata from connector
      */
     val metadata: Map<String, String> = emptyMap(),
-
-    /**
-     * A conversation key/value data.
-     */
-    val conversationData: Map<String, String> = emptyMap()
 ) {
 
     companion object {
         const val CONVERSATION_ID = "CONVERSATION_ID"
+
         // the operator id (=chatbotId) prefixed with the iAdvize environment
         const val OPERATOR_ID = "OPERATOR_ID"
         const val CHAT_BOT_ID = "CHAT_BOT_ID"
-        const val PROACTIVE_MESSAGE ="PROACTIVE_MESSAGE"
+        const val PROACTIVE_MESSAGE = "PROACTIVE_MESSAGE"
+
         // iAdvize environment sd- or ha-
         const val IADVIZE_ENV = "IADVIZE_ENV"
     }

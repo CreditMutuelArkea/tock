@@ -33,9 +33,6 @@ import ai.tock.bot.connector.iadvize.model.response.AvailabilityStrategies.Strat
 import ai.tock.bot.connector.iadvize.model.response.Bot
 import ai.tock.bot.connector.iadvize.model.response.BotUpdated
 import ai.tock.bot.connector.iadvize.model.response.Healthcheck
-import ai.tock.bot.engine.ConnectorController
-import ai.tock.bot.engine.event.Event
-import ai.tock.shared.error
 import ai.tock.bot.connector.iadvize.model.response.conversation.QuickReply
 import ai.tock.bot.connector.iadvize.model.response.conversation.RepliesResponse
 import ai.tock.bot.connector.iadvize.model.response.conversation.reply.IadvizeMessage
@@ -46,7 +43,6 @@ import ai.tock.bot.definition.StoryStep
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
-
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
@@ -56,7 +52,6 @@ import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.jackson.mapper
-import ai.tock.shared.exception.rest.BadRequestException
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
@@ -308,14 +303,18 @@ class IadvizeConnector internal constructor(
         when (iadvizeRequest) {
             is MessageRequest -> {
                 val event = WebhookActionConverter.toEvent(iadvizeRequest, applicationId)
-                controller.handle(event, ConnectorData(callback, conversationData = mapOf(
-                    ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
-                    ConnectorData.OPERATOR_ID to iadvizeRequest.idOperator,
-                    // iAdvize environment sd- or ha-
-                    ConnectorData.IADVIZE_ENV to iadvizeRequest.idOperator.split("-")[0],
-                    // the operator id (=chatbotId) prefixed with the iAdvize environment
-                    ConnectorData.CHAT_BOT_ID to iadvizeRequest.idOperator.split("-")[1],
-                )))
+                controller.handle(
+                    event, ConnectorData(
+                        callback, metadata = mapOf(
+                            ConnectorData.CONVERSATION_ID to iadvizeRequest.idConversation,
+                            ConnectorData.OPERATOR_ID to iadvizeRequest.idOperator,
+                            // iAdvize environment sd- or ha-
+                            ConnectorData.IADVIZE_ENV to iadvizeRequest.idOperator.split("-")[0],
+                            // the operator id (=chatbotId) prefixed with the iAdvize environment
+                            ConnectorData.CHAT_BOT_ID to iadvizeRequest.idOperator.split("-")[1],
+                        )
+                    )
+                )
             }
 
             // Only MessageRequest are supported, other messages are UnsupportedMessage
@@ -390,7 +389,6 @@ class IadvizeConnector internal constructor(
         ) {
             true
         } else {
-            //TODO : à revoir
             val unfilledParameters = arrayListOf<String>()
             val message =
                 if (parameters.isEmpty()) {

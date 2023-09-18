@@ -49,8 +49,9 @@ object RagAnswerHandler {
             try {
                 if (this.underlyingConnector.hasFeature(ConnectorFeature.PROACTIVE_MESSAGE, targetConnectorType)) {
                     val parameters = Parameters(
-                        this.connectorData.conversationData.plus(
-                            (Pair(ConnectorData.PROACTIVE_MESSAGE, callLLM(botBus)))
+                        this.connectorData.metadata.plus(
+                            (Pair(ConnectorData.PROACTIVE_MESSAGE,
+                                callLLM(botBus)))
                         ).toMap()
                     )
 
