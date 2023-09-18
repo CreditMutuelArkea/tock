@@ -63,6 +63,7 @@ import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType.bot
 import ai.tock.bot.engine.user.PlayerType.temporary
 import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.shared.Executor
 import ai.tock.shared.booleanProperty
 import ai.tock.shared.defaultLocale
@@ -588,6 +589,7 @@ class MessengerConnector internal constructor(
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>?,
         parameters: Map<String, String>,
+        ragResult: RagResult?,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit
     ) {

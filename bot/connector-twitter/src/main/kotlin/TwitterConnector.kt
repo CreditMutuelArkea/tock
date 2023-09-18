@@ -51,6 +51,7 @@ import ai.tock.bot.engine.monitoring.logError
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.PlayerType
 import ai.tock.bot.engine.user.UserPreferences
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.shared.Executor
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
@@ -254,6 +255,7 @@ internal class TwitterConnector internal constructor(
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>?,
         parameters: Map<String, String>,
+        ragResult: RagResult?,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit
     ) {
