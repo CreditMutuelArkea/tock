@@ -103,7 +103,7 @@ import mu.KotlinLogging
 import org.litote.kmongo.Id
 import org.litote.kmongo.toId
 import java.time.Instant
-import java.util.*
+import java.util.Locale
 
 object BotAdminService {
 
@@ -428,6 +428,11 @@ object BotAdminService {
         saveSentences(botConf, storyToImport, controller)
     }
 
+    /**
+     * Manage the existing Story that match the intent name or the storyId, of the imported story
+     * @param botConf the [BotApplicationConfiguration]
+     * @param storyToImport the [StoryDefinitionConfiguration]
+     */
     private fun manageExistingStory(botConf: BotApplicationConfiguration, storyToImport: StoryDefinitionConfiguration): StoryDefinitionConfiguration {
         val existingStory1 = storyDefinitionDAO.getStoryDefinitionByNamespaceAndBotIdAndIntent(
             botConf.namespace,
@@ -469,6 +474,11 @@ object BotAdminService {
         storyToImport.steps.forEach { saveUserSentenceOfStep(controller.application, it, controller.user) }
     }
 
+    /**
+     * Update and get the story features
+     * @param story the [StoryDefinitionConfiguration]
+     * @param enabled the feature state
+     */
     private fun prepareEndingFeatures(
         story: StoryDefinitionConfiguration, enabled: Boolean
     ): List<StoryDefinitionConfigurationFeature> {
