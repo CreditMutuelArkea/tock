@@ -16,7 +16,6 @@
 
 package ai.tock.bot.engine.config.rag
 
-import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorFeature
 import ai.tock.bot.definition.Parameters
 import ai.tock.bot.definition.notify
@@ -32,6 +31,7 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import java.lang.NullPointerException
 import java.net.ConnectException
 
 /**
@@ -47,32 +47,38 @@ object RagAnswerHandler {
     ) {
         with(botBus) {
             try {
-                if (this.underlyingConnector.hasFeature(ConnectorFeature.PROACTIVE_MESSAGE, targetConnectorType)) {
-                    val parameters = Parameters(
-                        this.connectorData.metadata.plus(
-                            (Pair(ConnectorData.PROACTIVE_MESSAGE,
-                                callLLM(botBus)))
-                        ).toMap()
-                    )
+                if (this.underlyingConnector.hasFeature(ConnectorFeature.NOTIFY_SUPPORTED, targetConnectorType)) {
+                    // default end, cannot be used since other responses will thrown already answered
+                    end()
+                    runBlocking {
+                        launch {
+                            val parameters = Parameters(
+                                botBus.connectorData.metadata.toMap()
+                            )
 
-                    notify(
-                        applicationId = applicationId,
-                        namespace = this.botDefinition.namespace,
-                        botId = this.botDefinition.botId,
-                        recipientId = this.userId,
-                        intent = this.currentIntent!!,
-                        parameters = parameters,
-                        // TODO : error listener managing Throwable Exceptions : seems to not work as expected
-                        errorListener = { manageNoAnswerRedirection(this) }
-                    )
+                            notify(
+                                applicationId = applicationId,
+                                namespace = botBus.botDefinition.namespace,
+                                botId = botBus.botDefinition.botId,
+                                recipientId = botBus.userId,
+                                intent = botBus.currentIntent!!,
+                                parameters = parameters,
+                                ragResult = callLLM(botBus),
+                                // TODO : error listener managing Throwable Exceptions : seems to not work as expected
+                                errorListener = { manageNoAnswerRedirection(botBus) }
+                            )
+                        }
+                    }
                 } else {
                     runBlocking {
                         launch {
-                            end(callLLM(botBus))
+                            end(botBus.underlyingConnector.formatNotifyRagMessage(callLLM(botBus)))
                         }
                     }
                 }
-                //   TODO : check if error Listener is doing its job : seems NOT so let the following below
+                //   TODO : check if error Listener is doing its job : seems NOT so lets keep the following below
+            } catch (conn: NullPointerException) {
+                manageNoAnswerRedirection(this)
             } catch (conn: ConnectException) {
                 logger.error { "failed to connect to ${conn.message}" }
                 manageNoAnswerRedirection(this)
@@ -85,33 +91,29 @@ object RagAnswerHandler {
         }
     }
 
-
     /**
      * Call the LLM
      * @param botBus
-     * @return a specified answer from the LLM or close the conversation by managing noAnswer
+     * @return [RagResult]
+     * How define that RAG could not find an answer :
+     * - No sources documents found
+     * - "noAnswerSentence" presents in answer (parameterized in RAG setting)
+     * - Technical error calling ragClient
      */
-    private fun callLLM(botBus: BotBus): String {
+    private fun callLLM(botBus: BotBus): RagResult {
         with(botBus) {
             logger.debug { "Rag config : ${botBus.botDefinition.ragConfiguration}" }
-            val response: RagResult? =
-                ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
+            val response = ragClient.ask(RagQuery(userText.toString(), applicationId, userId.id))
 
-            // TODO MASS
-            // Comment définir le fait que le RAG n'a pas pu trouver une réponse :
-            // - Pas de documents sources retournés
-            // - Avoir "noAnswerSentence" dans la réponse (est paramètré dans le RAG setting)
-            // - Ko technique lors de l'appel de la stack python
-            response?.answer?.let {
-                if (!it.contains(botDefinition.ragConfiguration!!.noAnswerSentence)) {
-                    //TODO to format per connector or other ?
-                    return "$it " +
-                            "${response.sourceDocuments}"
-                    // TODO MASS : get langchain debug data
+            return if (response?.answer != null && !(response.answer.contains(botDefinition.ragConfiguration!!.noAnswerSentence))) {
+                response
+            } else {
+                if (response?.answer == null) {
+                    throw RagUnavailableException()
                 } else {
                     throw RagNotFoundAnswerException()
                 }
-            } ?: throw RagUnavailableException()
+            }
         }
 
     }

@@ -31,6 +31,7 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import io.vertx.ext.web.Router
 
 /**
@@ -64,6 +65,7 @@ interface ConnectorController {
      * @param step the optional step target
      * @param parameters the optional parameters
      * @param notificationType notification type if any
+     * @param ragResult [RagResult] ragResult if used to notify
      * @param errorListener called when a message has not been delivered
      */
     fun notify(
@@ -72,9 +74,10 @@ interface ConnectorController {
         step: StoryStep<out StoryHandlerDefinition>? = null,
         parameters: Map<String, String> = emptyMap(),
         notificationType: ActionNotificationType?,
+        ragResult: RagResult? = null,
         errorListener: (Throwable) -> Unit = {}
     ) {
-        connector.notify(this, recipientId, intent, step, parameters, notificationType, errorListener)
+        connector.notify(this, recipientId, intent, step, parameters, ragResult, notificationType, errorListener)
     }
 
     /**

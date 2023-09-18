@@ -26,7 +26,7 @@ enum class ConnectorFeature {
     CAROUSEL,
 
     /**
-     * Are proactive message supported ?
+     * Are notify message supported ?
      */
-    PROACTIVE_MESSAGE
+    NOTIFY_SUPPORTED
 }

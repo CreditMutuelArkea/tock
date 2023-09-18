@@ -25,6 +25,7 @@ import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.translator.UserInterfaceType
 
 /**
@@ -555,6 +556,7 @@ inline fun <reified T> storyWithSteps(
  * @param intent the notification intent
  * @param step the optional step target
  * @param parameters the optional parameters
+ * @param ragResult the optional ragResult for rag
  * @param stateModifier allow the notification to bypass current user state
  * @param notificationType the notification type if any
  * @param errorListener called when a message has not been delivered
@@ -567,6 +569,7 @@ fun notify(
     intent: IntentAware,
     step: StoryStep<out StoryHandlerDefinition>? = null,
     parameters: Parameters = Parameters.EMPTY,
+    ragResult: RagResult? = null,
     stateModifier: NotifyBotStateModifier = NotifyBotStateModifier.KEEP_CURRENT_STATE,
     notificationType: ActionNotificationType? = null,
     errorListener: (Throwable) -> Unit = {}
@@ -576,6 +579,7 @@ fun notify(
     intent = intent,
     step = step,
     parameters = parameters.toMap(),
+    ragResult = ragResult,
     stateModifier = stateModifier,
     notificationType = notificationType,
     namespace = namespace,

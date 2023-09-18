@@ -48,6 +48,7 @@ import ai.tock.bot.engine.nlp.NlpController
 import ai.tock.bot.engine.nlp.NlpListener
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserTimelineDAO
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.nlp.api.client.NlpClient
 import ai.tock.shared.Executor
 import ai.tock.shared.defaultLocale
@@ -186,6 +187,7 @@ object BotRepository {
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>? = null,
         parameters: Map<String, String> = emptyMap(),
+        ragResult: RagResult? = null,
         stateModifier: NotifyBotStateModifier = NotifyBotStateModifier.KEEP_CURRENT_STATE,
         notificationType: ActionNotificationType? = null,
         namespace: String? = null,
@@ -200,7 +202,16 @@ object BotRepository {
         }
         val conf = key?.let { getConfigurationByApplicationId(it) } ?: error("unknown application $applicationId")
         connectorControllerMap.getValue(conf)
-            .notifyAndCheckState(recipientId, intent, step, parameters, stateModifier, notificationType, errorListener)
+            .notifyAndCheckState(
+                recipientId,
+                intent,
+                step,
+                parameters,
+                ragResult,
+                stateModifier,
+                notificationType,
+                errorListener
+            )
     }
 
     private fun ConnectorController.notifyAndCheckState(
@@ -208,6 +219,7 @@ object BotRepository {
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>?,
         parameters: Map<String, String>,
+        ragResult: RagResult?,
         stateModifier: NotifyBotStateModifier,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit = {}
@@ -224,7 +236,7 @@ object BotRepository {
             userTimelineDAO.save(userTimeline, botDefinition)
         }
 
-        notify(recipientId, intent, step, parameters, notificationType, errorListener)
+        notify(recipientId, intent, step, parameters, notificationType, ragResult, errorListener)
 
         if (stateModifier == NotifyBotStateModifier.ACTIVATE_ONLY_FOR_THIS_NOTIFICATION) {
             val userTimelineAfterNotification = userTimelineDAO.loadWithoutDialogs(botDefinition.namespace, recipientId)

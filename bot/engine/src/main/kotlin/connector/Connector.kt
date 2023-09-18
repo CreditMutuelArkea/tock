@@ -16,6 +16,7 @@
 
 package ai.tock.bot.connector
 
+import ai.tock.bot.connector.ConnectorFeature.NOTIFY_SUPPORTED
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.StoryHandlerDefinition
@@ -26,8 +27,7 @@ import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.engine.user.UserPreferences
-import ai.tock.bot.engine.user.UserState
-import java.time.Duration
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 
 /**
  * A connector connects bots to users via a dedicated interface (like Messenger, Google Assistant, Slack... ).
@@ -82,6 +82,7 @@ interface Connector {
      * @param intent the notification intent
      * @param step the optional step target
      * @param parameters the optional parameters
+     * @param ragResult optional parameter for rag notification
      * @param notificationType notification type if any
      * @param errorListener called when a message has not been delivered
      */
@@ -91,10 +92,35 @@ interface Connector {
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>? = null,
         parameters: Map<String, String> = emptyMap(),
+        ragResult: RagResult? = null,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit = {}
     ): Unit =
         throw UnsupportedOperationException("Connector $connectorType does not support notification")
+
+
+    /**
+     * Format the notification Rag message when active
+     * default connector without format
+     * @param ragResult
+     * @param specificConnectorFormatFn function to invoke if default format is not convincing
+     */
+    fun formatNotifyRagMessage(ragResult: RagResult): String {
+        if (this.hasFeature(NOTIFY_SUPPORTED, this.connectorType)) {
+                val linkSources =
+                    ragResult.sourceDocuments.joinToString(", ") {
+                        // TODO : document title need for sources. done for web scraping, but not for csv
+        //                    if (it.metadata.title != null) {
+                        "[${it.metadata.title}](${it.metadata.source})"
+        //                    } else {
+        //                        "[source ${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})"
+        //                    }
+                    }
+            return ragResult.answer + "\n\n" + "Sources : $linkSources"
+        } else {
+            throw UnsupportedOperationException("Connector $connectorType does not support notification")
+        }
+    }
 
     /**
      * if true, profile is not loaded twice, except that [refreshProfile] is called periodically.

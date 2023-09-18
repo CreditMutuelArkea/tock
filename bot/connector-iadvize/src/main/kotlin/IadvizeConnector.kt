@@ -47,6 +47,7 @@ import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
+import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
@@ -70,7 +71,6 @@ private const val ROLE_OPERATOR: String = "operator"
 
 private const val CONVERSATION_ID = "CONVERSATION_ID"
 private const val CHAT_BOT_ID = "CHAT_BOT_ID"
-private const val PROACTIVE_MESSAGE = "PROACTIVE_MESSAGE"
 
 /**
  *
@@ -84,7 +84,7 @@ class IadvizeConnector internal constructor(
     val secretToken: String?,
     val distributionRuleUnvailableMessage: String,
     val localeCode: String?
-) : ConnectorBase(IadvizeConnectorProvider.connectorType, setOf(ConnectorFeature.PROACTIVE_MESSAGE)) {
+) : ConnectorBase(IadvizeConnectorProvider.connectorType, setOf(ConnectorFeature.NOTIFY_SUPPORTED)) {
 
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -358,16 +358,17 @@ class IadvizeConnector internal constructor(
         intent: IntentAware,
         step: StoryStep<out StoryHandlerDefinition>?,
         parameters: Map<String, String>,
+        ragResult: RagResult?,
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit
     ) {
         try {
-            if (validateNotifyParameters(parameters)) {
-                logger.info { "proactive notification to iadvize : ${parameters[PROACTIVE_MESSAGE]}}" }
+            if (validateNotifyParameters(parameters,ragResult)) {
+                logger.info { "proactive notification to iadvize : ${formatNotifyRagMessage(ragResult!!)}}" }
                 IadvizeGraphQLClient().sendProactiveMessage(
-                    parameters[CONVERSATION_ID]!!,
-                    parameters[CHAT_BOT_ID]?.toInt()!!,
-                    parameters[PROACTIVE_MESSAGE]!!
+                    parameters[ConnectorData.CONVERSATION_ID]!!,
+                    parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
+                    formatNotifyRagMessage(ragResult!!)
                 )
             }
         } catch (t: Throwable) {
@@ -376,16 +377,56 @@ class IadvizeConnector internal constructor(
     }
 
     /**
+     * Format the notification Rag message when active
+     * default connector without format
+     *
+     */
+    override fun formatNotifyRagMessage(ragResult: RagResult): String {
+        return prepareSourceMessage(ragResult)
+    }
+
+    /**
+     * Prepare sources footnotes in markdown for iadvize message
+     * @param ragResult langchain stack result python
+     * @return the message with footnote
+     */
+    private fun prepareSourceMessage(ragResult: RagResult?): String {
+        var documentNumber = 1
+
+        val sourceDocuments = ragResult?.sourceDocuments
+        // TODO : prévoir un titre de document pour tte les sources. cé fait pour le scraping web, mais pas pour csv
+        // header documents with size of sourceDocuments
+        val headerFootnotes = sourceDocuments?.joinToString("'") {
+            "[^${documentNumber++}]"
+        } + "\n\n"
+
+        //reset documentNumber
+        documentNumber = 1
+        val linkSourcesWithFootNotes =
+            sourceDocuments?.map {
+                val source = "[^${documentNumber++}]: "
+                if (it.metadata.title != null) {
+                    source + "*[${it.metadata.title}](${it.metadata.source})*"
+                } else {
+                    source + "*[${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})*"
+                }
+            }?.joinToString("\n")
+
+        return "${ragResult?.answer} \n $headerFootnotes$linkSourcesWithFootNotes"
+    }
+
+    /**
      * Validate parameters expected are filled
      * @param parameters Map<String,String>
+     * @param ragResult RagResult
      * @throws [BadRequestException]
      */
-    private fun validateNotifyParameters(parameters: Map<String, String>): Boolean {
+    private fun validateNotifyParameters(parameters: Map<String, String>, ragResult: RagResult?): Boolean {
         return if (
             parameters.isNotEmpty()
             && parameters.containsKey(CHAT_BOT_ID) && parameters[CHAT_BOT_ID]!!.isNotBlank()
             && parameters.containsKey(CONVERSATION_ID) && parameters[CONVERSATION_ID]!!.isNotBlank()
-            && parameters.containsKey(PROACTIVE_MESSAGE) && parameters[PROACTIVE_MESSAGE]!!.isNotBlank()
+            && ragResult?.answer != null
         ) {
             true
         } else {
@@ -402,14 +443,17 @@ class IadvizeConnector internal constructor(
                     if (!parameters.containsKey(CONVERSATION_ID) && parameters[CONVERSATION_ID].isNullOrEmpty()) {
                         unfilledParameters.add(CONVERSATION_ID)
                     }
-                    if (!parameters.containsKey(PROACTIVE_MESSAGE) && parameters[PROACTIVE_MESSAGE].isNullOrEmpty()) {
-                        unfilledParameters.add(PROACTIVE_MESSAGE)
+
+                    val ragEmptyMessage = if (ragResult?.answer.isNullOrEmpty()) {
+                        "the rag message is empty"
+                    } else {
+                        ""
                     }
 
                     if (unfilledParameters.size > 1) {
                         "The following parameters are not as expected $unfilledParameters"
                     } else {
-                        "The following parameter is not as expected $unfilledParameters"
+                        "The following parameter is not as expected $unfilledParameters $ragEmptyMessage"
                     }
                 }
 
