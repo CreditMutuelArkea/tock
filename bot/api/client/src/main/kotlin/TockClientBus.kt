@@ -53,7 +53,6 @@ class TockClientBus(
     constructor(botDefinition: ClientBotDefinition, data: RequestData, sendAnswer: (BotResponse) -> Unit) :
         this(botDefinition, data.requestId, data.botRequest!!, sendAnswer)
 
-    override val conversationData: Map<String, String> = request.context.metadata
     override val applicationId: String = request.context.applicationId
     override val userId: PlayerId = request.context.userId
     override val botId: PlayerId = request.context.botId

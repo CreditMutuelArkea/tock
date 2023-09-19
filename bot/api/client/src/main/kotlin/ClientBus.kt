@@ -36,8 +36,6 @@ import ai.tock.translator.TranslatedString
  */
 interface ClientBus : Bus<ClientBus> {
 
-    val conversationData: Map<String, String>
-
     /**
      * The bot definition.
      */
