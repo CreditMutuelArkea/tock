@@ -408,6 +408,7 @@ class IadvizeConnector internal constructor(
                 if (it.metadata.title != null) {
                     source + "*[${it.metadata.title}](${it.metadata.source})*"
                 } else {
+                   //TODO : cette url doit être gérée (ragSourcesDocuments = "https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq" ) directement lors de de l'indexation, pour qu'il soit pas en dure. Il faudra revoir les metadatas (title) qu'on va sauvegarder en plus du vecteur
                     source + "*[${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})*"
                 }
             }?.joinToString("\n")
@@ -445,15 +446,16 @@ class IadvizeConnector internal constructor(
                     }
 
                     val ragEmptyMessage = if (ragResult?.answer.isNullOrEmpty()) {
-                        "the rag message is empty"
+                        val and = if(unfilledParameters.size > 0) {" and"} else {""}
+                        "$and the rag message is empty"
                     } else {
                         ""
                     }
 
                     if (unfilledParameters.size > 1) {
-                        "The following parameters are not as expected $unfilledParameters"
+                        "The following parameters are not as expected $unfilledParameters$ragEmptyMessage"
                     } else {
-                        "The following parameter is not as expected $unfilledParameters $ragEmptyMessage"
+                        "The following parameter is not as expected $unfilledParameters$ragEmptyMessage"
                     }
                 }
 

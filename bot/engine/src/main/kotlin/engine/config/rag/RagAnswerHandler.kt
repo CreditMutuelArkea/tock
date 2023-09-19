@@ -42,38 +42,33 @@ object RagAnswerHandler {
     private val ragClient: RagClient = injector.provide()
 
     internal fun handle(
-        botBus: BotBus
+            botBus: BotBus
     ) {
         with(botBus) {
             try {
                 if (this.underlyingConnector.hasFeature(ConnectorFeature.NOTIFY_SUPPORTED, targetConnectorType)) {
                     // default end
                     end()
-                    runBlocking {
-                        launch {
-                            val parameters = Parameters(
-                                botBus.connectorData.metadata.toMap()
-                            )
+                    val parameters = Parameters(
+                            botBus.connectorData.metadata.toMap()
+                    )
 
-                            notify(
-                                applicationId = applicationId,
-                                namespace = botBus.botDefinition.namespace,
-                                botId = botBus.botDefinition.botId,
-                                recipientId = botBus.userId,
-                                intent = botBus.currentIntent!!,
-                                parameters = parameters,
-                                ragResult = callLLM(botBus),
-                                // TODO : error listener managing Throwable Exceptions : seems to not work as expected
-                                errorListener = { manageNoAnswerRedirection(botBus) }
-                            )
-                        }
-                    }
+                    notify(
+                            applicationId = applicationId,
+                            namespace = botBus.botDefinition.namespace,
+                            botId = botBus.botDefinition.botId,
+                            recipientId = botBus.userId,
+                            intent = botBus.currentIntent!!,
+                            parameters = parameters,
+                            ragResult = callLLM(botBus),
+                            // TODO : error listener managing Throwable Exceptions : seems to not work as expected
+                            errorListener = {
+                                logger.info { "passing by error listener" }
+                                manageNoAnswerRedirection(botBus)
+                            }
+                    )
                 } else {
-                    runBlocking {
-                        launch {
-                            end(botBus.underlyingConnector.formatNotifyRagMessage(callLLM(botBus)))
-                        }
-                    }
+                    end(botBus.underlyingConnector.formatNotifyRagMessage(callLLM(botBus)))
                 }
                 //   TODO : check if error Listener is doing its job : seems NOT so lets keep the following below
             } catch (conn: ConnectException) {
@@ -112,7 +107,6 @@ object RagAnswerHandler {
                 }
             }
         }
-
     }
 
     /**
@@ -125,7 +119,7 @@ object RagAnswerHandler {
             val noAnswerStory = botDefinition.ragConfiguration?.noAnswerStoryId?.let { noAnswerStoryId ->
                 botBus.botDefinition.stories.firstOrNull { it.id == noAnswerStoryId.toString() }
             }
-                ?: botDefinition.unknownStory
+                    ?: botDefinition.unknownStory
 
             noAnswerStory.storyHandler.handle(this)
         }
@@ -137,9 +131,9 @@ object RagAnswerHandler {
  * TODO : enhance the behavior
  */
 class RagNotFoundAnswerException :
-    RestException(ErrorMessageWrapper("No answer found in the documents"), HttpResponseStatus.NO_CONTENT)
+        RestException(ErrorMessageWrapper("No answer found in the documents"), HttpResponseStatus.NO_CONTENT)
 
 class RagUnavailableException : RestException(
-    ErrorMessageWrapper("An error seems to occurs : No answer from the service"),
-    HttpResponseStatus.SERVICE_UNAVAILABLE
+        ErrorMessageWrapper("An error seems to occurs : No answer from the service"),
+        HttpResponseStatus.SERVICE_UNAVAILABLE
 )
