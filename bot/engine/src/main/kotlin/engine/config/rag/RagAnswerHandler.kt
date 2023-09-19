@@ -31,7 +31,6 @@ import io.netty.handler.codec.http.HttpResponseStatus
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import java.lang.NullPointerException
 import java.net.ConnectException
 
 /**
@@ -48,7 +47,7 @@ object RagAnswerHandler {
         with(botBus) {
             try {
                 if (this.underlyingConnector.hasFeature(ConnectorFeature.NOTIFY_SUPPORTED, targetConnectorType)) {
-                    // default end, cannot be used since other responses will thrown already answered
+                    // default end
                     end()
                     runBlocking {
                         launch {
@@ -77,8 +76,6 @@ object RagAnswerHandler {
                     }
                 }
                 //   TODO : check if error Listener is doing its job : seems NOT so lets keep the following below
-            } catch (conn: NullPointerException) {
-                manageNoAnswerRedirection(this)
             } catch (conn: ConnectException) {
                 logger.error { "failed to connect to ${conn.message}" }
                 manageNoAnswerRedirection(this)
@@ -122,7 +119,6 @@ object RagAnswerHandler {
      * Manage story redirection when no answer redirection is filled
      * Use the handler of the configured story otherwise launch default unknown
      * @param botBus
-     * @param configuration
      */
     private fun manageNoAnswerRedirection(botBus: BotBus) {
         with(botBus) {
