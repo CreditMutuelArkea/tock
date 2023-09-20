@@ -16,7 +16,6 @@
 
 package ai.tock.bot.connector
 
-import ai.tock.bot.connector.ConnectorFeature.NOTIFY_SUPPORTED
 import ai.tock.bot.connector.media.MediaMessage
 import ai.tock.bot.definition.IntentAware
 import ai.tock.bot.definition.StoryHandlerDefinition
@@ -103,23 +102,13 @@ interface Connector {
      * Format the notification Rag message when active
      * default connector without format
      * @param ragResult
-     * @param specificConnectorFormatFn function to invoke if default format is not convincing
      */
-    fun formatNotifyRagMessage(ragResult: RagResult): String {
-        if (this.hasFeature(NOTIFY_SUPPORTED, this.connectorType)) {
-                val linkSources =
-                    ragResult.sourceDocuments.joinToString(", ") {
-                        // TODO : document title need for sources. done for web scraping, but not for csv
-        //                    if (it.metadata.title != null) {
-                        "[${it.metadata.title}](${it.metadata.source})"
-        //                    } else {
-        //                        "[source ${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})"
-        //                    }
-                    }
-            return ragResult.answer + "\n\n" + "Sources : $linkSources"
-        } else {
-            throw UnsupportedOperationException("Connector $connectorType does not support notification")
-        }
+    fun formatRagMessage(ragResult: RagResult): String {
+        val linkSources =
+                ragResult.sourceDocuments.joinToString(", ") {
+                    "[${it.metadata.title}](${it.metadata.source})"
+                }
+        return ragResult.answer + "\n\n" + "Sources : $linkSources"
     }
 
     /**
