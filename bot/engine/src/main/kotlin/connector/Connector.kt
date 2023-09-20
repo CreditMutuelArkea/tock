@@ -102,6 +102,8 @@ interface Connector {
      * Format the notification Rag message when active
      * default connector without format
      * @param ragResult
+     * //TODO : could be a ConnectorMessage ?
+     * @return the formatted answer as a String
      */
     fun formatRagMessage(ragResult: RagResult): String {
         val linkSources =

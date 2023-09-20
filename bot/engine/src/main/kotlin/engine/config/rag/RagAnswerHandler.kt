@@ -28,8 +28,6 @@ import ai.tock.shared.exception.rest.RestException
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import io.netty.handler.codec.http.HttpResponseStatus
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import java.net.ConnectException
 
