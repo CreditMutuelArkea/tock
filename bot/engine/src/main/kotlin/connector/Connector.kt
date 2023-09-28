@@ -72,6 +72,10 @@ interface Connector {
      */
     fun send(event: Event, callback: ConnectorCallback, delayInMs: Long = 0)
 
+    fun startProactiveConversation(callback: ConnectorCallback): Boolean = false
+    fun flushProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) = run { }
+    fun endProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) = run { }
+
     /**
      * Sends a notification to the connector.
      * A [BotBus] is created and the corresponding story is called.

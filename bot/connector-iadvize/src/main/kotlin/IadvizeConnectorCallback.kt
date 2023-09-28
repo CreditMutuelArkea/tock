@@ -17,6 +17,7 @@
 package ai.tock.bot.connector.iadvize
 
 import ai.tock.bot.connector.ConnectorCallbackBase
+import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
@@ -102,6 +103,21 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         } catch (t: Throwable) {
             sendTechnicalError(t)
         }
+    }
+
+
+
+    private fun buildProactiveResponse(): MessageResponse {
+        val response = MessageResponse(
+            request.idConversation,
+            request.idOperator,
+            LocalDateTime.now(),
+            LocalDateTime.now()
+        )
+
+        response.replies.add(IadvizeMessage(TextPayload("TODO MASS Proactive message !")))
+
+        return response
     }
 
     private fun buildResponse(): MessageResponse {

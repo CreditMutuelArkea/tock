@@ -20,6 +20,7 @@ import ai.tock.bot.admin.bot.BotRAGConfiguration
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.config.RAGAnswerHandler
 import ai.tock.bot.engine.config.rag.RagAnswerHandler
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.nlp.BuiltInKeywordListener.deleteKeyword
@@ -97,7 +98,7 @@ open class BotDefinitionBase(
                 object : SimpleStoryHandlerBase() {
                     override fun action(bus: BotBus) {
                         bus.markAsUnknown()
-                        RagAnswerHandler.handle(bus)
+                        RAGAnswerHandler().handle(bus)
                     }
                 },
             )

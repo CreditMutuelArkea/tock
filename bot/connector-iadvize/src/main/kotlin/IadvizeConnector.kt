@@ -21,6 +21,7 @@ import ai.tock.bot.connector.ConnectorCallback
 import ai.tock.bot.connector.ConnectorData
 import ai.tock.bot.connector.ConnectorFeature
 import ai.tock.bot.connector.ConnectorMessage
+import ai.tock.bot.connector.ConnectorQueue
 import ai.tock.bot.connector.iadvize.model.request.ConversationsRequest
 import ai.tock.bot.connector.iadvize.model.request.IadvizeRequest
 import ai.tock.bot.connector.iadvize.model.request.MessageRequest
@@ -49,11 +50,14 @@ import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.llm.rag.core.client.models.RagResult
 import ai.tock.iadvize.client.graphql.IadvizeGraphQLClient
+import ai.tock.shared.Executor
 import ai.tock.shared.defaultLocale
 import ai.tock.shared.error
 import ai.tock.shared.exception.rest.BadRequestException
+import ai.tock.shared.injector
 import ai.tock.shared.jackson.mapper
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.github.salomonbrys.kodein.instance
 import io.vertx.core.Future
 import io.vertx.core.http.HttpServerResponse
 import io.vertx.core.json.JsonObject
@@ -91,6 +95,9 @@ class IadvizeConnector internal constructor(
     }
 
     val locale: Locale = localeCode?.let{ getLocale(localeCode) } ?: defaultLocale
+
+    private val executor: Executor by injector.instance()
+    private val queue: ConnectorQueue = ConnectorQueue(executor)
 
     override fun register(controller: ConnectorController) {
         controller.registerServices(path) { router ->
@@ -284,6 +291,46 @@ class IadvizeConnector internal constructor(
         }
     }
 
+    override fun startProactiveConversation(callback: ConnectorCallback): Boolean {
+        // TODO MASS : Ici on peut ajouter un message de début de conversation
+        // iadvizeCallback?.addAction(event)
+        (callback as? IadvizeConnectorCallback)?.context?.response()?.end()
+
+        return true
+    }
+
+    override fun flushProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) {
+
+        // (callback as? IadvizeConnectorCallback)?.flushProactiveConversation(parameters)
+
+        val iadvizeCallback = callback as? IadvizeConnectorCallback
+
+        iadvizeCallback?.actions?.forEach {
+            queue.add(it.action , it.delayInMs) {action ->
+                send(action, parameters)
+            }
+        }
+        iadvizeCallback?.actions?.clear()
+    }
+
+    fun send(action: Action, parameters: Map<String, String>){
+        // TODO MASS : utiliser action.metadata à la place des parameters
+        IadvizeGraphQLClient().sendProactiveMessage(
+            parameters[ConnectorData.CONVERSATION_ID]!!,
+            parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
+            action.toString() // TODO : format
+        )
+    }
+
+    override fun endProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) {
+        // TODO MASS : Ici on peut ajouter un message de fin de la conversation
+        // iadvizeCallback?.addAction(action)
+//        queue.add(it.action , it.delayInMs) {action ->
+//            send(action, parameters)
+//        }
+        flushProactiveConversation(callback, parameters)
+    }
+
     internal fun handleRequest(
         controller: ConnectorController,
         context: RoutingContext,
@@ -362,7 +409,7 @@ class IadvizeConnector internal constructor(
         notificationType: ActionNotificationType?,
         errorListener: (Throwable) -> Unit
     ) {
-        try {
+        try { // TODO MASS
             if (validateNotifyParameters(parameters,ragResult)) {
                 logger.info { "proactive notification to iadvize : ${formatNotifyRagMessage(ragResult!!)}}" }
                 IadvizeGraphQLClient().sendProactiveMessage(
@@ -376,12 +423,13 @@ class IadvizeConnector internal constructor(
         }
     }
 
+
     /**
      * Format the notification Rag message when active
      * default connector without format
      *
      */
-    override fun formatNotifyRagMessage(ragResult: RagResult): String {
+    fun formatNotifyRagMessage(ragResult: RagResult): String {
         return prepareSourceMessage(ragResult)
     }
 
