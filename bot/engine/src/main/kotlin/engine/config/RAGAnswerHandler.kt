@@ -17,25 +17,44 @@
 package ai.tock.bot.engine.config
 
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.action.FootNote
+import ai.tock.bot.engine.action.SendSentenceWithFootnotes
 import engine.config.AbstractProactiveAnswerHandler
 
 class RAGAnswerHandler : AbstractProactiveAnswerHandler {
     override fun handleProactiveAnswer(botBus: BotBus) {
         with(botBus) {
-            send("test 1")
+            send("blabla")
+            flushProactiveConversation()
+            send("un autre blabla")
             flushProactiveConversation()
 
-
-
-            send("test 2")
-            send("test 3")
             // Appel LLM
-            flushProactiveConversation()
-
-            send("test 4")
-            flushProactiveConversation()
-
-            send("test 5")
+            send(
+                SendSentenceWithFootnotes(
+                    botId,
+                    applicationId,
+                    userId,
+                    text = "Bénéficiez d’une assurance personnalisée : propriétaire ou locataire, chacun de vos besoins trouvera sa garantie. Avec votre assurance, protégez vos biens tout en favorisant l'économie circulaire.",
+                    footNotes = mutableListOf(
+                        FootNote(
+                            "1",
+                            "Assurance Habitation",
+                            "https://www.cmso.com/reseau-bancaire-cooperatif/web/assurances/assurances-habitation/assurance-habitation"
+                        ),
+                        FootNote(
+                            "2",
+                            "Assurance Habitation Étudiant",
+                            "https://www.cmso.com/reseau-bancaire-cooperatif/web/assurances/assurances-habitation/assurance-habitation-etudiant"
+                        ),
+                        FootNote(
+                            "3",
+                            "Télésurveillance",
+                            "https://www.cmso.com/reseau-bancaire-cooperatif/web/assurances/assurances-habitation/telesurveillance"
+                        )
+                    )
+                )
+            )
         }
     }
 }

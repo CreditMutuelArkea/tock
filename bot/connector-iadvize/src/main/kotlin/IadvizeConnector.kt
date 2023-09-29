@@ -46,6 +46,8 @@ import ai.tock.bot.engine.ConnectorController
 import ai.tock.bot.engine.I18nTranslator
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.ActionNotificationType
+import ai.tock.bot.engine.action.SendSentence
+import ai.tock.bot.engine.action.SendSentenceWithFootnotes
 import ai.tock.bot.engine.event.Event
 import ai.tock.bot.engine.user.PlayerId
 import ai.tock.bot.llm.rag.core.client.models.RagResult
@@ -292,19 +294,12 @@ class IadvizeConnector internal constructor(
     }
 
     override fun startProactiveConversation(callback: ConnectorCallback): Boolean {
-        // TODO MASS : Ici on peut ajouter un message de début de conversation
-        // iadvizeCallback?.addAction(event)
         (callback as? IadvizeConnectorCallback)?.context?.response()?.end()
-
         return true
     }
 
     override fun flushProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) {
-
-        // (callback as? IadvizeConnectorCallback)?.flushProactiveConversation(parameters)
-
         val iadvizeCallback = callback as? IadvizeConnectorCallback
-
         iadvizeCallback?.actions?.forEach {
             queue.add(it.action , it.delayInMs) {action ->
                 send(action, parameters)
@@ -314,20 +309,44 @@ class IadvizeConnector internal constructor(
     }
 
     fun send(action: Action, parameters: Map<String, String>){
-        // TODO MASS : utiliser action.metadata à la place des parameters
         IadvizeGraphQLClient().sendProactiveMessage(
             parameters[ConnectorData.CONVERSATION_ID]!!,
             parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
-            action.toString() // TODO : format
+            buildGraphQLResponse(action)
         )
     }
 
+    private fun buildGraphQLResponse(action: Action): String =
+        when(action) {
+            is SendSentenceWithFootnotes -> action.toGraphQLMessage()
+            else -> action.toString()
+        }
+
+    /**
+     * Format the notification Rag message when active
+     * default connector without format
+     *
+     */
+    private fun SendSentenceWithFootnotes.toGraphQLMessage(): String {
+
+        val headerFootnotes = footNotes
+            .map { it.identifier }
+            .joinToString("'") {
+                "[^$it]"
+            } + "\n\n"
+
+        val linkSourcesWithFootNotes =
+            footNotes.joinToString("\n") { footNote ->
+                val source = "[^${footNote.identifier}]: "
+                footNote.url?.let {
+                    source + "*[${footNote.title}]($it)*"
+                } ?: footNote.title
+            }
+
+        return "${text} \n $headerFootnotes$linkSourcesWithFootNotes"
+    }
+
     override fun endProactiveConversation(callback: ConnectorCallback, parameters: Map<String, String>) {
-        // TODO MASS : Ici on peut ajouter un message de fin de la conversation
-        // iadvizeCallback?.addAction(action)
-//        queue.add(it.action , it.delayInMs) {action ->
-//            send(action, parameters)
-//        }
         flushProactiveConversation(callback, parameters)
     }
 
@@ -399,70 +418,63 @@ class IadvizeConnector internal constructor(
         }
     }
 
-    override fun notify(
-        controller: ConnectorController,
-        recipientId: PlayerId,
-        intent: IntentAware,
-        step: StoryStep<out StoryHandlerDefinition>?,
-        parameters: Map<String, String>,
-        ragResult: RagResult?,
-        notificationType: ActionNotificationType?,
-        errorListener: (Throwable) -> Unit
-    ) {
-        try { // TODO MASS
-            if (validateNotifyParameters(parameters,ragResult)) {
-                logger.info { "proactive notification to iadvize : ${formatNotifyRagMessage(ragResult!!)}}" }
-                IadvizeGraphQLClient().sendProactiveMessage(
-                    parameters[ConnectorData.CONVERSATION_ID]!!,
-                    parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
-                    formatNotifyRagMessage(ragResult!!)
-                )
-            }
-        } catch (t: Throwable) {
-            errorListener.invoke(t)
-        }
-    }
+//    override fun notify(
+//        controller: ConnectorController,
+//        recipientId: PlayerId,
+//        intent: IntentAware,
+//        step: StoryStep<out StoryHandlerDefinition>?,
+//        parameters: Map<String, String>,
+//        ragResult: RagResult?,
+//        notificationType: ActionNotificationType?,
+//        errorListener: (Throwable) -> Unit
+//    ) {
+//        try { // TODO MASS
+//            if (validateNotifyParameters(parameters,ragResult)) {
+//                logger.info { "proactive notification to iadvize : ${formatNotifyRagMessage(ragResult!!)}}" }
+//                IadvizeGraphQLClient().sendProactiveMessage(
+//                    parameters[ConnectorData.CONVERSATION_ID]!!,
+//                    parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
+//                    formatNotifyRagMessage(ragResult!!)
+//                )
+//            }
+//        } catch (t: Throwable) {
+//            errorListener.invoke(t)
+//        }
+//    }
 
 
-    /**
-     * Format the notification Rag message when active
-     * default connector without format
-     *
-     */
-    fun formatNotifyRagMessage(ragResult: RagResult): String {
-        return prepareSourceMessage(ragResult)
-    }
 
-    /**
-     * Prepare sources footnotes in markdown for iadvize message
-     * @param ragResult langchain stack result python
-     * @return the message with footnote
-     */
-    private fun prepareSourceMessage(ragResult: RagResult?): String {
-        var documentNumber = 1
 
-        val sourceDocuments = ragResult?.sourceDocuments
-        // TODO : prévoir un titre de document pour tte les sources. cé fait pour le scraping web, mais pas pour csv
-        // header documents with size of sourceDocuments
-        val headerFootnotes = sourceDocuments?.joinToString("'") {
-            "[^${documentNumber++}]"
-        } + "\n\n"
-
-        //reset documentNumber
-        documentNumber = 1
-        val linkSourcesWithFootNotes =
-            sourceDocuments?.map {
-                val source = "[^${documentNumber++}]: "
-                if (it.metadata.title != null) {
-                    source + "*[${it.metadata.title}](${it.metadata.source})*"
-                } else {
-                   //TODO : cette url doit être gérée (ragSourcesDocuments = "https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq" ) directement lors de de l'indexation, pour qu'il soit pas en dure. Il faudra revoir les metadatas (title) qu'on va sauvegarder en plus du vecteur
-                    source + "*[${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})*"
-                }
-            }?.joinToString("\n")
-
-        return "${ragResult?.answer} \n $headerFootnotes$linkSourcesWithFootNotes"
-    }
+//    /**
+//     * Prepare sources footnotes in markdown for iadvize message
+//     * @param ragResult langchain stack result python
+//     * @return the message with footnote
+//     */
+//    private fun prepareSourceMessage(ragResult: RagResult?): String {
+//        var documentNumber = 1
+//
+//        val sourceDocuments = ragResult?.sourceDocuments
+//        // TODO : prévoir un titre de document pour tte les sources. cé fait pour le scraping web, mais pas pour csv
+//        // header documents with size of sourceDocuments
+//        val headerFootnotes = sourceDocuments?.joinToString("'") {
+//            "[^${documentNumber++}]"
+//        } + "\n\n"
+//
+//        //reset documentNumber
+//        documentNumber = 1
+//        val linkSourcesWithFootNotes =
+//            sourceDocuments?.map {
+//                val source = "[^${documentNumber++}]: "
+//                if (it.metadata.title != null) {
+//                    source + "*[${it.metadata.title}](${it.metadata.source})*"
+//                } else {
+//                   //TODO : cette url doit être gérée (ragSourcesDocuments = "https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq" ) directement lors de de l'indexation, pour qu'il soit pas en dure. Il faudra revoir les metadatas (title) qu'on va sauvegarder en plus du vecteur
+//                    source + "*[${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})*"
+//                }
+//            }?.joinToString("\n")
+//
+//        return "${ragResult?.answer} \n $headerFootnotes$linkSourcesWithFootNotes"
+//    }
 
     /**
      * Validate parameters expected are filled
