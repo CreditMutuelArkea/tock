@@ -105,21 +105,6 @@ class IadvizeConnectorCallback(override val  applicationId: String,
         }
     }
 
-
-
-    private fun buildProactiveResponse(): MessageResponse {
-        val response = MessageResponse(
-            request.idConversation,
-            request.idOperator,
-            LocalDateTime.now(),
-            LocalDateTime.now()
-        )
-
-        response.replies.add(IadvizeMessage(TextPayload("TODO MASS Proactive message !")))
-
-        return response
-    }
-
     private fun buildResponse(): MessageResponse {
         val response = MessageResponse(
             request.idConversation,

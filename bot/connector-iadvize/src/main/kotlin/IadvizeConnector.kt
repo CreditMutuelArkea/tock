@@ -418,64 +418,6 @@ class IadvizeConnector internal constructor(
         }
     }
 
-//    override fun notify(
-//        controller: ConnectorController,
-//        recipientId: PlayerId,
-//        intent: IntentAware,
-//        step: StoryStep<out StoryHandlerDefinition>?,
-//        parameters: Map<String, String>,
-//        ragResult: RagResult?,
-//        notificationType: ActionNotificationType?,
-//        errorListener: (Throwable) -> Unit
-//    ) {
-//        try { // TODO MASS
-//            if (validateNotifyParameters(parameters,ragResult)) {
-//                logger.info { "proactive notification to iadvize : ${formatNotifyRagMessage(ragResult!!)}}" }
-//                IadvizeGraphQLClient().sendProactiveMessage(
-//                    parameters[ConnectorData.CONVERSATION_ID]!!,
-//                    parameters[ConnectorData.CHAT_BOT_ID]?.toInt()!!,
-//                    formatNotifyRagMessage(ragResult!!)
-//                )
-//            }
-//        } catch (t: Throwable) {
-//            errorListener.invoke(t)
-//        }
-//    }
-
-
-
-
-//    /**
-//     * Prepare sources footnotes in markdown for iadvize message
-//     * @param ragResult langchain stack result python
-//     * @return the message with footnote
-//     */
-//    private fun prepareSourceMessage(ragResult: RagResult?): String {
-//        var documentNumber = 1
-//
-//        val sourceDocuments = ragResult?.sourceDocuments
-//        // TODO : prévoir un titre de document pour tte les sources. cé fait pour le scraping web, mais pas pour csv
-//        // header documents with size of sourceDocuments
-//        val headerFootnotes = sourceDocuments?.joinToString("'") {
-//            "[^${documentNumber++}]"
-//        } + "\n\n"
-//
-//        //reset documentNumber
-//        documentNumber = 1
-//        val linkSourcesWithFootNotes =
-//            sourceDocuments?.map {
-//                val source = "[^${documentNumber++}]: "
-//                if (it.metadata.title != null) {
-//                    source + "*[${it.metadata.title}](${it.metadata.source})*"
-//                } else {
-//                   //TODO : cette url doit être gérée (ragSourcesDocuments = "https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq" ) directement lors de de l'indexation, pour qu'il soit pas en dure. Il faudra revoir les metadatas (title) qu'on va sauvegarder en plus du vecteur
-//                    source + "*[${it.metadata.row}](https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq${it.metadata.source})*"
-//                }
-//            }?.joinToString("\n")
-//
-//        return "${ragResult?.answer} \n $headerFootnotes$linkSourcesWithFootNotes"
-//    }
-
     /**
      * Validate parameters expected are filled
      * @param parameters Map<String,String>
