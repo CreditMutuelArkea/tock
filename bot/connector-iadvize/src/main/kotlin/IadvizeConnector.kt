@@ -238,7 +238,7 @@ class IadvizeConnector internal constructor(
             distributionRule,
             distributionRuleUnvailableMessage
         )
-        callback.sendResponse()
+        callback.answerWithResponse()
     }
 
     internal var handlerConversation: IadvizeHandler = { context, controller ->
@@ -289,12 +289,12 @@ class IadvizeConnector internal constructor(
         val iadvizeCallback = callback as? IadvizeConnectorCallback
         iadvizeCallback?.addAction(event, delayInMs)
         if (event is Action && event.metadata.lastAnswer) {
-            iadvizeCallback?.sendResponse()
+            iadvizeCallback?.answerWithResponse()
         }
     }
 
     override fun startProactiveConversation(callback: ConnectorCallback): Boolean {
-        (callback as? IadvizeConnectorCallback)?.context?.response()?.end()
+        (callback as? IadvizeConnectorCallback)?.answerWithoutResponse()
         return true
     }
 
@@ -385,7 +385,7 @@ class IadvizeConnector internal constructor(
 
             // Only MessageRequest are supported, other messages are UnsupportedMessage
             // and UnsupportedResponse can be sent immediately
-            else -> callback.sendResponse()
+            else -> callback.answerWithResponse()
         }
     }
 

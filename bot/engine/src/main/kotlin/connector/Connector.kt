@@ -65,6 +65,9 @@ interface Connector {
 
     /**
      * Send an event with this connector for the specified delay.
+     * End the conversation when event.metadata.lastAnswer is activated
+     * If the connector implements the proactive conversation functions,
+     * the end must take account the start of the proactive conversation
      *
      * @param event the event to send
      * @param callback the initial connector callback

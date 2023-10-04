@@ -29,6 +29,8 @@ class RAGAnswerHandler : AbstractProactiveAnswerHandler {
             send("un autre blabla")
             flushProactiveConversation()
 
+            end()
+
             // Appel LLM
             send(
                 SendSentenceWithFootnotes(
