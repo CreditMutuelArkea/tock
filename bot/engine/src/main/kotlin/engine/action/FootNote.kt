@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.llm.rag.core.client.models
+package ai.tock.bot.engine.action
 
-data class RagQuery(
-    val query: String,
-    val applicationId: String = "",
-    val userId: String = ""
+data class FootNote(
+    val identifier: String,
+    val title: String,
+    val url: String?,
 )

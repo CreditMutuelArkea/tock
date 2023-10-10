@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.llm.rag.core.client.models
+package ai.tock.iadvize.client.graphql.models.sendproactivemessage
 
-data class RagQuery(
-    val query: String,
-    val applicationId: String = "",
-    val userId: String = ""
-)
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
+
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class SendProactiveMessageResult(@JsonProperty("userErrors") val userErrors: UserErrors? = null)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+data class UserErrors(@JsonProperty("__typename") val typename: String?= null)

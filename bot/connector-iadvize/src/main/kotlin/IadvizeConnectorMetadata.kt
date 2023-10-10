@@ -14,10 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.llm.rag.core.client.models
+package ai.tock.bot.connector.iadvize
 
-data class RagQuery(
-    val query: String,
-    val applicationId: String = "",
-    val userId: String = ""
-)
+/**
+ * The iAdvize connector metadata
+ */
+enum class IadvizeConnectorMetadata {
+    // The conversation id
+    CONVERSATION_ID,
+
+    // the operator id (=chatbotId) prefixed with the iAdvize environment
+    OPERATOR_ID,
+    CHAT_BOT_ID,
+
+    // iAdvize environment sd- or ha-
+    IADVIZE_ENV,
+}
