@@ -42,6 +42,11 @@ export class ConfigurationTabsComponent implements OnInit {
       icon: 'folder-outline'
     },
     {
+      title: 'LLM Settings',
+      route: 'llm-settings',
+      icon: 'options-2-outline'
+    },
+    {
       title: 'Log',
       route: 'users/logs',
       icon: 'eye-outline'
