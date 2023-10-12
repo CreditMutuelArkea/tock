@@ -62,6 +62,7 @@ import {
 
 import { AutofocusDirective } from './directives';
 import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json-iterator/debug-json-iterator.component';
+import { SentencesGenerationModule } from './modules/sentences-generation/sentences-generation.module';
 
 @NgModule({
   imports: [
@@ -123,7 +124,9 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     ChoiceDialogComponent,
     AutofocusDirective,
     AutocompleteInputComponent,
-    DebugViewerComponent
+    DebugViewerComponent,
+
+    SentencesGenerationModule
   ],
   providers: [BotSharedService]
 })

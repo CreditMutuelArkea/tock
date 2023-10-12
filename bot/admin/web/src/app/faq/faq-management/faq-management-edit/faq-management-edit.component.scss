@@ -1,3 +1,33 @@
+// @import '@nebular/theme/styles/global/breakpoints';
+// @import '@nebular/theme/styles/theming';
+// @import '@nebular/theme/styles/themes';
+
+// @include nb-install-component() {
+//   .entries-list {
+//     max-height: 35vh;
+//     overflow-y: auto;
+//     UL {
+//       padding: 0;
+//       margin: 0;
+//       list-style-type: none;
+//       LI {
+//         padding: 0.4rem;
+//         border-bottom: 1px solid nb-theme(color-basic-transparent-300);
+//         font-style: italic;
+//       }
+//     }
+//   }
+// }
+// .alert-custom-close {
+//   right: 0;
+//   position: absolute;
+//   top: 0;
+//   color: inherit;
+//   background-color: transparent;
+//   border: 0;
+//   appearance: none;
+// }
+
 @import '@nebular/theme/styles/global/breakpoints';
 @import '@nebular/theme/styles/theming';
 @import '@nebular/theme/styles/themes';
@@ -17,6 +47,10 @@
       width: fit-content;
     }
   }
+}
+
+nb-card {
+  height: calc(100vh - 11.5rem);
 }
 
 @include nb-install-component() {
@@ -43,4 +77,9 @@
   background-color: transparent;
   border: 0;
   appearance: none;
+}
+
+.add-utterances {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
 }
