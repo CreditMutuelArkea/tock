@@ -14,7 +14,24 @@
   </nb-card-header>
 
   <nb-card-body>
+    <div *ngIf="llmSettingsMissing">
+      <div class="text-warning font-weight-bold">LLM settings are missing.</div>
+
+      <span *ngIf="!state.hasRole(UserRole.admin)"> Contact an administrator </span>
+
+      <button
+        *ngIf="state.hasRole(UserRole.admin)"
+        nbButton
+        status="primary"
+        class="mt-3"
+        (click)="jumpToLlmSettings()"
+      >
+        LLM settings
+      </button>
+    </div>
+
     <tock-sentences-generation-content
+      *ngIf="!llmSettingsMissing"
       [sentences]="sentences"
       [errors]="errors"
       (onLoading)="handleLoading($event)"

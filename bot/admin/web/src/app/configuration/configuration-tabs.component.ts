@@ -61,6 +61,7 @@ export class ConfigurationTabsComponent implements OnInit {
     }
     if (!state.hasRole(UserRole.admin)) {
       this.tabs = this.tabs.filter((t) => t.route !== 'bot');
+      this.tabs = this.tabs.filter((t) => t.route !== 'llm-settings');
     }
     this.configurationTabLinks = this.tabs;
   }
