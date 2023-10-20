@@ -28,8 +28,7 @@ data class SentenceWithFootnotes(
     override val delay: Long = 0
 ) : Message {
 
-    // TODO MASS: nv EventType -> sentenceWithFootnotes (JIRA FRONT)
-    override val eventType: EventType = EventType.sentence
+    override val eventType: EventType = EventType.sentenceWithFootnotes
     override fun toAction(playerId: PlayerId, applicationId: String, recipientId: PlayerId): Action =
         SendSentenceWithFootnotes(
             playerId,
