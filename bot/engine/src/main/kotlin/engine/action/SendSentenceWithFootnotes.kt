@@ -29,7 +29,7 @@ open class SendSentenceWithFootnotes(
     playerId: PlayerId,
     applicationId: String,
     recipientId: PlayerId,
-    val text: String,
+    val text: CharSequence,
     val footNotes: MutableList<FootNote> = mutableListOf(),
     id: Id<Action> = newId(),
     date: Instant = Instant.now(),
@@ -37,7 +37,7 @@ open class SendSentenceWithFootnotes(
     metadata: ActionMetadata = ActionMetadata()
 ) :
     Action(playerId, recipientId, applicationId, id, date, state, metadata) {
-    override fun toMessage(): Message = SentenceWithFootnotes(text, footNotes.toList())
+    override fun toMessage(): Message = SentenceWithFootnotes(text.toString(), footNotes.toList())
 }
 
 

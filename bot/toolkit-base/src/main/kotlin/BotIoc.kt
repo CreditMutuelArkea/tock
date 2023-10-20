@@ -16,7 +16,6 @@
 
 package ai.tock.bot
 
-import ai.tock.aws.awsToolsModule
 import ai.tock.shared.Loader
 import ai.tock.bot.engine.botModule
 import ai.tock.bot.mongo.botMongoModule

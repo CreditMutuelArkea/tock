@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.engine.action
+package ai.tock.bot.engine.config
 
-/**
- * Footnote to refer to a source document
- * Basic format: {identifier}. {title} {link:url},
- */
-data class FootNote(
-    /**
-     * A footnote identifier
-     */
-    val identifier: CharSequence,
-    /**
-     * A footnote title
-     */
-    val title: CharSequence,
-    /**
-     * A footnote link
-     */
-    val url: String?,
-)
+enum class ProactiveConversationStatus {
+    LUNCHED,
+    STARTED,
+    CLOSED
+}

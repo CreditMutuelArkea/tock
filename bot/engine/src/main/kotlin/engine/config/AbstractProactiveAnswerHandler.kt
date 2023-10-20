@@ -17,6 +17,10 @@
 package engine.config
 
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.config.ProactiveConversationStatus
+import ai.tock.bot.engine.config.ProactiveConversationStatus.LUNCHED
+import ai.tock.bot.engine.config.ProactiveConversationStatus.STARTED
+import ai.tock.bot.engine.config.ProactiveConversationStatus.CLOSED
 
 private const val PROACTIVE_CONVERSATION_STATUS: String = "PROACTIVE_CONVERSATION_STATUS"
 
@@ -32,24 +36,23 @@ interface AbstractProactiveAnswerHandler {
     }
 
     private fun BotBus.startProactiveConversation() {
-        if(getBusContextValue<String>(PROACTIVE_CONVERSATION_STATUS) == null) {
-            setBusContextValue(PROACTIVE_CONVERSATION_STATUS, "LUNCHED")
+        if(getBusContextValue<ProactiveConversationStatus>(PROACTIVE_CONVERSATION_STATUS) == null) {
+            setBusContextValue(PROACTIVE_CONVERSATION_STATUS, LUNCHED)
             if(underlyingConnector.startProactiveConversation(connectorData.callback)){
-                setBusContextValue(PROACTIVE_CONVERSATION_STATUS, "STARTED")
+                setBusContextValue(PROACTIVE_CONVERSATION_STATUS, STARTED)
             }
         }
     }
 
     fun BotBus.flushProactiveConversation() {
-        if(getBusContextValue<String>(PROACTIVE_CONVERSATION_STATUS) == "STARTED") {
-            setBusContextValue(PROACTIVE_CONVERSATION_STATUS, "STARTED")
+        if(getBusContextValue<ProactiveConversationStatus>(PROACTIVE_CONVERSATION_STATUS) == STARTED) {
             underlyingConnector.flushProactiveConversation(connectorData.callback, connectorData.metadata)
         }
     }
 
     private fun BotBus.endProactiveConversation() {
-        if(getBusContextValue<String>(PROACTIVE_CONVERSATION_STATUS) == "STARTED") {
-            setBusContextValue(PROACTIVE_CONVERSATION_STATUS, "CLOSED")
+        if(getBusContextValue<ProactiveConversationStatus>(PROACTIVE_CONVERSATION_STATUS) == STARTED) {
+            setBusContextValue(PROACTIVE_CONVERSATION_STATUS, CLOSED)
             underlyingConnector.endProactiveConversation(connectorData.callback, connectorData.metadata)
         }
         else {

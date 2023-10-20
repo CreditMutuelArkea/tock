@@ -329,7 +329,7 @@ internal data class DialogCol(
 
         constructor(sentence: SendSentenceWithFootnotes) :
                 this(
-                    sentence.text,
+                    sentence.text.toString(),
                     sentence.footNotes
                 ) {
             assignFrom(sentence)
