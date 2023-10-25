@@ -1,0 +1,11 @@
+<img
+  *ngIf="sentence.userInterface"
+  src="/assets/images/{{ sentence.userInterface }}.svg"
+  class="userInterface"
+  nbTooltip="{{ sentence.userInterface }}"
+/>
+<span
+  *ngIf="reply"
+  [innerHTML]="linkifyHtml(sentence.text)"
+></span>
+<span *ngIf="!reply">{{ sentence.text }}</span>
