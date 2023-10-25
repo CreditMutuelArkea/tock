@@ -125,7 +125,7 @@ export abstract class BotMessage {
       case EventType.debug:
         return Debug.fromJSON(json);
       case EventType.sentenceWithFootnotes:
-        return sentenceWithFootnotes.fromJSON(json);
+        return SentenceWithFootnotes.fromJSON(json);
       default:
         throw 'unknown type : ' + json.type;
     }
@@ -236,13 +236,19 @@ export class Sentence extends BotMessage {
   }
 }
 
-export class sentenceWithFootnotes extends BotMessage {
-  constructor(public delay: number, public footNotes, public text?: string, public userInterface?: UserInterfaceType) {
+export interface FootNote {
+  title: string;
+  url: string;
+  identifier: string;
+}
+
+export class SentenceWithFootnotes extends BotMessage {
+  constructor(public delay: number, public footNotes: FootNote[], public text?: string, public userInterface?: UserInterfaceType) {
     super(EventType.sentenceWithFootnotes, delay);
   }
 
-  static fromJSON(json?: any): sentenceWithFootnotes {
-    const value = Object.create(sentenceWithFootnotes.prototype);
+  static fromJSON(json?: any): SentenceWithFootnotes {
+    const value = Object.create(SentenceWithFootnotes.prototype);
 
     const result = Object.assign(value, json, {
       footNotes: json.footNotes,
@@ -252,8 +258,8 @@ export class sentenceWithFootnotes extends BotMessage {
     return result;
   }
 
-  static fromJSONArray(json?: Array<any>): Sentence[] {
-    return json ? json.map(Sentence.fromJSON) : [];
+  static fromJSONArray(json?: Array<any>): SentenceWithFootnotes[] {
+    return json ? json.map(SentenceWithFootnotes.fromJSON) : [];
   }
 }
 

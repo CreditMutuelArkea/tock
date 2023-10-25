@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import linkifyHtml from 'linkify-html';
-import { BotMessage, Sentence } from '../../../../model/dialog-data';
+import { SentenceWithFootnotes } from '../../../../model/dialog-data';
 
 @Component({
   selector: 'tock-chat-ui-message-sentence-footnotes',
@@ -8,19 +8,11 @@ import { BotMessage, Sentence } from '../../../../model/dialog-data';
   styleUrls: ['./chat-ui-message-sentence-footnotes.component.scss']
 })
 export class ChatUiMessageSentenceFootnotesComponent {
-  @Input() sentence: Sentence;
-
-  @Input() replay: boolean;
+  @Input() sentence: SentenceWithFootnotes;
 
   @Input() reply: boolean = false;
 
-  @Output() sendMessage: EventEmitter<BotMessage> = new EventEmitter();
-
   linkifyHtml(str) {
     return linkifyHtml(str, { target: '_blank' });
-  }
-
-  replyMessage(message: BotMessage) {
-    this.sendMessage.emit(message);
   }
 }
