@@ -90,7 +90,8 @@ import { NlpRoutingModule } from './nlp-routing.module';
     NbTreeGridModule,
     NbAutocompleteModule,
     ReactiveFormsModule,
-    NbFormFieldModule
+    NbFormFieldModule,
+    BotSharedModule
   ],
   declarations: [
     NlpTabsComponent,

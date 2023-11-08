@@ -13,20 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+.tag {
+  display: inline-flex;
+  width: fit-content;
+  padding: 0.3rem 0.9rem;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border-radius: 10rem;
+  background-color: var(--border-basic-color-3);
+  font-size: 0.9rem;
+  line-height: 1.25rem;
+  white-space: nowrap;
+}
 
-import { Component } from '@angular/core';
+.error {
+  color: red;
+}
 
-import { SentenceStatus } from '../model/nlp';
-import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
-import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
+.content {
+  width: 50vw;
+}
 
-@Component({
-  selector: 'tock-inbox',
-  templateUrl: './inbox.component.html',
-  styleUrls: ['./inbox.component.css']
-})
-export class InboxComponent {
-  filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
-  mode = SentenceTrainingMode.INBOX;
-  constructor() {}
+.footer {
+  text-align: right;
+}
+
+.submit-button {
+  margin-left: 20px;
 }

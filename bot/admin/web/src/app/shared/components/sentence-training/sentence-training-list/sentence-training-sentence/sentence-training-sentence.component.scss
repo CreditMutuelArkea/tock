@@ -1,0 +1,18 @@
+.tokens-container {
+  line-height: 1.7em;
+  .token {
+    border-radius: 0.45rem;
+    padding: 0rem 0.3rem 0.1rem 0.3rem;
+    .delete {
+      font-size: 1em;
+      margin-top: 2px;
+      margin-left: 4px;
+    }
+  }
+}
+
+.existing-entity-selector {
+  SPAN {
+    margin-right: 0.5rem;
+  }
+}

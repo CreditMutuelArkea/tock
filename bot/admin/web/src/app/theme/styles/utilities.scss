@@ -108,6 +108,10 @@ nb-card.selected {
   background-color: var(--color-basic-transparent-200);
 }
 
+.unselectable {
+  user-select: none;
+}
+
 .card-footer-actions {
   display: flex;
   flex-direction: column;

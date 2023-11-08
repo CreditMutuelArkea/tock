@@ -59,6 +59,7 @@ import {
   ChatUiMessageSentenceFootnotesComponent,
   ChoiceDialogComponent,
   DebugViewerComponent,
+  EntityCreationComponent,
   ErrorHelperComponent,
   FileUploadComponent,
   FormControlComponent,
@@ -68,6 +69,7 @@ import {
   SentenceTrainingDialogComponent,
   SentenceTrainingFiltersComponent,
   SentenceTrainingListComponent,
+  SentenceTrainingSentenceComponent,
   SliderComponent
 } from './components';
 
@@ -131,6 +133,8 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     SentenceTrainingDialogComponent,
     SentenceTrainingFiltersComponent,
     SentenceTrainingListComponent,
+    SentenceTrainingSentenceComponent,
+    EntityCreationComponent,
     AutocompleteInputComponent,
     DebugJsonIteratorComponent,
     DebugViewerComponent

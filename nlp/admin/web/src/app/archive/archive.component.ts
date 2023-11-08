@@ -19,6 +19,7 @@ import { Component } from '@angular/core';
 import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
 import { Intent } from '../model/nlp';
 import { SentenceStatus } from '../model/nlp';
+import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
 
 @Component({
   selector: 'tock-archive',
@@ -27,6 +28,8 @@ import { SentenceStatus } from '../model/nlp';
 })
 export class ArchiveComponent {
   filter: SentenceFilter = new SentenceFilter(null, Intent.unknown, [SentenceStatus.validated, SentenceStatus.model]);
+
+  mode = SentenceTrainingMode.UNKNOWN;
 
   constructor() {}
 }

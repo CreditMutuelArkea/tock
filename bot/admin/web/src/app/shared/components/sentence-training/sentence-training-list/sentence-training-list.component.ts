@@ -10,6 +10,7 @@ import { UserRole } from '../../../../model/auth';
 import { Action, SentenceTrainingMode } from '../models';
 import { Pagination } from '../..';
 import { SentenceExtended } from '../sentence-training.component';
+import { NbToastrService } from '@nebular/theme';
 
 @Component({
   selector: 'tock-sentence-training-list',
@@ -38,7 +39,12 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   isSorted: boolean = false;
 
-  constructor(public readonly state: StateService, private router: Router, private readonly elementRef: ElementRef) {}
+  constructor(
+    public readonly state: StateService,
+    private router: Router,
+    private readonly elementRef: ElementRef,
+    private toastrService: NbToastrService
+  ) {}
 
   ngOnInit(): void {
     this.state.currentIntentsCategories.pipe(takeUntil(this._destroy$)).subscribe((groups) => {
@@ -169,5 +175,10 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     const nativeElement: HTMLElement = this.elementRef.nativeElement;
     const found: Element | null = nativeElement.querySelector(`#${id}`);
     if (found) found.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
+  }
+
+  async copySentence(sentence) {
+    await navigator.clipboard.writeText(sentence.getText());
+    this.toastrService.success(`Sentence copied to clipboard`, 'Clipboard');
   }
 }

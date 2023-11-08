@@ -1,0 +1,51 @@
+<div class="px-3">
+  <div class="tokens-container">
+    <span
+      *ngFor="let token of tokens"
+      [title]="'Entity : ' + token.entity?.role"
+      [ngClass]="{ token: token.entity, pointer: token.entity, 'cursor-default': !token.entity }"
+      [style.background]="token.color()"
+      [style.color]="getContrastYIQ(token.color())"
+      ><!-- NO carriage return here ! -->{{ token.text
+      }}<nb-icon
+        *ngIf="token.entity"
+        icon="trash-2-outline"
+        nbTooltip="Remove entity"
+        (click)="delete(token)"
+        class="delete"
+      ></nb-icon
+    ></span>
+  </div>
+
+  <div
+    class="mt-3"
+    *ngIf="!readOnly && edited"
+  >
+    <div
+      *ngIf="entityProvider"
+      class="existing-entity-selector"
+    >
+      <span
+        class="pointer"
+        *ngFor="let entity of entityProvider.getEntities()"
+        nbTooltip="Assign the &quot;{{ entity.qualifiedName(state.user) }}&quot; entity to the selection"
+        (click)="onSelect(entity)"
+        [style.background-color]="entity.entityColor"
+        [style.color]="getContrastYIQ(entity.entityColor)"
+      >
+        {{ entity.qualifiedName(state.user) }}
+      </span>
+    </div>
+
+    <div>
+      <button
+        nbButton
+        ghost
+        (click)="addEntity()"
+      >
+        <nb-icon icon="plus-outline"></nb-icon>
+        Add Entity
+      </button>
+    </div>
+  </div>
+</div>

@@ -14,8 +14,6 @@ import { SentenceTrainingListComponent } from './sentence-training-list/sentence
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
 
-import { SentenceFilter } from '../../../sentences-scroll/sentences-scroll.component';
-
 export type SentenceExtended = Sentence & { _selected?: boolean };
 
 @Component({
@@ -86,9 +84,10 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
     if ([Intent.unknown, Intent.ragExcluded].includes(this.filters.intentId)) {
       this.filters = { ...this.filters, ...{ status: [SentenceStatus.validated, SentenceStatus.model] } };
-    } else {
-      this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
     }
+    // else {
+    //   this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
+    // }
   }
 
   sortSentenceTraining(sort: boolean): void {
@@ -208,6 +207,16 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     this.setSentenceAccordingToAction(action, sentence);
 
     await lastValueFrom(this.nlp.updateSentence(sentence));
+
+    // delete old sentence when language change
+    if (sentence.language !== this.state.currentLocale) {
+      const s = sentence.clone();
+      s.language = this.state.currentLocale;
+      s.status = SentenceStatus.deleted;
+      this.nlp.updateSentence(s).subscribe((_) => {
+        this.toastrService.success(`Language change to ${this.state.localeName(sentence.language)}`, 'Language change');
+      });
+    }
 
     this.pagination.total--;
     this.loadSentencesAfterActionPerformed();
