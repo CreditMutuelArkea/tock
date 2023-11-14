@@ -18,7 +18,7 @@ repos:
       rev: v4.5.0
       hooks:
         - id: check-ast
-#        - id: double-quote-string-fixer
+        - id: double-quote-string-fixer
         - id: trailing-whitespace
         - id: end-of-file-fixer
           files: '\.md$'
