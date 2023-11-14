@@ -1,0 +1,12 @@
+repos:
+  -   repo: https://github.com/psf/black
+      rev: 23.11.0
+      hooks:
+        - id: black
+          language_version: python3.9
+          verbose: true
+  -   repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v1.2.3
+      hooks:
+        - id: flake8
+          verbose: true

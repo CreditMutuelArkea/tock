@@ -26,7 +26,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-LLM Orchestrator bla bla bla ...
+LLM Orchestrator is the server that handle all LLMs operations : Retrieval Augmented Generation, synthetic sentences generatio. This server is called by Bot API RAG story.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -47,28 +47,32 @@ LLM Orchestrator bla bla bla ...
 
 ### Prerequisites
 
-* python 3.9+
+* python 3.9+ | poetry
   ```sh
   apt install python3 poetry
   ```
+  It's recommended to use pyenv (https://gist.github.com/trongnghia203/9cc8157acb1a9faad2de95c3175aa875)
 
 * Vector Database
   ```sh
   OpenSearch (Docker Compose)
   # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
+  # Or you can use the docker-compose present in tock-docker for opensearch
   ```
+### Dev
+
+Install pre-commit: pip install pre-commit
+Add pre-commit to requirements.txt (or requirements-dev.txt)
+Define .pre-commit-config.yaml with the hooks you want to include.
+Execute pre-commit install to install git hooks in your .git/ directory.
 
 
 ### Installation
 
-TODO MASS : 
-cd tock/llm/orchestrator/src/main/python/app
-poetry install
-
-1. Creation of virtual environments
+1. Install python packages
    ```sh
-    cd {PATH_TO_PROJECT}/tock/llm/python-core
-    python3.9 -m venv ./venv
+    cd {PATH_TO_PROJECT}/tock/llm/orchestrator-server/src/main/python/app
+    poetry install
    ```
 2. Install python packages
    ```sh

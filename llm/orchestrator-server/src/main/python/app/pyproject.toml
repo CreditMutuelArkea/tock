@@ -12,6 +12,7 @@ uvicorn = "^0.24.0"
 fastapi = "^0.104.1"
 
 [tool.poetry.group.dev.dependencies]
+pre-commit = "^3.5.0"
 
 [build-system]
 requires = ["poetry-core"]

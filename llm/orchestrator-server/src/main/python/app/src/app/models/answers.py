@@ -9,7 +9,7 @@ class AnswerAI:
 
 
 @dataclass
-class ResponseIA:
+class ResponseAI:
     answer: AnswerAI
-    error: []
 
+    error: []
