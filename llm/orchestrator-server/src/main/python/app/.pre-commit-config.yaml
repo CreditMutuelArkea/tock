@@ -4,9 +4,24 @@ repos:
       hooks:
         - id: black
           language_version: python3.9
-          verbose: true
   -   repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v1.2.3
+      rev: v4.5.0
       hooks:
-        - id: flake8
-          verbose: true
+        - id: check-ast
+        - id: double-quote-string-fixer
+        - id: trailing-whitespace
+        - id: end-of-file-fixer
+#        - id: markdown-spellcheck
+#          args: [--ignore-numbers, --check-filenames, --check-hidden, --check-acronyms, --check-case, --check-urls]
+          files: '\.md$'
+  -   repo: https://github.com/hadialqattan/pycln
+      rev: v2.3.0
+      hooks:
+        -   id: pycln
+            args: [--all]
+  -   repo: https://github.com/pycqa/isort
+      rev: 5.12.0
+      hooks:
+        -   id: isort
+            files: "\\.(py)$"
+            args: [--settings-path=llm/orchestrator-server/src/main/python/app/pyproject.toml]
