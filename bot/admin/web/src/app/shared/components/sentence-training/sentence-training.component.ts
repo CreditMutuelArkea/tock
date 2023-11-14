@@ -14,7 +14,7 @@ import { SentenceTrainingListComponent } from './sentence-training-list/sentence
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
 
-export type SentenceExtended = Sentence & { _selected?: boolean };
+export type SentenceExtended = Sentence & { _selected?: boolean; _intentBeforeClassification?: string };
 
 @Component({
   selector: 'tock-sentence-training',

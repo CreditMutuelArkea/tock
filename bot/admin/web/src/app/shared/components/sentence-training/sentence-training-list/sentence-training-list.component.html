@@ -14,7 +14,7 @@
       <button
         nbButton
         nbTooltip="Validate all selected sentences"
-        class="text-success"
+        status="success"
         ghost
         shape="round"
         (click)="handleBatchAction(Action.VALIDATE)"
@@ -26,19 +26,19 @@
         *ngIf="!isFilteredUnknown"
         nbButton
         nbTooltip="Set all selected sentences as unknown"
-        class="text-danger"
+        status="warning"
         ghost
         shape="round"
         (click)="handleBatchAction(Action.UNKNOWN)"
         data-testid="batch-action-unknown"
       >
-        <nb-icon icon="close-circle-outline"></nb-icon>
+        <nb-icon icon="question-mark-circle-outline"></nb-icon>
       </button>
       <button
         *ngIf="sentenceTrainingMode !== SentenceTrainingMode.RAGEXCLUDED"
         nbButton
         nbTooltip="Set all selected sentences as ragexcluded"
-        class="text-danger"
+        status="warning"
         ghost
         shape="round"
         (click)="handleBatchAction(Action.RAGEXCLUDED)"
@@ -49,6 +49,7 @@
       <button
         nbButton
         nbTooltip="Delete all selected sentences"
+        status="danger"
         ghost
         shape="round"
         (click)="handleBatchAction(Action.DELETE)"
@@ -100,10 +101,32 @@
 
     <div data-testid="text">
       <tock-sentence-training-sentence [sentence]="sentence"></tock-sentence-training-sentence>
+
+      <nb-card
+        class="mx-3 mt-2 mb-0"
+        accent="info"
+        *ngIf="sentence.forReview && sentence.reviewComment"
+      >
+        <nb-card-body class="text-muted review">
+          <strong class="d-block">Review comment :</strong>
+          {{ sentence.reviewComment }}
+        </nb-card-body>
+      </nb-card>
     </div>
 
     <div class="tools-panel">
-      <small class="ml-2 d-block text-muted unselectable">
+      <small class="d-block text-muted unselectable">
+        <button
+          nbButton
+          ghost
+          size="tiny"
+          class="mr-2 lineFirstSmallButtonRetract"
+          nbTooltip="Copy sentence"
+          (click)="copySentence(sentence)"
+        >
+          <nb-icon icon="copy-outline"></nb-icon>
+        </button>
+
         <time>{{ sentence.creationDate | date: 'yy/MM/dd HH:mm:ss' }}</time>
 
         <span
@@ -117,21 +140,10 @@
         <span nbTooltip="Sentence configuration">
           {{ sentence.configuration }}
         </span>
-
-        <button
-          nbButton
-          ghost
-          size="tiny"
-          class="ml-2"
-          nbTooltip="Copy sentence"
-          (click)="copySentence(sentence)"
-        >
-          <nb-icon icon="copy-outline"></nb-icon>
-        </button>
       </small>
 
       <nb-form-field
-        class="ml-2 mb-1"
+        class="mb-1"
         nbTooltip="Intent association"
       >
         <input
@@ -145,6 +157,7 @@
           (keyup)="filterIntentsList($event)"
           autocomplete="off"
           [nbAutocomplete]="intentsAutocomplete"
+          class="intent-input"
         />
         <small
           nbSuffix
@@ -172,13 +185,15 @@
         </nb-option-group>
       </nb-autocomplete>
 
-      <div class="d-flex flex-wrap">
+      <div class="d-flex flex-wrap justify-content-between">
         <button
           nbButton
           nbTooltip="Validate"
-          class="text-success"
+          status="success"
           ghost
           shape="round"
+          size="large"
+          class="lineFirstLargeButtonRetract"
           (click)="handleAction(Action.VALIDATE, sentence)"
           data-testid="validate"
         >
@@ -186,25 +201,39 @@
         </button>
 
         <button
+          nbButton
+          nbTooltip="Ask for review"
+          status="info"
+          ghost
+          shape="round"
+          size="large"
+          (click)="askForReview(sentence)"
+        >
+          <nb-icon icon="search-outline"></nb-icon>
+        </button>
+
+        <button
           *ngIf="!isFilteredUnknown"
           nbButton
           nbTooltip="Set as unknown"
-          class="text-danger"
+          status="warning"
           ghost
           shape="round"
+          size="large"
           (click)="handleAction(Action.UNKNOWN, sentence)"
           data-testid="unknown"
         >
-          <nb-icon icon="close-circle-outline"></nb-icon>
+          <nb-icon icon="question-mark-circle-outline"></nb-icon>
         </button>
 
         <button
           *ngIf="sentenceTrainingMode !== SentenceTrainingMode.RAGEXCLUDED"
           nbButton
           nbTooltip="Exclude from Rag handling"
-          class="text-danger"
+          status="warning"
           ghost
           shape="round"
+          size="large"
           (click)="handleAction(Action.RAGEXCLUDED, sentence)"
           data-testid="ragexcluded"
         >
@@ -214,8 +243,10 @@
         <button
           nbButton
           nbTooltip="Delete"
+          status="danger"
           ghost
           shape="round"
+          size="large"
           (click)="handleAction(Action.DELETE, sentence)"
           data-testid="delete"
         >
@@ -226,8 +257,7 @@
           [(ngModel)]="sentence.language"
           placeholder="Sentence language"
           nbTooltip="Set sentence language"
-          size="small"
-          class="mx-2 mt-1 flex-grow-1"
+          class="ml-2 mt-1 flex-grow-1"
         >
           <nb-option
             *ngFor="let l of state.currentApplication.supportedLocales"
@@ -236,28 +266,43 @@
             {{ state.localeName(l) }}
           </nb-option>
         </nb-select>
+      </div>
+
+      <div class="d-flex flex-wrap justify-content-between">
+        <div>
+          <button
+            nbButton
+            nbTooltip="Create new Intent"
+            ghost
+            shape="round"
+            class="lineFirstButtonRetract"
+          >
+            <nb-icon icon="plus-circle-outline"></nb-icon>
+          </button>
+
+          <button
+            *ngIf="state.hasRole(UserRole.botUser)"
+            nbButton
+            nbTooltip="Create new FAQ based on this sentence"
+            ghost
+            shape="round"
+            (click)="redirectToFaqManagement(sentence)"
+            data-testid="redirectToFaqManagement"
+          >
+            <nb-icon icon="message-square-outline"></nb-icon>
+          </button>
+        </div>
 
         <button
           nbButton
-          nbTooltip="Details"
+          nbTooltip="Show conversation"
           ghost
           shape="round"
+          status="info"
           (click)="showDetails(sentence)"
           data-testid="details"
         >
           <nb-icon icon="message-circle-outline"></nb-icon>
-        </button>
-
-        <button
-          *ngIf="state.hasRole(UserRole.botUser)"
-          nbButton
-          nbTooltip="Create new FAQ"
-          ghost
-          shape="round"
-          (click)="redirectToFaqManagement(sentence)"
-          data-testid="redirectToFaqManagement"
-        >
-          <nb-icon icon="plus-circle-outline"></nb-icon>
         </button>
       </div>
     </div>

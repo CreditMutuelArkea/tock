@@ -10,7 +10,8 @@ import { UserRole } from '../../../../model/auth';
 import { Action, SentenceTrainingMode } from '../models';
 import { Pagination } from '../..';
 import { SentenceExtended } from '../sentence-training.component';
-import { NbToastrService } from '@nebular/theme';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { SentenceReviewRequestComponent } from './sentence-review-request/sentence-review-request.component';
 
 @Component({
   selector: 'tock-sentence-training-list',
@@ -43,7 +44,8 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     public readonly state: StateService,
     private router: Router,
     private readonly elementRef: ElementRef,
-    private toastrService: NbToastrService
+    private toastrService: NbToastrService,
+    private nbDialogService: NbDialogService
   ) {}
 
   ngOnInit(): void {
@@ -81,8 +83,9 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     this.selection.deselect(sentence);
 
     let originalIndex = this.sentences.findIndex((s) => s === sentence);
-    const newSentence = sentence.withIntent(this.state, intentId);
-
+    let intentBeforeClassification = sentence._intentBeforeClassification || sentence.classification.intentId;
+    const newSentence = sentence.withIntent(this.state, intentId) as SentenceExtended;
+    newSentence._intentBeforeClassification = intentBeforeClassification;
     if (isSelected) this.selection.select(newSentence);
 
     this.sentences.splice(originalIndex, 1, newSentence);
@@ -122,6 +125,22 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
 
   showDetails(sentence: SentenceExtended): void {
     this.onDetails.emit(sentence);
+  }
+
+  askForReview(sentence: SentenceExtended) {
+    const dialogRef = this.nbDialogService.open(SentenceReviewRequestComponent, {
+      context: {
+        beforeClassification: sentence._intentBeforeClassification || sentence.classification.intentId,
+        reviewComment: sentence.reviewComment
+      }
+    });
+    dialogRef.onClose.subscribe((result) => {
+      if (result && result.status === 'confirm') {
+        sentence.forReview = true;
+        sentence.reviewComment = result.description;
+        this.handleAction(Action.VALIDATE, sentence);
+      }
+    });
   }
 
   handleAction(action: Action, sentence: SentenceExtended): void {

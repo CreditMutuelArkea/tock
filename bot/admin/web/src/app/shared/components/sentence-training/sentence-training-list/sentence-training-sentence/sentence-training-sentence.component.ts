@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit } from '@angular/core';
+import { Component, HostListener, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import {
   ClassifiedEntity,
   EntityContainer,
@@ -15,6 +15,8 @@ import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { User } from '../../../../../model/auth';
 import { isNullOrUndefined } from '../../../../../model/commons';
 import { EntityCreationComponent } from '../../entity-creation/entity-creation.component';
+import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
 
 @Component({
   selector: 'tock-sentence-training-sentence',
@@ -36,7 +38,9 @@ export class SentenceTrainingSentenceComponent implements OnInit {
     private nlp: NlpService,
     public state: StateService,
     private nbDialogService: NbDialogService,
-    private toastrService: NbToastrService
+    private toastrService: NbToastrService,
+    private overlay: Overlay,
+    private viewContainerRef: ViewContainerRef
   ) {}
 
   ngOnInit(): void {
@@ -122,10 +126,11 @@ export class SentenceTrainingSentenceComponent implements OnInit {
   // }
 
   @HostListener('mouseup', ['$event'])
-  select() {
+  select(event) {
+    this.hideTokenMenu();
     setTimeout((_) => {
       const windowsSelection = window.getSelection();
-      // if (windowsSelection.rangeCount > 0 && !this.currentDblClick) {
+
       if (windowsSelection.rangeCount > 0) {
         const selection = windowsSelection.getRangeAt(0);
         let start = selection.startOffset;
@@ -160,6 +165,7 @@ export class SentenceTrainingSentenceComponent implements OnInit {
           window.getSelection().removeAllRanges();
         } else if (this.entityProvider.isValid()) {
           this.edited = true;
+          this.displayTokenMenu(event, null);
         }
       }
     });
@@ -267,6 +273,54 @@ export class SentenceTrainingSentenceComponent implements OnInit {
       this.sentence.cleanupEditedSubEntities();
       this.rebuild();
     }
+  }
+
+  overlayRef: OverlayRef | null;
+  @ViewChild('userMenu') userMenu: TemplateRef<any>;
+
+  @HostListener('document:click', ['$event'])
+  private hideTokenMenu(): void {
+    if (this.overlayRef) this.overlayRef.detach();
+  }
+
+  displayTokenMenu(event: MouseEvent, token: Token): void {
+    event.stopPropagation();
+    this.hideTokenMenu();
+
+    const positionStrategy = this.overlay
+      .position()
+      .flexibleConnectedTo(event.target as FlexibleConnectedPositionStrategyOrigin)
+      .withPositions([
+        {
+          originX: 'start',
+          originY: 'bottom',
+          overlayX: 'start',
+          overlayY: 'top'
+        },
+        {
+          originX: 'start',
+          originY: 'center',
+          overlayX: 'end',
+          overlayY: 'center'
+        },
+        {
+          originX: 'end',
+          originY: 'center',
+          overlayX: 'start',
+          overlayY: 'center'
+        }
+      ]);
+
+    this.overlayRef = this.overlay.create({
+      positionStrategy,
+      scrollStrategy: this.overlay.scrollStrategies.reposition()
+    });
+
+    this.overlayRef.attach(
+      new TemplatePortal(this.userMenu, this.viewContainerRef, {
+        $implicit: token
+      })
+    );
   }
 }
 
