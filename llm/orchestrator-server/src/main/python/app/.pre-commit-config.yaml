@@ -1,9 +1,4 @@
 repos:
-  -   repo: https://github.com/psf/black
-      rev: 23.11.0
-      hooks:
-        - id: black
-          language_version: python3.9
   -   repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v4.5.0
       hooks:
@@ -14,11 +9,6 @@ repos:
 #        - id: markdown-spellcheck
 #          args: [--ignore-numbers, --check-filenames, --check-hidden, --check-acronyms, --check-case, --check-urls]
           files: '\.md$'
-  -   repo: https://github.com/hadialqattan/pycln
-      rev: v2.3.0
-      hooks:
-        -   id: pycln
-            args: [--all]
   -   repo: https://github.com/pycqa/isort
       rev: 5.12.0
       hooks:
@@ -29,3 +19,8 @@ repos:
     rev: v2.3.0
     hooks:
       - id: pycln
+  -   repo: https://github.com/psf/black
+      rev: 23.11.0
+      hooks:
+        - id: black
+          language_version: python3.9
