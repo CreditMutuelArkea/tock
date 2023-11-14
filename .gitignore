@@ -42,3 +42,6 @@ travis
 
 #ngrok
 scripts/connector-messenger/ngrok.exe
+
+#env
+llm/orchestrator-server/src/main/python/app/src/app/.env

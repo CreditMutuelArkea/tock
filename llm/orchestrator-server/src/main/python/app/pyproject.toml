@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "app"
+name = "tock-llm-orchestrator"
 version = "0.1.0"
 description = ""
 authors = ["Mohamed ASSOUKTI <mohamed.assoukti@partnre.com>"]
