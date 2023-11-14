@@ -1,12 +1,15 @@
 from fastapi import Depends, FastAPI
 
-from .routers import llm, chat
+from .routers import llm, chat, healthcheck
 from .dependencies import get_token_header
 
-app = FastAPI(dependencies=[Depends(get_token_header)])
+global_dependencies = [Depends(get_token_header)]
 
-app.include_router(llm.router)
-app.include_router(chat.router)
+app = FastAPI()
+
+app.include_router(llm.router, dependencies=global_dependencies)
+app.include_router(chat.router, dependencies=global_dependencies)
+app.include_router(healthcheck.router)
 
 # TODO MASS :
 # load_dotenv()
