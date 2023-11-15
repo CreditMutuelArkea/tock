@@ -14,8 +14,8 @@
 #
 from typing import Any
 
-from ..llmprovider import LLMProvider
-from ..llmsetting import LLMSetting
+from src.main.python.app.src.app.models.llm.llmprovider import LLMProvider
+from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
 
 
 class AzureOpenAISetting(LLMSetting):

@@ -14,7 +14,7 @@
 #
 from typing import Union
 
-from .ErrorCode import ErrorCode
+from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
 
 
 class FunctionalException(Exception):

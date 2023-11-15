@@ -13,18 +13,20 @@
 #   limitations under the License.
 #
 from fastapi import APIRouter, Depends
-
-from ..models.chat import ChatQuery
-from ..services.llm.llmservice import ask
-from .dependencies import get_query_bot_id, get_query_conversation_id
+from src.main.python.app.src.app.models.chat import ChatQuery
+from src.main.python.app.src.app.routers.dependencies import (
+    get_query_bot_id,
+    get_query_conversation_id,
+)
+from src.main.python.app.src.app.services.llm.llmservice import ask
 
 router = APIRouter(
-    prefix='/chat',
-    tags=['Chat'],
+    prefix="/chat",
+    tags=["Chat"],
     dependencies=[Depends(get_query_bot_id), Depends(get_query_conversation_id)],
 )
 
 
-@router.post('/')
+@router.post("/")
 async def chat(botId: str, conversationId: str, query: ChatQuery):
     return ask(botId, conversationId, query.llmSetting, query.llmSettingEmbedding)

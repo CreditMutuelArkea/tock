@@ -14,8 +14,10 @@
 #
 from typing import Union
 
-from ..exceptions.ErrorCode import ErrorCode
-from ..exceptions.FunctionalException import FunctionalException
+from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
+from src.main.python.app.src.app.exceptions.FunctionalException import (
+    FunctionalException,
+)
 
 
 async def get_query_bot_id(botId: Union[str, None]):

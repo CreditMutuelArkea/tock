@@ -12,15 +12,23 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from ...exceptions.ErrorCode import ErrorCode
-from ...exceptions.FunctionalException import FunctionalException
-from ...models.chat import QueryAI
-from ...models.footnotes import FootNote
-from ...models.llm.azureopenai.azureopenaisetting import AzureOpenAISetting
-from ...models.llm.llmsetting import LLMSetting
-from ...models.llm.openai.openaisetting import OpenAISetting
-from ...services.llm.azureopenaicaller import AzureOpenAICaller
-from ...services.llm.openaicaller import OpenAICaller
+from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
+from src.main.python.app.src.app.exceptions.FunctionalException import (
+    FunctionalException,
+)
+from src.main.python.app.src.app.models.chat import QueryAI
+from src.main.python.app.src.app.models.footnotes import FootNote
+from src.main.python.app.src.app.models.llm.azureopenai.azureopenaisetting import (
+    AzureOpenAISetting,
+)
+from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
+from src.main.python.app.src.app.models.llm.openai.openaisetting import (
+    OpenAISetting,
+)
+from src.main.python.app.src.app.services.llm.azureopenaicaller import (
+    AzureOpenAICaller,
+)
+from src.main.python.app.src.app.services.llm.openaicaller import OpenAICaller
 
 
 def executeChain(query: QueryAI):
@@ -29,13 +37,13 @@ def executeChain(query: QueryAI):
 
     # Fake answer
     return {
-        'answer': {
-            'text': caller.getLanguageModel(query.llmSetting)
-            + ' '
+        "answer": {
+            "text": caller.getLanguageModel(query.llmSetting)
+            + " "
             + embeddingCaller.getEmbeddingModel(query.llmSettingEmbedding),
-            'footnotes': [FootNote('1', 'title1', 'url1'), FootNote('2', 'title2')],
+            "footnotes": [FootNote("1", "title1", "url1"), FootNote("2", "title2")],
         },
-        'debug': [],
+        "debug": [],
     }
 
 

@@ -13,31 +13,32 @@
 #   limitations under the License.
 #
 from fastapi import APIRouter, Depends, HTTPException
-
-from ..dependencies import get_token_header
-from ..exceptions.FunctionalException import FunctionalException
-from ..models.llm.llmprovider import LLMProvider
-from ..services.llm.llmservice import checkLLMSetting
+from src.main.python.app.src.app.dependencies import get_token_header
+from src.main.python.app.src.app.exceptions.FunctionalException import (
+    FunctionalException,
+)
+from src.main.python.app.src.app.models.llm.llmprovider import LLMProvider
+from src.main.python.app.src.app.services.llm.llmservice import checkLLMSetting
 
 router = APIRouter(
-    prefix='/llm',
-    tags=['LLM'],
+    prefix="/llm",
+    tags=["LLM"],
     dependencies=[Depends(get_token_header)],
-    responses={404: {'description': 'Not found'}},
+    responses={404: {"description": "Not found"}},
 )
 
 
-@router.get('/')
+@router.get("/")
 async def listLLMs():
     return [provider.value for provider in LLMProvider]
 
 
-@router.get('/{providerId}')
+@router.get("/{providerId}")
 async def getLLM(providerId: str):
     return LLMProvider.has_value(providerId)
 
 
-@router.post('/check-setting')
+@router.post("/check-setting")
 async def checkSetting(setting: dict, isEmbeddingModel: bool = False):
     try:
         return checkLLMSetting(setting, isEmbeddingModel)

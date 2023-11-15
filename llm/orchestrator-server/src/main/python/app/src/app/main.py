@@ -13,9 +13,8 @@
 #   limitations under the License.
 #
 from fastapi import Depends, FastAPI
-
-from .dependencies import get_token_header
-from .routers import chat, healthcheck, llm
+from src.main.python.app.src.app.dependencies import get_token_header
+from src.main.python.app.src.app.routers import chat, healthcheck, llm
 
 global_dependencies = [Depends(get_token_header)]
 

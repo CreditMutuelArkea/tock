@@ -12,8 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from ...models.llm.openai.openaisetting import OpenAISetting
-from .llmcaller import LLMCaller
+from src.main.python.app.src.app.models.llm.openai.openaisetting import (
+    OpenAISetting,
+)
+from src.main.python.app.src.app.services.llm.llmcaller import LLMCaller
 
 
 class OpenAICaller(LLMCaller):
@@ -21,7 +23,7 @@ class OpenAICaller(LLMCaller):
         return True
 
     def getLanguageModel(self, setting: OpenAISetting):
-        return 'LanguageModel[OpenAICaller]'
+        return "LanguageModel[OpenAICaller]"
 
     def getEmbeddingModel(self, setting: OpenAISetting):
-        return 'EmbeddingModel[OpenAICaller]'
+        return "EmbeddingModel[OpenAICaller]"

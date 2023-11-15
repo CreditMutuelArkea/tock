@@ -12,8 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from ...models.llm.azureopenai.azureopenaisetting import AzureOpenAISetting
-from .llmcaller import LLMCaller
+from src.main.python.app.src.app.models.llm.azureopenai.azureopenaisetting import (
+    AzureOpenAISetting,
+)
+from src.main.python.app.src.app.services.llm.llmcaller import LLMCaller
 
 
 class AzureOpenAICaller(LLMCaller):
@@ -21,7 +23,7 @@ class AzureOpenAICaller(LLMCaller):
         return False
 
     def getLanguageModel(self, setting: AzureOpenAISetting):
-        return 'LanguageModel[AzureOpenAICaller]'
+        return "LanguageModel[AzureOpenAICaller]"
 
     def getEmbeddingModel(self, setting: AzureOpenAISetting):
-        return 'EmbeddingModel[AzureOpenAICaller]'
+        return "EmbeddingModel[AzureOpenAICaller]"

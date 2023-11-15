@@ -14,7 +14,7 @@
 #
 from dataclasses import dataclass
 
-from .llm.llmsetting import LLMSetting
+from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
 
 
 @dataclass
