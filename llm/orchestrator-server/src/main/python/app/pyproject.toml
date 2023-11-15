@@ -10,6 +10,8 @@ packages = [{include = "llm_orchestrator", from = "src"}]
 python = "^3.9"
 uvicorn = "^0.24.0"
 fastapi = "^0.104.1"
+langchain = "^0.0.335"
+
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.5.0"

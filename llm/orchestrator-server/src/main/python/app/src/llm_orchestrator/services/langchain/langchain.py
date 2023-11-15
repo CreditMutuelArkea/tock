@@ -24,6 +24,11 @@ from llm_orchestrator.models.llm.openai.openaisetting import OpenAISetting
 from llm_orchestrator.services.llm.azureopenaicaller import AzureOpenAICaller
 from llm_orchestrator.services.llm.openaicaller import OpenAICaller
 
+# In think it would be great to name filed RAGChain of something that includes RAG in the naming.
+# For me we will have RagChain / RagService that uses langchain conversationnal QA
+# but also syntheticSentenceGenerationChain
+# that will generate derivate of sentence and use langchain list formatter.
+
 
 def executeChain(query: QueryAI):
     caller = create_llm_caller(query.llmSetting)

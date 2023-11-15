@@ -16,7 +16,10 @@ from typing import Annotated
 
 from fastapi import Header, HTTPException
 
+# TODO MASS : This just an example.
+# TODO MASS : It will be improved with a new JIRA
+
 
 async def get_token_header(x_token: Annotated[str, Header()]):
-    if x_token != 'fake-super-secret-token':
+    if x_token != 'fake-super-secret-token' and False:
         raise HTTPException(status_code=400, detail='X-Token header invalid')

@@ -12,6 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+
+from langchain.base_language import BaseLanguageModel
+from langchain.embeddings.base import Embeddings
+
 from llm_orchestrator.models.llm.azureopenai.azureopenaisetting import (
     AzureOpenAISetting,
 )
@@ -22,8 +26,8 @@ class AzureOpenAICaller(LLMCaller):
     def checkSetting(self, setting: AzureOpenAISetting, isEmbeddingModel: bool):
         return False
 
-    def getLanguageModel(self, setting: AzureOpenAISetting):
+    def getLanguageModel(self, setting: AzureOpenAISetting) -> BaseLanguageModel:
         return 'LanguageModel[AzureOpenAICaller]'
 
-    def getEmbeddingModel(self, setting: AzureOpenAISetting):
+    def getEmbeddingModel(self, setting: AzureOpenAISetting) -> Embeddings:
         return 'EmbeddingModel[AzureOpenAICaller]'

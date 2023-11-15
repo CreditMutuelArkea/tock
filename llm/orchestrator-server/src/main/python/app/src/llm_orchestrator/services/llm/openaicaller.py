@@ -12,16 +12,19 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+from langchain.base_language import BaseLanguageModel
+from langchain.embeddings.base import Embeddings
+
 from llm_orchestrator.models.llm.openai.openaisetting import OpenAISetting
 from llm_orchestrator.services.llm.llmcaller import LLMCaller
 
 
 class OpenAICaller(LLMCaller):
-    def checkSetting(self, setting: OpenAISetting, isEmbeddingModel: bool):
+    def checkSetting(self, setting: OpenAISetting, isEmbeddingModel: bool) -> bool:
         return True
 
-    def getLanguageModel(self, setting: OpenAISetting):
+    def getLanguageModel(self, setting: OpenAISetting) -> BaseLanguageModel:
         return 'LanguageModel[OpenAICaller]'
 
-    def getEmbeddingModel(self, setting: OpenAISetting):
+    def getEmbeddingModel(self, setting: OpenAISetting) -> Embeddings:
         return 'EmbeddingModel[OpenAICaller]'
