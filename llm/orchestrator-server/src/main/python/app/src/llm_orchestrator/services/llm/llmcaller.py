@@ -14,7 +14,7 @@
 #
 from abc import ABC, abstractmethod
 
-from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
+from llm_orchestrator.models.llm.llmsetting import LLMSetting
 
 
 class LLMCaller(ABC):  # LLMFactory

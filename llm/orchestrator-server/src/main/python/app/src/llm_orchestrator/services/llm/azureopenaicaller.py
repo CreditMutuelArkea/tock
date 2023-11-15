@@ -12,19 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
-
-from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
-from src.main.python.app.src.app.exceptions.FunctionalException import (
-    FunctionalException,
+from llm_orchestrator.models.llm.azureopenai.azureopenaisetting import (
+    AzureOpenAISetting,
 )
+from llm_orchestrator.services.llm.llmcaller import LLMCaller
 
 
-async def get_query_bot_id(botId: Union[str, None]):
-    if not botId:
-        raise FunctionalException(ErrorCode.E30)
+class AzureOpenAICaller(LLMCaller):
+    def checkSetting(self, setting: AzureOpenAISetting, isEmbeddingModel: bool):
+        return False
 
+    def getLanguageModel(self, setting: AzureOpenAISetting):
+        return 'LanguageModel[AzureOpenAICaller]'
 
-async def get_query_conversation_id(conversationId: str):
-    if not conversationId:
-        raise FunctionalException(ErrorCode.E40)
+    def getEmbeddingModel(self, setting: AzureOpenAISetting):
+        return 'EmbeddingModel[AzureOpenAICaller]'

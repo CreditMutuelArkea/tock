@@ -12,21 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from fastapi import Depends, FastAPI
-from src.main.python.app.src.app.dependencies import get_token_header
-from src.main.python.app.src.app.routers import chat, healthcheck, llm
+from fastapi import APIRouter, Depends
 
-global_dependencies = [Depends(get_token_header)]
+from llm_orchestrator.models.chat import ChatQuery
+from llm_orchestrator.routers.dependencies import (
+    get_query_bot_id,
+    get_query_conversation_id,
+)
+from llm_orchestrator.services.llm.llmservice import ask
 
-app = FastAPI()
+router = APIRouter(
+    prefix='/chat',
+    tags=['Chat'],
+    dependencies=[Depends(get_query_bot_id), Depends(get_query_conversation_id)],
+)
 
-app.include_router(llm.router, dependencies=global_dependencies)
-app.include_router(chat.router, dependencies=global_dependencies)
-app.include_router(healthcheck.router)
 
-# TODO MASS :
-# load_dotenv()
-# from dotenv import load_dotenv
-# from pathlib import Path
-# dotenv_path = Path('path/to/.env')
-# load_dotenv(dotenv_path=dotenv_path)
+@router.post('/')
+async def chat(botId: str, conversationId: str, query: ChatQuery):
+    return ask(botId, conversationId, query.llmSetting, query.llmSettingEmbedding)

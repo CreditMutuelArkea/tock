@@ -12,26 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
-from src.main.python.app.src.app.exceptions.FunctionalException import (
-    FunctionalException,
-)
-from src.main.python.app.src.app.models.chat import QueryAI
-from src.main.python.app.src.app.models.llm.azureopenai.azureopenaisetting import (
+from llm_orchestrator.exceptions.ErrorCode import ErrorCode
+from llm_orchestrator.exceptions.FunctionalException import FunctionalException
+from llm_orchestrator.models.chat import QueryAI
+from llm_orchestrator.models.llm.azureopenai.azureopenaisetting import (
     AzureOpenAISetting,
 )
-from src.main.python.app.src.app.models.llm.llmprovider import LLMProvider
-from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
-from src.main.python.app.src.app.models.llm.openai.openaisetting import (
-    OpenAISetting,
-)
-from src.main.python.app.src.app.services.langchain.langchain import (
-    executeChain,
-)
-from src.main.python.app.src.app.services.llm.azureopenaicaller import (
-    AzureOpenAICaller,
-)
-from src.main.python.app.src.app.services.llm.openaicaller import OpenAICaller
+from llm_orchestrator.models.llm.llmprovider import LLMProvider
+from llm_orchestrator.models.llm.llmsetting import LLMSetting
+from llm_orchestrator.models.llm.openai.openaisetting import OpenAISetting
+from llm_orchestrator.services.langchain.langchain import executeChain
+from llm_orchestrator.services.llm.azureopenaicaller import AzureOpenAICaller
+from llm_orchestrator.services.llm.openaicaller import OpenAICaller
 
 
 def checkLLMSetting(setting: dict, isEmbeddingModel: bool):
@@ -56,7 +48,7 @@ def ask(botId: str, conversationId: str, setting: dict, embeddingSetting):
 
 
 def create_instance(setting: dict):
-    provider = setting.get("provider")
+    provider = setting.get('provider')
     if provider == LLMProvider.OPEN_AI.value:
         return OpenAISetting(**setting)
     elif provider == LLMProvider.AZURE_OPEN_AI_SERVICE.value:

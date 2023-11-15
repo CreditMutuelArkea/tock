@@ -12,18 +12,21 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from src.main.python.app.src.app.models.llm.azureopenai.azureopenaisetting import (
-    AzureOpenAISetting,
-)
-from src.main.python.app.src.app.services.llm.llmcaller import LLMCaller
+from dataclasses import dataclass
+
+from llm_orchestrator.models.llm.llmsetting import LLMSetting
 
 
-class AzureOpenAICaller(LLMCaller):
-    def checkSetting(self, setting: AzureOpenAISetting, isEmbeddingModel: bool):
-        return False
+@dataclass
+class ChatQuery:
+    llmSetting: dict
+    llmSettingEmbedding: dict
 
-    def getLanguageModel(self, setting: AzureOpenAISetting):
-        return "LanguageModel[AzureOpenAICaller]"
 
-    def getEmbeddingModel(self, setting: AzureOpenAISetting):
-        return "EmbeddingModel[AzureOpenAICaller]"
+@dataclass
+class QueryAI:
+    botId: str
+    conversationId: str
+    llmSetting: LLMSetting
+    llmSettingEmbedding: LLMSetting
+    debug: bool = False

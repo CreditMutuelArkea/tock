@@ -12,21 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from dataclasses import dataclass
+from typing import Union
 
-from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
-
-
-@dataclass
-class ChatQuery:
-    llmSetting: dict
-    llmSettingEmbedding: dict
+from llm_orchestrator.exceptions.ErrorCode import ErrorCode
 
 
-@dataclass
-class QueryAI:
-    botId: str
-    conversationId: str
-    llmSetting: LLMSetting
-    llmSettingEmbedding: LLMSetting
-    debug: bool = False
+class FunctionalException(Exception):
+    def __init__(self, code: ErrorCode, message: Union[str, None] = None):
+        if message:
+            super().__init__(message)
+        else:
+            super().__init__(code.value)
+
+        self.code = code

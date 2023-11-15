@@ -12,12 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Any
-
-from src.main.python.app.src.app.models.llm.llmprovider import LLMProvider
-from src.main.python.app.src.app.models.llm.llmsetting import LLMSetting
+from llm_orchestrator.models.llm.openai.openaisetting import OpenAISetting
+from llm_orchestrator.services.llm.llmcaller import LLMCaller
 
 
-class OpenAISetting(LLMSetting):
-    def __init__(self, apiKey, model, temperature=None, prompt=None, **kwargs: Any):
-        super().__init__(LLMProvider.OPEN_AI, apiKey, model, temperature, prompt)
+class OpenAICaller(LLMCaller):
+    def checkSetting(self, setting: OpenAISetting, isEmbeddingModel: bool):
+        return True
+
+    def getLanguageModel(self, setting: OpenAISetting):
+        return 'LanguageModel[OpenAICaller]'
+
+    def getEmbeddingModel(self, setting: OpenAISetting):
+        return 'EmbeddingModel[OpenAICaller]'

@@ -12,16 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
+from fastapi import Depends, FastAPI
 
-from src.main.python.app.src.app.exceptions.ErrorCode import ErrorCode
+from llm_orchestrator.dependencies import get_token_header
+from llm_orchestrator.routers import chat, healthcheck, llm
 
+global_dependencies = [Depends(get_token_header)]
 
-class FunctionalException(Exception):
-    def __init__(self, code: ErrorCode, message: Union[str, None] = None):
-        if message:
-            super().__init__(message)
-        else:
-            super().__init__(code.value)
+app = FastAPI()
 
-        self.code = code
+app.include_router(llm.router, dependencies=global_dependencies)
+app.include_router(chat.router, dependencies=global_dependencies)
+app.include_router(healthcheck.router)
+
+# TODO MASS :
+# load_dotenv()
+# from dotenv import load_dotenv
+# from pathlib import Path
+# dotenv_path = Path('path/to/.env')
+# load_dotenv(dotenv_path=dotenv_path)

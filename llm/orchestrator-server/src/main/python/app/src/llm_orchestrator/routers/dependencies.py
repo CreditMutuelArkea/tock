@@ -12,21 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from fastapi import APIRouter, Depends
-from src.main.python.app.src.app.models.chat import ChatQuery
-from src.main.python.app.src.app.routers.dependencies import (
-    get_query_bot_id,
-    get_query_conversation_id,
-)
-from src.main.python.app.src.app.services.llm.llmservice import ask
+from typing import Union
 
-router = APIRouter(
-    prefix="/chat",
-    tags=["Chat"],
-    dependencies=[Depends(get_query_bot_id), Depends(get_query_conversation_id)],
-)
+from llm_orchestrator.exceptions.ErrorCode import ErrorCode
+from llm_orchestrator.exceptions.FunctionalException import FunctionalException
 
 
-@router.post("/")
-async def chat(botId: str, conversationId: str, query: ChatQuery):
-    return ask(botId, conversationId, query.llmSetting, query.llmSettingEmbedding)
+async def get_query_bot_id(botId: Union[str, None]):
+    if not botId:
+        raise FunctionalException(ErrorCode.E30)
+
+
+async def get_query_conversation_id(conversationId: str):
+    if not conversationId:
+        raise FunctionalException(ErrorCode.E40)
