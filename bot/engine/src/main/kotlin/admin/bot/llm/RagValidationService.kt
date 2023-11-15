@@ -17,35 +17,49 @@
 package ai.tock.bot.admin.bot.llm
 
 
+import ai.tock.bot.admin.bot.llm.settings.EMSetting
 import ai.tock.bot.admin.bot.llm.settings.LLMSetting
-import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAISetting
+import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAIEMSetting
+import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAILLMSetting
 import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAIVersion
-import ai.tock.bot.admin.bot.llm.settings.openai.OpenAIModel
-import ai.tock.bot.admin.bot.llm.settings.openai.OpenAISetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAIEMSetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAIEmbeddingModel
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILLMSetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILanguageModel
 
 object RagValidationService {
 
     // TODO MASS : improve the validation. Workshop ?
     fun validate(ragConfig: BotRAGConfiguration): Set<String> =
-        validateLLMSetting(ragConfig.llmSetting) + validateLLMSetting(ragConfig.llmSettingEmbedding, true)
+        validateLLMSetting(ragConfig.llmSetting) + validateEMSetting(ragConfig.emSetting)
 
-    private fun validateLLMSetting(setting: LLMSetting, isForEmbedding: Boolean = false): Set<String> {
+    private fun validateLLMSetting(setting: LLMSetting): Set<String> {
         return when(setting){
-            is OpenAISetting -> validateOpenAISetting(setting, isForEmbedding)
-            is AzureOpenAISetting -> validateAzureOpenAISetting(setting, isForEmbedding)
+            is OpenAILLMSetting -> validateOpenAILLMSetting(setting)
+            is AzureOpenAILLMSetting -> validateAzureOpenAILLMSetting(setting)
             else -> setOf("Unknown LLM setting")
         }
     }
 
+    private fun validateEMSetting(setting: EMSetting): Set<String> {
+        return when(setting){
+            is OpenAIEMSetting -> validateOpenAIEMSetting(setting)
+            is AzureOpenAIEMSetting -> validateAzureOpenAIEMSetting(setting)
+            else -> setOf("Unknown EM setting")
+        }
+    }
 
-    private fun validateOpenAISetting(setting: OpenAISetting, isForEmbedding: Boolean = false): Set<String> =
-        validate(setting, isForEmbedding)
 
+    private fun validateOpenAILLMSetting(setting: OpenAILLMSetting): Set<String> =
+        validate(setting)
 
-    private fun validateAzureOpenAISetting(setting: AzureOpenAISetting, isForEmbedding: Boolean = false): Set<String> {
+    private fun validateOpenAIEMSetting(setting: OpenAIEMSetting): Set<String> =
+        validate(setting)
+
+    private fun validateAzureOpenAILLMSetting(setting: AzureOpenAILLMSetting): Set<String> {
         val errors = mutableSetOf<String>()
 
-        errors.addAll(validate(setting, isForEmbedding))
+        errors.addAll(validate(setting))
 
         AzureOpenAIVersion.findByVersion(setting.apiVersion)
             ?: errors.add("Unknown API version : ${setting.apiVersion}")
@@ -53,34 +67,50 @@ object RagValidationService {
         return errors
     }
 
-    private fun validate(setting: LLMSetting, isForEmbedding: Boolean = false): Set<String> {
+    private fun validateAzureOpenAIEMSetting(setting: AzureOpenAIEMSetting): Set<String> {
+        val errors = mutableSetOf<String>()
+
+        errors.addAll(validate(setting))
+
+        AzureOpenAIVersion.findByVersion(setting.apiVersion)
+            ?: errors.add("Unknown API version : ${setting.apiVersion}")
+
+        return errors
+    }
+
+    private fun validate(setting: LLMSetting): Set<String> {
         val errors = mutableSetOf<String>()
 
         if(setting.apiKey.isBlank()) {
             errors.add("The API key is not provided")
         }
 
-        OpenAIModel.findById(setting.model)
+        OpenAILanguageModel.findById(setting.model)
             ?: errors.add("Unknown model : ${setting.model}")
 
-        if(!isForEmbedding) {
-            if (setting.temperature.isNullOrBlank()) {
-                errors.add("The temperature is not provided")
-            } else if (setting.temperature!!.toDouble() !in 0.0..1.0) {
-                errors.add("The temperature is not correct [0..1]")
-            }
-
-            if (setting.prompt.isNullOrBlank()) {
-                errors.add("The prompt is not provided")
-            }
-        } else{
-            if (setting.temperature != null) {
-                errors.add("The temperature is not allowed for embedding")
-            }
-            if (setting.prompt != null) {
-                errors.add("The prompt is not allowed for embedding")
-            }
+        if (setting.temperature.isBlank()) {
+            errors.add("The temperature is not provided")
+        } else if (setting.temperature.toDouble() !in 0.0..1.0) {
+            errors.add("The temperature is not correct [0..1]")
         }
+
+        if (setting.prompt.isBlank()) {
+            errors.add("The prompt is not provided")
+        }
+
+
+        return errors
+    }
+
+    private fun validate(setting: EMSetting): Set<String> {
+        val errors = mutableSetOf<String>()
+
+        if(setting.apiKey.isBlank()) {
+            errors.add("The API key is not provided")
+        }
+
+        OpenAIEmbeddingModel.findById(setting.model)
+            ?: errors.add("Unknown model : ${setting.model}")
 
         return errors
     }

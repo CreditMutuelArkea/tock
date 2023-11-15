@@ -21,8 +21,9 @@ import ai.tock.bot.admin.BotAdminService
 import ai.tock.bot.admin.answer.AnswerConfigurationType
 import ai.tock.bot.admin.bot.BotRAGConfigurationDAO
 import ai.tock.bot.admin.bot.llm.BotRAGConfiguration
-import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAISetting
-import ai.tock.bot.admin.bot.llm.settings.openai.OpenAISetting
+import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAIEMSetting
+import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAILLMSetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILLMSetting
 import ai.tock.bot.admin.model.BotRAGConfigurationDTO
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.admin.story.StoryDefinitionConfigurationDAO
@@ -68,18 +69,18 @@ class RagServiceTest : AbstractTest() {
             namespace = NAMESPACE,
             botId = BOT_ID,
             enabled = false,
-            llmSetting = OpenAISetting (
+            llmSetting = OpenAILLMSetting (
                 apiKey = "apikey",
                 model = MODEL,
                 prompt = PROMPT,
                 temperature = TEMPERATURE
             ),
-            llmSettingEmbedding = AzureOpenAISetting (
-                apiKey = "apikey",
+            emSetting = AzureOpenAIEMSetting (
+                apiKey = "apiKey",
                 model = EMBEDDING_MODEL,
-                apiVersion = "apiversion",
+                apiVersion = "apiVersion",
                 deploymentName = "deployment",
-                privateEndpointBaseUrl = "url"
+                apiBase = "url"
             ),
             "",
             null

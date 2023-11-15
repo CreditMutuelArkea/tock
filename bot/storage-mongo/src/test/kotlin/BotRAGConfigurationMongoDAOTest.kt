@@ -17,7 +17,8 @@
 package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.bot.llm.BotRAGConfiguration
-import ai.tock.bot.admin.bot.llm.settings.openai.OpenAISetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAIEMSetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILLMSetting
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.litote.kmongo.newId
@@ -42,13 +43,13 @@ internal class BotRAGConfigurationMongoDAOTest : AbstractTest() {
             "namespace1",
             "botId1",
             false,
-            llmSetting = OpenAISetting(
+            llmSetting = OpenAILLMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1",
                 temperature = "1F",
                 prompt = "prompt1"
             ),
-            llmSettingEmbedding = OpenAISetting(
+            emSetting = OpenAIEMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1"
             ),
@@ -68,13 +69,13 @@ internal class BotRAGConfigurationMongoDAOTest : AbstractTest() {
             "namespace1",
             "botId1",
             false,
-            llmSetting = OpenAISetting(
+            llmSetting = OpenAILLMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1",
                 temperature = "1F",
                 prompt = "prompt1"
             ),
-            llmSettingEmbedding = OpenAISetting(
+            emSetting = OpenAIEMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1"
             ),
@@ -86,13 +87,13 @@ internal class BotRAGConfigurationMongoDAOTest : AbstractTest() {
             "namespace1",
             "botId2",
             false,
-            llmSetting = OpenAISetting(
+            llmSetting = OpenAILLMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1",
                 temperature = "1F",
                 prompt = "prompt1"
             ),
-            llmSettingEmbedding = OpenAISetting(
+            emSetting = OpenAIEMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1"
             ),
@@ -118,13 +119,13 @@ internal class BotRAGConfigurationMongoDAOTest : AbstractTest() {
             "namespace1",
             "botId1",
             false,
-            llmSetting = OpenAISetting(
+            llmSetting = OpenAILLMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1",
                 temperature = "1F",
                 prompt = "prompt1"
             ),
-            llmSettingEmbedding = OpenAISetting(
+            emSetting = OpenAIEMSetting(
                 apiKey = "apiKey1",
                 model = "modelName1"
             ),

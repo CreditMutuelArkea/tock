@@ -16,12 +16,10 @@
 
 package ai.tock.bot.admin.bot.llm.settings.openai
 
+import ai.tock.bot.admin.bot.llm.settings.EMSetting
 import ai.tock.bot.admin.bot.llm.settings.LLMProvider
-import ai.tock.bot.admin.bot.llm.settings.LLMSetting
 
-data class OpenAISetting(
+data class OpenAIEMSetting(
     override val apiKey: String,
     override val model: String,
-    override val temperature: String? = null,
-    override val prompt: String? = null,
-) : LLMSetting(LLMProvider.OpenAI, apiKey, model, temperature, prompt)
+) : EMSetting(LLMProvider.OpenAI, apiKey, model)

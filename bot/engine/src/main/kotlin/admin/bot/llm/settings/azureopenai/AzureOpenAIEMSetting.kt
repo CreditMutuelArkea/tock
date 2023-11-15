@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.bot.llm
+package ai.tock.bot.admin.bot.llm.settings.azureopenai
 
 import ai.tock.bot.admin.bot.llm.settings.EMSetting
-import ai.tock.bot.admin.bot.llm.settings.LLMSetting
-import ai.tock.bot.admin.story.StoryDefinitionConfiguration
-import org.litote.kmongo.Id
+import ai.tock.bot.admin.bot.llm.settings.LLMProvider
 
-data class BotRAGConfiguration(
-    val _id: Id<BotRAGConfiguration>,
-    val namespace: String,
-    val botId: String,
-    val enabled: Boolean,
-    val llmSetting: LLMSetting,
-    val emSetting: EMSetting,
-    val noAnswerSentence: String,
-    val noAnswerStoryId: Id<StoryDefinitionConfiguration>? = null,
-)
+data class AzureOpenAIEMSetting(
+    override val apiKey: String,
+    override val model: String,
+    val apiBase: String,
+    val deploymentName: String,
+    val apiVersion: String,
+) : EMSetting(LLMProvider.AzureOpenAIService, apiKey, model)

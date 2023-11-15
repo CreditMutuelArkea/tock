@@ -14,17 +14,14 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.bot.llm.settings.azureopenai
+package ai.tock.bot.admin.bot.llm.settings.openai
 
 import ai.tock.bot.admin.bot.llm.settings.LLMProvider
 import ai.tock.bot.admin.bot.llm.settings.LLMSetting
 
-data class AzureOpenAISetting(
+data class OpenAILLMSetting(
     override val apiKey: String,
     override val model: String,
-    override val temperature: String? = null,
-    override val prompt: String? = null,
-    val deploymentName: String,
-    val privateEndpointBaseUrl: String,
-    val apiVersion: String,
-) : LLMSetting(LLMProvider.AzureOpenAIService, apiKey, model, temperature, prompt)
+    override val temperature: String,
+    override val prompt: String,
+) : LLMSetting(LLMProvider.OpenAI, apiKey, model, temperature, prompt)

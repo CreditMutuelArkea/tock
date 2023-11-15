@@ -16,8 +16,8 @@
 
 package ai.tock.bot.admin.bot.llm.settings
 
-import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAILLMSetting
-import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILLMSetting
+import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAIEMSetting
+import ai.tock.bot.admin.bot.llm.settings.openai.OpenAIEMSetting
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -27,13 +27,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
     property = "provider"
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = OpenAILLMSetting::class, name = LLMConstants.OPEN_AI),
-    JsonSubTypes.Type(value = AzureOpenAILLMSetting::class, name = LLMConstants.AZURE_OPEN_AI_SERVICE)
+    JsonSubTypes.Type(value = OpenAIEMSetting::class, name = LLMConstants.OPEN_AI),
+    JsonSubTypes.Type(value = AzureOpenAIEMSetting::class, name = LLMConstants.AZURE_OPEN_AI_SERVICE)
 )
-abstract class LLMSetting(
+abstract class EMSetting(
     val provider: LLMProvider,
     open val apiKey: String,
     open val model: String,
-    open val temperature: String,
-    open val prompt: String
 )
