@@ -71,7 +71,8 @@ import {
   SentenceTrainingFiltersComponent,
   SentenceTrainingListComponent,
   SentenceTrainingSentenceComponent,
-  SliderComponent
+  SliderComponent,
+  TokenViewComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
@@ -135,6 +136,7 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     SentenceTrainingFiltersComponent,
     SentenceTrainingListComponent,
     SentenceTrainingSentenceComponent,
+    TokenViewComponent,
     SentenceReviewRequestComponent,
     EntityCreationComponent,
     AutocompleteInputComponent,

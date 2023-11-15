@@ -1,0 +1,15 @@
+<span
+  *ngFor="let token of tokens"
+  [nbTooltip]="'Entity : ' + token.entity?.role"
+  [nbTooltipDisabled]="!token.entity"
+  [ngClass]="{ token: token.entity, pointer: token.entity, unClickable: !token.entity, 'cursor-default': !token.entity }"
+  [style.background]="token.color()"
+  [style.color]="getContrastYIQ(token.color())"
+  (click)="token.entity ? displayMenu({ event: $event, token: this.token }) : null"
+  ><!-- NO carriage return here ! --><ng-container *ngIf="!token.subTokens">{{ token.text }}</ng-container
+  ><ng-container *ngIf="token.subTokens"
+    ><tock-token-view
+      [tokens]="token.subTokens"
+      (displayTokenMenu)="displayMenu($event)"
+    ></tock-token-view></ng-container
+></span>

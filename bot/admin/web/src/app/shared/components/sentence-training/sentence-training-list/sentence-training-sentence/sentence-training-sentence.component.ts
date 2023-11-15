@@ -12,11 +12,11 @@ import { NlpService } from '../../../../../nlp-tabs/nlp.service';
 import { StateService } from '../../../../../core-nlp/state.service';
 import { getContrastYIQ } from '../../../../utils';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { User } from '../../../../../model/auth';
 import { isNullOrUndefined } from '../../../../../model/commons';
 import { EntityCreationComponent } from '../../entity-creation/entity-creation.component';
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
+import { Token } from './models/token.model';
 
 @Component({
   selector: 'tock-sentence-training-sentence',
@@ -30,7 +30,6 @@ export class SentenceTrainingSentenceComponent implements OnInit {
 
   tokens: Token[];
   entityProvider: EntityProvider;
-  edited: boolean;
 
   getContrastYIQ = getContrastYIQ;
 
@@ -54,83 +53,67 @@ export class SentenceTrainingSentenceComponent implements OnInit {
   }
 
   private rebuild() {
-    this.edited = false;
     if (this.entityProvider) {
       this.entityProvider.reload();
     }
     this.initTokens();
-    // this.handleParentSelect();
   }
 
   initTokens(): void {
     this.tokens = this.parseTokens(this.sentence);
   }
 
-  parseTokens(sentence) {
-    const subEntities = sentence.getEditedSubEntities();
-    // if (subEntities.length) console.log(subEntities);
+  parseTokens(sentence: EntityContainer) {
     let text: String = sentence.getText();
     let entities: ClassifiedEntity[] = sentence.getEntities();
+
     let i = 0;
     let entityIndex = 0;
     const result: Token[] = [];
+
     while (i <= text.length) {
       if (entities.length > entityIndex) {
         const entity = entities[entityIndex] as ClassifiedEntity;
         if (entity.start !== i) {
-          result.push(new Token(i, text.substring(i, entity.start), result.length));
+          result.push(new Token(i, text.substring(i, entity.start), sentence));
         }
-        result.push(new Token(entity.start, text.substring(entity.start, entity.end), result.length, entity));
+
+        const token = new Token(entity.start, text.substring(entity.start, entity.end), sentence, entity);
+        if (token.entity?.subEntities?.length) {
+          token.subTokens = this.parseTokens(
+            new EntityWithSubEntities(sentence.getText().substring(token.start, token.end), token.entity, token.entity)
+          );
+        }
+        result.push(token);
+
         i = entity.end;
         entityIndex++;
       } else {
         if (i != text.length) {
-          result.push(new Token(i, text.substring(i, text.length), result.length));
+          result.push(new Token(i, text.substring(i, text.length), sentence));
         }
         break;
       }
     }
+
     return result;
   }
 
-  // private handleParentSelect() {
-  //   if (this.sentence instanceof EntityWithSubEntities) {
-  //     const e = this.sentence as EntityWithSubEntities;
-  //     if (e.hasSelection()) {
-  //       setTimeout((_) => {
-  //         this.txtSelectionStart = e.startSelection;
-  //         this.txtSelectionEnd = e.endSelection;
+  delete(token: Token): void {
+    if (token.entity) {
+      token.sentence.removeEntity(token.entity);
+      token.sentence.cleanupEditedSubEntities();
 
-  //         const tokenMatch = this.tokens.find((t) => t.start <= e.startSelection && t.end >= e.endSelection);
-  //         if (!tokenMatch) {
-  //           return;
-  //         }
-  //         const r = document.createRange();
-  //         const tokenId = this.prefix + tokenMatch.index;
-  //         const c: Node = this.tokensContainer.nativeElement;
+      this.rebuild();
+    }
+  }
 
-  //         let token;
-  //         c.childNodes.forEach((s) => {
-  //           if ((s as Element).id === tokenId) token = s.firstChild;
-  //         });
-  //         if (token) {
-  //           r.setStart(token, this.txtSelectionStart - tokenMatch.start);
-  //           r.setEnd(token, this.txtSelectionEnd - tokenMatch.start);
-  //           window.getSelection().removeAllRanges();
-  //           window.getSelection().addRange(r);
-  //           this.select();
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-
-  @HostListener('mouseup', ['$event'])
-  select(event) {
+  // @HostListener('mouseup', ['$event'])
+  select(event?: MouseEvent) {
     this.hideTokenMenu();
     setTimeout((_) => {
       const windowsSelection = window.getSelection();
-
+      console.log(windowsSelection);
       if (windowsSelection.rangeCount > 0) {
         const selection = windowsSelection.getRangeAt(0);
         let start = selection.startOffset;
@@ -151,27 +134,28 @@ export class SentenceTrainingSentenceComponent implements OnInit {
           return;
         }
         const span = selection.startContainer.parentElement;
+        console.log(start, end);
         this.txtSelectionStart = -1;
         this.txtSelectionEnd = -1;
+
         this.findSelected(span.parentNode, new SelectedResult(span, start, end));
 
-        const overlap = this.sentence.overlappedEntity(this.txtSelectionStart, this.txtSelectionEnd);
-        if (overlap) {
-          if (this.state.currentApplication.supportSubEntities) {
-            this.sentence
-              .addEditedSubEntities(overlap)
-              .setSelection(this.txtSelectionStart - overlap.start, this.txtSelectionEnd - overlap.start);
-          }
-          window.getSelection().removeAllRanges();
-        } else if (this.entityProvider.isValid()) {
-          this.edited = true;
-          this.displayTokenMenu(event, null);
-        }
+        // const overlap = this.sentence.overlappedEntity(this.txtSelectionStart, this.txtSelectionEnd);
+        // if (overlap) {
+        //   if (this.state.currentApplication.supportSubEntities) {
+        //     this.sentence
+        //       .addEditedSubEntities(overlap)
+        //       .setSelection(this.txtSelectionStart - overlap.start, this.txtSelectionEnd - overlap.start);
+        //   }
+        //   window.getSelection().removeAllRanges();
+        // } else if (this.entityProvider.isValid()) {
+        //   this.displayTokenMenu({ event, token: null });
+        // }
+        this.displayTokenMenu({ event, token: null });
       }
     });
   }
 
-  txtSelection: boolean = false;
   txtSelectionStart: number;
   txtSelectionEnd: number;
 
@@ -186,7 +170,7 @@ export class SentenceTrainingSentenceComponent implements OnInit {
             if (node === result.selectedNode) {
               this.txtSelectionStart = result.alreadyCount + result.startOffset;
               this.txtSelectionEnd = this.txtSelectionStart + result.endOffset - result.startOffset;
-              this.txtSelection = true;
+              console.log(this.txtSelectionStart, this.txtSelectionEnd);
             } else {
               this.findSelected(child, result);
             }
@@ -198,7 +182,6 @@ export class SentenceTrainingSentenceComponent implements OnInit {
 
   onSelect(entity: EntityDefinition) {
     if (this.txtSelectionStart < this.txtSelectionEnd) {
-      this.edited = false;
       const text = this.sentence.getText();
       if (this.txtSelectionStart >= 0 && this.txtSelectionEnd <= text.length) {
         //trim spaces
@@ -267,14 +250,6 @@ export class SentenceTrainingSentenceComponent implements OnInit {
     this.toastrService.success(`Entity Type ${entity.qualifiedRole} added`, 'Entity added');
   }
 
-  delete(token: Token): void {
-    if (token.entity) {
-      this.sentence.removeEntity(token.entity);
-      this.sentence.cleanupEditedSubEntities();
-      this.rebuild();
-    }
-  }
-
   overlayRef: OverlayRef | null;
   @ViewChild('userMenu') userMenu: TemplateRef<any>;
 
@@ -283,13 +258,13 @@ export class SentenceTrainingSentenceComponent implements OnInit {
     if (this.overlayRef) this.overlayRef.detach();
   }
 
-  displayTokenMenu(event: MouseEvent, token: Token): void {
-    event.stopPropagation();
+  displayTokenMenu(args: { event: MouseEvent; token: Token }): void {
+    args.event.stopPropagation();
     this.hideTokenMenu();
 
     const positionStrategy = this.overlay
       .position()
-      .flexibleConnectedTo(event.target as FlexibleConnectedPositionStrategyOrigin)
+      .flexibleConnectedTo(args.event.target as FlexibleConnectedPositionStrategyOrigin)
       .withPositions([
         {
           originX: 'start',
@@ -318,7 +293,7 @@ export class SentenceTrainingSentenceComponent implements OnInit {
 
     this.overlayRef.attach(
       new TemplatePortal(this.userMenu, this.viewContainerRef, {
-        $implicit: token
+        $implicit: args.token
       })
     );
   }
@@ -329,30 +304,6 @@ export class SelectedResult {
 
   constructor(public selectedNode: any, public startOffset: number, public endOffset) {
     this.alreadyCount = 0;
-  }
-}
-
-export class Token {
-  public end: number;
-
-  constructor(public start: number, public text: string, public index: number, public entity?: ClassifiedEntity) {
-    this.end = this.start + text.length;
-  }
-
-  display(sentence: Sentence, user: User): string {
-    if (!this.entity) {
-      return '';
-    } else {
-      return this.entity.qualifiedName(user) + ' = ' + sentence.entityValue(this.entity);
-    }
-  }
-
-  color(): string {
-    if (this.entity) {
-      return this.entity.entityColor;
-    } else {
-      return '';
-    }
   }
 }
 
