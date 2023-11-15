@@ -36,6 +36,31 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>poetry-to-requirements.txt</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <workingDirectory>src/main/python/app/</workingDirectory>
+                    <executable>poetry</executable>
+                    <arguments>
+                        <argument>export</argument>
+                        <argument>--without-hashes</argument>
+                        <argument>--format=requirements.txt</argument>
+                        <argument>--output=src/app/requirements.txt</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 </project>

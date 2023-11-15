@@ -8,7 +8,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>src/</directory>
+            <directory>src/main/python/app/src/app/</directory>
             <outputDirectory></outputDirectory>
         </fileSet>
     </fileSets>
