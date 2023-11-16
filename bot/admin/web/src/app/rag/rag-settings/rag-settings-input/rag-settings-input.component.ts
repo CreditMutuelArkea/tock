@@ -17,7 +17,7 @@ export class RagSettingsInputComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  getFormControlByName(): FormControl {
+  getFormControl(): FormControl {
     return this.form.get(this.parentGroup).get(this.configurationParam.key) as FormControl;
   }
 

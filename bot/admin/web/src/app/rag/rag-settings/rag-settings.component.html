@@ -126,18 +126,18 @@
       <h5 class="section-title mt-2">Embedding engine</h5>
 
       <tock-form-control
-        name="embeddingEngine"
-        [controls]="embeddingEngine"
+        name="emEngine"
+        [controls]="emEngine"
         [required]="true"
         [showError]="isSubmitted"
       >
         <nb-radio-group
-          formControlName="embeddingEngine"
-          name="embeddingEngine"
+          formControlName="emEngine"
+          name="emEngine"
           class="d-flex"
         >
           <nb-radio
-            *ngFor="let engine of enginesConfigurations['llmSettingEmbedding']"
+            *ngFor="let engine of enginesConfigurations['emSetting']"
             [value]="engine.key"
           >
             {{ engine.label }}
@@ -146,16 +146,16 @@
       </tock-form-control>
 
       <div
-        *ngIf="currentEmbeddingEngine"
+        *ngIf="currentEmEngine"
         class="mt-2 mb-2"
       >
         <div class="row mb-1">
           <div
             class="col-6"
-            *ngFor="let param of currentEmbeddingEngine.params"
+            *ngFor="let param of currentEmEngine.params"
           >
             <tock-rag-settings-input
-              parentGroup="llmSettingEmbedding"
+              parentGroup="emSetting"
               [configurationParam]="param"
               [form]="form"
               [isSubmitted]="isSubmitted"

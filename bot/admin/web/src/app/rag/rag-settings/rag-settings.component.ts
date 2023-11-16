@@ -21,8 +21,8 @@ interface RagSettingsForm {
 
   llmEngine: FormControl<LLMProvider>;
   llmSetting: FormGroup<any>;
-  embeddingEngine: FormControl<LLMProvider>;
-  llmSettingEmbedding: FormGroup<any>;
+  emEngine: FormControl<LLMProvider>;
+  emSetting: FormGroup<any>;
 }
 
 @Component({
@@ -80,10 +80,10 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       });
 
     this.form
-      .get('embeddingEngine')
+      .get('emEngine')
       .valueChanges.pipe(takeUntil(this.destroy$))
       .subscribe((engine: LLMProvider) => {
-        this.initFormSettings('llmSettingEmbedding', engine);
+        this.initFormSettings('emSetting', engine);
       });
 
     this.botConfiguration.configurations.pipe(takeUntil(this.destroy$)).subscribe((confs: BotApplicationConfiguration[]) => {
@@ -106,8 +106,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     noAnswerStoryId: new FormControl(undefined),
     llmEngine: new FormControl(undefined, [Validators.required]),
     llmSetting: new FormGroup<any>({}),
-    embeddingEngine: new FormControl(undefined, [Validators.required]),
-    llmSettingEmbedding: new FormGroup<any>({})
+    emEngine: new FormControl(undefined, [Validators.required]),
+    emSetting: new FormGroup<any>({})
   });
 
   get enabled(): FormControl {
@@ -116,8 +116,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   get llmEngine(): FormControl {
     return this.form.get('llmEngine') as FormControl;
   }
-  get embeddingEngine(): FormControl {
-    return this.form.get('embeddingEngine') as FormControl;
+  get emEngine(): FormControl {
+    return this.form.get('emEngine') as FormControl;
   }
 
   get noAnswerSentence(): FormControl {
@@ -131,7 +131,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     return this.isSubmitted ? this.form.valid : this.form.dirty;
   }
 
-  initFormSettings(group: 'llmSetting' | 'llmSettingEmbedding', provider: LLMProvider) {
+  initFormSettings(group: 'llmSetting' | 'emSetting', provider: LLMProvider) {
     let requiredConfiguration: EnginesConfiguration = EnginesConfigurations[group].find((c) => c.key === provider);
 
     if (requiredConfiguration) {
@@ -163,13 +163,12 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   }
 
   initForm(settings: RagSettings) {
-    this.form.patchValue({
-      ...settings,
-      llmEngine: settings.llmSetting.provider,
-      embeddingEngine: settings.llmSettingEmbedding.provider
-    });
     this.initFormSettings('llmSetting', settings.llmSetting.provider);
-    this.initFormSettings('llmSettingEmbedding', settings.llmSettingEmbedding.provider);
+    this.initFormSettings('emSetting', settings.emSetting.provider);
+    this.form.patchValue({
+      llmEngine: settings.llmSetting.provider,
+      emEngine: settings.emSetting.provider
+    });
     this.form.patchValue(settings);
     this.form.markAsPristine();
   }
@@ -194,8 +193,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     return EnginesConfigurations['llmSetting'].find((e) => e.key === this.llmEngine.value);
   }
 
-  get currentEmbeddingEngine(): EnginesConfiguration {
-    return EnginesConfigurations['llmSettingEmbedding'].find((e) => e.key === this.embeddingEngine.value);
+  get currentEmEngine(): EnginesConfiguration {
+    return EnginesConfigurations['emSetting'].find((e) => e.key === this.emEngine.value);
   }
 
   private loadAvailableStories(): void {
@@ -225,7 +224,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       formValue.namespace = this.state.currentApplication.namespace;
       formValue.botId = this.state.currentApplication.name;
       delete formValue['llmEngine'];
-      delete formValue['embeddingEngine'];
+      delete formValue['emEngine'];
 
       const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
       this.rest.post(url, formValue).subscribe((ragSettings: RagSettings) => {

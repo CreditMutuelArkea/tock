@@ -74,7 +74,7 @@ const EnginesConfigurations_Llm: EnginesConfiguration[] = [
       { key: 'apiKey', label: 'Api key', type: 'text' },
       { key: 'apiVersion', label: 'Api version', type: 'list', source: AzureOpenAiApiVersionsList },
       { key: 'deploymentName', label: 'Deployment name', type: 'text' },
-      { key: 'privateEndpointBaseUrl', label: 'Private endpoint base url', type: 'text' },
+      { key: 'apiBase', label: 'Private endpoint base url', type: 'text' },
       { key: 'temperature', label: 'Temperature', type: 'number', inputScale: 'fullwidth' },
       { key: 'prompt', label: 'Prompt', type: 'prompt', inputScale: 'fullwidth', defaultValue: DefaultPrompt }
     ]
@@ -98,12 +98,12 @@ const EnginesConfigurations_Embedding: EnginesConfiguration[] = [
       { key: 'apiKey', label: 'Api key', type: 'text' },
       { key: 'apiVersion', label: 'Api version', type: 'list', source: AzureOpenAiApiVersionsList },
       { key: 'deploymentName', label: 'Deployment name', type: 'text' },
-      { key: 'privateEndpointBaseUrl', label: 'Private endpoint base url', type: 'text' }
+      { key: 'apiBase', label: 'Private endpoint base url', type: 'text' }
     ]
   }
 ];
 
 export const EnginesConfigurations: { [key: string]: EnginesConfiguration[] } = {
   llmSetting: EnginesConfigurations_Llm,
-  llmSettingEmbedding: EnginesConfigurations_Embedding
+  emSetting: EnginesConfigurations_Embedding
 };

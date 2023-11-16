@@ -13,19 +13,30 @@ export interface RagSettings {
   noAnswerStoryId: string;
 
   llmSetting: llmSetting;
-  llmSettingEmbedding: llmSetting;
+  emSetting: emSetting;
 }
 
 export interface llmSetting {
   provider: LLMProvider;
 
+  apiKey: String;
+  model: String;
+
+  deploymentName?: String;
+  apiBase?: String;
+  apiVersion?: String;
+
   temperature?: Number;
   prompt?: String;
+}
+
+export interface emSetting {
+  provider: LLMProvider;
 
   apiKey: String;
   model: String;
 
   deploymentName?: String;
-  privateEndpointBaseUrl?: String;
+  apiBase?: String;
   apiVersion?: String;
 }
