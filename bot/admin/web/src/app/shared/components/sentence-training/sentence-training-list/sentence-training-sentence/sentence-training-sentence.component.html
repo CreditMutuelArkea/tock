@@ -2,14 +2,15 @@
   <div class="tokens-container-wrapper">
     <div class="tokens-container">
       <tock-token-view
-        [tokens]="tokens"
+        *ngFor="let token of tokens"
+        [token]="token"
         (displayTokenMenu)="displayTokenMenu($event)"
       ></tock-token-view>
     </div>
   </div>
 </div>
 
-<ng-template
+<!-- <ng-template
   #userMenu
   let-token
 >
@@ -27,7 +28,7 @@
     </button>
 
     <div
-      *ngIf="!token"
+      *ngIf="!token && entityProvider.getEntities().length"
       class="px-3 pb-1"
     >
       Associate an existing entity :
@@ -59,4 +60,4 @@
       <nb-icon icon="plus-circle-outline"></nb-icon> Add entity
     </button>
   </section>
-</ng-template>
+</ng-template> -->

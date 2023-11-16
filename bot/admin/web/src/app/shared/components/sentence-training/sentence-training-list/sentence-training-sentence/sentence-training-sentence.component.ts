@@ -1,4 +1,4 @@
-import { Component, HostListener, Input, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, HostListener, Input, OnDestroy, OnInit, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import {
   ClassifiedEntity,
   EntityContainer,
@@ -17,13 +17,17 @@ import { EntityCreationComponent } from '../../entity-creation/entity-creation.c
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { Token } from './models/token.model';
+import { SentenceTrainingSentenceService } from './sentence-training-sentence.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'tock-sentence-training-sentence',
   templateUrl: './sentence-training-sentence.component.html',
   styleUrls: ['./sentence-training-sentence.component.scss']
 })
-export class SentenceTrainingSentenceComponent implements OnInit {
+export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
+  destroy = new Subject();
+
   @Input() sentence: EntityContainer;
   @Input() prefix: string = 's';
   @Input() readOnly: boolean = false;
@@ -39,8 +43,15 @@ export class SentenceTrainingSentenceComponent implements OnInit {
     private nbDialogService: NbDialogService,
     private toastrService: NbToastrService,
     private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef
-  ) {}
+    private viewContainerRef: ViewContainerRef,
+    private sentenceTrainingSentenceService: SentenceTrainingSentenceService
+  ) {
+    this.sentenceTrainingSentenceService.sentenceTrainingSentenceCommunication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
+      if (evt.type === 'refreshTokens') {
+        this.rebuild();
+      }
+    });
+  }
 
   ngOnInit(): void {
     if (this.sentence instanceof Sentence) {
@@ -108,105 +119,9 @@ export class SentenceTrainingSentenceComponent implements OnInit {
     }
   }
 
-  // @HostListener('mouseup', ['$event'])
-  select(event?: MouseEvent) {
-    this.hideTokenMenu();
-    setTimeout((_) => {
-      const windowsSelection = window.getSelection();
-      console.log(windowsSelection);
-      if (windowsSelection.rangeCount > 0) {
-        const selection = windowsSelection.getRangeAt(0);
-        let start = selection.startOffset;
-        let end = selection.endOffset;
-        if (selection.startContainer !== selection.endContainer) {
-          if (!selection.startContainer.childNodes[0]) {
-            return;
-          }
-          end = selection.startContainer.childNodes[0].textContent.length - start;
-        } else {
-          if (start > end) {
-            const tmp = start;
-            start = end;
-            end = tmp;
-          }
-        }
-        if (start === end) {
-          return;
-        }
-        const span = selection.startContainer.parentElement;
-        console.log(start, end);
-        this.txtSelectionStart = -1;
-        this.txtSelectionEnd = -1;
-
-        this.findSelected(span.parentNode, new SelectedResult(span, start, end));
-
-        // const overlap = this.sentence.overlappedEntity(this.txtSelectionStart, this.txtSelectionEnd);
-        // if (overlap) {
-        //   if (this.state.currentApplication.supportSubEntities) {
-        //     this.sentence
-        //       .addEditedSubEntities(overlap)
-        //       .setSelection(this.txtSelectionStart - overlap.start, this.txtSelectionEnd - overlap.start);
-        //   }
-        //   window.getSelection().removeAllRanges();
-        // } else if (this.entityProvider.isValid()) {
-        //   this.displayTokenMenu({ event, token: null });
-        // }
-        this.displayTokenMenu({ event, token: null });
-      }
-    });
-  }
-
-  txtSelectionStart: number;
-  txtSelectionEnd: number;
-
-  private findSelected(node: Node, result: SelectedResult): void {
-    if (this.txtSelectionStart == -1) {
-      if (node.nodeType === Node.TEXT_NODE) {
-        const content = node.textContent;
-        result.alreadyCount += content.length;
-      } else {
-        node.childNodes.forEach((child) => {
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            if (node === result.selectedNode) {
-              this.txtSelectionStart = result.alreadyCount + result.startOffset;
-              this.txtSelectionEnd = this.txtSelectionStart + result.endOffset - result.startOffset;
-              console.log(this.txtSelectionStart, this.txtSelectionEnd);
-            } else {
-              this.findSelected(child, result);
-            }
-          }
-        });
-      }
-    }
-  }
-
-  onSelect(entity: EntityDefinition) {
-    if (this.txtSelectionStart < this.txtSelectionEnd) {
-      const text = this.sentence.getText();
-      if (this.txtSelectionStart >= 0 && this.txtSelectionEnd <= text.length) {
-        //trim spaces
-        for (let i = this.txtSelectionEnd - 1; i >= this.txtSelectionStart; i--) {
-          if (text[i].trim().length === 0) {
-            this.txtSelectionEnd--;
-          } else {
-            break;
-          }
-        }
-        for (let i = this.txtSelectionStart; i < this.txtSelectionEnd; i++) {
-          if (text[i].trim().length === 0) {
-            this.txtSelectionStart++;
-          } else {
-            break;
-          }
-        }
-        if (this.txtSelectionStart < this.txtSelectionEnd) {
-          const e = new ClassifiedEntity(entity.entityTypeName, entity.role, this.txtSelectionStart, this.txtSelectionEnd, []);
-          this.sentence.addEntity(e);
-        }
-        this.initTokens();
-      }
-    }
-  }
+  // onSelect(entity: EntityDefinition) {
+  //   this.sentenceTrainingSentenceService.assignEntity(entity);
+  // }
 
   addEntity() {
     const dialogRef = this.nbDialogService.open(EntityCreationComponent, {
@@ -246,64 +161,61 @@ export class SentenceTrainingSentenceComponent implements OnInit {
   }
 
   notifyAddEntity(entity: EntityDefinition) {
-    this.onSelect(entity);
+    // this.onSelect(entity);
     this.toastrService.success(`Entity Type ${entity.qualifiedRole} added`, 'Entity added');
   }
 
-  overlayRef: OverlayRef | null;
-  @ViewChild('userMenu') userMenu: TemplateRef<any>;
+  // overlayRef: OverlayRef | null;
+  // @ViewChild('userMenu') userMenu: TemplateRef<any>;
 
-  @HostListener('document:click', ['$event'])
-  private hideTokenMenu(): void {
-    if (this.overlayRef) this.overlayRef.detach();
-  }
+  // @HostListener('document:click', ['$event'])
+  // private hideTokenMenu(): void {
+  //   if (this.overlayRef) this.overlayRef.detach();
+  // }
 
-  displayTokenMenu(args: { event: MouseEvent; token: Token }): void {
-    args.event.stopPropagation();
-    this.hideTokenMenu();
+  // displayTokenMenu(args: { event: MouseEvent; token: Token }): void {
+  //   args.event.stopPropagation();
+  //   this.hideTokenMenu();
 
-    const positionStrategy = this.overlay
-      .position()
-      .flexibleConnectedTo(args.event.target as FlexibleConnectedPositionStrategyOrigin)
-      .withPositions([
-        {
-          originX: 'start',
-          originY: 'bottom',
-          overlayX: 'start',
-          overlayY: 'top'
-        },
-        {
-          originX: 'start',
-          originY: 'center',
-          overlayX: 'end',
-          overlayY: 'center'
-        },
-        {
-          originX: 'end',
-          originY: 'center',
-          overlayX: 'start',
-          overlayY: 'center'
-        }
-      ]);
+  //   const positionStrategy = this.overlay
+  //     .position()
+  //     .flexibleConnectedTo(args.event.target as FlexibleConnectedPositionStrategyOrigin)
+  //     .withPositions([
+  //       {
+  //         originX: 'start',
+  //         originY: 'bottom',
+  //         overlayX: 'start',
+  //         overlayY: 'top'
+  //       },
+  //       {
+  //         originX: 'start',
+  //         originY: 'center',
+  //         overlayX: 'end',
+  //         overlayY: 'center'
+  //       },
+  //       {
+  //         originX: 'end',
+  //         originY: 'center',
+  //         overlayX: 'start',
+  //         overlayY: 'center'
+  //       }
+  //     ]);
 
-    this.overlayRef = this.overlay.create({
-      positionStrategy,
-      scrollStrategy: this.overlay.scrollStrategies.reposition()
-    });
+  //   this.overlayRef = this.overlay.create({
+  //     positionStrategy,
+  //     scrollStrategy: this.overlay.scrollStrategies.reposition()
+  //   });
 
-    this.overlayRef.attach(
-      new TemplatePortal(this.userMenu, this.viewContainerRef, {
-        $implicit: args.token
-      })
-    );
-  }
-}
+  //   this.overlayRef.attach(
+  //     new TemplatePortal(this.userMenu, this.viewContainerRef, {
+  //       $implicit: args.token
+  //     })
+  //   );
+  // }
 
-export class SelectedResult {
-  alreadyCount: number;
-
-  constructor(public selectedNode: any, public startOffset: number, public endOffset) {
-    this.alreadyCount = 0;
+  ngOnDestroy(): void {
+    this.destroy.next(true);
+    this.destroy.complete();
   }
 }
 
