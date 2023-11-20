@@ -8,7 +8,7 @@
     <includeBaseDirectory>false</includeBaseDirectory>
     <fileSets>
         <fileSet>
-            <directory>src/main/python/app/src/llm_orchestrator/</directory>
+            <directory>src/main/python/app/src/</directory>
             <outputDirectory></outputDirectory>
         </fileSet>
     </fileSets>
