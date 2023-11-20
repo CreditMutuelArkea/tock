@@ -57,7 +57,7 @@
                         <argument>export</argument>
                         <argument>--without-hashes</argument>
                         <argument>--format=requirements.txt</argument>
-                        <argument>--output=src/app/requirements.txt</argument>
+                        <argument>--output=src/llm_orchestrator/requirements.txt</argument>
                     </arguments>
                 </configuration>
             </plugin>
