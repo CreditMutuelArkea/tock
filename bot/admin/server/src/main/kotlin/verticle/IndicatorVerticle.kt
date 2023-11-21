@@ -139,7 +139,7 @@ class IndicatorVerticle {
             blockingJsonPost(METRICS_BY_APPLICATION_NAME_PATH, authorizedRoles) {
                     context: RoutingContext, request: Requests ->
                 checkNamespaceAndExecute(context, currentContextApp) {
-                    MetricService.filterAndGroupBy(createFilterMetric(it.name, request.filter), request.groupBy)
+                    MetricService.filterAndGroupBy(createFilterMetric(it.namespace, it.name, request.filter), request.groupBy)
                 }
             }
         }
@@ -152,12 +152,13 @@ class IndicatorVerticle {
     private fun getNamespace(context: RoutingContext) = (context.user() as TockUser).namespace
 
     /**
-     * Merge botId on requested [MetricFilter]
+     * Merge namespace and botId on requested [MetricFilter]
+     * @param namespace the namespace
      * @param botId the bot id
      * @param filter a given [MetricFilter]
      */
-    private fun createFilterMetric(botId: String, filter: MetricFilter?)
-            = filter?.copy(botId) ?: MetricFilter(botId)
+    private fun createFilterMetric(namespace: String, botId: String, filter: MetricFilter?)
+            = filter?.copy(namespace, botId) ?: MetricFilter(namespace, botId)
 }
 
 /**

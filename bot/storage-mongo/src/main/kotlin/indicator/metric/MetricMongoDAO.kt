@@ -48,7 +48,14 @@ object MetricMongoDAO : MetricDAO {
         col.insertMany(metrics)
     }
 
-    override fun findAllByBotId(botId: String): List<Metric> = col.find(Metric::botId eq botId).toList()
+    override fun findAllByBotId(namespace: String, botId: String): List<Metric> = col.find(
+        and(
+            listOf(
+                Metric::namespace eq namespace,
+                Metric::botId eq botId
+            )
+        )
+    ).toList()
 
     override fun filterAndGroupBy(
         filter: MetricFilter, groupBy: List<MetricGroupBy>
@@ -89,6 +96,7 @@ object MetricMongoDAO : MetricDAO {
      */
     private fun MetricFilter.listOfNotNull(): List<Bson> =
         listOfNotNull(
+            namespace?.let { Metric::namespace eq it },
             botId?.let { Metric::botId eq it },
             types?.let { Metric::type `in` it },
             emitterStoryIds?.let { Metric::emitterStoryId `in` it },

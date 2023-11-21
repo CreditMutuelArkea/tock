@@ -34,9 +34,10 @@ interface MetricDAO {
 
     /**
      * Find all metrics by bot id
+     * @param namespace the namespace
      * @param botId the bot id
      */
-    fun findAllByBotId(botId: String): List<Metric>
+    fun findAllByBotId(namespace: String, botId: String): List<Metric>
 
     /**
      * Find all metrics by filtering and grouping data

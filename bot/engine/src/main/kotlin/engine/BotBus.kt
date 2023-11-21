@@ -441,7 +441,6 @@ interface BotBus : Bus<BotBus> {
     fun handleAndSwitchStory(storyDefinition: StoryDefinition, starterIntent: Intent = storyDefinition.mainIntent()) {
         switchStory(storyDefinition, starterIntent)
         hasCurrentSwitchStoryProcess = false
-        @Suppress("UNCHECKED_CAST")
         storyDefinition.storyHandler.handle(this)
     }
 
@@ -460,11 +459,12 @@ interface BotBus : Bus<BotBus> {
             trackedStoryId = getTrackedStoryId(),
             playerIds = dialog.playerIds,
             dialogId = dialog.id,
+            namespace = botDefinition.namespace,
             botId = botDefinition.botId
         )
 
     /**
-     * A tracked story is the last story in the dialog, wich flagged non metricStory,
+     * A tracked story is the last story in the dialog, which is flagged non metricStory,
      * If it doesn't exist, the tracked story is the current one
      */
     fun getTrackedStoryId() = dialog.stories

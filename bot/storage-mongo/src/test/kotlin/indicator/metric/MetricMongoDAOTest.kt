@@ -33,6 +33,7 @@ import kotlin.test.assertEquals
 
 class MetricMongoDAOTest : AbstractTest() {
 
+    private val namespace1 = "namespace1"
     private val botId1 = "botId1"
     private val botId2 = "botId2"
     private val creationDate = Instant.now().truncatedTo(ChronoUnit.MILLIS)
@@ -49,6 +50,7 @@ class MetricMongoDAOTest : AbstractTest() {
         ),
         dialogId = "dialogId1".toId(),
         creationDate = creationDate,
+        namespace = namespace1,
         botId = botId1,
     )
 
@@ -64,6 +66,7 @@ class MetricMongoDAOTest : AbstractTest() {
         ),
         dialogId = "dialogId2".toId(),
         creationDate = creationDate,
+        namespace = namespace1,
         botId = botId1,
     )
 
@@ -79,6 +82,7 @@ class MetricMongoDAOTest : AbstractTest() {
         ),
         dialogId = "dialogId3".toId(),
         creationDate = creationDate,
+        namespace = namespace1,
         botId = botId2,
     )
 
@@ -102,7 +106,7 @@ class MetricMongoDAOTest : AbstractTest() {
         // GIVEN
         initDb(listOf(metric1, metric2, metric3))
         // WHEN
-        val result = MetricMongoDAO.findAllByBotId(botId1)
+        val result = MetricMongoDAO.findAllByBotId(namespace1, botId1)
         // THEN
         assertEquals(listOf(metric1, metric2), result)
     }
@@ -114,7 +118,7 @@ class MetricMongoDAOTest : AbstractTest() {
         // WHEN
         MetricMongoDAO.save(metric1)
         // THEN
-        assertEquals(listOf(metric1), MetricMongoDAO.findAllByBotId(botId1))
+        assertEquals(listOf(metric1), MetricMongoDAO.findAllByBotId(namespace1, botId1))
     }
 
     @Test
@@ -124,7 +128,7 @@ class MetricMongoDAOTest : AbstractTest() {
         // WHEN
         MetricMongoDAO.saveAll(listOf(metric1, metric2))
         // THEN
-        assertEquals(listOf(metric1, metric2), MetricMongoDAO.findAllByBotId(botId1))
+        assertEquals(listOf(metric1, metric2), MetricMongoDAO.findAllByBotId(namespace1, botId1))
     }
 
 }
