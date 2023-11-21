@@ -4,7 +4,7 @@
   [ngClass]="{ token: token.entity, pointer: token.entity, unClickable: !token.entity, 'cursor-default': !token.entity }"
   [style.background]="token.color()"
   [style.color]="getContrastYIQ(token.color())"
-  (click)="token.entity ? displayMenu({ event: $event, token: this.token }) : null"
+  (click)="token.entity ? displayMenu($event) : null"
   ><!-- NO carriage return here ! --><ng-container *ngIf="!token.subTokens">{{ token.text }}</ng-container
   ><ng-container *ngIf="token.subTokens"
     ><tock-token-view
@@ -16,11 +16,11 @@
 
 <ng-template
   #userMenu
-  let-token
+  let-action
 >
   <section class="token-menu pt-1">
     <button
-      *ngIf="token"
+      *ngIf="action === 'delete'"
       type="button"
       nbButton
       ghost
@@ -32,7 +32,7 @@
     </button>
 
     <div
-      *ngIf="!token && getEntities().length"
+      *ngIf="action === 'select' && getEntities().length"
       class="px-3 pb-1"
     >
       Associate an existing entity :
@@ -53,13 +53,13 @@
     </div>
 
     <button
-      *ngIf="!token"
+      *ngIf="action === 'select'"
       type="button"
       nbButton
       ghost
       size="small"
       class="d-block w-100"
-      (click)="addEntity(token)"
+      (click)="newEntity()"
     >
       <nb-icon icon="plus-circle-outline"></nb-icon> Add entity
     </button>

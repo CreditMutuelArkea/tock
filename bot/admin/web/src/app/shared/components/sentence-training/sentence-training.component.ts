@@ -13,6 +13,8 @@ import { Action, SentenceTrainingFilter, SentenceTrainingMode } from './models';
 import { SentenceTrainingListComponent } from './sentence-training-list/sentence-training-list.component';
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
+import { UserRole } from '../../../model/auth';
+import { saveAs } from 'file-saver-es';
 
 export type SentenceExtended = Sentence & { _selected?: boolean; _intentBeforeClassification?: string };
 
@@ -113,6 +115,10 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     return this.loadData(this.pagination.end, this.pagination.size, true, false);
   }
 
+  refresh() {
+    this.loadData();
+  }
+
   loadData(
     start: number = 0,
     size: number = this.pagination.size,
@@ -202,7 +208,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   }
 
   async handleAction({ action, sentence }): Promise<void> {
-    const actionTitle = this.setActionTitle(action);
+    const actionTitle = this.getActionTitle(action);
 
     this.setSentenceAccordingToAction(action, sentence);
 
@@ -233,7 +239,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   }
 
   async handleBatchAction(action: Action): Promise<void> {
-    const actionTitle = this.setActionTitle(action);
+    const actionTitle = this.getActionTitle(action);
     let actionPerformed = 0;
 
     for (let sentence of this.selection.selected) {
@@ -303,7 +309,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     }
   }
 
-  private setActionTitle(action: Action): string {
+  private getActionTitle(action: Action): string {
     switch (action) {
       case Action.DELETE:
         return 'Delete';
@@ -345,6 +351,19 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         showUnknown: false
       });
     }
+  }
+
+  downloadSentencesDump() {
+    this.nlp
+      .getSentencesDump(
+        this.state.currentApplication,
+        this.toSearchQuery(this.state.createPaginatedQuery(0)),
+        this.state.hasRole(UserRole.technicalAdmin)
+      )
+      .subscribe((blob) => {
+        saveAs(blob, this.state.currentApplication.name + '_sentences.json');
+        this.toastrService.success('Dump provided', 'Sentences dump');
+      });
   }
 
   ngOnDestroy(): void {

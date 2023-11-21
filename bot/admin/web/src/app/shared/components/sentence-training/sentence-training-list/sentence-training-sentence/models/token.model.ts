@@ -1,5 +1,6 @@
 import { User } from '../../../../../../model/auth';
 import { ClassifiedEntity, EntityContainer, Sentence } from '../../../../../../model/nlp';
+import { EntityProvider } from '../sentence-training-sentence.component';
 
 export class Token {
   public end: number;
@@ -8,6 +9,7 @@ export class Token {
     public start: number,
     public text: string,
     public sentence: EntityContainer,
+    public entityProvider: EntityProvider,
     public entity?: ClassifiedEntity,
     public subTokens?: Token[]
   ) {

@@ -33,6 +33,7 @@ import { UserRole } from '../model/auth';
 import { NbToastrService } from '@nebular/theme';
 import { FilterOption, Group } from './filter/search-filter.component';
 import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
+import { SentenceTrainingComponent } from '../shared/components';
 
 @Component({
   selector: 'tock-search',
@@ -41,6 +42,15 @@ import { SentenceTrainingMode } from '../shared/components/sentence-training/mod
 })
 export class SearchComponent implements OnInit {
   mode = SentenceTrainingMode.SEARCH;
+  @ViewChild(SentenceTrainingComponent) sentencesTraining;
+
+  refresh() {
+    this.sentencesTraining.refresh();
+  }
+
+  downloadSentencesDump() {
+    this.sentencesTraining.downloadSentencesDump();
+  }
 
   UserRole = UserRole;
   filter: SentenceFilter = new SentenceFilter();

@@ -1,44 +1,65 @@
 <nb-card class="mb-0">
   <nb-card-body>
-    <form
-      class="grid"
-      [formGroup]="form"
-    >
-      <nb-form-field>
-        <nb-icon
-          nbPrefix
-          icon="search-outline"
-        ></nb-icon>
-        <input
-          nbInput
-          fullWidth
-          fieldSize="medium"
-          placeholder="Search a sentence"
-          type="text"
-          formControlName="search"
-        />
-        <button
-          *ngIf="!!search.value"
-          nbButton
-          nbSuffix
-          nbTooltip="Clear"
-          ghost
-          (click)="clearSearch()"
-          data-testid="clear-button"
-        >
-          <nb-icon icon="close-outline"></nb-icon>
-        </button>
-      </nb-form-field>
+    <form [formGroup]="form">
+      <div class="d-flex justify-content-between align-items-center">
+        <nb-form-field class="flex-grow-1">
+          <nb-icon
+            nbPrefix
+            icon="search-outline"
+          ></nb-icon>
+          <input
+            nbInput
+            fullWidth
+            fieldSize="medium"
+            placeholder="Search a sentence"
+            type="text"
+            formControlName="search"
+          />
+          <button
+            *ngIf="!!search.value"
+            nbButton
+            nbSuffix
+            nbTooltip="Clear"
+            ghost
+            (click)="clearSearch()"
+            data-testid="clear-button"
+          >
+            <nb-icon icon="close-outline"></nb-icon>
+          </button>
+        </nb-form-field>
 
-      <div *ngIf="sentenceTrainingMode === SentenceTrainingMode.INBOX">
-        <nb-toggle
-          class="mb-n2 mr-2"
-          nbTooltip="Show unknown sentences"
-          formControlName="showUnknown"
+        <!-- <div *ngIf="sentenceTrainingMode === SentenceTrainingMode.INBOX">
+          <nb-toggle
+            class="mb-n2 mr-2"
+            nbTooltip="Show unknown sentences"
+            formControlName="showUnknown"
+          >
+            Unknown
+          </nb-toggle>
+        </div> -->
+
+        <div
+          class="ml-3"
+          *ngIf="sentenceTrainingMode === SentenceTrainingMode.SEARCH"
         >
-          Unknown
-        </nb-toggle>
+          <nb-icon
+            *ngIf="!advanced"
+            icon="chevron-down-outline"
+            (click)="swapAdvanced()"
+            class="pointer"
+            nbTooltip="Show advanced search options"
+          ></nb-icon>
+          <nb-icon
+            *ngIf="advanced"
+            icon="chevron-up-outline"
+            (click)="swapAdvanced()"
+            class="pointer"
+            nbTooltip="Hide advanced search options"
+          ></nb-icon>
+        </div>
       </div>
+
+      <div *ngIf="advanced">Advanced</div>
     </form>
   </nb-card-body>
 </nb-card>

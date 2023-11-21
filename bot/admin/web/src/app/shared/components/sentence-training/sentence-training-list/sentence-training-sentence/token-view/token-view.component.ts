@@ -15,10 +15,13 @@ import { Token } from '../models/token.model';
 import { getContrastYIQ } from '../../../../../utils';
 import { SentenceTrainingSentenceService } from '../sentence-training-sentence.service';
 import { Subject, takeUntil } from 'rxjs';
-import { ClassifiedEntity, Sentence } from '../../../../../../model/nlp';
+import { ClassifiedEntity, EntityDefinition, EntityWithSubEntities, Sentence } from '../../../../../../model/nlp';
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { StateService } from '../../../../../../core-nlp/state.service';
+import { NbDialogService } from '@nebular/theme';
+import { EntityCreationComponent } from '../../../entity-creation/entity-creation.component';
+import { NlpService } from '../../../../../../nlp-tabs/nlp.service';
 
 @Component({
   selector: 'tock-token-view',
@@ -30,8 +33,6 @@ export class TokenViewComponent implements OnDestroy {
 
   @Input() token: Token;
 
-  // @Output() displayTokenMenu = new EventEmitter<{ event: MouseEvent; token: Token }>();
-
   @ViewChild('userMenu') userMenu: TemplateRef<any>;
 
   getContrastYIQ = getContrastYIQ;
@@ -41,7 +42,9 @@ export class TokenViewComponent implements OnDestroy {
     private self: ElementRef,
     private sentenceTrainingSentenceService: SentenceTrainingSentenceService,
     private overlay: Overlay,
-    private viewContainerRef: ViewContainerRef
+    private viewContainerRef: ViewContainerRef,
+    private nbDialogService: NbDialogService,
+    private nlp: NlpService
   ) {
     this.sentenceTrainingSentenceService.sentenceTrainingSentenceCommunication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
       if (evt.type === 'assignEntity') {
@@ -53,9 +56,39 @@ export class TokenViewComponent implements OnDestroy {
   }
 
   assignEntity(entity) {
-    const newentity = new ClassifiedEntity(entity.entityTypeName, entity.role, this.txtSelectionStart, this.txtSelectionEnd, []);
+    const text = this.token.sentence.getText();
+    for (let i = this.txtSelectionEnd - 1; i >= this.txtSelectionStart; i--) {
+      if (text[i].trim().length === 0) {
+        this.txtSelectionEnd--;
+      } else {
+        break;
+      }
+    }
+    for (let i = this.txtSelectionStart; i < this.txtSelectionEnd; i++) {
+      if (text[i].trim().length === 0) {
+        this.txtSelectionStart++;
+      } else {
+        break;
+      }
+    }
 
-    this.token.sentence.addEntity(newentity);
+    let start = this.txtSelectionStart;
+    let end = this.txtSelectionEnd;
+    if (!this.token.entity) {
+      start += this.txtSelectionOffset;
+      end += this.txtSelectionOffset;
+    }
+
+    const newentity = new ClassifiedEntity(entity.entityTypeName, entity.role, start, end, []);
+
+    if (!this.token.entity) {
+      start += this.txtSelectionOffset;
+      end += this.txtSelectionOffset;
+      this.token.sentence.addEntity(newentity);
+    } else {
+      this.token.entity.subEntities.push(newentity);
+      this.token.entity.subEntities.sort((e1, e2) => e1.start - e2.start);
+    }
 
     this.sentenceTrainingSentenceService.refreshTokens();
   }
@@ -70,31 +103,73 @@ export class TokenViewComponent implements OnDestroy {
   }
 
   getEntities() {
-    console.log(1);
     if (this.token.sentence instanceof Sentence) {
       const intent = this.state.currentApplication.intentById(this.token.sentence.classification.intentId);
       return intent.entities;
     } else {
-      console.log(this.token.sentence);
+      const sntce = this.token.sentence as EntityWithSubEntities;
+      return sntce.entity.subEntities;
     }
-
-    return [];
   }
 
-  displayMenu(args: { event: MouseEvent; token: Token }) {
-    this.displayTokenMenu(args);
+  newEntity() {
+    const dialogRef = this.nbDialogService.open(EntityCreationComponent, {
+      context: {
+        entityProvider: this.token.entityProvider
+      }
+    });
+    dialogRef.onClose.subscribe((result) => {
+      if (result && result !== 'cancel') {
+        const name = result.name;
+        const role = result.role;
+        const existingEntityType = this.state.findEntityTypeByName(name);
+
+        if (existingEntityType) {
+          const entity = new EntityDefinition(name, role);
+          const result = this.token.entityProvider.addEntity(entity);
+
+          this.assignEntity(entity);
+          if (result) {
+            // this.toastrService.success(result);
+            console.log(result);
+          }
+        } else {
+          this.nlp.createEntityType(name).subscribe((e) => {
+            if (e) {
+              const entity = new EntityDefinition(e.name, role);
+              const entities = this.state.entityTypes.getValue().slice(0);
+              entities.push(e);
+              this.state.entityTypes.next(entities);
+              const result = this.token.entityProvider.addEntity(entity);
+              this.assignEntity(entity);
+              if (result) {
+                // this.toastrService.success(result);
+                console.log('this.toastrService.success(result)');
+                console.log(result);
+              }
+            } else {
+              // this.toastrService.success(`Error when creating Entity Type ${name}`);
+              console.log('this.toastrService.success(`Error when creating Entity Type ${name}`)');
+            }
+          });
+        }
+      }
+    });
   }
 
+  displayMenu(event: MouseEvent) {
+    this.displayTokenMenu(event, 'delete');
+  }
+
+  txtSelectionOffset;
   txtSelectionStart;
   txtSelectionEnd;
 
   @HostListener('mouseup', ['$event'])
   select(event?: MouseEvent) {
     event.stopPropagation();
-    console.clear();
 
     if (event.target !== this.self.nativeElement && !this.self.nativeElement.contains(event.target)) {
-      console.log(999);
       setTimeout(() => {
         this.txtSelectionStart = undefined;
         this.txtSelectionEnd = undefined;
@@ -127,11 +202,12 @@ export class TokenViewComponent implements OnDestroy {
 
       const sentenceTxt = this.token.sentence.getText();
       const offset = sentenceTxt.indexOf(this.token.text);
-      this.txtSelectionStart = start + offset;
-      this.txtSelectionEnd = end + offset;
+      this.txtSelectionOffset = offset;
+      this.txtSelectionStart = start;
+      this.txtSelectionEnd = end;
 
       setTimeout((_) => {
-        this.displayTokenMenu({ event, token: null });
+        this.displayTokenMenu(event, 'select');
       });
     }
   }
@@ -143,13 +219,13 @@ export class TokenViewComponent implements OnDestroy {
     if (this.overlayRef) this.overlayRef.detach();
   }
 
-  displayTokenMenu(args: { event: MouseEvent; token: Token }): void {
-    args.event.stopPropagation();
+  displayTokenMenu(event: MouseEvent, action: 'delete' | 'select'): void {
+    event.stopPropagation();
     this.hideTokenMenu();
 
     const positionStrategy = this.overlay
       .position()
-      .flexibleConnectedTo(args.event.target as FlexibleConnectedPositionStrategyOrigin)
+      .flexibleConnectedTo(event.target as FlexibleConnectedPositionStrategyOrigin)
       .withPositions([
         {
           originX: 'start',
@@ -176,11 +252,7 @@ export class TokenViewComponent implements OnDestroy {
       scrollStrategy: this.overlay.scrollStrategies.reposition()
     });
 
-    this.overlayRef.attach(
-      new TemplatePortal(this.userMenu, this.viewContainerRef, {
-        $implicit: args.token
-      })
-    );
+    this.overlayRef.attach(new TemplatePortal(this.userMenu, this.viewContainerRef, { $implicit: action }));
   }
 
   ngOnDestroy(): void {

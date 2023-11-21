@@ -86,10 +86,10 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
       if (entities.length > entityIndex) {
         const entity = entities[entityIndex] as ClassifiedEntity;
         if (entity.start !== i) {
-          result.push(new Token(i, text.substring(i, entity.start), sentence));
+          result.push(new Token(i, text.substring(i, entity.start), sentence, this.entityProvider));
         }
 
-        const token = new Token(entity.start, text.substring(entity.start, entity.end), sentence, entity);
+        const token = new Token(entity.start, text.substring(entity.start, entity.end), sentence, this.entityProvider, entity);
         if (token.entity?.subEntities?.length) {
           token.subTokens = this.parseTokens(
             new EntityWithSubEntities(sentence.getText().substring(token.start, token.end), token.entity, token.entity)
@@ -101,7 +101,7 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
         entityIndex++;
       } else {
         if (i != text.length) {
-          result.push(new Token(i, text.substring(i, text.length), sentence));
+          result.push(new Token(i, text.substring(i, text.length), sentence, this.entityProvider));
         }
         break;
       }
@@ -165,54 +165,6 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
     this.toastrService.success(`Entity Type ${entity.qualifiedRole} added`, 'Entity added');
   }
 
-  // overlayRef: OverlayRef | null;
-  // @ViewChild('userMenu') userMenu: TemplateRef<any>;
-
-  // @HostListener('document:click', ['$event'])
-  // private hideTokenMenu(): void {
-  //   if (this.overlayRef) this.overlayRef.detach();
-  // }
-
-  // displayTokenMenu(args: { event: MouseEvent; token: Token }): void {
-  //   args.event.stopPropagation();
-  //   this.hideTokenMenu();
-
-  //   const positionStrategy = this.overlay
-  //     .position()
-  //     .flexibleConnectedTo(args.event.target as FlexibleConnectedPositionStrategyOrigin)
-  //     .withPositions([
-  //       {
-  //         originX: 'start',
-  //         originY: 'bottom',
-  //         overlayX: 'start',
-  //         overlayY: 'top'
-  //       },
-  //       {
-  //         originX: 'start',
-  //         originY: 'center',
-  //         overlayX: 'end',
-  //         overlayY: 'center'
-  //       },
-  //       {
-  //         originX: 'end',
-  //         originY: 'center',
-  //         overlayX: 'start',
-  //         overlayY: 'center'
-  //       }
-  //     ]);
-
-  //   this.overlayRef = this.overlay.create({
-  //     positionStrategy,
-  //     scrollStrategy: this.overlay.scrollStrategies.reposition()
-  //   });
-
-  //   this.overlayRef.attach(
-  //     new TemplatePortal(this.userMenu, this.viewContainerRef, {
-  //       $implicit: args.token
-  //     })
-  //   );
-  // }
-
   ngOnDestroy(): void {
     this.destroy.next(true);
     this.destroy.complete();
@@ -228,20 +180,21 @@ export interface EntityProvider {
 
   hasEntityRole(role: string): boolean;
 
-  addEntity(entity: EntityDefinition, highlight: SentenceTrainingSentenceComponent): string;
+  addEntity(entity: EntityDefinition, highlight?: SentenceTrainingSentenceComponent): string;
 }
 
 export class IntentEntityProvider implements EntityProvider {
   constructor(private nlp: NlpService, private state: StateService, private sentence: Sentence, private intent?: Intent) {}
 
-  addEntity(entity: EntityDefinition, highlight: SentenceTrainingSentenceComponent): string {
+  addEntity(entity: EntityDefinition, highlight?: SentenceTrainingSentenceComponent): string {
     this.intent.addEntity(entity);
     const allEntities = this.state.entities.getValue();
     if (!allEntities.some((e) => e.entityTypeName === entity.entityTypeName && e.role === entity.role)) {
       this.state.entities.next(this.state.currentApplication.allEntities());
     }
     this.nlp.saveIntent(this.intent).subscribe((_) => {
-      highlight.notifyAddEntity(entity);
+      // highlight.notifyAddEntity(entity);
+      console.log('highlight.notifyAddEntity(entity)');
     });
     return null;
   }
@@ -277,7 +230,7 @@ export class SubEntityProvider implements EntityProvider {
     private entityType?: EntityType
   ) {}
 
-  addEntity(entity: EntityDefinition, highlight: SentenceTrainingSentenceComponent): string {
+  addEntity(entity: EntityDefinition, highlight?: SentenceTrainingSentenceComponent): string {
     if (
       this.entity.root.containsEntityType(entity.entityTypeName) ||
       this.containsEntityType(this.state.findEntityTypeByName(entity.entityTypeName), this.entity.root.type, new Set())
@@ -286,7 +239,8 @@ export class SubEntityProvider implements EntityProvider {
     }
     this.entityType.addEntity(entity);
     this.nlp.updateEntityType(this.entityType).subscribe((_) => {
-      highlight.notifyAddEntity(entity);
+      // highlight.notifyAddEntity(entity);
+      console.log('highlight.notifyAddEntity(entity)');
     });
     return null;
   }

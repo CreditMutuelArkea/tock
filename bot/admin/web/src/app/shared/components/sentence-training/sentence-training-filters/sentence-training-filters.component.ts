@@ -23,6 +23,8 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   @Output() onFilter = new EventEmitter<SentenceTrainingFilter>();
 
+  advanced: boolean = false;
+
   form = new FormGroup<SentenceTrainingFilterForm>({
     search: new FormControl(),
     showUnknown: new FormControl(false)
@@ -40,6 +42,10 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe(() => {
       this.onFilter.emit(this.form.value as SentenceTrainingFilter);
     });
+  }
+
+  swapAdvanced() {
+    this.advanced = !this.advanced;
   }
 
   clearSearch(): void {

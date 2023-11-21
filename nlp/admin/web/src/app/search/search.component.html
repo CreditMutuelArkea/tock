@@ -14,8 +14,37 @@
   ~ limitations under the License.
   -->
 
-<h1 class="mt-3">Search sentences</h1>
-<tock-sentence-training [sentenceTrainingMode]="mode"></tock-sentence-training>
+<div class="d-flex flex-wrap mt-3">
+  <h1 class="flex-grow-1">Search sentences</h1>
+
+  <section class="d-flex flex-wrap align-items-center">
+    <button
+      nbButton
+      nbTooltip="Download a dump of the matching sentences"
+      ghost
+      shape="round"
+      (click)="downloadSentencesDump()"
+      class="ml-2"
+    >
+      <nb-icon icon="cloud-download-outline"></nb-icon>
+    </button>
+
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Refresh sentences"
+      (click)="refresh()"
+      class="ml-2"
+    >
+      <nb-icon icon="refresh-outline"></nb-icon>
+    </button>
+  </section>
+</div>
+<tock-sentence-training
+  #sentencesTraining
+  [sentenceTrainingMode]="mode"
+></tock-sentence-training>
 
 <div class="search">
   <tock-sentences-scroll
