@@ -41,7 +41,8 @@ import {
   NbCheckboxModule,
   NbInputModule,
   NbFormFieldModule,
-  NbAutocompleteModule
+  NbAutocompleteModule,
+  NbRadioModule
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
@@ -80,6 +81,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json-iterator/debug-json-iterator.component';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
   imports: [
@@ -100,7 +102,9 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     NbFormFieldModule,
     InfiniteScrollModule,
     NbAutocompleteModule,
-    NbAlertModule
+    NbAlertModule,
+    NbRadioModule,
+    NgxSliderModule
   ],
   declarations: [
     BotMessageComponent,

@@ -33,8 +33,10 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   @ViewChild('sentenceTrainingFilter') sentenceTrainingFilter: SentenceTrainingFiltersComponent;
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
+
   Action: typeof Action = Action;
-  filters = {
+
+  filters: SentenceTrainingFilter = {
     search: null,
     sort: [{ first: 'creationDate', second: false }],
     intentId: null,
@@ -172,15 +174,16 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       null,
       [],
       [],
-      null,
-      null,
+      this.filters.modifiedAfter,
+      this.filters.modifiedBefore,
       this.filters.sort,
       this.filters.onlyToReview,
       null,
-      null,
-      null,
+      this.filters.user,
+      this.filters.allButUser,
       this.filters.maxIntentProbability / 100,
-      this.filters.minIntentProbability / 100
+      this.filters.minIntentProbability / 100,
+      this.filters.configuration
     );
     return result;
   }
