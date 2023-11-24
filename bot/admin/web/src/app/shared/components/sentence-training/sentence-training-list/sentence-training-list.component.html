@@ -130,7 +130,7 @@
         <time>{{ sentence.creationDate | date: 'yy/MM/dd HH:mm:ss' }}</time>
 
         <span
-          class="text-uppercase ml-2 px-1"
+          class="text-uppercase mx-1"
           [style.color]="sentence.statusColor()"
           nbTooltip="Sentence status"
         >
@@ -287,6 +287,7 @@
             ghost
             shape="round"
             (click)="redirectToFaqManagement(sentence)"
+            class="ml-2"
             data-testid="redirectToFaqManagement"
           >
             <nb-icon icon="message-square-outline"></nb-icon>

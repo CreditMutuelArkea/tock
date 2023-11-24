@@ -9,7 +9,7 @@ import { PaginatedQuery, truncate } from '../../../model/commons';
 import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { Pagination } from '..';
-import { Action, SentenceTrainingFilter, SentenceTrainingMode } from './models';
+import { Action, SentenceTrainingMode } from './models';
 import { SentenceTrainingListComponent } from './sentence-training-list/sentence-training-list.component';
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
@@ -36,7 +36,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   Action: typeof Action = Action;
 
-  filters: SentenceTrainingFilter = {
+  filters: Partial<SearchQuery> = {
     search: null,
     sort: [{ first: 'creationDate', second: false }],
     intentId: null,
@@ -47,7 +47,6 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   };
 
   loading: boolean = false;
-  isFilteredUnknown: boolean = false;
 
   sentences: SentenceExtended[] = [];
 
@@ -62,9 +61,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     });
   }
 
-  filterSentenceTraining(filters: SentenceTrainingFilter): void {
-    this.isFilteredUnknown = filters.showUnknown;
-
+  filterSentenceTraining(filters: Partial<SearchQuery>): void {
     this.selection.clear();
     this.initFilters();
 
@@ -72,13 +69,13 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     this.loadData();
   }
 
-  initFilters() {
+  initFilters(): void {
     if (this.sentenceTrainingMode === SentenceTrainingMode.INBOX) {
       this.filters = { ...this.filters, ...{ intentId: null } };
       this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
     }
 
-    if (this.sentenceTrainingMode === SentenceTrainingMode.UNKNOWN || this.isFilteredUnknown) {
+    if (this.sentenceTrainingMode === SentenceTrainingMode.UNKNOWN) {
       this.filters = { ...this.filters, ...{ intentId: Intent.unknown } };
     }
 
@@ -89,9 +86,6 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     if ([Intent.unknown, Intent.ragExcluded].includes(this.filters.intentId)) {
       this.filters = { ...this.filters, ...{ status: [SentenceStatus.validated, SentenceStatus.model] } };
     }
-    // else {
-    //   this.filters = { ...this.filters, ...{ status: [SentenceStatus.inbox] } };
-    // }
   }
 
   sortSentenceTraining(sort: boolean): void {
@@ -107,17 +101,17 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     total: undefined
   };
 
-  paginationChange() {
+  paginationChange(): void {
     this.loadData(this.pagination.start, this.pagination.size);
   }
 
-  onScroll() {
+  onScroll(): Observable<PaginatedResult<SentenceExtended>> {
     if (this.loading || this.pagination.end >= this.pagination.total) return;
 
     return this.loadData(this.pagination.end, this.pagination.size, true, false);
   }
 
-  refresh() {
+  refresh(): void {
     this.loadData();
   }
 
@@ -161,31 +155,30 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   }
 
   toSearchQuery(query: PaginatedQuery): SearchQuery {
-    const result = new SearchQuery(
+    return new SearchQuery(
       query.namespace,
       query.applicationName,
       query.language,
       query.start,
       query.size,
-      null /* NOTE: There is a weird behavior when set */,
+      null,
       this.filters.search,
       this.filters.intentId,
       this.filters.status,
-      null,
-      [],
-      [],
+      this.filters.entityType,
+      this.filters.entityRolesToInclude,
+      this.filters.entityRolesToExclude,
       this.filters.modifiedAfter,
       this.filters.modifiedBefore,
       this.filters.sort,
       this.filters.onlyToReview,
-      null,
+      this.filters.searchSubEntities,
       this.filters.user,
       this.filters.allButUser,
       this.filters.maxIntentProbability / 100,
       this.filters.minIntentProbability / 100,
       this.filters.configuration
     );
-    return result;
   }
 
   dialogDetailsSentence: SentenceExtended;
@@ -356,7 +349,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     }
   }
 
-  downloadSentencesDump() {
+  downloadSentencesDump(): void {
     this.nlp
       .getSentencesDump(
         this.state.currentApplication,

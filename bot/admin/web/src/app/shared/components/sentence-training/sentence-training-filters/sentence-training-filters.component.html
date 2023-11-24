@@ -19,31 +19,21 @@
             autocomplete="off"
           />
           <button
-            *ngIf="!!search.value"
+            *ngIf="!!getFormControl('search').value"
             nbButton
             nbSuffix
             nbTooltip="Clear"
             ghost
-            (click)="resetControl(search)"
+            (click)="resetControl(getFormControl('search'))"
             data-testid="clear-button"
           >
             <nb-icon icon="close-outline"></nb-icon>
           </button>
         </nb-form-field>
 
-        <!-- <div *ngIf="sentenceTrainingMode === SentenceTrainingMode.INBOX">
-          <nb-toggle
-            class="mb-n2 mr-2"
-            nbTooltip="Show unknown sentences"
-            formControlName="showUnknown"
-          >
-            Unknown
-          </nb-toggle>
-        </div> -->
-
         <div
           class="ml-3"
-          *ngIf="sentenceTrainingMode === SentenceTrainingMode.SEARCH"
+          *ngIf="sentenceTrainingMode === SentenceTrainingModes.SEARCH"
         >
           <nb-icon
             *ngIf="!advanced"
@@ -68,7 +58,7 @@
       >
         <div class="row">
           <div class="col d-flex align-items-center">
-            <small class="text-nowrap mb-0 mr-2">Status :</small>
+            <small class="text-muted text-nowrap mb-0 mr-2">Status :</small>
             <nb-radio-group
               class="d-flex"
               formControlName="status"
@@ -109,6 +99,10 @@
         <div class="row mt-1">
           <div class="col-3 mb-2">
             <nb-form-field>
+              <nb-icon
+                nbPrefix
+                icon="compass-outline"
+              ></nb-icon>
               <input
                 #intentInput
                 nbInput
@@ -130,8 +124,8 @@
                 size="small"
                 nbTooltip="Clear"
                 nbSuffix
-                *ngIf="intent.value"
-                (click)="resetControl(intent, intentInput)"
+                *ngIf="getFormControl('intent').value"
+                (click)="resetControl(getFormControl('intent'), intentInput)"
               >
                 <nb-icon icon="close-outline"></nb-icon>
               </button>
@@ -165,41 +159,87 @@
           </div>
 
           <div class="col-3 mb-2">
-            <nb-select
-              size="small"
-              placeholder="Entity type"
-              fullWidth
-              nbTooltip="Filter by entity type"
-            >
-              <nb-option-group title="Group 1">
-                <nb-option value="1">Option 1</nb-option>
-              </nb-option-group>
-            </nb-select>
+            <nb-form-field>
+              <nb-icon
+                nbPrefix
+                icon="attach-outline"
+              ></nb-icon>
+              <nb-select
+                *ngIf="entityTypes"
+                size="small"
+                placeholder="Entity type"
+                fullWidth
+                nbTooltip="Filter by entity type"
+                formControlName="entityType"
+              >
+                <nb-option [value]="null">All</nb-option>
+                <nb-option
+                  *ngFor="let e of entityTypes"
+                  [value]="e.name"
+                >
+                  {{ e.qualifiedName(state.user) }}
+                </nb-option>
+              </nb-select>
+            </nb-form-field>
           </div>
 
           <div class="col-3 mb-2">
             <nb-select
+              *ngIf="entityRolesToIncludeList"
+              multiple
               size="small"
               placeholder="Entity roles to include"
               fullWidth
               nbTooltip="Filter by entity roles to include"
+              formControlName="entityRolesToInclude"
             >
-              <nb-option-group title="Group 1">
-                <nb-option value="1">Option 1</nb-option>
-              </nb-option-group>
+              <nb-option
+                [disabled]="!getFormControl('entityRolesToInclude').value?.length"
+                [value]="null"
+                ><span class="d-flex align-items-center"
+                  ><nb-icon
+                    icon="close-outline"
+                    class="mr-1"
+                  ></nb-icon>
+                  Clear selection</span
+                ></nb-option
+              >
+              <nb-option
+                *ngFor="let r of entityRolesToIncludeList"
+                [value]="r"
+              >
+                {{ r }}
+              </nb-option>
             </nb-select>
           </div>
 
           <div class="col-3 mb-2">
             <nb-select
+              *ngIf="entityRolesToExcludeList"
+              multiple
               size="small"
               placeholder="Entity roles to exclude"
               fullWidth
               nbTooltip="Filter by entity roles to exclude"
+              formControlName="entityRolesToExclude"
             >
-              <nb-option-group title="Group 1">
-                <nb-option value="1">Option 1</nb-option>
-              </nb-option-group>
+              <nb-option
+                [disabled]="!getFormControl('entityRolesToExclude').value?.length"
+                [value]="null"
+                ><span class="d-flex align-items-center"
+                  ><nb-icon
+                    icon="close-outline"
+                    class="mr-1"
+                  ></nb-icon>
+                  Clear selection</span
+                ></nb-option
+              >
+              <nb-option
+                *ngFor="let r of entityRolesToExcludeList"
+                [value]="r"
+              >
+                {{ r }}
+              </nb-option>
             </nb-select>
           </div>
 
@@ -223,8 +263,8 @@
                 size="small"
                 nbTooltip="Clear"
                 nbSuffix
-                *ngIf="modifiedBefore.value"
-                (click)="resetControl(modifiedBefore)"
+                *ngIf="getFormControl('modifiedBefore').value"
+                (click)="resetControl(getFormControl('modifiedBefore'))"
               >
                 <nb-icon icon="close-outline"></nb-icon>
               </button>
@@ -252,8 +292,8 @@
                 size="small"
                 nbTooltip="Clear"
                 nbSuffix
-                *ngIf="modifiedAfter.value"
-                (click)="resetControl(modifiedAfter)"
+                *ngIf="getFormControl('modifiedAfter').value"
+                (click)="resetControl(getFormControl('modifiedAfter'))"
               >
                 <nb-icon icon="close-outline"></nb-icon>
               </button>
@@ -265,63 +305,81 @@
             class="col-3 mb-2"
             *ngIf="users && users.length !== 0"
           >
-            <nb-select
-              size="small"
-              placeholder="Validated by"
-              fullWidth
-              formControlName="user"
-              nbTooltip="Filter sentences validated by the given user"
-            >
-              <nb-option [value]="null">Anyone</nb-option>
-              <nb-option
-                *ngFor="let u of users"
-                [value]="u"
+            <nb-form-field>
+              <nb-icon
+                nbPrefix
+                icon="person-outline"
+              ></nb-icon>
+              <nb-select
+                size="small"
+                placeholder="Validated by"
+                fullWidth
+                formControlName="user"
+                nbTooltip="Filter sentences validated by the given user"
               >
-                {{ u }}
-              </nb-option>
-            </nb-select>
+                <nb-option [value]="null">Anyone</nb-option>
+                <nb-option
+                  *ngFor="let u of users"
+                  [value]="u"
+                >
+                  {{ u }}
+                </nb-option>
+              </nb-select>
+            </nb-form-field>
           </div>
 
           <div
             class="col-3 mb-2"
             *ngIf="users && users.length !== 0"
           >
-            <nb-select
-              size="small"
-              placeholder="Not validated by"
-              fullWidth
-              formControlName="allButUser"
-              nbTooltip="Filter sentences not validated by the given user"
-            >
-              <nb-option [value]="null">Nobody</nb-option>
-              <nb-option
-                *ngFor="let u of users"
-                [value]="u"
+            <nb-form-field>
+              <nb-icon
+                nbPrefix
+                icon="person-remove-outline"
+              ></nb-icon>
+              <nb-select
+                size="small"
+                placeholder="Not validated by"
+                fullWidth
+                formControlName="allButUser"
+                nbTooltip="Filter sentences not validated by the given user"
               >
-                {{ u }}
-              </nb-option>
-            </nb-select>
+                <nb-option [value]="null">Nobody</nb-option>
+                <nb-option
+                  *ngFor="let u of users"
+                  [value]="u"
+                >
+                  {{ u }}
+                </nb-option>
+              </nb-select>
+            </nb-form-field>
           </div>
 
           <div
             class="col-3 mb-2"
             *ngIf="configurations && configurations.length !== 0"
           >
-            <nb-select
-              size="small"
-              placeholder="Configuration"
-              fullWidth
-              formControlName="configuration"
-              nbTooltip="Filter sentences by configuration"
-            >
-              <nb-option [value]="null">All configurations</nb-option>
-              <nb-option
-                *ngFor="let u of configurations"
-                [value]="u"
+            <nb-form-field>
+              <nb-icon
+                nbPrefix
+                icon="link-outline"
+              ></nb-icon>
+              <nb-select
+                size="small"
+                placeholder="Configuration"
+                fullWidth
+                formControlName="configuration"
+                nbTooltip="Filter sentences by configuration"
               >
-                {{ u }}
-              </nb-option>
-            </nb-select>
+                <nb-option [value]="null">All configurations</nb-option>
+                <nb-option
+                  *ngFor="let u of configurations"
+                  [value]="u"
+                >
+                  {{ u }}
+                </nb-option>
+              </nb-select>
+            </nb-form-field>
           </div>
 
           <div
@@ -329,7 +387,7 @@
             style="min-width: 25em"
           >
             <div class="flex-fill d-flex align-items-center">
-              <small class="text-nowrap mb-0 mr-3">Detection probability : </small>
+              <small class="text-muted text-nowrap mb-0 mr-3">Detection probability : </small>
               <div class="intent-proba-slider">
                 <ngx-slider
                   [options]="intentProbaSliderOptions"

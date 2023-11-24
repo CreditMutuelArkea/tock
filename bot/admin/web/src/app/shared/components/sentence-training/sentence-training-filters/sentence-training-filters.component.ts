@@ -2,9 +2,9 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormControl, FormGroup } from '@angular/forms';
 import { Observable, Subject, of } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-import { SentenceTrainingFilter, SentenceTrainingMode } from './../models';
+import { SentenceTrainingMode } from './../models';
 import { Options } from '@angular-slider/ngx-slider';
-import { EntityType, Intent, IntentsCategory, SentenceStatus } from '../../../../model/nlp';
+import { EntityType, Intent, IntentsCategory, SearchQuery, SentenceStatus, getRoles } from '../../../../model/nlp';
 import { StateService } from '../../../../core-nlp/state.service';
 import { NlpService } from '../../../../nlp-tabs/nlp.service';
 
@@ -14,6 +14,10 @@ interface SentenceTrainingFilterForm {
   status: FormControl<SentenceStatus | ''>;
   onlyToReview: FormControl<boolean>;
   intent: FormControl<Intent>;
+  entityType: FormControl<string>;
+  searchSubEntities: FormControl<boolean>;
+  entityRolesToInclude: FormControl<string[]>;
+  entityRolesToExclude: FormControl<string[]>;
   modifiedBefore: FormControl<Date>;
   modifiedAfter: FormControl<Date>;
   intentProbability: FormControl<number[]>;
@@ -32,11 +36,11 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   @Input() sentenceTrainingMode: SentenceTrainingMode;
 
-  SentenceTrainingMode = SentenceTrainingMode;
+  @Output() onFilter = new EventEmitter<Partial<SearchQuery>>();
 
-  @Output() onFilter = new EventEmitter<SentenceTrainingFilter>();
+  SentenceTrainingModes = SentenceTrainingMode;
 
-  advanced: boolean = true;
+  advanced: boolean = false;
 
   sentenceStatus = SentenceStatus;
 
@@ -46,6 +50,17 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   filteredIntentsGroups$: Observable<IntentsCategory[]>;
 
+  entityTypes: EntityType[];
+
+  entityRolesToIncludeList: string[];
+
+  entityRolesToExcludeList: string[];
+
+  unknownIntent: Partial<Intent> = {
+    label: 'Unknown',
+    _id: Intent.unknown
+  };
+
   constructor(public state: StateService, private nlp: NlpService) {}
 
   form = new FormGroup<SentenceTrainingFilterForm>({
@@ -54,6 +69,10 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     status: new FormControl(''),
     onlyToReview: new FormControl(),
     intent: new FormControl(),
+    entityType: new FormControl(),
+    searchSubEntities: new FormControl(),
+    entityRolesToInclude: new FormControl([]),
+    entityRolesToExclude: new FormControl([]),
     modifiedBefore: new FormControl(),
     modifiedAfter: new FormControl(),
     intentProbability: new FormControl([0, 100]),
@@ -62,87 +81,64 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     configuration: new FormControl()
   });
 
-  get search(): FormControl {
-    return this.form.get('search') as FormControl;
-  }
-
-  get showUnknown(): FormControl {
-    return this.form.get('showUnknown') as FormControl;
-  }
-
-  get status(): FormControl {
-    return this.form.get('status') as FormControl;
-  }
-
-  get onlyToReview(): FormControl {
-    return this.form.get('onlyToReview') as FormControl;
-  }
-
-  get intent(): FormControl {
-    return this.form.get('intent') as FormControl;
-  }
-
-  get modifiedBefore(): FormControl {
-    return this.form.get('modifiedBefore') as FormControl;
-  }
-
-  get modifiedAfter(): FormControl {
-    return this.form.get('modifiedAfter') as FormControl;
-  }
-
   ngOnInit(): void {
-    this.nlp.findUsers(this.state.currentApplication).subscribe((u) => {
-      this.users = u;
+    this.nlp.findUsers(this.state.currentApplication).subscribe((users) => {
+      this.users = users;
     });
 
-    this.nlp.findConfigurations(this.state.currentApplication).subscribe((res) => {
-      this.configurations = res;
+    this.nlp.findConfigurations(this.state.currentApplication).subscribe((configurations) => {
+      this.configurations = configurations;
     });
 
-    this.onlyToReview.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((state: boolean) => {
-      if (state) {
-        this.form.patchValue({
-          status: ''
+    this.getFormControl('onlyToReview')
+      .valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((state: boolean) => {
+        if (state) this.form.patchValue({ status: '' });
+      });
+
+    this.getFormControl('status')
+      .valueChanges.pipe(takeUntil(this.destroy$))
+      .subscribe((status: SentenceStatus | '') => {
+        if (status !== '') this.form.patchValue({ onlyToReview: false });
+      });
+
+    ['intent', 'entityType', 'entityRolesToInclude', 'entityRolesToExclude'].forEach((formName: string) => {
+      this.getFormControl(formName)
+        .valueChanges.pipe(takeUntil(this.destroy$))
+        .subscribe(() => {
+          this.updateEntitiesFilters();
         });
-      }
     });
 
-    this.status.valueChanges.pipe(takeUntil(this.destroy$)).subscribe((status: SentenceStatus | '') => {
-      if (status !== '') {
-        this.form.patchValue({
-          onlyToReview: false
-        });
-      }
-    });
+    this.updateEntitiesFilters();
 
-    this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe(() => {
-      const formValue = this.form.value;
-      console.log(formValue);
-      const payload = {
-        search: formValue.search,
-        status: [],
-        onlyToReview: formValue.onlyToReview,
-        intentId: formValue.intent?._id,
-        modifiedBefore: formValue.modifiedBefore,
-        modifiedAfter: formValue.modifiedAfter,
-        minIntentProbability: formValue.intentProbability[0],
-        maxIntentProbability: formValue.intentProbability[1],
-        user: formValue.user,
-        allButUser: formValue.allButUser,
-        configuration: formValue.configuration
-      } as SentenceTrainingFilter;
+    this.form.valueChanges.pipe(takeUntil(this.destroy$), debounceTime(500)).subscribe(() => this.submitFiltersChange());
+  }
 
-      if (formValue.status !== '') {
-        payload.status = [this.status.value];
-      }
+  submitFiltersChange(): void {
+    const formValue = this.form.value;
 
-      console.log(payload);
-      this.onFilter.emit(payload as SentenceTrainingFilter);
+    this.onFilter.emit({
+      search: formValue.search,
+      status: formValue.status !== '' ? [formValue.status] : [],
+      onlyToReview: formValue.onlyToReview,
+      intentId: formValue.intent?._id,
+      entityType: formValue.entityType,
+      searchSubEntities: formValue.searchSubEntities,
+      entityRolesToInclude: formValue.entityRolesToInclude,
+      entityRolesToExclude: formValue.entityRolesToExclude,
+      modifiedBefore: formValue.modifiedBefore,
+      modifiedAfter: formValue.modifiedAfter,
+      minIntentProbability: formValue.intentProbability[0],
+      maxIntentProbability: formValue.intentProbability[1],
+      user: formValue.user,
+      allButUser: formValue.allButUser,
+      configuration: formValue.configuration
     });
   }
 
-  swapAdvanced(): void {
-    this.advanced = !this.advanced;
+  getFormControl(formControlName: string): FormControl {
+    return this.form.get(formControlName) as FormControl;
   }
 
   resetControl(ctrl: FormControl, input?: HTMLInputElement): void {
@@ -152,12 +148,20 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     }
   }
 
-  filterIntentsList(event: any): void {
+  swapAdvanced(): void {
+    this.advanced = !this.advanced;
+  }
+
+  get currentIntentsCategories(): IntentsCategory[] {
+    return this.state.currentIntentsCategories.getValue();
+  }
+
+  filterIntentsList(event: KeyboardEvent): void {
     if (['ArrowDown', 'ArrowUp', 'Escape'].includes(event.key)) return;
 
-    let str = event.target.value.toLowerCase();
+    let str = (event.target as HTMLInputElement).value.toLowerCase();
     let result: IntentsCategory[] = [];
-    this.state.currentIntentsCategories.getValue().forEach((group) => {
+    this.currentIntentsCategories.forEach((group) => {
       group.intents.forEach((intent) => {
         if (intent.label?.toLowerCase().includes(str) || intent.name?.toLowerCase().includes(str)) {
           let cat = result.find((cat) => cat.category == group.category);
@@ -173,21 +177,21 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
   }
 
   setIntentsListFilter(): void {
-    this.filteredIntentsGroups$ = of(this.state.currentIntentsCategories.getValue());
+    this.filteredIntentsGroups$ = of(this.currentIntentsCategories);
   }
 
   onFocusIntentsInput(): void {
     this.setIntentsListFilter();
   }
 
-  onBlurIntentsInput(event: any): void {
-    if (!this.intent.value) event.target.value = '';
+  onBlurIntentsInput(event: KeyboardEvent): void {
+    if (!this.getFormControl('intent').value) (event.target as HTMLInputElement).value = '';
     else {
-      event.target.value = this.intent.value.label || this.intent.value.name;
+      (event.target as HTMLInputElement).value = this.getFormControl('intent').value.label || this.getFormControl('intent').value.name;
     }
   }
 
-  intentsAutocompleteViewHandle(stringOrIntent: string | Intent) {
+  intentsAutocompleteViewHandle(stringOrIntent: string | Intent): string {
     if (typeof stringOrIntent === 'object') {
       return stringOrIntent?.label || stringOrIntent?.name || '';
     } else {
@@ -195,13 +199,73 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     }
   }
 
-  unknownIntent: Partial<Intent> = {
-    label: 'Unknown',
-    _id: Intent.unknown
-  };
+  selectIntent(intent: Intent): void {
+    this.getFormControl('intent').patchValue(intent);
+  }
 
-  selectIntent(intent: Intent) {
-    this.intent.patchValue(intent);
+  private updateEntitiesFilters(): void {
+    this.state.entityTypesSortedByName().subscribe((entities) => {
+      if (!this.getFormControl('intent').value) {
+        this.entityTypes = entities;
+        const roles = getRoles(this.state.currentIntents.value, entities, this.getFormControl('entityType').value);
+        this.entityRolesToIncludeList = roles;
+        this.entityRolesToExcludeList = roles;
+      } else {
+        const intent = this.getFormControl('intent').value;
+        if (intent) {
+          this.entityTypes = this.findEntitiesAndSubEntities(entities, intent);
+          const roles = getRoles([intent], entities, this.getFormControl('entityType').value);
+          this.entityRolesToIncludeList = roles;
+          this.entityRolesToExcludeList = roles;
+        } else {
+          this.entityTypes = [];
+          this.entityRolesToIncludeList = [];
+          this.entityRolesToExcludeList = [];
+        }
+      }
+
+      let shouldSearchSubentities = false;
+
+      if (this.getFormControl('entityType').value) {
+        const entity = entities.find((e) => e.name === this.getFormControl('entityType').value);
+        const hasSubentities = entity && entity.allSuperEntities(entities, new Set()).size !== 0;
+
+        if (hasSubentities) shouldSearchSubentities = true;
+      }
+
+      if (this.getFormControl('entityRolesToInclude').value?.length) {
+        const hasSubentities =
+          entities.find(
+            (e) => e.subEntities.find((s) => this.getFormControl('entityRolesToInclude').value.includes(s.role)) != undefined
+          ) != undefined;
+
+        if (hasSubentities) {
+          shouldSearchSubentities = true;
+        }
+      }
+
+      if (this.getFormControl('entityRolesToExclude').value?.length) {
+        const hasSubentities =
+          entities.find(
+            (e) => e.subEntities.find((s) => this.getFormControl('entityRolesToExclude').value.includes(s.role)) != undefined
+          ) != undefined;
+
+        if (hasSubentities) shouldSearchSubentities = true;
+      }
+
+      if (shouldSearchSubentities && !this.getFormControl('searchSubEntities').value) {
+        this.getFormControl('searchSubEntities').patchValue(true);
+      }
+      if (!shouldSearchSubentities && this.getFormControl('searchSubEntities').value) {
+        this.getFormControl('searchSubEntities').patchValue(false);
+      }
+    });
+  }
+
+  private findEntitiesAndSubEntities(entities: EntityType[], intent: Intent): EntityType[] {
+    return entities.filter((e) =>
+      intent.entities.some((intentEntity) => intentEntity.entityTypeName === e.name || e.containsSuperEntity(intentEntity, entities))
+    );
   }
 
   updateFilter(filter): void {
@@ -220,8 +284,6 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
       return `${value}%`;
     }
   };
-
-  entityTypes: EntityType[];
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
