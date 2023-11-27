@@ -20,6 +20,9 @@
       #sentenceTrainingFilter
       [sentenceTrainingMode]="sentenceTrainingMode"
       (onFilter)="filterSentenceTraining($event)"
+      (onChangeIntent)="changeSentencesIntent($event)"
+      (onChangeEntity)="changeSentencesEntity($event)"
+      (onTranslateSentences)="translateSentences($event)"
       class="d-block mb-2"
     ></tock-sentence-training-filters>
 

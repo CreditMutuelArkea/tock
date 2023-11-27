@@ -55,7 +55,7 @@ describe('SentenceTrainingFiltersComponent', () => {
     expect(onFilterSpy).not.toHaveBeenCalled();
 
     tick(500);
-    expect(onFilterSpy).toHaveBeenCalledOnceWith({ search: 'test', showUnknown: false });
+    expect(onFilterSpy).toHaveBeenCalledOnceWith({ search: 'test' });
   }));
 
   it('should show clear button of search input if the search value is defined', () => {

@@ -40,7 +40,7 @@
             icon="chevron-down-outline"
             (click)="swapAdvanced()"
             class="pointer"
-            nbTooltip="Show advanced search options"
+            nbTooltip="Display advanced search options"
           ></nb-icon>
           <nb-icon
             *ngIf="advanced"
@@ -51,11 +51,13 @@
           ></nb-icon>
         </div>
       </div>
+    </form>
 
-      <div
-        class="mt-2"
-        *ngIf="advanced"
-      >
+    <div
+      class="mt-2"
+      *ngIf="advanced"
+    >
+      <form [formGroup]="form">
         <div class="row">
           <div class="col d-flex align-items-center">
             <small class="text-muted text-nowrap mb-0 mr-2">Status :</small>
@@ -113,10 +115,10 @@
                 spellcheck="false"
                 autocomplete="off"
                 [nbAutocomplete]="intentsAutocomplete"
-                (keyup)="filterIntentsList($event)"
-                (keyup.escape)="onBlurIntentsInput($event)"
-                (blur)="onBlurIntentsInput($event)"
-                (focus)="onFocusIntentsInput($event)"
+                (keyup)="filterIntentsList('filter', $event)"
+                (keyup.escape)="onBlurIntentsInput('filter', $event)"
+                (blur)="onBlurIntentsInput('filter', $event)"
+                (focus)="onFocusIntentsInput('filter')"
               />
               <button
                 nbButton
@@ -138,7 +140,7 @@
               [handleDisplayFn]="intentsAutocompleteViewHandle"
             >
               <nb-option-group
-                *ngFor="let group of filteredIntentsGroups$ | async"
+                *ngFor="let group of filteredFilterIntentsGroups$ | async"
                 [title]="group.category"
               >
                 <nb-option
@@ -150,10 +152,13 @@
               </nb-option-group>
 
               <nb-option
-                class="autocompleteSeparator mt-2 py-2"
+                class="autocompleteSeparator mt-2 pt-2"
                 [value]="unknownIntent"
               >
                 {{ unknownIntent.label }}
+              </nb-option>
+              <nb-option [value]="ragExcludedIntent">
+                {{ ragExcludedIntent.label }}
               </nb-option>
             </nb-autocomplete>
           </div>
@@ -397,7 +402,176 @@
             </div>
           </div>
         </div>
+      </form>
+
+      <div class="advanced-tools font-size-small">
+        <div
+          *ngIf="state.hasRole(userRoles.admin)"
+          class="pointer font-weight-bold d-flex align-items-center"
+          (click)="swapAdvancedTools()"
+          nbTooltip="Display intent and entity management tools"
+        >
+          <nb-icon
+            *ngIf="!advancedTools"
+            icon="chevron-down-outline"
+          ></nb-icon>
+          <nb-icon
+            *ngIf="advancedTools"
+            icon="chevron-up-outline"
+          ></nb-icon>
+          Advanced tools
+        </div>
+
+        <div *ngIf="advancedTools">
+          <div class="my-2 tools-columns">
+            Change the intent of selected sentences
+            <div class="flex-grow-1 d-flex gap-1 align-items-center justify-content-between">
+              <nb-form-field class="flex-grow-1">
+                <nb-icon
+                  nbPrefix
+                  icon="compass-outline"
+                ></nb-icon>
+                <input
+                  nbInput
+                  fieldSize="small"
+                  placeholder="Select intent"
+                  fullWidth
+                  nbTooltip="Select the intent to assign to selected sentences"
+                  spellcheck="false"
+                  autocomplete="off"
+                  [(ngModel)]="changeIntent"
+                  [nbAutocomplete]="intentSwapAutocomplete"
+                  (keyup)="filterIntentsList('swap', $event)"
+                  (focus)="onFocusIntentsInput('swap')"
+                  (keyup.escape)="onBlurIntentsInput('swap', $event)"
+                  (blur)="onBlurIntentsInput('swap', $event)"
+                />
+              </nb-form-field>
+            </div>
+            <button
+              nbButton
+              size="small"
+              status="warning"
+              nbTooltip="Apply intent change"
+              [disabled]="!isIntentSelected()"
+              (click)="applyChangeIntent()"
+            >
+              Change intent
+            </button>
+          </div>
+          <nb-autocomplete
+            #intentSwapAutocomplete
+            size="tiny"
+            [handleDisplayFn]="intentsAutocompleteViewHandle"
+          >
+            <nb-option-group
+              *ngFor="let group of filteredSwapIntentsGroups$ | async"
+              [title]="group.category"
+            >
+              <nb-option
+                *ngFor="let intent of group.intents"
+                [value]="intent"
+              >
+                {{ intent.label || intent.name }}
+              </nb-option>
+            </nb-option-group>
+
+            <nb-option
+              class="autocompleteSeparator mt-2 pt-2"
+              [value]="unknownIntent"
+            >
+              {{ unknownIntent.label }}
+            </nb-option>
+            <nb-option [value]="ragExcludedIntent">
+              {{ ragExcludedIntent.label }}
+            </nb-option>
+          </nb-autocomplete>
+
+          <div class="my-2 tools-columns">
+            Change the entity of selected sentences
+            <div class="flex-grow-1 d-flex gap-1 align-items-center justify-content-between">
+              <nb-form-field class="w-50">
+                <nb-icon
+                  nbPrefix
+                  icon="attach-outline"
+                ></nb-icon>
+
+                <nb-select
+                  size="small"
+                  placeholder="Select old entity"
+                  nbTooltip="Select the entity to replace"
+                  [(ngModel)]="swapEntitiesOrigin"
+                >
+                  <nb-option
+                    *ngFor="let e of state.entities | async"
+                    [value]="e"
+                  >
+                    {{ e.qualifiedRole }}
+                  </nb-option>
+                </nb-select>
+              </nb-form-field>
+              <nb-form-field class="w-50">
+                <nb-icon
+                  nbPrefix
+                  icon="attach-outline"
+                ></nb-icon>
+                <nb-select
+                  size="small"
+                  placeholder="Select new entity"
+                  nbTooltip="Select the new entity to assign"
+                  [(ngModel)]="swapEntitiesTarget"
+                >
+                  <nb-option
+                    *ngFor="let e of state.entities | async"
+                    [value]="e"
+                  >
+                    {{ e.qualifiedRole }}
+                  </nb-option>
+                </nb-select>
+              </nb-form-field>
+            </div>
+            <button
+              nbButton
+              size="small"
+              status="warning"
+              nbTooltip="Apply entity swap"
+              [disabled]="!swapEntitiesOrigin || !swapEntitiesTarget"
+              (click)="applyChangeEntity()"
+            >
+              Change entity
+            </button>
+          </div>
+
+          <div class="my-2 tools-columns">
+            Translate selected sentences
+
+            <nb-select
+              placeholder="Target Language"
+              fullWidth
+              size="small"
+              nbTooltip="Select the language in which to translate the sentences"
+              [(ngModel)]="translateTargetLocale"
+            >
+              <nb-option
+                *ngFor="let l of state.otherThanCurrentLocales()"
+                [value]="l"
+                >{{ state.localeName(l) }}
+              </nb-option>
+            </nb-select>
+
+            <button
+              nbButton
+              size="small"
+              status="warning"
+              nbTooltip="Translate sentences"
+              [disabled]="!translateTargetLocale"
+              (click)="translateSentences()"
+            >
+              Translate
+            </button>
+          </div>
+        </div>
       </div>
-    </form>
+    </div>
   </nb-card-body>
 </nb-card>

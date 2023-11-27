@@ -1,14 +1,23 @@
 import { SelectionModel } from '@angular/cdk/collections';
 import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NbToastrService } from '@nebular/theme';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
 import { take, takeUntil, share } from 'rxjs/operators';
 
 import { StateService } from '../../../core-nlp/state.service';
 import { PaginatedQuery, truncate } from '../../../model/commons';
-import { Intent, PaginatedResult, SearchQuery, Sentence, SentenceStatus } from '../../../model/nlp';
+import {
+  EntityDefinition,
+  Intent,
+  PaginatedResult,
+  SearchQuery,
+  Sentence,
+  SentenceStatus,
+  TranslateSentencesQuery,
+  UpdateSentencesQuery
+} from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
-import { Pagination } from '..';
+import { ChoiceDialogComponent, Pagination } from '..';
 import { Action, SentenceTrainingMode } from './models';
 import { SentenceTrainingListComponent } from './sentence-training-list/sentence-training-list.component';
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
@@ -50,7 +59,12 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   sentences: SentenceExtended[] = [];
 
-  constructor(private nlp: NlpService, private state: StateService, private toastrService: NbToastrService) {}
+  constructor(
+    private nlp: NlpService,
+    private state: StateService,
+    private toastrService: NbToastrService,
+    private nbDialogService: NbDialogService
+  ) {}
 
   ngOnInit(): void {
     this.initFilters();
@@ -111,7 +125,8 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     return this.loadData(this.pagination.end, this.pagination.size, true, false);
   }
 
-  refresh(): void {
+  refresh(clearSelection?: boolean): void {
+    if (clearSelection) this.selection.clear();
     this.loadData();
   }
 
@@ -343,8 +358,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       }
 
       this.sentenceTrainingFilter.updateFilter({
-        search: sentence.text,
-        showUnknown: false
+        search: sentence.text
       });
     }
   }
@@ -360,6 +374,152 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         saveAs(blob, this.state.currentApplication.name + '_sentences.json');
         this.toastrService.success('Dump provided', 'Sentences dump');
       });
+  }
+
+  getCurrentSearchQuery(): SearchQuery {
+    return this.toSearchQuery(this.state.createPaginatedQuery(0, 10000));
+  }
+
+  changeSentencesIntent(intentId: string, changeAll?: boolean): void {
+    if (!this.selection.selected.length && !changeAll) {
+      const action = 'Change intent of all results';
+      const dialogRef = this.nbDialogService.open(ChoiceDialogComponent, {
+        context: {
+          title: `No sentence selected`,
+          subtitle: `You haven't selected any sentences. 
+Would you like to change the intent of all the sentences matching the search criteria above?`,
+          actions: [
+            { actionName: 'cancel', buttonStatus: 'basic', ghost: true },
+            { actionName: action, buttonStatus: 'danger' }
+          ],
+          modalStatus: 'danger'
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result?.toLowerCase() === action.toLowerCase()) {
+          this.changeSentencesIntent(intentId, true);
+        }
+      });
+    } else {
+      this.nlp
+        .updateSentences(
+          new UpdateSentencesQuery(
+            this.state.currentApplication.namespace,
+            this.state.currentApplication.name,
+            this.state.currentLocale,
+            this.selection.selected.length ? this.selection.selected : [],
+            this.selection.selected.length ? null : this.getCurrentSearchQuery(),
+            intentId
+          )
+        )
+        .subscribe((r) => {
+          const n = r.nbUpdates;
+          let message = `No sentence updated`;
+          if (n === 1) {
+            message = `1 sentence updated`;
+          } else if (n > 1) {
+            message = `${n} sentences updated`;
+          }
+          this.toastrService.show(message, 'UPDATE', { duration: 2000 });
+
+          this.refresh(true);
+        });
+    }
+  }
+
+  changeSentencesEntity(entities: { old: EntityDefinition; new: EntityDefinition }, changeAll?: boolean): void {
+    console.log(entities);
+    if (!this.selection.selected.length && !changeAll) {
+      const action = 'Change intent of all results';
+      const dialogRef = this.nbDialogService.open(ChoiceDialogComponent, {
+        context: {
+          title: `No sentence selected`,
+          subtitle: `You haven't selected any sentences. 
+Would you like to change the entity of all the sentences matching the search criteria above?`,
+          actions: [
+            { actionName: 'cancel', buttonStatus: 'basic', ghost: true },
+            { actionName: action, buttonStatus: 'danger' }
+          ],
+          modalStatus: 'danger'
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result?.toLowerCase() === action.toLowerCase()) {
+          this.changeSentencesEntity(entities, true);
+        }
+      });
+    } else {
+      this.nlp
+        .updateSentences(
+          new UpdateSentencesQuery(
+            this.state.currentApplication.namespace,
+            this.state.currentApplication.name,
+            this.state.currentLocale,
+            this.selection.selected.length ? this.selection.selected : [],
+            this.selection.selected.length ? null : this.getCurrentSearchQuery(),
+            null,
+            entities.old,
+            entities.new
+          )
+        )
+        .subscribe((r) => {
+          const n = r.nbUpdates;
+          let message = `No sentence updated`;
+          if (n === 1) {
+            message = `1 sentence updated`;
+          } else if (n > 1) {
+            message = `${n} sentences updated`;
+          }
+          this.toastrService.show(message, 'UPDATE', { duration: 2000 });
+
+          this.refresh(true);
+        });
+    }
+  }
+
+  translateSentences(locale: string, translateAll?: boolean): void {
+    if (!this.selection.selected.length && !translateAll) {
+      const action = 'Translate all results';
+      const dialogRef = this.nbDialogService.open(ChoiceDialogComponent, {
+        context: {
+          title: `No sentence selected`,
+          subtitle: `You haven't selected any sentences to translate. 
+Would you like to translate all the sentences matching the search criteria above?`,
+          actions: [
+            { actionName: 'cancel', buttonStatus: 'basic', ghost: true },
+            { actionName: action, buttonStatus: 'danger' }
+          ],
+          modalStatus: 'danger'
+        }
+      });
+      dialogRef.onClose.subscribe((result) => {
+        if (result?.toLowerCase() === action.toLowerCase()) {
+          this.translateSentences(locale, true);
+        }
+      });
+    } else {
+      this.nlp
+        .translateSentences(
+          new TranslateSentencesQuery(
+            this.state.currentApplication.namespace,
+            this.state.currentApplication.name,
+            this.state.currentLocale,
+            locale,
+            this.selection.selected.length ? this.selection.selected : [],
+            this.selection.selected.length ? null : this.getCurrentSearchQuery()
+          )
+        )
+        .subscribe((r) => {
+          const n = r.nbTranslations;
+          let message = `No sentence translated`;
+          if (n === 1) {
+            message = `1 sentence translated`;
+          } else if (n > 1) {
+            message = `${n} sentences translated`;
+          }
+          this.toastrService.show(message, 'UPDATE', { duration: 2000 });
+        });
+    }
   }
 
   ngOnDestroy(): void {

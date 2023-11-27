@@ -4,13 +4,13 @@ import { Observable, Subject, of } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
 import { SentenceTrainingMode } from './../models';
 import { Options } from '@angular-slider/ngx-slider';
-import { EntityType, Intent, IntentsCategory, SearchQuery, SentenceStatus, getRoles } from '../../../../model/nlp';
+import { EntityDefinition, EntityType, Intent, IntentsCategory, SearchQuery, SentenceStatus, getRoles } from '../../../../model/nlp';
 import { StateService } from '../../../../core-nlp/state.service';
 import { NlpService } from '../../../../nlp-tabs/nlp.service';
+import { UserRole } from '../../../../model/auth';
 
 interface SentenceTrainingFilterForm {
   search: FormControl<string>;
-  showUnknown: FormControl<boolean>;
   status: FormControl<SentenceStatus | ''>;
   onlyToReview: FormControl<boolean>;
   intent: FormControl<Intent>;
@@ -38,9 +38,19 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   @Output() onFilter = new EventEmitter<Partial<SearchQuery>>();
 
+  @Output() onChangeIntent = new EventEmitter<string>();
+
+  @Output() onChangeEntity = new EventEmitter<{ old: EntityDefinition; new: EntityDefinition }>();
+
+  @Output() onTranslateSentences = new EventEmitter<string>();
+
   SentenceTrainingModes = SentenceTrainingMode;
 
+  userRoles = UserRole;
+
   advanced: boolean = false;
+
+  advancedTools: boolean = false;
 
   sentenceStatus = SentenceStatus;
 
@@ -48,7 +58,9 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   configurations: string[];
 
-  filteredIntentsGroups$: Observable<IntentsCategory[]>;
+  filteredFilterIntentsGroups$: Observable<IntentsCategory[]>;
+
+  filteredSwapIntentsGroups$: Observable<IntentsCategory[]>;
 
   entityTypes: EntityType[];
 
@@ -58,14 +70,28 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   unknownIntent: Partial<Intent> = {
     label: 'Unknown',
-    _id: Intent.unknown
+    _id: Intent.unknown,
+    entities: []
   };
+
+  ragExcludedIntent: Partial<Intent> = {
+    label: 'RAG excluded',
+    _id: Intent.ragExcluded,
+    entities: []
+  };
+
+  changeIntent: Intent;
+
+  swapEntitiesOrigin: EntityDefinition;
+
+  swapEntitiesTarget: EntityDefinition;
+
+  translateTargetLocale: string;
 
   constructor(public state: StateService, private nlp: NlpService) {}
 
   form = new FormGroup<SentenceTrainingFilterForm>({
     search: new FormControl(),
-    showUnknown: new FormControl(false),
     status: new FormControl(''),
     onlyToReview: new FormControl(),
     intent: new FormControl(),
@@ -156,7 +182,7 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
     return this.state.currentIntentsCategories.getValue();
   }
 
-  filterIntentsList(event: KeyboardEvent): void {
+  filterIntentsList(which: string, event: KeyboardEvent): void {
     if (['ArrowDown', 'ArrowUp', 'Escape'].includes(event.key)) return;
 
     let str = (event.target as HTMLInputElement).value.toLowerCase();
@@ -173,21 +199,34 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
         }
       });
     });
-    this.filteredIntentsGroups$ = of(result);
+
+    if (which === 'filter') this.filteredFilterIntentsGroups$ = of(result);
+
+    if (which === 'swap') this.filteredSwapIntentsGroups$ = of(result);
   }
 
-  setIntentsListFilter(): void {
-    this.filteredIntentsGroups$ = of(this.currentIntentsCategories);
+  setIntentsListFilter(which: string): void {
+    if (which === 'filter') this.filteredFilterIntentsGroups$ = of(this.currentIntentsCategories);
+
+    if (which === 'swap') this.filteredSwapIntentsGroups$ = of(this.currentIntentsCategories);
   }
 
-  onFocusIntentsInput(): void {
-    this.setIntentsListFilter();
+  onFocusIntentsInput(which: string): void {
+    this.setIntentsListFilter(which);
   }
 
-  onBlurIntentsInput(event: KeyboardEvent): void {
-    if (!this.getFormControl('intent').value) (event.target as HTMLInputElement).value = '';
-    else {
-      (event.target as HTMLInputElement).value = this.getFormControl('intent').value.label || this.getFormControl('intent').value.name;
+  onBlurIntentsInput(which: string, event: KeyboardEvent): void {
+    if (which === 'filter') {
+      if (!this.getFormControl('intent').value) (event.target as HTMLInputElement).value = '';
+      else {
+        (event.target as HTMLInputElement).value = this.getFormControl('intent').value.label || this.getFormControl('intent').value.name;
+      }
+    }
+
+    if (which === 'swap') {
+      if (!this.isIntentSelected()) {
+        (event.target as HTMLInputElement).value = '';
+      }
     }
   }
 
@@ -270,8 +309,7 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
 
   updateFilter(filter): void {
     this.form.patchValue({
-      search: filter.text,
-      showUnknown: filter.showUnknown
+      search: filter.text
     });
   }
 
@@ -284,6 +322,29 @@ export class SentenceTrainingFiltersComponent implements OnInit, OnDestroy {
       return `${value}%`;
     }
   };
+
+  swapAdvancedTools(): void {
+    this.advancedTools = !this.advancedTools;
+  }
+
+  isIntentSelected(): boolean {
+    return this.changeIntent instanceof Intent;
+  }
+
+  applyChangeIntent(): void {
+    this.onChangeIntent.emit(this.changeIntent._id);
+  }
+
+  applyChangeEntity(): void {
+    this.onChangeEntity.emit({
+      old: this.swapEntitiesOrigin,
+      new: this.swapEntitiesTarget
+    });
+  }
+
+  translateSentences(): void {
+    this.onTranslateSentences.emit(this.translateTargetLocale);
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next(true);
