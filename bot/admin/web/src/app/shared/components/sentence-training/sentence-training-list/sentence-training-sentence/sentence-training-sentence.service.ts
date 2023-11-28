@@ -7,16 +7,22 @@ import { Subject } from 'rxjs';
 export class SentenceTrainingSentenceService {
   public sentenceTrainingSentenceCommunication = new Subject<any>();
 
-  // assignEntity(entity): void {
-  //   this.sentenceTrainingSentenceCommunication.next({
-  //     type: 'assignEntity',
-  //     entity: entity
-  //   });
-  // }
-
   refreshTokens(): void {
     this.sentenceTrainingSentenceCommunication.next({
       type: 'refreshTokens'
+    });
+  }
+
+  documentClick(): void {
+    this.sentenceTrainingSentenceCommunication.next({
+      type: 'documentClick'
+    });
+  }
+
+  componentMouseUp(event: MouseEvent): void {
+    this.sentenceTrainingSentenceCommunication.next({
+      type: 'componentMouseUp',
+      event
     });
   }
 }

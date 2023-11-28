@@ -1,4 +1,7 @@
-<div class="grid-columns-header">
+<div
+  class="grid-columns-header sticky"
+  [ngClass]="{ scrolled: scrolled }"
+>
   <div class="d-flex gap-1 align-items-center">
     <nb-checkbox
       class="lineHeight-0"

@@ -1,5 +1,5 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
 import { take, takeUntil, share } from 'rxjs/operators';
@@ -30,7 +30,8 @@ export type SentenceExtended = Sentence & { _selected?: boolean; _intentBeforeCl
 @Component({
   selector: 'tock-sentence-training',
   templateUrl: './sentence-training.component.html',
-  styleUrls: ['./sentence-training.component.scss']
+  styleUrls: ['./sentence-training.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SentenceTrainingComponent implements OnInit, OnDestroy {
   private readonly destroy$: Subject<boolean> = new Subject();
@@ -63,7 +64,8 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     private nlp: NlpService,
     private state: StateService,
     private toastrService: NbToastrService,
-    private nbDialogService: NbDialogService
+    private nbDialogService: NbDialogService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -156,6 +158,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         }
 
         this.loading = false;
+        this.cd.detectChanges();
       },
       error: () => {
         this.loading = false;
@@ -247,6 +250,8 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       duration: 2000,
       status: 'basic'
     });
+
+    this.cd.detectChanges();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
@@ -274,6 +279,8 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     });
 
     this.selection.clear();
+
+    this.cd.detectChanges();
   }
 
   private loadSentencesAfterActionPerformed(actionPerformed: number = 1): void {

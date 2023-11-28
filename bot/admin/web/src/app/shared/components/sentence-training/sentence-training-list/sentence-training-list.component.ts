@@ -1,4 +1,14 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output
+} from '@angular/core';
 import { SelectionModel } from '@angular/cdk/collections';
 import { Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
@@ -16,7 +26,8 @@ import { SentenceReviewRequestComponent } from './sentence-review-request/senten
 @Component({
   selector: 'tock-sentence-training-list',
   templateUrl: './sentence-training-list.component.html',
-  styleUrls: ['./sentence-training-list.component.scss']
+  styleUrls: ['./sentence-training-list.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   @Input() isFilteredUnknown!: boolean;
@@ -40,10 +51,24 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   Action: typeof Action = Action;
   isSorted: boolean = false;
 
+  scrolled: boolean = false;
+  prevScrollVal: number;
+
+  @HostListener('window:scroll')
+  onScroll() {
+    const offset = 240;
+    const verticalOffset = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    if (verticalOffset === 0 && this.prevScrollVal > offset) return; // deal with <nb-select> reseting page scroll when opening select
+
+    this.scrolled = verticalOffset > offset ? true : false;
+    this.prevScrollVal = verticalOffset;
+  }
+
   constructor(
-    public readonly state: StateService,
+    private state: StateService,
     private router: Router,
-    private readonly elementRef: ElementRef,
+    private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService
   ) {}

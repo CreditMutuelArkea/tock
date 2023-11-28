@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { EntityProvider } from '../sentence-training-list/sentence-training-sentence/sentence-training-sentence.component';
+
 import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../model/nlp';
 import { NbDialogRef } from '@nebular/theme';
 import { StateService } from '../../../../core-nlp/state.service';
+import { EntityProvider } from '../sentence-training-list/sentence-training-sentence/token-view/token-view.component';
 
 @Component({
   selector: 'tock-entity-creation',
