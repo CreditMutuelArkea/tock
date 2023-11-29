@@ -14,7 +14,7 @@
 #
 
 from langchain.base_language import BaseLanguageModel
-
+from langchain.chat_models import ChatOpenAI
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
@@ -30,4 +30,7 @@ class OpenAILLMFactory(LangChainLLMFactory):
         return True
 
     def get_language_model(self) -> BaseLanguageModel:
-        return 'LanguageModel[OpenAILLMFactory]'
+        return ChatOpenAI(
+            model_name=self.setting.model,
+            temperature=self.setting.temperature,
+            openai_api_key=self.setting.apiKey)

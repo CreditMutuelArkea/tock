@@ -20,6 +20,7 @@ from llm_orchestrator.routers import (
     health_check_router,
     llm_providers_router,
     rag_router,
+    generate_sentences,
 )
 
 global_dependencies = [Depends(get_token_header)]
@@ -29,6 +30,7 @@ app = FastAPI()
 app.include_router(llm_providers_router.router, dependencies=global_dependencies)
 app.include_router(em_providers_router.router, dependencies=global_dependencies)
 app.include_router(rag_router.router, dependencies=global_dependencies)
+app.include_router(generate_sentences.router, dependencies=global_dependencies)
 app.include_router(health_check_router.router)
 
 # TODO MASS :
