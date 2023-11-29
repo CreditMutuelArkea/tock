@@ -22,7 +22,7 @@ import { Pagination } from '../..';
 import { SentenceExtended } from '../sentence-training.component';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { SentenceReviewRequestComponent } from './sentence-review-request/sentence-review-request.component';
-import { SentenceTrainingSentenceService } from './sentence-training-sentence/sentence-training-sentence.service';
+import { SentenceTrainingService } from './sentence-training.service';
 
 @Component({
   selector: 'tock-sentence-training-list',
@@ -61,7 +61,7 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService,
-    private sentenceTrainingSentenceService: SentenceTrainingSentenceService
+    private sentenceTrainingSentenceService: SentenceTrainingService
   ) {}
 
   ngOnInit(): void {

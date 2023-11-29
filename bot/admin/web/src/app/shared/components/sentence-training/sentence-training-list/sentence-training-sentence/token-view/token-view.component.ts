@@ -1,7 +1,7 @@
-import { Component, Input, OnDestroy, ElementRef, ViewContainerRef, ViewChild, TemplateRef } from '@angular/core';
-import { Token } from '../models/token.model';
+import { Component, Input, OnDestroy, ViewContainerRef, ViewChild, TemplateRef, Output, EventEmitter } from '@angular/core';
+import { Token } from './token.model';
 import { getContrastYIQ } from '../../../../../utils';
-import { SentenceTrainingSentenceService } from '../sentence-training-sentence.service';
+import { SentenceTrainingService } from '../../sentence-training.service';
 import { Subject, takeUntil } from 'rxjs';
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
@@ -17,17 +17,21 @@ export class TokenViewComponent implements OnDestroy {
 
   @Input() token: Token;
 
+  @Output() deleteTokenEntity = new EventEmitter();
+
   @ViewChild('userMenu') userMenu: TemplateRef<any>;
 
   getContrastYIQ = getContrastYIQ;
 
+  overlayRef: OverlayRef | null;
+
   constructor(
-    public state: StateService,
-    private sentenceTrainingSentenceService: SentenceTrainingSentenceService,
+    private state: StateService,
+    private sentenceTrainingService: SentenceTrainingService,
     private overlay: Overlay,
     private viewContainerRef: ViewContainerRef
   ) {
-    this.sentenceTrainingSentenceService.sentenceTrainingSentenceCommunication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
+    this.sentenceTrainingService.communication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
       if (evt.type === 'documentClick') {
         this.hideTokenMenu();
       }
@@ -35,23 +39,18 @@ export class TokenViewComponent implements OnDestroy {
   }
 
   delete(token: Token): void {
-    if (token.entity) {
-      token.sentence.removeEntity(token.entity);
-      token.sentence.cleanupEditedSubEntities();
-
-      this.sentenceTrainingSentenceService.refreshTokens();
-    }
+    this.deleteTokenEntity.emit(token);
   }
 
-  overlayRef: OverlayRef | null;
-
-  onClick(event) {
-    if (this.token.entity) this.displayMenu(event);
+  getEntityName(): string {
+    return this.token.entity?.qualifiedName(this.state.user);
   }
 
   displayMenu(event: MouseEvent) {
-    this.sentenceTrainingSentenceService.documentClick(event);
-    this.displayTokenMenu(event);
+    if (this.token.entity) {
+      this.sentenceTrainingService.documentClick(event);
+      this.displayTokenMenu(event);
+    }
   }
 
   hideTokenMenu(): void {

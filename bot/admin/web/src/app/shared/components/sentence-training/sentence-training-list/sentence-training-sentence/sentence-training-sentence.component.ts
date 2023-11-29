@@ -13,8 +13,8 @@ import {
 import { ClassifiedEntity, EntityContainer, EntityWithSubEntities, Sentence } from '../../../../../model/nlp';
 import { StateService } from '../../../../../core-nlp/state.service';
 import { getContrastYIQ } from '../../../../utils';
-import { Token } from './models/token.model';
-import { SentenceTrainingSentenceService } from './sentence-training-sentence.service';
+import { Token } from './token-view/token.model';
+import { SentenceTrainingService } from '../sentence-training.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -38,15 +38,11 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
 
   constructor(
     public state: StateService,
-    private sentenceTrainingSentenceService: SentenceTrainingSentenceService,
+    private sentenceTrainingService: SentenceTrainingService,
     private cd: ChangeDetectorRef,
     private self: ElementRef
   ) {
-    this.sentenceTrainingSentenceService.sentenceTrainingSentenceCommunication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
-      if (evt.type === 'refreshTokens') {
-        this.rebuild();
-      }
-
+    this.sentenceTrainingService.communication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
       if (evt.type === 'documentClick') {
         if (!self.nativeElement.contains(evt.event.target)) {
           this.selection = undefined;
@@ -105,6 +101,11 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
     return result;
   }
 
+  deleteTokenEntity(token: Token) {
+    token.sentence.removeEntity(token.entity);
+    this.rebuild();
+  }
+
   @HostListener('mouseup', ['$event'])
   onMouseUp(event: MouseEvent) {
     if ((event.target as HTMLElement).classList.contains('token-selector')) return;
@@ -121,7 +122,7 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
       }
 
       setTimeout(() => {
-        this.sentenceTrainingSentenceService.documentClick(event);
+        this.sentenceTrainingService.documentClick(event);
       });
 
       const tokenTxt = range.startContainer.textContent;
@@ -173,19 +174,19 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
     return clonedRange.toString().length;
   }
 
-  getEntities() {
-    if (this.sentence instanceof Sentence) {
+  getAssignableEntities() {
+    const parent = this.getParentEntity(this.sentence.classification.entities, this.selection.start, this.selection.end);
+
+    if (!parent) {
       const intent = this.state.currentApplication.intentById(this.sentence.classification.intentId);
       return intent?.entities ? intent.entities : [];
     } else {
-      const sntce = this.sentence as EntityWithSubEntities;
-      return sntce.entity.subEntities;
+      const entityType = this.state.findEntityTypeByName(parent.entity.type);
+      return entityType.subEntities;
     }
   }
 
-  assignEntity(entity, event?) {
-    event?.stopPropagation();
-
+  assignEntity(entity) {
     const parent = this.getParentEntity(this.sentence.classification.entities, this.selection.start, this.selection.end);
 
     if (!parent) {
