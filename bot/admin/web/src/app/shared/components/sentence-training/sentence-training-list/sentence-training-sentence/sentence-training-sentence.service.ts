@@ -13,15 +13,9 @@ export class SentenceTrainingSentenceService {
     });
   }
 
-  documentClick(): void {
+  documentClick(event: MouseEvent): void {
     this.sentenceTrainingSentenceCommunication.next({
-      type: 'documentClick'
-    });
-  }
-
-  componentMouseUp(event: MouseEvent): void {
-    this.sentenceTrainingSentenceCommunication.next({
-      type: 'componentMouseUp',
+      type: 'documentClick',
       event
     });
   }

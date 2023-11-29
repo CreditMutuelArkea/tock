@@ -1,11 +1,41 @@
 <div class="px-3">
   <div class="tokens-container-wrapper">
-    <div class="tokens-container">
+    <div
+      class="tokens-container"
+      #tokensContainer
+    >
       <tock-token-view
         *ngFor="let token of tokens"
         [token]="token"
         (displayTokenMenu)="displayTokenMenu($event)"
       ></tock-token-view>
     </div>
+  </div>
+
+  <div
+    *ngIf="selection"
+    class="mt-3"
+  >
+    <div class="text-muted font-size-small">
+      Assign an entity to the selection <strong>"{{ getSelectionText() }}"</strong> :
+    </div>
+    <div
+      *ngFor="let entity of getEntities()"
+      class="token-selector pointer"
+      [style.background-color]="entity.entityColor"
+      nbTooltip="Select &quot;{{ entity.qualifiedName(state.user) }}&quot;"
+      (click)="assignEntity(entity, $event)"
+    >
+      {{ entity.qualifiedName(state.user) }}
+    </div>
+
+    <button
+      nbButton
+      ghost
+      size="small"
+    >
+      <nb-icon icon="plus-outline"></nb-icon>
+      Add entity
+    </button>
   </div>
 </div>

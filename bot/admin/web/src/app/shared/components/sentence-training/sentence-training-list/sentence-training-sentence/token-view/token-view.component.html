@@ -1,10 +1,10 @@
 <span
   [nbTooltip]="'Entity : ' + token.entity?.role"
   [nbTooltipDisabled]="!token.entity"
-  [ngClass]="{ token: token.entity, pointer: token.entity, unClickable: !token.entity, 'cursor-default': !token.entity }"
+  [ngClass]="{ token: token.entity, pointer: token.entity, 'cursor-default': !token.entity }"
   [style.background]="token.color()"
   [style.color]="getContrastYIQ(token.color())"
-  (click)="token.entity ? displayMenu($event) : null"
+  (click)="onClick($event)"
   ><!-- NO carriage return here ! --><ng-container *ngIf="!token.subTokens">{{ token.text }}</ng-container
   ><ng-container *ngIf="token.subTokens"
     ><tock-token-view
@@ -14,13 +14,9 @@
     ></tock-token-view></ng-container
 ></span>
 
-<ng-template
-  #userMenu
-  let-action
->
+<ng-template #userMenu>
   <section class="token-menu pt-1">
     <button
-      *ngIf="action === 'delete'"
       type="button"
       nbButton
       ghost
@@ -29,39 +25,6 @@
       (click)="delete(token)"
     >
       <nb-icon icon="trash-2-outline"></nb-icon> Remove entity
-    </button>
-
-    <div
-      *ngIf="action === 'select' && getEntities().length"
-      class="px-3 pb-1"
-    >
-      Associate an existing entity :
-      <div
-        *ngFor="let entity of getEntities()"
-        class="pointer text-mitigated p-1 mb-1"
-        nbTooltip="Assign the &quot;{{ entity.qualifiedName(state.user) }}&quot; entity to the selection"
-        (click)="assignEntity(entity)"
-        [style.background-color]="entity.entityColor"
-        [style.color]="getContrastYIQ(entity.entityColor)"
-      >
-        <nb-icon
-          icon="attach-outline"
-          class="valign-middle"
-        ></nb-icon>
-        {{ entity.qualifiedName(state.user) }}
-      </div>
-    </div>
-
-    <button
-      *ngIf="action === 'select'"
-      type="button"
-      nbButton
-      ghost
-      size="small"
-      class="d-block w-100"
-      (click)="newEntity()"
-    >
-      <nb-icon icon="plus-circle-outline"></nb-icon> Add entity
     </button>
   </section>
 </ng-template>

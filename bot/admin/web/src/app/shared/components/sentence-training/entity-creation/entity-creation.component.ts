@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../model/nlp';
 import { NbDialogRef } from '@nebular/theme';
 import { StateService } from '../../../../core-nlp/state.service';
-import { EntityProvider } from '../sentence-training-list/sentence-training-sentence/token-view/token-view.component';
+import { EntityProvider } from '../../../../sentence-analysis/highlight/highlight.component';
 
 @Component({
   selector: 'tock-entity-creation',
