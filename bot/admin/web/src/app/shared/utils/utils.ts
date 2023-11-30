@@ -104,12 +104,17 @@ export function includesArray(data: any[], arr: any[]): boolean {
   return data.some((e) => Array.isArray(e) && e.every((o, i) => Object.is(arr[i], o)));
 }
 
-export function getContrastYIQ(hexcolor: string): '' | 'black' | 'white' {
+export function getContrastYIQ(hexcolor: string, blackOutput?: string, whiteOutput?: string): string {
   if (!hexcolor) return '';
+  blackOutput = blackOutput || 'black';
+  whiteOutput = whiteOutput || 'white';
+
   hexcolor = hexcolor.replace('#', '');
+
   let r = parseInt(hexcolor.substring(0, 2), 16);
   let g = parseInt(hexcolor.substring(2, 4), 16);
   let b = parseInt(hexcolor.substring(4, 6), 16);
   let yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 140 ? 'black' : 'white';
+
+  return yiq >= 140 ? blackOutput : whiteOutput;
 }

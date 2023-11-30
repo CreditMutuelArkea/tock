@@ -46,7 +46,7 @@ export class TokenViewComponent implements OnDestroy {
     return this.token.entity?.qualifiedName(this.state.user);
   }
 
-  displayMenu(event: MouseEvent) {
+  displayMenu(event: MouseEvent): void {
     if (this.token.entity) {
       this.sentenceTrainingService.documentClick(event);
       this.displayTokenMenu(event);

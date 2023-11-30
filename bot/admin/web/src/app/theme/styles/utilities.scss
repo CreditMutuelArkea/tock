@@ -75,6 +75,10 @@ nb-route-tabset .tab-link {
   }
 }
 
+.cdk-overlay-backdrop {
+  backdrop-filter: blur(3px);
+}
+
 .cdk-overlay-pane {
   nb-option-list {
     min-width: 15rem;

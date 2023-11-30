@@ -4,6 +4,7 @@
   [ngClass]="{ token: token.entity, pointer: token.entity }"
   [style.background]="token.color()"
   [style.color]="getContrastYIQ(token.color())"
+  [style.borderColor]="getContrastYIQ(token.color(), 'rgba(0,0,0,0.3)', 'rgba(255,255,255,0.6)')"
   (click)="displayMenu($event)"
   ><!-- NO carriage return here ! --><ng-container *ngIf="!token.subTokens">{{ token.text }}</ng-container
   ><ng-container *ngIf="token.subTokens"

@@ -1,14 +1,12 @@
 .token {
-  border-radius: 0.45rem;
-  padding: 0.1rem 0.3rem;
-  // display: inline-block;
   line-height: 1;
+  padding: 0.1rem 0.1rem;
+
+  border-radius: 0.45rem;
+  border-width: 1px;
+  border-style: dashed;
+
   box-shadow: -1px 1px 5px #00000030;
-  .delete {
-    font-size: 1em;
-    margin-top: 2px;
-    margin-left: 4px;
-  }
 }
 
 .token-menu {

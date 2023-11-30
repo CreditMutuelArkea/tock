@@ -14,7 +14,7 @@
 
   <div
     *ngIf="selection"
-    class="mt-3"
+    class="my-3"
   >
     <div class="text-muted font-size-small">
       Assign an entity to <strong>"{{ getSelectionText() }}"</strong> :
@@ -23,6 +23,7 @@
       *ngFor="let entity of getAssignableEntities()"
       class="token-selector pointer"
       [style.background-color]="entity.entityColor"
+      [style.color]="getContrastYIQ(entity.entityColor)"
       nbTooltip="Assign &quot;{{ entity.qualifiedName(state.user) }}&quot;"
       (click)="assignEntity(entity)"
     >
@@ -33,6 +34,7 @@
       nbButton
       ghost
       size="small"
+      (click)="createEntity()"
     >
       <nb-icon icon="plus-outline"></nb-icon>
       Add entity

@@ -1,5 +1,4 @@
-import { User } from '../../../../../../model/auth';
-import { ClassifiedEntity, EntityContainer, Sentence } from '../../../../../../model/nlp';
+import { ClassifiedEntity, EntityContainer } from '../../../../../../model/nlp';
 
 export class Token {
   public end: number;
@@ -14,19 +13,7 @@ export class Token {
     this.end = this.start + text.length;
   }
 
-  display(sentence: Sentence, user: User): string {
-    if (!this.entity) {
-      return '';
-    } else {
-      return this.entity.qualifiedName(user) + ' = ' + sentence.entityValue(this.entity);
-    }
-  }
-
   color(): string {
-    if (this.entity) {
-      return this.entity.entityColor;
-    } else {
-      return '';
-    }
+    return this.entity?.entityColor || '';
   }
 }

@@ -1,29 +1,38 @@
 import { Component, Input, OnInit } from '@angular/core';
-
-import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../model/nlp';
+import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../../../model/nlp';
 import { NbDialogRef } from '@nebular/theme';
-import { StateService } from '../../../../core-nlp/state.service';
-import { EntityProvider } from '../../../../sentence-analysis/highlight/highlight.component';
+import { StateService } from '../../../../../../core-nlp/state.service';
+import { getContrastYIQ } from '../../../../../utils';
 
 @Component({
-  selector: 'tock-entity-creation',
-  templateUrl: './entity-creation.component.html',
-  styleUrls: ['./entity-creation.component.scss']
+  selector: 'tock-sentence-training-create-entity',
+  templateUrl: './sentence-training-create-entity.component.html',
+  styleUrls: ['./sentence-training-create-entity.component.scss']
 })
-export class EntityCreationComponent {
-  @Input() entityProvider: EntityProvider;
+export class SentenceTrainingCreateEntityComponent implements OnInit {
+  @Input() intentOrEntityType;
+
+  entityTypes: EntityType[];
+
   entityType: EntityType;
   type: string;
   role: string;
-
   roleInitialized: boolean;
 
   error: string;
-  entityTypes: EntityType[];
 
-  constructor(public dialogRef: NbDialogRef<EntityCreationComponent>, private state: StateService) {
-    this.state.entityTypesSortedByName().subscribe((entities) => (this.entityTypes = entities));
+  getContrastYIQ = getContrastYIQ;
+
+  constructor(public dialogRef: NbDialogRef<SentenceTrainingCreateEntityComponent>, private state: StateService) {
+    this.state.entityTypesSortedByName().subscribe(
+      (entities) =>
+        (this.entityTypes = entities.sort((a, b) => {
+          return a.qualifiedName(state.user).localeCompare(b.qualifiedName(state.user));
+        }))
+    );
   }
+
+  ngOnInit(): void {}
 
   onSelect(entityType: EntityType) {
     this.entityType = entityType;
@@ -32,7 +41,7 @@ export class EntityCreationComponent {
     this.roleInitialized = true;
   }
 
-  onTypeKeyUp(event) {
+  onTypeKeyUp() {
     if (this.type) {
       this.type = this.type
         .replace(/[^A-Za-z:_-]*/g, '')
@@ -44,7 +53,7 @@ export class EntityCreationComponent {
     }
   }
 
-  onRoleKeyUp(event) {
+  onRoleKeyUp() {
     this.roleInitialized = true;
     if (this.role) {
       this.role = this.role
@@ -55,10 +64,13 @@ export class EntityCreationComponent {
   }
 
   save() {
-    this.onTypeKeyUp(null);
-    this.onRoleKeyUp(null);
+    this.onTypeKeyUp();
+    this.onRoleKeyUp();
+
     this.error = undefined;
+
     let name = this.type;
+
     if (!name || name.length === 0) {
       if (this.entityType) {
         name = this.entityType.name;
@@ -69,14 +81,21 @@ export class EntityCreationComponent {
     } else if (name.indexOf(':') === -1) {
       name = `${this.state.user.organization}:${name}`;
     }
+
     let role = this.role;
+
     if (!role || role.length === 0) {
       role = entityNameFromQualifiedName(name);
     }
-    if (this.entityProvider && this.entityProvider.hasEntityRole(role)) {
+
+    if (this.intentOrEntityType && this.intentOrEntityType.containsEntityRole(role)) {
       this.error = 'Entity role already exists';
     } else {
       this.dialogRef.close({ name: name, role: role });
     }
+  }
+
+  close() {
+    this.dialogRef.close();
   }
 }
