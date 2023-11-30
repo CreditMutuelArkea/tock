@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from llm_orchestrator.models.rag.rag_models import FootNote, TextWithFootNotes
+from llm_orchestrator.models.rag.rag_models import Footnote, TextWithFootnotes
 from llm_orchestrator.routers.requests.requests import RagQuery
 from llm_orchestrator.routers.responses.responses import RagResponse
 from llm_orchestrator.services.langchain.factories.langchain_factory import (
@@ -27,7 +27,7 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
 
 
 def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
-    llm_factory = get_llm_factory(query.rephrasing_answer_llm_setting)
+    llm_factory = get_llm_factory(query.question_answering_llm_setting)
     em_factory = get_em_factory(query.embedding_question_em_setting)
 
     # Instantiate LangChain, using :
@@ -36,15 +36,15 @@ def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
 
     # Fake answer
     return RagResponse(
-        answer=TextWithFootNotes(
+        answer=TextWithFootnotes(
             text='{} - {} - {}'.format(
                 llm_factory.get_language_model(),
                 em_factory.get_embedding_model(),
                 debug,
             ),
             footnotes=[
-                FootNote(identifier='1', title='title1', url='url1'),
-                FootNote(identifier='2', title='title2'),
+                Footnote(identifier='1', title='title1', url='url1'),
+                Footnote(identifier='2', title='title2'),
             ],
         ),
         debug=[],

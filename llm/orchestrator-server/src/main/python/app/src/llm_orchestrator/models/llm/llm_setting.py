@@ -13,14 +13,27 @@
 #   limitations under the License.
 #
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from .llm_provider import LLMProvider
 
 
 class BaseLLMSetting(BaseModel):
-    provider: LLMProvider
-    apiKey: str
-    model: str
-    temperature: str
-    prompt: str
+    provider: LLMProvider = Field(
+        title='le provider !! ', description='The Large Language Model provider.'
+    )
+    api_key: str = Field(
+        description='The API key used to authenticate requests to the provider API.',
+        examples=['123-abc-456-def'],
+    )
+    model: str = Field(description='The model id', examples=['gpt-3.5-turbo'])
+    temperature: float = Field(
+        description='The temperature that controls the randomness of the text generated.',
+        examples=['1.2'],
+        ge=0,
+        le=2,
+    )
+    prompt: str = Field(
+        description='The prompt to generate completions for.',
+        examples=['How to learn to ride a bike without wheels!'],
+    )

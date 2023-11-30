@@ -15,31 +15,38 @@
 from enum import Enum, unique
 from typing import Union
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
-class FootNote(BaseModel):
-    identifier: str
-    title: str
-    url: Union[str, None] = None
+class Footnote(BaseModel):
+    identifier: str = Field(description='Footnote identifier', examples=['1'])
+    title: str = Field(description='Footnote title', examples=['Tock Documentation'])
+    url: Union[str, None] = Field(
+        description='Footnote url', examples=['https://doc.tock.ai/tock/'], default=None
+    )
 
 
-class TextWithFootNotes(BaseModel):
-    text: str
-    footnotes: list[FootNote]
+class TextWithFootnotes(BaseModel):
+    text: str = Field(
+        description='Text with footnotes used to list outside sources',
+        examples=['This is page content [1], and this is more content [2]'],
+    )
+    footnotes: list[Footnote] = Field(description='List of footnotes')
 
 
 @unique
 class ChatMessageType(str, Enum):
-    USER = 'USER'
+    USER = 'HUMAN'
     AI = 'AI'
 
 
 class ChatMessage(BaseModel):
-    text: str
-    type: ChatMessageType
+    text: str = Field(
+        description='Conversation message text', examples=['Hello, how can I do this?']
+    )
+    type: ChatMessageType = Field(description='The message origin (Human or AI)')
 
 
 class MetadataFilter(BaseModel):
-    name: str
-    value: str
+    name: str = Field(description='Metadata filter name', examples=['bot_id'])
+    value: str = Field(description='Metadata filter value', examples=['my-bot'])

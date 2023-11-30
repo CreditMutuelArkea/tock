@@ -15,7 +15,7 @@
 from fastapi import APIRouter, status
 from pydantic import BaseModel
 
-router = APIRouter(tags=['Health Check'])
+health_check_router = APIRouter(tags=['Health Check'])
 
 
 class HealthCheck(BaseModel):
@@ -24,10 +24,10 @@ class HealthCheck(BaseModel):
     status: str = 'OK'
 
 
-@router.get(
-    '/healthCheck',
-    summary='Perform a Health Check',
-    response_description='Return HTTP Status Code 200 (OK)',
+@health_check_router.get(
+    '/health-check',
+    summary='Perform a health check',
+    response_description='Return HTTP status code 200 (OK)',
     status_code=status.HTTP_200_OK,
     response_model=HealthCheck,
 )

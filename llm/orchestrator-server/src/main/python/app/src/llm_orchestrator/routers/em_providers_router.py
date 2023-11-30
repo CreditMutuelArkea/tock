@@ -12,11 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from llm_orchestrator.dependencies import get_token_header
+from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.exceptions.functional_exception import (
     FunctionalException,
 )
@@ -28,7 +28,7 @@ from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.services.em.em_service import check_em_setting
 
-router = APIRouter(
+em_providers_router = APIRouter(
     prefix='/em-providers',
     tags=['Embedding Model Providers'],
     dependencies=[Depends(get_token_header)],
@@ -36,39 +36,37 @@ router = APIRouter(
 )
 
 
-@router.get('')
-async def get_all_em_providers() -> list[str]:
+@em_providers_router.get('')
+async def get_all_em_providers() -> list[LLMProvider]:
     return [provider.value for provider in LLMProvider]
 
 
-@router.get('/{provider_id}')
-async def get_em_provider_by_id(provider_id: str) -> bool:
+@em_providers_router.get('/{provider_id}')
+async def get_em_provider_by_id(provider_id: LLMProvider) -> bool:
     return LLMProvider.has_value(provider_id)
 
 
-@router.get('/{provider_id}/settings')
-async def get_em_provider_settings_by_id(provider_id: str) -> Union[EMSetting, None]:
-    if provider_id == LLMProvider.OPEN_AI.value:
+@em_providers_router.get('/{provider_id}/setting')
+async def get_em_provider_setting_by_id(provider_id: LLMProvider) -> EMSetting:
+    if provider_id == LLMProvider.OPEN_AI:
         return OpenAIEMSetting(
-            provider=LLMProvider.OPEN_AI, apiKey='apiKey', model='model'
+            provider=LLMProvider.OPEN_AI, api_key='api_key', model='model'
         )
-    elif provider_id == LLMProvider.AZURE_OPEN_AI_SERVICE.value:
+    elif provider_id == LLMProvider.AZURE_OPEN_AI_SERVICE:
         return AzureOpenAIEMSetting(
             provider=LLMProvider.AZURE_OPEN_AI_SERVICE,
-            apiKey='apiKey',
+            api_key='api_key',
             model='model',
-            deploymentName='deploymentName',
-            apiBase='apiBase',
-            apiVersion='apiVersion',
+            deployment_name='deployment_name',
+            api_base='api_base',
+            api_version='api_version',
         )
     else:
-        return None
+        raise HTTPException(status_code=400, detail=ErrorCode.E20)
 
 
-@router.post('/{provider_id}/settings')
-async def check_em_provider_settings_by_id(
-    provider_id: str, setting: EMSetting
-) -> bool:
+@em_providers_router.post('/{provider_id}/setting')
+async def check_em_provider_setting_by_id(provider_id: str, setting: EMSetting) -> bool:
     try:
         return check_em_setting(provider_id, setting)
     except FunctionalException as e:

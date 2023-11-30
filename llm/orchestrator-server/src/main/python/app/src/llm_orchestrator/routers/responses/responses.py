@@ -14,11 +14,16 @@
 #
 from typing import Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from llm_orchestrator.models.rag.rag_models import TextWithFootNotes
+from llm_orchestrator.models.rag.rag_models import TextWithFootnotes
 
 
 class RagResponse(BaseModel):
-    answer: TextWithFootNotes
-    debug: list[Any]
+    answer: TextWithFootnotes = Field(
+        description='The RAF answer, with outside sources'
+    )
+    debug: list[Any] = Field(
+        description='Debug data',
+        examples=[{'action': 'retrieve', 'result': 'OK', 'errors': []}],
+    )

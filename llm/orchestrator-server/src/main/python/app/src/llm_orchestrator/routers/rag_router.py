@@ -20,9 +20,9 @@ from llm_orchestrator.routers.requests.requests import RagQuery
 from llm_orchestrator.routers.responses.responses import RagResponse
 from llm_orchestrator.services.rag.rag_service import qa_ask
 
-router = APIRouter(prefix='/rag', tags=['Retrieval Augmented Generation'])
+rag_router = APIRouter(prefix='/rag', tags=['Retrieval Augmented Generation'])
 
 
-@router.post('')
+@rag_router.post('')
 async def ask(query: RagQuery, debug: Union[bool, None] = False) -> RagResponse:
     return qa_ask(query, debug)

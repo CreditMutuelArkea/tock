@@ -13,20 +13,33 @@
 #   limitations under the License.
 #
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from llm_orchestrator.models.em.em_setting import BaseEMSetting
 from llm_orchestrator.models.em.em_types import EMSetting
-from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.models.rag.rag_models import ChatMessage, MetadataFilter
 
 
 class RagQuery(BaseModel):
-    question: str
-    history: list[ChatMessage]
-    # rephrasing_question_llm_setting: LLMSetting
-    rephrasing_answer_llm_setting: LLMSetting
-    embedding_question_em_setting: EMSetting
-    indexName: str
-    metadataFilters: list[MetadataFilter]
+    question: str = Field(
+        description='The user question.',
+        examples=['How to get started playing guitar ?'],
+    )
+    history: list[ChatMessage] = Field(
+        description="Conversation history, used to reformulate the user's question."
+    )
+    # condense_question_llm_setting: LLMSetting =
+    #   Field(description="LLM setting, used to condense the user's question.")
+    question_answering_llm_setting: LLMSetting = Field(
+        description='LLM setting, used to perform a QA Prompt.'
+    )
+    embedding_question_em_setting: EMSetting = Field(
+        description="Embedding model setting, used to calculate the user's question vector."
+    )
+    index_name: str = Field(
+        description='Index name corresponding to a document collection in the vector database.',
+        examples=['my-index-name'],
+    )
+    metadata_filters: list[MetadataFilter] = Field(
+        description='Metadata filters, used to search for specific documents.'
+    )

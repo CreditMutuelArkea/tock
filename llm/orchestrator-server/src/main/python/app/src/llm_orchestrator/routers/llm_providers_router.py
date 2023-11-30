@@ -12,11 +12,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from llm_orchestrator.dependencies import get_token_header
+from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.exceptions.functional_exception import (
     FunctionalException,
 )
@@ -30,7 +30,7 @@ from llm_orchestrator.models.llm.openai.openai_llm_setting import (
 )
 from llm_orchestrator.services.llm.llm_service import check_llm_setting
 
-router = APIRouter(
+llm_providers_router = APIRouter(
     prefix='/llm-providers',
     tags=['Large Language Model Providers'],
     dependencies=[Depends(get_token_header)],
@@ -38,43 +38,43 @@ router = APIRouter(
 )
 
 
-@router.get('')
-async def get_all_llm_providers() -> list[str]:
+@llm_providers_router.get('')
+async def get_all_llm_providers() -> list[LLMProvider]:
     return [provider.value for provider in LLMProvider]
 
 
-@router.get('/{provider_id}')
-async def get_llm_provider_by_id(provider_id: str) -> bool:
+@llm_providers_router.get('/{provider_id}')
+async def get_llm_provider_by_id(provider_id: LLMProvider) -> bool:
     return LLMProvider.has_value(provider_id)
 
 
-@router.get('/{provider_id}/settings')
-async def get_llm_provider_settings_by_id(provider_id: str) -> Union[LLMSetting, None]:
-    if provider_id == LLMProvider.OPEN_AI.value:
+@llm_providers_router.get('/{provider_id}/setting')
+async def get_llm_provider_setting_by_id(provider_id: LLMProvider) -> LLMSetting:
+    if provider_id == LLMProvider.OPEN_AI:
         return OpenAILLMSetting(
             provider=LLMProvider.OPEN_AI,
-            apiKey='apiKey',
+            api_key='api_key',
             model='model',
-            temperature='1.3',
+            temperature=1.3,
             prompt='ppp',
         )
-    elif provider_id == LLMProvider.AZURE_OPEN_AI_SERVICE.value:
+    elif provider_id == LLMProvider.AZURE_OPEN_AI_SERVICE:
         return AzureOpenAILLMSetting(
             provider=LLMProvider.AZURE_OPEN_AI_SERVICE,
-            apiKey='apiKey',
+            api_key='api_key',
             model='model',
-            deploymentName='deploymentName',
-            apiBase='apiBase',
-            apiVersion='apiVersion',
-            temperature='0.7',
+            deployment_name='deployment_name',
+            api_base='api_base',
+            api_version='api_version',
+            temperature=0.7,
             prompt='prompt',
         )
     else:
-        return None
+        raise HTTPException(status_code=400, detail=ErrorCode.E20)
 
 
-@router.post('/{provider_id}/settings')
-async def check_llm_provider_settings_by_id(
+@llm_providers_router.post('/{provider_id}/setting')
+async def check_llm_provider_setting_by_id(
     provider_id: str, setting: LLMSetting
 ) -> bool:
     try:
