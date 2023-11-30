@@ -1,5 +1,6 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ElementRef,
   EventEmitter,
@@ -14,7 +15,7 @@ import { Router } from '@angular/router';
 import { Observable, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
-import { IntentsCategory } from '../../../../model/nlp';
+import { Intent, IntentsCategory, nameFromQualifiedName } from '../../../../model/nlp';
 import { StateService } from '../../../../core-nlp/state.service';
 import { UserRole } from '../../../../model/auth';
 import { Action, SentenceTrainingMode } from '../models';
@@ -23,6 +24,9 @@ import { SentenceExtended } from '../sentence-training.component';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { SentenceReviewRequestComponent } from './sentence-review-request/sentence-review-request.component';
 import { SentenceTrainingService } from './sentence-training.service';
+import { IntentDialogComponent } from '../../../../sentence-analysis/intent-dialog/intent-dialog.component';
+import { ConfirmDialogComponent } from '../../../../shared-nlp/confirm-dialog/confirm-dialog.component';
+import { NlpService } from '../../../../nlp-tabs/nlp.service';
 
 @Component({
   selector: 'tock-sentence-training-list',
@@ -61,7 +65,9 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService,
-    private sentenceTrainingSentenceService: SentenceTrainingService
+    private sentenceTrainingSentenceService: SentenceTrainingService,
+    private nlp: NlpService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -231,5 +237,70 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   async copySentence(sentence) {
     await navigator.clipboard.writeText(sentence.getText());
     this.toastrService.success(`Sentence copied to clipboard`, 'Clipboard');
+  }
+
+  createNewIntent(sentence: SentenceExtended) {
+    const dialogRef = this.nbDialogService.open(IntentDialogComponent, { context: { create: true } });
+
+    dialogRef.onClose.subscribe((result) => {
+      if (result && result.name) {
+        this.createIntent(sentence, result.name, result.label, result.description, result.category);
+      }
+    });
+  }
+
+  private createIntent(sentence: SentenceExtended, name: string, label: string, description: string, category: string): void {
+    if (
+      StateService.intentExistsInApp(this.state.currentApplication, name) ||
+      name === nameFromQualifiedName(Intent.unknown) ||
+      name === nameFromQualifiedName(Intent.ragExcluded)
+    ) {
+      this.toastrService.warning(`Intent ${name} already exists`);
+    } else {
+      if (this.state.intentExistsInOtherApplication(name)) {
+        const dialogRef = this.nbDialogService.open(ConfirmDialogComponent, {
+          context: {
+            title: 'This intent is already used in an other application',
+            subtitle: 'If you confirm the name, the intent will be shared between the two applications.',
+            action: 'Confirm'
+          }
+        });
+        dialogRef.onClose.subscribe((result) => {
+          if (result === 'confirm') {
+            this.saveIntent(sentence, name, label, description, category);
+          }
+        });
+      } else {
+        this.saveIntent(sentence, name, label, description, category);
+      }
+    }
+  }
+
+  private saveIntent(sentence: SentenceExtended, name: string, label: string, description: string, category: string) {
+    this.nlp
+      .saveIntent(
+        new Intent(name, this.state.user.organization, [], [this.state.currentApplication._id], [], [], label, description, category)
+      )
+      .subscribe({
+        next: (intent) => {
+          this.state.addIntent(intent);
+
+          sentence.classification.intentId = intent._id;
+          const oldSentenceIndex = this.sentences.findIndex((s) => s === sentence);
+          const oldSentence = sentence;
+
+          const newSentence = oldSentence.clone();
+          newSentence.classification.intentId = intent._id;
+          newSentence.classification.entities = oldSentence.classification.entities.filter(
+            (e) => intent && intent.containsEntity(e.type, e.role)
+          );
+
+          this.sentences.splice(oldSentenceIndex, 1, newSentence);
+          this.cd.markForCheck();
+        },
+        error: () => {
+          this.toastrService.warning(`Error on intent creation`);
+        }
+      });
   }
 }

@@ -158,7 +158,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         }
 
         this.loading = false;
-        this.cd.detectChanges();
+        this.cd.markForCheck();
       },
       error: () => {
         this.loading = false;
@@ -251,7 +251,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       status: 'basic'
     });
 
-    this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
@@ -280,7 +280,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
     this.selection.clear();
 
-    this.cd.detectChanges();
+    this.cd.markForCheck();
   }
 
   private loadSentencesAfterActionPerformed(actionPerformed: number = 1): void {
