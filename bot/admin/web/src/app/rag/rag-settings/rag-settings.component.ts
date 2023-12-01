@@ -246,7 +246,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
-          console.log(error);
           let errorMessage = 'An error occured';
 
           if (error.error.errors.length) {
