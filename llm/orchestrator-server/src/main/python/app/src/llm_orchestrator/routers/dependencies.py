@@ -12,19 +12,3 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
-
-from llm_orchestrator.exceptions.error_code import ErrorCode
-from llm_orchestrator.exceptions.functional_exception import (
-    FunctionalException,
-)
-
-
-async def get_query_bot_id(bot_id: Union[str, None]):
-    if not bot_id:
-        raise FunctionalException(ErrorCode.E30)
-
-
-async def get_query_conversation_id(conversation_id: str):
-    if not conversation_id:
-        raise FunctionalException(ErrorCode.E40)

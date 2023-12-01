@@ -14,7 +14,7 @@
 #
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, HttpUrl
 
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
@@ -28,7 +28,10 @@ class AzureOpenAILLMSetting(BaseLLMSetting):
         description='The deployment name you chose when you deployed the model.',
         examples=['my-deployment-name'],
     )
-    api_base: str = Field(description='The API base url / Azure endpoint')
+    api_base: HttpUrl = Field(
+        description='The API base url / Azure endpoint',
+        examples=['https://doc.tock.ai/tock'],
+    )
     api_version: str = Field(
         description='The API version to use for this operation.',
         examples=['2023-05-15'],

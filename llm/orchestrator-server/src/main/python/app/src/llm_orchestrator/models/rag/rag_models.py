@@ -15,13 +15,13 @@
 from enum import Enum, unique
 from typing import Union
 
-from pydantic import BaseModel, Field
+from pydantic import AnyUrl, BaseModel, Field
 
 
 class Footnote(BaseModel):
     identifier: str = Field(description='Footnote identifier', examples=['1'])
     title: str = Field(description='Footnote title', examples=['Tock Documentation'])
-    url: Union[str, None] = Field(
+    url: Union[AnyUrl, None] = Field(
         description='Footnote url', examples=['https://doc.tock.ai/tock/'], default=None
     )
 

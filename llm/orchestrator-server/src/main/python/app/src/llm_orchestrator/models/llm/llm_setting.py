@@ -15,13 +15,11 @@
 
 from pydantic import BaseModel, Field
 
-from .llm_provider import LLMProvider
+from llm_orchestrator.models.llm.llm_provider import LLMProvider
 
 
 class BaseLLMSetting(BaseModel):
-    provider: LLMProvider = Field(
-        title='le provider !! ', description='The Large Language Model provider.'
-    )
+    provider: LLMProvider = Field(description='The Large Language Model provider.')
     api_key: str = Field(
         description='The API key used to authenticate requests to the provider API.',
         examples=['123-abc-456-def'],

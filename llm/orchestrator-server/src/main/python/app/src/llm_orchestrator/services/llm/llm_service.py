@@ -28,4 +28,4 @@ def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
     if LLMProvider.has_value(provider_id):
         return get_llm_factory(setting).check_llm_setting()
     else:
-        raise FunctionalException(ErrorCode.E10)
+        raise FunctionalException(ErrorCode.E20)
