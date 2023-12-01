@@ -55,6 +55,11 @@
   font-weight: bold;
 }
 
+.stats-button {
+  border-color: var(--input-basic-border-color);
+  border-left: none;
+}
+
 .lineFirstButtonRetract {
   margin-left: -8px;
 }

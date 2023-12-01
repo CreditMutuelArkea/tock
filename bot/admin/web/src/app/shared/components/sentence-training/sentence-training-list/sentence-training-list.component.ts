@@ -107,12 +107,12 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
     this.router.navigate(['faq/management'], { state: { question: sentence.text } });
   }
 
-  selectIntent(sentence: SentenceExtended, category: 'placeholder' | 'probability'): string | number {
+  getSentenceAttribut(sentence: SentenceExtended, category: 'intentLabel' | 'probability'): string | number {
     switch (category) {
-      case 'placeholder':
+      case 'intentLabel':
         return sentence.getIntentLabel(this.state);
       case 'probability':
-        return Math.trunc(sentence.classification.intentProbability * 100);
+        return sentence.classification.intentProbability;
     }
   }
 
@@ -159,6 +159,10 @@ export class SentenceTrainingListComponent implements OnInit, OnDestroy {
   }
   onBlur(event: any): void {
     event.target.value = '';
+  }
+
+  swapStatsDetails(sentence: SentenceExtended): void {
+    sentence._showStatsDetails = !sentence._showStatsDetails;
   }
 
   showDetails(sentence: SentenceExtended): void {

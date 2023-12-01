@@ -35,7 +35,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: true,
+    _showDialog: true,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -49,7 +49,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -63,7 +63,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -77,7 +77,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }

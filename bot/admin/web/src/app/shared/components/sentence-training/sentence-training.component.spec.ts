@@ -21,7 +21,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -35,7 +35,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -49,7 +49,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -63,7 +63,7 @@ const mockSentences: SentenceExtended[] = [
       entitiesProbability: 1
     },
     creationDate: new Date('2022-08-03T09:50:24.952Z'),
-    _selected: false,
+    _showDialog: false,
     getIntentLabel(_state) {
       return 'intent label';
     }
@@ -167,8 +167,8 @@ describe('SentenceTrainingComponent', () => {
 
       expect(component.dialogDetailsSentence).toEqual(component.sentences[0]);
       component.sentences.forEach((sentence, i) => {
-        if (i === 0) expect(sentence._selected).toBeTrue();
-        else expect(sentence._selected).toBeFalse();
+        if (i === 0) expect(sentence._showDialog).toBeTrue();
+        else expect(sentence._showDialog).toBeFalse();
       });
     });
 
@@ -180,7 +180,7 @@ describe('SentenceTrainingComponent', () => {
 
       expect(component.dialogDetailsSentence).toBeUndefined();
       component.sentences.forEach((sentence) => {
-        expect(sentence._selected).toBeFalse();
+        expect(sentence._showDialog).toBeFalse();
       });
     });
 
@@ -190,8 +190,8 @@ describe('SentenceTrainingComponent', () => {
 
         expect(component.dialogDetailsSentence).toEqual(component.sentences[v]);
         component.sentences.forEach((sentence, i) => {
-          if (i === v) expect(sentence._selected).toBeTrue();
-          else expect(sentence._selected).toBeFalse();
+          if (i === v) expect(sentence._showDialog).toBeTrue();
+          else expect(sentence._showDialog).toBeFalse();
         });
       });
     });
@@ -204,7 +204,7 @@ describe('SentenceTrainingComponent', () => {
 
     expect(component.dialogDetailsSentence).toBeUndefined();
     component.sentences.forEach((sentence) => {
-      expect(sentence._selected).toBeFalse();
+      expect(sentence._showDialog).toBeFalse();
     });
   });
 

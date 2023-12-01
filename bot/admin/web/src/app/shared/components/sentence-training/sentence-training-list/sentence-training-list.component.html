@@ -91,7 +91,7 @@
 
 <nb-card
   *ngFor="let sentence of sentences"
-  [ngClass]="{ 'my-2': true, selected: sentence._selected }"
+  [ngClass]="{ 'my-2': true, selected: sentence._showDialog }"
   [id]="getSentenceId(sentence)"
   data-testid="list"
 >
@@ -118,7 +118,7 @@
     </div>
 
     <div class="tools-panel">
-      <small class="d-block text-muted unselectable">
+      <div class="font-size-small text-muted unselectable">
         <button
           nbButton
           ghost
@@ -143,33 +143,68 @@
         <span nbTooltip="Sentence configuration">
           {{ sentence.configuration }}
         </span>
-      </small>
+      </div>
 
-      <nb-form-field
-        class="mb-1"
-        nbTooltip="Intent association"
-      >
-        <input
-          nbInput
-          fullWidth
-          type="text"
-          placeholder="{{ selectIntent(sentence, 'placeholder') }}"
-          (focus)="onFocus($event)"
-          (blur)="onBlur($event)"
-          (keyup.escape)="onBlur($event)"
-          (keyup)="filterIntentsList($event)"
-          autocomplete="off"
-          [nbAutocomplete]="intentsAutocomplete"
-          class="intent-input"
-        />
-        <small
-          nbSuffix
-          nbTooltip="Detection probability"
-          class="pr-2"
+      <div class="d-flex mb-1">
+        <nb-form-field
+          class="mb-0 flex-grow-1 mb-0"
+          nbTooltip="Intent association"
         >
-          {{ selectIntent(sentence, 'probability') }}%
-        </small>
-      </nb-form-field>
+          <nb-icon
+            nbPrefix
+            icon="compass-outline"
+          ></nb-icon>
+          <input
+            nbInput
+            fullWidth
+            type="text"
+            placeholder="{{ getSentenceAttribut(sentence, 'intentLabel') }}"
+            (focus)="onFocus($event)"
+            (blur)="onBlur($event)"
+            (keyup.escape)="onBlur($event)"
+            (keyup)="filterIntentsList($event)"
+            autocomplete="off"
+            [nbAutocomplete]="intentsAutocomplete"
+            class="intent-input"
+          />
+        </nb-form-field>
+        <button
+          nbButton
+          ghost
+          nbTooltip="Intent detection probability. Click for details"
+          class="stats-button font-weight-normal pl-3 pr-1"
+          (click)="swapStatsDetails(sentence)"
+        >
+          {{ getSentenceAttribut(sentence, 'probability') | percent: '1.0-2' }}
+          <nb-icon [icon]="sentence._showStatsDetails ? 'chevron-up-outline' : 'chevron-down-outline'"></nb-icon>
+        </button>
+      </div>
+
+      <div
+        class="font-size-small my-3"
+        *ngIf="sentence._showStatsDetails"
+      >
+        <div class="d-flex gap-1 justify-content-between">
+          <span> Intent probability: {{ sentence.classification.intentProbability | percent: '1.0-2' }} </span>
+          <span> Entities probability: {{ sentence.classification.entitiesProbability | percent: '1.0-2' }} </span>
+        </div>
+
+        {{ sentence.classification | json }}
+
+        <hr />
+        {{ sentence.notRetainedEntitiesContainer() | json }}
+        <hr />
+
+        Probability for other intents:
+        <div
+          class="d-flex gap-1 justify-content-between"
+          *ngFor="let i of sentence.classification.otherIntentsProbabilities | mapToIterable"
+        >
+          <span>{{ state.intentLabelByName(i.key) }}</span>
+          <span>{{ i.value | percent: '1.0-2' }}</span>
+        </div>
+      </div>
+
       <nb-autocomplete
         size="tiny"
         #intentsAutocomplete

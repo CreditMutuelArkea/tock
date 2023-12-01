@@ -25,7 +25,7 @@ import { SentenceTrainingFiltersComponent } from './sentence-training-filters/se
 import { UserRole } from '../../../model/auth';
 import { saveAs } from 'file-saver-es';
 
-export type SentenceExtended = Sentence & { _selected?: boolean; _intentBeforeClassification?: string };
+export type SentenceExtended = Sentence & { _showDialog?: boolean; _showStatsDetails?: boolean; _intentBeforeClassification?: string };
 
 @Component({
   selector: 'tock-sentence-training',
@@ -202,7 +202,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   dialogDetailsSentence: SentenceExtended;
 
   unselectAllSentences(): void {
-    this.sentences.forEach((s) => (s._selected = false));
+    this.sentences.forEach((s) => (s._showDialog = false));
   }
 
   closeDetails(): void {
@@ -216,9 +216,10 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
       this.dialogDetailsSentence = undefined;
     } else {
-      sentence._selected = true;
+      sentence._showDialog = true;
       this.dialogDetailsSentence = sentence;
     }
+    this.cd.markForCheck();
   }
 
   async handleAction({ action, sentence }): Promise<void> {
@@ -347,7 +348,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
     if (exists) {
       this.unselectAllSentences();
-      exists._selected = true;
+      exists._showDialog = true;
       this.sentenceTrainingDialog.updateSentence(sentence);
       setTimeout(() => {
         this.sentenceTrainingList.scrollToSentence(sentence);
