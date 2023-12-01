@@ -22,3 +22,7 @@ from llm_orchestrator.models.rag.rag_models import TextWithFootNotes
 class RagResponse(BaseModel):
     answer: TextWithFootNotes
     debug: list[Any]
+
+
+class GenerateSentencesResponse(BaseModel):
+    sentences: list[str]

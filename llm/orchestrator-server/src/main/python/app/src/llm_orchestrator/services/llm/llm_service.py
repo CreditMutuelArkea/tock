@@ -22,6 +22,7 @@ from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_llm_factory,
 )
+from langchain.schema import BaseOutputParser, AIMessage
 
 
 def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
@@ -29,3 +30,29 @@ def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
         return get_llm_factory(setting).check_llm_setting()
     else:
         raise FunctionalException(ErrorCode.E10)
+
+
+def format_prompt_with_parser(prompt: str, parser: BaseOutputParser) -> str:
+    """
+        Add format instructions in the prompt based on the given parser.
+
+        :param prompt: The original prompt string to which format instructions will be added.
+        :param parser: An instance of the BaseOutputParser class providing format instructions.
+
+        :return: A new prompt string with added format instructions.
+    """
+
+    format_instructions = parser.get_format_instructions()
+    formatted_prompt = prompt + "\n" + format_instructions
+    return formatted_prompt
+
+
+def parse_llm_output_content(llm_output: AIMessage, parser: BaseOutputParser):
+    """
+        Parse the content of an AIMessage (output of an LLM invoke()) using the provided BaseOutputParser.
+
+        :param llm_output: LLM output whose content will be parsed.
+        :param parser: An instance of the BaseOutputParser class used for parsing.
+    """
+
+    llm_output.content = parser.parse(llm_output.content)

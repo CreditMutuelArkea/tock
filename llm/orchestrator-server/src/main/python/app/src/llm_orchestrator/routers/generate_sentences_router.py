@@ -1,4 +1,4 @@
-#  Copyright (C) 2017/2021 e-voyageurs technologies
+#   Copyright (C) 2023 Credit Mutuel Arkea
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,9 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from fastapi import APIRouter, Depends
-from llm_orchestrator.models.llm.llm_types import LLMSetting
-from llm_orchestrator.services.generatesentences.generate_sentences_service import get_sentences
+from fastapi import APIRouter
+from llm_orchestrator.services.generatesentences.generate_sentences_service import generate_and_split_sentences
+from llm_orchestrator.routers.requests.requests import GenerateSentencesQuery
 
 router = APIRouter(
     prefix='/prompt',
@@ -23,6 +23,6 @@ router = APIRouter(
 
 
 @router.post('/generate-sentences')
-async def generate_sentences(bot_id: str, conversation_id: str, setting: LLMSetting,  debug: bool):
-    return get_sentences(bot_id, conversation_id, setting, debug)
+async def generate_sentences(query: GenerateSentencesQuery):
+    return generate_and_split_sentences(query)
 

@@ -19,6 +19,8 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_llm_factory,
 )
+from langchain.base_language import BaseLanguageModel
+from langchain.schema import AIMessage
 
 # In think it would be great to name filed RAGChain of something that includes RAG in the naming.
 # For me we will have RagChain / RagService that uses langchain conversationnal QA
@@ -49,3 +51,7 @@ def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
         ),
         debug=[],
     )
+
+
+def llm_inference(llm: BaseLanguageModel, prompt: str) -> AIMessage:
+    return llm.invoke(prompt)

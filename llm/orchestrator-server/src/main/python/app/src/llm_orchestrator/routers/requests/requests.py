@@ -30,3 +30,8 @@ class RagQuery(BaseModel):
     embedding_question_em_setting: EMSetting
     indexName: str
     metadataFilters: list[MetadataFilter]
+
+
+class GenerateSentencesQuery(BaseModel):
+    llm_setting: LLMSetting
+
