@@ -15,10 +15,8 @@
 
 from fastapi import APIRouter, HTTPException
 
+from llm_orchestrator.exceptions.business_exception import BusinessException
 from llm_orchestrator.exceptions.error_code import ErrorCode
-from llm_orchestrator.exceptions.functional_exception import (
-    FunctionalException,
-)
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
@@ -73,5 +71,5 @@ async def get_em_provider_setting_by_id(provider_id: EMProvider) -> EMSetting:
 async def check_em_provider_setting_by_id(provider_id: str, setting: EMSetting) -> bool:
     try:
         return check_em_setting(provider_id, setting)
-    except FunctionalException as e:
+    except BusinessException as e:
         raise HTTPException(status_code=400, detail=e.args[0])

@@ -16,8 +16,19 @@ from enum import Enum, unique
 
 
 @unique
-class ErrorCode(str, Enum):
-    E10 = 'Unknown LLM Setting'
-    E11 = 'Unknown EM Setting'
-    E20 = 'Unknown LLM Provider'
-    E21 = 'Unknown EM Provider'
+class ErrorCode(Enum):
+    UNKNOWN_PROVIDER = 1001
+    UNKNOWN_MODEL = 1002
+
+    INVALID_QUERY = 3002
+
+    AUTH_PROVIDER = 4003
+
+
+class ErrorMessages:
+    MESSAGES = {
+        ErrorCode.UNKNOWN_PROVIDER: 'Unknown AI provider',
+        ErrorCode.UNKNOWN_MODEL: 'Unknown AI model',
+        ErrorCode.INVALID_QUERY: 'Setting incompatible with the AI provider specified in endpoint.',
+        ErrorCode.AUTH_PROVIDER: 'Authentication failure with the AI provider',
+    }

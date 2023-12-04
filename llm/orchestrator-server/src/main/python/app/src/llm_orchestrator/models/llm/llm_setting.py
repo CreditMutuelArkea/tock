@@ -22,7 +22,7 @@ class BaseLLMSetting(BaseModel):
     provider: LLMProvider = Field(description='The Large Language Model provider.')
     api_key: str = Field(
         description='The API key used to authenticate requests to the provider API.',
-        examples=['123-abc-456-def'],
+        examples=['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'],
     )
     model: str = Field(description='The model id', examples=['gpt-3.5-turbo'])
     temperature: float = Field(

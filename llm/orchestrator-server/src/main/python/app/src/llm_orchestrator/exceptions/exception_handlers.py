@@ -12,16 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
+from fastapi import status
+from fastapi.responses import JSONResponse
 
-from llm_orchestrator.exceptions.error_code import ErrorCode
+from llm_orchestrator.exceptions.business_exception import BusinessException
 
 
-class FunctionalException(Exception):
-    def __init__(self, code: ErrorCode, message: Union[str, None] = None):
-        if message:
-            super().__init__(message)
-        else:
-            super().__init__(code.value)
-
-        self.code = code
+def functional_exception_handler(_, exc: BusinessException):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={
+            'code': exc.error_code.value,
+            'message': exc.message,
+            'parameters': exc.parameters,
+        },
+    )

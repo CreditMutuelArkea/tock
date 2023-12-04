@@ -15,9 +15,26 @@
 
 from pydantic import BaseModel, Field
 
+from llm_orchestrator.exceptions.business_exception import BusinessException
+from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.models.em.em_types import EMSetting
 from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.models.rag.rag_models import ChatMessage, MetadataFilter
+
+
+class LLMProviderSettingStatusQuery(BaseModel):
+    setting: LLMSetting
+
+
+class ErrorResponse(BaseModel):
+    code: ErrorCode
+    message: str
+    parameters: dict
+
+
+class LLMProviderSettingStatusResponse(BaseModel):
+    valid: bool = False
+    errors: list[ErrorResponse] = []
 
 
 class RagQuery(BaseModel):

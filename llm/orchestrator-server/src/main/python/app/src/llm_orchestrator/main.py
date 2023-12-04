@@ -14,6 +14,13 @@
 #
 from fastapi import FastAPI
 
+from llm_orchestrator.exceptions.business_exception import (
+    BusinessException,
+    UnknownProviderException,
+)
+from llm_orchestrator.exceptions.exception_handlers import (
+    functional_exception_handler,
+)
 from llm_orchestrator.routers.app_monitors_router import (
     application_check_router,
 )
@@ -22,6 +29,9 @@ from llm_orchestrator.routers.llm_providers_router import llm_providers_router
 from llm_orchestrator.routers.rag_router import rag_router
 
 app = FastAPI()
+
+# Add functional exception handler
+app.add_exception_handler(BusinessException, functional_exception_handler)
 
 app.include_router(application_check_router)
 app.include_router(llm_providers_router)

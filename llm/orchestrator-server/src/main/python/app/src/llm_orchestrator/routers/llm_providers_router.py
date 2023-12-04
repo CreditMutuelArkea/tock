@@ -12,13 +12,16 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+import logging
 
 from fastapi import APIRouter, HTTPException
 
-from llm_orchestrator.exceptions.error_code import ErrorCode
-from llm_orchestrator.exceptions.functional_exception import (
-    FunctionalException,
+from llm_orchestrator.exceptions.business_exception import (
+    BusinessException,
+    InvalidQueryException,
+    UnknownProviderException,
 )
+from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
@@ -27,8 +30,15 @@ from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
+from llm_orchestrator.routers.requests.requests import (
+    ErrorResponse,
+    LLMProviderSettingStatusQuery,
+    LLMProviderSettingStatusResponse,
+)
 from llm_orchestrator.routers.responses.responses import LLMProviderResponse
 from llm_orchestrator.services.llm.llm_service import check_llm_setting
+
+logger = logging.getLogger(__name__)
 
 llm_providers_router = APIRouter(
     prefix='/llm-providers',
@@ -76,10 +86,38 @@ async def get_llm_provider_setting_by_id(provider_id: LLMProvider) -> LLMSetting
 
 
 @llm_providers_router.post('/{provider_id}/setting/status')
-async def check_llm_provider_setting_by_id(
-    provider_id: str, setting: LLMSetting
-) -> bool:
+async def check_llm_provider_setting(
+    provider_id: str, query: LLMProviderSettingStatusQuery
+) -> LLMProviderSettingStatusResponse:
+    # Query validation
+    validate_query(provider_id, query.setting)
+
     try:
-        return check_llm_setting(provider_id, setting)
-    except FunctionalException as e:
-        raise HTTPException(status_code=400, detail=e.args[0])
+        # LLM setting check
+        check_llm_setting(query.setting)
+
+        return LLMProviderSettingStatusResponse(valid=True)
+    except BusinessException as e:
+        logger.error(e)
+        return LLMProviderSettingStatusResponse(
+            errors=[
+                ErrorResponse(
+                    code=e.error_code, message=e.message, parameters=e.parameters
+                )
+            ]
+        )
+
+
+def validate_query(provider_id, setting):
+    if not LLMProvider.has_value(provider_id):
+        raise UnknownProviderException(
+            {'provider_type': 'LLM', 'provider_id': provider_id}
+        )
+    elif provider_id != setting.provider:
+        raise InvalidQueryException(
+            {
+                'provider_type': 'LLM',
+                'provider_id': provider_id,
+                'setting_provider_id': setting.provider,
+            }
+        )
