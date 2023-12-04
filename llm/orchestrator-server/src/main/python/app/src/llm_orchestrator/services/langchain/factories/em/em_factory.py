@@ -24,17 +24,17 @@ class LangChainEMFactory(ABC, BaseModel):
     setting: BaseEMSetting
 
     @abstractmethod
-    def check_embedding_model_setting(self) -> bool:
-        """
-        check the Embedding model setting validity
-        :return: True if the setting is valid.
-        """
-        pass
-
-    @abstractmethod
     def get_embedding_model(self) -> Embeddings:
         """
         Embedding model to call
         :return: [Embeddings] the interface for embedding models.
+        """
+        pass
+
+    @abstractmethod
+    def check_embedding_model_setting(self) -> bool:
+        """
+        check the Embedding model setting validity
+        :return: True if the setting is valid.
         """
         pass

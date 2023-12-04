@@ -14,7 +14,11 @@
 #
 
 from langchain.base_language import BaseLanguageModel
+from langchain.chat_models import AzureChatOpenAI
 
+from llm_orchestrator.errors.exceptions.handlers import (
+    factory_openai_exception_handler,
+)
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
@@ -26,8 +30,19 @@ from llm_orchestrator.services.langchain.factories.llm.llm_factory import (
 class AzureOpenAILLMFactory(LangChainLLMFactory):
     setting: AzureOpenAILLMSetting
 
-    def check_llm_setting(self) -> bool:
-        return False
-
     def get_language_model(self) -> BaseLanguageModel:
-        return 'LanguageModel[AzureOpenAILLMFactory]'
+        return AzureChatOpenAI(
+            openai_api_key=self.setting.api_key,
+            openai_api_version=self.setting.api_version,
+            azure_endpoint=str(self.setting.api_base),
+            azure_deployment=self.setting.deployment_name,
+            # TODO MASS : model_version is no longer used - Legacy, for openai<1.0.0 support.
+            # TODO MASS : Do I have to remove it?
+            # model_version=self.setting.model,
+            temperature=self.setting.temperature,
+        )
+
+    @factory_openai_exception_handler
+    def check_llm_setting(self) -> bool:
+        self.get_language_model().invoke('Hi, are you there?')
+        return True

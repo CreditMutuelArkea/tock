@@ -24,17 +24,18 @@ class LangChainLLMFactory(ABC, BaseModel):
     setting: BaseLLMSetting
 
     @abstractmethod
-    def check_llm_setting(self) -> bool:
+    def get_language_model(self) -> BaseLanguageModel:
         """
-        check the LLM setting validity
-        :return: True if the setting is valid.
+        Fabric the language model to call.
+        :return: BaseLanguageModel the interface for Language models.
         """
         pass
 
     @abstractmethod
-    def get_language_model(self) -> BaseLanguageModel:
+    def check_llm_setting(self) -> bool:
         """
-        Fabric the language model to call.
-        :return: [BaseLanguageModel] the interface for Language models.
+        check the LLM setting validity, by pinging the AI provider API
+        :return: True if the setting is valid.
+        :raises BusinessException: For incorrect setting
         """
         pass
