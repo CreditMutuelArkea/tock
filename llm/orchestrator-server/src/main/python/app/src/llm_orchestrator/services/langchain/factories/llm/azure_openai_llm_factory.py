@@ -81,6 +81,7 @@ class AzureOpenAILLMFactory(LangChainLLMFactory):
         return AzureChatOpenAI(
             openai_api_key=self.setting.api_key,
             openai_api_version=self.setting.api_version,
+            # TODO MASS self.setting.api_base, it dose not work. how to convert URL -> str
             azure_endpoint='https://conversationnel-api-arkea.azure-api.net',
             deployment_name=self.setting.deployment_name,
             model_name=self.setting.model,
