@@ -22,6 +22,8 @@ class ErrorCode(Enum):
     UNKNOWN_AZURE_DEPLOYMENT = 1003
     UNKNOWN_AZURE_VERSION = 1004
 
+    CONTEXT_LENGTH_EXCEEDED = 2001
+
     INVALID_QUERY = 3002
 
     AUTH_PROVIDER = 4003
@@ -33,6 +35,7 @@ class ErrorMessages:
         ErrorCode.UNKNOWN_MODEL: 'Unknown AI model',
         ErrorCode.UNKNOWN_AZURE_DEPLOYMENT: 'Unknown Azure AI deployment',
         ErrorCode.UNKNOWN_AZURE_VERSION: 'Unknown Azure AI Api version',
+        ErrorCode.CONTEXT_LENGTH_EXCEEDED: "The model's context length has been exceeded",
         ErrorCode.INVALID_QUERY: 'Setting incompatible with the AI provider specified in endpoint.',
         ErrorCode.AUTH_PROVIDER: 'Authentication failure with the AI provider',
     }

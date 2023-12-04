@@ -51,3 +51,8 @@ class UnknownAzureDeploymentException(BusinessException):
 class UnknownAzureVersionException(BusinessException):
     def __init__(self, parameters: dict):
         super().__init__(ErrorCode.UNKNOWN_AZURE_VERSION, parameters)
+
+
+class ContextLengthExceededException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.CONTEXT_LENGTH_EXCEEDED, parameters)
