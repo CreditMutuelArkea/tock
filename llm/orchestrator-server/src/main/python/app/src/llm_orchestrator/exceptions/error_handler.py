@@ -12,3 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+
+
+# TODO :  Use a custom exception handler
+# TODO : https://fastapi.tiangolo.com/tutorial/handling-errors/

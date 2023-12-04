@@ -14,9 +14,13 @@
 #
 from typing import Literal
 
+from pydantic import Field
+
 from llm_orchestrator.models.em.em_setting import BaseEMSetting
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 
 
 class OpenAIEMSetting(BaseEMSetting):
-    provider: Literal[LLMProvider.OPEN_AI]
+    provider: Literal[LLMProvider.OPEN_AI] = Field(
+        description='The Embedding Model provider.'
+    )

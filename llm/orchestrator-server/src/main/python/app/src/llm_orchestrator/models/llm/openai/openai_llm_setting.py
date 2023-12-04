@@ -14,9 +14,13 @@
 #
 from typing import Literal
 
+from pydantic import Field
+
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 
 
 class OpenAILLMSetting(BaseLLMSetting):
-    provider: Literal[LLMProvider.OPEN_AI]
+    provider: Literal[LLMProvider.OPEN_AI] = Field(
+        description='The Large Language Model provider.'
+    )

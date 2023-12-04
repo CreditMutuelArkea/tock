@@ -14,12 +14,22 @@
 #
 from typing import Literal
 
+from pydantic import Field
+
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 
 
 class AzureOpenAILLMSetting(BaseLLMSetting):
-    provider: Literal[LLMProvider.AZURE_OPEN_AI_SERVICE]
-    deploymentName: str
-    apiBase: str
-    apiVersion: str
+    provider: Literal[LLMProvider.AZURE_OPEN_AI_SERVICE] = Field(
+        description='The Large Language Model provider.'
+    )
+    deployment_name: str = Field(
+        description='The deployment name you chose when you deployed the model.',
+        examples=['my-deployment-name'],
+    )
+    api_base: str = Field(description='The API base url / Azure endpoint')
+    api_version: str = Field(
+        description='The API version to use for this operation.',
+        examples=['2023-05-15'],
+    )

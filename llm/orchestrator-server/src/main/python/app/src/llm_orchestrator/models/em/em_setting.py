@@ -12,12 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 
 
 class BaseEMSetting(BaseModel):
-    provider: LLMProvider
-    apiKey: str
-    model: str
+    provider: LLMProvider = Field(description='The Embedding Model provider.')
+    api_key: str = Field(
+        description='The API key used to authenticate requests to the provider API.',
+        examples=['123-abc-456-def'],
+    )
+    model: str = Field(description='The model id', examples=['text-embedding-ada-002'])
