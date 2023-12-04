@@ -36,3 +36,11 @@ class AzureOpenAILLMSetting(BaseLLMSetting):
         description='The API version to use for this operation.',
         examples=['2023-05-15'],
     )
+
+
+# azure_endpoint='https://conversationnel-api-arkea.azure-api.net',
+#                                 azure_deployment='squadconv-gpt4',
+#                                 openai_api_key='62f386ad5d064a599f4b41ea2c89a037',
+#                                 openai_api_version='2023-03-15-preview',
+#                                 model_version='gpt-4', # this can be omitted (Azure OpenAI doesn't return model version with the response : this value will be appended to the model name in the response)
+#                                 temperature=0

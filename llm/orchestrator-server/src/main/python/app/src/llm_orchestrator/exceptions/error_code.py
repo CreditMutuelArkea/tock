@@ -19,6 +19,8 @@ from enum import Enum, unique
 class ErrorCode(Enum):
     UNKNOWN_PROVIDER = 1001
     UNKNOWN_MODEL = 1002
+    UNKNOWN_AZURE_DEPLOYMENT = 1003
+    UNKNOWN_AZURE_VERSION = 1004
 
     INVALID_QUERY = 3002
 
@@ -29,6 +31,8 @@ class ErrorMessages:
     MESSAGES = {
         ErrorCode.UNKNOWN_PROVIDER: 'Unknown AI provider',
         ErrorCode.UNKNOWN_MODEL: 'Unknown AI model',
+        ErrorCode.UNKNOWN_AZURE_DEPLOYMENT: 'Unknown Azure AI deployment',
+        ErrorCode.UNKNOWN_AZURE_VERSION: 'Unknown Azure AI Api version',
         ErrorCode.INVALID_QUERY: 'Setting incompatible with the AI provider specified in endpoint.',
         ErrorCode.AUTH_PROVIDER: 'Authentication failure with the AI provider',
     }

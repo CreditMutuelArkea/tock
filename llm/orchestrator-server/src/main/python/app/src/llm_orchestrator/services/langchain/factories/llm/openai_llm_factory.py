@@ -21,6 +21,7 @@ from llm_orchestrator.exceptions.business_exception import (
     AuthenticationProviderException,
     UnknownModelException,
 )
+from llm_orchestrator.exceptions.exception_handlers import extract_error
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
@@ -34,7 +35,9 @@ class OpenAILLMFactory(LangChainLLMFactory):
     setting: OpenAILLMSetting
 
     def check_llm_setting(self) -> bool:
-        prompt = 'Hi, are you here ?'
+        prompt = (
+            'Hi, are you here ?'  # TODO MASS: Dois-je utiliser le prompt du setting ?
+        )
         try:
             self.get_language_model().invoke(prompt)
             return True
@@ -55,7 +58,7 @@ class OpenAILLMFactory(LangChainLLMFactory):
                 }
             )
         except Exception as e:
-            print(e)
+            print(e)  # TODO MASS
             return False
 
     def get_language_model(self) -> BaseLanguageModel:
@@ -64,14 +67,3 @@ class OpenAILLMFactory(LangChainLLMFactory):
             model_name=self.setting.model,
             temperature=self.setting.temperature,
         )
-
-
-import re
-
-
-def extract_error(message: str):
-    match = re.search(r'\{.*\}', message)
-    if match:
-        return match.group()
-    else:
-        return message

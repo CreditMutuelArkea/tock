@@ -12,13 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+import re
+
 from fastapi import status
 from fastapi.responses import JSONResponse
 
 from llm_orchestrator.exceptions.business_exception import BusinessException
 
 
-def functional_exception_handler(_, exc: BusinessException):
+def business_exception_handler(_, exc: BusinessException):
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
@@ -27,3 +29,11 @@ def functional_exception_handler(_, exc: BusinessException):
             'parameters': exc.parameters,
         },
     )
+
+
+def extract_error(message: str):
+    match = re.search(r'\{.*\}', message)
+    if match:
+        return match.group()
+    else:
+        return message

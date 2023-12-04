@@ -41,3 +41,13 @@ class AuthenticationProviderException(BusinessException):
 class UnknownModelException(BusinessException):
     def __init__(self, parameters: dict):
         super().__init__(ErrorCode.UNKNOWN_MODEL, parameters)
+
+
+class UnknownAzureDeploymentException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.UNKNOWN_AZURE_DEPLOYMENT, parameters)
+
+
+class UnknownAzureVersionException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.UNKNOWN_AZURE_VERSION, parameters)
