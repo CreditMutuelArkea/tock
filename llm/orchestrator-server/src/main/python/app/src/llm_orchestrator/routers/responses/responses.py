@@ -21,7 +21,7 @@ from llm_orchestrator.models.rag.rag_models import TextWithFootnotes
 
 class RagResponse(BaseModel):
     answer: TextWithFootnotes = Field(
-        description='The RAF answer, with outside sources'
+        description='The RAG answer, with outside sources'
     )
     debug: list[Any] = Field(
         description='Debug data',
@@ -30,4 +30,6 @@ class RagResponse(BaseModel):
 
 
 class GenerateSentencesResponse(BaseModel):
-    sentences: list[str]
+    sentences: list[str] = Field(
+        description='The list of sentences generated'
+    )

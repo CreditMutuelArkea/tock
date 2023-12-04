@@ -14,8 +14,7 @@
 #
 from llm_orchestrator.services.langchain.factories.langchain_factory import get_llm_factory
 from langchain.output_parsers import CommaSeparatedListOutputParser
-from llm_orchestrator.services.langchain.langchain import llm_inference
-from llm_orchestrator.services.llm.llm_service import format_prompt_with_parser, parse_llm_output_content
+from llm_orchestrator.services.llm.llm_service import format_prompt_with_parser, parse_llm_output_content, llm_inference
 from llm_orchestrator.routers.responses.responses import GenerateSentencesResponse
 from llm_orchestrator.routers.requests.requests import GenerateSentencesQuery
 

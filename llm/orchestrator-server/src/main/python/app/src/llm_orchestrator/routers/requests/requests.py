@@ -46,5 +46,7 @@ class RagQuery(BaseModel):
 
 
 class GenerateSentencesQuery(BaseModel):
-    llm_setting: LLMSetting
+    llm_setting: LLMSetting = Field(
+        description='LLM setting, used to perform a sentences generation.'
+    )
 

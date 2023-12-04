@@ -13,6 +13,7 @@
 #   limitations under the License.
 #
 
+from langchain.schema.language_model import BaseLanguageModel
 from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.exceptions.functional_exception import (
     FunctionalException,
@@ -56,3 +57,14 @@ def parse_llm_output_content(llm_output: AIMessage, parser: BaseOutputParser):
     """
 
     llm_output.content = parser.parse(llm_output.content)
+
+
+def llm_inference(llm: BaseLanguageModel, prompt: str) -> AIMessage:
+    """
+        Inference of the LLM using the given prompt.
+
+        :param llm: the LLM build from the factory
+        :param prompt: the prompt we want to inject into
+    """
+
+    return llm.invoke(prompt)
