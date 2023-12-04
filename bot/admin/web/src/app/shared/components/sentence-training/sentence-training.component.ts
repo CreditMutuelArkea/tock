@@ -48,7 +48,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   filters: Partial<SearchQuery> = {
     search: null,
-    sort: [{ first: 'creationDate', second: false }],
+    sort: null, //[{ first: 'creationDate', second: false }],
     intentId: null,
     status: [],
     onlyToReview: false,
@@ -106,6 +106,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   sortSentenceTraining(sort: boolean): void {
     this.selection.clear();
+    if (!this.filters.sort) this.filters.sort = [{ first: 'creationDate', second: false }];
     this.filters.sort[0].second = sort;
     this.loadData();
   }

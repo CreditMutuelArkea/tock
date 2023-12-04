@@ -60,6 +60,11 @@
   border-left: none;
 }
 
+.stats-details {
+  border: 1px solid var(--input-basic-border-color);
+  padding: 0.5em;
+}
+
 .lineFirstButtonRetract {
   margin-left: -8px;
 }
