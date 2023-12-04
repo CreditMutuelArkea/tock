@@ -51,7 +51,3 @@ def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
         ),
         debug=[],
     )
-
-
-def llm_inference(llm: BaseLanguageModel, prompt: str) -> AIMessage:
-    return llm.invoke(prompt)
