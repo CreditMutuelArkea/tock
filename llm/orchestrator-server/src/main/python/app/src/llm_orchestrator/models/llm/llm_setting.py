@@ -23,8 +23,11 @@ class BaseLLMSetting(BaseModel):
     api_key: str = Field(
         description='The API key used to authenticate requests to the provider API.',
         examples=['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'],  # TODO MASS
+        min_length=1,
     )
-    model: str = Field(description='The model id', examples=['gpt-3.5-turbo'])
+    model: str = Field(
+        description='The model id', examples=['gpt-3.5-turbo'], min_length=1
+    )
     temperature: float = Field(
         description='The temperature that controls the randomness of the text generated.',
         examples=['1.2'],
@@ -34,4 +37,5 @@ class BaseLLMSetting(BaseModel):
     prompt: str = Field(
         description='The prompt to generate completions for.',
         examples=['How to learn to ride a bike without wheels!'],
+        min_length=1,
     )

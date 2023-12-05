@@ -19,7 +19,12 @@ from llm_orchestrator.exceptions.error_code import ErrorCode, ErrorMessages
 class BusinessException(Exception):
     def __init__(self, error_code: ErrorCode, parameters: dict):
         self.error_code = error_code
-        self.message = ErrorMessages.MESSAGES.get(error_code, 'Unknown error')
+        self.message = ErrorMessages.MESSAGES.get(
+            error_code, {'message': 'Unknown error', 'details': ''}
+        )['message']
+        self.details = ErrorMessages.MESSAGES.get(
+            error_code, {'message': 'Unknown error', 'details': ''}
+        )['details']
         self.parameters = parameters
 
 
@@ -33,26 +38,53 @@ class InvalidQueryException(BusinessException):
         super().__init__(ErrorCode.INVALID_QUERY, parameters)
 
 
-class AuthenticationProviderException(BusinessException):
+class ProviderAPIErrorException(BusinessException):
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.AUTH_PROVIDER, parameters)
+        super().__init__(ErrorCode.PROVIDER_API_ERROR, parameters)
 
 
-class UnknownModelException(BusinessException):
+class ProviderAPIConnectionException(BusinessException):
+    """
+    Two cases handled :
+    - Connection error. Example: Internet or proxy connectivity / Azure endpoint non existent
+    - Request timed out
+    """
+
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.UNKNOWN_MODEL, parameters)
+        super().__init__(ErrorCode.PROVIDER_API_CONNECTION_ERROR, parameters)
 
 
-class UnknownAzureDeploymentException(BusinessException):
+class ProviderAPIAuthenticationException(BusinessException):
+    """
+    API key or token was invalid, expired, or revoked.
+    """
+
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.UNKNOWN_AZURE_DEPLOYMENT, parameters)
+        super().__init__(ErrorCode.PROVIDER_API_AUTHENTICATION_ERROR, parameters)
 
 
-class UnknownAzureVersionException(BusinessException):
+class ProviderAPIBadRequestException(BusinessException):
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.UNKNOWN_AZURE_VERSION, parameters)
+        super().__init__(ErrorCode.PROVIDER_API_UNKNOWN_BAD_REQUEST, parameters)
 
 
-class ContextLengthExceededException(BusinessException):
+class ProviderAPIContextLengthExceededException(BusinessException):
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.CONTEXT_LENGTH_EXCEEDED, parameters)
+        super().__init__(
+            ErrorCode.PROVIDER_API_CONTEXT_LENGTH_EXCEEDED_BAD_REQUEST, parameters
+        )
+
+
+class ProviderAPIResourceNotFoundException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.PROVIDER_API_RESOURCE_NOT_FOUND, parameters)
+
+
+class ProviderAPIModelException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.PROVIDER_API_MODEL_NOT_FOUND, parameters)
+
+
+class ProviderAPIDeploymentException(BusinessException):
+    def __init__(self, parameters: dict):
+        super().__init__(ErrorCode.PROVIDER_API_DEPLOYMENT_NOT_FOUND, parameters)
