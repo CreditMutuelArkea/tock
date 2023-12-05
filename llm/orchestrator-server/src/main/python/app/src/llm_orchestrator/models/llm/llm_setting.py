@@ -22,7 +22,7 @@ class BaseLLMSetting(BaseModel):
     provider: LLMProvider = Field(description='The Large Language Model provider.')
     api_key: str = Field(
         description='The API key used to authenticate requests to the provider API.',
-        examples=['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'],  # TODO MASS
+        examples=['ab7***************************A1IV4B'],
         min_length=1,
     )
     model: str = Field(

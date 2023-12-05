@@ -36,7 +36,7 @@ class ErrorMessages:
     MESSAGES = {
         ErrorCode.PROVIDER_NOT_FOUND: {
             'message': 'Unknown AI provider.',
-            'details': 'Accepted values : {}',  # [provider.value for provider in LLMProvider]
+            'details': '',
         },
         ErrorCode.PROVIDER_BAD_QUERY: {
             'message': 'Setting incompatible with the AI provider specified in endpoint.',

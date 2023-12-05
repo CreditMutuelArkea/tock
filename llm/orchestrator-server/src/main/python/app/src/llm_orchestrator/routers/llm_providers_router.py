@@ -110,14 +110,8 @@ async def check_llm_provider_setting(
 
 def validate_query(provider_id, setting):
     if not LLMProvider.has_value(provider_id):
-        raise UnknownProviderException(
-            {'provider_type': 'LLM', 'provider_id': provider_id}
-        )
+        raise UnknownProviderException({'provider': provider_id})
     elif provider_id != setting.provider:
         raise InvalidQueryException(
-            {
-                'provider_type': 'LLM',
-                'provider_id': provider_id,
-                'setting_provider_id': setting.provider,
-            }
+            {'provider': provider_id, 'setting': setting.provider}
         )

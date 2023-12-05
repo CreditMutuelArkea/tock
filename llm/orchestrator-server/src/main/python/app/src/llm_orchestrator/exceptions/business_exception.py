@@ -19,23 +19,20 @@ from llm_orchestrator.exceptions.error_code import ErrorCode, ErrorMessages
 class BusinessException(Exception):
     def __init__(self, error_code: ErrorCode, parameters: dict):
         self.error_code = error_code
-        self.message = ErrorMessages.MESSAGES.get(
-            error_code, {'message': 'Unknown error', 'details': ''}
-        )['message']
-        self.details = ErrorMessages.MESSAGES.get(
-            error_code, {'message': 'Unknown error', 'details': ''}
-        )['details']
+        unknown_error = {'message': 'Unknown error', 'details': ''}
+        self.message = ErrorMessages.MESSAGES.get(error_code, unknown_error)['message']
+        self.details = ErrorMessages.MESSAGES.get(error_code, unknown_error)['details']
         self.parameters = parameters
 
 
 class UnknownProviderException(BusinessException):
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.UNKNOWN_PROVIDER, parameters)
+        super().__init__(ErrorCode.PROVIDER_NOT_FOUND, parameters)
 
 
 class InvalidQueryException(BusinessException):
     def __init__(self, parameters: dict):
-        super().__init__(ErrorCode.INVALID_QUERY, parameters)
+        super().__init__(ErrorCode.PROVIDER_BAD_QUERY, parameters)
 
 
 class ProviderAPIErrorException(BusinessException):
