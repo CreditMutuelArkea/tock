@@ -18,6 +18,6 @@ from enum import Enum, unique
 @unique
 class ErrorCode(str, Enum):
     E10 = 'Unknown LLM Setting'
+    E11 = 'Unknown EM Setting'
     E20 = 'Unknown LLM Provider'
-    E30 = 'No Bot Id provided'
-    E40 = 'No Conversation Id provided'
+    E21 = 'Unknown EM Provider'

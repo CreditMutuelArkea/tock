@@ -14,21 +14,24 @@
 #
 from typing import Literal
 
-from pydantic import Field
+from pydantic import Field, HttpUrl
 
+from llm_orchestrator.models.em.em_provider import EMProvider
 from llm_orchestrator.models.em.em_setting import BaseEMSetting
-from llm_orchestrator.models.llm.llm_provider import LLMProvider
 
 
 class AzureOpenAIEMSetting(BaseEMSetting):
-    provider: Literal[LLMProvider.AZURE_OPEN_AI_SERVICE] = Field(
+    provider: Literal[EMProvider.AZURE_OPEN_AI_SERVICE] = Field(
         description='The Embedding Model provider.'
     )
     deployment_name: str = Field(
         description='The deployment name you chose when you deployed the model.',
         examples=['my-deployment-name'],
     )
-    api_base: str = Field(description='The API base url / Azure endpoint')
+    api_base: HttpUrl = Field(
+        description='The API base url / Azure endpoint',
+        examples=['https://doc.tock.ai/tock'],
+    )
     api_version: str = Field(
         description='The API version to use for this operation.',
         examples=['2023-05-15'],

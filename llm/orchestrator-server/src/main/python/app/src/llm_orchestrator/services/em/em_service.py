@@ -27,4 +27,4 @@ def check_em_setting(provider_id: str, setting: EMSetting) -> bool:
     if LLMProvider.has_value(provider_id):
         return get_em_factory(setting).check_embedding_model_setting()
     else:
-        raise FunctionalException(ErrorCode.E10)
+        raise FunctionalException(ErrorCode.E21)

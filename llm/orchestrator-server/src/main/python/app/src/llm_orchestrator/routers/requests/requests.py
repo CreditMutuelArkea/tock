@@ -41,7 +41,8 @@ class RagQuery(BaseModel):
         examples=['my-index-name'],
     )
     metadata_filters: list[MetadataFilter] = Field(
-        description='Metadata filters, used to search for specific documents.'
+        description='Metadata filters, used to search for specific documents. The AND operator is applied, '
+        'so all filters should be satisfied.'
     )
 
 
@@ -49,4 +50,3 @@ class GenerateSentencesQuery(BaseModel):
     llm_setting: LLMSetting = Field(
         description='LLM setting, used to perform a sentences generation.'
     )
-

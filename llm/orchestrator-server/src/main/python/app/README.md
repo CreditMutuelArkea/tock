@@ -43,51 +43,74 @@ LLM Orchestrator is the server that handle all LLMs operations : Retrieval Augme
 
 
 <!-- GETTING STARTED -->
-## Getting Started
+## Getting Started with Tock LLM Orchestrator
 
 ### Prerequisites
 
-* python 3.9+ | poetry
-  ```sh
-  apt install python3 poetry
-  ```
-  It's recommended to use pyenv (https://gist.github.com/trongnghia203/9cc8157acb1a9faad2de95c3175aa875)
+#### Python & Peotry
 
-* Vector Database
+##### Using pyenv && poetry (recommended)
+  It's recommended to use pyenv, see install and usage guide here :
+  https://gist.github.com/trongnghia203/9cc8157acb1a9faad2de95c3175aa875
+
+  Basic usage to create a venv with a specific version of Python for this project :
+```sh
+# In llm/orchestrator-server/src/main/python/app
+pyenv install 3.9.18
+pyenv local 3.9.18  # Activate Python 3.9 for the current
+which python # Check that you use the python version installed by pyenv
+python --version # Check your python version
+python -m venv .venv # Create a virtual env based on this python version
+source .venv/bin/activate # Activate your virtual env
+poetry install # Install dependencies for this project in the virtual env
+```
+
+##### Using apt (not recommended version may vary)
+
+*Skip this part if you have followed the install using pyenv*
+
+Install python3.9 and poetry :
   ```sh
-  OpenSearch (Docker Compose)
-  # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
-  # Or you can use the docker-compose present in tock-docker for opensearch
+  apt install python3.9 poetry
   ```
+
+Create a virtual env then install dependencies :
+```bash
+python3.9 -m venv .venv
+source .venv/bin/activate # Activate your virtual env
+poetry install # Install dependencies for this project in the virtual env
+```
+
+#### Install dependencies
+
+```bash
+poetry install # Install dependencies for this project in the virtual env
+```
+
+#### Open Search vector DB
+
+To run Open Search vector database see [tock-docker](https://github.com/theopenconversationkit/tock-docker)
+([see our fork](https://github.com/CreditMutuelArkea/tock-docker/blob/feature/rag/develop/docker-compose-opensearch-only.yml) until it's merge to the upstream)
+
+Start the Open Search cluster using :
+```
+docker compose -f docker-compose-opensearch-only.yml up -d
+```
+
+#### Start the API
+
+```bash
+uvicorn llm_orchestrator.main:app --host 0.0.0.0 --port 8000 --reload --log-level trace
+```
+
 ### Dev
 
-TODO MASS
-Install pre-commit: pip install pre-commit
-Add pre-commit to requirements.txt (or requirements-dev.txt)
-Define .pre-commit-config.yaml with the hooks you want to include.
-Execute pre-commit install to install git hooks in your .git/ directory.
-
-Naming Styles => https://realpython.com/python-pep8/#naming-styles
-
-### Installation
-
-1. Install python packages
-   ```sh
-    cd {PATH_TO_PROJECT}/tock/llm/orchestrator-server/src/main/python/app
-    poetry install
-   ```
-2. Install python packages
-   ```sh
-    source venv/bin/activate
-    python3.9 -m pip install -r src/requirements/base.txt
-    python3.9 -m pip install -r src/requirements/dev.txt
-   ```
-3. Enter your API keys in `.env`
-   ```sh
-    API_KEY = 'ENTER YOUR API'
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+See the installation guide, in your virtual env install extra dependencies and pre-commit hooks :
+```bash
+poetry install --with dev
+pre-commit install
+uvicorn llm_orchestrator.main:app --host 0.0.0.0 --port 8000 --reload --log-level trace
+```
 
 <!-- USAGE EXAMPLES -->
 ## Usage
@@ -97,7 +120,7 @@ Uvicorn Fast API : Go to
     http://localhost:8000/
    ```
 
-_For more information, please refer to the [Documentation](https://example.com) and [Swagger](http://localhost:8000/docs)_
+_For more information, please refer to the [Swagger](http://localhost:8000/docs)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

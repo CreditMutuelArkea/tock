@@ -12,21 +12,14 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Union
-
-from fastapi import APIRouter
-
-from llm_orchestrator.routers.requests.requests import RagQuery
-from llm_orchestrator.routers.responses.responses import RagResponse
-from llm_orchestrator.services.rag.rag_service import qa_ask
-
-rag_router = APIRouter(prefix='/rag', tags=['Retrieval Augmented Generation'])
+from enum import Enum, unique
 
 
-@rag_router.post('')
-async def ask(query: RagQuery, debug: Union[bool, None] = False) -> RagResponse:
-    """
-    ## Ask a RAG System
-    Ask question to a RAG System, and return answer by using a knowledge base (documents)
-    """
-    return qa_ask(query, debug)
+@unique
+class EMProvider(str, Enum):
+    OPEN_AI = 'OpenAI'
+    AZURE_OPEN_AI_SERVICE = 'AzureOpenAIService'
+
+    @classmethod
+    def has_value(cls, value) -> bool:
+        return value in cls._value2member_map_

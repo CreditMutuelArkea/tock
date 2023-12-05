@@ -14,11 +14,11 @@
 #
 from pydantic import BaseModel, Field
 
-from llm_orchestrator.models.llm.llm_provider import LLMProvider
+from llm_orchestrator.models.em.em_provider import EMProvider
 
 
 class BaseEMSetting(BaseModel):
-    provider: LLMProvider = Field(description='The Embedding Model provider.')
+    provider: EMProvider = Field(description='The Embedding Model provider.')
     api_key: str = Field(
         description='The API key used to authenticate requests to the provider API.',
         examples=['123-abc-456-def'],

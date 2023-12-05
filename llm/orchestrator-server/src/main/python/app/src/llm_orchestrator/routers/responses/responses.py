@@ -16,7 +16,17 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from llm_orchestrator.models.em.em_provider import EMProvider
+from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.rag.rag_models import TextWithFootnotes
+
+
+class LLMProviderResponse(BaseModel):
+    provider: LLMProvider
+
+
+class EMProviderResponse(BaseModel):
+    provider: EMProvider
 
 
 class RagResponse(BaseModel):

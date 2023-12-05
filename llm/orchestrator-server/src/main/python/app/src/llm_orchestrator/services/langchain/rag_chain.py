@@ -19,16 +19,9 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_llm_factory,
 )
-from langchain.base_language import BaseLanguageModel
-from langchain.schema import AIMessage
-
-# In think it would be great to name filed RAGChain of something that includes RAG in the naming.
-# For me we will have RagChain / RagService that uses langchain conversationnal QA
-# but also syntheticSentenceGenerationChain
-# that will generate derivate of sentence and use langchain list formatter.
 
 
-def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
+def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     llm_factory = get_llm_factory(query.question_answering_llm_setting)
     em_factory = get_em_factory(query.embedding_question_em_setting)
 
@@ -45,8 +38,12 @@ def execute_chain(query: RagQuery, debug: bool) -> RagResponse:
                 debug,
             ),
             footnotes=[
-                Footnote(identifier='1', title='title1', url='url1'),
-                Footnote(identifier='2', title='title2'),
+                Footnote(
+                    identifier='1',
+                    title='Tock Documentation',
+                    url='https://doc.tock.ai/tock',
+                ),
+                Footnote(identifier='2', title='Other source'),
             ],
         ),
         debug=[],
