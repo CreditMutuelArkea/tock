@@ -1,4 +1,4 @@
-import { ClassifiedEntity, EntityContainer } from '../../../../../../model/nlp';
+import { ClassifiedEntity, EntityContainer } from '../../../../../model/nlp';
 
 export class Token {
   public end: number;

@@ -1,8 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../../../model/nlp';
+import { EntityType, entityNameFromQualifiedName, qualifiedNameWithoutRole } from '../../../../../model/nlp';
 import { NbDialogRef } from '@nebular/theme';
-import { StateService } from '../../../../../../core-nlp/state.service';
-import { getContrastYIQ } from '../../../../../utils';
+import { StateService } from '../../../../../core-nlp/state.service';
+import { getContrastYIQ } from '../../../../utils';
 
 @Component({
   selector: 'tock-sentence-training-create-entity',

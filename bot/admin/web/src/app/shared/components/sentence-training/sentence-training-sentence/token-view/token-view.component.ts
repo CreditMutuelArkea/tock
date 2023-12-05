@@ -1,11 +1,11 @@
 import { Component, Input, OnDestroy, ViewContainerRef, ViewChild, TemplateRef, Output, EventEmitter } from '@angular/core';
 import { Token } from './token.model';
-import { getContrastYIQ } from '../../../../../utils';
-import { SentenceTrainingService } from '../../sentence-training.service';
 import { Subject, takeUntil } from 'rxjs';
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
-import { StateService } from '../../../../../../core-nlp/state.service';
+import { getContrastYIQ } from '../../../../utils';
+import { StateService } from '../../../../../core-nlp/state.service';
+import { SentenceTrainingService } from '../../sentence-training-list/sentence-training.service';
 
 @Component({
   selector: 'tock-token-view',
