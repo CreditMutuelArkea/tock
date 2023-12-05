@@ -20,7 +20,7 @@ export * from './sentence-training/sentence-training-dialog/sentence-training-di
 export * from './sentence-training/sentence-training-filters/sentence-training-filters.component';
 export * from './sentence-training/sentence-training-list/sentence-training-list.component';
 export * from './sentence-training/sentence-training-list/sentence-training-sentence/sentence-training-sentence.component';
-export * from './sentence-training/sentence-training-list/sentence-review-request/sentence-review-request.component';
+export * from './sentence-training/sentence-review-request/sentence-review-request.component';
 export * from './sentence-training/sentence-training-list/sentence-training-sentence/token-view/token-view.component';
 export * from './sentence-training/sentence-training-list/sentence-training-sentence/sentence-training-create-entity/sentence-training-create-entity.component';
 export * from './debug-viewer/debug-viewer.component';

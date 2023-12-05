@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { NbDialogRef } from '@nebular/theme';
-import { StateService } from '../../../../../core-nlp/state.service';
-import { flatMap } from '../../../../../model/commons';
+import { StateService } from '../../../../core-nlp/state.service';
+import { flatMap } from '../../../../model/commons';
 
 @Component({
   selector: 'tock-sentence-review-request',

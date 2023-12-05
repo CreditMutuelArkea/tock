@@ -22,7 +22,7 @@ import { Action, SentenceTrainingMode } from '../models';
 import { Pagination } from '../..';
 import { SentenceExtended } from '../sentence-training.component';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { SentenceReviewRequestComponent } from './sentence-review-request/sentence-review-request.component';
+import { SentenceReviewRequestComponent } from '../sentence-review-request/sentence-review-request.component';
 import { SentenceTrainingService } from './sentence-training.service';
 import { IntentDialogComponent } from '../../../../sentence-analysis/intent-dialog/intent-dialog.component';
 import { ConfirmDialogComponent } from '../../../../shared-nlp/confirm-dialog/confirm-dialog.component';
