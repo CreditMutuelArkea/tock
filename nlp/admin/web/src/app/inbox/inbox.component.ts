@@ -15,10 +15,10 @@
  */
 
 import { Component } from '@angular/core';
-
-import { SentenceStatus } from '../model/nlp';
-import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
 import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
+
+// import { SentenceStatus } from '../model/nlp';
+// import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
 
 @Component({
   selector: 'tock-inbox',
@@ -26,7 +26,7 @@ import { SentenceTrainingMode } from '../shared/components/sentence-training/mod
   styleUrls: ['./inbox.component.css']
 })
 export class InboxComponent {
-  filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
   mode = SentenceTrainingMode.INBOX;
   constructor() {}
+  // filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
 }
