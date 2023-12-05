@@ -75,7 +75,7 @@ export class BotAdminAppModule {
   constructor(private iconLibraries: NbIconLibraries) {
     this.iconLibraries.registerSvgPack('tock-custom', {
       rag: ragIcon,
-      ragexclude: ragexclude
+      ragexclude: ragexcludeIcon
     });
   }
 }

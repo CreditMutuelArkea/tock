@@ -14,7 +14,22 @@
   ~ limitations under the License.
   -->
 
-<h1 class="mt-3">Inbox sentences</h1>
+<div class="d-flex flex-wrap mt-3">
+  <h1 class="flex-grow-1">Inbox sentences</h1>
+
+  <section class="d-flex flex-wrap align-items-center">
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Refresh sentences"
+      (click)="refresh()"
+      class="ml-2"
+    >
+      <nb-icon icon="refresh-outline"></nb-icon>
+    </button>
+  </section>
+</div>
 <tock-sentence-training [sentenceTrainingMode]="mode"></tock-sentence-training>
 
 <!-- <div class="inbox">

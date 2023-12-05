@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
+import { SentenceTrainingComponent } from '../shared/components';
 
 // import { SentenceStatus } from '../model/nlp';
 // import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
@@ -27,6 +28,11 @@ import { SentenceTrainingMode } from '../shared/components/sentence-training/mod
 })
 export class InboxComponent {
   mode = SentenceTrainingMode.INBOX;
-  constructor() {}
+
+  @ViewChild(SentenceTrainingComponent) sentencesTraining;
+
+  refresh() {
+    this.sentencesTraining.refresh();
+  }
   // filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
 }
