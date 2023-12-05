@@ -106,7 +106,7 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
       },
       {
         title: 'RAG',
-        icon: 'bulb-outline',
+        icon: { icon: 'rag', pack: 'tock-custom' },
         children: [
           {
             link: '/rag/sources',
@@ -117,7 +117,7 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
           {
             link: '/rag/exclusions',
             title: 'Rag exclusions',
-            icon: 'alert-triangle-outline'
+            icon: { icon: 'ragexclude', pack: 'tock-custom' }
           },
           {
             link: '/rag/settings',
