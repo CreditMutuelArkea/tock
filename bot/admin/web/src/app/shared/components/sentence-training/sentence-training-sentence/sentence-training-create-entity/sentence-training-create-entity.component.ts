@@ -9,7 +9,7 @@ import { getContrastYIQ } from '../../../../utils';
   templateUrl: './sentence-training-create-entity.component.html',
   styleUrls: ['./sentence-training-create-entity.component.scss']
 })
-export class SentenceTrainingCreateEntityComponent implements OnInit {
+export class SentenceTrainingCreateEntityComponent {
   @Input() intentOrEntityType;
 
   entityTypes: EntityType[];
@@ -31,8 +31,6 @@ export class SentenceTrainingCreateEntityComponent implements OnInit {
         }))
     );
   }
-
-  ngOnInit(): void {}
 
   onSelect(entityType: EntityType) {
     this.entityType = entityType;

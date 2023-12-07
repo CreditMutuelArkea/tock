@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  DoCheck,
   ElementRef,
   EventEmitter,
   Input,
@@ -32,7 +33,7 @@ import { getSentenceId } from '../commons/utils';
   styleUrls: ['./sentence-training-entry.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class SentenceTrainingEntryComponent implements OnInit, OnDestroy {
+export class SentenceTrainingEntryComponent implements OnInit, DoCheck, OnDestroy {
   private readonly _destroy$: Subject<boolean> = new Subject();
 
   @Input() standAlone: boolean;
