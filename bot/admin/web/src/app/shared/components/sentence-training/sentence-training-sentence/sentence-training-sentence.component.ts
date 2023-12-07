@@ -25,7 +25,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { SentenceTrainingCreateEntityComponent } from './sentence-training-create-entity/sentence-training-create-entity.component';
 import { NlpService } from '../../../../nlp-tabs/nlp.service';
-import { SentenceTrainingService } from '../sentence-training-list/sentence-training.service';
+import { SentenceTrainingService } from '../sentence-training.service';
 
 interface ClassifiedEntityWithIndexes {
   entity: ClassifiedEntity;

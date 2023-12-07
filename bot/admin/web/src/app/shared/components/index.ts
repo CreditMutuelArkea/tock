@@ -18,7 +18,7 @@ export * from './slider/slider.component';
 export * from './sentence-training/sentence-training.component';
 export * from './sentence-training/sentence-training-dialog/sentence-training-dialog.component';
 export * from './sentence-training/sentence-training-filters/sentence-training-filters.component';
-export * from './sentence-training/sentence-training-list/sentence-training-list.component';
+export * from './sentence-training/sentence-training-entry/sentence-training-entry.component';
 export * from './sentence-training/sentence-training-sentence/sentence-training-sentence.component';
 export * from './sentence-training/sentence-review-request/sentence-review-request.component';
 export * from './sentence-training/sentence-training-sentence/token-view/token-view.component';

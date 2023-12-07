@@ -70,7 +70,7 @@ import {
   SentenceTrainingCreateEntityComponent,
   SentenceTrainingDialogComponent,
   SentenceTrainingFiltersComponent,
-  SentenceTrainingListComponent,
+  SentenceTrainingEntryComponent,
   SentenceTrainingSentenceComponent,
   SliderComponent,
   TokenViewComponent
@@ -138,7 +138,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     SentenceTrainingComponent,
     SentenceTrainingDialogComponent,
     SentenceTrainingFiltersComponent,
-    SentenceTrainingListComponent,
+    SentenceTrainingEntryComponent,
     SentenceTrainingSentenceComponent,
     SentenceTrainingCreateEntityComponent,
     TokenViewComponent,
@@ -164,6 +164,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     FileUploadComponent,
     SliderComponent,
     SentenceTrainingComponent,
+    SentenceTrainingEntryComponent,
     AutocompleteInputComponent,
     DebugViewerComponent
   ],

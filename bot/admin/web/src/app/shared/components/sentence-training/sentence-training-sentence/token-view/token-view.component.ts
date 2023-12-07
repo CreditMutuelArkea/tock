@@ -5,7 +5,7 @@ import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@a
 import { TemplatePortal } from '@angular/cdk/portal';
 import { getContrastYIQ } from '../../../../utils';
 import { StateService } from '../../../../../core-nlp/state.service';
-import { SentenceTrainingService } from '../../sentence-training-list/sentence-training.service';
+import { SentenceTrainingService } from '../../sentence-training.service';
 
 @Component({
   selector: 'tock-token-view',

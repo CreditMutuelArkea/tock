@@ -1,11 +1,21 @@
 import { SelectionModel } from '@angular/cdk/collections';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Input,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
-import { lastValueFrom, Observable, Subject, Subscription } from 'rxjs';
+import { Observable, Subject, Subscription } from 'rxjs';
 import { take, takeUntil, share } from 'rxjs/operators';
 
 import { StateService } from '../../../core-nlp/state.service';
-import { PaginatedQuery, truncate } from '../../../model/commons';
+import { PaginatedQuery } from '../../../model/commons';
 import {
   EntityDefinition,
   Intent,
@@ -19,11 +29,12 @@ import {
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ChoiceDialogComponent, Pagination } from '..';
 import { Action, SentenceTrainingMode } from './models';
-import { SentenceTrainingListComponent } from './sentence-training-list/sentence-training-list.component';
 import { SentenceTrainingDialogComponent } from './sentence-training-dialog/sentence-training-dialog.component';
 import { SentenceTrainingFiltersComponent } from './sentence-training-filters/sentence-training-filters.component';
 import { UserRole } from '../../../model/auth';
 import { saveAs } from 'file-saver-es';
+import { SentenceTrainingService } from './sentence-training.service';
+import { getSentenceId } from './commons/utils';
 
 export type SentenceExtended = Sentence & { _showDialog?: boolean; _showStatsDetails?: boolean; _intentBeforeClassification?: string };
 
@@ -38,13 +49,19 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   @Input() sentenceTrainingMode: SentenceTrainingMode;
 
-  @ViewChild('sentenceTrainingList') sentenceTrainingList: SentenceTrainingListComponent;
   @ViewChild('sentenceTrainingDialog') sentenceTrainingDialog: SentenceTrainingDialogComponent;
+
   @ViewChild('sentenceTrainingFilter') sentenceTrainingFilter: SentenceTrainingFiltersComponent;
+
+  loading: boolean = false;
+
+  sentences: SentenceExtended[] = [];
 
   selection: SelectionModel<SentenceExtended> = new SelectionModel<SentenceExtended>(true, []);
 
   Action: typeof Action = Action;
+
+  SentenceTrainingMode = SentenceTrainingMode;
 
   filters: Partial<SearchQuery> = {
     search: null,
@@ -56,13 +73,16 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     minIntentProbability: 0
   };
 
-  loading: boolean = false;
+  isSorted: boolean = false;
 
-  sentences: SentenceExtended[] = [];
+  scrolled: boolean = false;
+  prevScrollVal: number;
 
   constructor(
     private nlp: NlpService,
     private state: StateService,
+    private sentenceTrainingSentenceService: SentenceTrainingService,
+    private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService,
     private cd: ChangeDetectorRef
@@ -75,6 +95,35 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       this.loadData();
       this.closeDetails();
     });
+  }
+
+  @HostListener('window:scroll')
+  onPageScroll() {
+    const offset = 230;
+    const verticalOffset = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    if (verticalOffset === 0 && this.prevScrollVal > offset) return; // deal with <nb-select> reseting page scroll when opening select
+
+    this.scrolled = verticalOffset > offset ? true : false;
+    this.prevScrollVal = verticalOffset;
+  }
+
+  @HostListener('document:click', ['$event'])
+  documentClick(event: MouseEvent) {
+    this.sentenceTrainingSentenceService.documentClick(event);
+  }
+
+  handleToggleSelectAll(value: boolean): void {
+    if (!value) {
+      this.selection.clear();
+    } else {
+      this.sentences.forEach((sentence) => this.selection.select(sentence));
+    }
+  }
+
+  toggleSort(): void {
+    this.isSorted = !this.isSorted;
+    this.sortSentenceTraining(this.isSorted);
   }
 
   filterSentenceTraining(filters: Partial<SearchQuery>): void {
@@ -119,6 +168,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   };
 
   paginationChange(): void {
+    this.selection.clear();
     this.loadData(this.pagination.start, this.pagination.size);
   }
 
@@ -223,37 +273,10 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     this.cd.markForCheck();
   }
 
-  async handleAction({ action, sentence }): Promise<void> {
-    const actionTitle = this.getActionTitle(action);
-
-    this.setSentenceAccordingToAction(action, sentence);
-
-    await lastValueFrom(this.nlp.updateSentence(sentence));
-
-    // delete old sentence when language change
-    if (sentence.language !== this.state.currentLocale) {
-      const s = sentence.clone();
-      s.language = this.state.currentLocale;
-      s.status = SentenceStatus.deleted;
-      this.nlp.updateSentence(s).subscribe((_) => {
-        this.toastrService.success(`Language change to ${this.state.localeName(sentence.language)}`, 'Language change');
-      });
-    }
-
+  clearSentence(sentence: SentenceExtended) {
     this.pagination.total--;
     this.loadSentencesAfterActionPerformed();
-
-    if (this.selection.isSelected(sentence)) {
-      this.selection.deselect(sentence);
-    }
     this.sentences = this.sentences.filter((s) => sentence.text !== s.text);
-
-    this.toastrService.success(truncate(sentence.text), actionTitle, {
-      duration: 2000,
-      status: 'basic'
-    });
-
-    this.cd.markForCheck();
   }
 
   async handleBatchAction(action: Action): Promise<void> {
@@ -352,7 +375,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
       exists._showDialog = true;
       this.sentenceTrainingDialog.updateSentence(sentence);
       setTimeout(() => {
-        this.sentenceTrainingList.scrollToSentence(sentence);
+        this.scrollToSentence(sentence);
       }, 200);
     } else {
       if (this.pagination.size * tryCount < 50) {
@@ -370,6 +393,13 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
         search: sentence.text
       });
     }
+  }
+
+  scrollToSentence(sentence: SentenceExtended): void {
+    const id = getSentenceId(sentence);
+    const nativeElement: HTMLElement = this.elementRef.nativeElement;
+    const found: Element | null = nativeElement.querySelector(`#${id}`);
+    if (found) found.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
   }
 
   downloadSentencesDump(): void {
