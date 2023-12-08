@@ -73,7 +73,8 @@ import {
   SentenceTrainingEntryComponent,
   SentenceTrainingSentenceComponent,
   SliderComponent,
-  TokenViewComponent
+  TokenViewComponent,
+  ScrollTopButtonComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
@@ -145,7 +146,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     SentenceReviewRequestComponent,
     AutocompleteInputComponent,
     DebugJsonIteratorComponent,
-    DebugViewerComponent
+    DebugViewerComponent,
+    ScrollTopButtonComponent
   ],
   exports: [
     BotMessageComponent,
@@ -166,7 +168,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     SentenceTrainingComponent,
     SentenceTrainingEntryComponent,
     AutocompleteInputComponent,
-    DebugViewerComponent
+    DebugViewerComponent,
+    ScrollTopButtonComponent
   ],
   providers: [BotSharedService, AnalyticsService]
 })

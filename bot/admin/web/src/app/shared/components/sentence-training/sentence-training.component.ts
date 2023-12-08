@@ -5,6 +5,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  Inject,
   Input,
   OnDestroy,
   OnInit,
@@ -35,6 +36,7 @@ import { UserRole } from '../../../model/auth';
 import { saveAs } from 'file-saver-es';
 import { SentenceTrainingService } from './sentence-training.service';
 import { getSentenceId } from './commons/utils';
+import { DOCUMENT } from '@angular/common';
 
 export type SentenceExtended = Sentence & { _showDialog?: boolean; _showStatsDetails?: boolean; _intentBeforeClassification?: string };
 
@@ -85,6 +87,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService,
+    @Inject(DOCUMENT) private document: Document,
     private cd: ChangeDetectorRef
   ) {}
 
@@ -100,7 +103,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   @HostListener('window:scroll')
   onPageScroll() {
     const offset = 230;
-    const verticalOffset = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const verticalOffset = this.document.documentElement.scrollTop || this.document.body.scrollTop || 0;
 
     if (verticalOffset === 0 && this.prevScrollVal > offset) return; // deal with <nb-select> reseting page scroll when opening select
 
@@ -169,7 +172,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   paginationChange(): void {
     this.selection.clear();
-    this.loadData(this.pagination.start, this.pagination.size);
+    this.loadData(this.pagination.start, this.pagination.size, false, true, false, true);
   }
 
   onScroll(): Observable<PaginatedResult<SentenceExtended>> {
@@ -188,7 +191,8 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     size: number = this.pagination.size,
     add: boolean = false,
     showLoadingSpinner: boolean = true,
-    partialReload: boolean = false
+    partialReload: boolean = false,
+    scrollToTop: Boolean = false
   ): Observable<PaginatedResult<SentenceExtended>> {
     if (showLoadingSpinner) this.loading = true;
 
@@ -208,6 +212,9 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
           this.pagination.start = data.start;
         }
 
+        if (scrollToTop) {
+          this.scrollToTop();
+        }
         this.loading = false;
         this.cd.markForCheck();
       },
@@ -217,6 +224,14 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
     });
 
     return search;
+  }
+
+  scrollToTop(): void {
+    const currentScroll = this.document.documentElement.scrollTop || this.document.body.scrollTop;
+    if (currentScroll > 0) {
+      window.requestAnimationFrame(this.scrollToTop.bind(this));
+      window.scrollTo(0, currentScroll - currentScroll / 4);
+    }
   }
 
   search(query: PaginatedQuery): Observable<PaginatedResult<SentenceExtended>> {

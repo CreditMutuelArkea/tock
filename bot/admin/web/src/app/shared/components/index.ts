@@ -24,3 +24,4 @@ export * from './sentence-training/sentence-review-request/sentence-review-reque
 export * from './sentence-training/sentence-training-sentence/token-view/token-view.component';
 export * from './sentence-training/sentence-training-sentence/sentence-training-create-entity/sentence-training-create-entity.component';
 export * from './debug-viewer/debug-viewer.component';
+export * from './scroll-top-button/scroll-top-button.component';
