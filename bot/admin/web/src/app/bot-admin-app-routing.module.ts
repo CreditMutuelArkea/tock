@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/nlp/inbox', pathMatch: 'full' },
+  { path: '', redirectTo: '/language-understanding/inbox', pathMatch: 'full' },
   // {
   //   path: 'nlp',
   //   loadChildren: () => import('./nlp/nlp.module').then((m) => m.BotNlpModule)
