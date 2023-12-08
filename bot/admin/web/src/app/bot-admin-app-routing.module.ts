@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   { path: '', redirectTo: '/language-understanding/inbox', pathMatch: 'full' },
+  { path: '**', redirectTo: '/language-understanding/inbox' },
   // {
   //   path: 'nlp',
   //   loadChildren: () => import('./nlp/nlp.module').then((m) => m.BotNlpModule)
@@ -42,8 +43,7 @@ const routes: Routes = [
   {
     path: 'rag',
     loadChildren: () => import('./rag/rag.module').then((m) => m.RagModule)
-  },
-  { path: '**', redirectTo: '/nlp/inbox' }
+  }
 ];
 
 @NgModule({
