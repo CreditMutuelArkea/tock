@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { SentenceTrainingMode } from '../../shared/components/sentence-training/models';
+import { Component } from '@angular/core';
+import { SentenceTrainingMode } from '../../../shared/components/sentence-training/models';
 
 @Component({
   selector: 'tock-sentences-unknown',

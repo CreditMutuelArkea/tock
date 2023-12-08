@@ -1,6 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { SentenceTrainingMode } from '../../shared/components/sentence-training/models';
-import { SentenceTrainingComponent } from '../../shared/components';
+import { Component, ViewChild } from '@angular/core';
+import { SentenceTrainingMode } from '../../../shared/components/sentence-training/models';
+import { SentenceTrainingComponent } from '../../../shared/components';
 
 @Component({
   selector: 'tock-sentences-inbox',

@@ -3,9 +3,13 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   { path: '', redirectTo: '/nlp/inbox', pathMatch: 'full' },
+  // {
+  //   path: 'nlp',
+  //   loadChildren: () => import('./nlp/nlp.module').then((m) => m.BotNlpModule)
+  // },
   {
-    path: 'nlp',
-    loadChildren: () => import('./nlp/nlp.module').then((m) => m.BotNlpModule)
+    path: 'language-understanding',
+    loadChildren: () => import('./language-understanding/language-understanding.module').then((m) => m.LanguageUnderstandingModule)
   },
   {
     path: 'quality',

@@ -133,7 +133,6 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     ChatUiMessageDebugComponent,
     ChatUiMessageSentenceFootnotesComponent,
     ChoiceDialogComponent,
-    AutofocusDirective,
     FileUploadComponent,
     SliderComponent,
     SentenceTrainingComponent,
@@ -147,7 +146,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     AutocompleteInputComponent,
     DebugJsonIteratorComponent,
     DebugViewerComponent,
-    ScrollTopButtonComponent
+    ScrollTopButtonComponent,
+    AutofocusDirective
   ],
   exports: [
     BotMessageComponent,
@@ -162,14 +162,14 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     ChatUiComponent,
     ChatUiMessageComponent,
     ChoiceDialogComponent,
-    AutofocusDirective,
     FileUploadComponent,
     SliderComponent,
     SentenceTrainingComponent,
     SentenceTrainingEntryComponent,
     AutocompleteInputComponent,
     DebugViewerComponent,
-    ScrollTopButtonComponent
+    ScrollTopButtonComponent,
+    AutofocusDirective
   ],
   providers: [BotSharedService, AnalyticsService]
 })

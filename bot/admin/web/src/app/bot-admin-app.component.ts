@@ -45,10 +45,16 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
 
   login(user: User): void {
     this.menu = [
+      // {
+      //   title: 'Language Understanding',
+      //   icon: 'message-circle-outline',
+      //   link: '/nlp',
+      //   hidden: !this.state.hasRole(UserRole.nlpUser)
+      // },
       {
         title: 'Language Understanding',
         icon: 'message-circle-outline',
-        link: '/nlp',
+        link: '/language-understanding',
         hidden: !this.state.hasRole(UserRole.nlpUser)
       },
       {
