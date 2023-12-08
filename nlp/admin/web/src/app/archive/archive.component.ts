@@ -15,11 +15,9 @@
  */
 
 import { Component } from '@angular/core';
-import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
-
-// import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
-// import { Intent } from '../model/nlp';
-// import { SentenceStatus } from '../model/nlp';
+import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
+import { Intent } from '../model/nlp';
+import { SentenceStatus } from '../model/nlp';
 
 @Component({
   selector: 'tock-archive',
@@ -27,9 +25,7 @@ import { SentenceTrainingMode } from '../shared/components/sentence-training/mod
   styleUrls: ['./archive.component.css']
 })
 export class ArchiveComponent {
-  mode = SentenceTrainingMode.UNKNOWN;
-
   constructor() {}
 
-  // filter: SentenceFilter = new SentenceFilter(null, Intent.unknown, [SentenceStatus.validated, SentenceStatus.model]);
+  filter: SentenceFilter = new SentenceFilter(null, Intent.unknown, [SentenceStatus.validated, SentenceStatus.model]);
 }

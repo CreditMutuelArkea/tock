@@ -18,8 +18,8 @@ import { Component, ViewChild } from '@angular/core';
 import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
 import { SentenceTrainingComponent } from '../shared/components';
 
-// import { SentenceStatus } from '../model/nlp';
-// import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
+import { SentenceStatus } from '../model/nlp';
+import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
 
 @Component({
   selector: 'tock-inbox',
@@ -27,12 +27,5 @@ import { SentenceTrainingComponent } from '../shared/components';
   styleUrls: ['./inbox.component.css']
 })
 export class InboxComponent {
-  mode = SentenceTrainingMode.INBOX;
-
-  @ViewChild(SentenceTrainingComponent) sentencesTraining;
-
-  refresh() {
-    this.sentencesTraining.refresh();
-  }
-  // filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
+  filter: SentenceFilter = new SentenceFilter(null, null, [SentenceStatus.inbox]);
 }

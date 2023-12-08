@@ -18,12 +18,12 @@ import { NgModule } from '@angular/core';
 import { TryComponent } from '../try/try.component';
 import { SharedModule } from '../shared-nlp/shared.module';
 import { NlpTabsComponent } from './nlp-tabs.component';
-import { InboxComponent } from '../inbox/inbox.component';
-import { ArchiveComponent } from '../archive/archive.component';
+// import { InboxComponent } from '../inbox/inbox.component';
+// import { ArchiveComponent } from '../archive/archive.component';
+// import { SearchComponent } from '../search/search.component';
 import { IntentsComponent } from '../intents/intents.component';
 import { IntentsFiltersComponent } from '../intents/intents-filters/intents-filters.component';
 import { IntentsListComponent } from '../intents/intents-list/intents-list.component';
-import { SearchComponent } from '../search/search.component';
 import { SearchFilterComponent } from '../search/filter/search-filter.component';
 import { DisplayFullLogComponent, LogsComponent } from '../logs/logs.component';
 import { CommonModule } from '@angular/common';
@@ -65,6 +65,9 @@ import { NgJsonEditorModule } from 'ang-jsoneditor';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NlpRoutingModule } from './nlp-routing.module';
 import { BotSharedModule } from '../shared/bot-shared.module';
+import { SentencesInboxComponent } from '../sentences/sentences-inbox/sentences-inbox.component';
+import { SentencesUnknownComponent } from '../sentences/sentences-unknown/sentences-unknown.component';
+import { SentencesSearchComponent } from '../sentences/sentences-search/sentences-search.component';
 
 @NgModule({
   imports: [
@@ -97,10 +100,13 @@ import { BotSharedModule } from '../shared/bot-shared.module';
   declarations: [
     NlpTabsComponent,
     TryComponent,
-    InboxComponent,
-    ArchiveComponent,
+    // InboxComponent,
+    // ArchiveComponent,
+    // SearchComponent,
+    SentencesInboxComponent,
+    SentencesUnknownComponent,
+    SentencesSearchComponent,
     IntentsComponent,
-    SearchComponent,
     SearchFilterComponent,
     LogsComponent,
     HighlightComponent,
