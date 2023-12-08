@@ -15,9 +15,6 @@
  */
 
 import { Component, ViewChild } from '@angular/core';
-import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
-import { SentenceTrainingComponent } from '../shared/components';
-
 import { SentenceFilter, SentencesScrollComponent } from '../sentences-scroll/sentences-scroll.component';
 import {
   EntityDefinition,

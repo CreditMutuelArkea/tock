@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, ViewChild } from '@angular/core';
-import { SentenceTrainingMode } from '../shared/components/sentence-training/models';
-import { SentenceTrainingComponent } from '../shared/components';
-
+import { Component } from '@angular/core';
 import { SentenceStatus } from '../model/nlp';
 import { SentenceFilter } from '../sentences-scroll/sentences-scroll.component';
 
