@@ -69,7 +69,7 @@ export class SentenceTrainingEntryComponent implements OnInit, DoCheck, OnDestro
 
   ngOnInit(): void {
     this.state.currentIntentsCategories.pipe(takeUntil(this._destroy$)).subscribe((groups) => {
-      this.intentGroups = groups;
+      this.intentGroups = Object.freeze(groups) as IntentsCategory[];
       this.resetIntentsListFilter();
     });
   }

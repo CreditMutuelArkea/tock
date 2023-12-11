@@ -83,7 +83,7 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
   constructor(
     private nlp: NlpService,
     private state: StateService,
-    private sentenceTrainingSentenceService: SentenceTrainingService,
+    private sentenceTrainingService: SentenceTrainingService,
     private elementRef: ElementRef,
     private toastrService: NbToastrService,
     private nbDialogService: NbDialogService,
@@ -113,7 +113,11 @@ export class SentenceTrainingComponent implements OnInit, OnDestroy {
 
   @HostListener('document:click', ['$event'])
   documentClick(event: MouseEvent) {
-    this.sentenceTrainingSentenceService.documentClick(event);
+    this.sentenceTrainingService.documentClick(event);
+  }
+
+  trackBySentence(index, item) {
+    return item.text;
   }
 
   handleToggleSelectAll(value: boolean): void {

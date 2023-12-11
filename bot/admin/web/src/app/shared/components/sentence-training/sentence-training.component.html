@@ -134,7 +134,7 @@
       </div>
 
       <tock-sentence-training-entry
-        *ngFor="let sentence of sentences"
+        *ngFor="let sentence of sentences; trackBy: trackBySentence"
         [sentence]="sentence"
         [sentences]="sentences"
         [sentenceTrainingMode]="sentenceTrainingMode"

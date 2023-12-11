@@ -1,10 +1,9 @@
 <nb-card
   [ngClass]="{ 'my-2': true, selected: sentence._showDialog }"
   [id]="getSentenceId(sentence)"
-  data-testid="list"
 >
   <nb-card-body
-    class="grid-columns p-3"
+    class="grid-columns flex-wrap p-3"
     [ngClass]="{ 'grid-columns-without-selection': !selection }"
   >
     <nb-checkbox
@@ -14,7 +13,7 @@
       class="mt-1"
     ></nb-checkbox>
 
-    <div data-testid="text">
+    <div class="flex-grow-1">
       <tock-sentence-training-sentence [sentence]="sentence"></tock-sentence-training-sentence>
 
       <nb-card
@@ -99,6 +98,24 @@
           {{ getSentenceAttribut(sentence, 'probability') | percent: '1.0-1' }}
           <nb-icon [icon]="sentence._showStatsDetails ? 'chevron-up-outline' : 'chevron-down-outline'"></nb-icon>
         </button>
+
+        <nb-autocomplete
+          size="tiny"
+          #intentsAutocomplete
+          (selectedChange)="addIntentToSentence($event)"
+        >
+          <nb-option-group
+            *ngFor="let group of filteredIntentGroups | async"
+            [title]="group.category"
+          >
+            <nb-option
+              *ngFor="let intent of group.intents"
+              [value]="intent._id"
+            >
+              {{ intent.label || intent.name }}
+            </nb-option>
+          </nb-option-group>
+        </nb-autocomplete>
       </div>
 
       <div
@@ -146,24 +163,6 @@
         </div>
       </div>
 
-      <nb-autocomplete
-        size="tiny"
-        #intentsAutocomplete
-        (selectedChange)="addIntentToSentence($event)"
-      >
-        <nb-option-group
-          *ngFor="let group of filteredIntentGroups | async"
-          [title]="group.category"
-        >
-          <nb-option
-            *ngFor="let intent of group.intents"
-            [value]="intent._id"
-          >
-            {{ intent.label || intent.name }}
-          </nb-option>
-        </nb-option-group>
-      </nb-autocomplete>
-
       <div class="d-flex flex-wrap justify-content-between">
         <button
           nbButton
@@ -174,7 +173,6 @@
           size="large"
           class="lineFirstLargeButtonRetract"
           (click)="handleAction(Action.VALIDATE, sentence)"
-          data-testid="validate"
         >
           <nb-icon icon="checkmark-circle-2"></nb-icon>
         </button>
@@ -200,7 +198,6 @@
           shape="round"
           size="large"
           (click)="handleAction(Action.UNKNOWN, sentence)"
-          data-testid="unknown"
         >
           <nb-icon icon="question-mark-circle-outline"></nb-icon>
         </button>
@@ -214,7 +211,6 @@
           shape="round"
           size="large"
           (click)="handleAction(Action.RAGEXCLUDED, sentence)"
-          data-testid="ragexcluded"
         >
           <nb-icon
             icon="ragexclude"
@@ -230,12 +226,11 @@
           shape="round"
           size="large"
           (click)="handleAction(Action.DELETE, sentence)"
-          data-testid="delete"
         >
           <nb-icon icon="trash-2-outline"></nb-icon>
         </button>
 
-        <nb-select
+        <!-- <nb-select
           [(ngModel)]="sentence.language"
           placeholder="Sentence language"
           nbTooltip="Set sentence language"
@@ -247,7 +242,22 @@
           >
             {{ state.localeName(l) }}
           </nb-option>
-        </nb-select>
+        </nb-select> -->
+
+        <!-- Here, we use a native select to increase performance when several hundred entries are displayed  -->
+        <select
+          [(ngModel)]="sentence.language"
+          placeholder="Sentence language"
+          nbTooltip="Set sentence language"
+          class="fast-select mt-1 flex-grow-1"
+        >
+          <option
+            *ngFor="let l of state.currentApplication.supportedLocales"
+            [value]="l"
+          >
+            {{ state.localeName(l) }}
+          </option>
+        </select>
       </div>
 
       <div class="d-flex flex-wrap justify-content-between">
@@ -271,7 +281,6 @@
             shape="round"
             (click)="redirectToFaqManagement(sentence)"
             class="ml-2"
-            data-testid="redirectToFaqManagement"
           >
             <nb-icon icon="message-square-outline"></nb-icon>
           </button>
@@ -285,7 +294,6 @@
           shape="round"
           status="info"
           (click)="showDetails(sentence)"
-          data-testid="details"
         >
           <nb-icon icon="message-circle-outline"></nb-icon>
         </button>
