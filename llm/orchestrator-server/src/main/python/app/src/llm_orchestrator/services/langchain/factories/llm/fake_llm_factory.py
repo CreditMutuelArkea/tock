@@ -12,21 +12,22 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Annotated, Union
+from langchain.base_language import BaseLanguageModel
+from langchain.chat_models.fake import FakeListChatModel
 
-from fastapi import Body
-
-from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
-    AzureOpenAILLMSetting,
-)
 from llm_orchestrator.models.llm.fake_llm.fake_llm_setting import (
     FakeLLMSetting,
 )
-from llm_orchestrator.models.llm.openai.openai_llm_setting import (
-    OpenAILLMSetting,
+from llm_orchestrator.services.langchain.factories.llm.llm_factory import (
+    LangChainLLMFactory,
 )
 
-LLMSetting = Annotated[
-    Union[OpenAILLMSetting, AzureOpenAILLMSetting, FakeLLMSetting],
-    Body(discriminator='provider'),
-]
+
+class FakeLLMFactory(LangChainLLMFactory):
+    setting: FakeLLMSetting
+
+    def check_llm_setting(self) -> bool:
+        return False
+
+    def get_language_model(self) -> BaseLanguageModel:
+        return FakeListChatModel(responses=self.setting.responses)

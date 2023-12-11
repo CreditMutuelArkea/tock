@@ -19,6 +19,7 @@ from enum import Enum, unique
 class LLMProvider(str, Enum):
     OPEN_AI = 'OpenAI'
     AZURE_OPEN_AI_SERVICE = 'AzureOpenAIService'
+    FAKE_LLM = 'FakeLLM'
 
     @classmethod
     def has_value(cls, value):

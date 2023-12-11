@@ -15,6 +15,7 @@
 
 from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import AzureChatOpenAI
+
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
@@ -31,10 +32,10 @@ class AzureOpenAILLMFactory(LangChainLLMFactory):
 
     def get_language_model(self) -> BaseLanguageModel:
         return AzureChatOpenAI(
-            deployment_name=self.setting.deploymentName,
+            deployment_name=self.setting.deployment_name,
             model_name=self.setting.model,
             temperature=self.setting.temperature,
-            openai_api_version=self.setting.apiVersion,
-            openai_api_key=self.setting.apiKey,
-            azure_endpoint=self.setting.apiBase
+            openai_api_version=self.setting.api_version,
+            openai_api_key=self.setting.api_key,
+            azure_endpoint=str(self.setting.api_base),
         )

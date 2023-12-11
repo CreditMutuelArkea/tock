@@ -12,21 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Annotated, Union
+from typing import List, Literal
 
-from fastapi import Body
+from pydantic import Field
 
-from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
-    AzureOpenAILLMSetting,
-)
-from llm_orchestrator.models.llm.fake_llm.fake_llm_setting import (
-    FakeLLMSetting,
-)
-from llm_orchestrator.models.llm.openai.openai_llm_setting import (
-    OpenAILLMSetting,
-)
+from llm_orchestrator.models.llm.llm_provider import LLMProvider
+from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 
-LLMSetting = Annotated[
-    Union[OpenAILLMSetting, AzureOpenAILLMSetting, FakeLLMSetting],
-    Body(discriminator='provider'),
-]
+
+class FakeLLMSetting(BaseLLMSetting):
+    provider: Literal[LLMProvider.FAKE_LLM] = Field(
+        description='The Large Language Model provider.'
+    )
+    responses: List[str] = Field(
+        description='The responses given when the Fake LLM is called'
+    )

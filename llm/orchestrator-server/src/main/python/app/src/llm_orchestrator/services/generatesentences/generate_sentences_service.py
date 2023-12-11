@@ -12,30 +12,35 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from llm_orchestrator.services.langchain.factories.langchain_factory import get_llm_factory
 from langchain.output_parsers import CommaSeparatedListOutputParser
-from llm_orchestrator.services.llm.llm_service import format_prompt_with_parser, parse_llm_output_content, llm_inference
-from llm_orchestrator.routers.responses.responses import GenerateSentencesResponse
+
 from llm_orchestrator.routers.requests.requests import GenerateSentencesQuery
+from llm_orchestrator.routers.responses.responses import (
+    GenerateSentencesResponse,
+)
+from llm_orchestrator.services.langchain.factories.langchain_factory import (
+    get_llm_factory,
+)
+from llm_orchestrator.services.llm.llm_service import llm_inference_with_parser
 
 
-def generate_and_split_sentences(query: GenerateSentencesQuery) -> GenerateSentencesResponse:
+def generate_and_split_sentences(
+    query: GenerateSentencesQuery,
+) -> GenerateSentencesResponse:
     """
-       Generate sentences using a language model based on the provided query,
-       and split the generated content into a list of sentences using a specific parser.
+    Generate sentences using a language model based on the provided query,
+    and split the generated content into a list of sentences using a specific parser.
 
-       :param query: A GenerateSentencesQuery object containing the llm setting.
-       :return: A GenerateSentencesResponse object containing the list of sentences.
+    :param query: A GenerateSentencesQuery object containing the llm setting.
+    :return: A GenerateSentencesResponse object containing the list of sentences.
     """
 
     llm_factory = get_llm_factory(query.llm_setting)
     llm = llm_factory.get_language_model()
 
     parser = CommaSeparatedListOutputParser()
-    prompt = format_prompt_with_parser(prompt=query.llm_setting.prompt, parser=parser)
-    sentences = llm_inference(llm=llm, prompt=prompt)
-    parse_llm_output_content(llm_output=sentences, parser=parser)
-
-    return GenerateSentencesResponse(
-        sentences=sentences.content
+    llm_output = llm_inference_with_parser(
+        llm=llm, prompt=query.llm_setting.prompt, parser=parser
     )
+
+    return GenerateSentencesResponse(sentences=llm_output.content)

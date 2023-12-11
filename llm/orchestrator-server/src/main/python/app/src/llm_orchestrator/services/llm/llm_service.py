@@ -13,7 +13,9 @@
 #   limitations under the License.
 #
 
+from langchain.schema import AIMessage, BaseOutputParser
 from langchain.schema.language_model import BaseLanguageModel
+
 from llm_orchestrator.exceptions.error_code import ErrorCode
 from llm_orchestrator.exceptions.functional_exception import (
     FunctionalException,
@@ -23,7 +25,6 @@ from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_llm_factory,
 )
-from langchain.schema import BaseOutputParser, AIMessage
 
 
 def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
@@ -33,38 +34,27 @@ def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
         raise FunctionalException(ErrorCode.E20)
 
 
-def format_prompt_with_parser(prompt: str, parser: BaseOutputParser) -> str:
+def llm_inference_with_parser(
+    llm: BaseLanguageModel, prompt: str, parser: BaseOutputParser
+) -> AIMessage:
     """
-        Add format instructions in the prompt based on the given parser.
+    Perform LLM inference and format the output content based on the given parser.
 
-        :param prompt: The original prompt string to which format instructions will be added.
-        :param parser: An instance of the BaseOutputParser class providing format instructions.
+    :param llm: LLM Factory model.
+    :param prompt: Input prompt.
+    :param parser: Parser to format the output.
 
-        :return: A new prompt string with added format instructions.
+    :return: Result of the language model inference with the content formatted.
     """
 
+    # Change the prompt with added format instructions
     format_instructions = parser.get_format_instructions()
-    formatted_prompt = prompt + "\n" + format_instructions
-    return formatted_prompt
+    formatted_prompt = prompt + '\n' + format_instructions
 
+    # Inference of the LLM with the formatted prompt
+    llm_output = llm.invoke(formatted_prompt)
 
-def parse_llm_output_content(llm_output: AIMessage, parser: BaseOutputParser):
-    """
-        Parse the content of an AIMessage (output of an LLM invoke()) using the provided BaseOutputParser.
-
-        :param llm_output: LLM output whose content will be parsed.
-        :param parser: An instance of the BaseOutputParser class used for parsing.
-    """
-
+    # Apply the parsing on the LLM output
     llm_output.content = parser.parse(llm_output.content)
 
-
-def llm_inference(llm: BaseLanguageModel, prompt: str) -> AIMessage:
-    """
-        Inference of the LLM using the given prompt.
-
-        :param llm: the LLM build from the factory
-        :param prompt: the prompt we want to inject into
-    """
-
-    return llm.invoke(prompt)
+    return llm_output

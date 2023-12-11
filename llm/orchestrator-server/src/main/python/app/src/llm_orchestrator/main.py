@@ -13,11 +13,15 @@
 #   limitations under the License.
 #
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from llm_orchestrator.routers.app_monitors_router import (
     application_check_router,
 )
 from llm_orchestrator.routers.em_providers_router import em_providers_router
+from llm_orchestrator.routers.generate_sentences_router import (
+    generate_sentences_router,
+)
 from llm_orchestrator.routers.llm_providers_router import llm_providers_router
 from llm_orchestrator.routers.rag_router import rag_router
 
@@ -27,3 +31,6 @@ app.include_router(application_check_router)
 app.include_router(llm_providers_router)
 app.include_router(em_providers_router)
 app.include_router(rag_router)
+app.include_router(generate_sentences_router)
+
+client = TestClient(app)

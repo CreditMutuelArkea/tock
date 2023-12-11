@@ -24,6 +24,9 @@ from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
+from llm_orchestrator.models.llm.fake_llm.fake_llm_setting import (
+    FakeLLMSetting,
+)
 from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
@@ -40,6 +43,9 @@ from llm_orchestrator.services.langchain.factories.em.openai_em_factory import (
 from llm_orchestrator.services.langchain.factories.llm.azure_openai_llm_factory import (
     AzureOpenAILLMFactory,
 )
+from llm_orchestrator.services.langchain.factories.llm.fake_llm_factory import (
+    FakeLLMFactory,
+)
 from llm_orchestrator.services.langchain.factories.llm.llm_factory import (
     LangChainLLMFactory,
 )
@@ -53,6 +59,8 @@ def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
         return OpenAILLMFactory(setting=setting)
     elif isinstance(setting, AzureOpenAILLMSetting):
         return AzureOpenAILLMFactory(setting=setting)
+    elif isinstance(setting, FakeLLMSetting):
+        return FakeLLMFactory(setting=setting)
     else:
         raise FunctionalException(ErrorCode.E10)
 
