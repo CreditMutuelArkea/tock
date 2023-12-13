@@ -36,9 +36,6 @@ class AzureOpenAILLMFactory(LangChainLLMFactory):
             openai_api_version=self.setting.api_version,
             azure_endpoint=str(self.setting.api_base),
             azure_deployment=self.setting.deployment_name,
-            # TODO MASS : model_version is no longer used - Legacy, for openai<1.0.0 support.
-            # TODO MASS : Do I have to remove it?
-            # model_version=self.setting.model,
             temperature=self.setting.temperature,
         )
 

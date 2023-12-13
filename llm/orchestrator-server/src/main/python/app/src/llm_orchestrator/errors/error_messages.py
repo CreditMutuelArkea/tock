@@ -13,7 +13,7 @@
 #   limitations under the License.
 #
 
-from llm_orchestrator.models.errors.errors_model import ErrorCode, ErrorMessage
+from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorMessage
 
 
 class ErrorMessages:

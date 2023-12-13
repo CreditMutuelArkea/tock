@@ -33,7 +33,7 @@ from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
 from llm_orchestrator.models.em.em_provider import EMProvider
 from llm_orchestrator.models.em.em_types import EMSetting
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from llm_orchestrator.models.errors.errors_model import ErrorCode
+from llm_orchestrator.models.errors.errors_models import ErrorCode
 from llm_orchestrator.routers.requests.requests import (
     EMProviderSettingStatusQuery,
 )
@@ -77,7 +77,6 @@ async def get_em_provider_setting_by_id(provider_id: EMProvider) -> EMSetting:
         return AzureOpenAIEMSetting(
             provider=EMProvider.AZURE_OPEN_AI_SERVICE,
             api_key='123-abc-456-def',
-            model='gpt-3.5-turbo',
             deployment_name='my-deployment-name',
             api_base='https://doc.tock.ai/tock',
             api_version='2023-05-15',

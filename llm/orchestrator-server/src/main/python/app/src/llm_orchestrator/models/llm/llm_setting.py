@@ -25,9 +25,6 @@ class BaseLLMSetting(BaseModel):
         examples=['ab7***************************A1IV4B'],
         min_length=1,
     )
-    model: str = Field(
-        description='The model id', examples=['gpt-3.5-turbo'], min_length=1
-    )
     temperature: float = Field(
         description='The temperature that controls the randomness of the text generated.',
         examples=['1.2'],

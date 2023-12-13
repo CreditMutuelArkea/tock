@@ -14,7 +14,7 @@
 #
 
 from llm_orchestrator.errors.error_messages import ErrorMessages
-from llm_orchestrator.models.errors.errors_model import ErrorCode, ErrorInfo
+from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
 
 
 class BusinessException(Exception):

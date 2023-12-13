@@ -16,7 +16,7 @@ from fastapi import Request
 from openai import APIError
 
 from llm_orchestrator.errors.exceptions.exceptions import BusinessException
-from llm_orchestrator.models.errors.errors_model import ErrorInfo
+from llm_orchestrator.models.errors.errors_models import ErrorInfo
 from llm_orchestrator.routers.responses.responses import ErrorResponse
 
 

@@ -35,9 +35,7 @@ class AzureOpenAIEMFactory(LangChainEMFactory):
             openai_api_key=self.setting.api_key,
             openai_api_version=self.setting.api_version,
             azure_endpoint=str(self.setting.api_base),
-            azure_deployment=self.setting.deployment_name,
-            # TODO MASS : Not used : I have to remove it
-            # model=self.setting.model
+            azure_deployment=self.setting.deployment_name
         )
 
     @factory_openai_exception_handler

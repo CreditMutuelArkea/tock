@@ -179,17 +179,16 @@
     class BaseLLMSetting(BaseModel):
         provider: LLMProvider
         api_key: str
-        model: str
         temperature: str
         prompt: str
 
     class BaseEMSetting(BaseModel):
         provider: LLMProvider
         api_key: str
-        model: str
 
     class OpenAILLMSetting(BaseLLMSetting):
         provider: Literal[LLMProvider.OPEN_AI]
+        model: str
 
     class AzureOpenAILLMSetting(BaseLLMSetting):
         provider: Literal[LLMProvider.AZURE_OPEN_AI_SERVICE]
@@ -204,6 +203,7 @@
 
     class OpenAIEMSetting(BaseEMSetting):
         provider: Literal[LLMProvider.OPEN_AI]
+        model: str
 
     class AzureOpenAIEMSetting(BaseEMSetting):
         provider: Literal[LLMProvider.AZURE_OPEN_AI_SERVICE]

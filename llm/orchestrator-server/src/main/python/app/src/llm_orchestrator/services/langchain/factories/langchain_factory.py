@@ -18,7 +18,7 @@ from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
 )
 from llm_orchestrator.models.em.em_setting import BaseEMSetting
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from llm_orchestrator.models.errors.errors_model import ErrorCode
+from llm_orchestrator.models.errors.errors_models import ErrorCode
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )

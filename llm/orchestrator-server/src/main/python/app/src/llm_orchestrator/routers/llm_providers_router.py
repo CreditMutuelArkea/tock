@@ -26,7 +26,7 @@ from llm_orchestrator.errors.exceptions.exceptions import (
     InvalidQueryException,
     UnknownProviderException,
 )
-from llm_orchestrator.models.errors.errors_model import ErrorCode, ErrorInfo
+from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
@@ -81,7 +81,6 @@ async def get_llm_provider_setting_by_id(provider_id: LLMProvider) -> LLMSetting
         return AzureOpenAILLMSetting(
             provider=LLMProvider.AZURE_OPEN_AI_SERVICE,
             api_key='123-abc-456-def',
-            model='gpt-3.5-turbo',
             deployment_name='my-deployment-name',
             api_base='https://doc.tock.ai/tock',
             api_version='2023-05-15',

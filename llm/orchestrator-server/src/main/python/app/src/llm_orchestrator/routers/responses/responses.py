@@ -17,7 +17,7 @@ from typing import Any, Optional
 from pydantic import BaseModel, Field
 
 from llm_orchestrator.models.em.em_provider import EMProvider
-from llm_orchestrator.models.errors.errors_model import ErrorCode, ErrorInfo
+from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 from llm_orchestrator.models.rag.rag_models import TextWithFootnotes
 
