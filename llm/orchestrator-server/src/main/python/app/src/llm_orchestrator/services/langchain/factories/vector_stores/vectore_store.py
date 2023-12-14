@@ -12,18 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Literal
-
-from pydantic import Field
-
-from llm_orchestrator.models.llm.llm_provider import LLMProvider
-from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
+from enum import Enum, unique
 
 
-class OpenAILLMSetting(BaseLLMSetting):
-    provider: Literal[LLMProvider.OPEN_AI] = Field(
-        description='The Large Language Model Provider.', examples=[LLMProvider.OPEN_AI]
-    )
-    model: str = Field(
-        description='The model id', examples=['gpt-3.5-turbo'], min_length=1
-    )
+@unique
+class VectorStore(str, Enum):
+    CHROMA = 'CHROMA'
+    OPEN_SEARCH = 'OPEN_SEARCH'

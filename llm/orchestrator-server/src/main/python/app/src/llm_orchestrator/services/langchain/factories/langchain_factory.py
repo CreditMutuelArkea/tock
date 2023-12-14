@@ -12,7 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from llm_orchestrator.errors.exceptions.exceptions import BusinessException
+
+from langchain_core.embeddings import Embeddings
+
+from llm_orchestrator.errors.exceptions.exceptions import (
+    GenAIOrchestratorException,
+    VectorStoreUnknownException,
+)
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
@@ -44,6 +50,15 @@ from llm_orchestrator.services.langchain.factories.llm.llm_factory import (
 from llm_orchestrator.services.langchain.factories.llm.openai_llm_factory import (
     OpenAILLMFactory,
 )
+from llm_orchestrator.services.langchain.factories.vector_stores.open_search_factory import (
+    OpenSearchFactory,
+)
+from llm_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
+    LangChainVectorStoreFactory,
+)
+from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import (
+    VectorStore,
+)
 
 
 def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
@@ -52,7 +67,7 @@ def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
     elif isinstance(setting, AzureOpenAILLMSetting):
         return AzureOpenAILLMFactory(setting=setting)
     else:
-        raise BusinessException(ErrorCode.E10)
+        raise GenAIOrchestratorException(ErrorCode.E10)
 
 
 def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
@@ -61,4 +76,15 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
     elif isinstance(setting, AzureOpenAIEMSetting):
         return AzureOpenAIEMFactory(setting=setting)
     else:
-        raise BusinessException(ErrorCode.E10)
+        raise GenAIOrchestratorException(ErrorCode.E10)
+
+
+def get_vector_store_factory(
+    vector_store: VectorStore, embedding_function: Embeddings, index_name: str
+) -> LangChainVectorStoreFactory:
+    if VectorStore.OPEN_SEARCH == vector_store:
+        return OpenSearchFactory(
+            embedding_function=embedding_function, index_name=index_name
+        )
+    else:
+        raise VectorStoreUnknownException()
