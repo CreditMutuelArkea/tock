@@ -12,10 +12,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+import logging
+import re
+from logging import ERROR, WARNING
+
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
 
+from llm_orchestrator.errors.exceptions.exceptions import (
+    GenAIGuardCheckException,
+)
 from llm_orchestrator.errors.handlers.openai.openai_exception_handler import (
     openai_exception_handler,
 )
@@ -41,6 +48,8 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_vector_store_factory,
 )
 
+logger = logging.getLogger(__name__)
+
 
 @opensearch_exception_handler
 @openai_exception_handler(provider='OpenAI or AzureOpenAIService')
@@ -50,7 +59,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     vector_store_factory = get_vector_store_factory(
         vector_store_provider=VectorStoreProvider.OPEN_SEARCH,
         embedding_function=em_factory.get_embedding_model(),
-        index_name=query.index_name,
+        index_name=query.document_index_name,
     )
 
     chat = ConversationalRetrievalChain.from_llm(
@@ -63,7 +72,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         combine_docs_chain_kwargs={
             'prompt': PromptTemplate(
                 template=llm_factory.setting.prompt,
-                input_variables=['context', 'question'],
+                input_variables=__find_input_variables(llm_factory.setting.prompt),
             )
         },
     )
@@ -77,14 +86,20 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
 
     records_callback_handler = RetrieverJsonCallbackHandler()
 
+    inputs = {
+        **query.question_answering_prompt_inputs,
+        'chat_history': message_history.messages,
+    }
+
     response = chat(
-        inputs={
-            'question': query.question,
-            'chat_history': message_history.messages,
-        },
+        inputs=inputs,
         callbacks=[records_callback_handler] if debug else [],
     )
 
+    # RAG Guard
+    __rag_guard(inputs, response)
+
+    # Returning RAG response
     return RagResponse(
         answer=TextWithFootnotes(
             text=response['answer'],
@@ -100,4 +115,53 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
             ),
         ),
         debug=records_callback_handler.show_records() if debug else None,
+    )
+
+
+def __find_input_variables(template):
+    motif = r'\{([^}]+)\}'
+    variables = re.findall(motif, template)
+    return variables
+
+
+def __rag_guard(inputs, response):
+    """
+    If a 'no_answer' input was given as a rag setting,
+    then the RAG system should give no further response when no source document has been found.
+    And, when the RAG system responds with the 'no_answer' phrase,
+    then the source documents are removed from the response.
+    """
+
+    if inputs['no_answer']:
+        if (
+            response['answer'] != inputs['no_answer']
+            and response['source_documents'] == []
+        ):
+            message = 'The RAG gives an answer when no document has been found!'
+            __rag_log(level=ERROR, message=message, inputs=inputs, response=response)
+            raise GenAIGuardCheckException(ErrorInfo(cause=message))
+
+        if (
+            response['answer'] == inputs['no_answer']
+            and response['source_documents'] != []
+        ):
+            message = (
+                'The RAG gives no answer for user question, but some documents has been found!',
+            )
+            __rag_log(level=WARNING, message=message, inputs=inputs, response=response)
+            # Remove source documents
+            response['source_documents'] = []
+
+
+def __rag_log(level, message, inputs, response):
+    logger.log(
+        level,
+        '%(message)s \n'
+        '[RAG Debug] : question="%(question)s", answer="%(answer)s", documents="%(documents)s"',
+        {
+            'message': message,
+            'question': inputs['question'],
+            'answer': response['answer'],
+            'documents': response['source_documents'],
+        },
     )
