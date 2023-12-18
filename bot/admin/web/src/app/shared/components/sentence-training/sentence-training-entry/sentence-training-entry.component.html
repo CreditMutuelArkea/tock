@@ -1,5 +1,6 @@
 <nb-card
-  [ngClass]="{ 'my-2': true, selected: sentence._showDialog }"
+  [ngClass]="{ selected: sentence._showDialog }"
+  class="my-2"
   [id]="getSentenceId(sentence)"
 >
   <nb-card-body
@@ -230,7 +231,7 @@
           <nb-icon icon="trash-2-outline"></nb-icon>
         </button>
 
-        <!-- <nb-select
+        <nb-select
           [(ngModel)]="sentence.language"
           placeholder="Sentence language"
           nbTooltip="Set sentence language"
@@ -242,10 +243,10 @@
           >
             {{ state.localeName(l) }}
           </nb-option>
-        </nb-select> -->
+        </nb-select>
 
         <!-- Here, we use a native select to increase performance when several hundred entries are displayed  -->
-        <select
+        <!-- <select
           [(ngModel)]="sentence.language"
           placeholder="Sentence language"
           nbTooltip="Set sentence language"
@@ -257,7 +258,7 @@
           >
             {{ state.localeName(l) }}
           </option>
-        </select>
+        </select> -->
       </div>
 
       <div class="d-flex flex-wrap justify-content-between">

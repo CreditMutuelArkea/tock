@@ -216,7 +216,7 @@ export class SentenceTrainingSentenceComponent implements OnInit, OnDestroy {
       return intent?.entities ? intent.entities : [];
     } else {
       const entityType = this.state.findEntityTypeByName(parentEntity.entity.type);
-      return entityType.subEntities;
+      return entityType?.subEntities;
     }
   }
 
