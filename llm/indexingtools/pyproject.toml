@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "indexingtools"
+version = "0.1.0"
+description = "Tools to index data from different sources to TOCK RAG vector DB"
+authors = ["Pierre Guirriec <pierre.guirriec@partnre.com>"]
+license = "Apache 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+docopt = "^0.6.2"
+pandas = "^2.1.4"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
