@@ -8,6 +8,7 @@ import { NbDialogRef } from '@nebular/theme';
 })
 export class DebugViewerComponent {
   @Input() debug?: any;
+  @Input() title?: string = 'Debug infos';
 
   constructor(public dialogRef: NbDialogRef<DebugViewerComponent>) {}
 

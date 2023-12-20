@@ -7,10 +7,11 @@ import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { EnginesConfiguration, EnginesConfigurations } from './models/engines-configurations';
 import { LLMProvider, RagSettings } from './models';
-import { NbToastrService } from '@nebular/theme';
+import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { deepCopy } from '../../shared/utils';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
+import { DebugViewerComponent } from '../../shared/components';
 
 interface RagSettingsForm {
   id: FormControl<string>;
@@ -66,7 +67,8 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     private state: StateService,
     private rest: RestService,
     private toastrService: NbToastrService,
-    private botConfiguration: BotConfigurationService
+    private botConfiguration: BotConfigurationService,
+    private nbDialogService: NbDialogService
   ) {}
 
   ngOnInit(): void {
@@ -259,6 +261,15 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
             duration: 5000,
             status: 'danger'
           });
+
+          if (error.error) {
+            this.nbDialogService.open(DebugViewerComponent, {
+              context: {
+                debug: error.error,
+                title: 'An error occured'
+              }
+            });
+          }
         }
       });
     }
