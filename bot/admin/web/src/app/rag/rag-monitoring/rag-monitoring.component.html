@@ -1,0 +1,38 @@
+<div class="d-flex flex-wrap mt-3 mb-2">
+  <h1 class="flex-grow-1">Rag monitoring</h1>
+
+  <section class="d-flex flex-wrap align-items-center">
+    <button
+      nbButton
+      ghost
+      shape="round"
+      nbTooltip="Refresh dialogs"
+      (click)="refresh()"
+      class="ml-2"
+    >
+      <nb-icon icon="refresh-outline"></nb-icon>
+    </button>
+  </section>
+</div>
+
+<div
+  class="loading"
+  [nbSpinner]="loading"
+>
+  <tock-no-data-found
+    *ngIf="!loading && !dialogs?.length"
+    title="No dialog found"
+  ></tock-no-data-found>
+
+  <nb-card
+    *ngFor="let dialog of dialogs"
+    class="mb-2"
+  >
+    <nb-card-body>
+      <div *ngFor="let action of dialog.actions">
+        <tock-debug-json-iterator [data]="action"></tock-debug-json-iterator>
+        <hr />
+      </div>
+    </nb-card-body>
+  </nb-card>
+</div>

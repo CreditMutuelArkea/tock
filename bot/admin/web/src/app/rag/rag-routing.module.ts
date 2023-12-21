@@ -6,6 +6,7 @@ import { RagExcludedComponent } from './rag-excluded/rag-excluded.component';
 import { RagSettingsComponent } from './rag-settings/rag-settings.component';
 import { RagTabsComponent } from './rag-tabs/rag-tabs.component';
 import { RagSourcesBoardComponent } from './rag-sources/rag-sources-board.component';
+import { RagMonitoringComponent } from './rag-monitoring/rag-monitoring.component';
 
 const routes: Routes = [
   {
@@ -19,6 +20,10 @@ const routes: Routes = [
       {
         path: 'sources',
         component: RagSourcesBoardComponent
+      },
+      {
+        path: 'monitoring',
+        component: RagMonitoringComponent
       },
       {
         path: 'exclusions',

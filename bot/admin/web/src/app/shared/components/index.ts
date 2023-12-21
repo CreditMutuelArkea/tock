@@ -20,3 +20,4 @@ export * from './sentence-training/sentence-training-dialog/sentence-training-di
 export * from './sentence-training/sentence-training-filters/sentence-training-filters.component';
 export * from './sentence-training/sentence-training-list/sentence-training-list.component';
 export * from './debug-viewer/debug-viewer.component';
+export * from './debug-viewer/debug-json-iterator/debug-json-iterator.component';

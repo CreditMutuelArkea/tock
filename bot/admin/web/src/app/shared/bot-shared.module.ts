@@ -153,7 +153,8 @@ import { DebugJsonIteratorComponent } from './components/debug-viewer/debug-json
     SliderComponent,
     SentenceTrainingComponent,
     AutocompleteInputComponent,
-    DebugViewerComponent
+    DebugViewerComponent,
+    DebugJsonIteratorComponent
   ],
   providers: [BotSharedService, AnalyticsService]
 })

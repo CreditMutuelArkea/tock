@@ -5,6 +5,7 @@ import { TabLink } from '../../shared/utils';
 
 const tabLinks = [
   new TabLink('sources', 'Rag sources', 'cloud-download-outline'),
+  new TabLink('monitoring', 'Rag monitoring', 'monitor-outline'),
   new TabLink('exclusions', 'Rag exclusions', 'alert-triangle-outline'),
   new TabLink('settings', 'Rag settings', 'settings-outline')
 ];
