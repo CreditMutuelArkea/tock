@@ -31,10 +31,10 @@ class LangChainEMFactory(ABC, BaseModel):
         """
         pass
 
-    @abstractmethod
     def check_embedding_model_setting(self) -> bool:
         """
         check the Embedding model setting validity
         :return: True if the setting is valid.
         """
-        pass
+        self.get_embedding_model().embed_query('Hi, are you there?')
+        return True

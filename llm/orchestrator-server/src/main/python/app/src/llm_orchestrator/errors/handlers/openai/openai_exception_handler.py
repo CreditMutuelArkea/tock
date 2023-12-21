@@ -15,9 +15,6 @@
 
 import logging
 
-from fastapi import status
-from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
 from openai import (
     APIConnectionError,
     APIError,
@@ -26,9 +23,7 @@ from openai import (
     NotFoundError,
 )
 
-from llm_orchestrator.errors.error_factories import create_error_info_openai
 from llm_orchestrator.errors.exceptions.exceptions import (
-    BusinessException,
     ProviderAPIAuthenticationException,
     ProviderAPIBadRequestException,
     ProviderAPIConnectionException,
@@ -38,23 +33,9 @@ from llm_orchestrator.errors.exceptions.exceptions import (
     ProviderAPIModelException,
     ProviderAPIResourceNotFoundException,
 )
-from llm_orchestrator.routers.responses.responses import ErrorResponse
+from llm_orchestrator.models.errors.errors_models import ErrorInfo
 
 logger = logging.getLogger(__name__)
-
-
-def business_exception_handler(_, exc: BusinessException) -> JSONResponse:
-    return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content=jsonable_encoder(
-            ErrorResponse(
-                code=exc.error_code.value,
-                message=exc.message,
-                detail=exc.detail,
-                info=exc.info,
-            )
-        ),
-    )
 
 
 def factory_openai_exception_handler(func):
@@ -102,3 +83,12 @@ def factory_openai_exception_handler(func):
             )
 
     return wrapper
+
+
+def create_error_info_openai(exc: APIError, provider: str) -> ErrorInfo:
+    return ErrorInfo(
+        provider=provider,
+        error=exc.__class__.__name__,
+        cause=exc.message,
+        request=f'[{exc.request.method}] {exc.request.url}',
+    )

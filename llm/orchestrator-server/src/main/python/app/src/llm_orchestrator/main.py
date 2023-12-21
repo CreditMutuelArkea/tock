@@ -15,7 +15,7 @@
 from fastapi import FastAPI
 
 from llm_orchestrator.errors.exceptions.exceptions import BusinessException
-from llm_orchestrator.errors.exceptions.handlers import (
+from llm_orchestrator.errors.handlers.fastapi.fastapi_handler import (
     business_exception_handler,
 )
 from llm_orchestrator.routers.app_monitors_router import (

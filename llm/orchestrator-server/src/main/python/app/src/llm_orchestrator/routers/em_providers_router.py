@@ -17,15 +17,15 @@ import logging
 
 from fastapi import APIRouter, HTTPException, Request
 
-from llm_orchestrator.errors.error_factories import (
-    create_error_info_bad_request,
-    create_error_info_not_found,
-    create_error_response,
-)
 from llm_orchestrator.errors.exceptions.exceptions import (
     BusinessException,
     InvalidQueryException,
     UnknownProviderException,
+)
+from llm_orchestrator.errors.handlers.fastapi.fastapi_handler import (
+    create_error_info_bad_request,
+    create_error_info_not_found,
+    create_error_response,
 )
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,

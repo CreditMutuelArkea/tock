@@ -16,7 +16,7 @@
 from langchain.base_language import BaseLanguageModel
 from langchain.chat_models import ChatOpenAI
 
-from llm_orchestrator.errors.exceptions.handlers import (
+from llm_orchestrator.errors.handlers.openai.openai_exception_handler import (
     factory_openai_exception_handler,
 )
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
@@ -39,5 +39,4 @@ class OpenAILLMFactory(LangChainLLMFactory):
 
     @factory_openai_exception_handler
     def check_llm_setting(self) -> bool:
-        self.get_language_model().invoke('Hi, are you there?')
-        return True
+        return super().check_llm_setting()

@@ -31,11 +31,11 @@ class LangChainLLMFactory(ABC, BaseModel):
         """
         pass
 
-    @abstractmethod
     def check_llm_setting(self) -> bool:
         """
         check the LLM setting validity, by pinging the AI provider API
         :return: True if the setting is valid.
         :raises BusinessException: For incorrect setting
         """
-        pass
+        self.get_language_model().invoke('Hi, are you there?')
+        return True
