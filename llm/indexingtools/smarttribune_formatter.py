@@ -1,7 +1,7 @@
 """Smart Tribune export file formatter.
 
 Usage:
-    smarttribune_formatter.py <input_csv> <tag_title> <base_url> <output_csv>
+    smarttribune_formatter.py [-v] <input_csv> <tag_title> <base_url> <output_csv>
 
 Arguments:
     input_csv   path to the Smart Tribune CSV export file
@@ -11,13 +11,22 @@ Arguments:
                 create a full URL
     output_csv  path to the output, ready-to-index CSV file
 
+Options:
+    -h --help   Show this screen
+    --version   Show version
+    -v          Verbose output for debugging (without this option, script will 
+                be silent but for errors)
+
 Turns a Smart Tribune CSV export file into a ready-to-index CSV file 
 (one 'title'|'url'|'text' line per filtered entry).
 """
 from docopt import docopt
+import logging
+from pathlib import Path
+import sys
 
-import os, sys
 from urllib.parse import urlparse
+
 import pandas as pd
 
 
@@ -32,6 +41,7 @@ def format(args):
                                     '<base_url>'
                                     '<output_csv>'
     """
+    logging.debug(f"Read input CSV file {args['<input_csv>']}")
     df = pd.read_csv(args['<input_csv>'], sep='|', encoding='utf-8')
     # Filter entries based on id
     filtered_df = df[df['Tag (ID system)'].str.contains(args['<tag_title>'], na=False)].copy()# Ensure copy (not a view)
@@ -46,17 +56,24 @@ def format(args):
         prefixed_column: 'url',
         'FAQ answer (text)': 'text'
     })
-    # Save to output CSV file
+    logging.debug(f"Export to output CSV file {args['<output_csv>']}")
     result_df.to_csv(args['<output_csv>'], sep='|', index=False)
 
 if __name__ == '__main__':
     cli_args = docopt(__doc__, version='Smart Tribune formatter 0.1.0')
-    
+
+    # Set logging level
+    log_format = '%(levelname)s:%(module)s:%(message)s'
+    if cli_args['-v']:
+        logging.basicConfig(level=logging.DEBUG, format=log_format)
+    else:
+        logging.basicConfig(level=logging.WARNING, format=log_format)
+        
     # Check args:
     # - input file path
-    inputfile_path = cli_args['<input_csv>']
-    if not os.path.isfile(inputfile_path):
-        print(f"Cannot proceed: input CSV file '{inputfile_path}' does not exist.")
+    inputfile_path = Path(cli_args['<input_csv>'])
+    if not inputfile_path.exists():
+        logging.error(f"Cannot proceed: input CSV file '{cli_args['<input_csv>']}' does not exist.")
         sys.exit(1)
 
     # - tag title is arbitrary
@@ -64,16 +81,13 @@ if __name__ == '__main__':
     # - base url must be valid
     result = urlparse(cli_args['<base_url>'])
     if not result.scheme or not result.netloc:
-        print(f"Cannot proceed: '{cli_args['<base_url>']}' is not a valid URL.")
+        logging.error(f"Cannot proceed: '{cli_args['<base_url>']}' is not a valid URL.")
         sys.exit(1)
 
     # - output file path
-    target_dir = os.path.dirname(cli_args['<output_csv>'])
-    if not os.access(target_dir, os.W_OK):
-        print(f"Cannot proceed: directory {target_dir} does not exist or is not writable.")
-        sys.exit(1)
-    if os.path.exists(cli_args['<output_csv>']) and not os.access(cli_args['<output_csv>'], os.W_OK):
-        print(f"Cannot proceed: file {cli_args['<output_csv>']} is not writable.")
+    target_dir = Path(cli_args['<output_csv>']).parent
+    if not target_dir.exists():
+        logging.error(f"Cannot proceed: directory {target_dir} does not exist.")
         sys.exit(1)
 
     format(cli_args)
