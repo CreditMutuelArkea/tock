@@ -24,24 +24,9 @@ import ai.tock.bot.admin.BotAdminService.importStories
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.admin.constants.Properties
-import ai.tock.bot.admin.model.BotAdminConfiguration
-import ai.tock.bot.admin.model.BotConnectorConfiguration
-import ai.tock.bot.admin.model.BotI18nLabel
-import ai.tock.bot.admin.model.BotI18nLabels
-import ai.tock.bot.admin.model.BotRAGConfigurationDTO
-import ai.tock.bot.admin.model.BotStoryDefinitionConfiguration
-import ai.tock.bot.admin.model.CreateI18nLabelRequest
-import ai.tock.bot.admin.model.CreateStoryRequest
-import ai.tock.bot.admin.model.DialogFlowRequest
-import ai.tock.bot.admin.model.DialogsSearchQuery
-import ai.tock.bot.admin.model.FaqDefinitionRequest
-import ai.tock.bot.admin.model.FaqSearchRequest
-import ai.tock.bot.admin.model.Feature
-import ai.tock.bot.admin.model.I18LabelQuery
-import ai.tock.bot.admin.model.StorySearchRequest
-import ai.tock.bot.admin.model.SummaryStorySearchRequest
-import ai.tock.bot.admin.model.UserSearchQuery
+import ai.tock.bot.admin.model.*
 import ai.tock.bot.admin.module.satisfactionContentModule
+import ai.tock.bot.admin.service.LLMSentenceGenerationService
 import ai.tock.bot.admin.service.RagService
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpImport
 import ai.tock.bot.admin.test.TestPlanService
@@ -1031,6 +1016,21 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingJsonGet("/configuration") {
             botAdminConfiguration
+        }
+
+        blockingJsonPost("/configuration/bots/:botId/llm-sentence-generation", setOf(botUser, faqBotUser)) { context, configuration: LLMSentenceGenerationConfigurationDTO  ->
+            if (context.organization == configuration.namespace) {
+                LLMSentenceGenerationService.saveLLMSentenceGeneration(configuration)
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonGet("/configuration/bots/:botId/llm-sentence-generation", setOf(botUser, faqBotUser)) { context  ->
+            LLMSentenceGenerationService.getLLMSentenceGenerationConfiguration(context.organization, context.path("botId"))
+                ?.let {
+                    LLMSentenceGenerationConfigurationDTO(it)
+                }
         }
 
         findTestService().registerServices().invoke(this)
