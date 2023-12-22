@@ -1,3 +1,17 @@
+#   Copyright (C) 2023 Credit Mutuel Arkea
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#   
 """Smart Tribune export file formatter.
 
 Usage:
@@ -34,12 +48,12 @@ def format(args):
     """
     Read a CSV Smart Tribune export then format it into a ready-to-index CSV file.
     
-    Parameters:
-    args (dict): A dictionary containing command-line arguments.
-                 Expecting keys:    '<input_csv>'
-                                    '<tag_title>'
-                                    '<base_url>'
-                                    '<output_csv>'
+        Parameters:
+        args (dict): A dictionary containing command-line arguments.
+                    Expecting keys:    '<input_csv>'
+                                        '<tag_title>'
+                                        '<base_url>'
+                                        '<output_csv>'
     """
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
     df = pd.read_csv(args['<input_csv>'], sep='|', encoding='utf-8')
@@ -59,6 +73,7 @@ def format(args):
     logging.debug(f"Export to output CSV file {args['<output_csv>']}")
     result_df.to_csv(args['<output_csv>'], sep='|', index=False)
 
+
 if __name__ == '__main__':
     cli_args = docopt(__doc__, version='Smart Tribune formatter 0.1.0')
 
@@ -73,7 +88,7 @@ if __name__ == '__main__':
     # - input file path
     inputfile_path = Path(cli_args['<input_csv>'])
     if not inputfile_path.exists():
-        logging.error(f"Cannot proceed: input CSV file '{cli_args['<input_csv>']}' does not exist.")
+        logging.error(f"Cannot proceed: input CSV file '{cli_args['<input_csv>']}' does not exist")
         sys.exit(1)
 
     # - tag title is arbitrary
@@ -81,13 +96,13 @@ if __name__ == '__main__':
     # - base url must be valid
     result = urlparse(cli_args['<base_url>'])
     if not result.scheme or not result.netloc:
-        logging.error(f"Cannot proceed: '{cli_args['<base_url>']}' is not a valid URL.")
+        logging.error(f"Cannot proceed: '{cli_args['<base_url>']}' is not a valid URL")
         sys.exit(1)
 
     # - output file path
     target_dir = Path(cli_args['<output_csv>']).parent
     if not target_dir.exists():
-        logging.error(f"Cannot proceed: directory {target_dir} does not exist.")
+        logging.error(f"Cannot proceed: directory {target_dir} does not exist")
         sys.exit(1)
 
     format(cli_args)

@@ -1,0 +1,49 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Smart Tribune formatter",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/llm/indexingtools/smarttribune_formatter.py",
+            "cwd": "${workspaceFolder}/llm/indexingtools",
+            "args": [
+                "../../../langchain-conversationnal-qa-cmx/data/Questions_09112023.csv",
+                "01-pub-part",
+                "https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq",
+                "./tests/formatter_output_documents.csv",
+                "-v"
+            ]
+        },
+        {
+            "name": "Webscraper",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/llm/indexingtools/webscraper.py",
+            "cwd": "${workspaceFolder}/llm/indexingtools",
+            "args": [
+                "https://www.cmb.fr/reseau-bancaire-cooperatif/web/comptes-et-cartes,https://www.cmb.fr/reseau-bancaire-cooperatif/web/epargne-et-placements,https://www.cmb.fr/reseau-bancaire-cooperatif/web/prets-et-credits,https://www.cmb.fr/reseau-bancaire-cooperatif/web/assurances",
+                // "https://www.cmb.fr/reseau-bancaire-cooperatif/web/comptes-et-cartes",
+                "class_='container pos_rel',id='caracteristiques',id='notes'",
+                "./tests/webscraper_output_documents.csv",
+                "-v"
+            ]
+        },
+        {
+            "name": "Indexer",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/llm/indexingtools/index_documents.py",
+            "cwd": "${workspaceFolder}/llm/indexingtools",
+            "args": [
+                "output_documents.csv",
+                "namespace_botid",
+                "embeddings.json",
+                "200"
+            ]
+        }
+    ]
+}

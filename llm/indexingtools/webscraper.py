@@ -1,3 +1,17 @@
+#   Copyright (C) 2023 Credit Mutuel Arkea
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#   
 """Simple recursive webscraper based on a list of BeautifulSoup filters.
 
 Usage:
@@ -46,14 +60,13 @@ def browse_base_urls(base_urls, target_dir='.', base_domain='domain'):
     Recursively browse URLs for sub-URLs. Creates the <base_domain>/urls.txt
     file along the way (the base URLs are listed in this file).
 
-    Arguments:
-        base_urls   a list of base URLs that will be browsed recursively 
-                    for sub-URLs (follow links)
-        target_dir  the directory to store output files
-        base_domain all sub-URLs will be checked to be in this base domain, 
-                    and all debug will go in a subdirectory with this name
+        Arguments:
+            base_urls   a list of base URLs that will be browsed recursively 
+                        for sub-URLs (follow links)
+            target_dir  the directory to store output files
+            base_domain all sub-URLs will be checked to be in this base domain, 
+                        and all debug will go in a subdirectory with this name
     """
-
     # Create the debug sub-directory if it does not already exist
     path = Path(target_dir) / base_domain
     path.mkdir(parents=True, exist_ok=True)
@@ -110,15 +123,28 @@ def browse_base_urls(base_urls, target_dir='.', base_domain='domain'):
                                 visited_urls.add(current_url)
                                 logging.debug(f"Add to visited {current_url}")
                             else:
-                                logging.warning(f"Warning: URL '{current_url}' is ignored because its base URL href ({base_url_href}) is not in the '{base_domain}' domain")
+                                logging.warning(f"URL '{current_url}' is ignored because its base URL href ({base_url_href}) is not in the '{base_domain}' domain")
                         else:
-                            logging.warning(f"Warning: URL '{current_url}' is ignored because it answered GET with code {response.status}")
+                            logging.warning(f"URL '{current_url}' is ignored because it answered GET with code {response.status}")
 
                 except URLError as e:
-                    logging.warning(f"Warning: URL '{current_url}' is ignored because it failed to answer GET ({e})")
+                    logging.warning(f"URL '{current_url}' is ignored because it failed to answer GET ({e})")
 
 
 def scrape_urls(soup_filters, output_file, target_dir='.', base_domain='domain'):
+    """
+    Scrape all URLs listed in 'urls.txt' file with BeautifulSoup: create one 
+    txt file per scraped URL, then create the ready-to-index CSV file.
+    
+        Arguments:
+            soup_filters:   a string containing comma-separated BeautifulSoup 
+                            filters
+            output_file:    str path to the output file
+            target_dir      the directory to store output files
+            base_domain     all sub-URLs will be checked to be in this base 
+                            domain, and all debug will go in a subdirectory 
+                            with this name
+    """
     results = []
 
     # fetch URLs file contents
@@ -159,7 +185,7 @@ def scrape_urls(soup_filters, output_file, target_dir='.', base_domain='domain')
                     else:
                         logging.debug(f"Line {line} is ignored (empty tags)")
                 else:
-                    logging.debug(f"Warning: URL '{line}' is ignored because it failed to answer GET")
+                    logging.warning(f"URL '{line}' is ignored because it failed to answer GET")
 
     # Save to output CSV file (use pandas to ensure 'ready-to-index' consistency)
     pd.DataFrame(results).to_csv(output_file, sep='|', index=False)
@@ -179,16 +205,16 @@ if __name__ == '__main__':
     # - input URLs
     base_urls = cli_args['<input_urls>'].split(',')
     if not base_urls[0]:
-        logging.error(f"Cannot proceed: could not find a URL in list '{base_urls}'.")
+        logging.error(f"Cannot proceed: could not find a URL in list '{base_urls}'")
         sys.exit(1)
     base_domain = urlparse(base_urls[0]).netloc
     for base_url in base_urls:
         parsed_url = urlparse(base_url)
         if not parsed_url.scheme or not parsed_url.netloc:
-            logging.error(f"Cannot proceed: '{base_url}' is not a valid URL.")
+            logging.error(f"Cannot proceed: '{base_url}' is not a valid URL")
             sys.exit(1)
         if base_domain != parsed_url.netloc:
-            logging.error(f"Cannot proceed: '{base_url}' has a different base domain ('{parsed_url.netloc}') than previous URLs ('{base_domain}').")
+            logging.error(f"Cannot proceed: '{base_url}' has a different base domain ('{parsed_url.netloc}') than previous URLs ('{base_domain}')")
             sys.exit(1)
 
     # - BeautifulSoup filters
@@ -201,16 +227,16 @@ if __name__ == '__main__':
             if key and value:
                 filters_as_dicts.append({key: value})
             else:
-                logging.error(f"Cannot proceed: BeautifulSoup filter '{filter}' could not be parsed into a key and its value.")
+                logging.error(f"Cannot proceed: BeautifulSoup filter '{filter}' could not be parsed into a key and its value")
                 sys.exit(1)
     else:
-        logging.error(f"Cannot proceed: BeautifulSoup filters arg ({cli_args['<soup_filters>']}) could not be parsed for a list of filters.")
+        logging.error(f"Cannot proceed: BeautifulSoup filters arg ({cli_args['<soup_filters>']}) could not be parsed for a list of filters")
         sys.exit(1)
 
     # - output file path
     target_dir = Path(cli_args['<output_csv>']).parent
     if not target_dir.exists():
-        logging.error(f"Cannot proceed: directory {target_dir} does not exist.")
+        logging.error(f"Cannot proceed: directory {target_dir} does not exist")
         sys.exit(1)
 
     # Browse base URLs recursively to populate the urls.txt file listing all URLs to be scraped
