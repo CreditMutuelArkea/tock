@@ -1,12 +1,12 @@
 import { Component, Input } from '@angular/core';
-import { isPrimitive } from '../../../utils';
+import { isPrimitive } from '../../utils';
 
 @Component({
-  selector: 'tock-debug-json-iterator',
-  templateUrl: './debug-json-iterator.component.html',
-  styleUrls: ['./debug-json-iterator.component.scss']
+  selector: 'tock-json-iterator',
+  templateUrl: './json-iterator.component.html',
+  styleUrls: ['./json-iterator.component.scss']
 })
-export class DebugJsonIteratorComponent {
+export class JsonIteratorComponent {
   @Input() data: any;
   @Input() isRoot: boolean = true;
   @Input() parentKey: string;

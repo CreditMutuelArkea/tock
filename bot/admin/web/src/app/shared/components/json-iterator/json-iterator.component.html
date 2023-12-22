@@ -40,10 +40,10 @@
   [class.isRoot]="isRoot"
 >
   <ng-container *ngFor="let list of data | keyvalue">
-    <tock-debug-json-iterator
+    <tock-json-iterator
       [data]="list.value"
       [parentKey]="list.key"
       [isRoot]="false"
-    ></tock-debug-json-iterator>
+    ></tock-json-iterator>
   </ng-container>
 </div>
