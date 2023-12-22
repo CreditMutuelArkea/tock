@@ -13,9 +13,11 @@
 #   limitations under the License.
 #
 from enum import Enum, unique
-from typing import Optional
+from typing import Dict, Optional
 
 from pydantic import BaseModel, Field
+from pydantic.json_schema import GetJsonSchemaHandler, JsonSchemaValue
+from pydantic_core import core_schema
 
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
 
@@ -35,6 +37,21 @@ class ErrorCode(Enum):
 
     PROVIDER_API_BAD_REQUEST = 2006
     PROVIDER_API_CONTEXT_LENGTH_EXCEEDED_BAD_REQUEST = 2007
+
+    @classmethod
+    def __get_pydantic_json_schema__(
+        cls, core_schema: core_schema.JsonSchema, handler: GetJsonSchemaHandler
+    ) -> Dict:
+        """
+        Document error codes using the names in the enum so that they are more comprehensible in the openAPI spec.
+        """
+        return {
+            'enum': [item.value for item in cls],
+            'description': '\n'.join(
+                [f'* `{item.value}`: {item.name}' for item in cls]
+            ),
+            'type': 'string',
+        }
 
 
 class ErrorMessage(BaseModel):
