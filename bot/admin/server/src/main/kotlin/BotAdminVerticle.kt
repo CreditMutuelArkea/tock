@@ -1014,9 +1014,7 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonGet("/configuration") {
-            botAdminConfiguration
-        }
+
 
         blockingJsonPost("/configuration/bots/:botId/llm-sentence-generation", setOf(botUser, faqBotUser)) { context, configuration: LLMSentenceGenerationConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
@@ -1031,6 +1029,10 @@ open class BotAdminVerticle : AdminVerticle() {
                 ?.let {
                     LLMSentenceGenerationConfigurationDTO(it)
                 }
+        }
+
+        blockingJsonGet("/configuration") {
+            botAdminConfiguration
         }
 
         findTestService().registerServices().invoke(this)

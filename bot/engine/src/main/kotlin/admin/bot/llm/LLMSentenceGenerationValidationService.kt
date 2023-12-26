@@ -55,6 +55,7 @@ object LLMSentenceGenerationValidationService {
 
     private fun validate(setting: LLMSetting): Set<String> {
         val errors = mutableSetOf<String>()
+        //val template = JinjaTemplate(setting.prompt)
 
         if(setting.apiKey.isBlank()) {
             errors.add("The API key is not provided")
@@ -69,9 +70,15 @@ object LLMSentenceGenerationValidationService {
             errors.add("The temperature is not correct [0..1]")
         }
 
+
+
         if (setting.prompt.isBlank()) {
             errors.add("The prompt is not provided")
-        }
+        } /*else if ( template.local.isBlank()){
+            errors.add("The language is not provided" )
+        } else if ( template.sentences.isBlank()){
+            errors.add("The sentences is not provided" )
+        }*/
 
 
         return errors
