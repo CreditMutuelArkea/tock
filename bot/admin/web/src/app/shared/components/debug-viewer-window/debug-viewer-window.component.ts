@@ -1,15 +1,10 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'tock-debug-viewer-window',
   templateUrl: './debug-viewer-window.component.html',
   styleUrls: ['./debug-viewer-window.component.scss']
 })
-export class DebugViewerWindowComponent implements OnInit {
+export class DebugViewerWindowComponent {
   @Input() debug?: any;
-  constructor() {}
-
-  ngOnInit(): void {
-    console.log(this.debug);
-  }
 }

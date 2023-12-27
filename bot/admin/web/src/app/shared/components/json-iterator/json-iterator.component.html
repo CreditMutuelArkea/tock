@@ -1,3 +1,14 @@
+<button
+  nbButton
+  size="tiny"
+  class="float-right ml-2"
+  nbTooltip="Expand recursively"
+  *ngIf="isRoot && !isPrimitive(data)"
+  (click)="expandAll()"
+>
+  <nb-icon icon="list-outline"></nb-icon>
+</button>
+
 <div *ngIf="isRoot && isPrimitive(data)">
   {{ data }}
 </div>
