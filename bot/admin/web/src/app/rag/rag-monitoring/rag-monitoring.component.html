@@ -30,8 +30,14 @@
   >
     <nb-card-body>
       <div *ngFor="let action of dialog.actions">
-        <tock-debug-json-iterator [data]="action"></tock-debug-json-iterator>
-        <hr />
+        <div>
+          <tock-rag-monitoring-message
+            [dialog]="dialog"
+            [message]="action.message"
+            [isBot]="action.isBot()"
+            (onClearMessage)="clearMessage($event)"
+          ></tock-rag-monitoring-message>
+        </div>
       </div>
     </nb-card-body>
   </nb-card>

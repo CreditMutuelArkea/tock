@@ -1,0 +1,21 @@
+.avatar {
+  max-width: 2.2em;
+}
+
+.message {
+  padding: 0.5em 1em;
+  border-radius: 0.5rem;
+  width: 100%;
+
+  &.bot {
+    background: var(--chat-message-reply-background-color);
+    color: var(--chat-message-reply-text-color);
+    border-top-left-radius: 0;
+  }
+}
+
+.signalement-menu {
+  padding: 1em;
+  background-color: white;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}

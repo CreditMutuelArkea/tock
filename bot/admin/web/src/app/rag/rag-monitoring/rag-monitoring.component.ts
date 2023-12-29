@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { SearchMark } from '../../model/commons';
 import { Subject, takeUntil } from 'rxjs';
 import { AnalyticsService } from '../../analytics/analytics.service';
@@ -8,6 +8,8 @@ import { DialogReportQuery } from '../../analytics/dialogs/dialogs';
 import { DialogFilter } from '../../analytics/dialogs/dialogs.component';
 import { BotConfigurationService } from '../../core/bot-configuration.service';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
+import { ActionReport, BotMessage, DialogReport } from '../../shared/model/dialog-data';
+import { RagMonitoringService } from './rag-monitoring.service';
 
 @Component({
   selector: 'tock-rag-monitoring',
@@ -26,13 +28,14 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   mark: SearchMark;
 
-  dialogs;
+  dialogs:DialogReport[];
 
   constructor(
     public state: StateService,
     private analytics: AnalyticsService,
     private botConfiguration: BotConfigurationService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private ragMonitoringService:RagMonitoringService
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +51,11 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
         this.loading = false;
       }
     });
+  }
+
+  @HostListener('document:click', ['$event'])
+  documentClick(event: MouseEvent) {
+    this.ragMonitoringService.documentClick(event);
   }
 
   private buildDialogQuery(): DialogReportQuery {
@@ -79,6 +87,22 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
       this.loading = false;
       this.cd.markForCheck();
     });
+  }
+
+  clearMessage(event:{dialog: DialogReport,message:BotMessage}){
+    const dialog = this.dialogs.find(d=>d===event.dialog)
+    let canClearDialog = true
+    dialog.actions.forEach(action=>{
+      if(action.isBot()){
+        if(!action.message["_validated"]&&!action.message["_signaled"]){
+          canClearDialog = false
+        }
+      }
+    })
+
+    if(canClearDialog){
+      this.dialogs = this.dialogs.filter(d=>d!==dialog)
+    }    
   }
 
   refresh() {

@@ -33,6 +33,11 @@ import { SourceManagementService } from './rag-sources/source-management.service
 import { SourceManagementApiService } from './rag-sources/source-management.api.service';
 import { RagSettingsInputComponent } from './rag-settings/rag-settings-input/rag-settings-input.component';
 import { RagMonitoringComponent } from './rag-monitoring/rag-monitoring.component';
+import { RagMonitoringMessageComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-message.component';
+import { RagMonitoringSentenceComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-sentence/rag-monitoring-sentence.component';
+import { RagMonitoringSentenceElementComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-sentence-element/rag-monitoring-sentence-element.component';
+import { RagMonitoringAttachementComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-attachement/rag-monitoring-attachement.component';
+import { RagMonitoringLocationComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-location/rag-monitoring-location.component';
 
 @NgModule({
   imports: [
@@ -67,7 +72,12 @@ import { RagMonitoringComponent } from './rag-monitoring/rag-monitoring.componen
     SourceNormalizationJsonComponent,
     JsonIteratorComponent,
     RagSettingsInputComponent,
-    RagMonitoringComponent
+    RagMonitoringComponent,
+    RagMonitoringMessageComponent,
+    RagMonitoringSentenceComponent,
+    RagMonitoringSentenceElementComponent,
+    RagMonitoringAttachementComponent,
+    RagMonitoringLocationComponent
   ],
   providers: [SourceManagementService, SourceManagementApiService]
 })

@@ -1,0 +1,11 @@
+<!-- <tock-debug-json-iterator [data]="sentence"></tock-debug-json-iterator> -->
+<div *ngIf="sentence.text">
+  {{ sentence.text }}
+</div>
+
+<div *ngIf="!sentence.text">
+  <div *ngFor="let element of sentence.messages">
+    ({{ element.connectorType.id }})
+    <tock-rag-monitoring-sentence-element [element]="element"></tock-rag-monitoring-sentence-element>
+  </div>
+</div>

@@ -1,0 +1,114 @@
+<!-- <tock-debug-json-iterator [data]="message"></tock-debug-json-iterator> -->
+
+<div class="d-flex gap-1">
+  <img
+    *ngIf="!isBot"
+    src="assets/images/scenario-client.svg"
+    class="avatar align-self-start"
+  />
+  <img
+    *ngIf="isBot"
+    src="assets/images/scenario-bot.svg"
+    class="avatar align-self-start"
+  />
+
+  <div
+    *ngIf="message"
+    class="message d-flex mb-1"
+    [ngClass]="{ bot: isBot, 'text-muted': !isBot }"
+  >
+    <div class="flex-grow-1 align-self-center">
+      <div *ngIf="message.isSentence()">
+        <tock-rag-monitoring-sentence [sentence]="message"></tock-rag-monitoring-sentence>
+      </div>
+
+      <div *ngIf="message.isAttachment()">
+        <tock-rag-monitoring-attachement [attachment]="message"></tock-rag-monitoring-attachement>
+      </div>
+      <div *ngIf="message.isChoice()">
+        choice
+        <tock-bot-message-choice
+          [choice]="message"
+          [user]="user"
+          (sendMessage)="sendReply($event)"
+        ></tock-bot-message-choice>
+      </div>
+      <div *ngIf="message.isLocation()">
+        location
+        <tock-bot-message-location [location]="message"></tock-bot-message-location>
+      </div>
+    </div>
+
+    <div *ngIf="isBot" class="d-flex align-items-center">
+      <button
+        nbButton
+        ghost
+        shape="round"
+        status="success"
+        size="large"
+        nbTooltip="Validate this answer"
+        (click)="validateAnswer()"
+        [disabled]="message._validated || message._signaled"
+      >
+        <nb-icon icon="checkmark-circle-2"></nb-icon>
+      </button>
+      <button
+        nbButton
+        ghost
+        shape="round"
+        status="danger"
+        size="large"
+        nbTooltip="Report an inappropriate answer"
+        (click)="signalAnswer($event, message)"
+        [disabled]="message._validated || message._signaled"
+      >
+        <nb-icon icon="close-circle"></nb-icon>
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #signalementMenu>
+  <section class="signalement-menu pt-1" (click)="$event.stopPropagation();">
+    <form [formGroup]="form" (submit)="submitSignalAnswer">
+      <nb-radio-group formControlName="reason"
+      name="reason">
+        <nb-radio value="inappropriate"> Inappropriate or incorrect response </nb-radio>
+        <nb-radio value="incomplete"> Incomplete or confused response </nb-radio>
+        <nb-radio value="incorrect"> Response based on incorrect or out-of-date information </nb-radio>
+      </nb-radio-group>
+  
+      <textarea
+        nbInput
+        fullWidth
+        fieldSize="tiny"
+        placeholder="Comment (optional)"
+        class="mt-2"
+        formControlName="comment"
+      ></textarea>
+  
+      <button
+        type="button"
+        status="primary"
+        nbButton
+        size="small"
+        class="mt-2 mr-2"
+        [disabled]="!canSubmit"
+        (click)="submitSignalAnswer()"
+      >
+        Submit
+      </button>
+  
+      <button
+        type="button"
+        status="basic"
+        nbButton
+        size="small"
+        class="mt-2"
+        (click)="hideSignalementMenu()"
+      >
+        Cancel
+      </button>
+    </form>
+  </section>
+</ng-template>
