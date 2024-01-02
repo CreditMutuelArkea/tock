@@ -12,6 +12,8 @@ docopt = "^0.6.2"
 pandas = "^2.1.4"
 beautifulsoup4 = "^4.12.2"
 langchain = "^0.0.352"
+python-dotenv = "^1.0.0"
+opensearch-py = "^2.4.2"
 
 
 [build-system]

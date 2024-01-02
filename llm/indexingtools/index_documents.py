@@ -53,6 +53,7 @@ from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import OpenSearchVectorSearch
 
+
 def index_documents(args):
     """
     Read a ready-to-index CSV file, then index its contents to an OpenSearch DB.
@@ -66,14 +67,14 @@ def index_documents(args):
     """
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
     csv_loader = CSVLoader(file_path=args['<input_csv>'], 
-                                          source_column="Question URL", 
-                                          csv_args={'delimiter': '|',
-                                                    'quotechar': '"'})
+                            source_column="text", 
+                            csv_args={'delimiter': '|',
+                                      'quotechar': '"'})
     docs = csv_loader.load()
 
     logging.debug(f"Split texts in {args['<chunks_size>']}-sized chunks")
-    text_splitter = CharacterTextSplitter(chunk_size=args['<chunks_size>'], chunk_overlap=0)
-    splited_docs = text_splitter.split_documents(docs)
+    text_splitter = CharacterTextSplitter(chunk_size=int(args['<chunks_size>']), chunk_overlap=0)
+    splitted_docs = text_splitter.split_documents(docs)
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
     # TODO get embeddings from config
@@ -86,7 +87,7 @@ def index_documents(args):
                                            opensearch_url=opensearch_url, 
                                            verify_certs=False)
     logging.debug(f"Index chunks in DB")
-    opensearch_db.from_documents(splited_docs, 
+    opensearch_db.from_documents(splitted_docs, 
                                  embeddings,
                                  index_name = args['<index_name>'],
                                  opensearch_url=opensearch_url, 
@@ -156,7 +157,13 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # .env file
-    load_dotenv()
+    load_dotenv()  # Load environment variables from .env into environment
+    if os.getenv("OPENSEARCH_HOST") == None:
+        logging.error(f"Cannot proceed: env var 'OPENSEARCH_HOST' is not defined")
+        sys.exit(1)
+    if os.getenv("OPENSEARCH_PORT") == None:
+        logging.error(f"Cannot proceed: env var 'OPENSEARCH_PORT' is not defined")
+        sys.exit(1)
 
     # Check args:
     index_documents(cli_args)
