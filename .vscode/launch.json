@@ -39,9 +39,9 @@
             "program": "${workspaceFolder}/llm/indexingtools/index_documents.py",
             "cwd": "${workspaceFolder}/llm/indexingtools",
             "args": [
-                "output_documents.csv",
+                "./tests/test_output_documents.csv",
                 "namespace_botid",
-                "embeddings.json",
+                "tests/embeddings.json",
                 "200"
             ]
         }
