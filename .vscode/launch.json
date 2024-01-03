@@ -1,7 +1,4 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
         {
@@ -26,7 +23,6 @@
             "cwd": "${workspaceFolder}/llm/indexingtools",
             "args": [
                 "https://www.cmb.fr/reseau-bancaire-cooperatif/web/comptes-et-cartes,https://www.cmb.fr/reseau-bancaire-cooperatif/web/epargne-et-placements,https://www.cmb.fr/reseau-bancaire-cooperatif/web/prets-et-credits,https://www.cmb.fr/reseau-bancaire-cooperatif/web/assurances",
-                // "https://www.cmb.fr/reseau-bancaire-cooperatif/web/comptes-et-cartes",
                 "class_='container pos_rel',id='caracteristiques',id='notes'",
                 "./tests/webscraper_output_documents.csv",
                 "-v"
@@ -39,10 +35,11 @@
             "program": "${workspaceFolder}/llm/indexingtools/index_documents.py",
             "cwd": "${workspaceFolder}/llm/indexingtools",
             "args": [
-                "./tests/test_output_documents.csv",
+                "./tests/webscraper_output_documents.csv",
                 "namespace_botid",
                 "tests/embeddings.json",
-                "200"
+                "2000",
+                "-v"
             ]
         }
     ]

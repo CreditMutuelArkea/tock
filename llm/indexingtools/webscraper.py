@@ -196,10 +196,7 @@ if __name__ == '__main__':
     
     # Set logging level
     log_format = '%(levelname)s:%(module)s:%(message)s'
-    if cli_args['-v']:
-        logging.basicConfig(level=logging.DEBUG, format=log_format)
-    else:
-        logging.basicConfig(level=logging.WARNING, format=log_format)
+    logging.basicConfig(level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format)
 
     # Check args:
     # - input URLs
