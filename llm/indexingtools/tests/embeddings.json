@@ -2,6 +2,6 @@
     "provider":         "AzureOpenAIService",
     "api_key":          "62f386ad5d064a599f4b41ea2c89a037",
     "deployment_name":  "conv-embeddings",
-    "azure_endpoint":   "https://conversationnel-api-arkea.azure-api.net",
+    "api_base":         "https://conversationnel-api-arkea.azure-api.net",
     "api_version":      "2023-03-15-preview"
 }

@@ -42,7 +42,9 @@ uses the embeddings constructor from the orchestrator module, so JSON file
 shall follow corresponding format). Documents will be indexed in OpenSearch DB 
 under index_name index (index_name shall follow OpenSearch naming restrictions).
 """
+from datetime import datetime
 import json
+from uuid import uuid4
 from docopt import docopt
 import logging
 from pathlib import Path
@@ -50,8 +52,12 @@ import sys, os
 from dotenv import load_dotenv
 
 from langchain.document_loaders import CSVLoader
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import OpenSearchVectorSearch
+
+from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
+from llm_orchestrator.services.langchain.factories.langchain_factory import get_em_factory
+from llm_orchestrator.services.langchain.factories.em.azure_openai_em_factory import AzureOpenAIEMFactory
 
 
 def index_documents(args):
@@ -65,20 +71,35 @@ def index_documents(args):
                                     '<embeddings_cfg>'
                                     '<chunks_size>'
     """
+    # unique date / uuid for each indexing session (stored as metadata)
+    formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    session_uuid = uuid4().hex[0:8]
+    logging.debug(f"Beginning indexation session {session_uuid} at '{formatted_datetime}'")
+
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
     csv_loader = CSVLoader(file_path=args['<input_csv>'], 
-                            source_column="text", 
-                            csv_args={'delimiter': '|',
-                                      'quotechar': '"'})
+                           source_column="url", 
+                           metadata_columns=("title","url"), 
+                           csv_args={'delimiter': '|', 
+                                     'quotechar': '"'})
     docs = csv_loader.load()
+    for doc in docs:
+        doc.metadata['index_session_id'] = session_uuid
+        doc.metadata['index_datetime'] = formatted_datetime
 
-    logging.debug(f"Split texts in {args['<chunks_size>']}-sized chunks")
-    text_splitter = CharacterTextSplitter(chunk_size=int(args['<chunks_size>']), chunk_overlap=0)
+    logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
+    # recursive splitter is used to preserve sentences & paragraphs
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=int(args['<chunks_size>']))
     splitted_docs = text_splitter.split_documents(docs)
+    logging.debug(f"Split {len(docs)} texts in {len(splitted_docs)} chunks")
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
-    # TODO get embeddings from config
-    embeddings = None
+    with open(args['<embeddings_cfg>'], 'r') as file:
+        config_dict = json.load(file)
+    em_settings = AzureOpenAIEMSetting(**config_dict)
+    em_factory = get_em_factory(em_settings)
+    em_factory.check_embedding_model_setting()
+    embeddings = em_factory.get_embedding_model()
 
     opensearch_url = 'https://admin:admin@' + os.getenv('OPENSEARCH_HOST') + ":" + os.getenv('OPENSEARCH_PORT')
     logging.debug(f"Connect to DB at {opensearch_url}")
@@ -122,10 +143,7 @@ if __name__ == '__main__':
     
     # Set logging level
     log_format = '%(levelname)s:%(module)s:%(message)s'
-    if cli_args['-v']:
-        logging.basicConfig(level=logging.DEBUG, format=log_format)
-    else:
-        logging.basicConfig(level=logging.WARNING, format=log_format)
+    logging.basicConfig(level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format)
 
     # Check args:
     # - input file path
@@ -152,7 +170,9 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # - chunks size
-    if not int(cli_args['<chunks_size>']):
+    try:
+        int(cli_args['<chunks_size>'])
+    except ValueError:
         logging.error(f"Cannot proceed: chunks size ({cli_args['<chunks_size>']}) is not a number")
         sys.exit(1)
 
