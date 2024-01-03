@@ -46,3 +46,12 @@ scripts/connector-messenger/ngrok.exe
 # Python
 **/requirements.txt
 
+<<<<<<< HEAD
+=======
+#env
+llm/orchestrator-server/src/main/python/app/src/app/.env
+
+#Indexing tools test files 
+llm/orchestrator-server/src/main/python/indexing_tools/tests
+!llm/orchestrator-server/src/main/python/indexing_tools/tests/embeddings.json.example
+>>>>>>> [DERCBOT-661] Move to TOCK Python

@@ -73,7 +73,7 @@ def index_documents(args):
     """
     # unique date / uuid for each indexing session (stored as metadata)
     formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    session_uuid = uuid4().hex[0:8]
+    session_uuid = uuid4()
     logging.debug(f"Beginning indexation session {session_uuid} at '{formatted_datetime}'")
 
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
@@ -86,21 +86,25 @@ def index_documents(args):
     for doc in docs:
         doc.metadata['index_session_id'] = session_uuid
         doc.metadata['index_datetime'] = formatted_datetime
+        # TODO add uuid ('id')
 
     logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
     # recursive splitter is used to preserve sentences & paragraphs
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=int(args['<chunks_size>']))
     splitted_docs = text_splitter.split_documents(docs)
+    # TODO add chunkid (x/N) of uuid ('chunk')
     logging.debug(f"Split {len(docs)} texts in {len(splitted_docs)} chunks")
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
     with open(args['<embeddings_cfg>'], 'r') as file:
         config_dict = json.load(file)
+    # TODO discriminate via provider
     em_settings = AzureOpenAIEMSetting(**config_dict)
     em_factory = get_em_factory(em_settings)
     em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
+    # TODO generalize via factory
     opensearch_url = 'https://admin:admin@' + os.getenv('OPENSEARCH_HOST') + ":" + os.getenv('OPENSEARCH_PORT')
     logging.debug(f"Connect to DB at {opensearch_url}")
     opensearch_db = OpenSearchVectorSearch(index_name=args['<index_name>'], 
@@ -153,6 +157,7 @@ if __name__ == '__main__':
         sys.exit(1)
     
     # - index name
+    # could be checked via factory in a future version
     if not index_name_is_valid(cli_args['<index_name>']):
         logging.error(f"Cannot proceed: index name {cli_args['<index_name>']} is not a valid OpenSearch index name")
         sys.exit(1)
@@ -187,3 +192,6 @@ if __name__ == '__main__':
 
     # Check args:
     index_documents(cli_args)
+
+    # TODO stats
+    # TODO return indexation uuid

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "indexingtools"
+name = "indexing_tools"
 version = "0.1.0"
 description = "Tools to index data from different sources to TOCK RAG vector DB"
 authors = ["Pierre Guirriec <pierre.guirriec@partnre.com>"]
@@ -14,7 +14,7 @@ beautifulsoup4 = "^4.12.2"
 langchain = "^0.0.351"
 python-dotenv = "^1.0.0"
 opensearch-py = "^2.4.2"
-llm-orchestrator = {path = "../orchestrator-server/src/main/python/app"}
+llm-orchestrator = {path = "../app"}
 
 
 [build-system]
