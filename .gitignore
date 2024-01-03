@@ -49,6 +49,7 @@ scripts/connector-messenger/ngrok.exe
 #env
 llm/orchestrator-server/src/main/python/app/src/app/.env
 
-#Indexing tools test files 
+#Indexing tools env file
+llm/orchestrator-server/src/main/python/indexing_tools/.env
+#Indexing tools test files
 llm/orchestrator-server/src/main/python/indexing_tools/tests
-!llm/orchestrator-server/src/main/python/indexing_tools/tests/embeddings.json.example
