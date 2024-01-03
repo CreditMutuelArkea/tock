@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 from enum import Enum, unique
 from typing import Optional
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 @unique
@@ -24,13 +24,11 @@ class Environment(str, Enum):
     PROD = 'PROD'
 
 
-@unique
-class INFRA(str, Enum):
-    LOCAL = 'LOCAL'
-    AWS = 'AWS'
-
-
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_prefix='tock_gen_ai_orchestrator_', case_sensitive=True
+    )
+
     application_environment: Environment = Environment.DEV
     open_search_host: str = 'localhost'
     open_search_port: str = '9200'

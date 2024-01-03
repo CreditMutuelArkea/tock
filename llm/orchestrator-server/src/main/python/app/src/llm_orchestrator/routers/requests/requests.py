@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 
 from llm_orchestrator.models.em.em_types import EMSetting
 from llm_orchestrator.models.llm.llm_types import LLMSetting
-from llm_orchestrator.models.rag.rag_models import ChatMessage, MetadataFilter
+from llm_orchestrator.models.rag.rag_models import ChatMessage
 
 
 class LLMProviderSettingStatusQuery(BaseModel):

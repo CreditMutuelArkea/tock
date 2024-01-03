@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -15,19 +15,13 @@
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
-from requests import ConnectionError as RequestConnectionError
 
-from llm_orchestrator.errors.exceptions.exceptions import (
-    GenAIAuthenticationException,
-    GenAIConnectionErrorException,
-)
 from llm_orchestrator.errors.handlers.openai.openai_exception_handler import (
     openai_exception_handler,
 )
 from llm_orchestrator.errors.handlers.opensearch.opensearch_exception_handler import (
     opensearch_exception_handler,
 )
-from llm_orchestrator.models.errors.errors_models import ErrorInfo
 from llm_orchestrator.models.rag.rag_models import (
     ChatMessageType,
     Footnote,
@@ -46,25 +40,6 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
 from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import (
     VectorStore,
 )
-
-# Errors :
-# ----------> Api Key ...
-# ----------> Pas d'open search
-# ----------> absence d'une variable dans le prompt (context ou question)
-# pydantic.v1.error_wrappers.ValidationError: 1 validation error for StuffDocumentsChain
-# __root__
-#   document_variable_name context was not found in llm_chain input_variables: [] (type=value_error)
-
-# import logging
-# import http.client as http_client
-# http_client.HTTPConnection.debuglevel = 1
-#
-# # You must initialize logging, otherwise you'll not see debug output.
-# logging.basicConfig()
-# logging.getLogger().setLevel(logging.DEBUG)
-# requests_log = logging.getLogger("requests.packages.urllib3")
-# requests_log.setLevel(logging.DEBUG)
-# requests_log.propagate = True
 
 
 @opensearch_exception_handler
