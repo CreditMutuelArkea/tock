@@ -21,13 +21,13 @@ Usage:
     index_documents.py --version
 
 Arguments:
-    input_csv      path to the ready-to-index file
+    input_csv       path to the ready-to-index file
     index_name      name of the OpenSearch index (shall follow indexes 
                     naming rules)
     embeddings_cfg  path to an embeddings configuration file (JSON format)
+                    (shall describe settings for one of OpenAI or AzureOpenAI 
+                    embeddings model)
     chunks_size     size of the embedded chunks of documents
-    env_file        path to an alternative env file name (.env is loaded 
-                    if left unspecified)
 
 Options:
     -h --help   Show this screen
@@ -40,7 +40,9 @@ CSV columns are 'title'|'url'|'text'. 'text' will be chunked according to
 chunks_size, and embedded using configuration described in embeddings_cfg (it 
 uses the embeddings constructor from the orchestrator module, so JSON file 
 shall follow corresponding format). Documents will be indexed in OpenSearch DB 
-under index_name index (index_name shall follow OpenSearch naming restrictions).
+under index_name index (index_name shall follow OpenSearch naming restrictions). 
+A unique indexing session id is produced and printed to the console (will be 
+the last line printed if the '-v' option is used).
 """
 from datetime import datetime
 import json
@@ -55,24 +57,33 @@ from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import OpenSearchVectorSearch
 
+from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
 from llm_orchestrator.services.langchain.factories.langchain_factory import get_em_factory
-from llm_orchestrator.services.langchain.factories.em.azure_openai_em_factory import AzureOpenAIEMFactory
+from llm_orchestrator.models.em.em_setting import BaseEMSetting
+from llm_orchestrator.models.em.em_provider import EMProvider
+from llm_orchestrator.services.langchain.factories.langchain_factory import get_vector_store_factory
+from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import VectorStore
 
 
 def index_documents(args):
     """
     Read a ready-to-index CSV file, then index its contents to an OpenSearch DB.
     
-        Parameters:
-        args (dict): A dictionary containing command-line arguments.
-                    Expecting keys: '<input_csv>'
+    Args:
+
+        args (dict):    A dictionary containing command-line arguments.
+                        Expecting keys: '<input_csv>'
                                     '<index_name>'
                                     '<embeddings_cfg>'
                                     '<chunks_size>'
+
+    Returns:
+        The indexing session unique id.
     """
     # unique date / uuid for each indexing session (stored as metadata)
-    formatted_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    start_time = datetime.now()
+    formatted_datetime = start_time.strftime("%Y-%m-%d %H:%M:%S")
     session_uuid = uuid4()
     logging.debug(f"Beginning indexation session {session_uuid} at '{formatted_datetime}'")
 
@@ -86,37 +97,61 @@ def index_documents(args):
     for doc in docs:
         doc.metadata['index_session_id'] = session_uuid
         doc.metadata['index_datetime'] = formatted_datetime
-        # TODO add uuid ('id')
+        doc.metadata['id'] = uuid4() # A uuid for the doc (will be used by TOCK)
 
     logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
     # recursive splitter is used to preserve sentences & paragraphs
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=int(args['<chunks_size>']))
     splitted_docs = text_splitter.split_documents(docs)
-    # TODO add chunkid (x/N) of uuid ('chunk')
+    # Add chunk id to each chunk
+    tagged_index = 0
+    len_docs = len(splitted_docs)
+    while tagged_index < len_docs:
+        cur_doc_uuid = splitted_docs[tagged_index].metadata['id']
+        chunks_ctr = 1
+        # Search all chunks with same id
+        while (tagged_index+chunks_ctr)<len_docs and splitted_docs[tagged_index+chunks_ctr].metadata['id'] == cur_doc_uuid:
+            chunks_ctr += 1
+        # Add tag
+        doc_nb = 1
+        for doc in splitted_docs[tagged_index:tagged_index+chunks_ctr]:
+            doc.metadata['chunk'] = f"{doc_nb}/{chunks_ctr}"
+            doc_nb += 1
+        tagged_index = tagged_index + chunks_ctr
     logging.debug(f"Split {len(docs)} texts in {len(splitted_docs)} chunks")
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
     with open(args['<embeddings_cfg>'], 'r') as file:
         config_dict = json.load(file)
-    # TODO discriminate via provider
-    em_settings = AzureOpenAIEMSetting(**config_dict)
+    # Create settings class according to embeddings provider from config file
+    if config_dict['provider'] == EMProvider.OPEN_AI:
+        em_settings = OpenAIEMSetting(**config_dict)
+    elif config_dict['provider'] == EMProvider.AZURE_OPEN_AI_SERVICE:
+        em_settings =AzureOpenAIEMSetting(**config_dict)
+    
+    # Use embeddings factory from orchestrator
     em_factory = get_em_factory(em_settings)
     em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
-    # TODO generalize via factory
-    opensearch_url = 'https://admin:admin@' + os.getenv('OPENSEARCH_HOST') + ":" + os.getenv('OPENSEARCH_PORT')
-    logging.debug(f"Connect to DB at {opensearch_url}")
-    opensearch_db = OpenSearchVectorSearch(index_name=args['<index_name>'], 
-                                           embedding_function=embeddings, 
-                                           opensearch_url=opensearch_url, 
-                                           verify_certs=False)
     logging.debug(f"Index chunks in DB")
-    opensearch_db.from_documents(splitted_docs, 
-                                 embeddings,
-                                 index_name = args['<index_name>'],
-                                 opensearch_url=opensearch_url, 
-                                 verify_certs=False)
+    # Use vector store factory from orchestrator
+    vectorstore_factory = get_vector_store_factory(VectorStore.OPEN_SEARCH, 
+                                                   embedding_function=embeddings, 
+                                                   index_name=args['<index_name>'])
+    opensearch_db = vectorstore_factory.get_vector_store()
+    # Index respecting bulk_size (500 is from_documents current default: it is described for clarity only)
+    bulk_size = 500
+    for i in range(0, len(splitted_docs), bulk_size):
+        opensearch_db.add_documents(documents=splitted_docs[i:i+500], 
+                                    bulk_size=bulk_size)
+    
+    # Print statistics
+    duration = datetime.now() - start_time
+    logging.debug(f"Indexed {len(splitted_docs)} chunks in '{args['<index_name>']}' from {len(docs)} lines in '{args['<input_csv>']}' (duration: {duration})")
+
+    # Return session index uuid to main script
+    return session_uuid
 
 
 def index_name_is_valid(index_name):
@@ -169,9 +204,12 @@ if __name__ == '__main__':
         sys.exit(1)
     try:
         with open(cfg_file_path, 'r') as file:
-            json.load(file)
+            config_dict = json.load(file)
     except json.JSONDecodeError:
         logging.error(f"Cannot proceed: embeddings config file '{cli_args['<embeddings_cfg>']}' is not a valid JSON file")
+        sys.exit(1)
+    if not EMProvider.has_value(config_dict['provider']):
+        logging.error(f"Cannot proceed: embeddings config file references an unknown embedding model : '{config_dict['provider']}'")
         sys.exit(1)
 
     # - chunks size
@@ -190,8 +228,9 @@ if __name__ == '__main__':
         logging.error(f"Cannot proceed: env var 'OPENSEARCH_PORT' is not defined")
         sys.exit(1)
 
-    # Check args:
-    index_documents(cli_args)
+    # Main func
+    indexing_session_uuid = index_documents(cli_args)
 
-    # TODO stats
-    # TODO return indexation uuid
+    # Print indexation session's unique id
+    print(indexing_session_uuid)
+    

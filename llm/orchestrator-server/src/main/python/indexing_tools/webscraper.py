@@ -236,11 +236,12 @@ if __name__ == '__main__':
         logging.error(f"Cannot proceed: directory {target_dir} does not exist")
         sys.exit(1)
 
-    # Browse base URLs recursively to populate the urls.txt file listing all URLs to be scraped
+    # Two successive main funcs:
+    # - Browse base URLs recursively to populate the urls.txt file listing all URLs to be scraped
     browse_base_urls(base_urls=base_urls, 
                      target_dir=target_dir, 
                      base_domain=base_domain)
-    # Scrape all URLs from urls.txt using BeautifulSoup filters
+    # - Scrape all URLs from urls.txt using BeautifulSoup filters
     scrape_urls(soup_filters=filters_as_dicts, 
                 output_file=cli_args['<output_csv>'], 
                 target_dir=target_dir, 

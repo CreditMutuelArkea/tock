@@ -102,4 +102,5 @@ if __name__ == '__main__':
         logging.error(f"Cannot proceed: directory {target_dir} does not exist")
         sys.exit(1)
 
+    # Main func
     format(cli_args)
