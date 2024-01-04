@@ -44,26 +44,24 @@ under index_name index (index_name shall follow OpenSearch naming restrictions).
 A unique indexing session id is produced and printed to the console (will be 
 the last line printed if the '-v' option is used).
 """
-from datetime import datetime
-import json
-from uuid import uuid4
 from docopt import docopt
 import logging
 from pathlib import Path
-import sys, os
-from dotenv import load_dotenv
+import sys
+
+from datetime import datetime
+import json
+from uuid import uuid4
 
 from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.vectorstores import OpenSearchVectorSearch
 
+from llm_orchestrator.models.em.em_provider import EMProvider
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
 from llm_orchestrator.services.langchain.factories.langchain_factory import get_em_factory
-from llm_orchestrator.models.em.em_setting import BaseEMSetting
-from llm_orchestrator.models.em.em_provider import EMProvider
-from llm_orchestrator.services.langchain.factories.langchain_factory import get_vector_store_factory
 from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import VectorStore
+from llm_orchestrator.services.langchain.factories.langchain_factory import get_vector_store_factory
 
 
 def index_documents(args):
@@ -74,9 +72,9 @@ def index_documents(args):
 
         args (dict):    A dictionary containing command-line arguments.
                         Expecting keys: '<input_csv>'
-                                    '<index_name>'
-                                    '<embeddings_cfg>'
-                                    '<chunks_size>'
+                                        '<index_name>'
+                                        '<embeddings_cfg>'
+                                        '<chunks_size>'
 
     Returns:
         The indexing session unique id.
@@ -217,15 +215,6 @@ if __name__ == '__main__':
         int(cli_args['<chunks_size>'])
     except ValueError:
         logging.error(f"Cannot proceed: chunks size ({cli_args['<chunks_size>']}) is not a number")
-        sys.exit(1)
-
-    # .env file
-    load_dotenv()  # Load environment variables from .env into environment
-    if os.getenv("OPENSEARCH_HOST") == None:
-        logging.error(f"Cannot proceed: env var 'OPENSEARCH_HOST' is not defined")
-        sys.exit(1)
-    if os.getenv("OPENSEARCH_PORT") == None:
-        logging.error(f"Cannot proceed: env var 'OPENSEARCH_PORT' is not defined")
         sys.exit(1)
 
     # Main func
