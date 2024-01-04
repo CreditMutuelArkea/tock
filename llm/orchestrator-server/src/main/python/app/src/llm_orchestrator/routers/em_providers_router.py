@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 #   limitations under the License.
 #
 
-import logging
-
 from fastapi import APIRouter, HTTPException, Request
 
+from llm_orchestrator.configurations.logging.logger import application_logger
 from llm_orchestrator.errors.exceptions.ai_provider.ai_provider_exceptions import (
     AIProviderBadQueryException,
     GenAIUnknownProviderException,
@@ -44,8 +43,6 @@ from llm_orchestrator.routers.responses.responses import (
     ProviderSettingStatusResponse,
 )
 from llm_orchestrator.services.em.em_service import check_em_setting
-
-logger = logging.getLogger(__name__)
 
 em_providers_router = APIRouter(
     prefix='/em-providers',
@@ -102,7 +99,7 @@ async def check_em_provider_setting(
 
         return ProviderSettingStatusResponse(valid=True)
     except GenAIOrchestratorException as exc:
-        logger.error(exc)
+        application_logger.error(exc)
         return ProviderSettingStatusResponse(errors=[create_error_response(exc)])
 
 

@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@ from langchain.vectorstores.opensearch_vector_search import (
     OpenSearchVectorSearch,
 )
 
+from llm_orchestrator.configurations.env.settings import (
+    application_settings,
+    is_prod_environment,
+)
 from llm_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
-from llm_orchestrator.settings import application_settings, is_prod_environment
 
 
 class OpenSearchFactory(LangChainVectorStoreFactory):

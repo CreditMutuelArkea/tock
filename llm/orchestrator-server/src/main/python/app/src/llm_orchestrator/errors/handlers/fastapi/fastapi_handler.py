@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 #   limitations under the License.
 #
 
-import logging
 
 from fastapi import Request, status
 from fastapi.encoders import jsonable_encoder
@@ -23,10 +22,8 @@ from llm_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
     GenAIUnknownErrorException,
 )
-from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
+from llm_orchestrator.models.errors.errors_models import ErrorInfo
 from llm_orchestrator.routers.responses.responses import ErrorResponse
-
-logger = logging.getLogger(__name__)
 
 
 def business_exception_handler(_, exc: GenAIOrchestratorException) -> JSONResponse:

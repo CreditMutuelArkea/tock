@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 #
 from fastapi import FastAPI
 
+from llm_orchestrator.configurations.logging.logger import application_logger
 from llm_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
 )
@@ -28,7 +29,7 @@ from llm_orchestrator.routers.em_providers_router import em_providers_router
 from llm_orchestrator.routers.llm_providers_router import llm_providers_router
 from llm_orchestrator.routers.rag_router import rag_router
 
-app = FastAPI()
+app = FastAPI(title='Generative AI Orchestrator')
 
 # Add functional exception handler
 app.add_exception_handler(GenAIOrchestratorException, business_exception_handler)
