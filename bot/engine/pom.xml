@@ -38,6 +38,10 @@
 <!--            <artifactId>jinjava</artifactId>-->
 <!--        </dependency>-->
         <dependency>
+            <groupId>com.hubspot.jinjava</groupId>
+            <artifactId>jinjava</artifactId>
+        </dependency>
+        <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-llm-orchestrator-client</artifactId>
         </dependency>
