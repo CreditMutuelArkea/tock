@@ -17,7 +17,7 @@ import logging.config
 
 import yaml
 
-from llm_orchestrator.configurations.env.settings import application_settings
+from llm_orchestrator.configurations.environement.settings import application_settings
 
 
 def _setup_logging():

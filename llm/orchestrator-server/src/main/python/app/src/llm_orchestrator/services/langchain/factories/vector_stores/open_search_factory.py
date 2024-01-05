@@ -16,7 +16,7 @@ from langchain.vectorstores.opensearch_vector_search import (
     OpenSearchVectorSearch,
 )
 
-from llm_orchestrator.configurations.env.settings import (
+from llm_orchestrator.configurations.environement.settings import (
     application_settings,
     is_prod_environment,
 )
