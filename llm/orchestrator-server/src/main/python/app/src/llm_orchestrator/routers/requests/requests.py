@@ -12,13 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Any
 
 from pydantic import BaseModel, Field
 
-from llm_orchestrator.models.em.em_types import EMSetting
-from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.models.rag.rag_models import ChatMessage
+from llm_orchestrator.routers.requests.types import (
+    DocumentSearchParams,
+    EMSetting,
+    LLMSetting,
+)
 
 
 class LLMProviderSettingStatusQuery(BaseModel):
@@ -51,7 +53,7 @@ class RagQuery(BaseModel):
         description='Index name corresponding to a document collection in the vector database.',
         examples=['my-index-name'],
     )
-    document_search_params: Any = Field(
+    document_search_params: DocumentSearchParams = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
         examples=[
             {

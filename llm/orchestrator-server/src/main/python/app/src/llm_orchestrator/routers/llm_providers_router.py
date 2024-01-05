@@ -12,9 +12,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+import logging
+
 from fastapi import APIRouter, HTTPException, Request
 
-from llm_orchestrator.configurations.logging.logger import application_logger
 from llm_orchestrator.errors.exceptions.ai_provider.ai_provider_exceptions import (
     AIProviderBadQueryException,
     GenAIUnknownProviderException,
@@ -32,18 +33,20 @@ from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
 from llm_orchestrator.models.llm.llm_provider import LLMProvider
-from llm_orchestrator.models.llm.llm_types import LLMSetting
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
 from llm_orchestrator.routers.requests.requests import (
     LLMProviderSettingStatusQuery,
 )
+from llm_orchestrator.routers.requests.types import LLMSetting
 from llm_orchestrator.routers.responses.responses import (
     LLMProviderResponse,
     ProviderSettingStatusResponse,
 )
 from llm_orchestrator.services.llm.llm_service import check_llm_setting
+
+logger = logging.getLogger(__name__)
 
 llm_providers_router = APIRouter(
     prefix='/llm-providers',
@@ -109,7 +112,7 @@ async def check_llm_provider_setting(
 
         return ProviderSettingStatusResponse(valid=True)
     except GenAIOrchestratorException as exc:
-        application_logger.error(exc)
+        logger.error(exc)
         return ProviderSettingStatusResponse(errors=[create_error_response(exc)])
 
 

@@ -27,6 +27,9 @@ from llm_orchestrator.models.rag.rag_models import (
     Footnote,
     TextWithFootnotes,
 )
+from llm_orchestrator.models.vector_stores.vectore_store_provider import (
+    VectorStoreProvider,
+)
 from llm_orchestrator.routers.requests.requests import RagQuery
 from llm_orchestrator.routers.responses.responses import RagResponse
 from llm_orchestrator.services.langchain.callbacks.retriever_json_callback_handler import (
@@ -37,9 +40,6 @@ from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_llm_factory,
     get_vector_store_factory,
 )
-from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import (
-    VectorStore,
-)
 
 
 @opensearch_exception_handler
@@ -48,7 +48,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     llm_factory = get_llm_factory(setting=query.question_answering_llm_setting)
     em_factory = get_em_factory(setting=query.embedding_question_em_setting)
     vector_store_factory = get_vector_store_factory(
-        vector_store=VectorStore.OPEN_SEARCH,
+        vector_store_provider=VectorStoreProvider.OPEN_SEARCH,
         embedding_function=em_factory.get_embedding_model(),
         index_name=query.index_name,
     )
@@ -56,7 +56,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     chat = ConversationalRetrievalChain.from_llm(
         llm=llm_factory.get_language_model(),
         retriever=vector_store_factory.get_vector_store().as_retriever(
-            search_kwargs={**query.document_search_params}
+            search_kwargs=query.document_search_params.to_dict()
         ),
         return_source_documents=True,
         return_generated_question=True,

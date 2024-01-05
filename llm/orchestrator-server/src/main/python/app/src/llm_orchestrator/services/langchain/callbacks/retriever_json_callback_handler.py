@@ -12,12 +12,13 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+import logging
 from typing import Any, Dict, List, Optional, Union
 
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema import AgentAction, AgentFinish, LLMResult
 
-from llm_orchestrator.configurations.logging.logger import application_logger
+logger = logging.getLogger(__name__)
 
 
 class RetrieverJsonCallbackHandler(BaseCallbackHandler):
@@ -25,7 +26,7 @@ class RetrieverJsonCallbackHandler(BaseCallbackHandler):
 
     def __init__(self, color: Optional[str] = None) -> None:
         """Initialize callback handler."""
-        self.logger = application_logger
+        self.logger = logger
         self.color = color
 
         self.records: Dict[str, Any] = {

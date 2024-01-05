@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@ from llm_orchestrator.models.llm.llm_setting import BaseLLMSetting
 from llm_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
+from llm_orchestrator.models.vector_stores.vectore_store_provider import (
+    VectorStoreProvider,
+)
 from llm_orchestrator.services.langchain.factories.em.azure_openai_em_factory import (
     AzureOpenAIEMFactory,
 )
@@ -56,9 +59,6 @@ from llm_orchestrator.services.langchain.factories.vector_stores.open_search_fac
 from llm_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
-from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import (
-    VectorStore,
-)
 
 
 def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
@@ -80,9 +80,11 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 
 def get_vector_store_factory(
-    vector_store: VectorStore, embedding_function: Embeddings, index_name: str
+    vector_store_provider: VectorStoreProvider,
+    embedding_function: Embeddings,
+    index_name: str,
 ) -> LangChainVectorStoreFactory:
-    if VectorStore.OPEN_SEARCH == vector_store:
+    if VectorStoreProvider.OPEN_SEARCH == vector_store_provider:
         return OpenSearchFactory(
             embedding_function=embedding_function, index_name=index_name
         )

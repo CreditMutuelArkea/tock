@@ -14,7 +14,6 @@
 #
 from fastapi import FastAPI
 
-from llm_orchestrator.configurations.logging.logger import application_logger
 from llm_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
 )

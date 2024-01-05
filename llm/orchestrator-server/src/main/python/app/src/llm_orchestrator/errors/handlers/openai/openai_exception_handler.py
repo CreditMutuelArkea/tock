@@ -13,6 +13,8 @@
 #   limitations under the License.
 #
 
+import logging
+
 from openai import (
     APIConnectionError,
     APIError,
@@ -22,7 +24,6 @@ from openai import (
     OpenAIError,
 )
 
-from llm_orchestrator.configurations.logging.logger import application_logger
 from llm_orchestrator.errors.exceptions.ai_provider.ai_provider_exceptions import (
     AIProviderAPIBadRequestException,
     AIProviderAPIContextLengthExceededException,
@@ -37,6 +38,8 @@ from llm_orchestrator.errors.exceptions.exceptions import (
 )
 from llm_orchestrator.models.errors.errors_models import ErrorInfo
 
+logger = logging.getLogger(__name__)
+
 
 def openai_exception_handler(provider):
     def decorator(func):
@@ -44,17 +47,17 @@ def openai_exception_handler(provider):
             try:
                 return func(*args, **kwargs)
             except APIConnectionError as exc:
-                application_logger.error(exc)
+                logger.error(exc)
                 raise GenAIConnectionErrorException(
                     create_error_info_openai(exc, provider)
                 )
             except AuthenticationError as exc:
-                application_logger.error(exc)
+                logger.error(exc)
                 raise GenAIAuthenticationException(
                     create_error_info_openai(exc, provider)
                 )
             except NotFoundError as exc:
-                application_logger.error(exc)
+                logger.error(exc)
                 if 'model_not_found' == exc.code:
                     raise AIProviderAPIModelException(
                         create_error_info_openai(exc, provider)
@@ -68,7 +71,7 @@ def openai_exception_handler(provider):
                         create_error_info_openai(exc, provider)
                     )
             except BadRequestError as exc:
-                application_logger.error(exc)
+                logger.error(exc)
                 if 'context_length_exceeded' == exc.code:
                     raise AIProviderAPIContextLengthExceededException(
                         create_error_info_openai(exc, provider)
@@ -78,7 +81,7 @@ def openai_exception_handler(provider):
                         create_error_info_openai(exc, provider)
                     )
             except APIError as exc:
-                application_logger.error(exc)
+                logger.error(exc)
                 raise AIProviderAPIErrorException(
                     create_error_info_openai(exc, provider)
                 )
