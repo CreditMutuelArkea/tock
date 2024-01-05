@@ -73,7 +73,7 @@
         <pac4j>5.7.0</pac4j>
         <vertx-pac4j>6.0.2</vertx-pac4j>
         <graphql-kotlin>6.3.0</graphql-kotlin>
-
+        <com.hubspot.jinjava>2.7.1</com.hubspot.jinjava>
         <junit-jupiter>5.10.1</junit-jupiter>
 
         <mockk>1.13.8</mockk>

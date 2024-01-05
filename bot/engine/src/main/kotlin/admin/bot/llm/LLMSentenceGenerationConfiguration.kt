@@ -26,4 +26,6 @@ data class LLMSentenceGenerationConfiguration(
     val botId: String,
     val enabled: Boolean = true,
     val llmSetting: LLMSetting,
-)
+) {
+
+}

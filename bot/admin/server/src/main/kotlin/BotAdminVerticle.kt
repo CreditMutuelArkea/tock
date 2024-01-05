@@ -435,7 +435,8 @@ open class BotAdminVerticle : AdminVerticle() {
             }
         }
 
-        blockingJsonPost("/configuration/bots/:botId/rag", setOf(botUser, faqBotUser)) { context, configuration: BotRAGConfigurationDTO  ->
+        blockingJsonPost("/configuration/bots/:botId/rag", setOf(botUser, faqBotUser))
+        { context, configuration: BotRAGConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
                 RagService.saveRag(configuration)
             } else {

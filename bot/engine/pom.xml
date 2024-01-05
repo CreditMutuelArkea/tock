@@ -34,6 +34,10 @@
             <artifactId>tock-shared</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.hubspot.jinjava</groupId>
+            <artifactId>jinjava</artifactId>
+        </dependency>
+        <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>nlp-api-client</artifactId>
         </dependency>
