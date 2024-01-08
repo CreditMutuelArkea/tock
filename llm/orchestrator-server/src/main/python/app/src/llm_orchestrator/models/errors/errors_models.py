@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ class ErrorCode(Enum):
     GEN_AI_UNKNOWN_ERROR = 1000
     GEN_AI_CONNECTION_ERROR = 1001
     GEN_AI_AUTHENTICATION_ERROR = 1002
+    GEN_AI_UNKNOWN_PROVIDER_SETTING = 1003
 
     # AI Provider Errors
     AI_PROVIDER_UNKNOWN = 2000
@@ -111,6 +112,9 @@ class ErrorMessages:
         ErrorCode.GEN_AI_AUTHENTICATION_ERROR: ErrorMessage(
             message='Authentication error.',
             detail='Check the API key or token, and make sure it is correct.',
+        ),
+        ErrorCode.GEN_AI_UNKNOWN_PROVIDER_SETTING: ErrorMessage(
+            message='Unknown AI provider setting.'
         ),
         # AI Provider Errors
         ErrorCode.AI_PROVIDER_UNKNOWN: ErrorMessage(message='Unknown AI Provider.'),

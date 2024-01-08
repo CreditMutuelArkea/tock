@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -16,11 +16,6 @@ from llm_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
 )
 from llm_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
-
-
-class GenAIUnknownProviderException(GenAIOrchestratorException):
-    def __init__(self, info: ErrorInfo):
-        super().__init__(ErrorCode.AI_PROVIDER_UNKNOWN, info)
 
 
 class AIProviderBadQueryException(GenAIOrchestratorException):

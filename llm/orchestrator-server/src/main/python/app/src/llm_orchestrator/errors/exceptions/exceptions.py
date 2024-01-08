@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -56,6 +56,16 @@ class GenAIAuthenticationException(GenAIOrchestratorException):
 
     def __init__(self, info: ErrorInfo):
         super().__init__(ErrorCode.GEN_AI_AUTHENTICATION_ERROR, info)
+
+
+class GenAIUnknownProviderException(GenAIOrchestratorException):
+    def __init__(self, info: ErrorInfo):
+        super().__init__(ErrorCode.AI_PROVIDER_UNKNOWN, info)
+
+
+class GenAIUnknownProviderSettingException(GenAIOrchestratorException):
+    def __init__(self, info: Optional[ErrorInfo] = None):
+        super().__init__(ErrorCode.GEN_AI_UNKNOWN_PROVIDER_SETTING, info)
 
 
 class VectorStoreUnknownException(GenAIOrchestratorException):

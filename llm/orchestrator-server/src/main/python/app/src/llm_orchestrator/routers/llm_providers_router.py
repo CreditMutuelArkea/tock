@@ -18,10 +18,10 @@ from fastapi import APIRouter, HTTPException, Request
 
 from llm_orchestrator.errors.exceptions.ai_provider.ai_provider_exceptions import (
     AIProviderBadQueryException,
-    GenAIUnknownProviderException,
 )
 from llm_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
+    GenAIUnknownProviderException,
 )
 from llm_orchestrator.errors.handlers.fastapi.fastapi_handler import (
     create_error_info_bad_request,

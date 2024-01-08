@@ -16,7 +16,7 @@
 from langchain_core.embeddings import Embeddings
 
 from llm_orchestrator.errors.exceptions.exceptions import (
-    GenAIOrchestratorException,
+    GenAIUnknownProviderSettingException,
     VectorStoreUnknownException,
 )
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
@@ -24,7 +24,6 @@ from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
 )
 from llm_orchestrator.models.em.em_setting import BaseEMSetting
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from llm_orchestrator.models.errors.errors_models import ErrorCode
 from llm_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
@@ -67,7 +66,7 @@ def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
     elif isinstance(setting, AzureOpenAILLMSetting):
         return AzureOpenAILLMFactory(setting=setting)
     else:
-        raise GenAIOrchestratorException(ErrorCode.E10)
+        raise GenAIUnknownProviderSettingException()
 
 
 def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
@@ -76,7 +75,7 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
     elif isinstance(setting, AzureOpenAIEMSetting):
         return AzureOpenAIEMFactory(setting=setting)
     else:
-        raise GenAIOrchestratorException(ErrorCode.E10)
+        raise GenAIUnknownProviderSettingException()
 
 
 def get_vector_store_factory(

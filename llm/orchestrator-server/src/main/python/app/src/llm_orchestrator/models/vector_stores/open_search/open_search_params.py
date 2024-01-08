@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import Literal
+from typing import List, Literal
 
 from pydantic import BaseModel, Field
 
@@ -39,7 +39,7 @@ class OpenSearchParams(BaseVectorStoreSearchParams):
         default=4,
     )
     # https://opensearch.org/docs/latest/query-dsl/compound/bool/
-    filter: list[OpenSearchTermParams] = Field(
+    filter: List[OpenSearchTermParams] = Field(
         description='The OpenSearch boolean query filter. Logical "and" operator is applied.',
         examples=[[{'term': {'key_1': 'value_1'}}, {'term': {'key_2': 'value_2'}}]],
     )
