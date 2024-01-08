@@ -33,7 +33,7 @@ Options:
     -h --help   Show this screen
     --version   Show version
     -v          Verbose output for debugging (without this option, script will 
-                be silent but for errors)
+                be silent but for errors and the unique indexing session id)
 
 Index a ready-to-index CSV file contents into an OpenSearch vector database. 
 CSV columns are 'title'|'url'|'text'. 'text' will be chunked according to 
