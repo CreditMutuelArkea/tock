@@ -23,8 +23,8 @@ import ai.tock.iadvize.client.authenticationFailedError
 import ai.tock.iadvize.client.createApi
 import ai.tock.shared.injector
 import ai.tock.shared.provide
+import ai.tock.shared.security.credentials.CredentialsProvider
 import mu.KotlinLogging
-import security.credentials.CredentialsProvider
 import java.time.LocalDateTime
 import java.util.concurrent.atomic.AtomicReference
 
@@ -40,15 +40,7 @@ class IadvizeAuthenticationClient {
         const val DELAY_SECONDS = 5
     }
 
-    private val credentialsProvider: CredentialsProvider get() {
-        return try {
-            // Tries to load the service via dependency injection
-            injector.provide()
-        } catch (e: Exception) {
-            // If this fails, load the default service
-            EnvCredentialsProvider()
-        }
-    }
+    private val credentialsProvider: CredentialsProvider = injector.provide()
 
     internal var iadvizeApi: IadvizeApi = createApi(logger)
 

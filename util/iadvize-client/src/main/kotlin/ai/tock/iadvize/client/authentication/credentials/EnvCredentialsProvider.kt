@@ -20,8 +20,8 @@ import ai.tock.iadvize.client.IADVIZE_PASSWORD_AUTHENTICATION
 import ai.tock.iadvize.client.IADVIZE_USERNAME_AUTHENTICATION
 import ai.tock.iadvize.client.property
 import ai.tock.shared.security.credentials.Credentials
+import ai.tock.shared.security.credentials.CredentialsProvider
 import ai.tock.shared.security.credentials.CredentialsProviderType
-import security.credentials.CredentialsProvider
 
 class EnvCredentialsProvider : CredentialsProvider {
     override val type: CredentialsProviderType

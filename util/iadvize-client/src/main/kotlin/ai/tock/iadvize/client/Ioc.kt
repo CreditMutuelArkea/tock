@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2021 e-voyageurs technologies
+ * Copyright (C) 2017/2022 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.connector.web
+package ai.tock.iadvize.client
 
-import ai.tock.bot.connector.web.channel.ChannelDAO
-import ai.tock.bot.connector.web.channel.ChannelMongoDAO
-import ai.tock.shared.service.BotAdditionalModulesService
+import ai.tock.iadvize.client.authentication.credentials.EnvCredentialsProvider
+import ai.tock.shared.security.credentials.CredentialsProvider
 import com.github.salomonbrys.kodein.Kodein
 import com.github.salomonbrys.kodein.bind
 import com.github.salomonbrys.kodein.singleton
 
-val webConnectorModule = Kodein.Module {
-    bind<ChannelDAO>() with singleton { ChannelMongoDAO }
-}
 
-// used in file META-INF/services/ai.tock.shared.service.BotAdditionalModulesService
-class IOCModulesService : BotAdditionalModulesService {
-    override fun defaultModules() = setOf(webConnectorModule)
+val iAdvizeClientModule = Kodein.Module {
+    bind<CredentialsProvider>() with singleton { EnvCredentialsProvider() }
 }

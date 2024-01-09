@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package security.credentials
-
-import ai.tock.shared.security.credentials.Credentials
-import ai.tock.shared.security.credentials.CredentialsProviderType
+package ai.tock.shared.security.credentials
 
 interface CredentialsProvider {
     val type : CredentialsProviderType

@@ -22,9 +22,9 @@ import ai.tock.aws.secretmanager.dao.SecretDAO
 import ai.tock.shared.injector
 import ai.tock.shared.provide
 import ai.tock.shared.security.credentials.Credentials
+import ai.tock.shared.security.credentials.CredentialsProvider
 import ai.tock.shared.security.credentials.CredentialsProviderType
 import kotlinx.serialization.json.Json
-import security.credentials.CredentialsProvider
 
 /**
  * IAdvize credentials AWS provider
