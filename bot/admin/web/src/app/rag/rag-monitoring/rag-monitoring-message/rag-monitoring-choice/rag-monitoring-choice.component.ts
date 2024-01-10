@@ -7,7 +7,6 @@ import { Choice } from '../../../../shared/model/dialog-data';
   styleUrls: ['./rag-monitoring-choice.component.scss']
 })
 export class RagMonitoringChoiceComponent {
-
   @Input() choice: Choice;
 
   title(): String {
@@ -35,5 +34,4 @@ export class RagMonitoringChoiceComponent {
     }
     return r.trim();
   }
-
 }

@@ -28,14 +28,14 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
   pageSize: number = 10;
   mark: SearchMark;
 
-  dialogs:DialogReport[];
+  dialogs: DialogReport[];
 
   constructor(
     public state: StateService,
     private analytics: AnalyticsService,
     private botConfiguration: BotConfigurationService,
     private cd: ChangeDetectorRef,
-    private ragMonitoringService:RagMonitoringService
+    private ragMonitoringService: RagMonitoringService
   ) {}
 
   ngOnInit(): void {
@@ -50,7 +50,7 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
       } else {
         this.loading = false;
       }
-      this.cd.markForCheck()
+      this.cd.markForCheck();
     });
   }
 
@@ -90,20 +90,20 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
     });
   }
 
-  clearMessage(event:{dialog: DialogReport,message:BotMessage}){
-    const dialog = this.dialogs.find(d=>d===event.dialog)
-    let canClearDialog = true
-    dialog.actions.forEach(action=>{
-      if(action.isBot()){
-        if(!action.message["_validated"]&&!action.message["_signaled"]){
-          canClearDialog = false
+  clearMessage(event: { dialog: DialogReport; message: BotMessage }) {
+    const dialog = this.dialogs.find((d) => d === event.dialog);
+    let canClearDialog = true;
+    dialog.actions.forEach((action) => {
+      if (action.isBot()) {
+        if (!action.message['_validated'] && !action.message['_signaled']) {
+          canClearDialog = false;
         }
       }
-    })
+    });
 
-    if(canClearDialog){
-      this.dialogs = this.dialogs.filter(d=>d!==dialog)
-    }    
+    if (canClearDialog) {
+      this.dialogs = this.dialogs.filter((d) => d !== dialog);
+    }
   }
 
   refresh() {

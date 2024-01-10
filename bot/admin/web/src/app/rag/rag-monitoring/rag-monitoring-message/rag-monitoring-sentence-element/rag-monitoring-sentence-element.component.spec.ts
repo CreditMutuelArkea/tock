@@ -8,9 +8,8 @@ describe('RagMonitoringSentenceElementComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RagMonitoringSentenceElementComponent ]
-    })
-    .compileComponents();
+      declarations: [RagMonitoringSentenceElementComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RagMonitoringSentenceElementComponent);
     component = fixture.componentInstance;

@@ -8,7 +8,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 
 interface SignalementForm {
   reason: FormControl<string>;
-  comment: FormControl<string>
+  comment: FormControl<string>;
 }
 
 @Component({
@@ -18,19 +18,19 @@ interface SignalementForm {
 })
 export class RagMonitoringMessageComponent implements OnInit {
   destroy = new Subject();
-  
+
   @Input() dialog: DialogReport;
   @Input() action: ActionReport;
   @Input() message: BotMessage;
   @Input() isBot: boolean;
 
-  @Output() onClearMessage = new EventEmitter<{dialog: DialogReport,message:BotMessage}>()
+  @Output() onClearMessage = new EventEmitter<{ dialog: DialogReport; message: BotMessage }>();
 
   overlayRef: OverlayRef | null;
 
   @ViewChild('signalementMenu') signalementMenu: TemplateRef<any>;
 
-  constructor(private overlay: Overlay, private viewContainerRef: ViewContainerRef,private ragMonitoringService:RagMonitoringService) {
+  constructor(private overlay: Overlay, private viewContainerRef: ViewContainerRef, private ragMonitoringService: RagMonitoringService) {
     this.ragMonitoringService.communication.pipe(takeUntil(this.destroy)).subscribe((evt) => {
       if (evt.type === 'documentClick') {
         this.hideSignalementMenu();
@@ -41,8 +41,8 @@ export class RagMonitoringMessageComponent implements OnInit {
   ngOnInit(): void {}
 
   form = new FormGroup<SignalementForm>({
-    reason: new FormControl(undefined,[Validators.required]),
-    comment: new FormControl(undefined),
+    reason: new FormControl(undefined, [Validators.required]),
+    comment: new FormControl(undefined)
   });
 
   get reason(): FormControl {
@@ -53,18 +53,18 @@ export class RagMonitoringMessageComponent implements OnInit {
   }
 
   get canSubmit(): boolean {
-    return this.form.valid
+    return this.form.valid;
   }
-  
+
   validateAnswer() {
     this.message['_validated'] = true;
-    this.onClearMessage.emit({dialog:this.dialog,message:this.message})
+    this.onClearMessage.emit({ dialog: this.dialog, message: this.message });
   }
-  
+
   submitSignalAnswer() {
     this.message['_signaled'] = true;
-    this.hideSignalementMenu()
-    this.onClearMessage.emit({dialog:this.dialog,message:this.message})
+    this.hideSignalementMenu();
+    this.onClearMessage.emit({ dialog: this.dialog, message: this.message });
   }
 
   hideSignalementMenu(): void {
@@ -75,7 +75,7 @@ export class RagMonitoringMessageComponent implements OnInit {
     event.stopPropagation();
 
     this.ragMonitoringService.documentClick(event);
-    
+
     const positionStrategy = this.overlay
       .position()
       .flexibleConnectedTo(event.target as FlexibleConnectedPositionStrategyOrigin)

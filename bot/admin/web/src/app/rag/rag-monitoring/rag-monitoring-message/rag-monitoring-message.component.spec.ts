@@ -8,9 +8,8 @@ describe('RagMonitoringMessageComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ RagMonitoringMessageComponent ]
-    })
-    .compileComponents();
+      declarations: [RagMonitoringMessageComponent]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RagMonitoringMessageComponent);
     component = fixture.componentInstance;
