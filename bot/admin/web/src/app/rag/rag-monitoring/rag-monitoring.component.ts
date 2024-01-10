@@ -50,6 +50,7 @@ export class RagMonitoringComponent implements OnInit, OnDestroy {
       } else {
         this.loading = false;
       }
+      this.cd.markForCheck()
     });
   }
 

@@ -1,15 +1,31 @@
-<!-- <tock-debug-json-iterator [data]="message"></tock-debug-json-iterator> -->
+<!--
+  ~ Copyright (C) 2017/2021 e-voyageurs technologies
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 
 <div class="d-flex gap-1">
   <img
     *ngIf="!isBot"
     src="assets/images/scenario-client.svg"
     class="avatar align-self-start"
+    nbTooltip="{{ action.date | date: 'y/MM/dd HH:mm:ss' }}"
   />
   <img
     *ngIf="isBot"
     src="assets/images/scenario-bot.svg"
     class="avatar align-self-start"
+    nbTooltip="{{ action.date | date: 'y/MM/dd HH:mm:ss' }}"
   />
 
   <div
@@ -21,25 +37,21 @@
       <div *ngIf="message.isSentence()">
         <tock-rag-monitoring-sentence [sentence]="message"></tock-rag-monitoring-sentence>
       </div>
-
       <div *ngIf="message.isAttachment()">
         <tock-rag-monitoring-attachement [attachment]="message"></tock-rag-monitoring-attachement>
       </div>
       <div *ngIf="message.isChoice()">
-        choice
-        <tock-bot-message-choice
-          [choice]="message"
-          [user]="user"
-          (sendMessage)="sendReply($event)"
-        ></tock-bot-message-choice>
+        <tock-rag-monitoring-choice [choice]="message"></tock-rag-monitoring-choice>
       </div>
       <div *ngIf="message.isLocation()">
-        location
-        <tock-bot-message-location [location]="message"></tock-bot-message-location>
+        <tock-rag-monitoring-location [location]="message"></tock-rag-monitoring-location>
       </div>
     </div>
 
-    <div *ngIf="isBot" class="d-flex align-items-center">
+    <div
+      *ngIf="isBot"
+      class="d-flex align-items-center"
+    >
       <button
         nbButton
         ghost
@@ -69,15 +81,23 @@
 </div>
 
 <ng-template #signalementMenu>
-  <section class="signalement-menu pt-1" (click)="$event.stopPropagation();">
-    <form [formGroup]="form" (submit)="submitSignalAnswer">
-      <nb-radio-group formControlName="reason"
-      name="reason">
+  <section
+    class="signalement-menu pt-1"
+    (click)="$event.stopPropagation()"
+  >
+    <form
+      [formGroup]="form"
+      (submit)="(submitSignalAnswer)"
+    >
+      <nb-radio-group
+        formControlName="reason"
+        name="reason"
+      >
         <nb-radio value="inappropriate"> Inappropriate or incorrect response </nb-radio>
         <nb-radio value="incomplete"> Incomplete or confused response </nb-radio>
         <nb-radio value="incorrect"> Response based on incorrect or out-of-date information </nb-radio>
       </nb-radio-group>
-  
+
       <textarea
         nbInput
         fullWidth
@@ -86,7 +106,7 @@
         class="mt-2"
         formControlName="comment"
       ></textarea>
-  
+
       <button
         type="button"
         status="primary"
@@ -98,7 +118,7 @@
       >
         Submit
       </button>
-  
+
       <button
         type="button"
         status="basic"

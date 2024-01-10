@@ -15,66 +15,42 @@
   -->
 
 <div *ngIf="element">
-  <table *ngIf="element.subElements.length !== 0">
-    <tr>
-      <td *ngFor="let e of element.subElements">
-        <table>
-          <tr *ngFor="let a of e.attachments">
-            <td>
-              <tock-rag-monitoring-attachement [attachment]="a"></tock-rag-monitoring-attachement>
-            </td>
-          </tr>
-          <tr *ngFor="let l of e.locations">
-            <td>
-              <tock-bot-message-location [location]="l"></tock-bot-message-location>
-            </td>
-          </tr>
-          <tr *ngFor="let entry of e.texts | keyvalue">
-            <td>
-              <span class="text">{{ entry.value }}</span>
-              <span class="text-category">({{ entry.key }})</span>
-            </td>
-          </tr>
-          <tr *ngIf="e.choices.length !== 0">
-            <td>
-              <tock-bot-message-choice
-                *ngFor="let c of e.choices"
-                [choice]="c"
-                [user]="user"
-                (sendMessage)="reply($event)"
-              ></tock-bot-message-choice>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-
-  <table *ngIf="!element.isEmptyElement()">
-    <tr *ngFor="let a of element.attachments">
-      <td>
+  <ng-container *ngIf="element.subElements.length !== 0">
+    <ng-container *ngFor="let e of element.subElements">
+      <div *ngFor="let entry of e.texts | keyvalue">
+        <span class="text">{{ entry.value }}</span>
+        <span class="text-category">({{ entry.key }})</span>
+      </div>
+      <div *ngFor="let a of e.attachments">
         <tock-rag-monitoring-attachement [attachment]="a"></tock-rag-monitoring-attachement>
-      </td>
-    </tr>
-    <tr *ngFor="let l of element.locations">
-      <td>
-        <tock-bot-message-location [location]="l"></tock-bot-message-location>
-      </td>
-    </tr>
-    <tr *ngFor="let entry of element.texts | keyvalue">
-      <td>
-        {{ entry.value }} <span class="text-category">({{ entry.key }})</span>
-      </td>
-    </tr>
-    <tr *ngIf="element.choices.length !== 0">
-      <td>
-        <tock-bot-message-choice
-          *ngFor="let c of element.choices"
+      </div>
+      <div *ngFor="let l of e.locations">
+        <tock-rag-monitoring-location [location]="l"></tock-rag-monitoring-location>
+      </div>
+      <div *ngIf="e.choices.length !== 0">
+        <tock-rag-monitoring-choice
+          *ngFor="let c of e.choices"
           [choice]="c"
-          [user]="user"
-          (sendMessage)="reply($event)"
-        ></tock-bot-message-choice>
-      </td>
-    </tr>
-  </table>
+        ></tock-rag-monitoring-choice>
+      </div>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="!element.isEmptyElement()">
+    <div *ngFor="let entry of element.texts | keyvalue">
+      {{ entry.value }}
+    </div>
+    <div *ngFor="let a of element.attachments">
+      <tock-rag-monitoring-attachement [attachment]="a"></tock-rag-monitoring-attachement>
+    </div>
+    <div *ngFor="let l of element.locations">
+      <tock-rag-monitoring-location [location]="l"></tock-rag-monitoring-location>
+    </div>
+    <div *ngIf="element.choices.length !== 0">
+      <tock-rag-monitoring-choice
+        *ngFor="let c of element.choices"
+        [choice]="c"
+      ></tock-rag-monitoring-choice>
+    </div>
+  </ng-container>
 </div>

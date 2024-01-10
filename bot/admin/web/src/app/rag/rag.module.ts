@@ -38,6 +38,7 @@ import { RagMonitoringSentenceComponent } from './rag-monitoring/rag-monitoring-
 import { RagMonitoringSentenceElementComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-sentence-element/rag-monitoring-sentence-element.component';
 import { RagMonitoringAttachementComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-attachement/rag-monitoring-attachement.component';
 import { RagMonitoringLocationComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-location/rag-monitoring-location.component';
+import { RagMonitoringChoiceComponent } from './rag-monitoring/rag-monitoring-message/rag-monitoring-choice/rag-monitoring-choice.component';
 
 @NgModule({
   imports: [
@@ -77,7 +78,8 @@ import { RagMonitoringLocationComponent } from './rag-monitoring/rag-monitoring-
     RagMonitoringSentenceComponent,
     RagMonitoringSentenceElementComponent,
     RagMonitoringAttachementComponent,
-    RagMonitoringLocationComponent
+    RagMonitoringLocationComponent,
+    RagMonitoringChoiceComponent
   ],
   providers: [SourceManagementService, SourceManagementApiService]
 })

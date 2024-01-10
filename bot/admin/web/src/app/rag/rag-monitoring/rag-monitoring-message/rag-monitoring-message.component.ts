@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { BotMessage, DialogReport } from '../../../shared/model/dialog-data';
+import { ActionReport, BotMessage, DialogReport } from '../../../shared/model/dialog-data';
 import { FlexibleConnectedPositionStrategyOrigin, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 import { RagMonitoringService } from '../rag-monitoring.service';
@@ -20,6 +20,7 @@ export class RagMonitoringMessageComponent implements OnInit {
   destroy = new Subject();
   
   @Input() dialog: DialogReport;
+  @Input() action: ActionReport;
   @Input() message: BotMessage;
   @Input() isBot: boolean;
 

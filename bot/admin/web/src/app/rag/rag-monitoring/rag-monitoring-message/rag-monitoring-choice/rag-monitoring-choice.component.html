@@ -14,12 +14,12 @@
   ~ limitations under the License.
   -->
 
-<div *ngIf="sentence.text">
-  {{ sentence.text }}
-</div>
-
-<div *ngIf="!sentence.text">
-  <div *ngFor="let element of sentence.messages">
-    <tock-rag-monitoring-sentence-element [element]="element"></tock-rag-monitoring-sentence-element>
-  </div>
-</div>
+<button
+  nbButton
+  status="{{ url() ? 'warning' : 'primary' }}"
+  [nbTooltip]="title() ? title() + ' - ' + parameters() : parameters()"
+  class="mr-1"
+>
+  <span *ngIf="title()">{{ title() }}</span>
+  <span *ngIf="!title()">{{ choice.intentName }}</span>
+</button>
