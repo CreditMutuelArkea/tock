@@ -38,9 +38,9 @@ class OpenSearchParams(BaseVectorStoreSearchParams):
         examples=[3],
         default=4,
     )
-    # https://opensearch.org/docs/latest/query-dsl/compound/bool/
     filter: List[OpenSearchTermParams] = Field(
-        description='The OpenSearch boolean query filter. Logical "and" operator is applied.',
+        description='The OpenSearch boolean query filter. Logical "and" operator is applied. For more information, '
+                    'see : https://opensearch.org/docs/latest/query-dsl/compound/bool/',
         examples=[[{'term': {'key_1': 'value_1'}}, {'term': {'key_2': 'value_2'}}]],
     )
 

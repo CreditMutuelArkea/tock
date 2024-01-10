@@ -82,7 +82,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
             'question': query.question,
             'chat_history': message_history.messages,
         },
-        callbacks=([], [records_callback_handler])[debug],
+        callbacks=[records_callback_handler] if debug else [],
     )
 
     return RagResponse(
@@ -99,5 +99,5 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                 )
             ),
         ),
-        debug=(None, records_callback_handler.show_records())[debug],
+        debug=records_callback_handler.show_records() if debug else None,
     )
