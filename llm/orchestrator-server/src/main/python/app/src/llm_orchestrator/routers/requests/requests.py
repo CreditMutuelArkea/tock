@@ -48,11 +48,9 @@ class RagQuery(BaseModel):
     question_answering_llm_setting: LLMSetting = Field(
         description='LLM setting, used to perform a QA Prompt.'
     )
-    question_answering_prompt_inputs: Any = (
-        Field(
-            description='Key-value inputs for the llm prompt when used as a template. Please note that the '
-                        'chat_history field must not be specified here, it will be override by the history field',
-        ),
+    question_answering_prompt_inputs: Any = Field(
+        description='Key-value inputs for the llm prompt when used as a template. Please note that the '
+        'chat_history field must not be specified here, it will be override by the history field',
     )
     embedding_question_em_setting: EMSetting = Field(
         description="Embedding model setting, used to calculate the user's question vector."
@@ -65,24 +63,21 @@ class RagQuery(BaseModel):
     )
 
     model_config = {
-        "json_schema_extra": {
+        'json_schema_extra': {
             'examples': [
                 {
-                    "history": [
+                    'history': [
+                        {'text': 'Hello, how can I do this?', 'type': 'HUMAN'},
                         {
-                            "text": "Hello, how can I do this?",
-                            "type": "HUMAN"
+                            'text': 'you can do this with the following method ....',
+                            'type': 'AI',
                         },
-                        {
-                            "text": "you can do this with the following method ....",
-                            "type": "AI"
-                        }
                     ],
-                    "question_answering_llm_setting": {
-                        "provider": "OpenAI",
-                        "api_key": "ab7***************************A1IV4B",
-                        "temperature": 1.2,
-                        "prompt": """Use the following context to answer the question at the end.
+                    'question_answering_llm_setting': {
+                        'provider': 'OpenAI',
+                        'api_key': 'ab7***************************A1IV4B',
+                        'temperature': 1.2,
+                        'prompt': """Use the following context to answer the question at the end.
 If you don't know the answer, just say {no_answer}.
 
 Context:
@@ -92,27 +87,30 @@ Question:
 {question}
 
 Answer in {locale}:""",
-                        "model": "gpt-3.5-turbo"
+                        'model': 'gpt-3.5-turbo',
                     },
-                    "question_answering_prompt_inputs": {
+                    'question_answering_prompt_inputs': {
                         'question': 'How to get started playing guitar ?',
                         'no_answer': 'Sorry, I don' 't know.',
-                        'locale': 'French'
+                        'locale': 'French',
                     },
-                    "embedding_question_em_setting": {
-                        "provider": "OpenAI",
-                        "api_key": "ab7***************************A1IV4B",
-                        "model": "text-embedding-ada-002"
+                    'embedding_question_em_setting': {
+                        'provider': 'OpenAI',
+                        'api_key': 'ab7***************************A1IV4B',
+                        'model': 'text-embedding-ada-002',
                     },
-                    "document_index_name": "my-index-name",
-                    "document_search_params": {
-                        "filter": {
-                            "term": {
-                                "metadata.index_session_id.keyword": "352d2466-17c5-4250-ab20-d7c823daf035"
+                    'document_index_name': 'my-index-name',
+                    'document_search_params': {
+                        'provider': 'OpenSearch',
+                        'filter': [
+                            {
+                                'term': {
+                                    'metadata.index_session_id.keyword': '352d2466-17c5-4250-ab20-d7c823daf035'
+                                }
                             }
-                        },
-                        "k": 4
-                    }
+                        ],
+                        'k': 4,
+                    },
                 }
             ]
         }

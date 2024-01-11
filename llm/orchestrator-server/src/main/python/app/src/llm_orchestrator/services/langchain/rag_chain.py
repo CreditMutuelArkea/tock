@@ -16,7 +16,7 @@ import logging
 import re
 from logging import ERROR, WARNING
 
-from langchain.chains import ConversationalRetrievalChain
+from langchain.chains import ConversationalRetrievalChain, LLMChain
 from langchain.memory import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
 
@@ -29,6 +29,7 @@ from llm_orchestrator.errors.handlers.openai.openai_exception_handler import (
 from llm_orchestrator.errors.handlers.opensearch.opensearch_exception_handler import (
     opensearch_exception_handler,
 )
+from llm_orchestrator.models.errors.errors_models import ErrorInfo
 from llm_orchestrator.models.rag.rag_models import (
     ChatMessageType,
     Footnote,
@@ -62,7 +63,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         index_name=query.document_index_name,
     )
 
-    chat = ConversationalRetrievalChain.from_llm(
+    conversational_retrieval_chain = ConversationalRetrievalChain.from_llm(
         llm=llm_factory.get_language_model(),
         retriever=vector_store_factory.get_vector_store().as_retriever(
             search_kwargs=query.document_search_params.to_dict()
@@ -91,9 +92,9 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         'chat_history': message_history.messages,
     }
 
-    response = chat(
-        inputs=inputs,
-        callbacks=[records_callback_handler] if debug else [],
+    response = conversational_retrieval_chain.invoke(
+        input=inputs,
+        config={'callbacks': [records_callback_handler] if debug else []},
     )
 
     # RAG Guard
