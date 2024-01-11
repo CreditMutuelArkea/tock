@@ -15,7 +15,7 @@ import { FaqManagementEditComponent } from './faq-management-edit/faq-management
 import { FaqManagementSettingsComponent } from './faq-management-settings/faq-management-settings.component';
 import { Pagination } from '../../shared/components';
 
-export type FaqDefinitionExtended = FaqDefinition & { _initUtterance?: string };
+export type FaqDefinitionExtended = FaqDefinition & { _initUtterance?: string; _initAnswer?: string };
 
 @Component({
   selector: 'tock-faq-management',
@@ -45,6 +45,7 @@ export class FaqManagementComponent implements OnInit, OnDestroy {
   };
 
   initUtterance: string;
+  initAnswer: string;
 
   constructor(
     private botConfiguration: BotConfigurationService,
@@ -54,6 +55,7 @@ export class FaqManagementComponent implements OnInit, OnDestroy {
     private router: Router
   ) {
     this.initUtterance = this.router.getCurrentNavigation().extras?.state?.question;
+    this.initAnswer = this.router.getCurrentNavigation().extras?.state?.answer;
   }
 
   ngOnInit(): void {
@@ -64,10 +66,13 @@ export class FaqManagementComponent implements OnInit, OnDestroy {
         this.search();
         this.closeSidePanel();
 
-        if (this.initUtterance) {
+        if (this.initUtterance || this.initAnswer) {
           let initUtterance = this.initUtterance;
           this.initUtterance = undefined;
-          this.addFaq(initUtterance);
+
+          let initAnswer = this.initAnswer;
+          this.initAnswer = undefined;
+          this.addFaq(initUtterance, initAnswer);
         }
       }
     });
@@ -201,7 +206,7 @@ export class FaqManagementComponent implements OnInit, OnDestroy {
     }
   }
 
-  addFaq(initUtterance?: string) {
+  addFaq(initUtterance?: string, initAnswer?: string) {
     this.faqEdit = {
       id: undefined,
       intentId: undefined,
@@ -217,6 +222,10 @@ export class FaqManagementComponent implements OnInit, OnDestroy {
 
     if (initUtterance) {
       this.faqEdit._initUtterance = initUtterance;
+    }
+
+    if (initAnswer) {
+      this.faqEdit._initAnswer = initAnswer;
     }
 
     this.isSidePanelOpen.edit = true;

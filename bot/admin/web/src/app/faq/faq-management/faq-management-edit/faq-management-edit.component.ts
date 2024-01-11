@@ -131,9 +131,21 @@ export class FaqManagementEditComponent implements OnChanges {
             delete faq._initUtterance;
           });
         }
+
+        if (faq._initAnswer) {
+          this.form.markAsDirty();
+          this.form.markAsTouched();
+
+          this.setCurrentTab({ tabTitle: FaqTabs.ANSWER } as NbTabComponent);
+
+          setTimeout(() => {
+            this.answer.setValue(faq._initAnswer);
+            delete faq._initAnswer;
+          });
+        }
       }
 
-      if (!faq.id && !faq._initUtterance) {
+      if (!faq.id && !faq._initUtterance && !faq._initAnswer) {
         this.setCurrentTab({ tabTitle: FaqTabs.INFO } as NbTabComponent);
       }
     }
@@ -235,7 +247,9 @@ export class FaqManagementEditComponent implements OnChanges {
                 this.form.markAsDirty();
                 setTimeout(() => {
                   this.addUtteranceInput?.nativeElement.focus();
-                  this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
+                  if (this.utterancesListWrapper) {
+                    this.utterancesListWrapper.nativeElement.scrollTop = this.utterancesListWrapper.nativeElement.scrollHeight;
+                  }
                 });
               }
               this.lookingForSameUterranceInOtherInent = false;
@@ -245,7 +259,8 @@ export class FaqManagementEditComponent implements OnChanges {
             }
           });
       }
-      this.addUtteranceInput.nativeElement.value = '';
+
+      if (this.addUtteranceInput) this.addUtteranceInput.nativeElement.value = '';
     }
   }
 
