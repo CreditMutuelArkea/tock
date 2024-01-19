@@ -9,26 +9,31 @@ client = TestClient(app)
 urls_prefix='/em-providers'
 
 def test_get_all_em_providers():
+    """Test getting all embeddings providers."""
     response = client.get(f"{urls_prefix}")
     assert response.status_code == 200
     assert len(response.json()) == len(EMProvider)
 
 def test_get_em_provider_by_id():
+    """Test getting provider by id (use first provider listed provider class)."""
     response = client.get(f"{urls_prefix}/{list(EMProvider)[0]}")
     assert response.status_code == 200
     assert response.json()['provider'] == list(EMProvider)[0]
 
 def test_get_em_provider_by_id_wrong_id():
+    """Test getting provider by id, with an id that does not exist."""
     response = client.get(f"{urls_prefix}/wrong_id")
     assert response.status_code == 400
     assert response.json()['message'] == ErrorMessages().get_message(ErrorCode.AI_PROVIDER_UNKNOWN).message
 
 def test_get_em_provider_setting_by_id():
+    """Test getting provider setting example for id (use first provider listed provider class)."""
     response = client.get(f"{urls_prefix}/{list(EMProvider)[0]}/setting/example")
     assert response.status_code == 200
     assert response.json()['provider'] == list(EMProvider)[0]
 
 def test_check_em_provider_setting():
+    """Test checking a provider setting (use example for checking)."""
     response = client.get(f"{urls_prefix}/{list(EMProvider)[0]}/setting/example")
     data = {
         "setting": response.json()

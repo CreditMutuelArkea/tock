@@ -1,17 +1,28 @@
+from langchain_core.documents import Document
 from llm_orchestrator.services.langchain.callbacks.retriever_json_callback_handler import RetrieverJsonCallbackHandler
-
 
 def test_retriever_json_callback_handler_on_chain_start():
     """Check records are added (in the correct entries)"""
     handler = RetrieverJsonCallbackHandler()
     _inputs={
-        'input_documents': [],
+        'input_documents': [Document(page_content='some page content', metadata={'some meta': 'some meta value'})],
         'question' : "What is happening?",
         'chat_history': []
     }
     handler.on_chain_start(serialized={}, inputs=_inputs)
-    assert handler.records['on_chain_start_records'][0]['event_name'] == 'on_chain_start'
-    assert handler.records['action_records'][0]['event_name'] == 'on_chain_start'
+    expected_json_data = {
+        'event_name': 'on_chain_start',
+        'inputs': {
+            'input_documents': [{
+                'page_content': 'some page content',
+                'metadata': {'some meta': 'some meta value'}
+            }],
+            'question': _inputs['question'],
+            'chat_history': _inputs['chat_history'],
+        },
+    }
+    assert handler.records['on_chain_start_records'][0] == expected_json_data
+    assert handler.records['action_records'][0] == expected_json_data
 
 def test_retriever_json_callback_handler_on_chain_end():
     """Check records are added (in the correct entries)"""
@@ -20,12 +31,17 @@ def test_retriever_json_callback_handler_on_chain_end():
         'text': 'This is what is happening',
     }
     handler.on_chain_end(outputs=_outputs)
-    assert handler.records['on_chain_end_records'][0]['event_name'] == 'on_chain_end'
-    assert handler.records['action_records'][0]['event_name'] == 'on_chain_end'
+    expected_json_data = {'event_name': 'on_chain_end', 'output': 'This is what is happening'}
+    assert handler.records['on_chain_end_records'][0] == expected_json_data
+    assert handler.records['action_records'][0] == expected_json_data
 
 def test_retriever_json_callback_handler_on_text():
     """Check records are added (in the correct entries)"""
     handler = RetrieverJsonCallbackHandler()
     handler.on_text(text='Some text arrives')
-    assert handler.records['on_text_records'][0]['event_name'] == 'on_text'
-    assert handler.records['action_records'][0]['event_name'] == 'on_text'
+    expected_json_data = {
+            'event_name': 'on_text',
+            'text': 'Some text arrives',
+        }
+    assert handler.records['on_text_records'][0] == expected_json_data
+    assert handler.records['action_records'][0] == expected_json_data
