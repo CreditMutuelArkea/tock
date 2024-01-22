@@ -68,7 +68,7 @@ Answer in {locale}:""",
         },
         'question_answering_prompt_inputs': {
             'question': 'How to get started playing guitar ?',
-            'no_answer': 'Sorry, I don' 't know.',
+            'no_answer': "Sorry, I don't know.",
             'locale': 'French',
         },
         'embedding_question_em_setting': {
