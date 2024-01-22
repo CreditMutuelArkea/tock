@@ -139,7 +139,7 @@ object BotAdminService {
             script: ScriptAnswerVersionedConfigurationDump,
             compile: Boolean
         ): ScriptAnswerVersionedConfiguration {
-            return if (compile && !KotlinCompilerClient.compilerDisabled) {
+            return if (compile && !KotlinCompilerClient.compilerDai.tock.llm.orchestrator.clientisabled) {
                 val fileName = "T${Dice.newId()}.kt"
                 val result = KotlinCompilerClient.compile(KotlinFile(script.script, fileName))
                 if (result?.compilationResult == null) {
