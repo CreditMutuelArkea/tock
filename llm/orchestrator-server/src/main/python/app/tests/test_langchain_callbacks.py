@@ -24,6 +24,47 @@ def test_retriever_json_callback_handler_on_chain_start():
     assert handler.records['on_chain_start_records'][0] == expected_json_data
     assert handler.records['action_records'][0] == expected_json_data
 
+def test_retriever_json_callback_handler_on_chain_start_no_double_entries():
+    """Check records are added only once in history."""
+    handler = RetrieverJsonCallbackHandler()
+    _inputs={
+        'input_documents': [Document(page_content='some page content', metadata={'some meta': 'some meta value'})],
+        'question' : "What is happening?",
+        'chat_history': []
+    }
+    handler.on_chain_start(serialized={}, inputs=_inputs)
+    expected_json_data = {
+        'event_name': 'on_chain_start',
+        'inputs': {
+            'input_documents': [{
+                'page_content': 'some page content',
+                'metadata': {'some meta': 'some meta value'}
+            }],
+            'question': _inputs['question'],
+            'chat_history': _inputs['chat_history'],
+        },
+    }
+    assert expected_json_data in handler.records['on_chain_start_records']
+    assert expected_json_data in handler.records['action_records']
+    assert len(handler.records['on_chain_start_records']) == 1
+    assert len(handler.records['action_records']) == 1
+    handler.on_chain_start(serialized={}, inputs=_inputs)
+    assert expected_json_data in handler.records['on_chain_start_records']
+    assert expected_json_data in handler.records['action_records']
+    assert len(handler.records['on_chain_start_records']) == 1
+    assert len(handler.records['action_records']) == 1
+
+def test_retriever_json_callback_handler_on_chain_start_no_inputs():
+    """Check no records are added if none are present in chain inputs."""
+    handler = RetrieverJsonCallbackHandler()
+    _inputs={
+        'question' : "What is happening?",
+        'chat_history': []
+    }
+    handler.on_chain_start(serialized={}, inputs=_inputs)
+    assert len(handler.records['on_chain_start_records']) == 0
+    assert len(handler.records['action_records']) == 0
+
 def test_retriever_json_callback_handler_on_chain_end():
     """Check records are added (in the correct entries)"""
     handler = RetrieverJsonCallbackHandler()
