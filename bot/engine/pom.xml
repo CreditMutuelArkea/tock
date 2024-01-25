@@ -33,10 +33,10 @@
             <groupId>ai.tock</groupId>
             <artifactId>tock-shared</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.hubspot.jinjava</groupId>
-            <artifactId>jinjava</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.hubspot.jinjava</groupId>-->
+<!--            <artifactId>jinjava</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>tock-llm-orchestrator-client</artifactId>
@@ -94,6 +94,10 @@
             <artifactId>vertx-codegen</artifactId>
             <version>${vertx}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-bot-admin-server</artifactId>
         </dependency>
     </dependencies>
 

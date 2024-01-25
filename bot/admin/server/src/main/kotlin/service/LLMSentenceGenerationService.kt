@@ -17,9 +17,8 @@
 package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.BotAdminService
-import ai.tock.bot.admin.bot.LLMSentenceGenerationConfigurationDAO
-import ai.tock.bot.admin.bot.llm.LLMSentenceGenerationConfiguration
-import ai.tock.bot.admin.bot.llm.LLMSentenceGenerationValidationService
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfiguration
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfigurationDAO
 import ai.tock.bot.admin.model.LLMSentenceGenerationConfigurationDTO
 import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.injector

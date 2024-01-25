@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.bot.llm
+package admin.bot.rag
 
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.llm.orchestrator.core.models.em.EMSetting

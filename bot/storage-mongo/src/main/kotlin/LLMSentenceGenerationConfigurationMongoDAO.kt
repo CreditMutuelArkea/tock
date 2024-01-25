@@ -18,8 +18,8 @@ package ai.tock.bot.mongo
 
 import ai.tock.bot.admin.bot.BotApplicationConfiguration_.Companion.BotId
 import ai.tock.bot.admin.bot.BotApplicationConfiguration_.Companion.Namespace
-import ai.tock.bot.admin.bot.LLMSentenceGenerationConfigurationDAO
-import ai.tock.bot.admin.bot.llm.LLMSentenceGenerationConfiguration
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfigurationDAO
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfiguration
 import ai.tock.bot.mongo.MongoBotConfiguration.asyncDatabase
 import ai.tock.bot.mongo.MongoBotConfiguration.database
 import ai.tock.shared.ensureUniqueIndex

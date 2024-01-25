@@ -16,7 +16,7 @@
 
 package ai.tock.bot.admin.bot.rag
 
-import ai.tock.bot.admin.bot.llm.BotRagConfiguration
+import admin.bot.rag.BotRagConfiguration
 import org.litote.kmongo.Id
 
 interface BotRagConfigurationDAO {

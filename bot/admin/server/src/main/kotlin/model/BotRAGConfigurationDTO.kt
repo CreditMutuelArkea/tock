@@ -16,7 +16,7 @@
 
 package ai.tock.bot.admin.model
 
-import ai.tock.bot.admin.bot.llm.BotRagConfiguration
+import admin.bot.rag.BotRagConfiguration
 import ai.tock.llm.orchestrator.core.models.em.EMSetting
 import ai.tock.llm.orchestrator.core.models.llm.LLMSetting
 import org.litote.kmongo.newId

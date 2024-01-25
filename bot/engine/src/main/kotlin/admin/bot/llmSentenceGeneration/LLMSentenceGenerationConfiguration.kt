@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.bot
+package ai.tock.bot.admin.bot.llmSentenceGeneration
 
-import ai.tock.bot.admin.bot.llm.LLMSentenceGenerationConfiguration
+
+import ai.tock.llm.orchestrator.core.models.llm.LLMSetting
 import org.litote.kmongo.Id
 
-interface LLMSentenceGenerationConfigurationDAO {
+data class LLMSentenceGenerationConfiguration(
+    val _id: Id<LLMSentenceGenerationConfiguration>,
+    val namespace: String,
+    val botId: String,
+    val indexSessionId: String? = null,
+    val enabled: Boolean = true,
+    val llmSetting: LLMSetting,
+) {
 
-    fun listenChanges(listener: () -> Unit)
-
-    fun save(conf: LLMSentenceGenerationConfiguration): LLMSentenceGenerationConfiguration
-
-    fun findByNamespaceAndBotId(namespace: String, botId: String): LLMSentenceGenerationConfiguration?
-
-    fun delete(id: Id<LLMSentenceGenerationConfiguration>)
 }

@@ -20,11 +20,18 @@ package ai.tock.bot.admin.bot.llm
 import ai.tock.bot.admin.bot.llm.settings.LLMSetting
 import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAILLMSetting
 import ai.tock.bot.admin.bot.llm.settings.azureopenai.AzureOpenAIVersion
+import ai.tock.bot.admin.requests.LLMProviderSettingStatusQuery
 import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILLMSetting
 import ai.tock.bot.admin.bot.llm.settings.openai.OpenAILanguageModel
-
+import ai.tock.bot.admin.service.LLMProviderService
+import ai.tock.shared.exception.error.ErrorMessage
+import ai.tock.shared.injector
+import ai.tock.shared.provide
+import com.hubspot.jinjava.Jinjava
+import java.util.HashMap
 object LLMSentenceGenerationValidationService {
 
+    private val llmProviderService: LLMProviderService get() = injector.provide()
     // TODO MASS : improve the validation. Workshop ?
     fun validate(llmSentenceGenerationConfig: LLMSentenceGenerationConfiguration): Set<String> =
         validateLLMSetting(llmSentenceGenerationConfig.llmSetting)
@@ -55,7 +62,7 @@ object LLMSentenceGenerationValidationService {
 
     private fun validate(setting: LLMSetting): Set<String> {
         val errors = mutableSetOf<String>()
-        //val template = JinjaTemplate(setting.prompt)
+        val jinjava = Jinjava()
 
         if(setting.apiKey.isBlank()) {
             errors.add("The API key is not provided")
@@ -72,13 +79,27 @@ object LLMSentenceGenerationValidationService {
 
 
 
+        val context = HashMap<String, Any>()
+
+        context["LOCAL"] = "French-FR"
+        context["NB_SENTENCES"] = "5 phraseS de TesTEs"
+
+        val renderedTemplate = jinjava.render(setting.prompt, context)
         if (setting.prompt.isBlank()) {
             errors.add("The prompt is not provided")
-        } /*else if ( template.local.isBlank()){
-            errors.add("The language is not provided" )
-        } else if ( template.sentences.isBlank()){
-            errors.add("The sentences is not provided" )
-        }*/
+        } else {
+            if (! renderedTemplate.contains("French-FR")){
+                errors.add("No LOCAL variable in the template " )
+            }
+            if ( ! renderedTemplate.contains("5 phraseS de TesTE")){
+                errors.add("No NB_SENTENCES variable in the template " )
+            }
+        }
+
+       errors.addAll( llmProviderService
+                            .checkSetting(LLMProviderSettingStatusQuery(setting))
+                            .getErrors("LLM setting check failed")
+            )
 
 
         return errors

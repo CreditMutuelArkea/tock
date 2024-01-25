@@ -16,8 +16,8 @@
 
 package ai.tock.bot.admin.model
 
-import ai.tock.bot.admin.bot.llm.LLMSentenceGenerationConfiguration
-import ai.tock.bot.admin.bot.llm.settings.LLMSetting
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfiguration
+import ai.tock.llm.orchestrator.core.models.llm.LLMSetting
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 
@@ -25,6 +25,7 @@ data class LLMSentenceGenerationConfigurationDTO(
     val id: String? = null,
     val namespace: String,
     val botId: String,
+    val indexSessionId: String? = null,
     val enabled: Boolean = false,
     val llmSetting: LLMSetting,
 ) {
@@ -32,6 +33,7 @@ data class LLMSentenceGenerationConfigurationDTO(
         configuration._id.toString(),
         configuration.namespace,
         configuration.botId,
+        configuration.indexSessionId,
         configuration.enabled,
         configuration.llmSetting,
     )
@@ -40,6 +42,7 @@ data class LLMSentenceGenerationConfigurationDTO(
             id?.toId() ?: newId(),
             namespace,
             botId,
+            indexSessionId = indexSessionId,
             enabled,
             llmSetting
         )

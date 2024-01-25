@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
-package ai.tock.bot.admin.service
+package ai.tock.bot.admin.bot.llmSentenceGeneration
 
-import ai.tock.bot.admin.requests.LLMProviderSettingStatusQuery
-import ai.tock.bot.admin.responses.ProviderSettingStatusResponse
+import org.litote.kmongo.Id
 
-interface LLMProviderService {
-    fun checkSetting(query: LLMProviderSettingStatusQuery): ProviderSettingStatusResponse?
+interface LLMSentenceGenerationConfigurationDAO {
+
+    fun listenChanges(listener: () -> Unit)
+
+    fun save(conf: LLMSentenceGenerationConfiguration): LLMSentenceGenerationConfiguration
+
+    fun findByNamespaceAndBotId(namespace: String, botId: String): LLMSentenceGenerationConfiguration?
+
+    fun delete(id: Id<LLMSentenceGenerationConfiguration>)
 }

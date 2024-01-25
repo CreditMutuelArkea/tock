@@ -16,42 +16,33 @@
 
 package ai.tock.bot.admin.service
 
-import admin.bot.rag.BotRagConfiguration
-import ai.tock.llm.orchestrator.client.requests.EMProviderSettingStatusQuery
-import ai.tock.llm.orchestrator.client.requests.LLMProviderSettingStatusQuery
+import ai.tock.bot.admin.bot.llmSentenceGeneration.LLMSentenceGenerationConfiguration
 import ai.tock.llm.orchestrator.client.responses.ProviderSettingStatusResponse
-import ai.tock.llm.orchestrator.client.services.EMProviderService
 import ai.tock.llm.orchestrator.client.services.LLMProviderService
+import ai.tock.llm.orchestrator.client.requests.LLMProviderSettingStatusQuery
 import ai.tock.shared.exception.error.ErrorMessage
 import ai.tock.shared.injector
 import ai.tock.shared.provide
-
-
-object RagValidationService {
+object LLMSentenceGenerationValidationService {
 
     private val llmProviderService: LLMProviderService get() = injector.provide()
-    private val emProviderService: EMProviderService get() = injector.provide()
 
 
-    fun validate(ragConfig: BotRagConfiguration): Set<ErrorMessage> {
+    fun validate(llmSentenceGenerationConfig: LLMSentenceGenerationConfiguration): Set<ErrorMessage> {
         return mutableSetOf<ErrorMessage>().apply {
             addAll(
                 llmProviderService
-                    .checkSetting(LLMProviderSettingStatusQuery(ragConfig.llmSetting))
+                    .checkSetting( LLMProviderSettingStatusQuery(llmSentenceGenerationConfig.llmSetting))
                     .getErrors("LLM setting check failed")
             )
-            addAll(
-                emProviderService
-                    .checkSetting(EMProviderSettingStatusQuery(ragConfig.emSetting))
-                    .getErrors("Embedding Model setting check failed")
-            )
-            addAll(validateIndexSessionId(ragConfig))
+
+            addAll(validateIndexSessionId(llmSentenceGenerationConfig))
         }
     }
 
-    private fun validateIndexSessionId(ragConfig: BotRagConfiguration): Set<ErrorMessage> {
+    private fun validateIndexSessionId(llmSentenceGenerationConfig: LLMSentenceGenerationConfiguration): Set<ErrorMessage> {
         val errors = mutableSetOf<ErrorMessage>()
-        if (ragConfig.enabled && ragConfig.indexSessionId.isNullOrBlank()) {
+        if (llmSentenceGenerationConfig.enabled && llmSentenceGenerationConfig.indexSessionId.isNullOrBlank()) {
             errors.add(
                 ErrorMessage(
                     message = "The index session ID is required to enable the RAG feature"

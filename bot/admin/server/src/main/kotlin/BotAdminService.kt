@@ -28,7 +28,7 @@ import ai.tock.bot.admin.answer.SimpleAnswerConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfiguration
 import ai.tock.bot.admin.bot.BotApplicationConfigurationDAO
 import ai.tock.bot.admin.bot.BotConfiguration
-import ai.tock.bot.admin.bot.llm.BotRagConfiguration
+import admin.bot.rag.BotRagConfiguration
 import ai.tock.bot.admin.bot.rag.BotRagConfigurationDAO
 import ai.tock.bot.admin.bot.BotVersion
 import ai.tock.bot.admin.dialog.ApplicationDialogFlowData
@@ -139,7 +139,7 @@ object BotAdminService {
             script: ScriptAnswerVersionedConfigurationDump,
             compile: Boolean
         ): ScriptAnswerVersionedConfiguration {
-            return if (compile && !KotlinCompilerClient.compilerDai.tock.llm.orchestrator.clientisabled) {
+            return if (compile && !KotlinCompilerClient.compilerDisabled) {
                 val fileName = "T${Dice.newId()}.kt"
                 val result = KotlinCompilerClient.compile(KotlinFile(script.script, fileName))
                 if (result?.compilationResult == null) {
