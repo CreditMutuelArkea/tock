@@ -210,7 +210,12 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  initForm(settings: RagSettings): void {
+  private getRagSettingsLoader(): Observable<RagSettings> {
+    const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
+    return this.rest.get<RagSettings>(url, (settings: RagSettings) => settings);
+  }
+
+  initForm(settings: RagSettings) {
     this.initFormSettings('llmSetting', settings.llmSetting.provider);
     this.initFormSettings('emSetting', settings.emSetting.provider);
     this.form.patchValue({
@@ -256,11 +261,7 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
         )
       )
       .pipe(take(1));
-  }
 
-  private getRagSettingsLoader(): Observable<RagSettings> {
-    const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
-    return this.rest.get<RagSettings>(url, (settings: RagSettings) => settings);
   }
 
   cancel(): void {
