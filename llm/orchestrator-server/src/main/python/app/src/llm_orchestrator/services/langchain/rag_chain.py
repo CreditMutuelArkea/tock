@@ -100,7 +100,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
 
     logger.debug(
         'RAG chain - Use RetrieverJsonCallbackHandler for debugging : %s',
-        'Yes' if debug else 'No',
+        debug,
     )
     records_callback_handler = RetrieverJsonCallbackHandler()
     response = conversational_retrieval_chain.invoke(

@@ -51,3 +51,4 @@ app.include_router(em_providers_router)
 app.include_router(rag_router)
 
 logger.info('Generative AI Orchestrator - Startup')
+logger.info('Generative AI Orchestrator - Startup - Debug logs enabled')

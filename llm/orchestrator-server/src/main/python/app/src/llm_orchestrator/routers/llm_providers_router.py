@@ -103,7 +103,7 @@ async def get_llm_provider_setting_by_id(
 async def check_llm_provider_setting(
     request: Request, provider_id: str, query: LLMProviderSettingStatusQuery
 ) -> ProviderSettingStatusResponse:
-    logger.info('Start LLM setting check')
+    logger.info('Start LLM setting check for provider %s', provider_id)
     # Query validation
     validate_query(request, provider_id, query.setting)
 
