@@ -79,7 +79,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
 
         with(botBus) {
             val ragConfig = botDefinition.ragConfiguration
-            if (response?.answer?.text == ragConfig?.noAnswerSentence) {
+            if (response?.answer?.text.equals(ragConfig?.noAnswerSentence, ignoreCase = true)) {
                 logger.info { "The RAG API response is equal to the configured no-answer sentence." }
                 val noAnswerStoryId = ragConfig?.noAnswerStoryId?.toString()
                 if (!noAnswerStoryId.isNullOrBlank()) {
