@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -11,8 +11,8 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-#   
-"""Index a ready-to-index CSV file ('title'|'url'|'text' lines) file contents 
+#
+"""Index a ready-to-index CSV file ('title'|'url'|'text' lines) file contents
 into an OpenSearch vector database.
 
 Usage:
@@ -22,52 +22,57 @@ Usage:
 
 Arguments:
     input_csv       path to the ready-to-index file
-    index_name      name of the OpenSearch index (shall follow indexes 
+    index_name      name of the OpenSearch index (shall follow indexes
                     naming rules)
     embeddings_cfg  path to an embeddings configuration file (JSON format)
-                    (shall describe settings for one of OpenAI or AzureOpenAI 
+                    (shall describe settings for one of OpenAI or AzureOpenAI
                     embeddings model)
     chunks_size     size of the embedded chunks of documents
 
 Options:
     -h --help   Show this screen
     --version   Show version
-    -v          Verbose output for debugging (without this option, script will 
+    -v          Verbose output for debugging (without this option, script will
                 be silent but for errors and the unique indexing session id)
 
-Index a ready-to-index CSV file contents into an OpenSearch vector database. 
-CSV columns are 'title'|'url'|'text'. 'text' will be chunked according to 
-chunks_size, and embedded using configuration described in embeddings_cfg (it 
-uses the embeddings constructor from the orchestrator module, so JSON file 
-shall follow corresponding format). Documents will be indexed in OpenSearch DB 
-under index_name index (index_name shall follow OpenSearch naming restrictions). 
-A unique indexing session id is produced and printed to the console (will be 
+Index a ready-to-index CSV file contents into an OpenSearch vector database.
+CSV columns are 'title'|'url'|'text'. 'text' will be chunked according to
+chunks_size, and embedded using configuration described in embeddings_cfg (it
+uses the embeddings constructor from the orchestrator module, so JSON file
+shall follow corresponding format). Documents will be indexed in OpenSearch DB
+under index_name index (index_name shall follow OpenSearch naming restrictions).
+A unique indexing session id is produced and printed to the console (will be
 the last line printed if the '-v' option is used).
 """
-from docopt import docopt
-import logging
-from pathlib import Path
-import sys
-
-from datetime import datetime
 import json
+import logging
+import sys
+from datetime import datetime
+from pathlib import Path
 from uuid import uuid4
 
+from docopt import docopt
 from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
+from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
+    AzureOpenAIEMSetting,
+)
 from llm_orchestrator.models.em.em_provider import EMProvider
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
-from llm_orchestrator.services.langchain.factories.langchain_factory import get_em_factory
-from llm_orchestrator.services.langchain.factories.vector_stores.vectore_store import VectorStore
-from llm_orchestrator.services.langchain.factories.langchain_factory import get_vector_store_factory
+from llm_orchestrator.models.vector_stores.vectore_store_provider import (
+    VectorStoreProvider,
+)
+from llm_orchestrator.services.langchain.factories.langchain_factory import (
+    get_em_factory,
+    get_vector_store_factory,
+)
 
 
 def index_documents(args):
     """
     Read a ready-to-index CSV file, then index its contents to an OpenSearch DB.
-    
+
     Args:
 
         args (dict):    A dictionary containing command-line arguments.
@@ -79,27 +84,32 @@ def index_documents(args):
     Returns:
         The indexing session unique id.
     """
-    # unique date / uuid for each indexing session (stored as metadata)
+    # unique date / uuid for each indexing session (stored as metadata)
     start_time = datetime.now()
-    formatted_datetime = start_time.strftime("%Y-%m-%d %H:%M:%S")
+    formatted_datetime = start_time.strftime('%Y-%m-%d %H:%M:%S')
     session_uuid = uuid4()
-    logging.debug(f"Beginning indexation session {session_uuid} at '{formatted_datetime}'")
+    logging.debug(
+        f"Beginning indexation session {session_uuid} at '{formatted_datetime}'"
+    )
 
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
-    csv_loader = CSVLoader(file_path=args['<input_csv>'], 
-                           source_column="url", 
-                           metadata_columns=("title","url"), 
-                           csv_args={'delimiter': '|', 
-                                     'quotechar': '"'})
+    csv_loader = CSVLoader(
+        file_path=args['<input_csv>'],
+        source_column='url',
+        metadata_columns=('title', 'url'),
+        csv_args={'delimiter': '|', 'quotechar': '"'},
+    )
     docs = csv_loader.load()
     for doc in docs:
         doc.metadata['index_session_id'] = session_uuid
         doc.metadata['index_datetime'] = formatted_datetime
-        doc.metadata['id'] = uuid4() # A uuid for the doc (will be used by TOCK)
+        doc.metadata['id'] = uuid4()  # A uuid for the doc (will be used by TOCK)
 
     logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
-    # recursive splitter is used to preserve sentences & paragraphs
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=int(args['<chunks_size>']))
+    # recursive splitter is used to preserve sentences & paragraphs
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=int(args['<chunks_size>'])
+    )
     splitted_docs = text_splitter.split_documents(docs)
     # Add chunk id to each chunk
     tagged_index = 0
@@ -108,15 +118,17 @@ def index_documents(args):
         cur_doc_uuid = splitted_docs[tagged_index].metadata['id']
         chunks_ctr = 1
         # Search all chunks with same id
-        while (tagged_index+chunks_ctr)<len_docs and splitted_docs[tagged_index+chunks_ctr].metadata['id'] == cur_doc_uuid:
+        while (tagged_index + chunks_ctr) < len_docs and splitted_docs[
+            tagged_index + chunks_ctr
+        ].metadata['id'] == cur_doc_uuid:
             chunks_ctr += 1
-        # Add tag
+        # Add tag
         doc_nb = 1
-        for doc in splitted_docs[tagged_index:tagged_index+chunks_ctr]:
-            doc.metadata['chunk'] = f"{doc_nb}/{chunks_ctr}"
+        for doc in splitted_docs[tagged_index : tagged_index + chunks_ctr]:
+            doc.metadata['chunk'] = f'{doc_nb}/{chunks_ctr}'
             doc_nb += 1
         tagged_index = tagged_index + chunks_ctr
-    logging.debug(f"Split {len(docs)} texts in {len(splitted_docs)} chunks")
+    logging.debug(f'Split {len(docs)} texts in {len(splitted_docs)} chunks')
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
     with open(args['<embeddings_cfg>'], 'r') as file:
@@ -125,28 +137,34 @@ def index_documents(args):
     if config_dict['provider'] == EMProvider.OPEN_AI:
         em_settings = OpenAIEMSetting(**config_dict)
     elif config_dict['provider'] == EMProvider.AZURE_OPEN_AI_SERVICE:
-        em_settings =AzureOpenAIEMSetting(**config_dict)
-    
+        em_settings = AzureOpenAIEMSetting(**config_dict)
+
     # Use embeddings factory from orchestrator
     em_factory = get_em_factory(em_settings)
     em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
-    logging.debug(f"Index chunks in DB")
+    logging.debug(f'Index chunks in DB')
     # Use vector store factory from orchestrator
-    vectorstore_factory = get_vector_store_factory(VectorStore.OPEN_SEARCH, 
-                                                   embedding_function=embeddings, 
-                                                   index_name=args['<index_name>'])
+    vectorstore_factory = get_vector_store_factory(
+        VectorStoreProvider.OPEN_SEARCH,
+        embedding_function=embeddings,
+        index_name=args['<index_name>'],
+    )
     opensearch_db = vectorstore_factory.get_vector_store()
-    # Index respecting bulk_size (500 is from_documents current default: it is described for clarity only)
+    # Index respecting bulk_size (500 is from_documents current default: it is described for clarity only)
     bulk_size = 500
     for i in range(0, len(splitted_docs), bulk_size):
-        opensearch_db.add_documents(documents=splitted_docs[i:i+500], 
-                                    bulk_size=bulk_size)
-    
+        logging.debug(f'i={i}, splitted_docs={len(splitted_docs)}')
+        opensearch_db.add_documents(
+            documents=splitted_docs[i : i + 500], bulk_size=bulk_size
+        )
+
     # Print statistics
     duration = datetime.now() - start_time
-    logging.debug(f"Indexed {len(splitted_docs)} chunks in '{args['<index_name>']}' from {len(docs)} lines in '{args['<input_csv>']}' (duration: {duration})")
+    logging.debug(
+        f"Indexed {len(splitted_docs)} chunks in '{args['<index_name>']}' from {len(docs)} lines in '{args['<input_csv>']}' (duration: {duration})"
+    )
 
     # Return session index uuid to main script
     return session_uuid
@@ -158,18 +176,18 @@ def index_name_is_valid(index_name):
     (https://opensearch.org/docs/latest/api-reference/index-apis/create-index)
     """
     if not index_name.islower():
-        logging.error("Index name must be all lowercase")
+        logging.error('Index name must be all lowercase')
         return False
 
     if index_name.startswith('_') or index_name.startswith('-'):
-        logging.error("Index names can’t begin with underscores (_) or hyphens (-)")
+        logging.error('Index names can’t begin with underscores (_) or hyphens (-)')
         return False
 
     # List of invalid characters
-    invalid_chars = [":", "\"", "*", "+", "/", "\\", "|", "?", "#", ">", "<", ",", " "]
+    invalid_chars = [':', '"', '*', '+', '/', '\\', '|', '?', '#', '>', '<', ',', ' ']
     for char in invalid_chars:
         if char in index_name:
-            logging.error(f"Index name contains invalid character: {char}")
+            logging.error(f'Index name contains invalid character: {char}')
             return False
 
     return True
@@ -177,44 +195,58 @@ def index_name_is_valid(index_name):
 
 if __name__ == '__main__':
     cli_args = docopt(__doc__, version='Webscraper 0.1.0')
-    
-    # Set logging level
-    log_format = '%(levelname)s:%(module)s:%(message)s'
-    logging.basicConfig(level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format)
 
-    # Check args:
-    # - input file path
+    # Set logging level
+    log_format = '%(levelname)s:%(module)s:%(message)s'
+    logging.basicConfig(
+        level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format
+    )
+
+    # Check args:
+    # - input file path
     inputfile_path = Path(cli_args['<input_csv>'])
     if not inputfile_path.exists():
-        logging.error(f"Cannot proceed: input CSV file '{cli_args['<input_csv>']}' does not exist")
+        logging.error(
+            f"Cannot proceed: input CSV file '{cli_args['<input_csv>']}' does not exist"
+        )
         sys.exit(1)
-    
+
     # - index name
-    # could be checked via factory in a future version
+    # could be checked via factory in a future version
     if not index_name_is_valid(cli_args['<index_name>']):
-        logging.error(f"Cannot proceed: index name {cli_args['<index_name>']} is not a valid OpenSearch index name")
+        logging.error(
+            f"Cannot proceed: index name {cli_args['<index_name>']} is not a valid OpenSearch index name"
+        )
         sys.exit(1)
 
     # - embeddings config JSON file
     cfg_file_path = Path(cli_args['<embeddings_cfg>'])
     if not cfg_file_path.exists():
-        logging.error(f"Cannot proceed: embeddings config file '{cli_args['<embeddings_cfg>']}' does not exist")
+        logging.error(
+            f"Cannot proceed: embeddings config file '{cli_args['<embeddings_cfg>']}' does not exist"
+        )
         sys.exit(1)
     try:
         with open(cfg_file_path, 'r') as file:
             config_dict = json.load(file)
     except json.JSONDecodeError:
-        logging.error(f"Cannot proceed: embeddings config file '{cli_args['<embeddings_cfg>']}' is not a valid JSON file")
+        logging.error(
+            f"Cannot proceed: embeddings config file '{cli_args['<embeddings_cfg>']}' is not a valid JSON file"
+        )
         sys.exit(1)
     if not EMProvider.has_value(config_dict['provider']):
-        logging.error(f"Cannot proceed: embeddings config file references an unknown embedding model : '{config_dict['provider']}'")
+        logging.error(
+            f"Cannot proceed: embeddings config file references an unknown embedding model : '{config_dict['provider']}'"
+        )
         sys.exit(1)
 
     # - chunks size
     try:
         int(cli_args['<chunks_size>'])
     except ValueError:
-        logging.error(f"Cannot proceed: chunks size ({cli_args['<chunks_size>']}) is not a number")
+        logging.error(
+            f"Cannot proceed: chunks size ({cli_args['<chunks_size>']}) is not a number"
+        )
         sys.exit(1)
 
     # Main func
@@ -222,4 +254,3 @@ if __name__ == '__main__':
 
     # Print indexation session's unique id
     print(indexing_session_uuid)
-    
