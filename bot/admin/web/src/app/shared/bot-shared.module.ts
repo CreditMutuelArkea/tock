@@ -166,6 +166,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     SliderComponent,
     SentenceTrainingComponent,
     SentenceTrainingEntryComponent,
+    SentenceTrainingSentenceComponent,
+    SentenceTrainingDialogComponent,
     AutocompleteInputComponent,
     DebugViewerComponent,
     ScrollTopButtonComponent,
