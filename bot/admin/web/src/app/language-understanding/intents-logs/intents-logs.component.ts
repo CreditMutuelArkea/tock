@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { saveAs } from 'file-saver-es';
-import { Observable, debounceTime } from 'rxjs';
+import { Observable, Subject, debounceTime, takeUntil } from 'rxjs';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { DisplayIntentFullLogComponent } from './display-intents-full-log/display-intents-full-log.component';
-import { ScrollComponent } from '../../scroll/scroll.component';
 import { StateService } from '../../core-nlp/state.service';
 import { NlpService } from '../../nlp-tabs/nlp.service';
 import { CoreConfig } from '../../core-nlp/core.config';
 import { Log, LogsQuery, PaginatedResult, Sentence } from '../../model/nlp';
 import { PaginatedQuery, SearchMark } from '../../model/commons';
 import { copyToClipboard } from '../../shared/utils';
+import { Pagination } from '../../shared/components';
+import { DOCUMENT } from '@angular/common';
 
 interface IntentsLogsFilterForm {
   searchString: FormControl<string>;
@@ -38,41 +39,91 @@ interface IntentsLogsFilterForm {
   templateUrl: './intents-logs.component.html',
   styleUrls: ['./intents-logs.component.scss']
 })
-export class IntentsLogsComponent extends ScrollComponent<Log> {
+export class IntentsLogsComponent {
+  private readonly destroy$: Subject<boolean> = new Subject();
+
+  loading: boolean = false;
+
+  pagination: Pagination = {
+    start: 0,
+    end: undefined,
+    size: 10,
+    total: undefined
+  };
+
+  logs: Log[];
+
+  dialogDetailsSentence: Sentence;
+
   constructor(
     public state: StateService,
     private nlp: NlpService,
     private dialogService: NbDialogService,
     private config: CoreConfig,
-    private toastrService: NbToastrService
-  ) {
-    super(state);
-  }
+    private toastrService: NbToastrService,
+    @Inject(DOCUMENT) private document: Document
+  ) {}
 
   ngOnInit(): void {
-    super.ngOnInit();
+    this.state.configurationChange.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.closeDetails();
+      this.loadData();
+    });
+
     this.form.valueChanges.pipe(debounceTime(500)).subscribe(() => {
       this.closeDetails();
-      this.refresh();
+      this.loadData();
     });
+
+    this.loadData();
   }
 
-  form = new FormGroup<IntentsLogsFilterForm>({
-    searchString: new FormControl(),
-    onlyCurrentLocale: new FormControl(false),
-    displayTests: new FormControl(false)
-  });
-
-  get searchString(): FormControl {
-    return this.form.get('searchString') as FormControl;
+  paginationChange(): void {
+    this.loadData(this.pagination.start, this.pagination.size, false, true, false, true);
   }
 
-  get onlyCurrentLocale(): FormControl {
-    return this.form.get('onlyCurrentLocale') as FormControl;
+  onScroll(): void {
+    if (this.loading || this.pagination.end >= this.pagination.total) return;
+
+    this.loadData(this.pagination.end, this.pagination.size, true, false);
   }
 
-  get displayTests(): FormControl {
-    return this.form.get('displayTests') as FormControl;
+  loadData(
+    start: number = 0,
+    size: number = this.pagination.size,
+    add: boolean = false,
+    showLoadingSpinner: boolean = true,
+    partialReload: boolean = false,
+    scrollToTop: Boolean = false
+  ): void {
+    if (showLoadingSpinner) this.loading = true;
+
+    this.search(this.state.createPaginatedQuery(start, size))
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data: PaginatedResult<Log>) => {
+          this.pagination.total = data.total;
+          if (!partialReload || this.pagination.end > this.pagination.total) {
+            this.pagination.end = data.end;
+          }
+
+          if (add) {
+            this.logs = [...this.logs, ...data.rows];
+          } else {
+            this.logs = data.rows;
+            this.pagination.start = data.start;
+          }
+
+          if (scrollToTop) {
+            this.scrollToTop();
+          }
+
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        }
+      });
   }
 
   search(query: PaginatedQuery): Observable<PaginatedResult<Log>> {
@@ -94,6 +145,32 @@ export class IntentsLogsComponent extends ScrollComponent<Log> {
     this.searchString.reset();
   }
 
+  scrollToTop(): void {
+    const currentScroll = this.document.documentElement.scrollTop || this.document.body.scrollTop;
+    if (currentScroll > 0) {
+      window.requestAnimationFrame(this.scrollToTop.bind(this));
+      window.scrollTo(0, currentScroll - currentScroll / 4);
+    }
+  }
+
+  form = new FormGroup<IntentsLogsFilterForm>({
+    searchString: new FormControl(),
+    onlyCurrentLocale: new FormControl(false),
+    displayTests: new FormControl(false)
+  });
+
+  get searchString(): FormControl {
+    return this.form.get('searchString') as FormControl;
+  }
+
+  get onlyCurrentLocale(): FormControl {
+    return this.form.get('onlyCurrentLocale') as FormControl;
+  }
+
+  get displayTests(): FormControl {
+    return this.form.get('displayTests') as FormControl;
+  }
+
   displayFullLog(log: Log): void {
     this.dialogService.open(DisplayIntentFullLogComponent, {
       context: {
@@ -108,10 +185,7 @@ export class IntentsLogsComponent extends ScrollComponent<Log> {
     this.toastrService.success(`Sentence copied to clipboard`, 'Clipboard');
   }
 
-  dialogDetailsSentence: Sentence;
-
   showDetails(sentence: Sentence): void {
-    console.log(sentence);
     if (this.dialogDetailsSentence && this.dialogDetailsSentence == sentence) {
       this.dialogDetailsSentence = undefined;
     } else {
@@ -130,5 +204,10 @@ export class IntentsLogsComponent extends ScrollComponent<Log> {
         this.toastrService.show(`Export provided`, 'Dump', { duration: 2000 });
       });
     }, 1);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

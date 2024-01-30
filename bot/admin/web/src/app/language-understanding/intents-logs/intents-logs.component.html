@@ -15,7 +15,14 @@
   -->
 
 <div class="d-flex flex-wrap mt-3">
-  <h1 class="flex-grow-1">Logs ({{ formattedTotal() }})</h1>
+  <h1 class="flex-grow-1">
+    Logs
+    <span
+      *ngIf="pagination.total"
+      class="font-weight-normal"
+      >({{ pagination.total }})</span
+    >
+  </h1>
 
   <section class="d-flex flex-wrap align-items-center">
     <button
@@ -23,7 +30,7 @@
       ghost
       shape="round"
       nbTooltip="Refresh sentences"
-      (click)="refresh()"
+      (click)="loadData()"
       class="ml-2"
     >
       <nb-icon icon="refresh-outline"></nb-icon>
@@ -35,7 +42,7 @@
       shape="round"
       nbTooltip="Download a minimal csv dump of the logs"
       (click)="downloadDump()"
-      *ngIf="total > 0"
+      *ngIf="pagination.total"
     >
       <nb-icon icon="download-outline"></nb-icon>
     </button>
@@ -43,16 +50,14 @@
 </div>
 
 <section
+  [nbSpinner]="loading"
   [class.grid]="dialogDetailsSentence"
   infinite-scroll
   [infiniteScrollDistance]="1"
   (scrolled)="onScroll()"
 >
   <div>
-    <nb-card
-      [nbSpinner]="loading"
-      class="mb-3"
-    >
+    <nb-card class="mb-2">
       <nb-card-body>
         <form
           [formGroup]="form"
@@ -98,16 +103,27 @@
       </nb-card-body>
     </nb-card>
 
-    <div
-      *ngIf="total < 1"
-      class="text-muted font-italic text-center"
-    >
-      No logs found
-    </div>
+    <tock-sticky-menu>
+      <div class="d-flex justify-content-between">
+        <div></div>
+        <tock-pagination
+          [pagination]="pagination"
+          (onPaginationChange)="paginationChange()"
+        ></tock-pagination>
+      </div>
+    </tock-sticky-menu>
 
-    <div *ngIf="total">
+    <tock-no-data-found
+      *ngIf="!loading && !logs?.length"
+      title="No logs found"
+    ></tock-no-data-found>
+
+    <div
+      *ngIf="pagination.total"
+      class="mt-2"
+    >
       <nb-card
-        *ngFor="let d of data"
+        *ngFor="let d of logs"
         class="mb-1"
       >
         <nb-card-header>
