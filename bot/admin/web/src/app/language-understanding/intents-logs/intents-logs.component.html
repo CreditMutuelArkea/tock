@@ -182,6 +182,16 @@
             <button
               nbButton
               ghost
+              nbTooltip="Create a story based on this sentence"
+              *ngIf="isRootSentence(d.sentence) && config.answerToSentenceUrl"
+              (click)="answerToSentence(d.sentence)"
+            >
+              <nb-icon icon="message-square-outline"></nb-icon>
+            </button>
+
+            <button
+              nbButton
+              ghost
               nbTooltip="Copy sentence"
               (click)="copySentence(d.sentence)"
             >

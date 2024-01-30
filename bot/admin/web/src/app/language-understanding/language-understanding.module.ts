@@ -28,7 +28,8 @@ import {
   NbRouteTabsetModule,
   NbSpinnerModule,
   NbTabsetModule,
-  NbToggleModule
+  NbToggleModule,
+  NbTooltipModule
 } from '@nebular/theme';
 import { LanguageUndestandingRoutingModule } from './language-understanding-routing.module';
 import { SentencesInboxComponent } from './sentences/sentences-inbox/sentences-inbox.component';
@@ -71,6 +72,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
     NbFormFieldModule,
     NbSpinnerModule,
     NbToggleModule,
+    NbTooltipModule,
     NgJsonEditorModule,
     MomentModule,
     InfiniteScrollModule

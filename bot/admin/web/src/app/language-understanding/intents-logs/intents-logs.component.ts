@@ -28,6 +28,7 @@ import { PaginatedQuery, SearchMark } from '../../model/commons';
 import { copyToClipboard } from '../../shared/utils';
 import { Pagination } from '../../shared/components';
 import { DOCUMENT } from '@angular/common';
+import { Router } from '@angular/router';
 
 interface IntentsLogsFilterForm {
   searchString: FormControl<string>;
@@ -61,6 +62,7 @@ export class IntentsLogsComponent {
     private dialogService: NbDialogService,
     private config: CoreConfig,
     private toastrService: NbToastrService,
+    private router: Router,
     @Inject(DOCUMENT) private document: Document
   ) {}
 
@@ -169,6 +171,18 @@ export class IntentsLogsComponent {
 
   get displayTests(): FormControl {
     return this.form.get('displayTests') as FormControl;
+  }
+
+  isRootSentence(sentence: Sentence): boolean {
+    return sentence instanceof Sentence;
+  }
+
+  answerToSentence(sentence: Sentence) {
+    this.router.navigate([this.config.answerToSentenceUrl], {
+      queryParams: {
+        text: sentence.getText()
+      }
+    });
   }
 
   displayFullLog(log: Log): void {
