@@ -144,7 +144,7 @@ def index_documents(args):
     em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
-    logging.debug(f'Index chunks in DB')
+    logging.debug('Index chunks in DB')
     # Use vector store factory from orchestrator
     vectorstore_factory = get_vector_store_factory(
         VectorStoreProvider.OPEN_SEARCH,
