@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "indexing_tools"
+name = "tock-llm-indexing-tools"
 version = "0.1.0"
 description = "Tools to index data from different sources to TOCK RAG vector DB"
 authors = ["Pierre Guirriec <pierre.guirriec@partnre.com>"]
@@ -11,10 +11,11 @@ python = "^3.9"
 docopt = "^0.6.2"
 pandas = "^2.1.4"
 beautifulsoup4 = "^4.12.2"
-langchain = "^0.0.351"
+langchain = "^0.1.0"
 python-dotenv = "^1.0.0"
 opensearch-py = "^2.4.2"
 llm-orchestrator = {path = "../app"}
+langchain-community = "^0.0.16"
 
 
 [build-system]

@@ -52,8 +52,8 @@ from pathlib import Path
 from uuid import uuid4
 
 from docopt import docopt
-from langchain.document_loaders import CSVLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import CSVLoader
 
 from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
