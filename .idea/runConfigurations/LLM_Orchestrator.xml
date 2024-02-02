@@ -7,11 +7,12 @@
       <env name="PYTHONUNBUFFERED" value="1" />
     </envs>
     <option name="SDK_HOME" value="$USER_HOME$/.cache/pypoetry/virtualenvs/app-0JnYjnqK-py3.9/bin/python" />
-    <option name="SDK_NAME" value="Poetry (tock)" />
+    <option name="SDK_NAME" value="Python 3.9 (tock)" />
     <option name="WORKING_DIRECTORY" value="" />
-    <option name="IS_MODULE_SDK" value="true" />
+    <option name="IS_MODULE_SDK" value="false" />
     <option name="ADD_CONTENT_ROOTS" value="true" />
     <option name="ADD_SOURCE_ROOTS" value="true" />
+    <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
     <option name="SCRIPT_NAME" value="uvicorn" />
     <option name="PARAMETERS" value="llm_orchestrator.main:app --host 0.0.0.0 --port 8000 --reload --log-level trace" />
     <option name="SHOW_COMMAND_LINE" value="false" />

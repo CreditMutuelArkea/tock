@@ -17,6 +17,7 @@ from pydantic import BaseModel, Field
 
 from llm_orchestrator.models.em.em_types import EMSetting
 from llm_orchestrator.models.llm.llm_types import LLMSetting
+from llm_orchestrator.models.llm.prompt_template import PromptTemplate
 from llm_orchestrator.models.rag.rag_models import ChatMessage, MetadataFilter
 
 
@@ -49,4 +50,7 @@ class RagQuery(BaseModel):
 class GenerateSentencesQuery(BaseModel):
     llm_setting: LLMSetting = Field(
         description='LLM setting, used to perform a sentences generation.'
+    )
+    prompt: PromptTemplate = Field(
+        description='Prompt, used to create prompt with inputs and jinja template '
     )

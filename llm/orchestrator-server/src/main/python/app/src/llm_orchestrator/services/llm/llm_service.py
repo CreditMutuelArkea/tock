@@ -34,27 +34,4 @@ def check_llm_setting(provider_id: str, setting: LLMSetting) -> bool:
         raise FunctionalException(ErrorCode.E20)
 
 
-def llm_inference_with_parser(
-    llm: BaseLanguageModel, prompt: str, parser: BaseOutputParser
-) -> AIMessage:
-    """
-    Perform LLM inference and format the output content based on the given parser.
 
-    :param llm: LLM Factory model.
-    :param prompt: Input prompt.
-    :param parser: Parser to format the output.
-
-    :return: Result of the language model inference with the content formatted.
-    """
-
-    # Change the prompt with added format instructions
-    format_instructions = parser.get_format_instructions()
-    formatted_prompt = prompt + '\n' + format_instructions
-
-    # Inference of the LLM with the formatted prompt
-    llm_output = llm.invoke(formatted_prompt)
-
-    # Apply the parsing on the LLM output
-    llm_output.content = parser.parse(llm_output.content)
-
-    return llm_output

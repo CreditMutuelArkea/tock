@@ -12,17 +12,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from langchain.output_parsers import CommaSeparatedListOutputParser
+
 
 from llm_orchestrator.routers.requests.requests import GenerateSentencesQuery
 from llm_orchestrator.routers.responses.responses import (
     GenerateSentencesResponse,
 )
+from langchain.output_parsers import NumberedListOutputParser
+
 from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_llm_factory,
 )
-from llm_orchestrator.services.llm.llm_service import llm_inference_with_parser
-
+from langchain.prompts import PromptTemplate
 
 def generate_and_split_sentences(
     query: GenerateSentencesQuery,
@@ -36,11 +37,13 @@ def generate_and_split_sentences(
     """
 
     llm_factory = get_llm_factory(query.llm_setting)
-    llm = llm_factory.get_language_model()
+    # validate_jinja2(template, input_variables=["input_language", "content"])
+    # il faudrait faire la validation mais la remonté d'erreur se fait via log et c pas ouf
+    parser = NumberedListOutputParser()
+    prompt = PromptTemplate.from_template(query.prompt.template,  template_format=query.prompt.formatter)
+    model = llm_factory.get_language_model()
 
-    parser = CommaSeparatedListOutputParser()
-    llm_output = llm_inference_with_parser(
-        llm=llm, prompt=query.llm_setting.prompt, parser=parser
-    )
+    chain = prompt | model | parser
+    sentences = chain.invoke(query.prompt.inputs)
 
-    return GenerateSentencesResponse(sentences=llm_output.content)
+    return GenerateSentencesResponse(sentences=sentences)
