@@ -187,9 +187,7 @@ def __rag_guard(inputs, response):
             response['answer'] == inputs['no_answer']
             and response['source_documents'] != []
         ):
-            message = (
-                'The RAG gives no answer for user question, but some documents has been found!',
-            )
+            message = 'The RAG gives no answer for user question, but some documents has been found!'
             __rag_log(level=WARNING, message=message, inputs=inputs, response=response)
             # Remove source documents
             response['source_documents'] = []
