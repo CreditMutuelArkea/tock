@@ -16,7 +16,7 @@
 
 package ai.tock.bot.engine.config
 
-import ai.tock.bot.admin.bot.llm.BotRagConfiguration
+import admin.bot.rag.BotRagConfiguration
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Footnote
 import ai.tock.bot.engine.action.SendSentence
