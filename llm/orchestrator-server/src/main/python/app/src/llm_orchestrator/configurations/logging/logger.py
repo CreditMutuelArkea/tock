@@ -23,5 +23,5 @@ from llm_orchestrator.configurations.environement.settings import (
 
 
 def setup_logging():
-    """Setting up a logging configuration"""
+    """Setting up a logging configuration based on an ini file"""
     logging.config.fileConfig(application_settings.application_logging_config_ini)
