@@ -100,6 +100,8 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
     /**
      * Call RAG API
      * @param botBus
+     * 
+     * @return Rag response if it needs to be handled, null otherwise (already handled by a switch for instance in case of no response)
      */
     private fun rag(botBus: BotBus): RAGResponse? {
         logger.info { "Call Generative AI Orchestrator - RAG API" }
