@@ -167,7 +167,7 @@ def index_documents(args):
     return session_uuid
 
 
-def index_name_is_valid(index_name):
+def index_name_is_valid(index_name: str) -> bool:
     """
     Check if index_name is a valid OpenSearch index name.
     (https://opensearch.org/docs/latest/api-reference/index-apis/create-index)

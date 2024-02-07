@@ -42,7 +42,6 @@ contents into a ready-to-index CSV file (one 'title'|'url'|'text' line per
 URL with scraped contents).
 """
 import logging
-import ssl
 import sys
 from pathlib import Path
 from urllib import request
@@ -54,7 +53,9 @@ from bs4 import BeautifulSoup
 from docopt import docopt
 
 
-def browse_base_urls(base_urls, target_dir='.', base_domain='domain'):
+def browse_base_urls(
+    base_urls: list[str], target_dir: str = '.', base_domain: str = 'domain'
+):
     """
     Recursively browse URLs for sub-URLs. Creates the <base_domain>/urls.txt
     file along the way (the base URLs are listed in this file).
@@ -88,8 +89,7 @@ def browse_base_urls(base_urls, target_dir='.', base_domain='domain'):
 
                 try:
                     # Check URL is valid
-                    context = ssl._create_unverified_context()
-                    with request.urlopen(current_url, context=context) as response:
+                    with request.urlopen(current_url) as response:
                         if response.status == 200:
                             # Scrape the HTML page with BeautifulSoup
                             soup = BeautifulSoup(response.read(), 'html.parser')
@@ -160,8 +160,7 @@ def scrape_urls(soup_filters, output_file, target_dir='.', base_domain='domain')
             logging.debug(f'Scraping {line}')
 
             # GET contents
-            context = ssl._create_unverified_context()
-            with request.urlopen(line, context=context) as response:
+            with request.urlopen(line) as response:
                 # Check if response object is not None
                 if response is not None:
                     # Scrape the HTML page for tags corresponding to BeautifulSoup filters
