@@ -51,6 +51,7 @@ from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
 
+import pandas as pd
 from docopt import docopt
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import CSVLoader
@@ -59,10 +60,12 @@ from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
 from llm_orchestrator.models.em.em_provider import EMProvider
+from llm_orchestrator.models.em.em_setting import BaseEMSetting
 from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
 from llm_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
+from llm_orchestrator.routers.requests.types import EMSetting
 from llm_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_vector_store_factory,
@@ -112,23 +115,17 @@ def index_documents(args):
     )
     splitted_docs = text_splitter.split_documents(docs)
     # Add chunk id to each chunk
-    tagged_index = 0
-    len_docs = len(splitted_docs)
-    while tagged_index < len_docs:
-        cur_doc_uuid = splitted_docs[tagged_index].metadata['id']
-        chunks_ctr = 1
-        # Search all chunks with same id
-        while (tagged_index + chunks_ctr) < len_docs and splitted_docs[
-            tagged_index + chunks_ctr
-        ].metadata['id'] == cur_doc_uuid:
-            chunks_ctr += 1
-        # Add tag
-        doc_nb = 1
-        for doc in splitted_docs[tagged_index : tagged_index + chunks_ctr]:
-            doc.metadata['chunk'] = f'{doc_nb}/{chunks_ctr}'
-            doc_nb += 1
-        tagged_index = tagged_index + chunks_ctr
-    logging.debug(f'Split {len(docs)} texts in {len(splitted_docs)} chunks')
+    metadata = [doc.metadata for doc in splitted_docs]
+    df_metadata = pd.DataFrame(metadata)
+    df_metadata['total_chunks'] = df_metadata.groupby('id')['id'].transform('count')
+    df_metadata['chunk_id'] = df_metadata.groupby('id').cumcount() + 1
+    df_metadata['chunk'] = (
+        df_metadata['chunk_id'].astype(str)
+        + '/'
+        + df_metadata['total_chunks'].astype(str)
+    )
+    for i, doc in enumerate(splitted_docs):
+        doc.metadata['chunk'] = df_metadata.loc[i, 'chunk']
 
     logging.debug(f"Get embeddings model from {args['<embeddings_cfg>']} config file")
     with open(args['<embeddings_cfg>'], 'r') as file:
