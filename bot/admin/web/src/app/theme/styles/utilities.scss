@@ -10,6 +10,10 @@
   line-height: 0;
 }
 
+.font-size-small {
+  font-size: 0.875em;
+}
+
 .nb-theme-default .text-mitigated {
   color: #6c757d;
 }
@@ -71,6 +75,10 @@ nb-route-tabset .tab-link {
   }
 }
 
+.cdk-overlay-backdrop {
+  backdrop-filter: blur(3px);
+}
+
 .cdk-overlay-pane {
   nb-option-list {
     min-width: 15rem;
@@ -106,6 +114,10 @@ nb-card.selected {
 
 .divider {
   background-color: var(--color-basic-transparent-200);
+}
+
+.unselectable {
+  user-select: none;
 }
 
 .card-footer-actions {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Subject } from 'rxjs';
 import { take } from 'rxjs/operators';
 
@@ -20,7 +20,12 @@ export class SentenceTrainingDialogComponent implements OnChanges, OnDestroy {
   @Output() onClose = new EventEmitter();
   @Output() onSearchSentence = new EventEmitter();
 
-  constructor(private state: StateService, private readonly analyticsService: AnalyticsService, private readonly elementRef: ElementRef) {}
+  constructor(
+    private state: StateService,
+    private readonly analyticsService: AnalyticsService,
+    private readonly elementRef: ElementRef,
+    private cd: ChangeDetectorRef
+  ) {}
 
   dialogs: DialogReport[] = [];
   displayedDialog: DialogReport;
@@ -52,6 +57,7 @@ export class SentenceTrainingDialogComponent implements OnChanges, OnDestroy {
           this.displayedDialogIndex = 0;
           this.displayedDialog = this.dialogs[this.displayedDialogIndex];
           this.scrollToCurrent();
+          this.cd.markForCheck();
         });
     }
   }

@@ -1021,8 +1021,14 @@ export class TestErrorQuery extends PaginatedQuery {
 }
 
 export class LogCountQuery extends PaginatedQuery {
-
-  static create(stateService: StateService, start: number, size?: number, intentName?: string, minCount?: number, validated?: boolean): TestErrorQuery {
+  static create(
+    stateService: StateService,
+    start: number,
+    size?: number,
+    intentName?: string,
+    minCount?: number,
+    validated?: boolean
+  ): TestErrorQuery {
     const p = stateService.createPaginatedQuery(start, size);
     return new LogCountQuery(p.namespace, p.applicationName, p.language, p.start, p.size, intentName, minCount, validated);
   }
@@ -1035,15 +1041,14 @@ export class LogCountQuery extends PaginatedQuery {
     public size: number,
     public intentName?: string,
     public minCount?: number,
-    public validated?: boolean,
+    public validated?: boolean
   ) {
     super(namespace, applicationName, language, start, size);
   }
 }
 
 export class LogCountResult implements PaginatedResult<LogCount> {
-  constructor(public rows: LogCount[], public total: number, public start: number, public end: number) {
-  }
+  constructor(public rows: LogCount[], public total: number, public start: number, public end: number) {}
 
   static fromJSON(json?: any): LogCountResult {
     const value = Object.create(LogCountResult.prototype);
@@ -1064,7 +1069,7 @@ export class LogCount {
     public intent: string,
     public intentProbability?: number,
     public entitiesProbability?: number,
-    public validated?:boolean,
+    public validated?: boolean
   ) {}
 
   static fromJSON(json?: any): LogCount {
