@@ -14,6 +14,8 @@
 #
 from unittest.mock import patch
 
+import pytest
+
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIUnknownProviderSettingException,
     VectorStoreUnknownException,
@@ -26,25 +28,19 @@ from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
 
 
 def test_get_llm_factory():
-    try:
+    with pytest.raises(GenAIUnknownProviderSettingException):
         get_llm_factory(setting='settings with incorrect type')
-    except Exception as e:
-        assert isinstance(e, GenAIUnknownProviderSettingException)
 
 
 def test_get_em_factory():
-    try:
+    with pytest.raises(GenAIUnknownProviderSettingException):
         get_em_factory(setting='settings with incorrect type')
-    except Exception as e:
-        assert isinstance(e, GenAIUnknownProviderSettingException)
 
 
 def test_get_vector_store_factory():
-    try:
+    with pytest.raises(VectorStoreUnknownException):
         get_vector_store_factory(
             vector_store_provider='an incorrect vector store provider',
             embedding_function=None,
             index_name='an index name',
         )
-    except Exception as e:
-        assert isinstance(e, VectorStoreUnknownException)
