@@ -56,17 +56,19 @@ from docopt import docopt
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import CSVLoader
 
-from llm_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
+from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
-from llm_orchestrator.models.em.em_provider import EMProvider
-from llm_orchestrator.models.em.em_setting import BaseEMSetting
-from llm_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from llm_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.em.em_provider import EMProvider
+from gen_ai_orchestrator.models.em.em_setting import BaseEMSetting
+from gen_ai_orchestrator.models.em.openai.openai_em_setting import (
+    OpenAIEMSetting,
+)
+from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
-from llm_orchestrator.routers.requests.types import EMSetting
-from llm_orchestrator.services.langchain.factories.langchain_factory import (
+from gen_ai_orchestrator.routers.requests.types import EMSetting
+from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_vector_store_factory,
 )

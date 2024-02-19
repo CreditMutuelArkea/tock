@@ -1,6 +1,0 @@
-# Indexing tools env file
-src/main/python/tock-llm-indexing-tools/.env
-# Indexing tools test files
-src/main/python/tock-llm-indexing-tools/tests
-# Indexing tools embeddings config (may contain API keys)
-src/main/python/tock-llm-indexing-tools/**/embeddings.json

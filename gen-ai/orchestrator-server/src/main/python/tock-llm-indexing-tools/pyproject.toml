@@ -14,10 +14,13 @@ beautifulsoup4 = "^4.12.2"
 langchain = "^0.1.0"
 python-dotenv = "^1.0.0"
 opensearch-py = "^2.4.2"
-llm-orchestrator = {path = "../app"}
+gen_ai_orchestrator = {path = "../server"}
 langchain-community = "^0.0.16"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
