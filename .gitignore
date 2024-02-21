@@ -45,11 +45,3 @@ scripts/connector-messenger/ngrok.exe
 
 # Python
 **/requirements.txt
-
-#Indexing tools test files 
-gen-ai/orchestrator-server/src/main/python/tock-llm-indexing-tools/tests
-!gen-ai/orchestrator-server/src/main/python/tock-llm-indexing-tools/tests/embeddings.json.example
-#Indexing tools env file
-gen-ai/orchestrator-server/src/main/python/tock-llm-indexing-tools/.env
-#Indexing tools test files
-gen-ai/orchestrator-server/src/main/python/tock-llm-indexing-tools/tests
