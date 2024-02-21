@@ -8,7 +8,7 @@ Install tools using Poetry from package directory base:
 
 `poetry install`
 
-Then run the scripts by passing them to a Python interpreter:
+Then run the scripts by passing them to a Python interpreter (>= 3.9):
 
 `python <script> <args>`
 
@@ -74,7 +74,7 @@ Recursively browse web URLs (follow links from these base URLs), then scrape lin
 
 ## Documents indexing
 
-### index_documents.py
+### index_documents.py
 
 Index a ready-to-index CSV file ('title'|'url'|'text' lines) file contents into an OpenSearch vector database.
 
@@ -102,13 +102,14 @@ CSV columns are 'title'|'url'|'text'. 'text' will be chunked according to chunks
 
 Documents will be indexed in OpenSearch DB under index_name index (index_name shall follow OpenSearch naming restrictions) with the following metadata:
 
-| Metadata tag      | Description         |
-| ----------------- | ---------------------------------------------------------------  |
-| index_session_id  | a uuid for the indexing session (running this script)            |
-| index_datetime    | the date of the indexing session                                 |
-| id                | a uuid for each document (one per line in the input file)        |
-| chunk             | the nb of the chunk if the original document was splitted: 'n/N' |
-| title             | the 'title' column from original input CSV                       |
-| url               | the 'url' column from original input CSV                         |
+
+| Metadata tag     | Description                                                      |
+| ------------------ | ------------------------------------------------------------------ |
+| index_session_id | a uuid for the indexing session (running this script)            |
+| index_datetime   | the date of the indexing session                                 |
+| id               | a uuid for each document (one per line in the input file)        |
+| chunk            | the nb of the chunk if the original document was splitted: 'n/N' |
+| title            | the 'title' column from original input CSV                       |
+| url              | the 'url' column from original input CSV                         |
 
 A unique indexing session id is produced and printed to the console (will be the last line printed if the '-v' option is used).
