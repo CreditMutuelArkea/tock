@@ -25,6 +25,9 @@ from gen_ai_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetti
 from gen_ai_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
+from gen_ai_orchestrator.models.llm.fake_llm.fake_llm_setting import (
+    FakeLLMSetting,
+)
 from gen_ai_orchestrator.models.llm.huggingfacetgi.hugging_face_tgi_llm_setting import HuggingFaceTGILLMSetting
 from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
@@ -34,8 +37,8 @@ from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params imp
 )
 
 LLMSetting = Annotated[
-    Union[OpenAILLMSetting, AzureOpenAILLMSetting, HuggingFaceTGILLMSetting], Body(discriminator='provider')
-]
+    Union[OpenAILLMSetting, AzureOpenAILLMSetting, HuggingFaceTGILLMSetting, FakeLLMSetting],
+    Body(discriminator='provider'),]
 
 EMSetting = Annotated[
     Union[OpenAIEMSetting, AzureOpenAIEMSetting], Body(discriminator='provider')
