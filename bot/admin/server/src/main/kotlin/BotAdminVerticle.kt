@@ -26,7 +26,7 @@ import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.admin.constants.Properties
 import ai.tock.bot.admin.model.*
 import ai.tock.bot.admin.module.satisfactionContentModule
-import ai.tock.bot.admin.service.GenerateSentencesService
+import ai.tock.bot.admin.service.SentenceGenerationService
 import ai.tock.bot.admin.service.RagService
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpImport
 import ai.tock.bot.admin.test.TestPlanService
@@ -1016,9 +1016,9 @@ open class BotAdminVerticle : AdminVerticle() {
         blockingJsonPost(
             "/configuration/bots/:botId/sentence-generation",
             admin
-        ) { context, configuration: BotGenerateSentencesConfigurationDTO  ->
+        ) { context, configuration: BotSentenceGenerationConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
-                GenerateSentencesService.saveGenerateSentences(configuration)
+                SentenceGenerationService.saveSentenceGeneration(configuration)
             } else {
                 unauthorized()
             }
@@ -1028,9 +1028,9 @@ open class BotAdminVerticle : AdminVerticle() {
             "/configuration/bots/:botId/sentence-generation",
             admin
         ) { context  ->
-            GenerateSentencesService.getGenerateSentencesConfiguration(context.organization, context.path("botId"))
+            SentenceGenerationService.getSentenceGenerationConfiguration(context.organization, context.path("botId"))
                 ?.let {
-                    BotGenerateSentencesConfigurationDTO(it)
+                    BotSentenceGenerationConfigurationDTO(it)
                 }
         }
 
