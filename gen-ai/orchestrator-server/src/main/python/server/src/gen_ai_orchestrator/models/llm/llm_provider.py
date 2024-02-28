@@ -22,6 +22,7 @@ class LLMProvider(str, Enum):
     """Enumeration to list Large Language Provider type"""
 
     OPEN_AI = 'OpenAI'
+    HUGGING_FACE_TGI = 'HuggingFaceTGI'
     AZURE_OPEN_AI_SERVICE = 'AzureOpenAIService'
 
     @classmethod
