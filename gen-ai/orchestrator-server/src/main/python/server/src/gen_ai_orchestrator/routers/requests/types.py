@@ -33,7 +33,7 @@ from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params imp
 )
 
 LLMSetting = Annotated[
-    Union[OpenAILLMSetting, AzureOpenAILLMSetting], Body(discriminator='provider')
+    Union[OpenAILLMSetting, AzureOpenAILLMSetting, HuggingFaceTGILLMSetting], Body(discriminator='provider')
 ]
 
 EMSetting = Annotated[

@@ -60,6 +60,7 @@ logger = logging.getLogger(__name__)
 
 @opensearch_exception_handler
 @openai_exception_handler(provider='OpenAI or AzureOpenAIService')
+@hugging_face_exception_handler(provider='HuggingFaceTGI')
 def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     """
     RAG chain execution, using the LLM and Embedding settings specified in the query

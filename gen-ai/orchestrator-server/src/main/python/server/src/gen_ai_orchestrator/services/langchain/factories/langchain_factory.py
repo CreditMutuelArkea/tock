@@ -88,6 +88,9 @@ def get_llm_factory(setting: BaseLLMSetting) -> LangChainLLMFactory:
     elif isinstance(setting, AzureOpenAILLMSetting):
         logger.debug('LLM Factory - AzureOpenAILLMFactory')
         return AzureOpenAILLMFactory(setting=setting)
+    elif isinstance(setting, HuggingFaceTGILLMSetting):
+        logger.debug('LLM Factory - HuggingFaceTGILLMFactory')
+        return HuggingFaceTGILLMFactory(setting=setting)
     else:
         raise GenAIUnknownProviderSettingException()
 
