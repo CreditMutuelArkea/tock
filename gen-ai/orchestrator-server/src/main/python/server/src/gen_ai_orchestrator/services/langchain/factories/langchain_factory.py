@@ -40,6 +40,9 @@ from gen_ai_orchestrator.models.llm.llm_setting import BaseLLMSetting
 from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
+from gen_ai_orchestrator.models.llm.huggingfacetgi.hugging_face_tgi_llm_setting import (
+    HuggingFaceTGILLMSetting,
+)
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
@@ -60,6 +63,9 @@ from gen_ai_orchestrator.services.langchain.factories.llm.llm_factory import (
 )
 from gen_ai_orchestrator.services.langchain.factories.llm.openai_llm_factory import (
     OpenAILLMFactory,
+)
+from gen_ai_orchestrator.services.langchain.factories.llm.hugging_face_tgi_llm_factory import (
+    HuggingFaceTGILLMFactory,
 )
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.open_search_factory import (
     OpenSearchFactory,

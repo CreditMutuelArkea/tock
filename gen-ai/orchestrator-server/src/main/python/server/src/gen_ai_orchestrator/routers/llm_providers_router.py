@@ -128,7 +128,15 @@ async def get_llm_provider_setting_by_id(
             prompt='How to learn to ride a bike without wheels!',
         )
     elif provider_id == LLMProvider.HUGGING_FACE_TGI:
-        return HuggingFace
+        return HuggingFaceTGILLMSetting(
+            provider=LLMProvider.HUGGING_FACE_TGI,
+            api_key='123-abc-456-def',
+            repetition_penalty=1.0,
+            max_new_tokens=256,
+            temperature=0.7,
+            api_base='https://doc.tock.ai/tock',
+            prompt='How to learn to ride a bike without wheels!',
+        )
 
 
 @llm_providers_router.post('/{provider_id}/setting/status')

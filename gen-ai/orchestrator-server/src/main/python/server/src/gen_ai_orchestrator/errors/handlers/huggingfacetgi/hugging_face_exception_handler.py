@@ -16,26 +16,15 @@
 
 import logging
 
-from openai import (
-    APIConnectionError,
-    APIError,
-    AuthenticationError,
-    BadRequestError,
-    NotFoundError,
-    OpenAIError,
-)
+from huggingface_hub import InferenceTimeoutError
+from requests import HTTPError
 
 from gen_ai_orchestrator.errors.exceptions.ai_provider.ai_provider_exceptions import (
     AIProviderAPIBadRequestException,
-    AIProviderAPIContextLengthExceededException,
-    AIProviderAPIDeploymentNotFoundException,
-    AIProviderAPIErrorException,
-    AIProviderAPIModelException,
     AIProviderAPIResourceNotFoundException,
 )
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIAuthenticationException,
-    GenAIConnectionErrorException,
 )
 from gen_ai_orchestrator.models.errors.errors_models import ErrorInfo
 
@@ -44,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 def hugging_face_exception_handler(provider: str):
     """
-    Managing Hugging Face exceptions
+    Managing HuggingFace exceptions
 
     Args:
         provider: The AI Provider type
@@ -58,94 +47,51 @@ def hugging_face_exception_handler(provider: str):
 
             try:
                 return func(*args, **kwargs)
-            except APIConnectionError as exc:
+            except InferenceTimeoutError as exc:
                 logger.error(exc)
-                raise GenAIConnectionErrorException(
-                    create_error_info_openai(exc, provider)
+                raise AIProviderAPIBadRequestException(
+                    create_error_info_hugging_face(exc, provider)
                 )
-            except AuthenticationError as exc:
-                logger.error(exc)
-                raise GenAIAuthenticationException(
-                    create_error_info_openai(exc, provider)
-                )
-            except NotFoundError as exc:
-                logger.error(exc)
-                _manage_not_found_error(exc, provider)
-            except BadRequestError as exc:
-                logger.error(exc)
-                _manage_bad_request_error(exc, provider)
-            except APIError as exc:
-                logger.error(exc)
-                raise AIProviderAPIErrorException(
-                    create_error_info_openai(exc, provider)
-                )
+            except HTTPError as exc:
+                if exc.response.status_code == 400:
+                    logger.error(exc)
+                    raise GenAIAuthenticationException(
+                        create_error_info_hugging_face(exc, provider)
+                    )
+                elif exc.response.status_code == 407 or exc.response.status_code == 511:
+                    logger.error(exc)
+                    raise GenAIAuthenticationException(
+                        create_error_info_hugging_face(exc, provider)
+                    )
+                elif exc.response.status_code == 404:
+                    logger.error(exc)
+                    raise AIProviderAPIResourceNotFoundException(
+                        create_error_info_hugging_face(exc, provider)
+                    )
 
         return wrapper
 
     return decorator
 
 
-def create_error_info_openai(exc: OpenAIError, provider: str) -> ErrorInfo:
+def create_error_info_hugging_face(exc: HTTPError, provider: str) -> ErrorInfo:
     """
-    Create ErrorInfo for a OpenAI error
+    Create ErrorInfo for a Hugging Face error
 
     Args:
-        exc: the OpenAI error
+        exc: the Hugging Face error
         provider: the AI provider type
     Returns:
-        The ErrorInfo with the OpenAI error parameters
+        The ErrorInfo with the Hugging Face error parameters
     """
-
-    if isinstance(exc, APIError):
+    if isinstance(exc, HTTPError):
         return ErrorInfo(
             provider=provider,
-            error=exc.__class__.__name__,
-            cause=exc.message,
+            error=exc.response.status_code,
+            cause=exc.__cause__,
             request=f'[{exc.request.method}] {exc.request.url}',
         )
     else:
         return ErrorInfo(
-            provider=provider, error=exc.__class__.__name__, cause=str(exc)
+            provider=provider, error=exc.response.status_code, cause=str(exc)
         )
-
-
-def _manage_not_found_error(exc: NotFoundError, provider: str):
-    """
-    Manage a not found error
-
-    Args:
-        exc: the OpenAI not found error
-        provider: the AI provider type
-    Returns:
-        Raise a specific Gen AI Orchestrator exception according to the OpenAI error code
-    """
-
-    if 'model_not_found' == exc.code:
-        raise AIProviderAPIModelException(create_error_info_openai(exc, provider))
-    elif 'DeploymentNotFound' == exc.code:
-        raise AIProviderAPIDeploymentNotFoundException(
-            create_error_info_openai(exc, provider)
-        )
-    else:
-        raise AIProviderAPIResourceNotFoundException(
-            create_error_info_openai(exc, provider)
-        )
-
-
-def _manage_bad_request_error(exc: BadRequestError, provider: str):
-    """
-    Manage a bad request error
-
-    Args:
-        exc: the OpenAI bad request error
-        provider: the AI provider type
-    Returns:
-        Raise a specific Gen AI Orchestrator exception according to the OpenAI error code
-    """
-
-    if 'context_length_exceeded' == exc.code:
-        raise AIProviderAPIContextLengthExceededException(
-            create_error_info_openai(exc, provider)
-        )
-    else:
-        raise AIProviderAPIBadRequestException(create_error_info_openai(exc, provider))

@@ -15,14 +15,14 @@
 """Model for creating HuggingFaceTGILLMFactory"""
 
 from langchain.base_language import BaseLanguageModel
-from langchain_community.llms import HuggingFaceTextGenInference
+from langchain_community.llms import HuggingFaceEndpoint
 
 from gen_ai_orchestrator.configurations.environement.settings import application_settings
 
-from gen_ai_orchestrator.errors.handlers.huggingface.hugging_face_exception_handler import (
+from gen_ai_orchestrator.errors.handlers.huggingfacetgi.hugging_face_exception_handler import (
     hugging_face_exception_handler,
 )
-from gen_ai_orchestrator.models.llm.huggingfaceTGI.huggingface_text_gen_inference_llm_setting import (
+from gen_ai_orchestrator.models.llm.huggingfacetgi.hugging_face_tgi_llm_setting import (
     HuggingFaceTGILLMSetting,
 )
 from gen_ai_orchestrator.services.langchain.factories.llm.llm_factory import (
@@ -36,12 +36,11 @@ class HuggingFaceTGILLMFactory(LangChainLLMFactory):
     setting: HuggingFaceTGILLMSetting
 
     def get_language_model(self) -> BaseLanguageModel:
-        return HuggingFaceTextGenInference(
-            inference_server_url=self.settings.api_base,
+        return HuggingFaceEndpoint(
+            endpoint_url=self.settings.api_base,
             temperature=self.settings.temperature,
             repetition_penalty=self.settings.repetition_penalty,
             max_new_tokens=self.settings.max_new_tokens,
-            streaming=self.settings.streaming,
         )
 
     @hugging_face_exception_handler(provider='HuggingFaceTGI')
