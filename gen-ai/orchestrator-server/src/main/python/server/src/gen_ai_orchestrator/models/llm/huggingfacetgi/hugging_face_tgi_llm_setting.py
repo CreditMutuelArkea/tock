@@ -24,10 +24,9 @@ from gen_ai_orchestrator.models.llm.llm_setting import BaseLLMSetting
 
 class HuggingFaceTGILLMSetting(BaseLLMSetting):
     """
-    A class for OpenAI Large Language Model Setting.
+    A class for Hugging Face TGI Large Language Model Setting.
     Usage docs: https://platform.openai.com/docs/models
     """
-    # TODO
     provider: Literal[LLMProvider.HUGGING_FACE_TGI] = Field(
         description='The Large Language Model Provider.', examples=[LLMProvider.HUGGING_FACE_TGI]
     )
@@ -39,7 +38,4 @@ class HuggingFaceTGILLMSetting(BaseLLMSetting):
     )
     api_base: str = Field(
         description="TGI API base URL."
-    )
-    streaming: bool = Field(
-        description="Enable streaming response.", default=False
     )
