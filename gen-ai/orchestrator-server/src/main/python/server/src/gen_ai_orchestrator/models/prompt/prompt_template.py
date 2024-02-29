@@ -12,12 +12,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
+"""Model for creating PromptTemplate."""
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
 
 class PromptTemplate(BaseModel):
+    """A prompt template model, used to specify a formatter"""
+
     formatter: Literal['f-string', 'jinja2'] = Field(
         description='The formatter of this prompt.',
         examples=['jinja2'],
