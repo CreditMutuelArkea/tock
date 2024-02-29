@@ -26,6 +26,8 @@ import { DialogsListComponent } from '../../dialogs/dialogs-list/dialogs-list.co
 export class SatisfactionDetailsComponent implements OnInit {
   loading = false;
 
+  count: string = '';
+
   ratingFilter: number[] = [1, 2, 3, 4, 5];
 
   satisfactionStat: RatingReportQueryResult;
@@ -43,12 +45,14 @@ export class SatisfactionDetailsComponent implements OnInit {
     );
   }
 
-  refresh() {
-    this.dialogsList.refresh();
+  ngAfterViewInit() {
+    this.dialogsList.totalDialogsCount.subscribe((count) => {
+      this.count = count;
+    });
   }
 
-  formattedTotal() {
-    return this.dialogsList?.formattedTotal();
+  refresh() {
+    this.dialogsList.refresh();
   }
 
   exportDialogs() {

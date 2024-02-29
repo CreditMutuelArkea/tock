@@ -25,11 +25,15 @@ import { DialogsListComponent } from './dialogs-list/dialogs-list.component';
 export class DialogsComponent {
   @ViewChild('dialogsList') dialogsList: DialogsListComponent;
 
-  refresh() {
-    this.dialogsList.refresh();
+  count: string = '';
+
+  ngAfterViewInit() {
+    this.dialogsList.totalDialogsCount.subscribe((count) => {
+      this.count = count;
+    });
   }
 
-  formattedTotal() {
-    return this.dialogsList?.formattedTotal();
+  refresh() {
+    this.dialogsList.refresh();
   }
 }
