@@ -17,7 +17,8 @@
 package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.bot.sentencegeneration.BotSentenceGenerationConfigurationDAO
-import ai.tock.bot.admin.model.SentenceGenerationRequestDTO
+import ai.tock.bot.admin.model.SentenceGenerationRequest
+
 import ai.tock.genai.orchestratorclient.requests.Formatter
 import ai.tock.genai.orchestratorclient.requests.PromptTemplate
 import ai.tock.genai.orchestratorclient.requests.SentenceGenerationQuery
@@ -38,12 +39,12 @@ object CompletionService {
 
     /**
      * Generate sentences
-     * @param request [SentenceGenerationRequestDTO] : the sentence generation request
+     * @param request [SentenceGenerationQuery] : the sentence generation request
      * @param namespace [String] : the namespace
      * @param botId [String] : the bot id
      * @return [SentenceGenerationResponse]
      */
-    fun generateSentences(request : SentenceGenerationRequestDTO, namespace: String, botId: String ): SentenceGenerationResponse? {
+    fun generateSentences(request : SentenceGenerationRequest, namespace: String, botId: String ): SentenceGenerationResponse? {
         val sentenceGenerationConfig  = sentenceGenerationConfigurationDAO.findByNamespaceAndBotId(namespace, botId)
             ?: WebVerticle.badRequest("No configuration of sentence generation feature is defined yet [namespace: ${namespace}, botId = ${botId}]")
 
@@ -55,10 +56,10 @@ object CompletionService {
             "options" to mapOf<String, Any>(
                 "spelling_mistakes" to request.options.spellingMistakes,
                 "sms_language" to request.options.smsLanguage,
-                "abbreviated_language" to request.options.spellingMistakes
+                "abbreviated_language" to request.options.abbreviatedLanguage
             )
         )
-        val prompt = PromptTemplate(formatter = Formatter.JINJA2, template = llmSetting.prompt, inputs = inputs)
+        val prompt = PromptTemplate(formatter = Formatter.JINJA2.id, template = llmSetting.prompt, inputs = inputs)
 
         return completionService
             .generateSentences(SentenceGenerationQuery(llmSetting, prompt))
