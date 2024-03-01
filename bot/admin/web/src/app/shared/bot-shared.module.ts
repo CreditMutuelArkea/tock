@@ -78,7 +78,8 @@ import {
   SliderComponent,
   TokenViewComponent,
   ScrollTopButtonComponent,
-  StickyMenuComponent
+  StickyMenuComponent,
+  AiSettingsEngineConfigParamInputComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
@@ -86,6 +87,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
+import { SentencesGenerationModule } from './modules';
 
 @NgModule({
   imports: [
@@ -153,7 +155,8 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     DebugViewerWindowComponent,
     ScrollTopButtonComponent,
     AutofocusDirective,
-    StickyMenuComponent
+    StickyMenuComponent,
+    AiSettingsEngineConfigParamInputComponent
   ],
   exports: [
     BotMessageComponent,
@@ -180,7 +183,9 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     DebugViewerWindowComponent,
     ScrollTopButtonComponent,
     AutofocusDirective,
-    StickyMenuComponent
+    StickyMenuComponent,
+    SentencesGenerationModule,
+    AiSettingsEngineConfigParamInputComponent
   ],
   providers: [BotSharedService, AnalyticsService]
 })

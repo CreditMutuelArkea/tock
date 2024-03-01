@@ -45,6 +45,7 @@ import { BotSharedService } from '../shared/bot-shared.service';
 import { ApplicationConfig } from '../applications/application.config';
 import { SelectBotConfigurationDialogComponent } from './bot-configurations/selection-dialog/select-bot-configuration-dialog.component';
 import { BotConfigurationRoutingModule } from './configuration-routing.module';
+import { SentenceGenerationSettingsComponent } from './sentence-generation-settings/sentence-generation-settings.component';
 
 @Injectable()
 export class BotApplicationConfig implements ApplicationConfig {
@@ -62,7 +63,8 @@ export class BotApplicationConfig implements ApplicationConfig {
     BotConfigurationsComponent,
     BotConfigurationComponent,
     NewBotComponent,
-    SelectBotConfigurationDialogComponent
+    SelectBotConfigurationDialogComponent,
+    SentenceGenerationSettingsComponent
   ],
   imports: [
     CommonModule,

@@ -1,6 +1,6 @@
 import { emSetting, llmSetting } from '../../../shared/model/ai-settings';
 
-export interface RagSettings {
+export interface SentenceGenerationSettings {
   id: string;
   namespace: string;
   botId: string;
