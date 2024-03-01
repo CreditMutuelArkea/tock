@@ -29,6 +29,8 @@ from langchain_core.prompts import PromptTemplate
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIGuardCheckException,
 )
+from gen_ai_orchestrator.errors.handlers.huggingfacetgi.hugging_face_exception_handler import \
+    hugging_face_exception_handler
 from gen_ai_orchestrator.errors.handlers.openai.openai_exception_handler import (
     openai_exception_handler,
 )

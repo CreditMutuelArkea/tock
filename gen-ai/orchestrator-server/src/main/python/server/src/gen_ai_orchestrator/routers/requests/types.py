@@ -25,6 +25,7 @@ from gen_ai_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetti
 from gen_ai_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
+from gen_ai_orchestrator.models.llm.huggingfacetgi.hugging_face_tgi_llm_setting import HuggingFaceTGILLMSetting
 from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )

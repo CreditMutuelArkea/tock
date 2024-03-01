@@ -34,6 +34,7 @@ from gen_ai_orchestrator.models.errors.errors_models import ErrorCode
 from gen_ai_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import (
     AzureOpenAILLMSetting,
 )
+from gen_ai_orchestrator.models.llm.huggingfacetgi.hugging_face_tgi_llm_setting import HuggingFaceTGILLMSetting
 from gen_ai_orchestrator.models.llm.llm_provider import LLMProvider
 from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
