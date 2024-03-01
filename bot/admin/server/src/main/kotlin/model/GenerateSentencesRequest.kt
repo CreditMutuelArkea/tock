@@ -18,11 +18,11 @@ package ai.tock.bot.admin.model
 
 import java.util.Locale
 
-data class SentenceGenerationRequestDTO(
+data class SentenceGenerationRequest(
     val sentences: List<String>,
     val locale: Locale,
     val nbSentences: Int = 10,
-    val options: OptionsSentenceGenerationRequest,
+    val options: SentenceGenerationOptions,
 )
 
 

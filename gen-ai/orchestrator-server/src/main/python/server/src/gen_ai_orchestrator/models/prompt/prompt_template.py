@@ -1,4 +1,4 @@
-#   Copyright (C) 2023 Credit Mutuel Arkea
+#   Copyright (C) 2023-2024 Credit Mutuel Arkea
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -13,23 +13,22 @@
 #   limitations under the License.
 #
 """Model for creating PromptTemplate."""
-from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from gen_ai_orchestrator.models.prompt.prompt_formatter import PromptFormatter
 
 
 class PromptTemplate(BaseModel):
     """A prompt template model, used to specify a formatter"""
 
-    formatter: Literal['f-string', 'jinja2'] = Field(
+    formatter: PromptFormatter = Field(
         description='The formatter of this prompt.',
-        examples=['jinja2'],
+        examples=[PromptFormatter.JINJA2],
     )
     template: str = Field(
         description='The Jinja2 Template for create a prompt.',
-
-     )
+    )
     inputs: dict = Field(
         description='inputs for generation of prompt with the template',
-
     )
