@@ -26,7 +26,7 @@ from gen_ai_orchestrator.services.langchain.factories.llm.llm_factory import (
 
 
 class FakeLLMFactory(LangChainLLMFactory):
-    """A class for LangChain Azure OpenAI LLM Factory"""
+    """A class for LangChain Fake LLM Factory"""
     setting: FakeLLMSetting
 
     def get_language_model(self) -> BaseLanguageModel:

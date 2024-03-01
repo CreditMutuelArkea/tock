@@ -68,7 +68,9 @@ def validate_prompt_template(prompt: PromptTemplate):
         prompt: The prompt template
 
     Returns:
-        Nothing. It raises GenAIPromptTemplateException if template is incorrect
+        Nothing.
+    Raises:
+        GenAIPromptTemplateException if template is incorrect
     """
     if 'jinja2' == prompt.formatter:
         try:
