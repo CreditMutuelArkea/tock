@@ -84,7 +84,8 @@ export class SentencesGenerationContentComponent implements OnChanges {
 
     this.sentencesGenerationApiService.generateSentences(completionRequest).subscribe({
       next: (completionResponse: CompletionResponse) => {
-        this.generatedSentences = this.feedGeneratedSentences(completionResponse.choices);
+        console.log(completionResponse)
+        this.generatedSentences = this.feedGeneratedSentences(completionResponse.sentences);
         this.onLoading.emit(false);
       },
       error: (e) => {

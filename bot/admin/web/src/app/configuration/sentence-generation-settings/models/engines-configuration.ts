@@ -1,17 +1,19 @@
 import { AzureOpenAiApiVersionsList, EnginesConfiguration, LLMProvider, OpenAIModelsList } from '../../../shared/model/ai-settings';
 
 export const DefaultPrompt: string = `Parameters :
-{% if spelling_mistakes %}
+{% if options.spelling_mistakes %}
 - include sentences with spelling mistakes
 {% endif %}
-{% if sms_language %}
+{% if options.sms_language %}
 - include sentences with sms language
 {% endif %}
-{% if abbreviated_language %}
+{% if options.abbreviated_language %}
 - include sentences with abbreviated language
 {% endif %}
-
-Takes into account the previous parameters and generates in {locale}, {nb_sentences} sentences derived from the sentences in the following table {sentences}
+Takes into account the previous parameters and generates in {{locale}}, {{nb_sentences}} sentences derived from the sentences in the following list:
+{% for sentence in sentences %}
+- {{ sentence }}
+{% endfor %}
 `;
 
 export const EngineConfigurations: EnginesConfiguration[] = [
