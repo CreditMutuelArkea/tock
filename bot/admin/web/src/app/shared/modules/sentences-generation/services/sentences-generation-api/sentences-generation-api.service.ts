@@ -12,7 +12,8 @@ export class SentencesGenerationApiService {
   constructor(private restService: RestService, private state: StateService) {}
 
   generateSentences(body: CompletionRequest): Observable<CompletionResponse> {
-    const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation`;
+    const url = `/gen-ai/bot/${this.state.currentApplication.name}/sentence-generation`;
+    //  /rest/admin/gen-ai/bot/cmb/sentence-generation
 
     return this.restService.post<CompletionRequest, CompletionResponse>(url, body);
   }

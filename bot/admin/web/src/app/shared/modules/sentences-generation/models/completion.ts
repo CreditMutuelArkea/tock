@@ -13,5 +13,5 @@ export interface CompletionOptions {
 }
 
 export interface CompletionResponse {
-  choices: string[];
+  sentences: string[];
 }
