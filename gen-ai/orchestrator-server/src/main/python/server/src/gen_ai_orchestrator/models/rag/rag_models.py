@@ -15,9 +15,9 @@
 """Module for RAG Models"""
 
 from enum import Enum, unique
-from typing import Optional
+from typing import Optional, List
 
-from pydantic import AnyUrl, BaseModel, Field
+from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
 
 class Footnote(BaseModel):
@@ -36,9 +36,9 @@ class Footnote(BaseModel):
         this means that the sources are parts of the same document.
         """
         return (
-            isinstance(other, Footnote)
-            and self.title == other.title
-            and self.url == other.url
+                isinstance(other, Footnote)
+                and self.title == other.title
+                and self.url == other.url
         )
 
     def __hash__(self):
@@ -70,3 +70,66 @@ class ChatMessage(BaseModel):
         description='Conversation message text', examples=['Hello, how can I do this?']
     )
     type: ChatMessageType = Field(description='The message origin (Human or AI)')
+
+
+class RagDocumentMetadata(BaseModel):
+    """The RAG document metadata"""
+
+    index_session_id: str = Field(
+        description='The indexing session id.', examples=['123f-ed01-gt21-gg08']
+    )
+    id: str = Field(
+        description='The document id.', examples=['e014-g24-0f11-1g3e']
+    )
+    title: str = Field(
+        description='The document title.',
+        examples=['Tracking shot'])
+    url: HttpUrl = Field(
+        description='The document url.',
+        examples=['https://en.wikipedia.org/wiki/Tracking_shot']
+    )
+    chunk: str = Field(
+        description='The document chunk.',
+        examples=['1/3']
+    )
+
+
+class RagDocument(BaseModel):
+    """The definition of RAG document"""
+
+    content: str = Field(
+        description='The document content.',
+        examples=['In cinematography, a tracking shot is any shot where the camera follows backward, '
+                  'forward or moves alongside the subject being recorded.']
+    )
+    metadata: RagDocumentMetadata = Field(
+        description='The document metadata.',
+    )
+
+
+class RagDebugData(BaseModel):
+    """A RAG debug data"""
+
+    question_condensed_prompt: str = Field(
+        description='The prompt of the question rephrased with the history of the conversation.',
+        examples=['Hello, how to plan a trip to Morocco ?']
+    )
+    question_answered_prompt: str = Field(
+        description='The question answering prompt.',
+        examples=['Question: Hello, how to plan a trip to Morocco ?. Answer in French.']
+    )
+    documents: List[RagDocument] = Field(
+        description='Documents retrieved from the vector store.'
+    )
+    history: list[ChatMessage] = Field(
+        description="Conversation history, used to reformulate the user's question."
+    )
+    document_index_name: str = Field(
+        description='Index name corresponding to a document collection in the vector database.',
+    )
+    document_index_session_id: str = Field(
+        description='The indexing session id.', examples=['123f-ed01-gt21-gg08']
+    )
+    rag_duration: float = Field(
+        description='The duration of RAG in seconds.', examples=['7.2']
+    )
