@@ -58,8 +58,12 @@ private const val QUERY_ID_OPERATOR: String = "idOperator"
 private const val QUERY_ID_CONVERSATION: String = "idConversation"
 private const val TYPE_TEXT: String = "text"
 private const val ROLE_OPERATOR: String = "operator"
-private const val PROPERTY_TOCK_BOT_API_RAG_START_MESSAGE = "tock_bot_api_rag_start_message"
-private val ragStartMessage: String? = propertyOrNull(PROPERTY_TOCK_BOT_API_RAG_START_MESSAGE)
+
+// This is related to and iAdvize issue DERCBOT-850, iAdvize ticket number 119048.
+// RAG responses are proactive, very time-consuming, we don't have UX for that
+// So we're compensating with this message. It will be removed when the iAdvize problem is solved.
+private const val PROPERTY_TOCK_BOT_API_PROACTIVE_START_MESSAGE = "tock_bot_api_proactive_start_message"
+private val proactiveStartMessage: String? = propertyOrNull(PROPERTY_TOCK_BOT_API_PROACTIVE_START_MESSAGE)
 
 /**
  *
@@ -277,9 +281,9 @@ class IadvizeConnector internal constructor(
     }
 
     override fun startProactiveConversation(callback: ConnectorCallback, botBus: BotBus): Boolean {
-        if(!ragStartMessage.isNullOrBlank()){
+        if(!proactiveStartMessage.isNullOrBlank()){
             // Send a RAG start message
-            botBus.send(ragStartMessage)
+            botBus.send(proactiveStartMessage)
         }
         (callback as? IadvizeConnectorCallback)?.answerWithResponse()
         return true
