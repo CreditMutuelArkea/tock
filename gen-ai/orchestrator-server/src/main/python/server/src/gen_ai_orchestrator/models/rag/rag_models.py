@@ -19,6 +19,8 @@ from typing import Optional, List
 
 from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
+from gen_ai_orchestrator.routers.requests.types import DocumentSearchParams
+
 
 class Footnote(BaseModel):
     """A footnote model, used to associate document sources with the RAG answer"""
@@ -110,26 +112,40 @@ class RagDocument(BaseModel):
 class RagDebugData(BaseModel):
     """A RAG debug data"""
 
-    question_condensed_prompt: str = Field(
+    user_question: Optional[str] = Field(
+        description='The user\'s initial question.',
+        examples=["I'm interested in going to Morocco"]
+    )
+    condense_question_prompt: Optional[str] = Field(
         description='The prompt of the question rephrased with the history of the conversation.',
+        examples=["""Given the following conversation and a follow up question,
+        rephrase the follow up question to be a standalone question, in its original language.
+        Chat History:
+        Human: What travel offers are you proposing?
+        Assistant: We offer trips to all of Europe and North Africa.
+        Follow Up Input: I'm interested in going to Morocco
+        Standalone question:"""]
+    )
+    condense_question: Optional[str] = Field(
+        description='The question rephrased with the history of the conversation.',
         examples=['Hello, how to plan a trip to Morocco ?']
     )
-    question_answered_prompt: str = Field(
+    question_answering_prompt: Optional[str] = Field(
         description='The question answering prompt.',
         examples=['Question: Hello, how to plan a trip to Morocco ?. Answer in French.']
     )
     documents: List[RagDocument] = Field(
         description='Documents retrieved from the vector store.'
     )
-    history: list[ChatMessage] = Field(
-        description="Conversation history, used to reformulate the user's question."
-    )
     document_index_name: str = Field(
         description='Index name corresponding to a document collection in the vector database.',
     )
-    document_index_session_id: str = Field(
-        description='The indexing session id.', examples=['123f-ed01-gt21-gg08']
+    document_search_params: DocumentSearchParams = Field(
+        description='The document search parameters. Ex: number of documents, metadata filter',
     )
-    rag_duration: float = Field(
+    answer: str = Field(
+        description='The RAG answer.'
+    )
+    duration: float = Field(
         description='The duration of RAG in seconds.', examples=['7.2']
     )
