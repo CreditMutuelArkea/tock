@@ -167,7 +167,7 @@ Bot admins can customize this prompt to their specific conversational needs.
 
 The size of this prompt (in tokens) can strongly impact your RAG system's performance if it is too long. *tiktoken* is referenced as a dev dependency, to provide a convenience tokens counter tool for this prompt.
 
-Once dev dependencies are installed in a venv, the prompt tokens can be counted using the corresponding Python interpreter:
+Once dev dependencies are installed in a venv, the prompt tokens can be counted using the corresponding Python interpreter (see [here](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) for more details):
 
 ```python
 prompt = "my new prompt contents" # put your prompt's text there
