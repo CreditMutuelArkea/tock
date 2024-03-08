@@ -40,7 +40,10 @@ from gen_ai_orchestrator.models.errors.errors_models import ErrorInfo
 from gen_ai_orchestrator.models.rag.rag_models import (
     ChatMessageType,
     Footnote,
-    TextWithFootnotes, RagDebugData, RagDocument, RagDocumentMetadata,
+    RagDebugData,
+    RagDocument,
+    RagDocumentMetadata,
+    TextWithFootnotes,
 )
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
@@ -128,7 +131,7 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     __rag_guard(inputs, response)
 
     # Calculation of RAG processing time
-    rag_duration = "{:.2f}".format(time.time() - start_time)
+    rag_duration = '{:.2f}'.format(time.time() - start_time)
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
     # Returning RAG response
@@ -146,7 +149,11 @@ def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                 )
             ),
         ),
-        debug=get_rag_debug_data(query, response, records_callback_handler, rag_duration) if debug else None,
+        debug=get_rag_debug_data(
+            query, response, records_callback_handler, rag_duration
+        )
+        if debug
+        else None,
     )
 
 
@@ -177,16 +184,16 @@ def __rag_guard(inputs, response):
 
     if 'no_answer' in inputs:
         if (
-                response['answer'] != inputs['no_answer']
-                and response['source_documents'] == []
+            response['answer'] != inputs['no_answer']
+            and response['source_documents'] == []
         ):
             message = 'The RAG gives an answer when no document has been found!'
             __rag_log(level=ERROR, message=message, inputs=inputs, response=response)
             raise GenAIGuardCheckException(ErrorInfo(cause=message))
 
         if (
-                response['answer'] == inputs['no_answer']
-                and response['source_documents'] != []
+            response['answer'] == inputs['no_answer']
+            and response['source_documents'] != []
         ):
             message = 'The RAG gives no answer for user question, but some documents has been found!'
             __rag_log(level=WARNING, message=message, inputs=inputs, response=response)
@@ -229,8 +236,10 @@ def get_rag_documents(handler: RetrieverJsonCallbackHandler) -> List[RagDocument
     on_chain_start_records = handler.show_records('on_chain_start_records')
     return [
         # Get first 100 char of content
-        RagDocument(content=doc['page_content'][0:100]+'...',
-                    metadata=RagDocumentMetadata(**doc['metadata']))
+        RagDocument(
+            content=doc['page_content'][0:100] + '...',
+            metadata=RagDocumentMetadata(**doc['metadata']),
+        )
         for doc in on_chain_start_records[0]['inputs']['input_documents']
     ]
 
@@ -239,10 +248,13 @@ def get_condense_question(handler: RetrieverJsonCallbackHandler) -> Optional[str
     """Get the condensed question"""
 
     on_text_records = handler.show_records('on_text_records')
+    # If the handler records 2 texts (prompts), this means that 2 LLM providers are invoked
     if len(on_text_records) == 2:
+        # So the user question is condensed
         on_chain_start_records = handler.show_records('on_chain_start_records')
         return on_chain_start_records[0]['inputs']['question']
     else:
+        # Else, the user's question was not formulated
         return None
 
 
@@ -250,13 +262,17 @@ def get_llm_prompts(handler: RetrieverJsonCallbackHandler) -> (Optional[str], st
     """Get used llm prompt"""
 
     on_text_records = handler.show_records('on_text_records')
+    # If the handler records 2 texts (prompts), this means that 2 LLM providers are invoked
     if len(on_text_records) == 2:
         return on_text_records[0]['text'], on_text_records[1]['text']
 
+    # Else, only the LLM for "question answering" was invoked
     return None, on_text_records[0]['text']
 
 
-def get_rag_debug_data(query, response, records_callback_handler, rag_duration) -> RagDebugData:
+def get_rag_debug_data(
+    query, response, records_callback_handler, rag_duration
+) -> RagDebugData:
     """RAG debug data assembly"""
 
     return RagDebugData(
@@ -270,4 +286,3 @@ def get_rag_debug_data(query, response, records_callback_handler, rag_duration) 
         answer=response['answer'],
         duration=rag_duration,
     )
-
