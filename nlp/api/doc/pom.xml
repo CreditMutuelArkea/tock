@@ -21,13 +21,13 @@
     <parent>
         <groupId>ai.tock</groupId>
         <artifactId>tock-nlp-api</artifactId>
-        <version>23.9.3-SNAPSHOT</version>
+        <version>23.9.3-ARKEA-f3b26b296-SNAPSHOT</version>
     </parent>
 
     <artifactId>tock-nlp-api-doc</artifactId>
     <name>Tock NLP API Documentation</name>
     <description>Interface documentation for Tock NLP API</description>
-    
+
     <build>
         <plugins>
             <plugin>
