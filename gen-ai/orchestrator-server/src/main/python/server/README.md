@@ -24,13 +24,13 @@ LLM Orchestrator is the server that handle all LLMs operations : Retrieval Augme
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-* [![Python]][Python-url]
-* [![FastApi]][FastApi-url]
-* [![Azure]][Azure-url]
-* [![AWS]][AWS-url]
-* [![LangChain]][LangChain-url]
-* [![OpenAI]][OpenAI-url]
-* [![AzureOpenAI]][AzureOpenAI-url]
+* [![Python][Python]][Python-url]
+* [![FastApi][FastApi]][FastApi-url]
+* [![Azure][Azure]][Azure-url]
+* [![AWS][AWS]][AWS-url]
+* [![LangChain][LangChain]][LangChain-url]
+* [![OpenAI][OpenAI]][OpenAI-url]
+* [![AzureOpenAI][AzureOpenAI]][AzureOpenAI-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
