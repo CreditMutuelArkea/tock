@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-package ai.tock.aws.secretmanager.provider
+package ai.tock.shared.security.credentials
+import kotlinx.serialization.Serializable
 
-import ai.tock.aws.model.Credentials
-
-/**
- * IAdvize credentials provider
- */
-interface IAdvizeCredentialsProvider {
-    fun getIAdvizeCredentials(): Credentials
-}
+@Serializable
+data class Credentials(val username: String, val password: String)

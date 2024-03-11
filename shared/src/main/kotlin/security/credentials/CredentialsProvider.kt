@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017/2022 e-voyageurs technologies
+ * Copyright (C) 2017/2021 e-voyageurs technologies
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-package ai.tock.aws.model
+package security.credentials
 
-import kotlinx.serialization.Serializable
+import ai.tock.shared.security.credentials.Credentials
+import ai.tock.shared.security.credentials.CredentialsProviderType
 
-@Serializable
-data class Credentials(val username: String, val password: String)
+interface CredentialsProvider {
+    val type : CredentialsProviderType
+
+    fun getCredentials(): Credentials
+}
