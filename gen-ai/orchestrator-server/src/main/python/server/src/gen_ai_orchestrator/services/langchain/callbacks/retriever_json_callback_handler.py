@@ -171,7 +171,13 @@ class RetrieverJsonCallbackHandler(BaseCallbackHandler):
 
 
     def normalise_prompt(self, prompt: str):
-        """remove on after prompt and color on prompt"""
+        """
+        Remove 'on after prompt' and color on prompt.
+        To identify the color ansi sequence, the function uses this regular expression : \x1B\[[0-?]*[ -/]*[@-~]
+
+        Args:
+            prompt: the prompt to normalise
+        """
 
         # remove ansi escape sequences
         ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
