@@ -91,7 +91,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
-import { SentencesGenerationModule } from './modules';
 
 @NgModule({
   imports: [

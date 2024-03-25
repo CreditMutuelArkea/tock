@@ -12,8 +12,6 @@ import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
 import { ChoiceDialogComponent, SentencesGenerationComponent } from '../../../shared/components';
 import { FaqDefinitionExtended } from '../faq-management.component';
-import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/components';
-import { SentencesGenerationService } from '../../../shared/modules/sentences-generation/services';
 
 export enum FaqTabs {
   INFO = 'info',
