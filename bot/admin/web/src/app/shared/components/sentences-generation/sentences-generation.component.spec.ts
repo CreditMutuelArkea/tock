@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { SentencesGenerationContentComponent } from './sentences-generation-content.component';
+import { SentencesGenerationComponent } from './sentences-generation.component';
 
 describe('SentencesGenerationComponent', () => {
-  let component: SentencesGenerationContentComponent;
-  let fixture: ComponentFixture<SentencesGenerationContentComponent>;
+  let component: SentencesGenerationComponent;
+  let fixture: ComponentFixture<SentencesGenerationComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [SentencesGenerationContentComponent]
+      declarations: [SentencesGenerationComponent]
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(SentencesGenerationContentComponent);
+    fixture = TestBed.createComponent(SentencesGenerationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

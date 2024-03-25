@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 
-import { SentencesGenerationOptions } from '../../models';
+import { SentencesGenerationOptions } from './../models';
 
 @Component({
   selector: 'tock-sentences-generation-options',
@@ -12,10 +12,16 @@ export class SentencesGenerationOptionsComponent implements OnInit {
   @Input() sentences: string[] = [];
   @Input() options!: SentencesGenerationOptions;
 
-  @Output() onGenerate = new EventEmitter<SentencesGenerationOptions>();
+  @Output() onOptionsUpdate = new EventEmitter<Partial<SentencesGenerationOptions>>();
+
+  showAlert: boolean = true;
 
   ngOnInit(): void {
     this.form.patchValue({ ...this.options });
+
+    this.form.valueChanges.subscribe((value) => {
+      this.onOptionsUpdate.emit(this.form.value);
+    });
   }
 
   sentencesExampleMax: number = 5;
@@ -25,7 +31,6 @@ export class SentencesGenerationOptionsComponent implements OnInit {
     smsLanguage: new FormControl(false),
     abbreviatedLanguage: new FormControl(false),
     temperature: new FormControl(0.7),
-    sentenceExample: new FormControl(''),
     sentencesExample: new FormControl([], [Validators.maxLength(this.sentencesExampleMax)])
   });
 
@@ -45,19 +50,15 @@ export class SentencesGenerationOptionsComponent implements OnInit {
     return this.form.get('temperature') as FormControl;
   }
 
-  get sentenceExample(): FormControl {
-    return this.form.get('sentenceExample') as FormControl;
-  }
-
   get sentencesExample(): FormControl {
     return this.form.get('sentencesExample') as FormControl;
   }
 
   get canGenerate(): boolean {
-    return this.form.valid && (this.sentenceExample.value || this.sentencesExample.value.length);
+    return this.form.valid && this.sentencesExample.value.length;
   }
 
-  generate(): void {
-    if (this.canGenerate) this.onGenerate.emit(this.form.value as SentencesGenerationOptions);
+  closeAlert(): void {
+    this.showAlert = false;
   }
 }

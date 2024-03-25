@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-
-import { GeneratedSentence } from '../../models';
+import { GeneratedSentence } from './../models';
 
 @Component({
   selector: 'tock-sentences-generation-list',
@@ -12,7 +11,6 @@ export class SentencesGenerationListComponent implements OnChanges {
 
   @Output() onBackOptions = new EventEmitter();
   @Output() onGenerate = new EventEmitter();
-  @Output() onValidateSelection = new EventEmitter<string[]>();
 
   distinctGeneratedSentencesLength: number = 0;
 
@@ -68,14 +66,6 @@ export class SentencesGenerationListComponent implements OnChanges {
 
       return generatedSentence;
     });
-  }
-
-  validateSelection(): void {
-    const selectedGeneratedSentences = this.generatedSentences
-      .filter((generatedSentence: GeneratedSentence) => generatedSentence.selected)
-      .map((generatedSentence: GeneratedSentence) => generatedSentence.sentence);
-
-    this.onValidateSelection.emit(selectedGeneratedSentences);
   }
 
   backOptions(): void {

@@ -10,10 +10,8 @@ import { PaginatedQuery } from '../../../model/commons';
 import { Intent, SearchQuery, SentenceStatus } from '../../../model/nlp';
 import { NlpService } from '../../../nlp-tabs/nlp.service';
 import { ConfirmDialogComponent } from '../../../shared-nlp/confirm-dialog/confirm-dialog.component';
-import { ChoiceDialogComponent } from '../../../shared/components';
+import { ChoiceDialogComponent, SentencesGenerationComponent } from '../../../shared/components';
 import { FaqDefinitionExtended } from '../faq-management.component';
-import { SentencesGenerationWrapperComponent } from '../../../shared/modules/sentences-generation/components';
-import { SentencesGenerationService } from '../../../shared/modules/sentences-generation/services';
 
 export enum FaqTabs {
   INFO = 'info',
@@ -46,12 +44,7 @@ export class FaqManagementEditComponent implements OnChanges {
   @ViewChild('addUtteranceInput') addUtteranceInput: ElementRef;
   @ViewChild('utterancesListWrapper') utterancesListWrapper: ElementRef;
 
-  constructor(
-    private nbDialogService: NbDialogService,
-    private nlp: NlpService,
-    private readonly state: StateService,
-    private sentencesGenerationService: SentencesGenerationService
-  ) {}
+  constructor(private nbDialogService: NbDialogService, private nlp: NlpService, private readonly state: StateService) {}
 
   faqTabs: typeof FaqTabs = FaqTabs;
   isSubmitted: boolean = false;
@@ -393,8 +386,7 @@ export class FaqManagementEditComponent implements OnChanges {
   }
 
   generateSentences(): void {
-    const subscription = new Subscription();
-    const dialogRef = this.nbDialogService.open(SentencesGenerationWrapperComponent, {
+    const dialogRef = this.nbDialogService.open(SentencesGenerationComponent, {
       context: {
         sentences: this.utterances.value
       }
@@ -402,16 +394,7 @@ export class FaqManagementEditComponent implements OnChanges {
 
     dialogRef.componentRef.instance.onValidateSelection.subscribe((generatedSentences: string[]) => {
       generatedSentences.forEach((generatedSentence: string) => this.addUtterance(generatedSentence));
-      subscription.add(
-        this.utterances.valueChanges.subscribe((utterances) => {
-          this.sentencesGenerationService.feedSentencesExample(utterances);
-        })
-      );
-    });
-
-    dialogRef.onClose.subscribe(() => {
-      this.sentencesGenerationService.resetSentencesExample();
-      subscription.unsubscribe();
+      dialogRef.close();
     });
   }
 }

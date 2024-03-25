@@ -3,6 +3,5 @@ export interface SentencesGenerationOptions {
   smsLanguage: boolean;
   abbreviatedLanguage: boolean;
   temperature: number;
-  sentenceExample: string;
   sentencesExample: string[];
 }

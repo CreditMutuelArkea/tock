@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Observable, Subject, debounceTime, takeUntil } from 'rxjs';
 import { BotApplicationConfiguration } from '../../core/model/configuration';
 import { DefaultPrompt, EngineConfigurations } from './models/engines-configuration';
@@ -25,7 +25,7 @@ interface GenAiSettingsForm {
   templateUrl: './sentence-generation-settings.component.html',
   styleUrls: ['./sentence-generation-settings.component.scss']
 })
-export class SentenceGenerationSettingsComponent implements OnInit {
+export class SentenceGenerationSettingsComponent implements OnInit, OnDestroy {
   destroy$: Subject<unknown> = new Subject();
 
   configurations: BotApplicationConfiguration[];

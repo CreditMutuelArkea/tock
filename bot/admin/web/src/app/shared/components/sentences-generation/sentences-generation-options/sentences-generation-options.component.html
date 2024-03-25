@@ -1,19 +1,24 @@
+<nb-alert
+  *ngIf="showAlert"
+  outline="warning"
+  closable
+  (close)="closeAlert()"
+>
+  <div class="d-flex align-items-center gap-1">
+    <nb-icon
+      icon="alert-triangle-outline"
+      status="warning"
+    ></nb-icon>
+    Please note that data will be transmitted to an external partner. Be careful not to send sentences containing "sensitive" information.
+  </div>
+</nb-alert>
+
 <form
   class="d-flex flex-column"
   [formGroup]="form"
 >
   <div>
     <div class="mb-3">
-      <!-- <input
-        class="mb-2"
-        autofocusElement
-        nbInput
-        formControlName="sentenceExample"
-        id="sentence"
-        fullWidth
-        type="text"
-        placeholder="Enter an example"
-      /> -->
       <nb-select
         *ngIf="sentences.length"
         class="mb-1"
@@ -42,7 +47,7 @@
       <nb-toggle formControlName="spellingMistakes">Include spellings mistakes</nb-toggle>
       <nb-toggle formControlName="smsLanguage">Include SMS language</nb-toggle>
       <nb-toggle formControlName="abbreviatedLanguage">Include abbreviated language</nb-toggle>
-      <div class="form-group">
+      <!-- <div class="form-group">
         <label for="temperature"
           >Temperature
           <nb-icon
@@ -63,20 +68,7 @@
           />
           <small class="align-self-end">{{ temperature.value }} / 1</small>
         </div>
-      </div>
+      </div> -->
     </div>
-  </div>
-
-  <div class="card-footer-actions mt-2">
-    <button
-      type="submit"
-      nbButton
-      status="primary"
-      size="small"
-      [disabled]="!canGenerate"
-      (click)="generate()"
-    >
-      Generate
-    </button>
   </div>
 </form>

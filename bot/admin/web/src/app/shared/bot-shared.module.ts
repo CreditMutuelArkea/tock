@@ -43,7 +43,8 @@ import {
   NbFormFieldModule,
   NbAutocompleteModule,
   NbRadioModule,
-  NbWindowModule
+  NbWindowModule,
+  NbListModule
 } from '@nebular/theme';
 import { InfoButtonComponent } from './info-button/info-button.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
@@ -79,7 +80,10 @@ import {
   TokenViewComponent,
   ScrollTopButtonComponent,
   StickyMenuComponent,
-  AiSettingsEngineConfigParamInputComponent
+  AiSettingsEngineConfigParamInputComponent,
+  SentencesGenerationComponent,
+  SentencesGenerationListComponent,
+  SentencesGenerationOptionsComponent
 } from './components';
 
 import { AutofocusDirective } from './directives';
@@ -87,7 +91,6 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AnalyticsService } from '../analytics/analytics.service';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
-import { SentencesGenerationModule } from './modules';
 
 @NgModule({
   imports: [
@@ -111,7 +114,8 @@ import { SentencesGenerationModule } from './modules';
     NbAlertModule,
     NbRadioModule,
     NgxSliderModule,
-    NbWindowModule
+    NbWindowModule,
+    NbListModule
   ],
   declarations: [
     BotMessageComponent,
@@ -156,7 +160,10 @@ import { SentencesGenerationModule } from './modules';
     ScrollTopButtonComponent,
     AutofocusDirective,
     StickyMenuComponent,
-    AiSettingsEngineConfigParamInputComponent
+    AiSettingsEngineConfigParamInputComponent,
+    SentencesGenerationOptionsComponent,
+    SentencesGenerationListComponent,
+    SentencesGenerationComponent
   ],
   exports: [
     BotMessageComponent,
@@ -184,8 +191,8 @@ import { SentencesGenerationModule } from './modules';
     ScrollTopButtonComponent,
     AutofocusDirective,
     StickyMenuComponent,
-    SentencesGenerationModule,
-    AiSettingsEngineConfigParamInputComponent
+    AiSettingsEngineConfigParamInputComponent,
+    SentencesGenerationComponent
   ],
   providers: [BotSharedService, AnalyticsService]
 })

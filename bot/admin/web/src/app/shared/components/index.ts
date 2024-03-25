@@ -29,3 +29,6 @@ export * from './json-iterator/json-iterator.component';
 export * from './scroll-top-button/scroll-top-button.component';
 export * from './sticky-menu/sticky-menu.component';
 export * from './ai-settings-engine-config-param-input/ai-settings-engine-config-param-input.component';
+export * from './sentences-generation/sentences-generation-options/sentences-generation-options.component';
+export * from './sentences-generation/sentences-generation-list/sentences-generation-list.component';
+export * from './sentences-generation/sentences-generation.component';

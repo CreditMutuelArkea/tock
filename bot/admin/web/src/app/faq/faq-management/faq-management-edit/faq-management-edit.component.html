@@ -181,12 +181,11 @@
               nbTooltip="Generate sentences"
               ghost
               shape="round"
+              status="primary"
               (click)="generateSentences()"
+              [disabled]="!utterances.controls.length"
             >
-              <nb-icon
-                icon="bulb-outline"
-                status="primary"
-              ></nb-icon>
+              <nb-icon icon="bulb-outline"></nb-icon>
             </button>
           </div>
         </tock-form-control>

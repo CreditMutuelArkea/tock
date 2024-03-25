@@ -1,16 +1,22 @@
 import { AzureOpenAiApiVersionsList, EnginesConfiguration, LLMProvider, OpenAIModelsList } from '../../../shared/model/ai-settings';
 
-export const DefaultPrompt: string = `Parameters :
+export const DefaultPrompt: string = `Given the base sentences provided below, generate a list of {{nb_sentences}} unique sentences that convey the same meaning but vary in their presentation. 
+
+The variations should reflect a diverse range of alterations, including but not limited to:
 {% if options.spelling_mistakes %}
-- include sentences with spelling mistakes
+- Spelling Mistakes: Introduce common and uncommon spelling errors that do not hinder the overall comprehension of the sentence.
 {% endif %}
 {% if options.sms_language %}
-- include sentences with sms language
+- Incorporation of Non-Standard Language Features: Where appropriate, use features like onomatopoeia, mimetic words, or linguistic innovations unique to digital communication.
 {% endif %}
 {% if options.abbreviated_language %}
-- include sentences with abbreviated language
+- Abbreviations and DM (Direct Message) Language: Transform parts of the sentence using popular text messaging abbreviations, internet slang, and shorthand commonly found in online and informal communication.
 {% endif %}
-Takes into account the previous parameters and generates in {{locale}}, {{nb_sentences}} sentences derived from the sentences in the following list:
+- Answer as a numbered list.
+
+Ensure that all generated sentences remain intelligible and their meaning can be easily understood, despite the variations introduced. The language of the base sentence and all variations should be consistent (i.e., if the base sentence is in a language other than English, all variations should also be in that language).
+
+Base Sentences (remember: you must answer as a numbered list):
 {% for sentence in sentences %}
 - {{ sentence }}
 {% endfor %}
