@@ -158,7 +158,7 @@ async def test_opensearch_exception_handler_connexion_error():
         decorated_function()
 
 
-def test_opensearch_exception_handler_resource_not_found_error():
+async def test_opensearch_exception_handler_resource_not_found_error():
     @opensearch_exception_handler
     def decorated_function(*args, **kwargs):
         raise OpenSearchNotFoundError('400', 'there was an error')
@@ -167,7 +167,7 @@ def test_opensearch_exception_handler_resource_not_found_error():
         decorated_function()
 
 
-def test_opensearch_exception_handler_index_not_found_error():
+async def test_opensearch_exception_handler_index_not_found_error():
     @opensearch_exception_handler
     def decorated_function(*args, **kwargs):
         raise OpenSearchNotFoundError('400', 'index_not_found_exception')
@@ -176,7 +176,7 @@ def test_opensearch_exception_handler_index_not_found_error():
         decorated_function()
 
 
-def test_opensearch_exception_handler_transport_error():
+async def test_opensearch_exception_handler_transport_error():
     @opensearch_exception_handler
     def decorated_function(*args, **kwargs):
         raise OpenSearchTransportError('400', 'there was an error')
