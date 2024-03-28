@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { SentenceTrainingMode } from '../../../shared/components/sentence-training/models';
 import { SentenceTrainingComponent } from '../../../shared/components';
+
+import 'node_modules/Tock-Vue-Kit/index.js';
 
 @Component({
   selector: 'tock-sentences-inbox',
   templateUrl: './sentences-inbox.component.html',
   styleUrls: ['./sentences-inbox.component.scss']
 })
-export class SentencesInboxComponent {
+export class SentencesInboxComponent implements OnInit {
   mode = SentenceTrainingMode.INBOX;
 
   @ViewChild(SentenceTrainingComponent) sentencesTraining;
 
   constructor() {}
+
+  ngOnInit() {
+    window['TockVueKit'].renderChat(document.getElementById('testVueKit'), 'http://localhost:8080/io/01/cmb/web');
+  }
 
   refresh() {
     this.sentencesTraining.refresh();

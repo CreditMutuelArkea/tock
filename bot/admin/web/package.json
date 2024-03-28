@@ -45,10 +45,10 @@
     "ngx-infinite-scroll": "^8.0.2",
     "ngx-moment": "^6.0.2",
     "normalize.css": "6.0.0",
-    "papaparse": "^5.4.1",
     "rxjs": "^7.4.0",
     "tslib": "^2.4.1",
-    "zone.js": "~0.11.8"
+    "zone.js": "~0.11.8",
+    "Tock-vue-Kit": "file:../Tock-Vue-Kit"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^14.2.10",
