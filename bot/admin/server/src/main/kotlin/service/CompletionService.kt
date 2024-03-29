@@ -44,11 +44,19 @@ object CompletionService {
      * @param botId [String] : the bot id
      * @return [SentenceGenerationResponse]
      */
-    fun generateSentences(request : SentenceGenerationRequest, namespace: String, botId: String ): SentenceGenerationResponse? {
-        val sentenceGenerationConfig  = sentenceGenerationConfigurationDAO.findByNamespaceAndBotId(namespace, botId)
-            ?: WebVerticle.badRequest("No configuration of sentence generation feature is defined yet [namespace: ${namespace}, botId = ${botId}]")
+    fun generateSentences(
+        request: SentenceGenerationRequest,
+        namespace: String,
+        botId: String
+    ): SentenceGenerationResponse? {
+        val sentenceGenerationConfig = sentenceGenerationConfigurationDAO.findByNamespaceAndBotId(namespace, botId)
+            ?: WebVerticle.badRequest("No configuration of sentence generation feature is defined yet " +
+                    "[namespace: ${namespace}, botId = ${botId}]")
 
-        val llmSetting = sentenceGenerationConfig.llmSetting
+        // Get LLM Setting and override the temperature
+        val llmSetting = sentenceGenerationConfig.llmSetting.copyWithTemperature(request.llmTemperature)
+
+        // Create the inputs map
         val inputs = mapOf(
             "locale" to request.locale,
             "nb_sentences" to request.nbSentences,
@@ -59,10 +67,16 @@ object CompletionService {
                 "abbreviated_language" to request.options.abbreviatedLanguage
             )
         )
-        val prompt = PromptTemplate(formatter = Formatter.JINJA2.id, template = llmSetting.prompt, inputs = inputs)
 
+        // Create a Jinja2 prompt template
+        val prompt = PromptTemplate(
+            formatter = Formatter.JINJA2.id,
+            template = llmSetting.prompt,
+            inputs = inputs
+        )
+
+        // call the completion service to generate sentences
         return completionService
             .generateSentences(SentenceGenerationQuery(llmSetting, prompt))
     }
-
 }

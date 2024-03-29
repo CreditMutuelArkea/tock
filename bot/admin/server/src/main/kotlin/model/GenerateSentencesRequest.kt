@@ -19,6 +19,7 @@ package ai.tock.bot.admin.model
 import java.util.Locale
 
 data class SentenceGenerationRequest(
+    val llmTemperature: String,
     val sentences: List<String>,
     val locale: Locale,
     val nbSentences: Int = 10,
