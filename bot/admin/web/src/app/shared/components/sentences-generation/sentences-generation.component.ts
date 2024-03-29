@@ -36,7 +36,7 @@ export class SentencesGenerationComponent implements OnInit {
     sentencesExample: [],
     spellingMistakes: false,
     smsLanguage: false,
-    temperature: 0.7
+    llmTemperature: 0.5
   };
 
   constructor(
@@ -84,12 +84,13 @@ export class SentencesGenerationComponent implements OnInit {
   generate(options: SentencesGenerationOptions = this.options): void {
     this.informNoResult = false;
 
-    const { abbreviatedLanguage, sentencesExample, smsLanguage, spellingMistakes, temperature } = options;
+    const { abbreviatedLanguage, sentencesExample, smsLanguage, spellingMistakes, llmTemperature } = options;
 
     const completionRequest: CompletionRequest = {
       sentences: sentencesExample,
       nbSentences: 10,
       locale: this.state.currentLocale,
+      llmTemperature: llmTemperature,
       options: {
         abbreviatedLanguage,
         smsLanguage,

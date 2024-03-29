@@ -47,28 +47,28 @@
       <nb-toggle formControlName="spellingMistakes">Include spellings mistakes</nb-toggle>
       <nb-toggle formControlName="smsLanguage">Include SMS language</nb-toggle>
       <nb-toggle formControlName="abbreviatedLanguage">Include abbreviated language</nb-toggle>
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="temperature"
           >Temperature
           <nb-icon
             icon="info-outline"
-            nbTooltip="Controls the randomness: a temperature close to 0 leads to a more deterministic and repetitive generation by the model. A temperature close to 1 makes the model more creative"
+            nbTooltip="Controls the randomness: a temperature close to 0 leads to a more deterministic and repetitive generation by the model. A temperature close to 1 makes the model more creative within the limits imposed by the prompt."
           ></nb-icon
         ></label>
         <div class="d-flex flex-column">
           <input
-            formControlName="temperature"
+            formControlName="llmTemperature"
             type="range"
             class="form-control-range"
             id="temperature"
             name="temperature"
             min="0"
-            max="1"
+            [max]="maxTemperature"
             step="0.01"
           />
-          <small class="align-self-end">{{ temperature.value }} / 1</small>
+          <small class="align-self-end">{{ llmTemperature.value }} / {{ maxTemperature }}</small>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </form>

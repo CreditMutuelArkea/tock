@@ -13,8 +13,7 @@ The variations should reflect a diverse range of alterations, including but not 
 - Abbreviations and DM (Direct Message) Language: Transform parts of the sentence using popular text messaging abbreviations, internet slang, and shorthand commonly found in online and informal communication.
 {% endif %}
 - Answer as a numbered list.
-
-Ensure that all generated sentences remain intelligible and their meaning can be easily understood, despite the variations introduced. The language of the base sentence and all variations should be consistent (i.e., if the base sentence is in a language other than English, all variations should also be in that language).
+- Answer in {{locale}}.
 
 Base Sentences (remember: you must answer as a numbered list):
 {% for sentence in sentences %}

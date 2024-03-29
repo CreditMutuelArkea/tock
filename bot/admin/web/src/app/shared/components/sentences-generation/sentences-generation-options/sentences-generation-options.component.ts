@@ -16,6 +16,8 @@ export class SentencesGenerationOptionsComponent implements OnInit {
 
   showAlert: boolean = true;
 
+  maxTemperature: number = 1;
+
   ngOnInit(): void {
     this.form.patchValue({ ...this.options });
 
@@ -30,7 +32,7 @@ export class SentencesGenerationOptionsComponent implements OnInit {
     spellingMistakes: new FormControl(false),
     smsLanguage: new FormControl(false),
     abbreviatedLanguage: new FormControl(false),
-    temperature: new FormControl(0.7),
+    llmTemperature: new FormControl(0.5),
     sentencesExample: new FormControl([], [Validators.maxLength(this.sentencesExampleMax)])
   });
 
@@ -46,8 +48,8 @@ export class SentencesGenerationOptionsComponent implements OnInit {
     return this.form.get('abbreviatedLanguage') as FormControl;
   }
 
-  get temperature(): FormControl {
-    return this.form.get('temperature') as FormControl;
+  get llmTemperature(): FormControl {
+    return this.form.get('llmTemperature') as FormControl;
   }
 
   get sentencesExample(): FormControl {

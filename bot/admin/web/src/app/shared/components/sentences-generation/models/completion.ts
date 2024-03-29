@@ -4,6 +4,7 @@ export interface CompletionRequest {
 
   locale: string;
   options: CompletionOptions;
+  llmTemperature: number;
 }
 
 export interface CompletionOptions {
