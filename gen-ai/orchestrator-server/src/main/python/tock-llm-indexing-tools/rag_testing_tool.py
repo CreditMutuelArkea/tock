@@ -93,27 +93,23 @@ def test_rag(args):
     ]
     k = search_params['k']
 
+    # This is LangSmith's default concurrency level
+    concurrency_level = 5
+    # If delay arg is present, we want to space out executions, running them
+    # one at a time
     if args['<delay>']:
-        client.run_on_dataset(
-            dataset_name=args['<dataset_name>'],
-            llm_or_chain_factory=_construct_chain,
-            project_name=args['<test_name>'] + '-' + str(uuid4())[:8],
-            project_metadata={
-                'index_session_id': index_session_id,
-                'k': k,
-            },
-            concurrency_level=1,
-        )
-    else:
-        client.run_on_dataset(
-            dataset_name=args['<dataset_name>'],
-            llm_or_chain_factory=_construct_chain,
-            project_name=args['<test_name>'] + '-' + str(uuid4())[:8],
-            project_metadata={
-                'index_session_id': index_session_id,
-                'k': k,
-            },
-        )
+        concurrency_level = 1
+
+    client.run_on_dataset(
+        dataset_name=args['<dataset_name>'],
+        llm_or_chain_factory=_construct_chain,
+        project_name=args['<test_name>'] + '-' + str(uuid4())[:8],
+        project_metadata={
+            'index_session_id': index_session_id,
+            'k': k,
+        },
+        concurrency_level=concurrency_level,
+    )
 
     duration = datetime.now() - start_time
     hours, remainder = divmod(duration.seconds, 3600)
