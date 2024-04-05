@@ -7,7 +7,7 @@
       <a href="#about-the-project">About The Project</a>
     </li>
     <li>
-      <a href="#getting-started-with-tock-llm-orchestrator">Getting Started with Tock LLM Orchestrator</a>
+      <a href="#getting-started-with-gen-ai-orchestrator">Getting Started with Gen AI Orchestrator</a>
       <ul>
         <li><a href="#prerequisites">Prerequisites</a></li>
         <li><a href="#dev">Dev</a></li>
@@ -20,21 +20,21 @@
 
 ## About The Project
 
-LLM Orchestrator is the server that handle all LLMs operations : Retrieval Augmented Generation, synthetic sentences generation. This server is called by Bot API RAG story.
+Gen AI Orchestrator is the server that handle all LLMs operations : Retrieval Augmented Generation, synthetic sentences generation. This server is called by Bot API RAG story.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-* [![Python][Python]][Python-url]
-* [![FastApi][FastApi]][FastApi-url]
-* [![Azure][Azure]][Azure-url]
-* [![AWS][AWS]][AWS-url]
-* [![LangChain][LangChain]][LangChain-url]
-* [![OpenAI][OpenAI]][OpenAI-url]
-* [![AzureOpenAI][AzureOpenAI]][AzureOpenAI-url]
+* [![Python]][Python-url]
+* [![FastApi]][FastApi-url]
+* [![Azure]][Azure-url]
+* [![AWS]][AWS-url]
+* [![LangChain]][LangChain-url]
+* [![OpenAI]][OpenAI-url]
+* [![AzureOpenAI]][AzureOpenAI-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## Getting Started with Tock LLM Orchestrator
+## Getting Started with Gen AI Orchestrator
 
 ### Prerequisites
 
@@ -162,12 +162,12 @@ Uvicorn Fast API: go to
 
 ## Prompts tooling
 
-When a bot is configured to use the LLM Orchestrator (through the RAG/RAG settings screen in the Studio), a default prompt is proposed to the bot admin, to carry the user query to the LLM inference point.
+When a bot is configured to use the Gen AI Orchestrator (through the RAG/RAG settings screen in the Studio), a default prompt is proposed to the bot admin, to carry the user query to the LLM inference point.
 Bot admins can customize this prompt to their specific conversational needs.
 
-The size of this prompt (in tokens) can strongly impact your RAG system's performance if it is too long. *tiktoken* is referenced as a dev dependency, to provide a convenience tokens counter tool for this prompt.
+The size of this prompt (in tokens) can strongly impact your RAG system's performance if it is too long. *tiktoken* is referenced as a project dependency, to provide a convenience tokens counter tool for this prompt.
 
-Once dev dependencies are installed in a venv, the prompt tokens can be counted using the corresponding Python interpreter (see [here](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) for more details):
+Once the project's dependencies are installed in a venv, the prompt tokens can be counted using the corresponding Python interpreter (see [here](https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb) for more details):
 
 ```python
 prompt = "my new prompt contents" # put your prompt's text there
@@ -175,6 +175,8 @@ encoding = tiktoken.encoding_for_model("gpt-4") # change according to RAG settin
 num_tokens = len(encoding.encode(prompt))
 print(f"Nb of tokens: {num_tokens}")
 ```
+
+If your prompt contents can be made public, you can also use [OpenAI's tokenizer](https://platform.openai.com/tokenizer) as a more convenient method.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
