@@ -113,3 +113,21 @@ Documents will be indexed in OpenSearch DB under index_name index (index_name sh
 | url              | the 'url' column from original input CSV                         |
 
 A unique indexing session id is produced and printed to the console (will be the last line printed if the '-v' option is used).
+
+### generate_dataset.py
+
+```
+Generates a testing dataset based on an input file. The input file should have the correct format (see generate_datset_input.xlsx for sample). The generated dataset can be saved on filesystem, using the --csv-output option, on langsmith, using the --langsmith-dataset-name option, or both.
+
+Usage:
+generate_dataset.py [-v] <input_excel> (--range=<s> | --sheet=<n>...) [--csv-output=<path>] [ --langsmith-dataset-name=<name> ] [--locale=<locale>] [--no-answer=<na>] [--output=<path>]
+
+Arguments:
+    input_excel path to the input excel file
+
+Options:
+    -h --help       Show this screen
+    --version       Show version
+    -v              Verbose output for debugging (without this option, script will be silent but for errors)
+```
+

@@ -25,7 +25,7 @@ Options:
     --version       Show version
     -v              Verbose output for debugging (without this option, script will be silent but for errors)
 
-Generates a testing dataset based on an input file. The input file should have the correct format (see README). The generated dataset can be saved on filesystem, using the --csv-output option, on langsmith, using the --langsmith-dataset-name option, or both.
+Generates a testing dataset based on an input file. The input file should have the correct format (see generate_datset_input.xlsx for sample). The generated dataset can be saved on filesystem, using the --csv-output option, on langsmith, using the --langsmith-dataset-name option, or both.
 """
 
 import logging
