@@ -48,7 +48,6 @@ data class BotSentenceGenerationConfigurationDTO(
             botId,
             enabled,
             nbSentences,
-            llmSetting,
             LLMSettingMapper.toEntity(
                 llmSetting,
                 SecurityUtils.generateAwsSecretName(
