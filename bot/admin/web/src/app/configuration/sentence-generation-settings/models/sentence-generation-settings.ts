@@ -1,4 +1,4 @@
-import { emSetting, llmSetting } from '../../../shared/model/ai-settings';
+import { llmSetting } from '../../../shared/model/ai-settings';
 
 export interface SentenceGenerationSettings {
   id: string;
@@ -6,9 +6,5 @@ export interface SentenceGenerationSettings {
   botId: string;
   enabled: boolean;
 
-  noAnswerSentence: string;
-  noAnswerStoryId: string | null;
-
   llmSetting: llmSetting;
-  emSetting: emSetting;
 }
