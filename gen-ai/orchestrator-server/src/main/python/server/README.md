@@ -143,13 +143,6 @@ If you use [Dependency Track](https://dependencytrack.org/) for dependencies vul
 cyclonedx-py poetry . --no-dev -o tock-gen-ai-orchestrator-sbom-$(git rev-parse --short HEAD).json
 ```
 
-#### Generate SBOM file using cyclonedx-bom for Dependency Track
-
-If you use [Dependency Track](https://dependencytrack.org/) for dependencies vulnerability management, follow those instruction to generate the SBOM file :
-```bash
-cyclonedx-py poetry . --no-dev -o tock-gen-ai-orchestrator-sbom-$(git rev-parse --short HEAD).json
-```
-
 ## Usage
 
 Uvicorn Fast API: go to
