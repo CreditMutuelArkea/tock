@@ -28,7 +28,7 @@ import ai.tock.bot.admin.model.*
 import ai.tock.bot.admin.module.satisfactionContentModule
 import ai.tock.bot.admin.service.CompletionService
 import ai.tock.bot.admin.service.SentenceGenerationService
-import ai.tock.bot.admin.service.RagService
+import ai.tock.bot.admin.service.RAGService
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpImport
 import ai.tock.bot.admin.test.TestPlanService
 import ai.tock.bot.admin.test.findTestService
@@ -437,14 +437,14 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingJsonPost("/configuration/bots/:botId/rag", admin) { context, configuration: BotRAGConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
-                BotRAGConfigurationDTO(RagService.saveRag(configuration))
+                BotRAGConfigurationDTO(RAGService.saveRag(configuration))
             } else {
                 unauthorized()
             }
         }
 
         blockingJsonGet("/configuration/bots/:botId/rag", admin) { context  ->
-            RagService.getRAGConfiguration(context.organization, context.path("botId"))
+            RAGService.getRAGConfiguration(context.organization, context.path("botId"))
                 ?.let {
                     BotRAGConfigurationDTO(it)
                 }
