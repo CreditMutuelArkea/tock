@@ -125,6 +125,20 @@
           </ng-container>
         </div>
       </div>
+
+      <tock-form-control
+        label="Number of sentences to generate"
+        name="nbSentences"
+        [controls]="nbSentences"
+        [showError]="isSubmitted"
+      >
+        <tock-slider
+          min="1"
+          max="20"
+          step="1"
+          formControlName="nbSentences"
+        ></tock-slider>
+      </tock-form-control>
     </nb-card-body>
   </nb-card>
 </form>

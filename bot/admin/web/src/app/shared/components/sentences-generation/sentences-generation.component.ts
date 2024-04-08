@@ -22,6 +22,7 @@ export class SentencesGenerationComponent implements OnInit {
   @ViewChild('sentencesGenerationListComp') sentencesGenerationListComp: SentencesGenerationListComponent;
 
   loading: boolean = true;
+  initialized: boolean = false;
 
   llmNotEnabled: boolean = false;
 
@@ -51,21 +52,22 @@ export class SentencesGenerationComponent implements OnInit {
   }
 
   checkLlmSettingsConfiguration(): void {
-    // const url = `/configuration/bots/${this.state.currentApplication.name}/rag`;
-    // this.rest
-    //   .get<LlmSettings>(url, (settings: LlmSettings) => settings)
-    //   .subscribe((settings: LlmSettings) => {
-    //     if (!settings?.id) {
-    //       this.llmNotEnabled = true;
-    //     }
-    //     this.loading = false;
-    //   });
-
-    this.loading = false;
+    const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation/info`;
+    this.restService
+      .get(url, (settings) => settings)
+      .subscribe((settings) => {
+        if (!settings?.enabled) {
+          this.llmNotEnabled = true;
+        } else {
+          this.options.llmTemperature = parseFloat(settings.llmTemperature);
+        }
+        this.loading = false;
+        this.initialized = true;
+      });
   }
 
   jumpToLlmSettings(): void {
-    this.router.navigateByUrl('configuration/llm-settings');
+    this.router.navigateByUrl('configuration/sentence-generation-settings');
     this.dialogRef.close();
   }
 

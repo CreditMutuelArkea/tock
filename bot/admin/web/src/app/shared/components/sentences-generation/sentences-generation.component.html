@@ -17,7 +17,9 @@
     <section *ngIf="llmNotEnabled">
       <div class="text-warning font-weight-bold">Sentences generation is not enabled.</div>
 
-      <span *ngIf="!state.hasRole(UserRole.admin)"> Contact an administrator </span>
+      <div *ngIf="!state.hasRole(UserRole.admin)">Contact an administrator to enable this feature</div>
+
+      <div *ngIf="state.hasRole(UserRole.admin)">You can configure this feature by following the link below</div>
 
       <button
         *ngIf="state.hasRole(UserRole.admin)"
@@ -41,7 +43,7 @@
       >
 
       <tock-sentences-generation-options
-        *ngIf="!generatedSentences.length"
+        *ngIf="initialized && !generatedSentences.length"
         [options]="options"
         [sentences]="sentences"
         (onOptionsUpdate)="updateOptions($event)"

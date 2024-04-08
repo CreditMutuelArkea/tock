@@ -15,7 +15,7 @@ import { DebugViewerWindowComponent } from '../../shared/components';
 interface GenAiSettingsForm {
   id: FormControl<string>;
   enabled: FormControl<boolean>;
-
+  nbSentences: FormControl<number>;
   llmEngine: FormControl<LLMProvider>;
   llmSetting: FormGroup<any>;
 }
@@ -86,6 +86,7 @@ export class SentenceGenerationSettingsComponent implements OnInit, OnDestroy {
   form = new FormGroup<GenAiSettingsForm>({
     id: new FormControl(null),
     enabled: new FormControl({ value: undefined, disabled: !this.canBeActivated() }),
+    nbSentences: new FormControl(10),
 
     llmEngine: new FormControl(undefined, [Validators.required]),
     llmSetting: new FormGroup<any>({})
@@ -93,6 +94,9 @@ export class SentenceGenerationSettingsComponent implements OnInit, OnDestroy {
 
   get enabled(): FormControl {
     return this.form.get('enabled') as FormControl;
+  }
+  get nbSentences(): FormControl {
+    return this.form.get('nbSentences') as FormControl;
   }
   get llmEngine(): FormControl {
     return this.form.get('llmEngine') as FormControl;
@@ -121,7 +125,7 @@ export class SentenceGenerationSettingsComponent implements OnInit, OnDestroy {
   }
 
   private getSentenceGenerationSettingsLoader(): Observable<SentenceGenerationSettings> {
-    const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation`;
+    const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation/configuration`;
     return this.rest.get<SentenceGenerationSettings>(url, (settings: SentenceGenerationSettings) => settings);
   }
 
@@ -164,7 +168,7 @@ export class SentenceGenerationSettingsComponent implements OnInit, OnDestroy {
 
       delete formValue['llmEngine'];
 
-      const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation`;
+      const url = `/configuration/bots/${this.state.currentApplication.name}/sentence-generation/configuration`;
       this.rest.post(url, formValue, null, null, true).subscribe({
         next: (genAiSettings: SentenceGenerationSettings) => {
           this.settingsBackup = genAiSettings;
