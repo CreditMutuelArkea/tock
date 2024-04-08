@@ -1,7 +1,5 @@
 export interface CompletionRequest {
   sentences: string[];
-  nbSentences: number;
-
   locale: string;
   options: CompletionOptions;
   llmTemperature: number;

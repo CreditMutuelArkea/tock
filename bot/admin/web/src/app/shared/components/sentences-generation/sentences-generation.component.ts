@@ -90,7 +90,6 @@ export class SentencesGenerationComponent implements OnInit {
 
     const completionRequest: CompletionRequest = {
       sentences: sentencesExample,
-      nbSentences: 10,
       locale: this.state.currentLocale,
       llmTemperature: llmTemperature,
       options: {
