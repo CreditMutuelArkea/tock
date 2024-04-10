@@ -15,15 +15,22 @@
 """Dataset generator. This script takes an excel file as input and generates a csv dataset as output. The generated dataset can also be directly sent to langsmith.
 
 Usage:
-    generate_dataset.py [-v] <input_excel> (--range=<s> | --sheet=<n>...) [--csv-output=<path>] [ --langsmith-dataset-name=<name> ] [--locale=<locale>] [--no-answer=<na>] [--output=<path>]
+    generate_dataset.py [-v] <input_excel> --range=<s> [--csv-output=<path>] [ --langsmith-dataset-name=<name> ] [--locale=<locale>] [--no-answer=<na>]
+    generate_dataset.py [-v] <input_excel> --sheet=<n>... [--csv-output=<path>] [ --langsmith-dataset-name=<name> ] [--locale=<locale>] [--no-answer=<na>]
 
 Arguments:
     input_excel path to the input excel file
 
 Options:
-    -h --help       Show this screen
-    --version       Show version
-    -v              Verbose output for debugging (without this option, script will be silent but for errors)
+    --range=<s>                     Range of sheet to be parsed. The expected format is X,Y where X is the first sheet to be included, and Y is the last. Indices are 0-indexed.
+    --sheet=<n>                     Sheet numbers to be parsed. Indices are 0-indexed.
+    --csv-output=<path>             Output path of csv file to be generated.
+    --langsmith-dataset-name=<name> Name of the dataset to be saved on langsmith.
+    --locale=<locale>               Locale to be included in de dataset. [default: French]
+    --no-answer=<na>                Label of no_answer to be included in the dataset. [default: NO_RAG_SENTENCE]
+    -h --help                       Show this screen
+    --version                       Show version
+    -v                              Verbose output for debugging (without this option, script will be silent but for errors)
 
 Generates a testing dataset based on an input file. The input file should have the correct format (see generate_datset_input.xlsx for sample). The generated dataset can be saved on filesystem, using the --csv-output option, on langsmith, using the --langsmith-dataset-name option, or both.
 """
