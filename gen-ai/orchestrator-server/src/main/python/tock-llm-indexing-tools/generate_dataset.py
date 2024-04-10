@@ -123,6 +123,11 @@ if __name__ == "__main__":
         level=logging.DEBUG if cli_args["-v"] else logging.INFO, format=log_format
     )
 
+    filename = cli_args["<input_excel>"]
+    if not os.path.isfile(filename):
+        logging.error("Specified input excel file was not found.")
+        exit(1)
+
     if cli_args["--langsmith-dataset-name"] and not os.environ.get("LANGCHAIN_API_KEY"):
         logging.error("Envvar LANGCHAIN_API_KEY not found.")
         exit(1)
@@ -133,7 +138,7 @@ if __name__ == "__main__":
         sheet_indices = [int(i) for i in cli_args["--sheet"]]
 
     dataset = _generate_dataset(
-        filename=cli_args["<input_excel>"],
+        filename=filename,
         sheet_indices=sheet_indices,
         locale=cli_args["--locale"] or "French",
         no_answer=cli_args["--no-answer"] or "NO_RAG_SENTENCE",
