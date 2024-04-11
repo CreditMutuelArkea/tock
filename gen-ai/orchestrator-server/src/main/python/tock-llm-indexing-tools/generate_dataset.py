@@ -36,8 +36,9 @@ Generates a testing dataset based on an input file. The input file should have t
 """
 
 import logging
-from json import loads
 import os
+from json import loads
+from pathlib import Path
 from typing import List
 
 import pandas as pd
@@ -130,13 +131,24 @@ if __name__ == "__main__":
         level=logging.DEBUG if cli_args["-v"] else logging.INFO, format=log_format
     )
 
+    # check if input filer exists
     filename = cli_args["<input_excel>"]
     if not os.path.isfile(filename):
         logging.error("Specified input excel file was not found.")
         exit(1)
 
-    if cli_args["--langsmith-dataset-name"] and not os.environ.get("LANGCHAIN_API_KEY"):
+    # check if langsmith creds is set
+    langsmith_dataset_name = cli_args["--langsmith-dataset-name"]
+    if langsmith_dataset_name and not os.environ.get("LANGCHAIN_API_KEY"):
         logging.error("Envvar LANGCHAIN_API_KEY not found.")
+        exit(1)
+
+    # check if output file can be written
+    output_path = cli_args["--csv-output"]
+    if output_path and not Path(output_path).parent.exists():
+        logging.error(
+            "Cannot proceed: directory %s does not exist", Path(output_path).parent
+        )
         exit(1)
 
     if cli_args.get("--range") is not None:
@@ -151,8 +163,8 @@ if __name__ == "__main__":
         no_answer=cli_args["--no-answer"] or "NO_RAG_SENTENCE",
     )
 
-    if cli_args["--csv-output"]:
-        _save_on_fs(dataset, cli_args["--csv-output"])
+    if output_path:
+        _save_on_fs(dataset, output_path)
 
-    if cli_args["--langsmith-dataset-name"]:
+    if langsmith_dataset_name:
         _send_to_langsmith(dataset, cli_args["--langsmith-dataset-name"])
