@@ -17,24 +17,60 @@ Then run the scripts by passing them to a Python interpreter (>= 3.9):
 ### smarttribune_formatter.py
 
 ```
-Smart Tribune export file formatter.
+Smart Tribune import data and formatter ofr send in opensearch.
 
 Usage:
-smarttribune_formatter.py [-v] <input_csv> <tag_title> <base_url> <output_csv>
+    smarttribune_consumer.py [-v]  <knowledge_base>  <base_url> <output_csv> [options]
 
 Arguments:
-input_csv   path to the Smart Tribune CSV export file
-tag_title   tag title to discrimate FAQ source ('Tag (ID system)' column will be filtered for lines containing this tag)
-base_url    the base URL to prefix every FAQ entry's query parameter to create a full URL
-output_csv  path to the output, ready-to-index CSV file
+    knowledge_base  name of the target knowledge base, ex: "name1 | name2 | name3"
+    base_url    the base URL to prefix every FAQ entry's query parameter to
+                create a full URL
+    output_csv  path to the output, ready-to-index CSV file
 
 Options:
--h --help   Show this screen
---version   Show version
--v          Verbose output for debugging (without this option, script will be silent but for errors)
+    --tag_title=<value>  
+    -h --help   Show this screen
+    --version   Show version
+    -v          Verbose output for debugging (without this option, script will
+                be silent but for errors)
+
+Import and Format a Smart Tribune data by API  into a ready-to-index CSV file
+(one 'title'|'url'|'text' line per filtered entry).
 ```
 
 Turns a Smart Tribune CSV export file into a ready-to-index CSV file (one 'title'|'url'|'text' line per filtered entry):
+
+
+| Title      | URL                | Text                  |
+| ------------ | -------------------- | ----------------------- |
+| Some title | http://example.com | This is example text. |
+| ...        | ...                | ...                   |
+
+
+### smarttribune_consumer.py
+
+```
+Smart Tribune import data and formatter ofr send in opensearch.
+
+Usage:
+    smarttribune_consumer.py [-v] <knowledge_base> <tag_title> <base_url> <output_csv>
+
+Arguments:
+    knowledge_base  name of the target knowledge base <"" "" ... ''>
+    tag_title   tag title to discriminate FAQ source ('Tag (ID system)' column
+                will be filtered for lines containing this tag)
+    base_url    the base URL to prefix every FAQ entry's query parameter to
+                create a full URL
+    output_csv  path to the output, ready-to-index CSV file
+
+Options:
+    -h --help   Show this screen
+    --version   Show version
+    -v          Verbose output for debugging (without this option, script will
+                be silent but for errors)
+```
+Import data from smart tribune API and return a ready-to-index CSV file (one 'title'|'url'|'text' line per filtered entry):
 
 
 | Title      | URL                | Text                  |
