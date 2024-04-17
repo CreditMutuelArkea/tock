@@ -17,6 +17,7 @@
 package ai.tock.bot.engine.config
 
 import ai.tock.bot.admin.bot.rag.BotRAGConfiguration
+import ai.tock.bot.definition.RAGStoryDefinition
 import ai.tock.bot.definition.StoryDefinition
 import ai.tock.bot.engine.BotBus
 import ai.tock.bot.engine.action.Footnote
@@ -48,13 +49,20 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
     private val logger = KotlinLogging.logger {}
     private val ragService: RAGService get() = injector.provide()
 
-    override fun handleProactiveAnswer(botBus: BotBus) {
-        with(botBus) {
+    override fun handleProactiveAnswer(botBus: BotBus): StoryDefinition? {
+        return with(botBus) {
             // Call RAG Api - Gen AI Orchestrator
-            val (answer, debug) = rag(this)
+            val (answer, debug, noAnswerStory) = rag(this)
 
-            if (answer != null) {
-                logger.info { "Send RAG API response" }
+            // Add debug data if available and if debugging is enabled
+            if (debug != null && (connectorData.metadata["debugEnabled"].toBoolean() || ragDebugEnabled)) {
+                logger.info { "Send RAG debug data." }
+                sendDebugData("RAG", debug)
+            }
+
+            // Handle the RAG answer
+            if (noAnswerStory == null && answer != null) {
+                logger.info { "Send RAG answer." }
                 send(
                     SendSentenceWithFootnotes(
                         botId,
@@ -71,12 +79,10 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                     )
                 )
             } else {
-                logger.info { "No RAG response to send!" }
+                logger.info { "No RAG answer to send, because a noAnswerStory is returned." }
             }
 
-            if (connectorData.metadata["debugEnabled"].toBoolean() || ragDebugEnabled) {
-                debug?.let { sendDebugData("RAG", it) }
-            }
+            noAnswerStory
         }
     }
 
@@ -86,16 +92,15 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      * @param botBus the bot Bus
      * @param response the RAG response
      */
-    private fun ragStoryRedirection(botBus: BotBus, response: RAGResponse?): Boolean {
-        with(botBus) {
+    private fun ragStoryRedirection(botBus: BotBus, response: RAGResponse?): StoryDefinition? {
+        return with(botBus) {
             val ragConfig = botDefinition.ragConfiguration
-            if (response?.answer?.text.equals(ragConfig?.noAnswerSentence, ignoreCase = true)) {
-                logger.info { "The RAG API response is equal to the configured no-answer sentence." }
-                switch(ragConfig)
-                return true
-            }
+            if (ragConfig?.noAnswerStoryId != null
+                && response?.answer?.text.equals(ragConfig.noAnswerSentence, ignoreCase = true)) {
+                logger.info { "The RAG response is equal to the configured no-answer sentence, so switch to the no-answer story." }
+                getNoAnswerRAGStory(ragConfig)
+            } else null
         }
-        return false
     }
 
     /**
@@ -103,21 +108,26 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      * Switch to the default unknown story otherwise.
      * @param ragConfig: The RAG configuration
      */
-    private fun BotBus.switch(
+    private fun BotBus.getNoAnswerRAGStory(
         ragConfig: BotRAGConfiguration?
-    ) {
+    ): StoryDefinition {
         val noAnswerStory: StoryDefinition
         val noAnswerStoryId = ragConfig?.noAnswerStoryId
         if (!noAnswerStoryId.isNullOrBlank()) {
             logger.info { "A no-answer story $noAnswerStoryId is configured, so run it." }
-            noAnswerStory = botDefinition.findStoryDefinitionById(noAnswerStoryId, applicationId)
+            noAnswerStory = botDefinition.findStoryDefinitionById(noAnswerStoryId, applicationId).let {
+                // Prevent infinite loop when the noAnswerStory is removed or disabled
+                if(it.id == RAGStoryDefinition.RAG_STORY_NAME){
+                    logger.info { "The no-answer story is removed or disabled, so run the default unknown story." }
+                    botDefinition.unknownStory
+                } else it
+            }
         } else {
             logger.info { "No no-answer story is configured, so run the default unknown story." }
             noAnswerStory = botDefinition.unknownStory
         }
 
-        logger.info { "Run the story intent=${noAnswerStory.mainIntent()}, id=${noAnswerStory.id}" }
-        handleAndSwitchStory(noAnswerStory, noAnswerStory.mainIntent())
+        return noAnswerStory
     }
 
     /**
@@ -126,7 +136,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      *
      * @return RAG response if it needs to be handled, null otherwise (already handled by a switch for instance in case of no response)
      */
-    private fun rag(botBus: BotBus): Pair<TextWithFootnotes?, Any?> {
+    private fun rag(botBus: BotBus): Triple<TextWithFootnotes?, Any?, StoryDefinition?> {
         logger.info { "Call Generative AI Orchestrator - RAG API" }
         with(botBus) {
 
@@ -158,19 +168,14 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                 )
 
                 // Handle RAG response
-                return if (!ragStoryRedirection(this, response)) {
-                    Pair(response?.answer, response?.debug)
-                } else {
-                    // Do not return a response when the RAG story has been switched to the no RAG answer story
-                    Pair(null, response?.debug)
-                }
+                return Triple(response?.answer, response?.debug, ragStoryRedirection(this, response))
             } catch (exc: Exception) {
                 logger.error { exc }
                 return if (exc is GenAIOrchestratorBusinessError && exc.error.info.error == "APITimeoutError") {
-                    switch(ragConfiguration)
-                    // Do not return a response when the RAG story has been switched to the no RAG answer story
-                    Pair(null, null)
-                }else Pair(TextWithFootnotes(text = technicalErrorMessage), exc)
+                    logger.info { "The APITimeoutError is raised, so switch to the no-answer story." }
+                    Triple(null, null, getNoAnswerRAGStory(ragConfiguration))
+                }
+                else Triple(TextWithFootnotes(text = technicalErrorMessage), exc, null)
             }
         }
     }
