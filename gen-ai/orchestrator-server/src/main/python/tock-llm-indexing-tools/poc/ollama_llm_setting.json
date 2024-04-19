@@ -1,0 +1,9 @@
+{
+  "setting": {
+    "provider": "Ollama",
+    "api_key": "ab7***************************A1IV4B",
+    "temperature": 1.2,
+    "prompt": "How to learn to ride a bike without wheels!",
+    "model": "llama2"
+  }
+}
