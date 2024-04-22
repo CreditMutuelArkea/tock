@@ -6,7 +6,11 @@ A collection of tools to ingest data into a Vector DB.
 
 Install tools using Poetry from package directory base:
 
-`poetry install`
+`poetry install --no-root`
+
+Install pre-commit for format code before commit:
+
+`pre-commit install`
 
 Then run the scripts by passing them to a Python interpreter (>= 3.9):
 
@@ -15,6 +19,35 @@ Then run the scripts by passing them to a Python interpreter (>= 3.9):
 ## Data processing
 
 ### smarttribune_formatter.py
+
+```
+Smart Tribune export file formatter.
+
+Usage:
+    smarttribune_formatter.py [-v] <input_csv> <tag_title> <base_url> <output_csv>
+
+Arguments:
+input_csv   path to the Smart Tribune CSV export file
+tag_title   tag title to discrimate FAQ source ('Tag (ID system)' column will be filtered for lines containing this tag)
+base_url    the base URL to prefix every FAQ entry's query parameter to create a full URL
+
+output_csv  path to the output, ready-to-index CSV file
+
+Options:
+-h --help   Show this screen
+--version   Show version
+-v          Verbose output for debugging (without this option, script will be silent but for errors)
+```
+
+Turns a Smart Tribune CSV export file into a ready-to-index CSV file (one 'title'|'url'|'text' line per filtered entry):
+
+| Title      | URL                | Text                  |
+| ------------ | -------------------- | ----------------------- |
+| Some title | http://example.com | This is example text. |
+| ...        | ...                | ...                   |
+
+
+### smarttribune_consumer.py
 
 ```
 Smart Tribune import data and formatter ofr send in opensearch.
@@ -29,7 +62,7 @@ Arguments:
     output_csv  path to the output, ready-to-index CSV file
 
 Options:
-    --tag_title=<value>  
+    --tag_title=<value>
     -h --help   Show this screen
     --version   Show version
     -v          Verbose output for debugging (without this option, script will
@@ -37,38 +70,6 @@ Options:
 
 Import and Format a Smart Tribune data by API  into a ready-to-index CSV file
 (one 'title'|'url'|'text' line per filtered entry).
-```
-
-Turns a Smart Tribune CSV export file into a ready-to-index CSV file (one 'title'|'url'|'text' line per filtered entry):
-
-
-| Title      | URL                | Text                  |
-| ------------ | -------------------- | ----------------------- |
-| Some title | http://example.com | This is example text. |
-| ...        | ...                | ...                   |
-
-
-### smarttribune_consumer.py
-
-```
-Smart Tribune import data and formatter ofr send in opensearch.
-
-Usage:
-    smarttribune_consumer.py [-v] <knowledge_base> <tag_title> <base_url> <output_csv>
-
-Arguments:
-    knowledge_base  name of the target knowledge base <"" "" ... ''>
-    tag_title   tag title to discriminate FAQ source ('Tag (ID system)' column
-                will be filtered for lines containing this tag)
-    base_url    the base URL to prefix every FAQ entry's query parameter to
-                create a full URL
-    output_csv  path to the output, ready-to-index CSV file
-
-Options:
-    -h --help   Show this screen
-    --version   Show version
-    -v          Verbose output for debugging (without this option, script will
-                be silent but for errors)
 ```
 Import data from smart tribune API and return a ready-to-index CSV file (one 'title'|'url'|'text' line per filtered entry):
 
@@ -177,4 +178,3 @@ Options:
 
 Generates a testing dataset based on an input file. The input file should have the correct format (see generate_datset_input.xlsx for sample). The generated dataset can be saved on filesystem, using the --csv-output option, on langsmith, using the --langsmith-dataset-name option, or both.
 ```
-

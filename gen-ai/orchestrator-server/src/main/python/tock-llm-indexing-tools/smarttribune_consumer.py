@@ -38,14 +38,15 @@ import logging
 import os
 import sys
 import urllib
+from functools import partial
 from pathlib import Path
+from time import time
 from urllib.parse import urlparse
 
 import aiohttp
 import aiometer
 import pandas as pd
 import requests
-from aiohttp.client_exceptions import ClientError
 from aiohttp_socks import ProxyConnector
 from docopt import docopt
 from dotenv import load_dotenv
@@ -189,6 +190,7 @@ async def _main(args):
     """
 
     # receipt auth token
+    _start = time()
     logging.debug(f'request token with apiKey and apiSecret')
     url = 'https://api-gateway.app.smart-tribune.com/v1/auth'
     headers = {'Content-Type': 'application/json'}
@@ -258,27 +260,14 @@ async def _main(args):
     logging.debug(f'request question by page')
     df_all_questions = pd.concat([pd.DataFrame(page) for page in rawdata])
 
-    # Create a semaphore to limit the number of concurrent requests
-    semaphore = asyncio.Semaphore(50)
-
-    async def tache(question):
-        print(question[1])
-        return await _get_answer(token, question[1])
-
-    print(df_all_questions)
-    rawdata = await asyncio.gather(
-        *aiometer.amap(
-            tache,
-            df_all_questions.iterrows(),
-            max_at_once=20,
-            max_per_second=20,  # here we can set max rate per second
-        )
+    # receipt answer by documentId
+    _startGetAnswers = time()
+    rawdata = await aiometer.run_all(
+        [partial(_get_answer, token, row[1]) for row in df_all_questions.iterrows()],
+        max_at_once=20,
+        max_per_second=20,  # here we can set max rate per second
     )
-    df_all_questions = pd.concat(rawdata)
-
-    print(rawdata)
     df_all_questions = pd.DataFrame(rawdata)
-
     logging.debug(f'request answer by question')
 
     # format data
@@ -286,6 +275,9 @@ async def _main(args):
         cli_args['<base_url>'] + '?question=' + df_all_questions['URL']
     )
     logging.debug(f"Export to output CSV file {args['<output_csv>']}")
+    logging.debug(
+        f'finished {len(df_all_questions)} questions in {time() - _start:.2f} seconds'
+    )
     df_all_questions[['Title', 'URL', 'Text']].to_csv(
         args['<output_csv>'], sep='|', index=False
     )
