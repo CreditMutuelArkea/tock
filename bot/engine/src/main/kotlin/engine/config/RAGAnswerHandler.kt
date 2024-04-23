@@ -17,9 +17,11 @@
 package ai.tock.bot.engine.config
 
 import ai.tock.bot.admin.bot.rag.BotRAGConfiguration
+import ai.tock.bot.admin.indicators.metric.MetricType
 import ai.tock.bot.definition.RAGStoryDefinition
 import ai.tock.bot.definition.StoryDefinition
 import ai.tock.bot.engine.BotBus
+import ai.tock.bot.engine.BotRepository
 import ai.tock.bot.engine.action.Footnote
 import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.action.SendSentenceWithFootnotes
@@ -51,6 +53,11 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
 
     override fun handleProactiveAnswer(botBus: BotBus): StoryDefinition? {
         return with(botBus) {
+            // Save story handled metric
+            BotRepository.saveMetric(
+                createMetric(MetricType.STORY_HANDLED)
+            )
+
             // Call RAG Api - Gen AI Orchestrator
             val (answer, debug, noAnswerStory) = rag(this)
 
@@ -95,11 +102,18 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
     private fun ragStoryRedirection(botBus: BotBus, response: RAGResponse?): StoryDefinition? {
         return with(botBus) {
             val ragConfig = botDefinition.ragConfiguration
-            if (ragConfig?.noAnswerStoryId != null
-                && response?.answer?.text.equals(ragConfig.noAnswerSentence, ignoreCase = true)) {
-                logger.info { "The RAG response is equal to the configured no-answer sentence, so switch to the no-answer story." }
-                getNoAnswerRAGStory(ragConfig)
-            } else null
+            if(response?.answer?.text.equals(ragConfig?.noAnswerSentence, ignoreCase = true)) {
+                // Save no answer metric
+                BotRepository.saveMetric(
+                    createMetric(MetricType.NO_ANSWER)
+                )
+
+                if (ragConfig?.noAnswerStoryId != null ) {
+                    logger.info { "The RAG response is equal to the configured no-answer sentence, so switch to the no-answer story." }
+                    getNoAnswerRAGStory(ragConfig)
+                }
+            }
+            null
         }
     }
 
@@ -171,6 +185,11 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                 return Triple(response?.answer, response?.debug, ragStoryRedirection(this, response))
             } catch (exc: Exception) {
                 logger.error { exc }
+                // Save failure metric
+                BotRepository.saveMetric(
+                    createMetric(MetricType.FAILURE)
+                )
+
                 return if (exc is GenAIOrchestratorBusinessError && exc.error.info.error == "APITimeoutError") {
                     logger.info { "The APITimeoutError is raised, so switch to the no-answer story." }
                     Triple(null, null, getNoAnswerRAGStory(ragConfiguration))
