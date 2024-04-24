@@ -101,19 +101,19 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      */
     private fun ragStoryRedirection(botBus: BotBus, response: RAGResponse?): StoryDefinition? {
         return with(botBus) {
-            val ragConfig = botDefinition.ragConfiguration
-            if(response?.answer?.text.equals(ragConfig?.noAnswerSentence, ignoreCase = true)) {
-                // Save no answer metric
-                BotRepository.saveMetric(
-                    createMetric(MetricType.NO_ANSWER)
-                )
-
-                if (ragConfig?.noAnswerStoryId != null ) {
-                    logger.info { "The RAG response is equal to the configured no-answer sentence, so switch to the no-answer story." }
-                    getNoAnswerRAGStory(ragConfig)
-                }
+            botDefinition.ragConfiguration?.let { ragConfig ->
+                if(response?.answer?.text.equals(ragConfig.noAnswerSentence, ignoreCase = true)) {
+                    // Save no answer metric
+                    BotRepository.saveMetric(
+                        createMetric(MetricType.NO_ANSWER)
+                    )
+                    // Switch to no answer story if configured
+                    if (!ragConfig.noAnswerStoryId.isNullOrBlank()) {
+                        logger.info { "The RAG response is equal to the configured no-answer sentence, so switch to the no-answer story." }
+                        getNoAnswerRAGStory(ragConfig)
+                    } else null
+                } else null
             }
-            null
         }
     }
 
@@ -123,10 +123,10 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      * @param ragConfig: The RAG configuration
      */
     private fun BotBus.getNoAnswerRAGStory(
-        ragConfig: BotRAGConfiguration?
+        ragConfig: BotRAGConfiguration
     ): StoryDefinition {
         val noAnswerStory: StoryDefinition
-        val noAnswerStoryId = ragConfig?.noAnswerStoryId
+        val noAnswerStoryId = ragConfig.noAnswerStoryId
         if (!noAnswerStoryId.isNullOrBlank()) {
             logger.info { "A no-answer story $noAnswerStoryId is configured, so run it." }
             noAnswerStory = botDefinition.findStoryDefinitionById(noAnswerStoryId, applicationId).let {
