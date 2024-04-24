@@ -23,6 +23,5 @@ enum class MetricType {
     QUESTION_ASKED,
     QUESTION_REPLIED,
     STORY_HANDLED,
-    FAILURE,
-    NO_ANSWER,
+    FEATURE_HANDLED,
 }

@@ -40,10 +40,10 @@ data class Metric(
     val type: MetricType,
     val indicatorName: String? = null,
     val indicatorValueName: String? = null,
-    val emitterStoryId: String,
-    val trackedStoryId: String,
-    val playerIds: Set<PlayerId>,
-    val dialogId: Id<Dialog>,
+    val emitterStoryId: String? = null,
+    val trackedStoryId: String? = null,
+    val playerIds: Set<PlayerId>? = null,
+    val dialogId: Id<Dialog>? = null,
     val creationDate: Instant = Instant.now(),
     val botId: String
 )

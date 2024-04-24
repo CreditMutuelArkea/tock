@@ -27,6 +27,5 @@ internal interface CompletionApi {
     fun generateSentences(
         @Body query: SentenceGenerationQuery,
     ): Call<SentenceGenerationResponse>
-
 }
 

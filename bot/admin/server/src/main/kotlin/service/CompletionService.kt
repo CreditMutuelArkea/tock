@@ -17,7 +17,13 @@
 package ai.tock.bot.admin.service
 
 import ai.tock.bot.admin.bot.sentencegeneration.BotSentenceGenerationConfigurationDAO
+import ai.tock.bot.admin.indicators.IndicatorValues
+import ai.tock.bot.admin.indicators.Indicators
+import ai.tock.bot.admin.indicators.metric.Metric
+import ai.tock.bot.admin.indicators.metric.MetricType
 import ai.tock.bot.admin.model.SentenceGenerationRequest
+import ai.tock.bot.engine.BotRepository
+import ai.tock.bot.engine.config.RAGAnswerHandler
 
 import ai.tock.genai.orchestratorclient.requests.Formatter
 import ai.tock.genai.orchestratorclient.requests.PromptTemplate
@@ -82,8 +88,38 @@ object CompletionService {
             inputs = inputs
         )
 
-        // call the completion service to generate sentences
-        return completionService
-            .generateSentences(SentenceGenerationQuery(llmSetting, prompt))
+        return try {
+            // call the completion service to generate sentences
+            val response = completionService
+                .generateSentences(SentenceGenerationQuery(llmSetting, prompt))
+
+            if(response!!.sentences.isEmpty()){
+                // Save success metric
+                saveSentenceGenerationMetric(botId, IndicatorValues.NO_ANSWER)
+            }else{
+                // Save success metric
+                saveSentenceGenerationMetric(botId, IndicatorValues.SUCCESS)
+            }
+
+            // Return the response
+            response
+        } catch (exc: Exception) {
+            logger.error { exc }
+            // Save success metric
+            saveSentenceGenerationMetric(botId, IndicatorValues.FAILURE)
+            // Report error
+            WebVerticle.badRequest("Technical error when calling the sentence generation feature!")
+        }
+    }
+
+    private fun saveSentenceGenerationMetric(botId: String, indicatorValue: IndicatorValues) {
+        BotRepository.saveMetric(
+            Metric(
+                type = MetricType.FEATURE_HANDLED,
+                indicatorName = Indicators.GEN_AI_SENTENCE_GENERATION.value.name,
+                indicatorValueName = indicatorValue.value.name,
+                botId = botId
+            )
+        )
     }
 }
