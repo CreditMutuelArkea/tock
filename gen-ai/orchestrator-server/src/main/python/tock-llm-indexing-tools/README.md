@@ -50,7 +50,7 @@ Turns a Smart Tribune CSV export file into a ready-to-index CSV file (one 'title
 ### smarttribune_consumer.py
 
 ```
-Smart Tribune import data and formatter ofr send in opensearch.
+Smart Tribune import data and formatter for send in opensearch.
 
 Usage:
     smarttribune_consumer.py [-v]  <knowledge_base>  <base_url> <output_csv> [options]

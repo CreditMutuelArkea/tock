@@ -12,18 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-"""Smart Tribune import data and formatter ofr send in opensearch.
+"""Smart Tribune import data and formatter for send in opensearch.
 
 Usage:
-    smarttribune_consumer.py [-v]  <knowledge_base>  <base_url> <output_csv> [options]
+    smarttribune_consumer.py [-v]  <base_url> <output_csv> [options]
 
 Arguments:
-    knowledge_base  name of the target knowledge base, ex: "name1 | name2 | name3"
+
     base_url    the base URL to prefix every FAQ entry's query parameter to
                 create a full URL
     output_csv  path to the output, ready-to-index CSV file
 
 Options:
+    --knowledge_base=<value>...    name of the target knowledge base, ex: name1 name2 name3
+
     --tag_title=<value>
     -h --help   Show this screen
     --version   Show version
@@ -54,105 +56,77 @@ from dotenv import load_dotenv
 
 async def _get_number_page(row, token):
     # request numberPage of question with length page's equal to 200
-    proxy = urllib.request.getproxies()['https']
-    connector = ProxyConnector.from_url(url=proxy, rdns=True)
+    url_base_api, headers, connector = await pre_call(token)
 
     async with aiohttp.ClientSession(connector=connector) as session:
-        url = f'https://api-gateway.app.smart-tribune.com/v1/knowledge-bases/{row[1]}/search'
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept-Language': 'fr',
-            'Authorization': f'Bearer {token}',
-        }
-        if cli_args['--tag_title']:
-            body = dict(
-                knowledgeType=['question'],
-                channel='faq',
-                filters=[{'name': cli_args['--tag_title'], 'type': 'tag'}],
-            )
-        else:
-            body = dict(knowledgeType=['question'], channel='faq')
-        params = {'limit': 200}
+        url = url_base_api + f'knowledge-bases/{row[1]}/search'
+
+        body = dict(knowledgeType=['question'], channel='faq')
+        if cli_args.get('--tag_title') is not None:
+            body['filters'] = [{'name': cli_args.get('--tag_title'), 'type': 'tag'}]
+        params = dict(limit=200)
 
         async with session.post(
             url=url, json=body, headers=headers, params=params
         ) as response:
             if response.status != 200:
-                print('Error:', response.status, await response.text())
+                logging.error(await response.text(), response.status)
                 return 0
             response_json = await response.json()
-            total_items = response_json['meta']['totalItems']
+            total_items = response_json.get('meta').get('totalItems')
             if total_items != 0:
-                number_page = response_json['meta']['numberPage']
-                logging.debug(f'request all question, number of page {number_page}')
+                number_page = response_json.get('meta').get('numberPage')
+                logging.info(f'request all question, number of page {number_page}')
                 return number_page
             return 0
 
 
 async def _get_question(token, row, current_page):
     # request documentId and question by page with length page's equal to 200
-    proxy = urllib.request.getproxies()['https']
-    connector = ProxyConnector.from_url(url=proxy, rdns=True)
+    url_base_api, headers, connector = await pre_call(token)
+
     async with aiohttp.ClientSession(connector=connector) as session:
-        url = f'https://api-gateway.app.smart-tribune.com/v1/knowledge-bases/{row.iloc[0]}/search'
-        headers = {
-            'Content-Type': 'application/json',
-            'Accept-Language': 'fr',
-            'Authorization': f'Bearer {token}',
-        }
-        if cli_args['--tag_title'] is not None:
-            body = dict(
-                knowledgeType=['question'],
-                channel='faq',
-                filters=[{'name': cli_args['--tag_title'], 'type': 'tag'}],
-            )
-        else:
-            body = dict(knowledgeType=['question'], channel='faq')
+        url = url_base_api + f'knowledge-bases/{row.iloc[0]}/search'
+        body = dict(knowledgeType=['question'], channel='faq')
+        if cli_args.get('--tag_title') is not None:
+            body['filters'] = [{'name': cli_args.get('--tag_title'), 'type': 'tag'}]
         params = dict(limit=200, page=current_page)
 
         async with session.post(
             url, json=body, headers=headers, params=params
         ) as response:
             if response.status != 200:
-                print('Error:', response.status, await response.text())
+                logging.error(await response.text(), response.status)
                 return row.iloc[0], row.iloc[1], None, None, None
 
             response_get_questions_json = await response.json()
-            df_all_questions = pd.DataFrame(response_get_questions_json['data'])
+            df_all_questions = pd.DataFrame(response_get_questions_json.get('data'))
             df_all_questions = df_all_questions.rename(
                 columns={'title': 'Title', 'slug': 'URL'}
             )
             df_all_questions['knowledge_base_id'] = row.iloc[0]
             df_all_questions['channel_id'] = row.iloc[1]
-            return df_all_questions[
+            return df_all_questions.get(
                 ['knowledge_base_id', 'channel_id', 'documentId', 'Title', 'URL']
-            ]
+            )
 
 
 async def _get_answer(token, row):
-    # Créer une connexion proxy
-    proxy = urllib.request.getproxies()['https']
-    connector = ProxyConnector.from_url(url=proxy, rdns=True)
-
-    # Définir les en-têtes de la requête
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept-Language': 'fr',
-        'Authorization': f'Bearer {token}',
-    }
-    if cli_args['--tag_title'] is not None:
-        headers['customResponses'] = cli_args['--tag_title']
-
+    url_base_api, headers, connector = await pre_call(token)
+    if cli_args.get('--tag_title') is not None:
+        headers['customResponses'] = cli_args.get('--tag_title')
     # Définir l'URL de la requête
-    url = f"https://api-gateway.app.smart-tribune.com/v1/knowledge-bases/{row['knowledge_base_id']}/questions/{row['documentId']}/channels/{row['channel_id']}/responses"
+    url = (
+        url_base_api
+        + f"knowledge-bases/{row.get('knowledge_base_id')}/questions/{row.get('documentId')}/channels/{row.get('channel_id')}/responses"
+    )
 
-    # Utiliser le circuit breaker pour effectuer la requête
     async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(url, headers=headers) as response:
             if response.status != 200:
                 row['Text'] = None
-                print('Error:', response.status, await response.text())
-                return row[
+                logging.error(await response.text(), response.status)
+                return row.get(
                     [
                         'knowledge_base_id',
                         'channel_id',
@@ -161,11 +135,11 @@ async def _get_answer(token, row):
                         'URL',
                         'Text',
                     ]
-                ]
+                )
 
             response_json = await response.json()
-            row['Text'] = response_json['data'][0]['content']['body']
-            return row[
+            row['Text'] = response_json.get('data')[0].get('content').get('body')
+            return row.get(
                 [
                     'knowledge_base_id',
                     'channel_id',
@@ -174,66 +148,22 @@ async def _get_answer(token, row):
                     'URL',
                     'Text',
                 ]
-            ]
+            )
 
 
-async def _main(args):
-    """
-    import data from Smart Tribune API then format it into a ready-to-index CSV file.
-
-        Parameters:
-        args (dict): A dictionary containing command-line arguments.
-                    Expecting keys:    '<knowledge_base>'
-                                        '<tag_title>'
-                                        '<base_url>'
-                                        '<output_csv>'
-    """
-
-    # receipt auth token
-    _start = time()
-    logging.debug(f'request token with apiKey and apiSecret')
-    url = 'https://api-gateway.app.smart-tribune.com/v1/auth'
-    headers = {'Content-Type': 'application/json'}
-    body = dict(apiKey=os.getenv('APIKEY'), apiSecret=os.getenv('APISECRET'))
-    response_auth = requests.post(url, json=body, headers=headers)
-
-    if not response_auth.ok:
-        print('Error:', response_auth.status_code, response_auth.text)
-
-    # save token
-    token = response_auth.json()['token']
-
-    # request knowledge bases accessible with this token
-    url = 'https://api-gateway.app.smart-tribune.com/v1/knowledge-bases?limit=200'
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept-Language': 'fr',
-        'Authorization': f'Bearer {token}',
-    }
-    logging.debug('request allowed knowledge bases list and associated channels')
-    response_allowed_knowledge_bases = requests.get(url, headers=headers)
-
-    if not response_allowed_knowledge_bases.ok:
-        print(
-            'Error:',
-            response_allowed_knowledge_bases.status_code,
-            response_allowed_knowledge_bases.text,
-        )
-
-    # filter knowledge base id and faq channel id associated
-    results_allowed_knowledge_bases = response_allowed_knowledge_bases.json()['data']
+async def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases):
     filtered_data = filter(
-        lambda item: item['name'] in cli_args['<knowledge_base>']
-        and any(channel['systemName'] == 'faq' for channel in item['channels']),
-        results_allowed_knowledge_bases,
+        lambda item: item.get('name') in cli_args.get('--knowledge_base')
+        and any(channel.get('systemName') == 'faq' for channel in item.get('channels')),
+        allowed_knowledge_bases,
     )
     knowledge_bases_id_list = [
         (
-            item['id'],
+            item.get('id'),
             next(
-                channel['id']
-                for channel in item['channels']
-                if channel['systemName'] == 'faq'
+                channel.get('id')
+                for channel in item.get('channels')
+                if channel.get('systemName') == 'faq'
             ),
         )
         for item in filtered_data
@@ -241,9 +171,85 @@ async def _main(args):
     df_knowledge_bases = pd.DataFrame(
         knowledge_bases_id_list, columns=['knowledge_base_id', 'channel_id']
     )
-    logging.debug('request knowledge page id and channel id')
+    return df_knowledge_bases
+
+
+async def pre_call(token=None):
+    url_base_api = 'https://api-gateway.app.smart-tribune.com/v1/'
+    headers = {'Content-Type': 'application/json', 'Accept-Language': 'fr'}
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
+    if urllib.request.getproxies().get('https'):
+        proxy = urllib.request.getproxies().get('https')
+        connector = ProxyConnector.from_url(url=proxy, rdns=True)
+    elif urllib.request.getproxies().get('http'):
+        proxy = urllib.request.getproxies().get('http')
+        connector = ProxyConnector.from_url(url=proxy, rdns=True)
+    else:
+        connector = None
+
+    return url_base_api, headers, connector
+
+
+async def _main(args, body_credentials):
+    """
+       import data from Smart Tribune API then format it into a ready-to-index CSV file.
+    python smarttribune_consumer.py -v  https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq results_test.csv
+    -- [Arkéa - base de connaissances] cmb-pub-part-143
+
+           Parameters:
+           args (dict): A dictionary containing command-line arguments.
+                       Expecting keys:     '--knowledge_base'
+                                           '--tag_title'
+                                           '<base_url>'
+                                           '<output_csv>'
+           body_credentials (dict): A dictionary containing api credentials
+                       Expecting keys:     'apiKey'
+                                           'apiSecret'
+    """
+
+    # receipt auth token
+    _start = time()
+    url_base_api, headers, connector = await pre_call()
+
+    logging.debug(f'request token with apiKey and apiSecret')
+    url = url_base_api + 'auth'
+    headers = {'Content-Type': 'application/json'}
+    response_auth = requests.post(url, json=body_credentials, headers=headers)
+
+    if not response_auth.ok:
+        logging.error(response_auth.text, response_auth.status_code)
+        sys.exit(1)
+
+    # save token
+    token = response_auth.json().get('token')
+
+    # request knowledge bases accessible with this token
+    logging.debug('request allowed knowledge bases list and associated channels')
+    url = url_base_api + '/knowledge-bases?limit=200'
+    headers['Authorization'] = f'Bearer {token}'
+    response_allowed_knowledge_bases = requests.get(url, headers=headers)
+
+    if not response_allowed_knowledge_bases.ok:
+        logging.error(
+            response_allowed_knowledge_bases.text,
+            response_allowed_knowledge_bases.status_code,
+        )
+        sys.exit(1)
+
+    # filter knowledge base id and faq channel id associated
+    logging.debug(
+        'filtering knowledge base allowed for take knowledge_base_id and channel_id associated'
+    )
+    results_allowed_knowledge_bases = response_allowed_knowledge_bases.json().get(
+        'data'
+    )
+    df_knowledge_bases = receipt_id_from_allowed_desired_knowledge_base(
+        results_allowed_knowledge_bases
+    )
 
     # receipt number_page by knowledge_bases
+    logging.debug('request number page of question by knowledge base')
     coroutines = [
         _get_number_page(row, token) for row in df_knowledge_bases.itertuples()
     ]
@@ -251,35 +257,38 @@ async def _main(args):
     df_knowledge_bases['number_page'] = pd.Series(number_pages)
 
     # receipt question by knowledge_base_id
+    logging.debug(f'request questions by page')
+
     coroutines = [
         _get_question(token, row, current_page)
         for _, row in df_knowledge_bases.iterrows()
         for current_page in range(1, row.iloc[2] + 1)
     ]
     rawdata = await asyncio.gather(*coroutines, return_exceptions=False)
-    logging.debug(f'request question by page')
     df_all_questions = pd.concat([pd.DataFrame(page) for page in rawdata])
 
     # receipt answer by documentId
-    _startGetAnswers = time()
+    logging.debug(f'request answer by question')
     rawdata = await aiometer.run_all(
         [partial(_get_answer, token, row[1]) for row in df_all_questions.iterrows()],
         max_at_once=20,
-        max_per_second=20,  # here we can set max rate per second
+        max_per_second=20,
     )
     df_all_questions = pd.DataFrame(rawdata)
-    logging.debug(f'request answer by question')
 
     # format data
+    logging.debug('format data')
     df_all_questions['URL'] = (
-        cli_args['<base_url>'] + '?question=' + df_all_questions['URL']
+        cli_args.get('<base_url>') + '?question=' + df_all_questions.get('URL')
     )
-    logging.debug(f"Export to output CSV file {args['<output_csv>']}")
-    logging.debug(
+
+    # export data
+    logging.debug(f"Export to output CSV file {args.get('<output_csv>')}")
+    logging.info(
         f'finished {len(df_all_questions)} questions in {time() - _start:.2f} seconds'
     )
-    df_all_questions[['Title', 'URL', 'Text']].to_csv(
-        args['<output_csv>'], sep='|', index=False
+    df_all_questions.get(['Title', 'URL', 'Text']).to_csv(
+        args.get('<output_csv>'), sep='|', index=False
     )
 
 
@@ -290,30 +299,36 @@ if __name__ == '__main__':
     # Set logging level
     log_format = '%(levelname)s:%(module)s:%(message)s'
     logging.basicConfig(
-        level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format
+        level=logging.DEBUG if cli_args.get('-v') else logging.WARNING,
+        format=log_format,
     )
 
     # Check args:
-    knowledge_base = cli_args['<knowledge_base>'].split('|')
-    print(knowledge_base)
-    if not knowledge_base:
-        logging.error(
-            f"Cannot proceed: knowledgebase name '{cli_args['<knowledge_base>']}' does not exist"
-        )
-        sys.exit(1)
-    # - tag title is arbitrary
-
     # - base url must be valid
-    result = urlparse(cli_args['<base_url>'])
+    result = urlparse(cli_args.get('<base_url>'))
     if not result.scheme or not result.netloc:
-        logging.error(f"Cannot proceed: '{cli_args['<base_url>']}' is not a valid URL")
+        logging.error(
+            f"Cannot proceed: '{cli_args.get('<base_url>')}' is not a valid URL"
+        )
         sys.exit(1)
 
     # - output file path
-    target_dir = Path(cli_args['<output_csv>']).parent
+    target_dir = Path(cli_args.get('<output_csv>')).parent
     if not target_dir.exists():
         logging.error(f'Cannot proceed: directory {target_dir} does not exist')
         sys.exit(1)
 
+    # check credentials
+    if not os.getenv('APIKEY'):
+        logging.error(f'Cannot proceed: APIKEY  does not configured in .env ')
+        sys.exit(1)
+    if not os.getenv('APISECRET'):
+        logging.error(f'Cannot proceed: APISECRET  does not configured in .env ')
+        sys.exit(1)
+
+    body_credentials = dict(
+        apiKey=os.getenv('APIKEY'), apiSecret=os.getenv('APISECRET')
+    )
+
     # Main func
-    asyncio.run(_main(cli_args))
+    asyncio.run(_main(cli_args, body_credentials))
