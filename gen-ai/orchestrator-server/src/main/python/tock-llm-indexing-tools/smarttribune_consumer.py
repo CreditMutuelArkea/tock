@@ -151,7 +151,7 @@ async def _get_answer(token, row):
             )
 
 
-async def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases):
+def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases):
     filtered_data = filter(
         lambda item: item.get('name') in cli_args.get('--knowledge_base')
         and any(channel.get('systemName') == 'faq' for channel in item.get('channels')),
@@ -171,6 +171,7 @@ async def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases
     df_knowledge_bases = pd.DataFrame(
         knowledge_bases_id_list, columns=['knowledge_base_id', 'channel_id']
     )
+
     return df_knowledge_bases
 
 
@@ -247,7 +248,6 @@ async def _main(args, body_credentials):
     df_knowledge_bases = receipt_id_from_allowed_desired_knowledge_base(
         results_allowed_knowledge_bases
     )
-
     # receipt number_page by knowledge_bases
     logging.debug('request number page of question by knowledge base')
     coroutines = [
