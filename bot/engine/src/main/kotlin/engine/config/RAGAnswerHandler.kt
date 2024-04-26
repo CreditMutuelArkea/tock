@@ -73,7 +73,8 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                             Footnote(
                                 it.identifier,
                                 it.title,
-                                it.url
+                                it.url,
+                                it.content
                             )
                         }.toMutableList()
                     )
