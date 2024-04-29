@@ -299,7 +299,7 @@ if __name__ == '__main__':
     # Set logging level
     log_format = '%(levelname)s:%(module)s:%(message)s'
     logging.basicConfig(
-        level=logging.DEBUG if cli_args.get('-v') else logging.WARNING,
+        level=logging.DEBUG if cli_args.get('-v') else logging.INFO,
         format=log_format,
     )
 
