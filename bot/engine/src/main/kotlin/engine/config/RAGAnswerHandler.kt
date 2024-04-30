@@ -74,7 +74,8 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                                 it.identifier,
                                 it.title,
                                 it.url,
-                                it.content
+                                if(connectorData.metadata["sourceWithContent"].toBoolean()
+                                    || this.action.metadata.sourceWithContent) it.content else null
                             )
                         }.toMutableList()
                     )

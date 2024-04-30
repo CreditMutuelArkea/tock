@@ -92,7 +92,10 @@ class RestConnector(
                                 action,
                                 debugEnabled = message.debugEnabled,
                             ),
-                            metadata = mapOf("debugEnabled" to message.debugEnabled.toString()),
+                            metadata = mapOf(
+                                "debugEnabled" to message.debugEnabled.toString(),
+                                "sourceWithContent" to message.sourceWithContent.toString()
+                            ),
                         )
                     )
                 }
