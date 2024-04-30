@@ -147,7 +147,7 @@ class TestCoreService : TestService {
         }
     }
 
-    private fun talk(request: BotDialogRequest, debugEnabled: Boolean = false, sourceWithContent: Boolean): BotDialogResponse {
+    private fun talk(request: BotDialogRequest, debugEnabled: Boolean, sourceWithContent: Boolean): BotDialogResponse {
         val conf = getBotConfiguration(request.botApplicationConfigurationId, request.namespace)
         return try {
             val restClient = getRestClient(conf)

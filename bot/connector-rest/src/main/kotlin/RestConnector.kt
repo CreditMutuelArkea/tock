@@ -80,6 +80,8 @@ class RestConnector(
                     val locale = Locale.forLanguageTag(context.pathParam("locale"))
                     action.state.sourceConnectorType = message.connectorType
                     action.state.targetConnectorType = message.targetConnectorType
+                    action.metadata.debugEnabled = message.debugEnabled
+                    action.metadata.sourceWithContent = message.sourceWithContent
                     controller.handle(
                         action,
                         ConnectorData(
@@ -89,13 +91,8 @@ class RestConnector(
                                 context,
                                 if (message.test) controller.botDefinition.testBehaviour else null,
                                 locale,
-                                action,
-                                debugEnabled = message.debugEnabled,
-                            ),
-                            metadata = mapOf(
-                                "debugEnabled" to message.debugEnabled.toString(),
-                                "sourceWithContent" to message.sourceWithContent.toString()
-                            ),
+                                action
+                            )
                         )
                     )
                 }
