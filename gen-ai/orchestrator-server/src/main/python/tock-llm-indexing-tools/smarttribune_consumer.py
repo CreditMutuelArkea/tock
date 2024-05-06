@@ -59,7 +59,7 @@ async def _get_number_page(row, token):
     url_base_api, headers, connector = await pre_call(token)
 
     async with aiohttp.ClientSession(connector=connector) as session:
-        url = url_base_api + f'knowledge-bases/{row[1]}/search'
+        url = f'{url_base_api}knowledge-bases/{row[1]}/search'
 
         body = dict(knowledgeType=['question'], channel='faq')
         if cli_args.get('--tag_title') is not None:
@@ -86,7 +86,7 @@ async def _get_question(token, row, current_page):
     url_base_api, headers, connector = await pre_call(token)
 
     async with aiohttp.ClientSession(connector=connector) as session:
-        url = url_base_api + f'knowledge-bases/{row.iloc[0]}/search'
+        url = f'{url_base_api}knowledge-bases/{row.iloc[0]}/search'
         body = dict(knowledgeType=['question'], channel='faq')
         if cli_args.get('--tag_title') is not None:
             body['filters'] = [{'name': cli_args.get('--tag_title'), 'type': 'tag'}]
@@ -116,10 +116,7 @@ async def _get_answer(token, row):
     if cli_args.get('--tag_title') is not None:
         headers['customResponses'] = cli_args.get('--tag_title')
     # Définir l'URL de la requête
-    url = (
-        url_base_api
-        + f"knowledge-bases/{row.get('knowledge_base_id')}/questions/{row.get('documentId')}/channels/{row.get('channel_id')}/responses"
-    )
+    url = f"{url_base_api}knowledge-bases/{row.get('knowledge_base_id')}/questions/{row.get('documentId')}/channels/{row.get('channel_id')}/responses"
 
     async with aiohttp.ClientSession(connector=connector) as session:
         async with session.get(url, headers=headers) as response:
@@ -175,7 +172,7 @@ def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases):
     return df_knowledge_bases
 
 
-async def pre_call(token=None):
+async def prep_call(token=None):
     url_base_api = 'https://api-gateway.app.smart-tribune.com/v1/'
     headers = {'Content-Type': 'application/json', 'Accept-Language': 'fr'}
     if token:
@@ -213,8 +210,8 @@ async def _main(args, body_credentials):
     _start = time()
     url_base_api, headers, connector = await pre_call()
 
-    logging.debug(f'request token with apiKey and apiSecret')
-    url = url_base_api + 'auth'
+    logging.debug('request token with apiKey and apiSecret')
+    url = f'{url_base_api}auth'
     headers = {'Content-Type': 'application/json'}
     response_auth = requests.post(url, json=body_credentials, headers=headers)
 
@@ -227,7 +224,7 @@ async def _main(args, body_credentials):
 
     # request knowledge bases accessible with this token
     logging.debug('request allowed knowledge bases list and associated channels')
-    url = url_base_api + '/knowledge-bases?limit=200'
+    url = f'{url_base_api}knowledge-bases?limit=200'
     headers['Authorization'] = f'Bearer {token}'
     response_allowed_knowledge_bases = requests.get(url, headers=headers)
 
@@ -257,7 +254,7 @@ async def _main(args, body_credentials):
     df_knowledge_bases['number_page'] = pd.Series(number_pages)
 
     # receipt question by knowledge_base_id
-    logging.debug(f'request questions by page')
+    logging.debug('request questions by page')
 
     coroutines = [
         _get_question(token, row, current_page)
@@ -268,7 +265,7 @@ async def _main(args, body_credentials):
     df_all_questions = pd.concat([pd.DataFrame(page) for page in rawdata])
 
     # receipt answer by documentId
-    logging.debug(f'request answer by question')
+    logging.debug('request answer by question')
     rawdata = await aiometer.run_all(
         [partial(_get_answer, token, row[1]) for row in df_all_questions.iterrows()],
         max_at_once=20,
@@ -278,9 +275,9 @@ async def _main(args, body_credentials):
 
     # format data
     logging.debug('format data')
-    df_all_questions['URL'] = (
-        cli_args.get('<base_url>') + '?question=' + df_all_questions.get('URL')
-    )
+    df_all_questions[
+        'URL'
+    ] = f"{cli_args.get('<base_url>')}?question={df_all_questions.get('URL')}"
 
     # export data
     logging.debug(f"Export to output CSV file {args.get('<output_csv>')}")
@@ -320,10 +317,10 @@ if __name__ == '__main__':
 
     # check credentials
     if not os.getenv('APIKEY'):
-        logging.error(f'Cannot proceed: APIKEY  does not configured in .env ')
+        logging.error('Cannot proceed: APIKEY  does not configured in .env ')
         sys.exit(1)
     if not os.getenv('APISECRET'):
-        logging.error(f'Cannot proceed: APISECRET  does not configured in .env ')
+        logging.error('Cannot proceed: APISECRET  does not configured in .env ')
         sys.exit(1)
 
     body_credentials = dict(
