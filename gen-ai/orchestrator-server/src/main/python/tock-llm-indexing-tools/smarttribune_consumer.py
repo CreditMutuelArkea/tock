@@ -56,7 +56,7 @@ from dotenv import load_dotenv
 
 async def _get_number_page(row, token):
     # request numberPage of question with length page's equal to 200
-    url_base_api, headers, connector = await pre_call(token)
+    url_base_api, headers, connector = await prep_call(token)
 
     async with aiohttp.ClientSession(connector=connector) as session:
         url = f'{url_base_api}knowledge-bases/{row[1]}/search'
@@ -83,7 +83,7 @@ async def _get_number_page(row, token):
 
 async def _get_question(token, row, current_page):
     # request documentId and question by page with length page's equal to 200
-    url_base_api, headers, connector = await pre_call(token)
+    url_base_api, headers, connector = await prep_call(token)
 
     async with aiohttp.ClientSession(connector=connector) as session:
         url = f'{url_base_api}knowledge-bases/{row.iloc[0]}/search'
@@ -112,7 +112,7 @@ async def _get_question(token, row, current_page):
 
 
 async def _get_answer(token, row):
-    url_base_api, headers, connector = await pre_call(token)
+    url_base_api, headers, connector = await prep_call(token)
     if cli_args.get('--tag_title') is not None:
         headers['customResponses'] = cli_args.get('--tag_title')
     # Définir l'URL de la requête
@@ -208,7 +208,7 @@ async def _main(args, body_credentials):
 
     # receipt auth token
     _start = time()
-    url_base_api, headers, connector = await pre_call()
+    url_base_api, headers, connector = await prep_call()
 
     logging.debug('request token with apiKey and apiSecret')
     url = f'{url_base_api}auth'
@@ -271,13 +271,14 @@ async def _main(args, body_credentials):
         max_at_once=20,
         max_per_second=20,
     )
-    df_all_questions = pd.DataFrame(rawdata)
 
+    df_all_questions = pd.DataFrame(rawdata)
+    print(df_all_questions.get('URL'))
     # format data
     logging.debug('format data')
     df_all_questions[
         'URL'
-    ] = f"{cli_args.get('<base_url>')}?question={df_all_questions.get('URL')}"
+    ] = f"{cli_args.get('<base_url>')}?question=" + df_all_questions.get('URL')
 
     # export data
     logging.debug(f"Export to output CSV file {args.get('<output_csv>')}")
