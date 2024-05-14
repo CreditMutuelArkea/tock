@@ -29,6 +29,7 @@ import ai.tock.genai.orchestratorclient.requests.*
 import ai.tock.genai.orchestratorclient.responses.RAGResponse
 import ai.tock.genai.orchestratorclient.responses.TextWithFootnotes
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorBusinessError
+import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorValidationError
 import ai.tock.genai.orchestratorclient.services.RAGService
 import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.*
@@ -134,9 +135,9 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      * Call RAG API
      * @param botBus
      *
-     * @return RAG response if it needs to be handled, null otherwise (already handled by a switch for instance in case of no response)
+     * @return RAGResult. The answer is given if it needs to be handled, null otherwise (already handled by a switch for instance in case of no response)
      */
-    private fun rag(botBus: BotBus): Triple<TextWithFootnotes?, Any?, StoryDefinition?> {
+    private fun rag(botBus: BotBus): RAGResult {
         logger.info { "Call Generative AI Orchestrator - RAG API" }
         with(botBus) {
 
@@ -168,14 +169,21 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                 )
 
                 // Handle RAG response
-                return Triple(response?.answer, response?.debug, ragStoryRedirection(this, response))
+                return RAGResult(response?.answer, response?.debug, ragStoryRedirection(this, response))
             } catch (exc: Exception) {
                 logger.error { exc }
                 return if (exc is GenAIOrchestratorBusinessError && exc.error.info.error == "APITimeoutError") {
                     logger.info { "The APITimeoutError is raised, so switch to the no-answer story." }
-                    Triple(null, null, getNoAnswerRAGStory(ragConfiguration))
+                    RAGResult(noAnswerStory = getNoAnswerRAGStory(ragConfiguration))
                 }
-                else Triple(TextWithFootnotes(text = technicalErrorMessage), exc, null)
+                else RAGResult(
+                    answer = TextWithFootnotes(text = technicalErrorMessage),
+                    debug = when(exc) {
+                        is GenAIOrchestratorBusinessError -> RAGError(exc.message, exc.error)
+                        is GenAIOrchestratorValidationError -> RAGError(exc.message, exc.detail)
+                        else -> RAGError(errorMessage = exc.message)
+                    }
+                )
             }
         }
     }
@@ -212,3 +220,21 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             .takeLast(n = nLastMessages)
 
 }
+
+/**
+ * The RAG result.
+ * Aggregation of RAG answer, debug and the no answer Story.
+ */
+data class RAGResult(
+    val answer: TextWithFootnotes? = null,
+    val debug: Any? = null,
+    val noAnswerStory: StoryDefinition? = null,
+)
+
+/**
+ * The RAG error.
+ */
+data class RAGError(
+    val errorMessage: String?,
+    val errorDetail: Any? = null,
+)
