@@ -359,7 +359,7 @@ internal data class DialogCol(
         constructor(debug: SendDebug) :
                 this(
                     debug.text,
-                    debug.data
+                    transformData(debug.data)
                 ) {
             assignFrom(debug)
         }
@@ -370,7 +370,7 @@ internal data class DialogCol(
                     applicationId,
                     recipientId,
                     text,
-                    data,
+                    transformData(data),
                     id,
                     date,
                     state,
@@ -454,6 +454,18 @@ internal data class DialogCol(
                     botMetadata
             )
         }
+    }
+}
+
+private fun transformData(data: Any?): Any? {
+    return data?.let { when (it) {
+        is Map<*, *> -> {
+            it.mapKeys { (key, _) -> key.toString().replace(".", "_DOT_") }
+                .mapValues { (_, value) -> transformData(value) }
+        }
+        is List<*> -> it.map { elem -> transformData(elem) }
+        else -> it
+    }
     }
 }
 
