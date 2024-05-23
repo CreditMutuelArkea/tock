@@ -31,7 +31,12 @@ import logging
 
 from fastapi import APIRouter
 
-from gen_ai_orchestrator.routers.requests.requests import SentenceGenerationQuery
+from gen_ai_orchestrator.routers.requests.requests import (
+    SentenceGenerationQuery,
+)
+from gen_ai_orchestrator.routers.responses.responses import (
+    SentenceGenerationResponse,
+)
 from gen_ai_orchestrator.services.completion.completion_service import (
     generate_and_split_sentences,
 )
@@ -45,7 +50,9 @@ completion_router = APIRouter(
 
 
 @completion_router.post('/sentence-generation')
-async def generate_sentences(query: SentenceGenerationQuery):
+async def generate_sentences(
+    query: SentenceGenerationQuery,
+) -> SentenceGenerationResponse:
     """
     Sentence Generation API
 

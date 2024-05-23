@@ -56,6 +56,7 @@ python --version # Check your python version
 python -m venv .venv # Create a virtual env based on this python version
 source .venv/bin/activate # Activate your virtual env
 poetry install # Install dependencies for this project in the virtual env
+pre-commit install # Ensure that python venv used is the correct one
 ```
 
 ##### Using apt (not recommended version may vary)
