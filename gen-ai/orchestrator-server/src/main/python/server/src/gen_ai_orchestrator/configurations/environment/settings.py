@@ -80,6 +80,10 @@ class _Settings(BaseSettings):
     """Request timeout: set the maximum time (in seconds) for the request to be completed."""
     open_search_timeout: int = 4
 
+    langfuse_host: Optional[str] = 'http://localhost:3000'
+    langfuse_public_key: Optional[str] = None
+    langfuse_private_key: Optional[str] = None
+
 
 application_settings = _Settings()
 is_prod_environment = _Environment.PROD == application_settings.application_environment
