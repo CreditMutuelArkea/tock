@@ -26,7 +26,9 @@ from typing import List, Optional
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
+from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
+from gen_ai_orchestrator.configurations.environment.settings import application_settings
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIGuardCheckException,
 )
@@ -99,10 +101,20 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         'RAG chain - Use RetrieverJsonCallbackHandler for debugging : %s',
         debug,
     )
+
+    # Initialize Langfuse handler
+    langfuse_handler = LangfuseCallbackHandler(
+        host=application_settings.langfuse_host,
+        public_key=application_settings.langfuse_public_key,
+        secret_key=application_settings.langfuse_private_key,
+    )
+    # Tests the SDK connection with the server
+    langfuse_handler.auth_check()
+
     records_callback_handler = RetrieverJsonCallbackHandler()
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
-        config={'callbacks': [records_callback_handler] if debug else []},
+        config={'callbacks': [records_callback_handler, langfuse_handler] if debug else []},
     )
 
     # RAG Guard
