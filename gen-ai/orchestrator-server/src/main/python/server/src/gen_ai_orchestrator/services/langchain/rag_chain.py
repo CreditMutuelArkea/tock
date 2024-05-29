@@ -109,7 +109,8 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         secret_key=application_settings.langfuse_private_key,
     )
     # Tests the SDK connection with the server
-    langfuse_handler.auth_check()
+    if application_settings.langfuse_private_key is not None:
+        langfuse_handler.auth_check()
 
     records_callback_handler = RetrieverJsonCallbackHandler()
     response = await conversational_retrieval_chain.ainvoke(
