@@ -253,40 +253,46 @@ if __name__ == '__main__':
             f'{base_url}/datasets?id={dataset_id}',
             headers={"x-api-key": _LANGSMITH_API_KEY},
         )
-        if dataset_info_response.status_code == 200:
-            dataset_info_content = json.loads(dataset_info_response.content)
-            example_counter = dataset_info_content[0]['example_count']
-            logging.info(f"Number of examples in dataset = {example_counter}")
 
-            # Get dataset examples
-            dataset_examples = get_dataset_examples(example_counter)
-
-            # Get the runs of all examples, then create a csv file
-            if len(dataset_examples) > 0:
-                output_csv_file = f"export_run_result_{dataset_id}_{int(time.time())}.csv"
-
-                # CSV header line
-                csv_lines = [create_csv_header(session_ids)]
-
-                # CSV data lines
-                index = 1
-                for example in dataset_examples:
-                    csv_lines.append(append_example_runs(example, session_ids))
-                    progress = index / example_counter * 100
-                    logging.info(f"Example processed : {index}/{example_counter} - Progression : {progress:.2f}%")
-                    index += 1
-
-                # Creation of CSV file
-                with open(output_csv_file, 'w', newline='') as csv_file:
-                    writer = csv.writer(csv_file, delimiter='|')
-                    writer.writerows(csv_lines)
-                logging.info(f"Successful csv generation. Filename : {output_csv_file}")
-            else:
-                logging.error("No runs found !")
-        else:
+        # Exit the programme if an error occurs
+        if dataset_info_response.status_code != 200:
             logging.error(f"Failed to get dataset information. \n"
                           f"Http code : {dataset_info_response.status_code} \n"
                           f"Content   : {dataset_info_response.content}")
+            exit(1)
+
+        # No error occurred, continue loading content
+        dataset_info_content = json.loads(dataset_info_response.content)
+        example_counter = dataset_info_content[0]['example_count']
+        logging.info(f"Number of examples in dataset = {example_counter}")
+
+        # Get dataset examples
+        dataset_examples = get_dataset_examples(example_counter)
+
+        # Exit the programme if no runs is found
+        if len(dataset_examples) == 0:
+            logging.error("No runs found !")
+            exit(1)
+
+        # Get the runs of all examples, then create a csv file
+        # CSV filename
+        output_csv_file = f"export_run_result_{dataset_id}_{int(time.time())}.csv"
+        # CSV header line
+        csv_lines = [create_csv_header(session_ids)]
+
+        # CSV data lines
+        index = 1
+        for example in dataset_examples:
+            csv_lines.append(append_example_runs(example, session_ids))
+            progress = index / example_counter * 100
+            logging.info(f"Example processed : {index}/{example_counter} - Progression : {progress:.2f}%")
+            index += 1
+
+        # Creation of CSV file
+        with open(output_csv_file, 'w', newline='') as csv_file:
+            writer = csv.writer(csv_file, delimiter='|')
+            writer.writerows(csv_lines)
+        logging.info(f"Successful csv generation. Filename : {output_csv_file}")
     except requests.exceptions.RequestException as e:
         logging.error("A connection error has occurred : %s", e)
 
