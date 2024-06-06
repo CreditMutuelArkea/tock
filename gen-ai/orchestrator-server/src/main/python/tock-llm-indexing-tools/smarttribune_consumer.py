@@ -66,8 +66,9 @@ async def _get_number_page(row, token):
             body['filters'] = [{'name': cli_args.get('--tag_title'), 'type': 'tag'}]
         params = dict(limit=200)
 
+        # TODO MASS: APPEL HTTP KO!
         async with session.post(
-            url=url, json=body, headers=headers, params=params
+            url=url, json=body, headers=headers, params=params, ssl=False
         ) as response:
             if response.status != 200:
                 logging.error(await response.text(), response.status)
@@ -93,7 +94,7 @@ async def _get_question(token, row, current_page):
         params = dict(limit=200, page=current_page)
 
         async with session.post(
-            url, json=body, headers=headers, params=params
+            url, json=body, headers=headers, params=params, ssl=False
         ) as response:
             if response.status != 200:
                 logging.error(await response.text(), response.status)
@@ -119,7 +120,7 @@ async def _get_answer(token, row):
     url = f"{url_base_api}knowledge-bases/{row.get('knowledge_base_id')}/questions/{row.get('documentId')}/channels/{row.get('channel_id')}/responses"
 
     async with aiohttp.ClientSession(connector=connector) as session:
-        async with session.get(url, headers=headers) as response:
+        async with session.get(url, headers=headers, ssl=False) as response:
             if response.status != 200:
                 row['Text'] = None
                 logging.error(await response.text(), response.status)
@@ -149,6 +150,11 @@ async def _get_answer(token, row):
 
 
 def receipt_id_from_allowed_desired_knowledge_base(allowed_knowledge_bases):
+    print(f"-------------- base_url={cli_args.get('<base_url>')}")
+    print(f"-------------- output_csv={cli_args.get('<output_csv>')}")
+    print(f"-------------- knowledge_base={cli_args.get('--knowledge_base')}")
+    print(f"-------------- tag_title={cli_args.get('--tag_title')}")
+
     filtered_data = filter(
         lambda item: item.get('name') in cli_args.get('--knowledge_base')
         and any(channel.get('systemName') == 'faq' for channel in item.get('channels')),
@@ -225,7 +231,7 @@ async def _main(args, body_credentials):
     # request knowledge bases accessible with this token
     logging.debug('request allowed knowledge bases list and associated channels')
     url = f'{url_base_api}knowledge-bases?limit=200'
-    headers['Authorization'] = f'Bearer {token}'
+    headers['Authorization'] = f'Bearer {token}'  # TODO MASS: APPEL HTTP OK
     response_allowed_knowledge_bases = requests.get(url, headers=headers)
 
     if not response_allowed_knowledge_bases.ok:
