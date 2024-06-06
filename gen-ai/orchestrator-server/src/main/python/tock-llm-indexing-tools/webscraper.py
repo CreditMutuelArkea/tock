@@ -53,6 +53,14 @@ from bs4 import BeautifulSoup
 from docopt import docopt
 
 
+# TODO MASS : Disable SSL Check
+import ssl
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+
+# OK -> -v https://www.cmso.com/reseau-bancaire-cooperatif/web/comptes-et-cartes,https://www.cmso.com/reseau-bancaire-cooperatif/web/epargne-et-placements,https://www.cmso.com/reseau-bancaire-cooperatif/web/prets-et-credits/prets-immobiliers,https://www.cmso.com/reseau-bancaire-cooperatif/web/assurances "class_='container pos_rel',id='caracteristiques',id='notes'" cmso_webscraping_06062024.csv
+
 def browse_base_urls(
     base_urls: list[str], target_dir: str = '.', base_domain: str = 'domain'
 ):
@@ -89,7 +97,7 @@ def browse_base_urls(
 
                 try:
                     # Check URL is valid
-                    with request.urlopen(current_url) as response:
+                    with request.urlopen(url=current_url, context=ctx) as response:
                         if response.status == 200:
                             # Scrape the HTML page with BeautifulSoup
                             soup = BeautifulSoup(response.read(), 'html.parser')
@@ -160,7 +168,7 @@ def scrape_urls(soup_filters, output_file, target_dir='.', base_domain='domain')
             logging.debug(f'Scraping {line}')
 
             # GET contents
-            with request.urlopen(line) as response:
+            with request.urlopen(line, context=ctx) as response:
                 # Check if response object is not None
                 if response is not None:
                     # Scrape the HTML page for tags corresponding to BeautifulSoup filters
