@@ -336,3 +336,7 @@ if __name__ == '__main__':
 
     # Main func
     asyncio.run(_main(cli_args, body_credentials))
+
+# TODO MASS :
+# OK -> -v https://www.cmb.fr/reseau-bancaire-cooperatif/web/aide/faq cmb_faq_content_06062024.csv --knowledge_base="Arkéa - base de connaissances" --tag_title=cmb-pub-part-143
+# OK -> -v https://www.cmso.com/reseau-bancaire-cooperatif/web/aide/faq cmso_faq_content_06062024.csv --knowledge_base="Arkéa - base de connaissances" --tag_title=cmso-pub-part-144
