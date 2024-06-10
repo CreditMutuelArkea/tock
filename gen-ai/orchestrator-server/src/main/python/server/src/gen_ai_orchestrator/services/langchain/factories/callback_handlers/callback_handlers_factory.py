@@ -39,7 +39,7 @@ class LangChainCallbackHandlerFactory(ABC, BaseModel):
         pass
 
     @abstractmethod
-    def check_setting(self) -> bool:
+    def check_observability_setting(self) -> bool:
         """
         check the Callback Handler setting validity
         :return: True if the setting is valid.

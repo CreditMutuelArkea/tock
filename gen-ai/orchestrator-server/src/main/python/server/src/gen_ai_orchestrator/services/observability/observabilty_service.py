@@ -35,4 +35,4 @@ def check_observability_setting(setting: ObservabilitySetting) -> bool:
     """
 
     logger.info('Get the Callback handler Factory, then check the Observability setting.')
-    return get_callback_handler_factory(setting).check_setting()
+    return get_callback_handler_factory(setting).check_observability_setting()
