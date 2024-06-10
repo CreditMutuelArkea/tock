@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from gen_ai_orchestrator.models.em.em_types import EMSetting
 from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
+from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
 from gen_ai_orchestrator.models.vector_stores.vector_stores_types import DocumentSearchParams
@@ -37,6 +38,12 @@ class EMProviderSettingStatusQuery(BaseModel):
     setting: EMSetting = Field(
         description='The Embedding Model Provider setting to be checked.'
     )
+
+
+class ObservabilityProviderSettingStatusQuery(BaseModel):
+    """The query for the Observability Provider Setting Status"""
+
+    setting: ObservabilitySetting = Field(description='The Observability Provider setting to be checked.')
 
 
 class RagQuery(BaseModel):

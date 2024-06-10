@@ -41,9 +41,15 @@ from gen_ai_orchestrator.models.llm.llm_setting import BaseLLMSetting
 from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
     OpenAILLMSetting,
 )
+from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
+from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
+from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
+    LangChainCallbackHandlerFactory
+from gen_ai_orchestrator.services.langchain.factories.callback_handlers.langfuse_callback_handler_factory import \
+    LangfuseCallbackHandlerFactory
 from gen_ai_orchestrator.services.langchain.factories.em.azure_openai_em_factory import (
     AzureOpenAIEMFactory,
 )
@@ -142,3 +148,21 @@ def get_vector_store_factory(
         )
     else:
         raise VectorStoreUnknownException()
+
+
+def get_callback_handler_factory(setting: BaseObservabilitySetting) -> LangChainCallbackHandlerFactory:
+    """
+    Creates a Langchain Callback Handler Factory according to the given setting
+    Args:
+        setting: The Observability setting
+
+    Returns:
+        The Observability Factory, or raise an exception otherwise
+    """
+
+    logger.info('Get Observability Factory for the given setting')
+    if isinstance(setting, LangfuseObservabilitySetting):
+        logger.debug('Observability Factory - OpenAIObservabilityFactory')
+        return LangfuseCallbackHandlerFactory(setting=setting)
+    else:
+        raise GenAIUnknownProviderSettingException()

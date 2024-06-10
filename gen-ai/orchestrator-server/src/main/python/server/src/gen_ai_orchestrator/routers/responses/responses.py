@@ -21,6 +21,7 @@ from pydantic import BaseModel, Field
 from gen_ai_orchestrator.models.em.em_provider import EMProvider
 from gen_ai_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
 from gen_ai_orchestrator.models.llm.llm_provider import LLMProvider
+from gen_ai_orchestrator.models.observability.observability_provider import ObservabilityProvider
 from gen_ai_orchestrator.models.rag.rag_models import TextWithFootnotes
 
 
@@ -63,6 +64,14 @@ class LLMProviderResponse(BaseModel):
 
     provider: LLMProvider = Field(
         description='The LLM Provider ID', default=[LLMProvider.OPEN_AI]
+    )
+
+
+class ObservabilityProviderResponse(BaseModel):
+    """The response model of the Observability provider"""
+
+    provider: ObservabilityProvider = Field(
+        description='The Observability Provider ID', default=[ObservabilityProvider.LANGFUSE]
     )
 
 
