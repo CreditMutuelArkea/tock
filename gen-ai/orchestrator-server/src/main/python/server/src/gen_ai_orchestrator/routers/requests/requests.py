@@ -15,11 +15,13 @@
 """Module for Request Models"""
 
 from typing import Any
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
 from gen_ai_orchestrator.models.em.em_types import EMSetting
 from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
+from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
@@ -74,6 +76,10 @@ class RagQuery(BaseModel):
     )
     document_search_params: DocumentSearchParams = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
+    )
+    observability_setting: Optional[ObservabilitySetting] = Field(
+        description='The observability settings.',
+        default=None
     )
 
     model_config = {

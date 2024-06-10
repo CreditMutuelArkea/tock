@@ -58,7 +58,7 @@ from gen_ai_orchestrator.services.langchain.callbacks.retriever_json_callback_ha
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_llm_factory,
-    get_vector_store_factory,
+    get_vector_store_factory, get_callback_handler_factory,
 )
 
 logger = logging.getLogger(__name__)
@@ -102,20 +102,16 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         debug,
     )
 
-    # Initialize Langfuse handler
-    langfuse_handler = LangfuseCallbackHandler(
-        host=application_settings.langfuse_host,
-        public_key=application_settings.langfuse_public_key,
-        secret_key=application_settings.langfuse_private_key,
-    )
-    # Tests the SDK connection with the server
-    if application_settings.langfuse_private_key is not None:
-        langfuse_handler.auth_check()
+    callback_handlers = []
+    if debug:
+        callback_handlers.append(RetrieverJsonCallbackHandler())
+    if query.observability_setting is not None:
+        callback_handlers.append(get_callback_handler_factory(
+            setting=query.observability_setting).get_callback_handler())
 
-    records_callback_handler = RetrieverJsonCallbackHandler()
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
-        config={'callbacks': [records_callback_handler, langfuse_handler] if debug else []},
+        config={'callbacks': callback_handlers},
     )
 
     # RAG Guard
