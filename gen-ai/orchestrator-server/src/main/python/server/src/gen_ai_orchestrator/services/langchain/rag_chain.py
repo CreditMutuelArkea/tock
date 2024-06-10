@@ -26,9 +26,7 @@ from typing import List, Optional
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ChatMessageHistory
 from langchain_core.prompts import PromptTemplate
-from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
-from gen_ai_orchestrator.configurations.environment.settings import application_settings
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIGuardCheckException,
 )
@@ -103,8 +101,9 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     )
 
     callback_handlers = []
+    records_callback_handler = RetrieverJsonCallbackHandler()
     if debug:
-        callback_handlers.append(RetrieverJsonCallbackHandler())
+        callback_handlers.append(records_callback_handler)
     if query.observability_setting is not None:
         callback_handlers.append(get_callback_handler_factory(
             setting=query.observability_setting).get_callback_handler())
@@ -142,6 +141,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         )
         if debug
         else None,
+        warnings=warnings
     )
 
 

@@ -43,6 +43,7 @@ class LangfuseCallbackHandlerFactory(LangChainCallbackHandlerFactory):
         """Check if the provided credentials (public and secret key) are valid,
         while tracing a sample phrase"""
         try:
+            self.get_callback_handler().auth_check()
             Langfuse(**self._fetch_settings()).trace(name="CheckObservabilitySettings",
                                                      output="Check observability setting trace")
         except ApiError as exc:
