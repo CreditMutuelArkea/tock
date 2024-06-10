@@ -55,6 +55,10 @@ class ErrorCode(Enum):
     OPEN_SEARCH_RESOURCE_NOT_FOUND = 4002
     OPEN_SEARCH_INDEX_NOT_FOUND = 4003
 
+    # Observability Errors
+    OBSERVABILITY_SETTINGS_ERROR = 5000
+    OBSERVABILITY_API_ERROR = 5001
+
     @classmethod
     def __get_pydantic_json_schema__(
         cls, core_schema: core_schema.JsonSchema, handler: GetJsonSchemaHandler
@@ -176,6 +180,14 @@ class ErrorMessages:
         ErrorCode.OPEN_SEARCH_INDEX_NOT_FOUND: ErrorMessage(
             message='The OpenSearch index was not found.',
             detail='Ensure that the index exists and create it if it does not.',
+        ),
+        # Observability Errors
+        ErrorCode.OBSERVABILITY_SETTINGS_ERROR: ErrorMessage(
+            message='The Observability Provider is improperly configured.',
+            detail='The config passed to the client is inconsistent or invalid.',
+        ),
+        ErrorCode.OBSERVABILITY_API_ERROR: ErrorMessage(
+            message='API error.',
         ),
     }
 

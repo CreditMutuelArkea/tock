@@ -14,12 +14,20 @@
 #
 """Model for creating Langfuse Callback Handler Factory"""
 
+import logging
+
+from langfuse.api.core import ApiError
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
+from gen_ai_orchestrator.errors.exceptions.observability.observability_exceptions import \
+    GenAIObservabilityErrorException
+from gen_ai_orchestrator.errors.handlers.langfuse.langfuse_exception_handler import create_error_info_langfuse
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
     LangChainCallbackHandlerFactory
 from gen_ai_orchestrator.services.security.security_service import fetch_secret_key_value
+
+logger = logging.getLogger(__name__)
 
 
 class LangfuseCallbackHandlerFactory(LangChainCallbackHandlerFactory):
@@ -35,5 +43,12 @@ class LangfuseCallbackHandlerFactory(LangChainCallbackHandlerFactory):
         )
 
     def check_setting(self) -> bool:
-        self.get_callback_handler().auth_check()
+        """Check if the provided credentials (public and secret key) are valid"""
+        try:
+            self.get_callback_handler().auth_check()
+        except ApiError as exc:
+            logger.error(exc)
+            raise GenAIObservabilityErrorException(
+                create_error_info_langfuse(exc)
+            )
         return True
