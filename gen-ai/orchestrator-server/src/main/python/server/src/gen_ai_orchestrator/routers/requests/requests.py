@@ -33,7 +33,7 @@ class LLMProviderSettingStatusQuery(BaseModel):
 
     setting: LLMSetting = Field(description='The LLM Provider setting to be checked.')
     observability_setting: Optional[ObservabilitySetting] = Field(
-        description='The observability settings.',
+        description='The observability settings',
         default=None
     )
 
