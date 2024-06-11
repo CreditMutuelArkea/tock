@@ -16,6 +16,7 @@
 Observability Exception Module
 List of all Observability exceptions managed by Gen AI Orchestrator
 """
+from typing import Optional
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
@@ -27,13 +28,14 @@ class GenAIUnknownObservabilityProviderException(GenAIOrchestratorException):
     """Unknown Observability Provider"""
 
     def __init__(self, info: ErrorInfo):
-        super().__init__(ErrorCode.AI_PROVIDER_UNKNOWN, info)
+        super().__init__(ErrorCode.OBSERVABILITY_PROVIDER_UNKNOWN, info)
 
-class GenAIObservabilitySettingException(GenAIOrchestratorException):
-    """The Observability is improperly configured."""
 
-    def __init__(self, info: ErrorInfo):
-        super().__init__(ErrorCode.OBSERVABILITY_SETTINGS_ERROR, info)
+class GenAIUnknownObservabilityProviderSettingException(GenAIOrchestratorException):
+    """Unknown Observability Provider Setting"""
+
+    def __init__(self, info: Optional[ErrorInfo] = None):
+        super().__init__(ErrorCode.OBSERVABILITY_UNKNOWN_PROVIDER_SETTING, info)
 
 
 class GenAIObservabilityErrorException(GenAIOrchestratorException):

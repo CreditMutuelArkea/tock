@@ -56,8 +56,8 @@ class ErrorCode(Enum):
     OPEN_SEARCH_INDEX_NOT_FOUND = 4003
 
     # Observability Errors
-    OBSERVABILITY_PROVIDER_UNKNOWN = 5000
-    OBSERVABILITY_SETTINGS_ERROR = 5001
+    OBSERVABILITY_UNKNOWN_PROVIDER = 5000
+    OBSERVABILITY_UNKNOWN_PROVIDER_SETTING = 5001
     OBSERVABILITY_API_ERROR = 5002
 
     @classmethod
@@ -183,11 +183,9 @@ class ErrorMessages:
             detail='Ensure that the index exists and create it if it does not.',
         ),
         # Observability Errors
-        ErrorCode.OBSERVABILITY_PROVIDER_UNKNOWN: ErrorMessage(message='Unknown Observability Provider.'),
-        ErrorCode.OBSERVABILITY_SETTINGS_ERROR: ErrorMessage(
-            message='The Observability Provider is improperly configured.',
-            detail='The config passed to the client is inconsistent or invalid.',
-        ),
+        ErrorCode.OBSERVABILITY_UNKNOWN_PROVIDER: ErrorMessage(message='Unknown Observability Provider.'),
+        ErrorCode.OBSERVABILITY_UNKNOWN_PROVIDER_SETTING: ErrorMessage(
+            message='Unknown Observability Provider Settings.'),
         ErrorCode.OBSERVABILITY_API_ERROR: ErrorMessage(
             message='API error.',
         ),

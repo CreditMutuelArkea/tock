@@ -78,7 +78,7 @@ async def get_observability_provider_by_id(
         The Observability Provider Response
 
     Raises:
-        GenAIUnknownProviderException if the provider is unknown
+        GenAIUnknownProviderException: if the provider is unknown
     """
 
     # Query validation
@@ -101,7 +101,7 @@ async def get_observability_provider_setting_by_id(
         The Observability Provider Setting
 
     Raises:
-        GenAIUnknownProviderException if the provider is unknown
+        GenAIUnknownObservabilityProviderException: if the provider is unknown
     """
 
     # Query validation
@@ -130,7 +130,7 @@ async def check_observability_provider_setting(
         ProviderSettingStatusResponse
 
     Raises:
-        AIProviderBadQueryException if the provider ID is not consistent with the request body
+        AIProviderBadQueryException: if the provider ID is not consistent with the request body
     """
 
     logger.info('Start Observability setting check for provider %s', provider_id)
@@ -158,7 +158,7 @@ def validate_query(request: Request, provider_id: str, setting: ObservabilitySet
         setting:  The Observability Provider Setting
 
     Raises:
-        AIProviderBadQueryException if the provider ID is not consistent with the request body
+        AIProviderBadQueryException: if the provider ID is not consistent with the request body
     """
 
     logger.debug('Observability setting - Query validation')
@@ -177,7 +177,7 @@ def validate_observability_provider(request: Request, provider_id: str):
         provider_id: The provider ID
 
     Raises:
-        GenAIUnknownObservabilityProviderException if the provider is unknown
+        GenAIUnknownObservabilityProviderException: if the provider is unknown
     """
 
     if not ObservabilityProvider.has_value(provider_id):

@@ -21,13 +21,17 @@ It manages the creation of :
 """
 
 import logging
+from typing import Optional
 
 from langchain_core.embeddings import Embeddings
+from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIUnknownProviderSettingException,
     VectorStoreUnknownException,
 )
+from gen_ai_orchestrator.errors.exceptions.observability.observability_exceptions import \
+    GenAIUnknownObservabilityProviderSettingException
 from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
@@ -43,6 +47,7 @@ from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
 )
 from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
+from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
@@ -125,9 +130,9 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 
 def get_vector_store_factory(
-    vector_store_provider: VectorStoreProvider,
-    embedding_function: Embeddings,
-    index_name: str,
+        vector_store_provider: VectorStoreProvider,
+        embedding_function: Embeddings,
+        index_name: str,
 ) -> LangChainVectorStoreFactory:
     """
     Creates an LangChain Vector Store Factory according to the vector store provider
@@ -165,4 +170,23 @@ def get_callback_handler_factory(setting: BaseObservabilitySetting) -> LangChain
         logger.debug('Observability Factory - OpenAIObservabilityFactory')
         return LangfuseCallbackHandlerFactory(setting=setting)
     else:
-        raise GenAIUnknownProviderSettingException()
+        raise GenAIUnknownObservabilityProviderSettingException()
+
+
+def create_langfuse_callback_handler(
+        observability_setting: Optional[ObservabilitySetting],
+        trace_name: str) -> Optional[LangfuseCallbackHandler]:
+    """
+    Create a Langfuse Callback Handler
+
+    Args:
+        observability_setting: The Observability Settings
+        trace_name: The Langfuse trace name
+
+    Returns:
+        The Langfuse Callback Handler
+    """
+    if observability_setting is not None:
+        get_callback_handler_factory(setting=observability_setting).get_callback_handler(trace_name=trace_name)
+
+    return None

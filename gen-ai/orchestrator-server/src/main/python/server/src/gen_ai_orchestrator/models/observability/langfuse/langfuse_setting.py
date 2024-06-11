@@ -36,7 +36,7 @@ class LangfuseObservabilitySetting(BaseObservabilitySetting):
         description='The Observability Provider.', examples=[ObservabilityProvider.LANGFUSE]
     )
     url: AnyUrl = Field(
-        description='Footnote url', examples=['https://cloud.langfuse.com'], default='http://localhost:3000'
+        description='The Langfuse server url', examples=['https://cloud.langfuse.com'], default='http://localhost:3000'
     )
     secret_key: SecretKey = Field(
         description='Stores the secret key used to authenticate requests to the Observability Provider API.',
