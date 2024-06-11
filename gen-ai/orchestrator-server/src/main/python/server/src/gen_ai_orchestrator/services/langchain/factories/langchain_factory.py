@@ -187,6 +187,6 @@ def create_langfuse_callback_handler(
         The Langfuse Callback Handler
     """
     if observability_setting is not None:
-        get_callback_handler_factory(setting=observability_setting).get_callback_handler(trace_name=trace_name)
+        return get_callback_handler_factory(setting=observability_setting).get_callback_handler(trace_name=trace_name)
 
     return None
