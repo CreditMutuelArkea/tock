@@ -16,6 +16,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from typing import Any
 
 from langfuse.callback.langchain import LangchainCallbackHandler
 from pydantic import BaseModel
@@ -31,7 +32,7 @@ class LangChainCallbackHandlerFactory(ABC, BaseModel):
     setting: BaseObservabilitySetting
 
     @abstractmethod
-    def get_callback_handler(self) -> LangchainCallbackHandler:
+    def get_callback_handler(self, **kwargs: Any) -> LangchainCallbackHandler:
         """
         Fabric a callback handler.
         :return: LangchainCallbackHandler.

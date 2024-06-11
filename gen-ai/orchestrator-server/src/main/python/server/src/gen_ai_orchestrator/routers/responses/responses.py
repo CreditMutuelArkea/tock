@@ -52,7 +52,7 @@ class ProviderSettingStatusResponse(BaseModel):
     """The response model of the provider setting status"""
 
     valid: bool = Field(
-        description='It indicates the AI Provider setting validity.',
+        description='It indicates the Provider setting validity.',
         examples=[True],
         default=False,
     )

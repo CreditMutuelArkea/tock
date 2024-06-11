@@ -25,6 +25,8 @@ from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIOrchestratorException,
     GenAIUnknownProviderException,
 )
+from gen_ai_orchestrator.errors.exceptions.observability.observability_exceptions import \
+    GenAIUnknownObservabilityProviderException
 from gen_ai_orchestrator.errors.handlers.fastapi.fastapi_handler import (
     create_error_info_bad_request,
     create_error_info_not_found,
@@ -175,11 +177,11 @@ def validate_observability_provider(request: Request, provider_id: str):
         provider_id: The provider ID
 
     Raises:
-        GenAIUnknownProviderException if the provider is unknown
+        GenAIUnknownObservabilityProviderException if the provider is unknown
     """
 
     if not ObservabilityProvider.has_value(provider_id):
-        raise GenAIUnknownProviderException(  # TODO MASS
+        raise GenAIUnknownObservabilityProviderException(
             create_error_info_not_found(
                 request, provider_id, [provider.value for provider in ObservabilityProvider]
             )

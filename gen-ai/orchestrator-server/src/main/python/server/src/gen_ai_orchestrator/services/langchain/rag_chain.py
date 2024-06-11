@@ -37,6 +37,7 @@ from gen_ai_orchestrator.errors.handlers.opensearch.opensearch_exception_handler
     opensearch_exception_handler,
 )
 from gen_ai_orchestrator.models.errors.errors_models import ErrorInfo
+from gen_ai_orchestrator.models.observability.observability_trace import ObservabilityTrace
 from gen_ai_orchestrator.models.rag.rag_models import (
     ChatMessageType,
     Footnote,
@@ -105,8 +106,9 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     if debug:
         callback_handlers.append(records_callback_handler)
     if query.observability_setting is not None:
-        callback_handlers.append(get_callback_handler_factory(
-            setting=query.observability_setting).get_callback_handler())
+        callback_handlers.append(
+            get_callback_handler_factory(setting=query.observability_setting).get_callback_handler(
+                trace_name=ObservabilityTrace.RAG.value))
 
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
@@ -140,8 +142,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
             query, response, records_callback_handler, rag_duration
         )
         if debug
-        else None,
-        warnings=warnings
+        else None
     )
 
 

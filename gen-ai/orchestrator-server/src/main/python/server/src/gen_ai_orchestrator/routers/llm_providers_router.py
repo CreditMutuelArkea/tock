@@ -155,7 +155,7 @@ async def check_llm_provider_setting(
 
     try:
         # LLM setting check
-        await check_llm_setting(query.setting)
+        await check_llm_setting(query)
 
         logger.info('The LLM setting is valid')
         return ProviderSettingStatusResponse(valid=True)

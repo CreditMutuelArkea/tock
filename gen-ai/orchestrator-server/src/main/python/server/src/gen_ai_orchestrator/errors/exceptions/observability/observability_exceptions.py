@@ -23,6 +23,12 @@ from gen_ai_orchestrator.errors.exceptions.exceptions import (
 from gen_ai_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
 
 
+class GenAIUnknownObservabilityProviderException(GenAIOrchestratorException):
+    """Unknown Observability Provider"""
+
+    def __init__(self, info: ErrorInfo):
+        super().__init__(ErrorCode.AI_PROVIDER_UNKNOWN, info)
+
 class GenAIObservabilitySettingException(GenAIOrchestratorException):
     """The Observability is improperly configured."""
 

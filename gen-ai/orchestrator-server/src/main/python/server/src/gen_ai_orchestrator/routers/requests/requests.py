@@ -32,6 +32,10 @@ class LLMProviderSettingStatusQuery(BaseModel):
     """The query for the LLM Provider Setting Status"""
 
     setting: LLMSetting = Field(description='The LLM Provider setting to be checked.')
+    observability_setting: Optional[ObservabilitySetting] = Field(
+        description='The observability settings.',
+        default=None
+    )
 
 
 class EMProviderSettingStatusQuery(BaseModel):
@@ -137,6 +141,7 @@ Answer in {locale}:""",
                         ],
                         'k': 4,
                     },
+                    'observability_setting' : None
                 }
             ]
         }
@@ -151,4 +156,8 @@ class SentenceGenerationQuery(BaseModel):
     )
     prompt: PromptTemplate = Field(
         description='Prompt, used to create prompt with inputs and jinja template '
+    )
+    observability_setting: Optional[ObservabilitySetting] = Field(
+        description='The observability settings.',
+        default=None
     )
