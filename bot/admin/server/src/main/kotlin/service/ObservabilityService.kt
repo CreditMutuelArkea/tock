@@ -84,15 +84,4 @@ object ObservabilityService {
         }
     }
 
-    private fun prepareEndingFeatures(
-        story: StoryDefinitionConfiguration, observabilityEnabled: Boolean
-    ): List<StoryDefinitionConfigurationFeature> {
-        val features = mutableListOf<StoryDefinitionConfigurationFeature>()
-        features.addAll(story.features)
-        features.removeIf { feature -> feature.enabled != null }
-        features.add(StoryDefinitionConfigurationFeature(null, observabilityEnabled, null, null))
-        return features
-    }
-
-
 }
