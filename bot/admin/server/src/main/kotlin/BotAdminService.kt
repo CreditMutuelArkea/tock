@@ -31,6 +31,7 @@ import ai.tock.bot.admin.bot.BotConfiguration
 import ai.tock.bot.admin.bot.rag.BotRAGConfiguration
 import ai.tock.bot.admin.bot.rag.BotRAGConfigurationDAO
 import ai.tock.bot.admin.bot.BotVersion
+import ai.tock.bot.admin.bot.observability.BotObservabilityConfigurationDAO
 import ai.tock.bot.admin.dialog.ApplicationDialogFlowData
 import ai.tock.bot.admin.dialog.DialogReportDAO
 import ai.tock.bot.admin.dialog.DialogReportQueryResult
@@ -339,10 +340,6 @@ object BotAdminService {
                 )
             )
         }
-    }
-
-    fun getRAGConfiguration(namespace: String, botId: String): BotRAGConfiguration? {
-        return ragConfigurationDAO.findByNamespaceAndBotId(namespace, botId)
     }
 
     fun searchStories(request: StorySearchRequest): List<StoryDefinitionConfigurationSummaryExtended> =
