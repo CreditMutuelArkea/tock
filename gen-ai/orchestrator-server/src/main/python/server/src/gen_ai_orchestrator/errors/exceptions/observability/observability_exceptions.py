@@ -28,7 +28,7 @@ class GenAIUnknownObservabilityProviderException(GenAIOrchestratorException):
     """Unknown Observability Provider"""
 
     def __init__(self, info: ErrorInfo):
-        super().__init__(ErrorCode.OBSERVABILITY_PROVIDER_UNKNOWN, info)
+        super().__init__(ErrorCode.OBSERVABILITY_UNKNOWN_PROVIDER, info)
 
 
 class GenAIUnknownObservabilityProviderSettingException(GenAIOrchestratorException):

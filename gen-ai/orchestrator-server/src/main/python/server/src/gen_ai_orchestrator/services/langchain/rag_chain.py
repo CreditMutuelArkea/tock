@@ -57,7 +57,7 @@ from gen_ai_orchestrator.services.langchain.callbacks.retriever_json_callback_ha
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_llm_factory,
-    get_vector_store_factory, get_callback_handler_factory, create_langfuse_callback_handler,
+    get_vector_store_factory, create_langfuse_callback_handler,
 )
 
 logger = logging.getLogger(__name__)

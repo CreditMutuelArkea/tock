@@ -21,6 +21,7 @@ from langfuse import Langfuse
 from langfuse.api.core import ApiError
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
+from gen_ai_orchestrator.configurations.environment.settings import application_settings
 from gen_ai_orchestrator.errors.exceptions.observability.observability_exceptions import \
     GenAIObservabilityErrorException
 from gen_ai_orchestrator.errors.handlers.langfuse.langfuse_exception_handler import create_error_info_langfuse
@@ -59,5 +60,7 @@ class LangfuseCallbackHandlerFactory(LangChainCallbackHandlerFactory):
         return {
             'host': str(self.setting.url),
             'public_key': self.setting.public_key,
-            'secret_key': fetch_secret_key_value(self.setting.secret_key)
+            'secret_key': fetch_secret_key_value(self.setting.secret_key),
+            'timeout': application_settings.observability_provider_timeout,
+            'max_retries': application_settings.observability_provider_max_retries
         }

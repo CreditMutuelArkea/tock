@@ -80,6 +80,9 @@ class _Settings(BaseSettings):
     """Request timeout: set the maximum time (in seconds) for the request to be completed."""
     open_search_timeout: int = 4
 
+    observability_provider_timeout: int = 3
+    observability_provider_max_retries: int = 0
+
 
 application_settings = _Settings()
 is_prod_environment = _Environment.PROD == application_settings.application_environment
