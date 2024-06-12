@@ -35,6 +35,7 @@ import ai.tock.genai.orchestratorclient.responses.TextWithFootnotes
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorBusinessError
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorValidationError
 import ai.tock.genai.orchestratorclient.services.RAGService
+import ai.tock.genai.orchestratorcore.mappers.ObservabilitySettingMapper
 import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.*
 import engine.config.AbstractProactiveAnswerHandler
@@ -176,6 +177,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                                 Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
                             )
                         ),
+                        observabilitySetting = botDefinition.observabilityConfiguration?.setting
                     ), debug = action.metadata.debugEnabled || ragDebugEnabled
                 )
 
