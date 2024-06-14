@@ -1087,7 +1087,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         blockingJsonGet(
             "/configuration/bots/:botId/sentence-generation/info",
-            nlpUser
+            faqNlpUser
         ) { context ->
             SentenceGenerationService.getSentenceGenerationConfiguration(context.organization,
                 context.path("botId"))
