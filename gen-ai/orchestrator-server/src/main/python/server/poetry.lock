@@ -945,6 +945,25 @@ http2 = ["h2 (>=3,<5)"]
 socks = ["socksio (==1.*)"]
 
 [[package]]
+name = "httpx-auth-awssigv4"
+version = "0.1.4"
+description = "This package provides utilities to add AWS Signature V4 authentication infrormation to calls made by python httpx library."
+optional = false
+python-versions = ">=3.6.2,<4.0"
+files = [
+    {file = "httpx-auth-awssigv4-0.1.4.tar.gz", hash = "sha256:6e8c87c9367896db6eea28a2195cb85a61ddf374cffab2070b2d044c3343625d"},
+    {file = "httpx_auth_awssigv4-0.1.4-py3-none-any.whl", hash = "sha256:e58ea5abf976cf4d6ef7643088e8e8002a557ca0520b076c56a9b9a14141bfae"},
+]
+
+[package.dependencies]
+httpx = ">0.20.0"
+
+[package.extras]
+dev = ["bump2version (>=1.0.1,<2.0.0)", "pip (>=20.3.1,<21.0.0)", "pre-commit (>=2.12.0,<3.0.0)", "toml (>=0.10.2,<0.11.0)", "tox (>=3.20.1,<4.0.0)", "twine (>=3.3.0,<4.0.0)", "virtualenv (>=20.2.2,<21.0.0)"]
+doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-autorefs (>=0.2.1,<0.3.0)", "mkdocs-include-markdown-plugin (>=1.0.0,<2.0.0)", "mkdocs-material (>=6.1.7,<7.0.0)", "mkdocstrings (>=0.15.2,<0.16.0)"]
+test = ["black (>=22.3.0,<23.0.0)", "flake8 (>=3.9.2,<4.0.0)", "flake8-docstrings (>=1.6.0,<2.0.0)", "isort (>=5.8.0,<6.0.0)", "jinja2 (==2.11.3)", "markupsafe (==2.0.1)", "mkdocs-material-extensions (>=1.0.1,<2.0.0)", "mypy (>=0.900,<0.901)", "pytest (>=6.2.4,<7.0.0)", "pytest-cov (>=2.12.0,<3.0.0)"]
+
+[[package]]
 name = "identify"
 version = "2.5.36"
 description = "File identification library for Python"
@@ -3277,4 +3296,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "9273b184cce9a566cc908f528e67dec38d163951c1fdc03996ec82c49d9c1c70"
+content-hash = "e3754f13063a6311dce1d1884c04ee277e08105cf2ea9d3f891190d97c58b557"
