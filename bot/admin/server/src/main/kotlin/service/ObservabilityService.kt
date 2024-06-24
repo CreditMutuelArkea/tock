@@ -20,8 +20,6 @@ import ai.tock.bot.admin.BotAdminService
 import ai.tock.bot.admin.bot.observability.BotObservabilityConfiguration
 import ai.tock.bot.admin.bot.observability.BotObservabilityConfigurationDAO
 import ai.tock.bot.admin.model.BotObservabilityConfigurationDTO
-import ai.tock.bot.admin.story.StoryDefinitionConfiguration
-import ai.tock.bot.admin.story.StoryDefinitionConfigurationFeature
 import ai.tock.shared.exception.rest.BadRequestException
 import ai.tock.shared.injector
 import ai.tock.shared.provide
@@ -33,7 +31,6 @@ import mu.KotlinLogging
 /**
  * Service that manage the observability functionality
  */
-// TODO MASS javadoc
 object ObservabilityService {
 
     private val logger: KLogger = KotlinLogging.logger {}
