@@ -42,6 +42,11 @@ export class ConfigurationTabsComponent implements OnInit {
       icon: 'bulb-outline'
     },
     {
+      title: 'Observability settings',
+      route: 'observability-settings',
+      icon: 'monitor-outline'
+    },
+    {
       title: 'Namespaces',
       route: 'namespaces',
       icon: 'folder-outline'
@@ -52,9 +57,9 @@ export class ConfigurationTabsComponent implements OnInit {
       icon: 'eye-outline'
     },
     {
-     title: 'Synchronization',
-     route: 'synchronization',
-     icon: 'sync'
+      title: 'Synchronization',
+      route: 'synchronization',
+      icon: 'sync'
     }
   ];
 
