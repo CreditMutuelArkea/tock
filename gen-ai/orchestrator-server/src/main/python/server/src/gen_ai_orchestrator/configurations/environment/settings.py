@@ -82,6 +82,7 @@ class _Settings(BaseSettings):
     open_search_timeout: int = 4
 
     observability_provider_max_retries: int = 0
+    """Request timeout (in seconds)."""
     observability_provider_timeout: int = 3
     observability_proxy_server: Optional[ProxyServerType] = None
     observability_proxy_server_authorization_header_name: Optional[str] = None
