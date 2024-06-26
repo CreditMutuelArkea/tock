@@ -74,6 +74,14 @@ class LangfuseCallbackHandlerFactory(LangChainCallbackHandlerFactory):
     def _get_httpx_client(self) -> Optional[Client]:
         langfuse_settings = self._fetch_settings()
         if ProxyServerType.AWS_LAMBDA == application_settings.observability_proxy_server:
+            """
+            This AWSLambda proxy is used when the architecture implemented for the Langfuse
+            observability tool places it behind an API Gateway which requires its
+            own authentication, itself invoked by an AWS Lambda.
+            The API Gateway uses the standard "Authorization" header,
+            and uses observability_proxy_server_authorization_header_name
+            to define the "Authorization bearer token" for Langfuse.
+            """
             aws_session = boto3.Session()
             aws_credentials = aws_session.get_credentials()
             auth = SigV4Auth(

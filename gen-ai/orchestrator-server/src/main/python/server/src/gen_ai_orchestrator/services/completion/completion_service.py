@@ -40,7 +40,7 @@ from gen_ai_orchestrator.routers.responses.responses import (
     SentenceGenerationResponse,
 )
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
-    get_llm_factory, create_langfuse_callback_handler,
+    get_llm_factory, create_observability_callback_handler,
 )
 
 logger = logging.getLogger(__name__)
@@ -74,12 +74,12 @@ async def generate_and_split_sentences(
     chain = prompt | model | parser
 
     config = None
-    # Create a RunnableConfig containing the langfuse callback handler
+    # Create a RunnableConfig containing the observability callback handler
     if query.observability_setting is not None:
         config = {"callbacks": [
-            create_langfuse_callback_handler(
+            create_observability_callback_handler(
                 observability_setting=query.observability_setting,
-                trace_name=ObservabilityTrace.SENTENCE_GENERATION.value
+                trace_name=ObservabilityTrace.SENTENCE_GENERATION
             )]}
 
     sentences = await chain.ainvoke(query.prompt.inputs, config=config)

@@ -47,6 +47,7 @@ from gen_ai_orchestrator.models.llm.openai.openai_llm_setting import (
 )
 from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
+from gen_ai_orchestrator.models.observability.observability_trace import ObservabilityTrace
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
@@ -173,20 +174,21 @@ def get_callback_handler_factory(setting: BaseObservabilitySetting) -> LangChain
         raise GenAIUnknownObservabilityProviderSettingException()
 
 
-def create_langfuse_callback_handler(
+def create_observability_callback_handler(
         observability_setting: Optional[ObservabilitySetting],
-        trace_name: str) -> Optional[LangfuseCallbackHandler]:
+        trace_name: ObservabilityTrace) -> Optional[LangfuseCallbackHandler]:
     """
-    Create a Langfuse Callback Handler
+    Create the Observability Callback Handler
 
     Args:
         observability_setting: The Observability Settings
-        trace_name: The Langfuse trace name
+        trace_name: The trace name
 
     Returns:
-        The Langfuse Callback Handler
+        The Observability Callback Handler
     """
     if observability_setting is not None:
-        return get_callback_handler_factory(setting=observability_setting).get_callback_handler(trace_name=trace_name)
+        return get_callback_handler_factory(setting=observability_setting).get_callback_handler(
+            trace_name=trace_name.value)
 
     return None

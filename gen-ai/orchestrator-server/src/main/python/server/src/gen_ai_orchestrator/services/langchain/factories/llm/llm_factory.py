@@ -21,7 +21,7 @@ from typing import Optional
 from langchain.base_language import BaseLanguageModel
 from langchain_core.runnables import RunnableConfig
 from langchain_core.runnables.utils import Input, Output
-from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
+from langchain.callbacks.base import BaseCallbackHandler as LangchainBaseCallbackHandler
 from pydantic import BaseModel
 
 from gen_ai_orchestrator.models.llm.llm_setting import BaseLLMSetting
@@ -42,11 +42,12 @@ class LangChainLLMFactory(ABC, BaseModel):
         """
         pass
 
-    async def check_llm_setting(self, langfuse_callback_handler: Optional[LangfuseCallbackHandler] = None) -> bool:
+    async def check_llm_setting(
+            self, observability_callback_handler: Optional[LangchainBaseCallbackHandler] = None) -> bool:
         """
         check the LLM setting validity, by pinging the AI Provider API
         Args:
-            langfuse_callback_handler : The Langfuse Callback Handler
+            observability_callback_handler : The Observability Callback Handler
 
         Returns:
             True if the setting is valid.
@@ -57,7 +58,7 @@ class LangChainLLMFactory(ABC, BaseModel):
         logger.info('Invoke LLM provider to check setting')
         query = 'Hi, are you there?'
         response = await self.invoke(query, config={
-            "callbacks": [langfuse_callback_handler] if langfuse_callback_handler else []
+            "callbacks": [observability_callback_handler] if observability_callback_handler else []
         })
         logger.info('Invocation successful')
         logger.debug('[query: %s], [response: %s]', query, response)

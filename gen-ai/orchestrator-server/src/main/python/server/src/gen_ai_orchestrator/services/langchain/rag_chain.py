@@ -57,7 +57,7 @@ from gen_ai_orchestrator.services.langchain.callbacks.retriever_json_callback_ha
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_llm_factory,
-    get_vector_store_factory, create_langfuse_callback_handler,
+    get_vector_store_factory, create_observability_callback_handler,
 )
 
 logger = logging.getLogger(__name__)
@@ -109,9 +109,9 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     if query.observability_setting is not None:
         # Langfuse callback handler
         callback_handlers.append(
-            create_langfuse_callback_handler(
+            create_observability_callback_handler(
                 observability_setting=query.observability_setting,
-                trace_name=ObservabilityTrace.RAG.value))
+                trace_name=ObservabilityTrace.RAG))
 
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,

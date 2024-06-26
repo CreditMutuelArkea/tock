@@ -19,6 +19,14 @@ from enum import Enum, unique
 
 @unique
 class ProxyServerType(str, Enum):
-    """Enumeration to list Proxy Server types"""
+    """Enumeration to list Proxy Server types
+
+    This AWSLambda proxy is used when the architecture implemented for the Langfuse
+    observability tool places it behind an API Gateway which requires its
+    own authentication, itself invoked by an AWS Lambda.
+    The API Gateway uses the standard "Authorization" header,
+    and uses observability_proxy_server_authorization_header_name
+    to define the "Authorization bearer token" for Langfuse.
+    """
 
     AWS_LAMBDA = 'AwsLambda'
