@@ -168,7 +168,7 @@ def get_callback_handler_factory(setting: BaseObservabilitySetting) -> LangChain
 
     logger.info('Get Observability Factory for the given setting')
     if isinstance(setting, LangfuseObservabilitySetting):
-        logger.debug('Observability Factory - OpenAIObservabilityFactory')
+        logger.debug('Observability Factory - LangfuseCallbackHandlerFactory')
         return LangfuseCallbackHandlerFactory(setting=setting)
     else:
         raise GenAIUnknownObservabilityProviderSettingException()
