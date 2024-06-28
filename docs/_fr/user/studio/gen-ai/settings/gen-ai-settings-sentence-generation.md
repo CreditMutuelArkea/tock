@@ -1,39 +1,43 @@
 ---
-title: Gen AI / Sentence Generation
+title: Gen AI - Sentence generation settings
 ---
 
-# Le menu _Gen AI / Sentence Generation_
+# Le menu _Gen AI - Sentence generation settings_
 
-Le menu _Gen AI / Sentence Generation_ permet de générer via IA Générative, des phrases d'entraînement pour les bots FAQ.
+Le menu _Gen AI - Sentence Generation_ permet de configurer la fonctionnalité de génération de phrases d'entraînement pour les bots FAQ.
 
-Pour activer la sentence generation, il faut : 
-Un provider IA (ex: Azure Open AI), puis remplir les champs de sa configuration :
-- API key
-- API Version
-- Deployment name
-- Base URL
+> Pour accéder à cette page il faut bénéficier du rôle **_botUser_**. 
+> <br />( plus de détails sur les rôles dans [securité](../../../../admin/securite.md#rôles) ).
 
-Température : 
+![schéma Tock](../../../../img/gen-ai/gen-ai-settings-sentence-generation.png "Ecran de configuration")
+
+Pour activer la fonction de génération de phrases, vous devez choisir :
+
+**Un provider IA :**
+- Voir la [liste des fournisseurs d'IA](../providers/gen-ai-provider-ai-llm.md) 
+
+
+**Une température :** 
 - C’est la température qui apparaîtra par défaut lors de la création des phrases d'entraînement.
 - Elle Permet de définir le degré d’inventivité du modèle utilisé pour générer des phrases. 
 - Elle est situé entre 0 et 1.0. 
   - 0 = pas de latitude dans la création des phrases 
   - 1.0 = Plus grande latitude dans la création des phrases.
 
-Prompt :
+**Un prompt :**
 - Encadré dans lequel inclure le prompt qui permet la génération de nouvelles phrases d'entraînement.
 
-Nombre de phrases : 
+**Le nombre de phrases :** 
 - Défini le nombre de phrases d'entraînement générées par chaque requête.
 
-
-> Pour accéder à cette page il faut bénéficier du rôle _nlpUser_. ( plus de détails sur les rôles dans [securité](../../../admin/securite.md#rôles) ).
+**Activation :**
+- Permet d'activer ou pas la fonctionnalité.
 
 
 https://docs.google.com/document/d/12UwD9tJNiL-cUEKLddpKYIFtPMhVOnpwiMDPDfHD7eE/edit
 
 TODO MASS
-![schéma Tock](../../../img/ecran_faq.png "Ecran de configuration")
+![schéma Tock](../../../../img/ecran_faq.png "Ecran de configuration")
 
 
 Le Menu FAQ Management

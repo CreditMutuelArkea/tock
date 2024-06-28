@@ -13,10 +13,10 @@ Cette page sert à intégrer toutes les données de connexion et le prompt qui p
 
 
 
-> Pour accéder à cette page il faut bénéficier du rôle _nlpUser_. ( plus de détails sur les rôles dans [securité](../../../admin/securite.md#rôles) ).
+> Pour accéder à cette page il faut bénéficier du rôle _nlpUser_. ( plus de détails sur les rôles dans [securité](../../../../admin/securite.md#rôles) ).
 
 
-![schéma Tock](../../../img/ecran_faq.png "Ecran de configuration")
+![schéma Tock](../../../../img/ecran_faq.png "Ecran de configuration")
 
 
 RAG Exclusion
