@@ -4,6 +4,8 @@ title: FAQ Training
 
 # Le menu _FAQ Training_
 
+> Cette documentation est obsolète.
+
 Le menu _FAQ Training_ permet d'enrichir les modèles conversationnels en associant les phrases utilisateur avec des questions de FAQ.
 Il est destiné à un public métier non familier avec les concepts conversationnels (intentions, entités...).
 
