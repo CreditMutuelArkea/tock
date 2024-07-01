@@ -21,6 +21,7 @@ from gen_ai_orchestrator.configurations.environment.settings import (
     open_search_password,
     open_search_username,
 )
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
@@ -29,12 +30,14 @@ from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store
 class OpenSearchFactory(LangChainVectorStoreFactory):
     """A class for LangChain OpenSearch Factory"""
 
+    setting: OpenSearchVectorStoreSetting
+
     def get_vector_store(self):
         return OpenSearchVectorSearch(
-            opensearch_url=f'https://{application_settings.open_search_host}:{application_settings.open_search_port}',
+            opensearch_url=f'https://{self.setting.host}:{self.setting.port}',
             http_auth=(
-                open_search_username,
-                open_search_password,
+                self.setting.username,
+                self.setting.password,
             ),
             use_ssl=is_prod_environment,
             verify_certs=is_prod_environment,

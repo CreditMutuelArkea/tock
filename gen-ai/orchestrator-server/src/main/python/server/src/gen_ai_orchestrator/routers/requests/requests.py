@@ -25,7 +25,7 @@ from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import L
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
-from gen_ai_orchestrator.models.vector_stores.vector_stores_types import DocumentSearchParams
+from gen_ai_orchestrator.models.vector_stores.vector_stores_types import DocumentSearchParams, VectorStoreSetting
 
 
 class LLMProviderSettingStatusQuery(BaseModel):
@@ -80,6 +80,9 @@ class RagQuery(BaseModel):
     )
     document_search_params: DocumentSearchParams = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
+    )
+    vector_store_setting: VectorStoreSetting = Field(
+        description='The vector store settings.'
     )
     observability_setting: Optional[ObservabilitySetting] = Field(
         description='The observability settings.',

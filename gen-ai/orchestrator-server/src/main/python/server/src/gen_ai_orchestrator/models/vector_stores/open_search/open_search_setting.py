@@ -35,12 +35,16 @@ class OpenSearchVectorStoreSetting(BaseVectorStoreSetting):
     provider: Literal[VectorStoreProvider.OPEN_SEARCH] = Field(
         description='The Vector Store Provider.', examples=[VectorStoreProvider.OPEN_SEARCH]
     )
-    url: AnyUrl = Field(
-        description='The OpenSearch server url', examples=['https://my-opensearch-db:9200'],
-        default='http://localhost:9200'
+    host: AnyUrl = Field(
+        description='The hostname of OpenSearch server', examples=['my-opensearch-db'],
+        default='localhost'
     )
-    user: str = Field(
-        description='The vector store connection user.',
+    port: AnyUrl = Field(
+        description='The OpenSearch server port', examples=['9200'],
+        default='9200'
+    )
+    username: str = Field(
+        description='The vector store connection username.',
         examples=['admin'],
     )
     password: SecretKey = Field(

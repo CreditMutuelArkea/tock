@@ -20,10 +20,13 @@ from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore
 from pydantic import BaseModel, ConfigDict
 
+from gen_ai_orchestrator.models.vector_stores.vector_store_setting import BaseVectorStoreSetting
+
 
 class LangChainVectorStoreFactory(ABC, BaseModel):
     """A base class for LangChain Vector Store Factory"""
 
+    setting: BaseVectorStoreSetting
     embedding_function: Embeddings
     index_name: str
     model_config = ConfigDict(arbitrary_types_allowed=True)

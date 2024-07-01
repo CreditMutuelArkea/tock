@@ -73,8 +73,7 @@ class _Settings(BaseSettings):
     llm_provider_max_retries: int = 0
     em_provider_timeout: int = 4
 
-    open_search_host: str = 'localhost'
-    open_search_port: str = '9200'
+
     open_search_aws_secret_manager_name: Optional[str] = None
     open_search_user: Optional[str] = 'admin'
     open_search_pwd: Optional[str] = 'admin'

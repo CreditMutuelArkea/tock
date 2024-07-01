@@ -49,6 +49,8 @@ from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import L
 from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_trace import ObservabilityTrace
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+from gen_ai_orchestrator.models.vector_stores.vector_stores_types import VectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
@@ -131,14 +133,14 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 
 def get_vector_store_factory(
-        vector_store_provider: VectorStoreProvider,
+        setting: VectorStoreSetting,
         embedding_function: Embeddings,
         index_name: str,
 ) -> LangChainVectorStoreFactory:
     """
     Creates an LangChain Vector Store Factory according to the vector store provider
     Args:
-        vector_store_provider: The vector store provider
+        setting: The vector store setting
         embedding_function: The embedding function
         index_name: The index name
 
@@ -147,9 +149,10 @@ def get_vector_store_factory(
     """
 
     logger.info('Get Vector Store Factory for the given provider')
-    if VectorStoreProvider.OPEN_SEARCH == vector_store_provider:
+    if isinstance(setting, OpenSearchVectorStoreSetting):
         logger.debug('Vector Store Factory - OpenSearchFactory')
         return OpenSearchFactory(
+            setting=setting,
             embedding_function=embedding_function, index_name=index_name
         )
     else:
