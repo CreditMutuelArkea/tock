@@ -18,6 +18,8 @@ package ai.tock.bot.engine.config
 
 import ai.tock.bot.admin.answer.AnswerConfigurationType.builtin
 import ai.tock.bot.admin.bot.BotApplicationConfigurationKey
+import ai.tock.bot.admin.bot.rag.isEnabled
+import ai.tock.bot.admin.bot.vectorstore.isEnabled
 import ai.tock.bot.admin.story.StoryDefinitionConfiguration
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.Intent
@@ -135,7 +137,8 @@ internal class BotDefinitionWrapper(val botDefinition: BotDefinition) : BotDefin
                     keywordStory,
                     ragExcludedStory,
                     ragStory,
-                    botDefinition.ragConfiguration
+                    ragEnabled = botDefinition.ragConfiguration.isEnabled()
+                            && botDefinition.vectorStoreConfiguration.isEnabled()
             )
 
     internal fun builtInStory(storyId: String): StoryDefinition =

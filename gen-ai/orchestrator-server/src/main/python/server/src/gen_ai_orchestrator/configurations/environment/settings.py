@@ -14,8 +14,6 @@
 #
 """
 This module manages the initialization of application settings, based on environment variables
-The OpenSearch master user credentials are retrieved from AWS Secrets Manager if
-open_search_aws_secret_manager_name is set
 """
 
 import logging
@@ -30,23 +28,6 @@ from gen_ai_orchestrator.utils.aws.aws_secrets_manager_client import AWSSecretsM
 from gen_ai_orchestrator.utils.strings import obfuscate
 
 logger = logging.getLogger(__name__)
-
-
-def fetch_open_search_credentials() -> Tuple[Optional[str], Optional[str]]:
-    """Fetch the OpenSearch credentials."""
-    if application_settings.open_search_aws_secret_manager_name is not None:
-        logger.info('Use of AWS Secrets Manager to get OpenSearch credentials...')
-        credentials = AWSSecretsManagerClient().get_credentials(
-            secret_name=application_settings.open_search_aws_secret_manager_name
-        )
-        if credentials is not None:
-            logger.info("The credentials have been successfully retrieved from AWS Secrets Manager.")
-            return credentials.username, credentials.password
-        else:
-            logger.error("No credentials extracted from AWS Secrets Manager.")
-            return None, None
-    else:
-        return application_settings.open_search_user, application_settings.open_search_pwd
 
 
 @unique
@@ -73,13 +54,8 @@ class _Settings(BaseSettings):
     llm_provider_max_retries: int = 0
     em_provider_timeout: int = 4
 
-    open_search_host: str = 'localhost'
-    open_search_port: str = '9200'
-    open_search_aws_secret_manager_name: Optional[str] = None
-    open_search_user: Optional[str] = 'admin'
-    open_search_pwd: Optional[str] = 'admin'
     """Request timeout: set the maximum time (in seconds) for the request to be completed."""
-    open_search_timeout: int = 4
+    vector_store_timeout: int = 4
 
     observability_provider_max_retries: int = 0
     """Request timeout (in seconds)."""
@@ -99,10 +75,3 @@ class _Settings(BaseSettings):
 
 application_settings = _Settings()
 is_prod_environment = _Environment.PROD == application_settings.application_environment
-open_search_username, open_search_password = fetch_open_search_credentials()
-
-logger.info(
-    'OpenSearch user credentials: %s:%s',
-    open_search_username,
-    obfuscate(open_search_password),
-)

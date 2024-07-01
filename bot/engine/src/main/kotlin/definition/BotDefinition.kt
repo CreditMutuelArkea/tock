@@ -18,6 +18,7 @@ package ai.tock.bot.definition
 
 import ai.tock.bot.admin.bot.observability.BotObservabilityConfiguration
 import ai.tock.bot.admin.bot.rag.BotRAGConfiguration
+import ai.tock.bot.admin.bot.vectorstore.BotVectorStoreConfiguration
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.Intent.Companion.keyword
 import ai.tock.bot.definition.Intent.Companion.ragexcluded
@@ -87,7 +88,7 @@ interface BotDefinition : I18nKeyProvider {
             keywordStory: StoryDefinition,
             ragExcludedStory: StoryDefinition? = null,
             ragStory: StoryDefinition? = null,
-            ragConfiguration: BotRAGConfiguration? = null
+            ragEnabled: Boolean? = null
         ): StoryDefinition {
             return if (intent == null) {
                unknownStory
@@ -97,7 +98,7 @@ interface BotDefinition : I18nKeyProvider {
                     ?: when(intent) {
                         keyword.name -> keywordStory
                         ragexcluded.intentWithoutNamespace().name -> ragExcludedStory ?: unknownStory
-                        else -> (if(ragConfiguration?.enabled == true) ragStory else null) ?: unknownStory
+                        else -> (if(ragEnabled == true) ragStory else null) ?: unknownStory
                     }
             }
         }
@@ -124,12 +125,17 @@ interface BotDefinition : I18nKeyProvider {
     var ragConfiguration: BotRAGConfiguration?
 
     /**
+     * Vector Store configuration
+     */
+    var vectorStoreConfiguration: BotVectorStoreConfiguration?
+
+    /**
      * Observability configuration
      */
     var observabilityConfiguration: BotObservabilityConfiguration?
 
     /**
-     * The list of each stories.
+     * The list of each story.
      */
     val stories: List<StoryDefinition>
 

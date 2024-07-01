@@ -28,10 +28,11 @@ from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIUnknownProviderSettingException,
-    VectorStoreUnknownException,
 )
 from gen_ai_orchestrator.errors.exceptions.observability.observability_exceptions import \
     GenAIUnknownObservabilityProviderSettingException
+from gen_ai_orchestrator.errors.exceptions.vector_store.vector_store_exceptions import \
+    GenAIUnknownVectorStoreProviderSettingException
 from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
     AzureOpenAIEMSetting,
 )
@@ -49,9 +50,8 @@ from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import L
 from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_trace import ObservabilityTrace
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
-    VectorStoreProvider,
-)
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
     LangChainCallbackHandlerFactory
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.langfuse_callback_handler_factory import \
@@ -131,29 +131,28 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 
 def get_vector_store_factory(
-        vector_store_provider: VectorStoreProvider,
-        embedding_function: Embeddings,
-        index_name: str,
+        setting: VectorStoreSetting,
+        embedding_function: Embeddings
 ) -> LangChainVectorStoreFactory:
     """
     Creates an LangChain Vector Store Factory according to the vector store provider
     Args:
-        vector_store_provider: The vector store provider
+        setting: The vector store setting
         embedding_function: The embedding function
-        index_name: The index name
 
     Returns:
         The LangChain Vector Store Factory, or raise an exception otherwise
     """
 
     logger.info('Get Vector Store Factory for the given provider')
-    if VectorStoreProvider.OPEN_SEARCH == vector_store_provider:
+    if isinstance(setting, OpenSearchVectorStoreSetting):
         logger.debug('Vector Store Factory - OpenSearchFactory')
         return OpenSearchFactory(
-            embedding_function=embedding_function, index_name=index_name
+            setting=setting,
+            embedding_function=embedding_function
         )
     else:
-        raise VectorStoreUnknownException()
+        raise GenAIUnknownVectorStoreProviderSettingException()
 
 
 def get_callback_handler_factory(setting: BaseObservabilitySetting) -> LangChainCallbackHandlerFactory:

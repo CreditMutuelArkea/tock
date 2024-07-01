@@ -12,16 +12,3 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-"""Module defining generic type alias"""
-
-from typing import Annotated, Union
-
-from fastapi import Body
-
-from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params import (
-    OpenSearchParams,
-)
-
-DocumentSearchParams = Annotated[
-    Union[OpenSearchParams], Body(discriminator='provider')
-]
