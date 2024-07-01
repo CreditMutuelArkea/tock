@@ -144,7 +144,17 @@ Answer in {locale}:""",
                         ],
                         'k': 4,
                     },
-                    'observability_setting' : None
+                    'observability_setting': None,
+                    'vector_store_setting': {
+                        'provider': 'OpenSearch',
+                        'host': 'localhost',
+                        'port': 9200,
+                        'username': 'admin',
+                        'password': {
+                            'type': 'Raw',
+                            'value': 'admin',
+                        }
+                    },
                 }
             ]
         }
