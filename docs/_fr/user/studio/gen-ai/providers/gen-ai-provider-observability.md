@@ -1,5 +1,5 @@
 
-# Liste des fournisseurs d'observabilité de l'IA pris en compte par Tock.
+# Fournisseurs d'observabilité de l'IA pris en compte par Tock.
 
 
 <table>
@@ -19,7 +19,7 @@
 `Langfuse` <br />
 [Docs](https://langfuse.com/docs)
 </td>
-<td>
+<td style="vertical-align: top;">
 
 ```json
 {

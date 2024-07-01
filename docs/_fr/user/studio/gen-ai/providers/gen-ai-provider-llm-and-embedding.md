@@ -1,5 +1,5 @@
 
-# Liste des fournisseurs de l'IA pris en compte par Tock.
+# Fournisseurs de l'IA pris en compte par Tock.
 
 
 <table>
@@ -23,7 +23,7 @@
 `OpenAI` <br />
 [Docs](https://platform.openai.com/docs/introduction)
 </td>
-<td>
+<td style="vertical-align: top;">
 
 ```json
 {
@@ -38,7 +38,7 @@
 }
 ```
 </td>
-<td>
+<td style="vertical-align: top;">
 
 ```json
 {
@@ -58,22 +58,7 @@
 `AzureOpenAIService` <br />
 [Docs](https://azure.microsoft.com/fr-fr/products/ai-services/openai-service)
 </td>
-<td>
-
-```json
-{
-  "provider": "AzureOpenAIService",
-  "api_key": {
-    "type": "Raw",
-    "value": "aebb4b****************7b25e3371"
-  },
-  "api_base": "https://custom-api-name.azure-api.net",
-  "deployment_name": "custom-deployment-name",
-  "api_version": "2024-03-01-preview"
-}
-```
-</td>
-<td>
+<td style="vertical-align: top;">
 
 ```json
 {
@@ -84,6 +69,21 @@
   },
   "temperature": "1.0",
   "prompt": "Customized prompt for the use case",
+  "api_base": "https://custom-api-name.azure-api.net",
+  "deployment_name": "custom-deployment-name",
+  "api_version": "2024-03-01-preview"
+}
+```
+</td>
+<td style="vertical-align: top;">
+
+```json
+{
+  "provider": "AzureOpenAIService",
+  "api_key": {
+    "type": "Raw",
+    "value": "aebb4b****************7b25e3371"
+  },
   "api_base": "https://custom-api-name.azure-api.net",
   "deployment_name": "custom-deployment-name",
   "api_version": "2024-03-01-preview"
