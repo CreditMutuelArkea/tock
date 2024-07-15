@@ -459,6 +459,21 @@ open class BotAdminVerticle : AdminVerticle() {
                 }
         }
 
+        blockingJsonPost("/configuration/bots/:botId/observability", admin) { context, configuration: BotObservabilityConfigurationDTO  ->
+            if (context.organization == configuration.namespace) {
+                BotObservabilityConfigurationDTO(ObservabilityService.saveObservability(configuration))
+            } else {
+                unauthorized()
+            }
+        }
+
+        blockingJsonGet("/configuration/bots/:botId/observability", admin) { context  ->
+            ObservabilityService.getObservabilityConfiguration(context.organization, context.path("botId"))
+                ?.let {
+                    BotObservabilityConfigurationDTO(it)
+                }
+        }
+
         blockingJsonPost("/configuration/bots/:botId/vector-store", admin) { context, configuration: BotVectorStoreConfigurationDTO  ->
             if (context.organization == configuration.namespace) {
                 BotVectorStoreConfigurationDTO(VectorStoreService.saveVectorStore(configuration))
