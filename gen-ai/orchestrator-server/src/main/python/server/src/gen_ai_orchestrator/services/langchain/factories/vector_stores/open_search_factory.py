@@ -14,6 +14,7 @@
 #
 """Model for creating OpenSearchFactory"""
 import logging
+from typing import Optional, Any
 
 from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
 from langchain_core.vectorstores import VectorStoreRetriever
@@ -64,9 +65,10 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
             timeout=application_settings.vector_store_timeout,
         )
 
-    def get_vector_store_retriever(self) -> VectorStoreRetriever:
-        return self.get_vector_store().as_retriever(
-            search_kwargs={
+    def get_vector_store_retriever(self, **search_kwargs: Optional[dict]) -> VectorStoreRetriever:
+        search_filter = search_kwargs
+        if search_filter is None:
+            search_filter = {
                 'k': self.setting.k,
                 'filter': [{
                     "term": {
@@ -74,4 +76,7 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
                     }
                 }],
             }
+
+        return self.get_vector_store().as_retriever(
+            search_kwargs=search_filter
         )

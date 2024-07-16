@@ -43,9 +43,11 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
         pass
 
     @abstractmethod
-    def get_vector_store_retriever(self) -> VectorStoreRetriever:
+    def get_vector_store_retriever(self, search_kwargs) -> VectorStoreRetriever:
         """
         Fabric the Vector Store and return it as retriever
+        Args:
+            search_kwargs: the search filter
         :return: A VectorStoreRetriever.
         """
         pass

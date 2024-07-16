@@ -161,12 +161,14 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     llm_factory = get_llm_factory(setting=query.question_answering_llm_setting)
     em_factory = get_em_factory(setting=query.embedding_question_em_setting)
     vector_store_factory = get_vector_store_factory(setting=query.vector_store_setting,
+                                                    index_name=query.document_index_name,
                                                     embedding_function=em_factory.get_embedding_model())
 
     logger.debug('RAG chain - Create a ConversationalRetrievalChain from LLM')
     return ConversationalRetrievalChain.from_llm(
         llm=llm_factory.get_language_model(),
-        retriever=vector_store_factory.get_vector_store_retriever(),
+        retriever=vector_store_factory.get_vector_store_retriever(
+            None if query.document_search_params is None else query.document_search_params.to_dict()),
         return_source_documents=True,
         return_generated_question=True,
         combine_docs_chain_kwargs={

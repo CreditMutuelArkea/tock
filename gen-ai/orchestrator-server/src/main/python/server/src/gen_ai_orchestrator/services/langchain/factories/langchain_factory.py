@@ -55,6 +55,7 @@ from gen_ai_orchestrator.models.observability.observability_type import Observab
 from gen_ai_orchestrator.models.security.raw_secret_key.raw_secret_key import RawSecretKey
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
+from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
     LangChainCallbackHandlerFactory
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.langfuse_callback_handler_factory import \
@@ -136,7 +137,6 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 def get_vector_store_factory(
         setting: Optional[VectorStoreSetting],
         index_name: Optional[str],
-        index_session_id: Optional[str],
         embedding_function: Embeddings
 ) -> LangChainVectorStoreFactory:
     """
@@ -144,7 +144,6 @@ def get_vector_store_factory(
     Args:
         setting: The vector store setting
         index_name: The index name
-        index_session_id: The index session id
         embedding_function: The embedding function
 
     Returns:
@@ -153,19 +152,19 @@ def get_vector_store_factory(
 
     logger.info('Get Vector Store Factory for the given provider')
     if setting is None:
+        logger.debug('Vector Store Factory (based on env variables) - OpenSearchFactory')
         return OpenSearchFactory(
             setting=OpenSearchVectorStoreSetting(
                 host=application_settings.open_search_host,
                 port=application_settings.open_search_port,
                 username=open_search_username,
                 password=RawSecretKey(value=open_search_password),
-                index_name=index_name,
-                index_session_id=index_session_id
+                index_name=index_name
             ),
             embedding_function=embedding_function
         )
     elif isinstance(setting, OpenSearchVectorStoreSetting):
-        logger.debug('Vector Store Factory - OpenSearchFactory')
+        logger.debug('Vector Store Factory (based on RAG query) - OpenSearchFactory')
         return OpenSearchFactory(
             setting=setting,
             embedding_function=embedding_function

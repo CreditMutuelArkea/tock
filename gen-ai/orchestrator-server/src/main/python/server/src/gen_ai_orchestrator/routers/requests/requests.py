@@ -80,7 +80,13 @@ class RagQuery(BaseModel):
     embedding_question_em_setting: EMSetting = Field(
         description="Embedding model setting, used to calculate the user's question vector."
     )
-    vector_store_setting: VectorStoreSetting = Field(
+    document_index_name: str = Field(
+        description='Index name corresponding to a document collection in the vector database.',
+    )
+    document_search_params: DocumentSearchParams = Field(
+        description='The document search parameters. Ex: number of documents, metadata filter',
+    )
+    vector_store_setting: Optional[VectorStoreSetting] = Field(
         description='The vector store settings.'
     )
     observability_setting: Optional[ObservabilitySetting] = Field(
