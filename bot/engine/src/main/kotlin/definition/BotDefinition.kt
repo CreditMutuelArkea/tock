@@ -88,7 +88,7 @@ interface BotDefinition : I18nKeyProvider {
             keywordStory: StoryDefinition,
             ragExcludedStory: StoryDefinition? = null,
             ragStory: StoryDefinition? = null,
-            ragEnabled: Boolean? = null
+            ragConfiguration: BotRAGConfiguration? = null
         ): StoryDefinition {
             return if (intent == null) {
                unknownStory
@@ -98,7 +98,7 @@ interface BotDefinition : I18nKeyProvider {
                     ?: when(intent) {
                         keyword.name -> keywordStory
                         ragexcluded.intentWithoutNamespace().name -> ragExcludedStory ?: unknownStory
-                        else -> (if(ragEnabled == true) ragStory else null) ?: unknownStory
+                        else -> (if(ragConfiguration?.enabled == true) ragStory else null) ?: unknownStory
                     }
             }
         }

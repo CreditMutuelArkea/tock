@@ -29,6 +29,7 @@ data class RAGQuery(
     val questionAnsweringLlmSetting: LLMSetting,
     val questionAnsweringPromptInputs: Map<String, String>,
     val embeddingQuestionEmSetting: EMSetting,
+    val documentIndexName: String?,
     val documentSearchParams: DocumentSearchParams?,
     val vectorStoreSetting: VectorStoreSetting?,
     val observabilitySetting: ObservabilitySetting?

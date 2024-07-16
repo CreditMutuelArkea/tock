@@ -36,6 +36,7 @@ import ai.tock.genai.orchestratorclient.responses.TextWithFootnotes
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorBusinessError
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorValidationError
 import ai.tock.genai.orchestratorclient.services.RAGService
+import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.*
 import engine.config.AbstractProactiveAnswerHandler
 import mu.KotlinLogging
@@ -163,13 +164,18 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
 
             var documentSearchParams: OpenSearchParams? = null
-            if(vectorStoreConfiguration != null)
-                documentSearchParams = OpenSearchParams(
-                // The number of neighbors to return for each query_embedding.
-                k = kNeighborsDocuments, filter = listOf(
-                    Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+            var documentIndexName: String? = null
+            if(vectorStoreConfiguration != null) {
+                documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
+                    ragConfiguration.namespace, ragConfiguration.botId
                 )
-            )
+                documentSearchParams = OpenSearchParams(
+                    // The number of neighbors to return for each query_embedding.
+                    k = kNeighborsDocuments, filter = listOf(
+                        Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+                    )
+                )
+            }
 
             try {
                 val response = ragService.rag(
@@ -182,6 +188,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                             "no_answer" to ragConfiguration.noAnswerSentence
                         ),
                         embeddingQuestionEmSetting = ragConfiguration.emSetting,
+                        documentIndexName = documentIndexName,
                         documentSearchParams = documentSearchParams,
                         vectorStoreSetting = vectorStoreConfiguration?.setting,
                         observabilitySetting = botDefinition.observabilityConfiguration?.setting

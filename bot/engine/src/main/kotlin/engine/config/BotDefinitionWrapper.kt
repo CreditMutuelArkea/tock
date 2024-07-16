@@ -137,8 +137,7 @@ internal class BotDefinitionWrapper(val botDefinition: BotDefinition) : BotDefin
                     keywordStory,
                     ragExcludedStory,
                     ragStory,
-                    ragEnabled = botDefinition.ragConfiguration.isEnabled()
-                            && botDefinition.vectorStoreConfiguration.isEnabled()
+                    botDefinition.ragConfiguration
             )
 
     internal fun builtInStory(storyId: String): StoryDefinition =
