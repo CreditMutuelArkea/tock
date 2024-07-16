@@ -82,12 +82,15 @@ class RagQuery(BaseModel):
     )
     document_index_name: Optional[str] = Field(
         description='Index name corresponding to a document collection in the vector database.',
+        default=None
     )
     document_search_params: Optional[DocumentSearchParams] = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
+        default=None
     )
     vector_store_setting: Optional[VectorStoreSetting] = Field(
-        description='The vector store settings.'
+        description='The vector store settings.',
+        default=None
     )
     observability_setting: Optional[ObservabilitySetting] = Field(
         description='The observability settings.',

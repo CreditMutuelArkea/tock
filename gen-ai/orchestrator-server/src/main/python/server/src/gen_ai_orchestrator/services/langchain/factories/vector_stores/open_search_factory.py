@@ -65,7 +65,7 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
             timeout=application_settings.vector_store_timeout,
         )
 
-    def get_vector_store_retriever(self, **search_kwargs: Optional[dict]) -> VectorStoreRetriever:
+    def get_vector_store_retriever(self, search_kwargs: Optional[dict]) -> VectorStoreRetriever:
         search_filter = search_kwargs
         if search_filter is None:
             search_filter = {

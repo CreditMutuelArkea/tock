@@ -16,6 +16,7 @@
 
 import logging
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from langchain_core.embeddings import Embeddings
 from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
@@ -43,7 +44,7 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
         pass
 
     @abstractmethod
-    def get_vector_store_retriever(self, search_kwargs) -> VectorStoreRetriever:
+    def get_vector_store_retriever(self, search_kwargs: Optional[dict]) -> VectorStoreRetriever:
         """
         Fabric the Vector Store and return it as retriever
         Args:
