@@ -26,6 +26,8 @@ from typing import Optional
 from langchain_core.embeddings import Embeddings
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
 
+from gen_ai_orchestrator.configurations.environment.settings import open_search_password, open_search_username, \
+    application_settings
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIUnknownProviderSettingException,
 )
@@ -50,6 +52,7 @@ from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import L
 from gen_ai_orchestrator.models.observability.observability_setting import BaseObservabilitySetting
 from gen_ai_orchestrator.models.observability.observability_trace import ObservabilityTrace
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
+from gen_ai_orchestrator.models.security.raw_secret_key.raw_secret_key import RawSecretKey
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
@@ -131,13 +134,17 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 
 def get_vector_store_factory(
-        setting: VectorStoreSetting,
+        setting: Optional[VectorStoreSetting],
+        index_name: Optional[str],
+        index_session_id: Optional[str],
         embedding_function: Embeddings
 ) -> LangChainVectorStoreFactory:
     """
     Creates an LangChain Vector Store Factory according to the vector store provider
     Args:
         setting: The vector store setting
+        index_name: The index name
+        index_session_id: The index session id
         embedding_function: The embedding function
 
     Returns:
@@ -145,7 +152,19 @@ def get_vector_store_factory(
     """
 
     logger.info('Get Vector Store Factory for the given provider')
-    if isinstance(setting, OpenSearchVectorStoreSetting):
+    if setting is None:
+        return OpenSearchFactory(
+            setting=OpenSearchVectorStoreSetting(
+                host=application_settings.open_search_host,
+                port=application_settings.open_search_port,
+                username=open_search_username,
+                password=RawSecretKey(value=open_search_password),
+                index_name=index_name,
+                index_session_id=index_session_id
+            ),
+            embedding_function=embedding_function
+        )
+    elif isinstance(setting, OpenSearchVectorStoreSetting):
         logger.debug('Vector Store Factory - OpenSearchFactory')
         return OpenSearchFactory(
             setting=setting,
