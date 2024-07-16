@@ -30,9 +30,7 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.action.SendSentenceWithFootnotes
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.user.PlayerType
-import ai.tock.genai.orchestratorclient.requests.ChatMessage
-import ai.tock.genai.orchestratorclient.requests.ChatMessageType
-import ai.tock.genai.orchestratorclient.requests.RAGQuery
+import ai.tock.genai.orchestratorclient.requests.*
 import ai.tock.genai.orchestratorclient.responses.RAGResponse
 import ai.tock.genai.orchestratorclient.responses.TextWithFootnotes
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorBusinessError
@@ -42,6 +40,9 @@ import ai.tock.shared.*
 import engine.config.AbstractProactiveAnswerHandler
 import mu.KotlinLogging
 
+private val kNeighborsDocuments = intProperty(
+    name = "tock_gen_ai_orchestrator_document_number_neighbors",
+    defaultValue = 1)
 private val nLastMessages = intProperty(
     name = "tock_gen_ai_orchestrator_dialog_number_messages",
     defaultValue = 5)
@@ -159,7 +160,16 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
         with(botBus) {
             // The RAG Story is only handled when RAG and Vector Store configurations are enabled
             val ragConfiguration = botDefinition.ragConfiguration!!
-            val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration!!
+            val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
+
+            var documentSearchParams: OpenSearchParams? = null
+            if(vectorStoreConfiguration != null)
+                documentSearchParams = OpenSearchParams(
+                // The number of neighbors to return for each query_embedding.
+                k = kNeighborsDocuments, filter = listOf(
+                    Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+                )
+            )
 
             try {
                 val response = ragService.rag(
@@ -172,13 +182,8 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                             "no_answer" to ragConfiguration.noAnswerSentence
                         ),
                         embeddingQuestionEmSetting = ragConfiguration.emSetting,
-//                        documentSearchParams = OpenSearchParams(
-//                            // The number of neighbors to return for each query_embedding.
-//                            k = kNeighborsDocuments, filter = listOf(
-//                                Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
-//                            )
-//                        ),
-                        vectorStoreSetting = vectorStoreConfiguration.setting,
+                        documentSearchParams = documentSearchParams,
+                        vectorStoreSetting = vectorStoreConfiguration?.setting,
                         observabilitySetting = botDefinition.observabilityConfiguration?.setting
                     ), debug = action.metadata.debugEnabled || ragDebugEnabled
                 )

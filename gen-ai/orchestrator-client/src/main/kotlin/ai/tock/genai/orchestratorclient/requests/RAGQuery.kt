@@ -29,8 +29,8 @@ data class RAGQuery(
     val questionAnsweringLlmSetting: LLMSetting,
     val questionAnsweringPromptInputs: Map<String, String>,
     val embeddingQuestionEmSetting: EMSetting,
-//    val documentSearchParams: DocumentSearchParams,
-    val vectorStoreSetting: VectorStoreSetting,
+    val documentSearchParams: DocumentSearchParams?,
+    val vectorStoreSetting: VectorStoreSetting?,
     val observabilitySetting: ObservabilitySetting?
 )
 
@@ -44,15 +44,15 @@ enum class ChatMessageType{
     AI
 }
 
-//abstract class DocumentSearchParams(
-//    val provider: VectorStoreProvider,
-//)
-//
-//data class OpenSearchParams(
-//    val k: Int,
-//    val filter: List<Term>
-//): DocumentSearchParams(VectorStoreProvider.OpenSearch)
-//
-//data class Term(
-//    val term: Map<String, Any>
-//)
+abstract class DocumentSearchParams(
+    val provider: VectorStoreProvider,
+)
+
+data class OpenSearchParams(
+    val k: Int,
+    val filter: List<Term>
+): DocumentSearchParams(VectorStoreProvider.OpenSearch)
+
+data class Term(
+    val term: Map<String, Any>
+)
