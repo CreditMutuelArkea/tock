@@ -19,6 +19,8 @@ from typing import Optional, List
 
 from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
+from gen_ai_orchestrator.models.vector_stores.vector_store_types import DocumentSearchParams
+
 
 class Footnote(BaseModel):
     """A footnote model, used to associate document sources with the RAG answer"""
@@ -141,8 +143,11 @@ class RagDebugData(BaseModel):
     document_index_name: str = Field(
         description='Index name corresponding to a document collection in the vector database.',
     )
-    document_index_session_id: str = Field(
+    document_index_session_id: Optional[str] = Field(
         description='Indexing session identifier.',
+    )
+    document_search_params: Optional[DocumentSearchParams] = Field(
+        description='The document search parameters. Ex: number of documents, metadata filter',
     )
     answer: str = Field(
         description='The RAG answer.'

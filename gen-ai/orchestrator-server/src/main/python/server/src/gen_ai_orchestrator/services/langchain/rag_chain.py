@@ -304,8 +304,9 @@ def get_rag_debug_data(
         condense_question=get_condense_question(records_callback_handler),
         question_answering_prompt=get_llm_prompts(records_callback_handler)[1],
         documents=get_rag_documents(records_callback_handler),
-        document_index_name=query.vector_store_setting.index_name,
-        document_index_session_id=query.vector_store_setting.index_session_id,
+        document_index_name=query.document_index_name if query.document_index_name is not None else query.vector_store_setting.index_name,
+        document_index_session_id=None if query.vector_store_setting is None else query.vector_store_setting.index_session_id,
+        document_search_params=query.document_search_params,
         answer=response['answer'],
         duration=rag_duration,
     )
