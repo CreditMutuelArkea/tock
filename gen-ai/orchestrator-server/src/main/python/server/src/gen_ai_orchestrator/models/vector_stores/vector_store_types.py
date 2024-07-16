@@ -18,7 +18,12 @@ from typing import Annotated, Union
 
 from fastapi import Body
 
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params import OpenSearchParams
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+
+DocumentSearchParams = Annotated[
+    Union[OpenSearchParams], Body(discriminator='provider')
+]
 
 VectorStoreSetting = Annotated[
     Union[OpenSearchVectorStoreSetting], Body(discriminator='provider')

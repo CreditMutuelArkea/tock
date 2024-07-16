@@ -24,7 +24,7 @@ from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
-from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
+from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting, DocumentSearchParams
 
 
 class LLMProviderSettingStatusQuery(BaseModel):
@@ -80,10 +80,10 @@ class RagQuery(BaseModel):
     embedding_question_em_setting: EMSetting = Field(
         description="Embedding model setting, used to calculate the user's question vector."
     )
-    document_index_name: str = Field(
+    document_index_name: Optional[str] = Field(
         description='Index name corresponding to a document collection in the vector database.',
     )
-    document_search_params: DocumentSearchParams = Field(
+    document_search_params: Optional[DocumentSearchParams] = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
     )
     vector_store_setting: Optional[VectorStoreSetting] = Field(
