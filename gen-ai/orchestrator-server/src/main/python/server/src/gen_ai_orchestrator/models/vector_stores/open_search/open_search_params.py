@@ -18,12 +18,6 @@ from typing import List, Literal
 
 from pydantic import BaseModel, Field
 
-from gen_ai_orchestrator.models.vector_stores.open_search.open_search_term_params import (
-    OpenSearchTermParams,
-)
-from gen_ai_orchestrator.models.vector_stores.open_search.vector_store_search_params import (
-    BaseVectorStoreSearchParams,
-)
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
     VectorStoreProvider,
 )
