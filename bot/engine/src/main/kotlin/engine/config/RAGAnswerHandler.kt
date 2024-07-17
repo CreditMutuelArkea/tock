@@ -36,6 +36,7 @@ import ai.tock.genai.orchestratorclient.responses.TextWithFootnotes
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorBusinessError
 import ai.tock.genai.orchestratorclient.retrofit.GenAIOrchestratorValidationError
 import ai.tock.genai.orchestratorclient.services.RAGService
+import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreSetting
 import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.*
 import engine.config.AbstractProactiveAnswerHandler
@@ -163,9 +164,10 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             val ragConfiguration = botDefinition.ragConfiguration!!
             val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
 
+            var vectorStoreSetting: VectorStoreSetting? = null
             var documentSearchParams: OpenSearchParams? = null
             var documentIndexName: String? = null
-            if(vectorStoreConfiguration == null) {
+            if(vectorStoreConfiguration == null || !vectorStoreConfiguration.enabled) {
                 documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
                     ragConfiguration.namespace, ragConfiguration.botId
                 )
@@ -175,6 +177,9 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                         Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
                     )
                 )
+            }else{
+                vectorStoreSetting =
+                    vectorStoreConfiguration.setting.copyWithIndexSessionId(ragConfiguration.indexSessionId!!)
             }
 
             try {
@@ -190,7 +195,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                         embeddingQuestionEmSetting = ragConfiguration.emSetting,
                         documentIndexName = documentIndexName,
                         documentSearchParams = documentSearchParams,
-                        vectorStoreSetting = vectorStoreConfiguration?.setting,
+                        vectorStoreSetting = vectorStoreSetting,
                         observabilitySetting = botDefinition.observabilityConfiguration?.setting
                     ), debug = action.metadata.debugEnabled || ragDebugEnabled
                 )

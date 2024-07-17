@@ -26,5 +26,3 @@ data class BotVectorStoreConfiguration(
     val enabled: Boolean,
     val setting: VectorStoreSetting,
 )
-
-fun BotVectorStoreConfiguration?.isEnabled(): Boolean = this?.enabled ?: false
