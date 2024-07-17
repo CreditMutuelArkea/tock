@@ -165,7 +165,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
 
             var documentSearchParams: OpenSearchParams? = null
             var documentIndexName: String? = null
-            if(vectorStoreConfiguration != null) {
+            if(vectorStoreConfiguration == null) {
                 documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
                     ragConfiguration.namespace, ragConfiguration.botId
                 )
