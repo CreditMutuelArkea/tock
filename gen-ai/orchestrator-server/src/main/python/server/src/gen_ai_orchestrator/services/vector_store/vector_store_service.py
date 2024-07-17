@@ -37,5 +37,6 @@ async def check_vector_store_setting(setting: VectorStoreSetting) -> bool:
 
     logger.info('Get the Callback handler Factory, then check the Vector Store setting.')
     return await get_vector_store_factory(setting=setting,
-                                          embedding_function=FakeEmbeddings(size=1536)
+                                          index_name=None,
+                                          embedding_function=FakeEmbeddings(size=1536)  # TODO MASS
                                           ).check_vector_store_setting()
