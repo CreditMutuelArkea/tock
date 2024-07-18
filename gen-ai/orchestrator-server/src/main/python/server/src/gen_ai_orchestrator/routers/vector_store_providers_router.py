@@ -42,7 +42,7 @@ from gen_ai_orchestrator.routers.requests.requests import (
 )
 from gen_ai_orchestrator.routers.responses.responses import (
     VectorStoreProviderResponse,
-    ProviderSettingStatusResponse,
+    ProviderSettingStatusResponse, ProviderSettingStatus,
 )
 from gen_ai_orchestrator.services.vector_store.vector_store_service import check_vector_store_setting
 
@@ -144,10 +144,10 @@ async def check_vector_store_provider_setting(
 
     try:
         # Vector Store setting check
-        await check_vector_store_setting(query.setting)
+        status: ProviderSettingStatus = await check_vector_store_setting(query.setting)
 
         logger.info('The Vector Store setting is valid')
-        return ProviderSettingStatusResponse(valid=True)
+        return ProviderSettingStatusResponse(valid=status.valid, metadata=status.metadata)
     except GenAIOrchestratorException as exc:
         logger.info('The Vector Store setting is invalid!')
         logger.error(exc)

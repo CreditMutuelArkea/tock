@@ -19,12 +19,13 @@ import logging
 from langchain_community.embeddings import FakeEmbeddings
 
 from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
+from gen_ai_orchestrator.routers.responses.responses import ProviderSettingStatus
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import get_vector_store_factory
 
 logger = logging.getLogger(__name__)
 
 
-async def check_vector_store_setting(setting: VectorStoreSetting) -> bool:
+async def check_vector_store_setting(setting: VectorStoreSetting) -> ProviderSettingStatus:
     """
     Run a check for a given Vector Store setting.
 
