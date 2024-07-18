@@ -35,6 +35,7 @@ abstract class VectorStoreSettingBase<T>(
     open val indexName: String,
     open var indexSessionId: String? = null,
     open val k: String,
+    open val vectorSize: Int,
 ) {
     abstract fun copyWithIndexSessionId(indexSessionId: String): VectorStoreSettingBase<T>
 }
