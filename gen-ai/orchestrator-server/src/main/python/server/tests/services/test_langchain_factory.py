@@ -207,6 +207,7 @@ def test_get_open_search_vector_store_factory():
                 'k': 2,
             }
         ),
+        index_name=None,
         embedding_function=em_factory.get_embedding_model()
     )
     assert isinstance(open_search, OpenSearchFactory)
@@ -216,6 +217,7 @@ def test_get_unknown_vector_store_factory():
     with pytest.raises(GenAIUnknownVectorStoreProviderSettingException):
         get_vector_store_factory(
             setting='an incorrect vector store provider',
+            index_name=None,
             embedding_function=None
         )
 

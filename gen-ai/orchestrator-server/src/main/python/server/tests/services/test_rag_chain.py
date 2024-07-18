@@ -156,6 +156,7 @@ Answer in {locale}:""",
     )
     mocked_get_vector_store_factory.assert_called_once_with(
         setting=query.vector_store_setting,
+        index_name=query.document_index_name,
         embedding_function=em_factory_instance.get_embedding_model()
     )
     mocked_get_callback_handler_factory.assert_called_once_with(
