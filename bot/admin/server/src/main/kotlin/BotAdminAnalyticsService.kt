@@ -52,7 +52,7 @@ object BotAdminAnalyticsService {
     private val dialogFlowDAO: DialogFlowDAO get() = injector.provide()
     private val storyDefinitionDAO: StoryDefinitionConfigurationDAO by injector.instance()
 
-     private val requestCache = CacheBuilder.newBuilder().expireAfterWrite(Duration.ofSeconds(3))
+     private val requestCache = CacheBuilder.newBuilder().expireAfterWrite(Duration.ofMinutes(1))
         .build(object : CacheLoader<RequestCacheKey, UserAnalyticsQueryResult>() {
             override fun load(key: RequestCacheKey): UserAnalyticsQueryResult = key.operation.loader(key)
         })
