@@ -13,11 +13,10 @@
 #   limitations under the License.
 #
 """Module for Response Models"""
-from enum import Enum, unique
-from typing import Any, Optional, Dict
 
-from pydantic import BaseModel, Field, GetJsonSchemaHandler
-from pydantic_core import core_schema
+from typing import Any, Optional
+
+from pydantic import BaseModel, Field
 
 from gen_ai_orchestrator.models.em.em_provider import EMProvider
 from gen_ai_orchestrator.models.errors.errors_models import ErrorCode, ErrorInfo
@@ -50,42 +49,7 @@ class ErrorResponse(BaseModel):
     )
 
 
-@unique
-class MetadataCode(Enum):
-    """Enumeration to list metadata response codes"""
-
-    VECTOR_STORE_DOCUMENT_COUNT = 'VECTOR_STORE_DOCUMENT_COUNT'
-
-    @classmethod
-    def __get_pydantic_json_schema__(
-        cls, core_schema: core_schema.JsonSchema, handler: GetJsonSchemaHandler
-    ) -> Dict:
-        """
-        Document error codes using the names in the enum so that they are more comprehensible in the openAPI spec.
-        """
-        return {
-            'enum': [item.value for item in cls],
-            'description': '\n'.join(
-                [f'* `{item.value}`: {item.name}' for item in cls]
-            ),
-            'type': 'string',
-        }
-
-
-class MetadataResponse(BaseModel):
-    """The metadata response model"""
-
-    code: MetadataCode = Field(
-        description='The metadata code.',
-        examples=[MetadataCode.VECTOR_STORE_DOCUMENT_COUNT],
-    )
-    value: Any = Field(
-        description='The metadata value.',
-        examples=['myValue'],
-    )
-
-
-class ProviderSettingStatus(BaseModel):
+class ProviderSettingStatusResponse(BaseModel):
     """The response model of the provider setting status"""
 
     valid: bool = Field(
@@ -93,12 +57,6 @@ class ProviderSettingStatus(BaseModel):
         examples=[True],
         default=False,
     )
-    metadata: list[MetadataResponse] = Field(description='Status infos.', default=[])
-
-
-class ProviderSettingStatusResponse(ProviderSettingStatus):
-    """The response model of the provider setting status"""
-
     errors: list[ErrorResponse] = Field(description='The list of errors.', default=[])
 
 
