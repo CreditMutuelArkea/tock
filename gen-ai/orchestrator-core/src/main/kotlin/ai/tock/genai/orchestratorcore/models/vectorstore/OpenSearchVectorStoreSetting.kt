@@ -20,6 +20,7 @@ data class OpenSearchVectorStoreSetting<T>(
     override val indexName: String,
     override var indexSessionId: String? = null,
     override val k: String,
+    override val vectorSize: Int,
     val host: String,
     val port: Int,
     val username: String,
@@ -29,6 +30,7 @@ data class OpenSearchVectorStoreSetting<T>(
     indexName = indexName,
     indexSessionId = indexSessionId,
     k = k,
+    vectorSize = vectorSize
 ){
     override fun copyWithIndexSessionId(indexSessionId: String): VectorStoreSettingBase<T> {
         return this.copy(indexSessionId=indexSessionId)
