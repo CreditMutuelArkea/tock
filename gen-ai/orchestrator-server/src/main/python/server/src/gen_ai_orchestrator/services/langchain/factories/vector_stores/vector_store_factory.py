@@ -68,9 +68,7 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
         query = 'what is a vector store ?'
         response = await self.get_vector_store().asimilarity_search(
             query=query,
-            k=self.setting.k,
-            # TODO MASS - filter on metadata field (index_session_id)
-            # https://python.langchain.com/v0.1/docs/integrations/vectorstores/opensearch/
+            k=self.setting.k
         )
         logger.info('Invocation successful')
         logger.debug('[query: %s], [response: %s]', query, response)
