@@ -923,7 +923,7 @@ abstract class WebVerticle : AbstractVerticle() {
      * See https://vertx.io/docs/vertx-web/java/#_route_match_failures
      */
     open fun defaultErrorHandler(statusCode: Int): Handler<RoutingContext> = Handler<RoutingContext> { event ->
-        logger.info { "Error $statusCode: ${event.request().path()}" }
+        logger.error { "Error $statusCode: ${event.request().path()}" }
         tockErrorHandler.handle(event)
     }
 }

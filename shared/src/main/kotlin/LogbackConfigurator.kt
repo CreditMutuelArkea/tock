@@ -79,7 +79,7 @@ internal class LogbackConfigurator : ContextAwareBase(), Configurator {
             appender.context = c
             appender.apply {
                 encoder = PatternLayoutEncoder().apply {
-                    pattern = "%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n"
+                    pattern = "%d{yyyy-MM-dd'T'HH:mm:ss.SSS} [%thread] %-5level \\(%F:%L\\) - %msg%n"
                     context = c
                     start()
                 }
