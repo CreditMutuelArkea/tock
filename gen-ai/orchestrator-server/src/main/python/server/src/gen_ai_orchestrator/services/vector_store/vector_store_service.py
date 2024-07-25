@@ -24,12 +24,13 @@ from gen_ai_orchestrator.services.langchain.factories.langchain_factory import g
 logger = logging.getLogger(__name__)
 
 
-async def check_vector_store_setting(setting: VectorStoreSetting) -> bool:
+async def check_vector_store_setting(setting: VectorStoreSetting, index_name: str) -> bool:
     """
     Run a check for a given Vector Store setting.
 
     Args:
         setting: The Vector Store setting to check
+        index_name: the index name
 
     Returns:
          True for a valid Vector Store setting. Raise exception otherwise.
@@ -37,6 +38,6 @@ async def check_vector_store_setting(setting: VectorStoreSetting) -> bool:
 
     logger.info('Get the Callback handler Factory, then check the Vector Store setting.')
     return await get_vector_store_factory(setting=setting,
-                                          index_name=None,
+                                          index_name=index_name,
                                           embedding_function=FakeEmbeddings(size=setting.vector_size)
                                           ).check_vector_store_setting()

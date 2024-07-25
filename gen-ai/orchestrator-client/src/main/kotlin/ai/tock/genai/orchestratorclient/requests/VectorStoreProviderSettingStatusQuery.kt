@@ -19,5 +19,6 @@ package ai.tock.genai.orchestratorclient.requests
 import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreSetting
 
 class VectorStoreProviderSettingStatusQuery(
-    val setting: VectorStoreSetting
+    val setting: VectorStoreSetting,
+    val indexName: String,
 )

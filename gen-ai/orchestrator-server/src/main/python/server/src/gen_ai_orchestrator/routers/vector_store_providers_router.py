@@ -144,7 +144,7 @@ async def check_vector_store_provider_setting(
 
     try:
         # Vector Store setting check
-        await check_vector_store_setting(query.setting)
+        await check_vector_store_setting(query.setting, query.index_name)
 
         logger.info('The Vector Store setting is valid')
         return ProviderSettingStatusResponse(valid=True)

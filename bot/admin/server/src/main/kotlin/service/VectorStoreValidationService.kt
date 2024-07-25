@@ -20,6 +20,7 @@ import ai.tock.bot.admin.bot.vectorstore.BotVectorStoreConfiguration
 import ai.tock.genai.orchestratorclient.requests.VectorStoreProviderSettingStatusQuery
 import ai.tock.genai.orchestratorclient.responses.ProviderSettingStatusResponse
 import ai.tock.genai.orchestratorclient.services.VectorStoreProviderService
+import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.exception.error.ErrorMessage
 import ai.tock.shared.injector
 import ai.tock.shared.provide
@@ -33,7 +34,16 @@ object VectorStoreValidationService {
         return mutableSetOf<ErrorMessage>().apply {
             addAll(
                 vectorStoreProviderService
-                    .checkSetting(VectorStoreProviderSettingStatusQuery(config.setting))
+                    .checkSetting(
+                        VectorStoreProviderSettingStatusQuery(
+                            config.setting,
+                            // TODO : JIRA/DERCBOT-1138 The normalization of document index name
+                            //  will be carried out in accordance with the provider
+                            OpenSearchUtils.normalizeDocumentIndexName(
+                                config.namespace, config.botId
+                            )
+                        )
+                    )
                     .getErrors("Vector store setting check failed")
             )
         }

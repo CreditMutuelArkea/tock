@@ -55,6 +55,9 @@ class VectorStoreProviderSettingStatusQuery(BaseModel):
     """The query for the Vector Store Provider Setting Status"""
 
     setting: VectorStoreSetting = Field(description='The Vector Store Provider setting to be checked.')
+    index_name: str = Field(
+        description='Index name corresponding to a document collection in the vector database.'
+    )
 
 
 class RagQuery(BaseModel):
