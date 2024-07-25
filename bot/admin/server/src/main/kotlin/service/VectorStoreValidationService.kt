@@ -20,7 +20,6 @@ import ai.tock.bot.admin.bot.vectorstore.BotVectorStoreConfiguration
 import ai.tock.genai.orchestratorclient.requests.VectorStoreProviderSettingStatusQuery
 import ai.tock.genai.orchestratorclient.responses.ProviderSettingStatusResponse
 import ai.tock.genai.orchestratorclient.services.VectorStoreProviderService
-import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
 import ai.tock.shared.exception.error.ErrorMessage
 import ai.tock.shared.injector
 import ai.tock.shared.provide
@@ -32,22 +31,11 @@ object VectorStoreValidationService {
 
     fun validate(config: BotVectorStoreConfiguration): Set<ErrorMessage> {
         return mutableSetOf<ErrorMessage>().apply {
-            val indexName = OpenSearchUtils.normalizeDocumentIndexName(
-                config.namespace, config.botId
+            addAll(
+                vectorStoreProviderService
+                    .checkSetting(VectorStoreProviderSettingStatusQuery(config.setting))
+                    .getErrors("Vector store setting check failed")
             )
-            if(config.setting.indexName == indexName) {
-                addAll(
-                    vectorStoreProviderService
-                        .checkSetting(VectorStoreProviderSettingStatusQuery(config.setting))
-                        .getErrors("Vector store setting check failed")
-                )
-            } else {
-                addAll(
-                    listOf(ErrorMessage(
-                        message = "The index name is incorrect. Expected: $indexName"
-                    ))
-                )
-            }
         }
     }
 
