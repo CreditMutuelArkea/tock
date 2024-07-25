@@ -17,9 +17,7 @@
 package ai.tock.genai.orchestratorcore.models.vectorstore
 
 data class OpenSearchVectorStoreSetting<T>(
-    override val indexName: String,
-    override var indexSessionId: String? = null,
-    override val k: String,
+    override val k: Int,
     override val vectorSize: Int,
     val host: String,
     val port: Int,
@@ -27,12 +25,6 @@ data class OpenSearchVectorStoreSetting<T>(
     val password: T,
 ) : VectorStoreSettingBase<T>(
     provider = VectorStoreProvider.OpenSearch,
-    indexName = indexName,
-    indexSessionId = indexSessionId,
     k = k,
     vectorSize = vectorSize
-){
-    override fun copyWithIndexSessionId(indexSessionId: String): VectorStoreSettingBase<T> {
-        return this.copy(indexSessionId=indexSessionId)
-    }
-}
+)

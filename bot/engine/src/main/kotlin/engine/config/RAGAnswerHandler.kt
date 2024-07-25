@@ -164,22 +164,17 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             val ragConfiguration = botDefinition.ragConfiguration!!
             val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
 
+            var documentSearchParams = OpenSearchParams(
+                // The number of neighbors to return for each query_embedding.
+                k = kNeighborsDocuments, filter = listOf(
+                    Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+                )
+            )
+
             var vectorStoreSetting: VectorStoreSetting? = null
-            var documentSearchParams: OpenSearchParams? = null
-            var documentIndexName: String? = null
-            if(vectorStoreConfiguration == null || !vectorStoreConfiguration.enabled) {
-                documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
-                    ragConfiguration.namespace, ragConfiguration.botId
-                )
-                documentSearchParams = OpenSearchParams(
-                    // The number of neighbors to return for each query_embedding.
-                    k = kNeighborsDocuments, filter = listOf(
-                        Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
-                    )
-                )
-            }else{
-                vectorStoreSetting =
-                    vectorStoreConfiguration.setting.copyWithIndexSessionId(ragConfiguration.indexSessionId!!)
+            if(vectorStoreConfiguration!= null && vectorStoreConfiguration.enabled) {
+                vectorStoreSetting = vectorStoreConfiguration.setting
+                documentSearchParams = documentSearchParams.copy(k = vectorStoreSetting.k)
             }
 
             try {
@@ -193,7 +188,11 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                             "no_answer" to ragConfiguration.noAnswerSentence
                         ),
                         embeddingQuestionEmSetting = ragConfiguration.emSetting,
-                        documentIndexName = documentIndexName,
+                        // TODO : JIRA/DERCBOT-1138 The normalization of document index name
+                        //  will be carried out in accordance with the provider
+                        documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
+                            ragConfiguration.namespace, ragConfiguration.botId
+                        ),
                         documentSearchParams = documentSearchParams,
                         vectorStoreSetting = vectorStoreSetting,
                         observabilitySetting = botDefinition.observabilityConfiguration?.setting

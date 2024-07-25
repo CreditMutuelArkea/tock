@@ -40,6 +40,7 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
     """
 
     setting: OpenSearchVectorStoreSetting
+    index_name: str
 
     def get_vector_store(self):
         password = fetch_secret_key_value(self.setting.password)
@@ -60,23 +61,12 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
             # By default, is the same as host. If set to False, it will not verify hostname on certificate
             ssl_assert_hostname=self.setting.host if is_prod_environment else False,
             ssl_show_warn=is_prod_environment,
-            index_name=self.setting.index_name,
+            index_name=self.index_name,
             embedding_function=self.embedding_function,
             timeout=application_settings.vector_store_timeout,
         )
 
-    def get_vector_store_retriever(self, search_kwargs: Optional[dict]) -> VectorStoreRetriever:
-        search_filter = search_kwargs
-        if search_filter is None:
-            search_filter = {
-                'k': self.setting.k,
-                'filter': [{
-                    "term": {
-                        "metadata.index_session_id.keyword": self.setting.index_session_id
-                    }
-                }],
-            }
-
+    def get_vector_store_retriever(self, search_kwargs: dict) -> VectorStoreRetriever:
         return self.get_vector_store().as_retriever(
-            search_kwargs=search_filter
+            search_kwargs=search_kwargs
         )

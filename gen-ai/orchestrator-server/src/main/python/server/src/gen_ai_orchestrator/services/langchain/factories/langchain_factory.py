@@ -136,7 +136,7 @@ def get_em_factory(setting: BaseEMSetting) -> LangChainEMFactory:
 
 def get_vector_store_factory(
         setting: Optional[VectorStoreSetting],
-        index_name: Optional[str],
+        index_name: str,
         embedding_function: Embeddings
 ) -> LangChainVectorStoreFactory:
     """
@@ -159,14 +159,15 @@ def get_vector_store_factory(
                 port=application_settings.open_search_port,
                 username=open_search_username,
                 password=RawSecretKey(value=open_search_password),
-                index_name=index_name
             ),
+            index_name=index_name,
             embedding_function=embedding_function
         )
     elif isinstance(setting, OpenSearchVectorStoreSetting):
         logger.debug('Vector Store Factory (based on RAG query) - OpenSearchFactory')
         return OpenSearchFactory(
             setting=setting,
+            index_name=index_name,
             embedding_function=embedding_function
         )
     else:

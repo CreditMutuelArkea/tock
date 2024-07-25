@@ -24,16 +24,6 @@ class BaseVectorStoreSetting(BaseModel):
     """A base class for Vector Store Setting."""
 
     provider: VectorStoreProvider = Field(description='The Vector Store Provider.')
-    index_name: str = Field(
-        description='The index name in the vector store.', examples=['my-index-name'], default='my-index-name'
-    )
-    index_session_id: Optional[str] = Field(  # TODO MASS
-        description='The indexing session.', examples=['352d2466-17c5-4250-ab20-d7c823daf035'], default=None
-    )
-    k: int = Field(
-        description='Number of Documents to return', examples=[3], default=4,
-        ge=1
-    )
     vector_size: int = Field(
         description='The size of the embedding vector.', examples=[1536], default=1536,
         ge=1

@@ -143,10 +143,7 @@ class RagDebugData(BaseModel):
     document_index_name: str = Field(
         description='Index name corresponding to a document collection in the vector database.',
     )
-    document_index_session_id: Optional[str] = Field(
-        description='Indexing session identifier.',
-    )
-    document_search_params: Optional[DocumentSearchParams] = Field(
+    document_search_params: DocumentSearchParams = Field(
         description='The document search parameters. Ex: number of documents, metadata filter',
     )
     answer: str = Field(

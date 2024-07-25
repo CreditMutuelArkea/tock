@@ -44,7 +44,7 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
         pass
 
     @abstractmethod
-    def get_vector_store_retriever(self, search_kwargs: Optional[dict]) -> VectorStoreRetriever:
+    def get_vector_store_retriever(self, search_kwargs: dict) -> VectorStoreRetriever:
         """
         Fabric the Vector Store and return it as retriever
         Args:
@@ -68,7 +68,7 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
         query = 'what is a vector store ?'
         response = await self.get_vector_store().asimilarity_search(
             query=query,
-            k=self.setting.k
+            k=1
         )
         logger.info('Invocation successful')
         logger.debug('[query: %s], [response: %s]', query, response)

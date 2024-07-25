@@ -80,13 +80,11 @@ class RagQuery(BaseModel):
     embedding_question_em_setting: EMSetting = Field(
         description="Embedding model setting, used to calculate the user's question vector."
     )
-    document_index_name: Optional[str] = Field(
-        description='Index name corresponding to a document collection in the vector database.',
-        default=None
+    document_index_name: str = Field(
+        description='Index name corresponding to a document collection in the vector database.'
     )
-    document_search_params: Optional[DocumentSearchParams] = Field(
-        description='The document search parameters. Ex: number of documents, metadata filter',
-        default=None
+    document_search_params: DocumentSearchParams = Field(
+        description='The document search parameters. Ex: number of documents, metadata filter'
     )
     vector_store_setting: Optional[VectorStoreSetting] = Field(
         description='The vector store settings.',
@@ -143,8 +141,6 @@ Answer in {locale}:""",
                     'observability_setting': None,
                     'vector_store_setting': {
                         'provider': 'OpenSearch',
-                        'index_name': 'my-index-name',
-                        'index_session_id': '352d2466-17c5-4250-ab20-d7c823daf035',
                         'k': 3,
                         'host': 'localhost',
                         'port': 9200,

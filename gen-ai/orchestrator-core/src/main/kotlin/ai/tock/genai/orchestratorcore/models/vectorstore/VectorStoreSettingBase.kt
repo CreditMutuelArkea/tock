@@ -32,13 +32,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 )
 abstract class VectorStoreSettingBase<T>(
     val provider: VectorStoreProvider,
-    open val indexName: String,
-    open var indexSessionId: String? = null,
-    open val k: String,
+    open val k: Int,
     open val vectorSize: Int,
-) {
-    abstract fun copyWithIndexSessionId(indexSessionId: String): VectorStoreSettingBase<T>
-}
+)
 
 typealias VectorStoreSettingDTO = VectorStoreSettingBase<String>
 typealias VectorStoreSetting = VectorStoreSettingBase<SecretKey>
