@@ -13,22 +13,31 @@
 #   limitations under the License.
 #
 """Model for creating OpenSearchFactory"""
+
 import logging
 from typing import Optional
 
-from langchain_community.vectorstores.opensearch_vector_search import OpenSearchVectorSearch
+from langchain_community.vectorstores.opensearch_vector_search import (
+    OpenSearchVectorSearch,
+)
 from langchain_core.vectorstores import VectorStoreRetriever
 
 from gen_ai_orchestrator.configurations.environment.settings import (
     application_settings,
-    is_prod_environment
+    is_prod_environment,
 )
-from gen_ai_orchestrator.errors.handlers.opensearch.opensearch_exception_handler import opensearch_exception_handler
-from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+from gen_ai_orchestrator.errors.handlers.opensearch.opensearch_exception_handler import (
+    opensearch_exception_handler,
+)
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import (
+    OpenSearchVectorStoreSetting,
+)
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
-from gen_ai_orchestrator.services.security.security_service import fetch_secret_key_value
+from gen_ai_orchestrator.services.security.security_service import (
+    fetch_secret_key_value,
+)
 from gen_ai_orchestrator.utils.strings import obfuscate
 
 logger = logging.getLogger(__name__)
@@ -45,12 +54,12 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
     def get_vector_store(self, async_mode: Optional[bool] = True) -> OpenSearchVectorSearch:
         password = fetch_secret_key_value(self.setting.password)
         logger.info(
-            'OpenSearch user credentials: %s:%s',
+            "OpenSearch user credentials: %s:%s",
             self.setting.username,
             obfuscate(password),
         )
         return OpenSearchVectorSearch(
-            opensearch_url=f'https://{self.setting.host}:{self.setting.port}',
+            opensearch_url=f"https://{self.setting.host}:{self.setting.port}",
             http_auth=(
                 self.setting.username,
                 fetch_secret_key_value(self.setting.password),
@@ -67,9 +76,7 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
         )
 
     def get_vector_store_retriever(self, search_kwargs: dict) -> VectorStoreRetriever:
-        return self.get_vector_store().as_retriever(
-            search_kwargs=search_kwargs
-        )
+        return self.get_vector_store().as_retriever(search_kwargs=search_kwargs)
 
     @opensearch_exception_handler
     async def check_vector_store_connection(self) -> bool:
