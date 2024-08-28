@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SentenceTrainingCreateEntityComponent } from './sentence-training-create-entity.component';
+import { NbDialogRef } from '@nebular/theme';
 
 describe('SentenceTrainingCreateEntityComponent', () => {
   let component: SentenceTrainingCreateEntityComponent;
@@ -8,9 +9,9 @@ describe('SentenceTrainingCreateEntityComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SentenceTrainingCreateEntityComponent ]
-    })
-    .compileComponents();
+      declarations: [SentenceTrainingCreateEntityComponent],
+      imports: [NbDialogRef]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SentenceTrainingCreateEntityComponent);
     component = fixture.componentInstance;

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { SentenceReviewRequestComponent } from './sentence-review-request.component';
+import { NbDialogRef } from '@nebular/theme';
 
 describe('SentenceReviewRequestComponent', () => {
   let component: SentenceReviewRequestComponent;
@@ -8,9 +9,9 @@ describe('SentenceReviewRequestComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SentenceReviewRequestComponent ]
-    })
-    .compileComponents();
+      declarations: [SentenceReviewRequestComponent],
+      imports: [NbDialogRef]
+    }).compileComponents();
 
     fixture = TestBed.createComponent(SentenceReviewRequestComponent);
     component = fixture.componentInstance;

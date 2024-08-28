@@ -1,5 +1,14 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { NbButtonModule, NbCardModule, NbDialogRef, NbIconModule, NbTagModule, NbToggleModule, NbTooltipModule } from '@nebular/theme';
+import {
+  NbButtonModule,
+  NbCardModule,
+  NbDialogRef,
+  NbIconModule,
+  NbTagModule,
+  NbToastrModule,
+  NbToggleModule,
+  NbTooltipModule
+} from '@nebular/theme';
 import { of } from 'rxjs';
 
 import { StateService } from '../../../core-nlp/state.service';
@@ -59,7 +68,7 @@ describe('FaqManagementListComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [FaqManagementListComponent],
-      imports: [TestSharedModule, NbIconModule, NbCardModule, NbButtonModule, NbTagModule, NbToggleModule, NbTooltipModule],
+      imports: [TestSharedModule, NbIconModule, NbCardModule, NbButtonModule, NbTagModule, NbToggleModule, NbTooltipModule, NbToastrModule],
       providers: [
         {
           provide: StateService,

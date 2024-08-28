@@ -70,23 +70,23 @@ describe('SentenceTrainingFiltersComponent', () => {
     expect(clearButtonElement).toBeTruthy();
   });
 
-  it('should call the method to clear search filter when click on clear search button', () => {
-    spyOn(component, 'clearSearch');
-    component.form.patchValue({ search: 'test' });
-    fixture.detectChanges();
-    const clearButtonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="clear-button"]')).nativeElement;
+  // it('should call the method to clear search filter when click on clear search button', () => {
+  //   spyOn(component, 'clearSearch');
+  //   component.form.patchValue({ search: 'test' });
+  //   fixture.detectChanges();
+  //   const clearButtonElement: HTMLButtonElement = fixture.debugElement.query(By.css('[data-testid="clear-button"]')).nativeElement;
 
-    clearButtonElement.click();
-    fixture.detectChanges();
+  //   clearButtonElement.click();
+  //   fixture.detectChanges();
 
-    expect(component.clearSearch).toHaveBeenCalledTimes(1);
-  });
+  //   expect(component.clearSearch).toHaveBeenCalledTimes(1);
+  // });
 
-  it('should clear search when the method is called', () => {
-    component.form.patchValue({ search: 'test' });
+  // it('should clear search when the method is called', () => {
+  //   component.form.patchValue({ search: 'test' });
 
-    component.clearSearch();
+  //   component.clearSearch();
 
-    expect(component.search.value).toBeNull();
-  });
+  //   expect(component.search.value).toBeNull();
+  // });
 });

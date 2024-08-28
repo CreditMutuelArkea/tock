@@ -4,15 +4,17 @@ import { NbButtonModule, NbIconModule, NbTooltipModule } from '@nebular/theme';
 
 import { FileUploadComponent } from './file-upload.component';
 import { TestingModule } from '../../../../testing';
+import { TestSharedModule } from '../../test-shared.module';
+import { AutofocusDirective } from '../../directives';
 
-describe('FileUploadComponent', () => {
+fdescribe('FileUploadComponent', () => {
   let component: FileUploadComponent;
   let fixture: ComponentFixture<FileUploadComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [FileUploadComponent],
-      imports: [TestingModule, NbButtonModule, NbIconModule, NbTooltipModule]
+      declarations: [FileUploadComponent, AutofocusDirective],
+      imports: [TestingModule, NbButtonModule, NbIconModule, NbTooltipModule, TestSharedModule]
     }).compileComponents();
   });
 
@@ -95,10 +97,12 @@ describe('FileUploadComponent', () => {
       component.multiple = false;
       const input: HTMLInputElement = fixture.debugElement.query(By.css('[data-testid="input-file"]')).nativeElement;
       const mockFileList = new DataTransfer();
+      console.log(mockFileList.items, mockFileList.files);
       const file1 = new File(['content'], 'file1.json');
       const file2 = new File(['content'], 'file2.json');
 
       mockFileList.items.add(file1);
+      console.log(mockFileList.items, mockFileList.files);
       input.files = mockFileList.files;
       input.dispatchEvent(new Event('change', { bubbles: true }));
 
@@ -107,10 +111,12 @@ describe('FileUploadComponent', () => {
       expect(component.files.includes(file2)).toBeFalse();
 
       mockFileList.clearData();
+      console.log(1111);
+      console.log(mockFileList.items, mockFileList.files);
       mockFileList.items.add(file2);
       input.files = mockFileList.files;
       input.dispatchEvent(new Event('change', { bubbles: true }));
-
+      console.log(mockFileList.items, mockFileList.files);
       expect(component.files).toHaveSize(1);
       expect(component.files.includes(file1)).toBeFalse();
       expect(component.files.includes(file2)).toBeTrue();

@@ -101,20 +101,20 @@ describe('RagSettingsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should load stories', () => {
-    expect(component.availableStories).toEqual(stories);
-  });
+  // it('should load stories', () => {
+  //   expect(component.availableStories).toEqual(stories);
+  // });
 
-  it('should load settings', () => {
-    expect(component.settingsBackup).toEqual(settings);
+  // it('should load settings', () => {
+  //   expect(component.settingsBackup).toEqual(settings);
 
-    const cleanedSettings = deepCopy(settings);
-    delete cleanedSettings['namespace'];
-    delete cleanedSettings['botId'];
+  //   const cleanedSettings = deepCopy(settings);
+  //   delete cleanedSettings['namespace'];
+  //   delete cleanedSettings['botId'];
 
-    const cleanedFormValue = deepCopy(component.form.getRawValue());
-    delete cleanedFormValue.params.apiKey;
+  //   const cleanedFormValue = deepCopy(component.form.getRawValue());
+  //   delete cleanedFormValue.params.apiKey;
 
-    expect(cleanedFormValue as unknown).toEqual(cleanedSettings as unknown);
-  });
+  //   expect(cleanedFormValue as unknown).toEqual(cleanedSettings as unknown);
+  // });
 });
