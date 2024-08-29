@@ -1,11 +1,11 @@
 ---
-title: Gen AI / RAG
+title: Gen AI / RAG Settings
 ---
 
-# Le menu _Gen AI / RAG_
+# Le menu _Gen AI / RAG Settings_
 
 ## Configuration
-Le menu _Gen AI / RAG_ (Retrieving augmented Generation) vous permet de choisir les modèles d'IA générative pris en charge par Tock et de configurer un ensemble de critères spécifiques à chaque fournisseur d'IA.
+Le menu _Gen AI / RAG Settings_ (Retrieving augmented Generation) vous permet de choisir les modèles d'IA générative pris en charge par Tock et de configurer un ensemble de critères spécifiques à chaque fournisseur d'IA.
 Cette fonctionnalité permettra à TOCK de générer une réponse à une requête de l'utilisateur, sur la base d'un ensemble de documents intégrés dans une base de données vectorielle.
 
 > Pour accéder à cette page il faut bénéficier du rôle **_botUser_**.
@@ -52,19 +52,12 @@ Cette fonctionnalité permettra à TOCK de générer une réponse à une requêt
   - Désactiver le RAG et permettre l’import de la Story Unknown.
   - Garder le RAG activé et importer la Story Unknown mais désactivée.
 
-IMAGES
-https://docs.google.com/document/d/1NrLDxbNt2iTUjBYuNXVKBWA_QOL34EgPY5Pl_MRzvs0/edit
+## Utilisation
 
-RAG Exclusion
+Une fois le RAG configuré et activé, il peut être utilisé pour prendre le contrôle de toutes les questions qualifiées d'Inconnues par la NLP.
 
-Le menu Rag Exclusions permet d’exclure des sujets du périmètre de réponse du Bot.
+En voici un exemple :
+![schéma Tock](../../../../img/gen-ai/gen-ai-rag-test.png "Execution du RAG")
 
 
-En complément du prompt, il permet de limiter les réponses du bot afin qu’il reste dans son périmètre d’action et ne crée pas de réponse trop inventive.
-Pour ajouter des sujets ou phrases que le bot ne doit pas traiter :
-Aller dans FAQ Training
-Sélectionner la phrase que vous souhaitez exclure
-Cliquer sur “Exclude from RAG handling”
-
-Sur la page RAG Exclusion, retrouvez l’ensemble des phrases / sujets qui ont été exclu des réponses du Bot.
 
