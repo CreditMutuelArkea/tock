@@ -135,7 +135,10 @@ def index_documents(args):
     #     splitted_docs, embeddings=embeddings, index_name=args['<index_name>']
     # )
 
-    embed_and_store_docs_pgvector(splitted_docs, embeddings=embeddings, collection_name=session_uuid)
+    embed_and_store_docs_pgvector(splitted_docs,
+                                  embeddings=embeddings,
+                                  index_name=args['<index_name>'],
+                                  session_uuid=session_uuid)
 
     # Print statistics
     duration = datetime.now() - start_time
@@ -215,7 +218,7 @@ def embed_and_store_docs(
 
 
 def embed_and_store_docs_pgvector(
-    documents: List[Document], embeddings: Embeddings, collection_name: str
+    documents: List[Document], embeddings: Embeddings, index_name: str, session_uuid: str
 ) -> None:
     """ Embed all chunks in vector database."""
     logging.debug('Index chunks in PGVector DB')
@@ -227,7 +230,7 @@ def embed_and_store_docs_pgvector(
 
     vector_store = PGVector(
         embeddings=embeddings,
-        collection_name=collection_name,
+        collection_name=f'{index_name}_{session_uuid}',
         connection=connection,
         use_jsonb=True,
     )
