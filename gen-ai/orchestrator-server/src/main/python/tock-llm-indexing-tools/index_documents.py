@@ -49,7 +49,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, List
 from uuid import uuid4
 
 import pandas as pd
@@ -94,7 +94,7 @@ def index_documents(args):
     # unique date / uuid for each indexing session (stored as metadata)
     start_time = datetime.now()
     formatted_datetime = start_time.strftime('%Y-%m-%d %H:%M:%S')
-    session_uuid = uuid4()
+    session_uuid = str(uuid4())
     logging.debug(
         f"Beginning indexation session {session_uuid} at '{formatted_datetime}'"
     )
@@ -107,7 +107,7 @@ def index_documents(args):
     for doc in docs:
         doc.metadata['index_session_id'] = session_uuid
         doc.metadata['index_datetime'] = formatted_datetime
-        doc.metadata['id'] = uuid4()  # A uuid for the doc (will be used by TOCK)
+        doc.metadata['id'] = str(uuid4())  # A uuid for the doc (will be used by TOCK)
 
     logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
     # recursive splitter is used to preserve sentences & paragraphs
@@ -131,9 +131,11 @@ def index_documents(args):
     embeddings = em_factory.get_embedding_model()
 
     # Index all chunks in vector DB
-    embed_and_store_docs(
-        splitted_docs, embeddings=embeddings, index_name=args['<index_name>']
-    )
+    # embed_and_store_docs(
+    #     splitted_docs, embeddings=embeddings, index_name=args['<index_name>']
+    # )
+
+    embed_and_store_docs_pgvector(splitted_docs, embeddings=embeddings, collection_name=session_uuid)
 
     # Print statistics
     duration = datetime.now() - start_time
@@ -146,8 +148,8 @@ def index_documents(args):
 
 
 def generate_ids_for_each_chunks(
-    splitted_docs: Iterable[Document],
-) -> Iterable[Document]:
+    splitted_docs: List[Document],
+) -> List[Document]:
     """Add chunk id ('n/N') to the documents' metadata using Pandas."""
     metadata = [doc.metadata for doc in splitted_docs]
     df_metadata = pd.DataFrame(metadata)
@@ -164,8 +166,8 @@ def generate_ids_for_each_chunks(
 
 
 def add_title_to_text(
-    splitted_docs: Iterable[Document],
-) -> Iterable[Document]:
+    splitted_docs: List[Document],
+) -> List[Document]:
     """
     Add 'title' from metadata to Document's page_content for better semantic search.
 
@@ -210,6 +212,26 @@ def embed_and_store_docs(
         opensearch_db.add_documents(
             documents=documents[i : i + 500], bulk_size=bulk_size
         )
+
+
+def embed_and_store_docs_pgvector(
+    documents: List[Document], embeddings: Embeddings, collection_name: str
+) -> None:
+    """ Embed all chunks in vector database."""
+    logging.debug('Index chunks in PGVector DB')
+
+    # See docker command above to launch a postgres instance with pgvector enabled.
+    connection = "postgresql+psycopg://postgres:ChangeMe@127.0.0.1:5433/postgres"  # Uses psycopg3!
+
+    from langchain_postgres.vectorstores import PGVector
+
+    vector_store = PGVector(
+        embeddings=embeddings,
+        collection_name=collection_name,
+        connection=connection,
+        use_jsonb=True,
+    )
+    vector_store.add_documents(documents)
 
 
 def index_name_is_valid(index_name: str) -> bool:
