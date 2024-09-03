@@ -114,7 +114,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                 observability_setting=query.observability_setting,
                 trace_name=ObservabilityTrace.RAG))
 
-    response = await conversational_retrieval_chain.ainvoke(
+    response = conversational_retrieval_chain.invoke(
         input=inputs,
         config={'callbacks': callback_handlers},
     )
@@ -179,8 +179,8 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     # vector_store_factory = get_vector_store_factory(
     #     vector_store_provider=VectorStoreProvider.OPEN_SEARCH,
     #     embedding_function=em_factory.get_embedding_model(),
-    #     index_name=query.document_index_name,
-    # )
+    #     index_name=query.document_index_name)
+    #
 
     from langchain_postgres.vectorstores import PGVector
 
