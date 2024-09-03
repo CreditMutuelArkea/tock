@@ -17,6 +17,7 @@
 package ai.tock.genai.orchestratorcore.mappers
 
 import ai.tock.genai.orchestratorcore.models.vectorstore.OpenSearchVectorStoreSetting
+import ai.tock.genai.orchestratorcore.models.vectorstore.PGVectorStoreSetting
 import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreSetting
 import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreSettingDTO
 import ai.tock.genai.orchestratorcore.utils.SecurityUtils
@@ -38,6 +39,10 @@ object VectorStoreSettingMapper {
                     val fetchedPassword = SecurityUtils.fetchSecretKeyValue(password)
                     return OpenSearchVectorStoreSetting(k, vectorSize, host, port, username, fetchedPassword)
                 }
+                is PGVectorStoreSetting -> {
+                    val fetchedPassword = SecurityUtils.fetchSecretKeyValue(password)
+                    return PGVectorStoreSetting(k, vectorSize, host, port, username, fetchedPassword, database)
+                }
                 else ->
                     throw IllegalArgumentException("Unsupported VectorStore Setting")
             }
@@ -55,6 +60,10 @@ object VectorStoreSettingMapper {
                 is OpenSearchVectorStoreSetting -> {
                     val secretPassword = SecurityUtils.getSecretKey(password, secretName)
                     return OpenSearchVectorStoreSetting(k, vectorSize, host, port, username, secretPassword)
+                }
+                is PGVectorStoreSetting -> {
+                    val secretPassword = SecurityUtils.getSecretKey(password, secretName)
+                    return PGVectorStoreSetting(k, vectorSize, host, port, username, secretPassword, database)
                 }
                 else ->
                     throw IllegalArgumentException("Unsupported VectorStore Setting")

@@ -16,12 +16,16 @@
 
 package ai.tock.genai.orchestratorcore.models.vectorstore
 
-enum class VectorStoreProvider{
-    OpenSearch, PGVector;
-
-    companion object {
-        fun findByName(provider: String): VectorStoreProvider? {
-            return entries.firstOrNull { it.name == provider }
-        }
-    }
-}
+data class PGVectorStoreSetting<T>(
+    override val k: Int,
+    override val vectorSize: Int,
+    val host: String,
+    val port: Int,
+    val username: String,
+    val password: T,
+    val database: String,
+) : VectorStoreSettingBase<T>(
+    provider = VectorStoreProvider.PGVector,
+    k = k,
+    vectorSize = vectorSize
+)

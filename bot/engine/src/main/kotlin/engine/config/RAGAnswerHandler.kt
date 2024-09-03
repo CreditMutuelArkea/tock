@@ -164,12 +164,17 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             val ragConfiguration = botDefinition.ragConfiguration!!
             val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
 
-            var documentSearchParams = OpenSearchParams(
-                // The number of neighbors to return for each query_embedding.
-                k = kNeighborsDocuments, filter = listOf(
-                    Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+            // TODO MASS : quelle implementation choisir OpenSearch ou PGVector ? var d'env ?
+            var documentSearchParams = if(1 == 1){
+                OpenSearchParams(
+                    // The number of neighbors to return for each query_embedding.
+                    k = kNeighborsDocuments, filter = listOf(
+                        Term(term = mapOf("metadata.index_session_id.keyword" to ragConfiguration.indexSessionId!!))
+                    )
                 )
-            )
+            }else{
+                PGVectorParams(k = kNeighborsDocuments, filter = null)
+            }
 
             var vectorStoreSetting: VectorStoreSetting? = null
             if(vectorStoreConfiguration!= null && vectorStoreConfiguration.enabled) {
