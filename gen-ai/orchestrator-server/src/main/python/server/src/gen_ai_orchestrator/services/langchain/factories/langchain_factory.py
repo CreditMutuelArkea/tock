@@ -54,6 +54,7 @@ from gen_ai_orchestrator.models.observability.observability_trace import Observa
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.security.raw_secret_key.raw_secret_key import RawSecretKey
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import PGVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.callback_handlers_factory import \
@@ -82,6 +83,7 @@ from gen_ai_orchestrator.services.langchain.factories.llm.openai_llm_factory imp
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.open_search_factory import (
     OpenSearchFactory,
 )
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.pgvector_search_factory import PGVectorFactory
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
@@ -153,6 +155,7 @@ def get_vector_store_factory(
     logger.info('Get Vector Store Factory for the given provider')
     if setting is None:
         logger.debug('Vector Store Factory (based on env variables) - OpenSearchFactory')
+        # TODO MASS: ajouter une variable d'env pour préciser quelle bdd instancié en cas d'absence de dbSetting
         return OpenSearchFactory(
             setting=OpenSearchVectorStoreSetting(
                 host=application_settings.open_search_host,
@@ -168,6 +171,13 @@ def get_vector_store_factory(
         return OpenSearchFactory(
             setting=setting,
             index_name=index_name,
+            embedding_function=embedding_function
+        )
+    elif isinstance(setting, PGVectorStoreSetting):
+        logger.debug('Vector Store Factory (based on RAG query) - PGVectorFactory')
+        return PGVectorFactory(
+            setting=setting,
+            collection_name=index_name,
             embedding_function=embedding_function
         )
     else:
