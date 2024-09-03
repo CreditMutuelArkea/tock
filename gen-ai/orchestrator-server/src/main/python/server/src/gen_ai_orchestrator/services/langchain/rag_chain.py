@@ -80,7 +80,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     logger.info('RAG chain - Start of execution...')
     start_time = time.time()
 
-    conversational_retrieval_chain = create_rag_chain(query=query)
+    conversational_retrieval_chain = await create_rag_chain(query=query)
 
     logger.debug(
         'RAG chain - Use chat history: %s', 'Yes' if len(query.history) > 0 else 'No'
@@ -114,7 +114,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                 observability_setting=query.observability_setting,
                 trace_name=ObservabilityTrace.RAG))
 
-    response = conversational_retrieval_chain.invoke(
+    response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
         config={'callbacks': callback_handlers},
     )
@@ -165,7 +165,7 @@ def get_source_content(doc: Document) -> str:
         return doc.page_content
 
 
-def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
+async def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     """
     Create the RAG chain from RagQuery, using the LLM and Embedding settings specified in the query
 
@@ -183,18 +183,21 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     #
 
     from langchain_postgres.vectorstores import PGVector
+    from langchain_postgres import PGVector
 
     retriever = PGVector(
         embeddings=em_factory.get_embedding_model(),
         collection_name='ns-03-bot-cmso_0be43409-49d1-415c-b2f0-68eb7b1efa78',
         connection='postgresql+psycopg://postgres:ChangeMe@127.0.0.1:5433/postgres',
         use_jsonb=True,
+        async_mode=True
     ).as_retriever(
         search_type="mmr",
         search_kwargs={'k': 5}
     )
 
-    response = retriever.invoke(query.question_answering_prompt_inputs['question'])
+    # TODO MASS: just a test
+    response = await retriever.ainvoke(query.question_answering_prompt_inputs['question'])
 
     logger.debug('RAG chain - Create a ConversationalRetrievalChain from LLM')
     return ConversationalRetrievalChain.from_llm(
