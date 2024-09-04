@@ -15,11 +15,10 @@
  */
 
 package ai.tock.genai.orchestratorclient.requests
-import ai.tock.genai.orchestratorcore.models.llm.LLMSetting
 import ai.tock.genai.orchestratorcore.models.em.EMSetting
-import ai.tock.genai.orchestratorcore.models.llm.LLMProvider
+import ai.tock.genai.orchestratorcore.models.llm.LLMSetting
 import ai.tock.genai.orchestratorcore.models.observability.ObservabilitySetting
-import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreProvider
+import ai.tock.genai.orchestratorcore.models.vectorstore.DocumentSearchParams
 import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreSetting
 
 data class RAGQuery(
