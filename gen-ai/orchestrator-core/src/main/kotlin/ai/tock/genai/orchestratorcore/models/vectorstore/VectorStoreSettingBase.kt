@@ -34,7 +34,24 @@ abstract class VectorStoreSettingBase<T>(
     val provider: VectorStoreProvider,
     open val k: Int,
     open val vectorSize: Int,
-)
+){
+    /**
+     * Normalize the document index name
+     * @param namespace the namespace
+     * @param botId the bot ID
+     */
+    abstract fun normalizeDocumentIndexName(namespace: String, botId: String): String
+
+
+    abstract fun getDocumentSearchParams(indexSessionId: String ?): DocumentSearchParams
+}
 
 typealias VectorStoreSettingDTO = VectorStoreSettingBase<String>
 typealias VectorStoreSetting = VectorStoreSettingBase<SecretKey>
+
+
+abstract class DocumentSearchParams(
+    val provider: VectorStoreProvider,
+)
+
+// TODO MASS : https://github.com/theopenconversationkit/tock/pull/1725#pullrequestreview-2277706966

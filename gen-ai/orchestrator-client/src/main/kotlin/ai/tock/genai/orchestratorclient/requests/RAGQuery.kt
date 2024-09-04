@@ -44,27 +44,3 @@ enum class ChatMessageType{
     HUMAN,
     AI
 }
-
-abstract class DocumentSearchParams(
-    val provider: VectorStoreProvider,
-) {
-    abstract fun copy(k: Int): DocumentSearchParams
-}
-
-data class OpenSearchParams(
-    val k: Int,
-    val filter: List<Term>
-): DocumentSearchParams(VectorStoreProvider.OpenSearch) {
-    override fun copy(k: Int): OpenSearchParams = this.copy(k = k)
-}
-
-data class Term(
-    val term: Map<String, Any>
-)
-
-data class PGVectorParams(
-    val k: Int = 4,
-    val filter: Map<String, String>? = null
-): DocumentSearchParams(VectorStoreProvider.PGVector) {
-    override fun copy(k: Int): PGVectorParams = this.copy(k = k)
-}

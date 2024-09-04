@@ -16,6 +16,9 @@
 
 package ai.tock.genai.orchestratorcore.models.vectorstore
 
+import ai.tock.genai.orchestratorcore.utils.OpenSearchUtils
+import ai.tock.genai.orchestratorcore.utils.PGVectorUtils
+
 data class PGVectorStoreSetting<T>(
     override val k: Int,
     override val vectorSize: Int,
@@ -28,4 +31,18 @@ data class PGVectorStoreSetting<T>(
     provider = VectorStoreProvider.PGVector,
     k = k,
     vectorSize = vectorSize
-)
+) {
+
+    override fun normalizeDocumentIndexName(namespace: String, botId: String): String =
+        PGVectorUtils.normalizeDocumentIndexName(namespace, botId)
+
+    override fun getDocumentSearchParams(indexSessionId: String?): PGVectorParams =
+        PGVectorParams(k = k, filter = indexSessionId?.let {
+            mapOf("index_session_id" to indexSessionId)
+        })
+}
+
+data class PGVectorParams(
+    val k: Int = 4,
+    val filter: Map<String, String>? = null
+) : DocumentSearchParams(VectorStoreProvider.PGVector)
