@@ -169,7 +169,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             val ragConfiguration = botDefinition.ragConfiguration!!
             val vectorStoreConfiguration = botDefinition.vectorStoreConfiguration
 
-            val (vectorStoreSetting, documentSearchParams) = getVectorStoreElements(
+            val (vectorStoreSetting, documentSearchParams, indexName) = getVectorStoreElements(
                 ragConfiguration.namespace,
                 ragConfiguration.botId,
                 vectorStoreConfiguration,
@@ -186,11 +186,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                             "no_answer" to ragConfiguration.noAnswerSentence
                         ),
                         embeddingQuestionEmSetting = ragConfiguration.emSetting,
-                        // TODO : JIRA/DERCBOT-1138 The normalization of document index name
-                        //  will be carried out in accordance with the provider
-                        documentIndexName = OpenSearchUtils.normalizeDocumentIndexName(
-                            ragConfiguration.namespace, ragConfiguration.botId
-                        ),
+                        documentIndexName = indexName,
                         documentSearchParams = documentSearchParams,
                         vectorStoreSetting = vectorStoreSetting,
                         observabilitySetting = botDefinition.observabilityConfiguration?.setting
