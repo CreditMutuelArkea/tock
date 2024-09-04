@@ -36,10 +36,8 @@ data class PGVectorStoreSetting<T>(
     override fun normalizeDocumentIndexName(namespace: String, botId: String): String =
         PGVectorUtils.normalizeDocumentIndexName(namespace, botId)
 
-    override fun getDocumentSearchParams(indexSessionId: String?): PGVectorParams =
-        PGVectorParams(k = k, filter = indexSessionId?.let {
-            mapOf("index_session_id" to indexSessionId)
-        })
+    override fun getDocumentSearchParams(): PGVectorParams =
+        PGVectorParams(k = k, filter = null)
 }
 
 data class PGVectorParams(

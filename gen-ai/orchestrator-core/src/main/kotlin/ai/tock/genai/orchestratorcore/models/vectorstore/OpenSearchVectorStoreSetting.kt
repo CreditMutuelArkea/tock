@@ -34,15 +34,8 @@ data class OpenSearchVectorStoreSetting<T>(
     override fun normalizeDocumentIndexName(namespace: String, botId: String): String =
         OpenSearchUtils.normalizeDocumentIndexName(namespace, botId)
 
-    override fun getDocumentSearchParams(indexSessionId: String?): OpenSearchParams =
-        OpenSearchParams(
-            k = k, filter =
-            indexSessionId?.let {
-                listOf(
-                    Term(term = mapOf("metadata.index_session_id.keyword" to indexSessionId))
-                )
-            }
-        )
+    override fun getDocumentSearchParams(): OpenSearchParams =
+        OpenSearchParams(k = k, filter = null)
 }
 
 data class OpenSearchParams(
