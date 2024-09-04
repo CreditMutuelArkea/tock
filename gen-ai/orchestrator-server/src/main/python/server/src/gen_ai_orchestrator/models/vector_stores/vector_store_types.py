@@ -20,10 +20,11 @@ from fastapi import Body
 
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params import OpenSearchParams
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
+from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_params import PGVectorParams
 from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import PGVectorStoreSetting
 
 DocumentSearchParams = Annotated[
-    Union[OpenSearchParams], Body(discriminator='provider')
+    Union[OpenSearchParams, PGVectorParams], Body(discriminator='provider')
 ]
 
 VectorStoreSetting = Annotated[

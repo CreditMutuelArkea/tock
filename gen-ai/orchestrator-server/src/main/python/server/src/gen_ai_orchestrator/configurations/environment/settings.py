@@ -77,6 +77,7 @@ class _Settings(BaseSettings):
     """Request timeout: set the maximum time (in seconds) for the request to be completed."""
     vector_store_timeout: int = 4
     vector_store_provider: Optional[VectorStoreProvider] = VectorStoreProvider.OPEN_SEARCH.value
+    vector_store_k: int = 4
 
     """OpenSearch Vector Store Setting"""
     open_search_host: str = 'localhost'

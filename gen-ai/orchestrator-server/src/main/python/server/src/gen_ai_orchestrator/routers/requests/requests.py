@@ -17,14 +17,21 @@
 from typing import Any
 from typing import Optional
 
+from langchain_community.vectorstores import OpenSearchVectorSearch
 from pydantic import BaseModel, Field
 
+from gen_ai_orchestrator.configurations.environment.settings import application_settings
+from gen_ai_orchestrator.errors.exceptions.exceptions import GenAIUnknownProviderException
+from gen_ai_orchestrator.errors.handlers.fastapi.fastapi_handler import create_error_info_not_found
 from gen_ai_orchestrator.models.em.em_types import EMSetting
 from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
 from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_params import OpenSearchParams
+from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_params import PGVectorParams
 from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting, DocumentSearchParams
+from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import VectorStoreProvider
 
 
 class LLMProviderSettingStatusQuery(BaseModel):
@@ -157,6 +164,19 @@ Answer in {locale}:""",
             ]
         }
     }
+
+    def get_document_search_params(self) -> Optional[DocumentSearchParams]:
+        if self.document_search_params is not None:
+            return self.document_search_params
+
+        provider = (self.vector_store_setting.provider
+                    if self.vector_store_setting
+                    else application_settings.vector_store_provider)
+
+        if provider == VectorStoreProvider.OPEN_SEARCH:
+            return OpenSearchParams(k=application_settings.vector_store_k)
+        else:
+            return PGVectorParams(k=application_settings.vector_store_k)
 
 
 class SentenceGenerationQuery(BaseModel):
