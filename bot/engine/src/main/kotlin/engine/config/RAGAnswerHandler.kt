@@ -225,29 +225,27 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
         botId: String,
         vectorStoreConfiguration: BotVectorStoreConfiguration?,
     ): Triple<VectorStoreSetting?, DocumentSearchParams, String> {
-        var vectorStoreSetting: VectorStoreSetting? = null
-        var documentSearchParams: DocumentSearchParams? = null
-        var indexName: String? = null
-        if (vectorStoreConfiguration != null && vectorStoreConfiguration.enabled) {
-            vectorStoreSetting = vectorStoreConfiguration.setting
-            documentSearchParams = vectorStoreSetting.getDocumentSearchParams()
-            indexName = vectorStoreSetting.normalizeDocumentIndexName(
-                namespace,
-                botId)
-        }else{
-            documentSearchParams = when(vectorStore){
-                VectorStoreProvider.OpenSearch.name -> OpenSearchParams(k = kNeighborsDocuments, filter = null)
-                VectorStoreProvider.PGVector.name -> PGVectorParams(k = kNeighborsDocuments, filter = null)
-                else -> throw IllegalArgumentException("Unsupported Vector Store Provider [$vectorStore]")
-            }
 
-            indexName = when (vectorStore) {
-                VectorStoreProvider.OpenSearch.name -> OpenSearchUtils.normalizeDocumentIndexName(namespace, botId)
-                VectorStoreProvider.PGVector.name -> PGVectorUtils.normalizeDocumentIndexName(namespace, botId)
-                else -> throw IllegalArgumentException("Unsupported Vector Store Provider [$vectorStore]")
-            }
+        vectorStoreConfiguration?.takeIf { it.enabled }?.let { config ->
+            val setting = config.setting
+            val searchParams = setting.getDocumentSearchParams()
+            val indexName = setting.normalizeDocumentIndexName(namespace, botId)
+            return Triple(setting, searchParams, indexName)
         }
-        return Triple(vectorStoreSetting, documentSearchParams, indexName)
+
+        val (documentSearchParams, indexName) = when (vectorStore) {
+            VectorStoreProvider.OpenSearch.name -> {
+                OpenSearchParams(k = kNeighborsDocuments) to
+                        OpenSearchUtils.normalizeDocumentIndexName(namespace, botId)
+            }
+            VectorStoreProvider.PGVector.name -> {
+                PGVectorParams(k = kNeighborsDocuments) to
+                        PGVectorUtils.normalizeDocumentIndexName(namespace, botId)
+            }
+            else -> throw IllegalArgumentException("Unsupported Vector Store Provider [$vectorStore]")
+        }
+
+        return Triple(null, documentSearchParams, indexName)
     }
 
     /**
