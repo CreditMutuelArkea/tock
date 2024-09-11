@@ -14,19 +14,20 @@
 #
 import base64
 import io
-from typing import Union
+from typing import Optional, Union
 
 from fastapi import UploadFile
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.language_models import BaseLanguageModel
 from langchain_core.messages import HumanMessage
+from langchain_google_vertexai import ChatVertexAI, create_context_cache
 from pdf2image import convert_from_bytes
 
-from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
 from gen_ai_orchestrator.models.observability.observability_trace import (
     ObservabilityTrace,
 )
-from gen_ai_orchestrator.models.observability.observability_type import (
-    ObservabilitySetting,
-)
+from gen_ai_orchestrator.models.rag.rag_models import ChatMessageType
+from gen_ai_orchestrator.routers.requests.requests import RagVisionQuery
 from gen_ai_orchestrator.routers.responses.responses import (
     SentenceGenerationResponse,
 )
@@ -36,9 +37,9 @@ from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
 
 
 async def ask_model_with_files(
-    files: Union[list[UploadFile], UploadFile],
-    llm_setting: LLMSetting,
-    observability_setting: ObservabilitySetting,
+    query: RagVisionQuery,
+    files: Optional[list[UploadFile]] = None,
+    context_id: Optional[str] = None,
 ) -> SentenceGenerationResponse:
     """
     Sends a prompt along with uploaded files to a language model for inference.
@@ -48,47 +49,69 @@ async def ask_model_with_files(
     optional observability features to track the model's behavior and performance.
 
     Args:
+        query (RagQuery): The RAG query.
         files (Union[list[UploadFile], UploadFile]): A single uploaded file or a list of uploaded files
                                                      to be sent to the language model.
-        llm_setting (LLMSetting): Settings for the language model.
-        observability_setting (ObservabilitySetting): Settings for tracking observability.
+        context_id (Optional[str]): A string identifier for contextual caching system.
 
     Returns:
         Any: The response from the language model after processing the prompt and the files.
     """
-    model = get_llm_factory(setting=llm_setting).get_language_model()
+    model = get_llm_factory(setting=query.llm_setting).get_language_model()
 
-    images_list = await prepare_images(files)
+    if files:
+        context_id = await add_file_to_cache(model, files)
 
-    content = [{'type': 'text', 'text': llm_setting.prompt}]
-    content.extend(
-        [
-            {
-                'type': 'image_url',
-                'image_url': {'url': f'data:image/jpeg;base64,{image}'},
-            }
-            for image in images_list
-        ]
-    )
+    await activate_context_cache(model, context_id)
 
-    message = HumanMessage(content)
+    message_history = ChatMessageHistory()
+    for msg in query.history:
+        if ChatMessageType.HUMAN == msg.type:
+            message_history.add_user_message(msg.text)
+        else:
+            message_history.add_ai_message(msg.text)
+    message_history.add_message(HumanMessage(query.input))
 
     callback_handlers = []
-    if observability_setting is not None:
+    if query.observability_setting is not None:
         from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
             create_observability_callback_handler,
         )
 
         callback_handlers.append(
             create_observability_callback_handler(
-                observability_setting=observability_setting,
+                observability_setting=query.observability_setting,
                 trace_name=ObservabilityTrace.RAG,
             )
         )
 
-    model_response = model.invoke([message], {'callbacks': callback_handlers})
+    model_response = model.invoke(
+        message_history.messages, {'callbacks': callback_handlers}
+    )
 
     return SentenceGenerationResponse(sentences=[model_response.content])
+
+
+async def add_file_to_cache(model: BaseLanguageModel, files: list[UploadFile]) -> str:
+    if isinstance(model, ChatVertexAI):
+        images_list = await prepare_images(files)
+        messages = [
+            HumanMessage(
+                str(
+                    {
+                        'type': 'image_url',
+                        'image_url': {'url': f'data:image/jpeg;base64,{image}'},
+                    }
+                )
+            )
+            for image in images_list
+        ]
+        return create_context_cache(model, messages)
+
+
+async def activate_context_cache(model: BaseLanguageModel, context_id: str):
+    if isinstance(model, ChatVertexAI):
+        model.cached_content = context_id
 
 
 async def prepare_images(files: Union[list[UploadFile], UploadFile]) -> list:

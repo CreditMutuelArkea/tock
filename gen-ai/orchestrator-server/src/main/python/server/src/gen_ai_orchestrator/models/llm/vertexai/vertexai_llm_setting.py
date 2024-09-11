@@ -59,3 +59,7 @@ class VertexAILLMSetting(BaseLLMSetting):
     max_tokens: Optional[int] = Field(
         description='The maximum number of tokens to generate.', default=None
     )
+    context_caching: Optional[str] = Field(
+        description='Name of the context cache. Must be supported by the model.',
+        default=None,
+    )

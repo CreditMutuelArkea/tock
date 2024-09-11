@@ -43,4 +43,5 @@ class VertexAILLMFactory(LangChainLLMFactory):
             project=self.setting.project_id,
             location=self.setting.location,
             max_tokens=self.setting.max_tokens,
+            cached_content=self.setting.context_caching,
         )

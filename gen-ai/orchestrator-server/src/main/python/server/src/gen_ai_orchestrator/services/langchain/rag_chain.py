@@ -26,7 +26,7 @@ from typing import List, Optional
 from langchain.chains.conversational_retrieval.base import (
     ConversationalRetrievalChain,
 )
-from langchain.memory import ChatMessageHistory
+from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 
@@ -156,6 +156,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
         else None,
     )
 
+
 def get_source_content(doc: Document) -> str:
     """
     Find and delete the title followed by two line breaks
@@ -167,7 +168,7 @@ def get_source_content(doc: Document) -> str:
     """
     title_prefix = f"{doc.metadata['title']}\n\n"
     if doc.page_content.startswith(title_prefix):
-        return doc.page_content[len(title_prefix):]
+        return doc.page_content[len(title_prefix) :]
     else:
         return doc.page_content
 
@@ -183,15 +184,20 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     """
     llm_factory = get_llm_factory(setting=query.question_answering_llm_setting)
     em_factory = get_em_factory(setting=query.embedding_question_em_setting)
-    vector_store_factory = get_vector_store_factory(setting=query.vector_store_setting,
-                                                    index_name=query.document_index_name,
-                                                    embedding_function=em_factory.get_embedding_model())
+    vector_store_factory = get_vector_store_factory(
+        setting=query.vector_store_setting,
+        index_name=query.document_index_name,
+        embedding_function=em_factory.get_embedding_model(),
+    )
 
     logger.debug('RAG chain - Create a ConversationalRetrievalChain from LLM')
     return ConversationalRetrievalChain.from_llm(
         llm=llm_factory.get_language_model(),
         retriever=vector_store_factory.get_vector_store_retriever(
-            None if query.document_search_params is None else query.document_search_params.to_dict()),
+            None
+            if query.document_search_params is None
+            else query.document_search_params.to_dict()
+        ),
         return_source_documents=True,
         return_generated_question=True,
         combine_docs_chain_kwargs={
@@ -230,16 +236,16 @@ def __rag_guard(inputs, response):
 
     if 'no_answer' in inputs:
         if (
-                response['answer'] != inputs['no_answer']
-                and response['source_documents'] == []
+            response['answer'] != inputs['no_answer']
+            and response['source_documents'] == []
         ):
             message = 'The RAG gives an answer when no document has been found!'
             __rag_log(level=ERROR, message=message, inputs=inputs, response=response)
             raise GenAIGuardCheckException(ErrorInfo(cause=message))
 
         if (
-                response['answer'] == inputs['no_answer']
-                and response['source_documents'] != []
+            response['answer'] == inputs['no_answer']
+            and response['source_documents'] != []
         ):
             message = 'The RAG gives no answer for user question, but some documents has been found!'
             __rag_log(level=WARNING, message=message, inputs=inputs, response=response)
@@ -283,7 +289,8 @@ def get_rag_documents(handler: RetrieverJsonCallbackHandler) -> List[RagDocument
     return [
         # Get first 100 char of content
         RagDocument(
-            content=doc['page_content'][0:len(doc['metadata']['title'])+100] + '...',
+            content=doc['page_content'][0 : len(doc['metadata']['title']) + 100]
+            + '...',
             metadata=RagDocumentMetadata(**doc['metadata']),
         )
         for doc in on_chain_start_records[0]['inputs']['input_documents']
@@ -317,7 +324,7 @@ def get_llm_prompts(handler: RetrieverJsonCallbackHandler) -> (Optional[str], st
 
 
 def get_rag_debug_data(
-        query, response, records_callback_handler, rag_duration
+    query, response, records_callback_handler, rag_duration
 ) -> RagDebugData:
     """RAG debug data assembly"""
 

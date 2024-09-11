@@ -20,10 +20,15 @@ from pydantic import BaseModel, Field
 
 from gen_ai_orchestrator.models.em.em_types import EMSetting
 from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
-from gen_ai_orchestrator.models.observability.observability_type import ObservabilitySetting
+from gen_ai_orchestrator.models.observability.observability_type import (
+    ObservabilitySetting,
+)
 from gen_ai_orchestrator.models.prompt.prompt_template import PromptTemplate
 from gen_ai_orchestrator.models.rag.rag_models import ChatMessage
-from gen_ai_orchestrator.models.vector_stores.vector_store_types import VectorStoreSetting, DocumentSearchParams
+from gen_ai_orchestrator.models.vector_stores.vector_store_types import (
+    DocumentSearchParams,
+    VectorStoreSetting,
+)
 
 
 class LLMProviderSettingStatusQuery(BaseModel):
@@ -64,8 +69,7 @@ class BaseQuery(BaseModel):
         description='The document search parameters. Ex: number of documents, metadata filter',
     )
     vector_store_setting: Optional[VectorStoreSetting] = Field(
-        description='The vector store settings.',
-        default=None
+        description='The vector store settings.', default=None
     )
     observability_setting: Optional[ObservabilitySetting] = Field(
         description='The observability settings.', default=None
@@ -111,10 +115,67 @@ class QAQuery(BaseQuery):
 class VectorStoreProviderSettingStatusQuery(BaseModel):
     """The query for the Vector Store Provider Setting Status"""
 
-    setting: VectorStoreSetting = Field(description='The Vector Store Provider setting to be checked.')
+    setting: VectorStoreSetting = Field(
+        description='The Vector Store Provider setting to be checked.'
+    )
     index_name: str = Field(
         description='Index name corresponding to a document collection in the vector database.'
     )
+
+
+class RagVisionQuery(BaseModel):
+    """The RAG query model. This query is designed to use a vision model, such as Gemini Pro, without vector storage or embeddings."""
+
+    input: str = Field(description='The request to be sent to the model.')
+    context_id: Optional[str] = Field(
+        description='The context ID to use with this query.', default=None
+    )
+    history: list[ChatMessage] = Field(
+        description="Conversation history, used to reformulate the user's question."
+    )
+    llm_setting: LLMSetting = Field(
+        description='LLM setting, used to perform a QA Prompt.'
+    )
+    observability_setting: Optional[ObservabilitySetting] = Field(
+        description='The observability settings.', default=None
+    )
+    model_config = {
+        'json_schema_extra': {
+            'examples': [
+                {
+                    'input': 'Can you help me ?',
+                    'context_id': 'ab5519b2c',
+                    'history': [
+                        {'text': 'Hello, how can I do this?', 'type': 'HUMAN'},
+                        {
+                            'text': 'you can do this with the following method ....',
+                            'type': 'AI',
+                        },
+                    ],
+                    'llm_setting': {
+                        'provider': 'OpenAI',
+                        'api_key': {
+                            'type': 'Raw',
+                            'value': 'ab7***************************A1IV4B',
+                        },
+                        'temperature': 1.2,
+                        'prompt': """Use the following context to answer the question at the end.
+    If you don't know the answer, just say {no_answer}.
+
+    Context:
+    {context}
+
+    Question:
+    {question}
+
+    Answer in {locale}:""",
+                        'model': 'gpt-3.5-turbo',
+                    },
+                    'observability_setting': None,
+                }
+            ]
+        }
+    }
 
 
 class RagQuery(BaseQuery):
