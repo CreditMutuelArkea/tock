@@ -28,6 +28,7 @@ from langchain.chains.conversational_retrieval.base import (
 )
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.documents import Document
+from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
@@ -93,7 +94,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
     message_history = ChatMessageHistory()
     for msg in query.history:
         if ChatMessageType.HUMAN == msg.type:
-            message_history.add_user_message(msg.text)
+            message_history.add_user_message(HumanMessage([msg.text]))
         else:
             message_history.add_ai_message(msg.text)
 
@@ -121,33 +122,26 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
             )
         )
 
+    print(callback_handlers)
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
         config={'callbacks': callback_handlers},
     )
 
     # RAG Guard
-    __rag_guard(inputs, response)
+    # __rag_guard(inputs, response)
 
     # Calculation of RAG processing time
     rag_duration = '{:.2f}'.format(time.time() - start_time)
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
+    print(response['answer'])
+
     # Returning RAG response
     return RagResponse(
         answer=TextWithFootnotes(
             text=response['answer'],
-            footnotes=set(
-                map(
-                    lambda doc: Footnote(
-                        identifier=f'{doc.metadata["id"]}',
-                        title=doc.metadata['title'],
-                        url=doc.metadata['source'],
-                        content=get_source_content(doc),
-                    ),
-                    response['source_documents'],
-                )
-            ),
+            footnotes=set(),
         ),
         debug=get_rag_debug_data(
             query, response, records_callback_handler, rag_duration

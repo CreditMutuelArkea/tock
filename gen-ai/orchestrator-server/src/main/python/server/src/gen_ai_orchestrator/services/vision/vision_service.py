@@ -38,7 +38,6 @@ from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
 
 async def ask_model_with_files(
     query: RagVisionQuery,
-    files: Optional[list[UploadFile]] = None,
     context_id: Optional[str] = None,
 ) -> SentenceGenerationResponse:
     """
@@ -50,8 +49,6 @@ async def ask_model_with_files(
 
     Args:
         query (RagQuery): The RAG query.
-        files (Union[list[UploadFile], UploadFile]): A single uploaded file or a list of uploaded files
-                                                     to be sent to the language model.
         context_id (Optional[str]): A string identifier for contextual caching system.
 
     Returns:
@@ -59,15 +56,10 @@ async def ask_model_with_files(
     """
     model = get_llm_factory(setting=query.llm_setting).get_language_model()
 
-    if files:
-        context_id = await add_file_to_cache(model, files)
-
-    await activate_context_cache(model, context_id)
-
     message_history = ChatMessageHistory()
     for msg in query.history:
         if ChatMessageType.HUMAN == msg.type:
-            message_history.add_user_message(msg.text)
+            message_history.add_user_message(HumanMessage(content=[msg.text]))
         else:
             message_history.add_ai_message(msg.text)
     message_history.add_message(HumanMessage(query.input))

@@ -15,12 +15,13 @@
 """Module for RAG Models"""
 
 from enum import Enum, unique
-from typing import List, Optional
-
+from typing import List, Optional, Union
 
 from pydantic import AnyUrl, BaseModel, Field, HttpUrl
 
-from gen_ai_orchestrator.models.vector_stores.vector_store_types import DocumentSearchParams
+from gen_ai_orchestrator.models.vector_stores.vector_store_types import (
+    DocumentSearchParams,
+)
 
 
 class Source(BaseModel):
@@ -78,7 +79,7 @@ class ChatMessageType(str, Enum):
 class ChatMessage(BaseModel):
     """A conversation chat message"""
 
-    text: str = Field(
+    text: Union[str, dict] = Field(
         description='Conversation message text', examples=['Hello, how can I do this?']
     )
     type: ChatMessageType = Field(description='The message origin (Human or AI)')

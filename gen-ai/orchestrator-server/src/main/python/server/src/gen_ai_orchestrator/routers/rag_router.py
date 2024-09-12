@@ -13,8 +13,6 @@
 #   limitations under the License.
 #
 """RAG Router Module"""
-import json
-from typing import Annotated, Optional
 
 from fastapi import APIRouter, Form, HTTPException, UploadFile
 from pydantic import TypeAdapter
@@ -34,7 +32,7 @@ rag_router = APIRouter(prefix='/rag', tags=['Retrieval Augmented Generation'])
 
 
 @rag_router.post('')
-async def ask_rag(query: RagQuery, debug: bool = False) -> RagResponse:
+async def ask_rag(query: RagQuery, debug: bool = True) -> RagResponse:
     """
     ## Ask a RAG System
     Ask question to a RAG System, and return answer by using a knowledge base (documents)
@@ -44,21 +42,18 @@ async def ask_rag(query: RagQuery, debug: bool = False) -> RagResponse:
 
 @rag_router.post('/document')
 async def ask_rag_with_pdf(
-    query: Annotated[str, Form(json_schema_extra=RagVisionQuery.model_json_schema())],
-    files: Optional[list[UploadFile]],
+    query: RagVisionQuery,
 ):
-    for file in files:
-        if file.content_type not in [
-            'image/jpeg',
-            'image/jpg',
-            'image/png',
-            'application/pdf',
-        ]:
-            raise HTTPException(
-                status_code=400,
-                detail='Invalid file format. Please upload a JPEG/PNG images or PDF files.',
-            )
+    # for file in files:
+    #     if file.content_type not in [
+    #         'image/jpeg',
+    #         'image/jpg',
+    #         'image/png',
+    #         'application/pdf',
+    #     ]:
+    #         raise HTTPException(
+    #             status_code=400,
+    #             detail='Invalid file format. Please upload a JPEG/PNG images or PDF files.',
+    #         )
 
-    query: LLMSetting = TypeAdapter(RagVisionQuery).validate_python(json.loads(query))
-
-    return await ask_model_with_files(query, files)
+    return await ask_model_with_files(query)
