@@ -104,13 +104,17 @@ def index_documents(args):
 
     logging.debug(f"Read input CSV file {args['<input_csv>']}")
     df = pd.read_csv(args['<input_csv>'], delimiter='|', quotechar='"', names=['title', 'source', 'text'])
+    # Prevent NaN value in the 'source' column with a default value 'UNKNOWN', then replace it with None
+    df['source'] = df['source'].fillna('UNKNOWN')
+    df['source'] = df['source'].replace('UNKNOWN', None)
     loader = DataFrameLoader(df, page_content_column='text')
     docs = loader.load()
 
     for doc in docs:
+        doc.metadata['url'] = None # TODO MASS, car la REC n'a pas été livrée !
         doc.metadata['index_session_id'] = session_uuid
         doc.metadata['index_datetime'] = formatted_datetime
-        doc.metadata['id'] = uuid4()  # A uuid for the doc (will be used by TOCK)
+        doc.metadata['id'] = uuid4()  # An uuid for the doc (will be used by TOCK)
 
     logging.debug(f"Split texts in {args['<chunks_size>']} characters-sized chunks")
     # recursive splitter is used to preserve sentences & paragraphs
@@ -130,7 +134,7 @@ def index_documents(args):
 
     # Use embeddings factory from orchestrator
     em_factory = get_em_factory(em_settings)
-    em_factory.check_embedding_model_setting()
+    # em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
     # Index all chunks in vector DB
@@ -197,11 +201,11 @@ def em_settings_from_config(setting_dict: dict) -> BaseEMSetting:
 def embed_and_store_docs(
     documents: Iterable[Document], embeddings: Embeddings, index_name: str
 ) -> None:
-    """ "Embed all chunks in vector database."""
+    """Embed all chunks in vector database."""
     logging.debug('Index chunks in DB')
     # Use vector store factory from orchestrator
     vectorstore_factory = get_vector_store_factory(
-        VectorStoreProvider.OPEN_SEARCH,
+        setting=None,
         embedding_function=embeddings,
         index_name=index_name,
     )
