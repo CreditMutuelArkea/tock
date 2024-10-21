@@ -26,7 +26,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
+from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate, ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
@@ -199,8 +199,29 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
                 partial_variables=query.question_answering_prompt.inputs
             )
 
+    contextualize_q_system_prompt = """Given a chat history and the latest user question \
+    which might reference context in the chat history, formulate a standalone question \
+    which can be understood without the chat history. Do NOT answer the question, \
+    just reformulate it if needed and otherwise return it as is."""
+
+
+    contextualize_q_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("human", "{question}"),
+        ]
+    )
+    contextualize_q_chain = contextualize_q_prompt | llm | StrOutputParser()
+
+    def contextualized_question(input: dict):
+        if input.get("chat_history"):
+            return contextualize_q_chain
+        else:
+            return input["question"]
+
     rag_chain_from_docs = (
-            RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+            RunnablePassthrough.assign(context=contextualized_question | retriever | format_docs)
             | prompt
             | llm
             | StrOutputParser()
