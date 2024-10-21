@@ -25,7 +25,9 @@ from typing import List, Optional
 from langchain.chains import ConversationalRetrievalChain
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
+from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIGuardCheckException,
@@ -112,7 +114,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                 trace_name=ObservabilityTrace.RAG))
 
     response = await conversational_retrieval_chain.ainvoke(
-        input=inputs,
+        input=query.question_answering_prompt.inputs['question'],
         config={'callbacks': callback_handlers},
     )
 
@@ -135,7 +137,7 @@ async def execute_qa_chain(query: RagQuery, debug: bool) -> RagResponse:
                         url=doc.metadata['source'],
                         content=get_source_content(doc),
                     ),
-                    response['source_documents'],
+                    response['sources'],
                 )
             ),
         ),
@@ -161,6 +163,10 @@ def get_source_content(doc: Document) -> str:
     else:
         return doc.page_content
 
+from operator import itemgetter
+def format_docs(docs):
+    return "\n\n".join(doc.page_content for doc in docs)
+
 
 def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     """
@@ -180,22 +186,52 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
     logger.info('RAG chain - LLM template validation')
     validate_prompt_template(query.question_answering_prompt)
 
-
-
     logger.debug('RAG chain - Document index name: %s', query.document_index_name)
     logger.debug('RAG chain - Create a ConversationalRetrievalChain from LLM')
-    return ConversationalRetrievalChain.from_llm(
-        llm=llm_factory.get_language_model(),
-        retriever=vector_store_factory.get_vector_store_retriever(query.document_search_params.to_dict()),
-        return_source_documents=True,
-        return_generated_question=True,
-        combine_docs_chain_kwargs={
-            'prompt': LangChainPromptTemplate.from_template(
+
+    llm = llm_factory.get_language_model()
+    retriever = vector_store_factory.get_vector_store_retriever(query.document_search_params.to_dict())
+    prompt = LangChainPromptTemplate.from_template(
                 template=query.question_answering_prompt.template,
                 template_format=query.question_answering_prompt.formatter.value,
+                partial_variables=query.question_answering_prompt.inputs
             )
-        },
+
+    # rag_chain_from_docs = (
+    #         RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+    #         | prompt
+    #         | llm
+    #         | StrOutputParser()
+    # )
+    #
+    # rag_chain_with_source = RunnableParallel(
+    #     {"context": retriever, "question": RunnablePassthrough()}
+    # ).assign(answer=rag_chain_from_docs)
+    #
+    # return rag_chain_with_source
+
+    inputs = {
+        "context": lambda x: format_docs(x["documents"]),
+        "question": itemgetter("question"),
+    }
+
+    rag_chain_from_docs = inputs | prompt | llm | StrOutputParser()
+
+    rag_chain_with_source = RunnableParallel(
+        {
+            "documents": retriever,
+            "question": RunnablePassthrough(),
+            "locale": RunnablePassthrough(),
+            "no_answer": RunnablePassthrough()
+        }
+    ) | RunnableParallel(
+        {
+            "answer": rag_chain_from_docs,
+            "sources": itemgetter("documents"),
+        }
     )
+
+    return rag_chain_with_source
 
 def __rag_guard(inputs, response):
     """
@@ -212,7 +248,7 @@ def __rag_guard(inputs, response):
     if 'no_answer' in inputs:
         if (
                 response['answer'] != inputs['no_answer']
-                and response['source_documents'] == []
+                and response['sources'] == []
         ):
             message = 'The RAG gives an answer when no document has been found!'
             __rag_log(level=ERROR, message=message, inputs=inputs, response=response)
@@ -220,12 +256,12 @@ def __rag_guard(inputs, response):
 
         if (
                 response['answer'] == inputs['no_answer']
-                and response['source_documents'] != []
+                and response['sources'] != []
         ):
             message = 'The RAG gives no answer for user question, but some documents has been found!'
             __rag_log(level=WARNING, message=message, inputs=inputs, response=response)
             # Remove source documents
-            response['source_documents'] = []
+            response['sources'] = []
 
 
 def __rag_log(level, message, inputs, response):
@@ -247,7 +283,7 @@ def __rag_log(level, message, inputs, response):
             'message': message,
             'question': inputs['question'],
             'answer': response['answer'],
-            'documents': response['source_documents'],
+            'documents': response['sources'],
         },
     )
 
