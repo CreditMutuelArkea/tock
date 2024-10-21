@@ -164,6 +164,8 @@ def get_source_content(doc: Document) -> str:
         return doc.page_content
 
 from operator import itemgetter
+
+
 def format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
@@ -197,41 +199,19 @@ def create_rag_chain(query: RagQuery) -> ConversationalRetrievalChain:
                 partial_variables=query.question_answering_prompt.inputs
             )
 
-    # rag_chain_from_docs = (
-    #         RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
-    #         | prompt
-    #         | llm
-    #         | StrOutputParser()
-    # )
-    #
-    # rag_chain_with_source = RunnableParallel(
-    #     {"context": retriever, "question": RunnablePassthrough()}
-    # ).assign(answer=rag_chain_from_docs)
-    #
-    # return rag_chain_with_source
-
-    inputs = {
-        "context": lambda x: format_docs(x["documents"]),
-        "question": itemgetter("question"),
-    }
-
-    rag_chain_from_docs = inputs | prompt | llm | StrOutputParser()
-
-    rag_chain_with_source = RunnableParallel(
-        {
-            "documents": retriever,
-            "question": RunnablePassthrough(),
-            "locale": RunnablePassthrough(),
-            "no_answer": RunnablePassthrough()
-        }
-    ) | RunnableParallel(
-        {
-            "answer": rag_chain_from_docs,
-            "sources": itemgetter("documents"),
-        }
+    rag_chain_from_docs = (
+            RunnablePassthrough.assign(context=(lambda x: format_docs(x["context"])))
+            | prompt
+            | llm
+            | StrOutputParser()
     )
 
+    rag_chain_with_source = RunnableParallel(
+        {"context": retriever, "question": RunnablePassthrough()}
+    ).assign(answer=rag_chain_from_docs, sources= itemgetter("context"),)
+
     return rag_chain_with_source
+
 
 def __rag_guard(inputs, response):
     """
