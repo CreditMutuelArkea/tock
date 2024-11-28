@@ -36,4 +36,10 @@
         <module>web</module>
     </modules>
 
+    <dependencies>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-nlp-model-stanford</artifactId>
+        </dependency>
+    </dependencies>
 </project>

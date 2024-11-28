@@ -73,7 +73,10 @@
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-duckling-client</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-nlp-model-stanford</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

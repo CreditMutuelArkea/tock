@@ -53,6 +53,10 @@
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-front-ioc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-nlp-model-stanford</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

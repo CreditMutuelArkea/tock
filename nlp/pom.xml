@@ -103,6 +103,11 @@
             </dependency>
             <dependency>
                 <groupId>ai.tock</groupId>
+                <artifactId>tock-nlp-model-stanford</artifactId>
+                <version>${stanford}</version>
+            </dependency>
+            <dependency>
+                <groupId>ai.tock</groupId>
                 <artifactId>tock-nlp-model-sagemaker</artifactId>
                 <version>${project.version}</version>
             </dependency>
