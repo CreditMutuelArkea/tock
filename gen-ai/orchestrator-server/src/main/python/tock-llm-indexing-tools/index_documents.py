@@ -18,7 +18,7 @@ Index a CSV file (line format: 'title'|'source'|'text') into a vector database.
 Usage:
   index_documents.py --input-csv=<path> --namespace=<ns> --bot-id=<id> \
                      --embeddings-json-config=<emb_cfg> --vector-store-json-config=<vs_cfg> \
-                     --chunks-size=<size> [--ignore-source=<is>] [--embedding-bulk-size=<em_bs>] \
+                     [--chunking-strategy=<cs>] [--chunks-size=<size>] [--ignore-source=<is>] [--embedding-bulk-size=<em_bs>] \
                      [--env-file=<env>] [-v]
   index_documents.py (-h | --help)
   index_documents.py --version
@@ -33,7 +33,10 @@ Options:
                                        (Describes settings for embeddings models supported by TOCK.)
   --vector-store-json-config=<vs_cfg> Path to vector store configuration JSON file.
                                        (Describes settings for vector stores supported by TOCK.)
+  --chunking-strategy=<cs>            Chunking strategy.
+                                       [Supported value (CHARACTER, MARKDOWN)]
   --chunks-size=<size>                Size of the embedded document chunks.
+                                       [default: 1000]
   --ignore-source=<is>                Ignore source validation. Useful if sources aren't valid URLs.
                                        [default: false]
   --embedding-bulk-size=<em_bs>       Number of chunks sent in each embedding request.
@@ -57,6 +60,7 @@ import copy
 import csv
 import json
 import logging
+import os
 import re
 import sys
 from datetime import datetime
@@ -75,22 +79,81 @@ from gen_ai_orchestrator.models.em.em_provider import EMProvider
 from gen_ai_orchestrator.models.em.em_setting import BaseEMSetting
 from gen_ai_orchestrator.models.em.ollama.ollama_em_setting import OllamaEMSetting
 from gen_ai_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
+from gen_ai_orchestrator.models.llm.azureopenai.azure_openai_llm_setting import AzureOpenAILLMSetting
+from gen_ai_orchestrator.models.llm.llm_provider import LLMProvider
+from gen_ai_orchestrator.models.security.raw_secret_key.raw_secret_key import RawSecretKey
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import PGVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vector_store_setting import BaseVectorStoreSetting
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import VectorStoreProvider
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
-    get_vector_store_factory,
+    get_vector_store_factory, get_llm_factory,
 )
+from gen_ai_orchestrator.services.langchain.factories.llm.llm_factory import LangChainLLMFactory
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders.dataframe import DataFrameLoader
 from langchain_core.documents import Document
+from langchain_text_splitters import MarkdownHeaderTextSplitter
+from pydantic import HttpUrl
 
-from indexing_details import IndexingDetails
+from models import IndexingDetails
 
 # Define the size of the csv field -> Set to maximum to process large csvs
 csv.field_size_limit(sys.maxsize)
+
+def summarize_and_chunk_markdown_by_header(session_uuid: str, formatted_datetime: str, csv_file: str, llm_factory: LangChainLLMFactory) -> List[Document]:
+    docs = []
+    with open(csv_file, 'r', encoding='utf-8') as csvfile:
+        reader = csv.DictReader(csvfile, delimiter=';')  # Le séparateur est ';'
+        for row in reader:
+            file_path = row['Path/filename']
+            file_title = row['Title of the file']
+
+            with open(file_path, 'r', encoding='utf-8') as file:
+                lines = file.readlines()
+
+            file_content = "".join(lines)
+            header_prefixe = "## "
+            headers = [f'{line.strip()} ({file_title})' for line in lines if line.strip().startswith(header_prefixe)]
+
+            llm_factory.get_language_model().invoke("Hi !")
+            # summarize = llm_factory.get_language_model().invoke(
+            #     f"""Please summarize the content of the following markdown file in approximately 120 words:\n{file_content}"""
+            # ).content
+            # print(f'summarize of {file_path} : {summarize}')
+
+            summarize = "Objectifs Premium Février 2024 est un titre de créance complexe émis par Crédit Mutuel Arkéa"
+            if file_path == './input/Objectifs_Premium_Fév_2024.md' :
+                summarize = "Objectifs Premium Février 2024 est un titre de créance complexe émis par Crédit Mutuel Arkéa, exposé à l'indice EURO iSTOXX® Ocean Care 40 Decrement 5%. Ce produit financier présente un risque élevé de perte partielle ou totale du capital, tant en cours de vie qu'à l'échéance. La période de commercialisation s'étend du 9 janvier au 24 février 2024. L'investissement conseillé est de 10 ans, avec une possibilité de remboursement anticipé si l'indice ne baisse pas de plus de 5% par rapport à son niveau initial. À l'échéance, le capital initial peut être remboursé majoré d'un gain selon les performances de l'indice. Les investisseurs doivent être conscients des risques de crédit, de liquidité et de contrepartie, ainsi que des fluctuations de marché. Le produit est destiné à des investisseurs professionnels et non-professionnels et peut être intégré dans des comptes titres ou des contrats d'assurance-vie."
+            if file_path == './input/KID_Perspectives_Globe_Fév_2024.md' :
+                summarize = "Le document d'informations clés présente les détails essentiels d'un produit d'investissement complexe nommé \"Objectifs Premium Février 2024\" (ISIN: FR001400MKI6), émis par Crédit Mutuel Arkéa. Ce produit est un titre de créance de droit français avec une durée de vie de 10 ans, remboursable anticipativement sous certaines conditions. Il est indexé sur l'indice EURO iSTOXXfi Ocean Care 40 Decrement 5%. Le rendement dépend de la performance de cet indice sans versement de coupon. Le remboursement peut être anticipé ou à échéance, avec des conditions spécifiques basées sur le niveau final de l'indice. Le produit est destiné aux investisseurs recherchant un placement indexé sur les marchés actions avec une protection contre une baisse modérée. Les risques et les gains potentiels sont illustrés, avec une échelle de risque allant du plus faible au plus élevé."
+
+            print(f'summarize of {file_path} : {summarize}\n{"".join(headers)}')
+
+            headers_to_split_on = [
+                (header_prefixe.strip(), header.removeprefix(header_prefixe).removesuffix("\n"))
+                for header in headers
+            ]
+
+            markdown_splitter = MarkdownHeaderTextSplitter(headers_to_split_on, strip_headers=False)
+            md_header_splits = markdown_splitter.split_text(file_content)
+
+            # Add metadata to each document
+            for doc in md_header_splits:
+                doc.metadata['index_session_id'] = session_uuid
+                doc.metadata['index_datetime'] = formatted_datetime
+                doc.metadata['id'] = str(uuid4())
+                doc.metadata['reference'] = file_path
+                doc.metadata['title'] = file_title
+                doc.metadata['chunk'] = "1/1"
+                doc.page_content=f"```markdown\n{doc.page_content}\n```"
+                doc.metadata['source'] = None
+
+            docs += md_header_splits
+
+    return docs
+
 
 def index_documents() -> IndexingDetails:
     """
@@ -118,25 +181,6 @@ def index_documents() -> IndexingDetails:
     else:
         # Replace any empty strings in 'source' with None
         df_filtered['source'] = df_filtered['source'].replace('', None)
-
-    loader = DataFrameLoader(df_filtered, page_content_column='text')
-    docs = loader.load()
-
-    # Add metadata to each document
-    for doc, (_, row) in zip(docs, df_filtered_clone.iterrows()):
-        doc.metadata['index_session_id'] = session_uuid
-        doc.metadata['index_datetime'] = formatted_datetime
-        doc.metadata['id'] = str(uuid4())  # An uuid for the doc (will be used by TOCK)
-        # Add source metadata regardless of ignore_source
-        doc.metadata['reference'] = row['source']
-
-    logging.debug(f"Split texts in {chunks_size} characters-sized chunks")
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunks_size)
-    splitted_docs = text_splitter.split_documents(docs)
-    # Add chunk id ('n/N') metadata to each chunk
-    splitted_docs = generate_ids_for_each_chunks(splitted_docs)
-    # Add title to text (for better semantic search)
-    splitted_docs = add_title_to_text(splitted_docs)
 
     logging.debug(f"Get embeddings model from {embeddings_json_config} config file")
     with open(Path(embeddings_json_config), 'r') as json_file:
@@ -169,6 +213,46 @@ def index_documents() -> IndexingDetails:
     em_factory.check_embedding_model_setting()
     embeddings = em_factory.get_embedding_model()
 
+    llm_factory = get_llm_factory(AzureOpenAILLMSetting(
+        provider = LLMProvider.AZURE_OPEN_AI_SERVICE,
+        api_key=RawSecretKey(value="**************"),
+        api_base=HttpUrl("https://**************.net"),
+        api_version="2024-03-01-preview",
+        deployment_name="**************",
+        temperature=0.5,
+        model="GPT-4o",
+        prompt="f",
+    ))
+
+    loader = DataFrameLoader(df_filtered, page_content_column='text')
+    docs = loader.load()
+
+    # Add metadata to each document
+    for doc, (_, row) in zip(docs, df_filtered_clone.iterrows()):
+        doc.metadata['index_session_id'] = session_uuid
+        doc.metadata['index_datetime'] = formatted_datetime
+        doc.metadata['id'] = str(uuid4())  # An uuid for the doc (will be used by TOCK)
+        # Add source metadata regardless of ignore_source
+        doc.metadata['reference'] = row['source']
+
+    if chunking_strategy == 'CHARACTER':
+        logging.debug(f"Split texts in {chunks_size} characters-sized chunks")
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunks_size)
+        splitted_docs = text_splitter.split_documents(docs)
+
+        # Add chunk id ('n/N') metadata to each chunk
+        splitted_docs = generate_ids_for_each_chunks(splitted_docs)
+        # Add title to text (for better semantic search)
+        splitted_docs = add_title_to_text(splitted_docs)
+    elif chunking_strategy == 'MARKDOWN':
+        splitted_docs = summarize_and_chunk_markdown_by_header(
+            session_uuid, formatted_datetime, "input/inputs-md.csv", llm_factory)
+    else:
+        raise ValueError(f"Unknown chunking strategy!")
+
+    for doc in splitted_docs:
+        print(f"{doc.metadata['title']} - {doc.metadata['id']} : {len(doc.page_content)}")
+
     # generating index name
     index_name = normalize_index_name(vector_store_settings.provider, namespace, bot_id, session_uuid)
 
@@ -188,6 +272,7 @@ def index_documents() -> IndexingDetails:
         documents_count = len(docs),
         chunks_count = len(splitted_docs),
         chunk_size = chunks_size,
+        chunking_strategy = chunking_strategy,
         em_settings = em_settings,
         vector_store_settings = vector_store_settings,
         ignore_source = ignore_source,
@@ -315,7 +400,7 @@ def add_title_to_text(
         # Add title to page_content
         if 'title' in doc.metadata:
             title = doc.metadata['title']
-            doc.page_content = f'{title}\n\n{doc.page_content}'
+            doc.page_content = f"---\n### {title} - Chunk {doc.metadata['id']}[{doc.metadata['chunk']}]\n\n{doc.page_content}\n---\n"
     return splitted_docs
 
 
@@ -409,7 +494,8 @@ if __name__ == '__main__':
     bot_id = args['--bot-id']
     embeddings_json_config = validate_file(args['--embeddings-json-config'], allowed_extension='json')
     vector_store_json_config = validate_file(args['--vector-store-json-config'], allowed_extension='json')
-    chunks_size = validate_positive_integer(args, option_name='--chunks-size')
+    chunking_strategy = args['--chunking-strategy']
+    chunks_size = validate_positive_integer(args, option_name='--chunks-size') if args['--chunks-size'] is not None else None
     ignore_source = validate_boolean(args, option_name='--ignore-source') # Default: 'false'
     embedding_bulk_size = validate_positive_integer(args, option_name='--embedding-bulk-size')
 

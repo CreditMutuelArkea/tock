@@ -33,6 +33,10 @@ class IndexingDetails(BaseModel):
         description='Number of chunked documents.',
         examples=[81033]
     )
+    chunking_strategy: str = Field(
+        description='The chunking strategy.',
+        examples=["CHARACTER", "MARKDOWN"]
+    )
     chunk_size: int = Field(
         description='The chunk size.',
         examples=[1000]
@@ -50,6 +54,7 @@ class IndexingDetails(BaseModel):
 Index name          : {self.index_name}
 Index session ID    : {self.indexing_session_uuid}
 Documents extracted : {self.documents_count} (Docs)
+Chunking Strategy   : {self.chunking_strategy}
 Documents chunked   : {self.chunks_count} (Chunks)
 Chunk size          : {self.chunk_size} (Characters)
 Input csv           : {self.input_csv}
