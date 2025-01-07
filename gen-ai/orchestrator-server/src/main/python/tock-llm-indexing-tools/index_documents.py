@@ -53,6 +53,7 @@ Description:
   Indexing details will be displayed on the console at the end of the operation,
   and saved in a specific log file in ./logs
 """
+
 import copy
 import csv
 import json
@@ -68,17 +69,27 @@ from uuid import uuid4
 import pandas as pd
 from docopt import docopt
 from dotenv import load_dotenv
-from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
+from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import (
+    AzureOpenAIEMSetting,
+)
 from gen_ai_orchestrator.models.em.bloomz.bloomz_em_setting import BloomzEMSetting
 from gen_ai_orchestrator.models.em.ollama.ollama_em_setting import OllamaEMSetting
 from gen_ai_orchestrator.models.em.em_provider import EMProvider
 from gen_ai_orchestrator.models.em.em_setting import BaseEMSetting
 from gen_ai_orchestrator.models.em.ollama.ollama_em_setting import OllamaEMSetting
 from gen_ai_orchestrator.models.em.openai.openai_em_setting import OpenAIEMSetting
-from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import OpenSearchVectorStoreSetting
-from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import PGVectorStoreSetting
-from gen_ai_orchestrator.models.vector_stores.vector_store_setting import BaseVectorStoreSetting
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import VectorStoreProvider
+from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import (
+    OpenSearchVectorStoreSetting,
+)
+from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import (
+    PGVectorStoreSetting,
+)
+from gen_ai_orchestrator.models.vector_stores.vector_store_setting import (
+    BaseVectorStoreSetting,
+)
+from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+    VectorStoreProvider,
+)
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import (
     get_em_factory,
     get_vector_store_factory,
@@ -92,6 +103,7 @@ from indexing_details import IndexingDetails
 # Define the size of the csv field -> Set to maximum to process large csvs
 csv.field_size_limit(sys.maxsize)
 
+
 def index_documents() -> IndexingDetails:
     """
     Read a CSV file, then index its contents to a Vector Store DB.
@@ -101,34 +113,36 @@ def index_documents() -> IndexingDetails:
     """
 
     start_time = datetime.now()
-    formatted_datetime = start_time.strftime('%Y-%m-%d %H:%M:%S')
+    formatted_datetime = start_time.strftime("%Y-%m-%d %H:%M:%S")
     session_uuid = str(uuid4())
-    logging.debug(f"Beginning indexation session {session_uuid} at '{formatted_datetime}'")
+    logging.debug(
+        f"Beginning indexation session {session_uuid} at '{formatted_datetime}'"
+    )
 
     logging.debug(f"Read input CSV file {input_csv}")
-    df = pd.read_csv(input_csv, delimiter='|', quotechar='"', header=0, dtype=str)
+    df = pd.read_csv(input_csv, delimiter="|", quotechar='"', header=0, dtype=str)
     # Replace NaN values with empty strings in all columns to avoid type issues
-    df = df.fillna('')
+    df = df.fillna("")
     # Filter rows where 'text' is not empty or just whitespace
-    df_filtered = df[df['text'].str.strip().astype(bool)]
+    df_filtered = df[df["text"].str.strip().astype(bool)]
     df_filtered_clone = copy.deepcopy(df_filtered)
     # Set 'source' column to None based on the `ignore_source` option
     if ignore_source:
-        df_filtered['source'] = None
+        df_filtered["source"] = None
     else:
         # Replace any empty strings in 'source' with None
-        df_filtered['source'] = df_filtered['source'].replace('', None)
+        df_filtered["source"] = df_filtered["source"].replace("", None)
 
-    loader = DataFrameLoader(df_filtered, page_content_column='text')
+    loader = DataFrameLoader(df_filtered, page_content_column="text")
     docs = loader.load()
 
     # Add metadata to each document
     for doc, (_, row) in zip(docs, df_filtered_clone.iterrows()):
-        doc.metadata['index_session_id'] = session_uuid
-        doc.metadata['index_datetime'] = formatted_datetime
-        doc.metadata['id'] = str(uuid4())  # An uuid for the doc (will be used by TOCK)
+        doc.metadata["index_session_id"] = session_uuid
+        doc.metadata["index_datetime"] = formatted_datetime
+        doc.metadata["id"] = str(uuid4())  # An uuid for the doc (will be used by TOCK)
         # Add source metadata regardless of ignore_source
-        doc.metadata['reference'] = row['source']
+        doc.metadata["reference"] = row["source"]
 
     logging.debug(f"Split texts in {chunks_size} characters-sized chunks")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunks_size)
@@ -139,7 +153,7 @@ def index_documents() -> IndexingDetails:
     splitted_docs = add_title_to_text(splitted_docs)
 
     logging.debug(f"Get embeddings model from {embeddings_json_config} config file")
-    with open(Path(embeddings_json_config), 'r') as json_file:
+    with open(Path(embeddings_json_config), "r") as json_file:
         config_dict = json.load(json_file)
     em_settings = load_setting(
         data=config_dict,
@@ -149,19 +163,19 @@ def index_documents() -> IndexingDetails:
             EMProvider.OLLAMA: OllamaEMSetting,
             EMProvider.BLOOMZ: BloomzEMSetting,
         },
-        base_class=BaseEMSetting
+        base_class=BaseEMSetting,
     )
 
     logging.debug(f"Get vector store from {vector_store_json_config} config file")
-    with open(Path(vector_store_json_config), 'r') as json_file:
+    with open(Path(vector_store_json_config), "r") as json_file:
         config_dict = json.load(json_file)
     vector_store_settings = load_setting(
         data=config_dict,
         provider_mapping={
             VectorStoreProvider.OPEN_SEARCH: OpenSearchVectorStoreSetting,
-            VectorStoreProvider.PGVECTOR: PGVectorStoreSetting
+            VectorStoreProvider.PGVECTOR: PGVectorStoreSetting,
         },
-        base_class=BaseVectorStoreSetting
+        base_class=BaseVectorStoreSetting,
     )
 
     # Use embeddings factory from orchestrator
@@ -170,12 +184,14 @@ def index_documents() -> IndexingDetails:
     embeddings = em_factory.get_embedding_model()
 
     # generating index name
-    index_name = normalize_index_name(vector_store_settings.provider, namespace, bot_id, session_uuid)
+    index_name = normalize_index_name(
+        vector_store_settings.provider, namespace, bot_id, session_uuid
+    )
 
     vector_store_factory = get_vector_store_factory(
         setting=vector_store_settings,
         index_name=index_name,
-        embedding_function=embeddings
+        embedding_function=embeddings,
     )
     vector_store_factory.check_vector_store_connection()
     vector_store = vector_store_factory.get_vector_store(async_mode=False)
@@ -183,17 +199,18 @@ def index_documents() -> IndexingDetails:
     embedding_and_indexing(splitted_docs, vector_store)
 
     return IndexingDetails(
-        index_name = index_name,
-        indexing_session_uuid = session_uuid,
-        documents_count = len(docs),
-        chunks_count = len(splitted_docs),
-        chunk_size = chunks_size,
-        em_settings = em_settings,
-        vector_store_settings = vector_store_settings,
-        ignore_source = ignore_source,
-        input_csv = input_csv,
-        duration = datetime.now() - start_time
+        index_name=index_name,
+        indexing_session_uuid=session_uuid,
+        documents_count=len(docs),
+        chunks_count=len(splitted_docs),
+        chunk_size=chunks_size,
+        em_settings=em_settings,
+        vector_store_settings=vector_store_settings,
+        ignore_source=ignore_source,
+        input_csv=input_csv,
+        duration=datetime.now() - start_time,
     )
+
 
 def validate_positive_integer(args, option_name) -> int:
     """
@@ -213,6 +230,7 @@ def validate_positive_integer(args, option_name) -> int:
         logging.error(f"{option_name} must be a valid positive integer.")
         sys.exit(1)
 
+
 def validate_boolean(args, option_name):
     """
     Validate that a given value can be interpreted as a boolean.
@@ -230,8 +248,11 @@ def validate_boolean(args, option_name):
     elif args[option_name].lower() in falsy_values:
         return False
     else:
-        logging.error(f"{option_name} must be a valid boolean (e.g., 'true' or 'false').")
+        logging.error(
+            f"{option_name} must be a valid boolean (e.g., 'true' or 'false')."
+        )
         sys.exit(1)
+
 
 def validate_file(file_path, allowed_extension):
     """
@@ -247,10 +268,12 @@ def validate_file(file_path, allowed_extension):
         sys.exit(1)
 
     # Check if the file has the allowed extension
-    file_extension = Path(file_path).suffixes[-1],  # Only the last part of the suffix
+    file_extension = (Path(file_path).suffixes[-1],)  # Only the last part of the suffix
     file_extension = file_extension[0].lstrip(".").lower()
     if file_extension != allowed_extension.lower():
-        logging.error(f"Cannot proceed: '{file_path}' must have the '{allowed_extension}' extension.")
+        logging.error(
+            f"Cannot proceed: '{file_path}' must have the '{allowed_extension}' extension."
+        )
         sys.exit(1)
 
     # If it's a JSON file, validate the JSON format
@@ -264,13 +287,18 @@ def validate_file(file_path, allowed_extension):
 
     return file_path
 
+
 def embedding_and_indexing(splitted_docs: List[Document], vector_store):
     # Index all chunks in vector DB
-    logging.debug('Index document chunks in DB')
+    logging.debug("Index document chunks in DB")
 
     for i in range(0, len(splitted_docs), embedding_bulk_size):
-        logging.info(f'i={i}, splitted_docs={len(splitted_docs)}')
-        vector_store.add_documents(documents=splitted_docs[i: i + embedding_bulk_size], bulk_size=embedding_bulk_size)
+        logging.info(f"i={i}, splitted_docs={len(splitted_docs)}")
+        vector_store.add_documents(
+            documents=splitted_docs[i : i + embedding_bulk_size],
+            bulk_size=embedding_bulk_size,
+        )
+
 
 def load_setting(data: dict, provider_mapping: dict, base_class):
     """Function to load and instantiate the right class according to the provider"""
@@ -290,15 +318,15 @@ def generate_ids_for_each_chunks(
     """Add chunk id ('n/N') to the documents' metadata using Pandas."""
     metadata = [doc.metadata for doc in splitted_docs]
     df_metadata = pd.DataFrame(metadata)
-    df_metadata['total_chunks'] = df_metadata.groupby('id')['id'].transform('count')
-    df_metadata['chunk_id'] = df_metadata.groupby('id').cumcount() + 1
-    df_metadata['chunk'] = (
-        df_metadata['chunk_id'].astype(str)
-        + '/'
-        + df_metadata['total_chunks'].astype(str)
+    df_metadata["total_chunks"] = df_metadata.groupby("id")["id"].transform("count")
+    df_metadata["chunk_id"] = df_metadata.groupby("id").cumcount() + 1
+    df_metadata["chunk"] = (
+        df_metadata["chunk_id"].astype(str)
+        + "/"
+        + df_metadata["total_chunks"].astype(str)
     )
     for i, doc in enumerate(splitted_docs):
-        doc.metadata['chunk'] = df_metadata.loc[i, 'chunk']
+        doc.metadata["chunk"] = df_metadata.loc[i, "chunk"]
     return splitted_docs
 
 
@@ -313,14 +341,16 @@ def add_title_to_text(
     """
     for doc in splitted_docs:
         # Add title to page_content
-        if 'title' in doc.metadata:
-            title = doc.metadata['title']
-            doc.page_content = f'{title}\n\n{doc.page_content}'
+        if "title" in doc.metadata:
+            title = doc.metadata["title"]
+            doc.page_content = f"{title}\n\n{doc.page_content}"
     return splitted_docs
 
 
-def normalize_index_name(provider: VectorStoreProvider, namespace: str, bot_id: str, index_session_id: str) -> str:
-    if VectorStoreProvider.OPEN_SEARCH == provider :
+def normalize_index_name(
+    provider: VectorStoreProvider, namespace: str, bot_id: str, index_session_id: str
+) -> str:
+    if VectorStoreProvider.OPEN_SEARCH == provider:
         return normalize_opensearch_index_name(namespace, bot_id, index_session_id)
 
     if VectorStoreProvider.PGVECTOR == provider:
@@ -328,7 +358,10 @@ def normalize_index_name(provider: VectorStoreProvider, namespace: str, bot_id: 
 
     raise ValueError(f"Unknown Provider {provider}.")
 
-def normalize_pgvector_index_name(namespace: str, bot_id: str, index_session_id: str) -> str:
+
+def normalize_pgvector_index_name(
+    namespace: str, bot_id: str, index_session_id: str
+) -> str:
     """
     Normalize the document index name, base on PGVector rules.
     Same treatment as tock/gen-ai/orchestrator-core/src/main/kotlin/ai/tock/genai/orchestratorcore/utils/PGVectorUtils.kt#normalizeDocumentIndexName()
@@ -338,15 +371,18 @@ def normalize_pgvector_index_name(namespace: str, bot_id: str, index_session_id:
     normalized = f"ns-{namespace}-bot-{bot_id}-session-{index_session_id}".lower()
 
     # Replace invalid characters with underscores
-    normalized = re.sub(r'[^a-z0-9_]', '_', normalized)
+    normalized = re.sub(r"[^a-z0-9_]", "_", normalized)
 
     # Ensure the name starts with a letter or underscore
-    if not re.match(r'^[a-z_]', normalized):
+    if not re.match(r"^[a-z_]", normalized):
         normalized = f"_{normalized}"
 
     return normalized
 
-def normalize_opensearch_index_name(namespace: str, bot_id: str, index_session_id: str) -> str:
+
+def normalize_opensearch_index_name(
+    namespace: str, bot_id: str, index_session_id: str
+) -> str:
     """
     Normalize the document index name, base on OpenSearch rules.
     Same treatment as tock/gen-ai/orchestrator-core/src/main/kotlin/ai/tock/genai/orchestratorcore/utils/OpenSearchUtils.kt#normalizeDocumentIndexName()
@@ -356,24 +392,42 @@ def normalize_opensearch_index_name(namespace: str, bot_id: str, index_session_i
     normalized = f"ns-{namespace}-bot-{bot_id}-session-{index_session_id}".lower()
 
     # Replace underscores and spaces with hyphens
-    normalized = normalized.replace('_', '-').replace(' ', '-')
+    normalized = normalized.replace("_", "-").replace(" ", "-")
 
     # Remove invalid characters
-    invalid_characters = {' ', ',', ':', '"', '*', '+', '/', '\\', '|', '?', '#', '>', '<'}
-    normalized = ''.join(c for c in normalized if c not in invalid_characters)
+    invalid_characters = {
+        " ",
+        ",",
+        ":",
+        '"',
+        "*",
+        "+",
+        "/",
+        "\\",
+        "|",
+        "?",
+        "#",
+        ">",
+        "<",
+    }
+    normalized = "".join(c for c in normalized if c not in invalid_characters)
 
     return normalized
 
 
 # Configure logging
 def setup_logging():
-    log_format = '%(levelname)s:%(module)s:%(message)s'
+    log_format = "%(levelname)s:%(module)s:%(message)s"
     # Create log directory if it doesn't exist
-    log_dir = Path('logs')
+    log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
 
-    log_file_name = log_dir / f"index_documents_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-    file_handler = RotatingFileHandler(log_file_name, maxBytes=10 * 1024 * 1024, backupCount=5)
+    log_file_name = (
+        log_dir / f"index_documents_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+    )
+    file_handler = RotatingFileHandler(
+        log_file_name, maxBytes=10 * 1024 * 1024, backupCount=5
+    )
     file_handler.setLevel(logging.DEBUG if verbose else logging.INFO)
     file_handler.setFormatter(logging.Formatter(log_format))
 
@@ -382,39 +436,50 @@ def setup_logging():
     console_handler.setFormatter(logging.Formatter(log_format))
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)  # Set to DEBUG so that both handlers can capture everything
+    logger.setLevel(
+        logging.DEBUG
+    )  # Set to DEBUG so that both handlers can capture everything
 
     logger.addHandler(console_handler)
     logger.addHandler(file_handler)
 
+
 def str_to_bool(value):
     if isinstance(value, bool):
         return value
-    if value.lower() in ['true', '1', 'yes']:
+    if value.lower() in ["true", "1", "yes"]:
         return True
-    elif value.lower() in ['false', '0', 'no']:
+    elif value.lower() in ["false", "0", "no"]:
         return False
     else:
         raise ValueError(f"Cannot proceed: {value} is not a valid boolean value")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Parse command-line arguments
-    args = docopt(__doc__, version='Index Documents 1.0')
+    args = docopt(__doc__, version="Index Documents 1.0")
 
     # Access arguments, using defaults where applicable
-    verbose = args['-v']  # Boolean flag
-    input_csv = validate_file(args['--input-csv'], allowed_extension='csv')
-    namespace = args['--namespace']
-    bot_id = args['--bot-id']
-    embeddings_json_config = validate_file(args['--embeddings-json-config'], allowed_extension='json')
-    vector_store_json_config = validate_file(args['--vector-store-json-config'], allowed_extension='json')
-    chunks_size = validate_positive_integer(args, option_name='--chunks-size')
-    ignore_source = validate_boolean(args, option_name='--ignore-source') # Default: 'false'
-    embedding_bulk_size = validate_positive_integer(args, option_name='--embedding-bulk-size')
+    verbose = args["-v"]  # Boolean flag
+    input_csv = validate_file(args["--input-csv"], allowed_extension="csv")
+    namespace = args["--namespace"]
+    bot_id = args["--bot-id"]
+    embeddings_json_config = validate_file(
+        args["--embeddings-json-config"], allowed_extension="json"
+    )
+    vector_store_json_config = validate_file(
+        args["--vector-store-json-config"], allowed_extension="json"
+    )
+    chunks_size = validate_positive_integer(args, option_name="--chunks-size")
+    ignore_source = validate_boolean(
+        args, option_name="--ignore-source"
+    )  # Default: 'false'
+    embedding_bulk_size = validate_positive_integer(
+        args, option_name="--embedding-bulk-size"
+    )
 
     # Load .env file if provided
-    env_file = args['--env-file']
+    env_file = args["--env-file"]
     if env_file:
         print(f"Loading environment variables from: {env_file}")
         load_dotenv(env_file)
