@@ -142,6 +142,8 @@ class RagDebugData(QADebugData):
         description='The prompt of the question rephrased with the history of the conversation.',
         examples=['Given the following conversation, rephrase the follow up question to be a standalone question.'],
     )
+    question_condensing_history: list[ChatMessage] = Field(
+        description="Conversation history, used to reformulate the user's question.")
     condensed_question: Optional[str] = Field(
         description='The question rephrased with the history of the conversation.',
         examples=['Hello, how to plan a trip to Morocco ?'],

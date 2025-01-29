@@ -348,14 +348,21 @@ def rag_guard(inputs, response, documents_required):
         chain_reply_no_answer = response['answer'] == inputs['no_answer']
 
     if no_docs_but_required:
-        if chain_can_give_no_answer_reply and chain_reply_no_answer:  # We expect the chain to use it's no answer value and it did, it's the expected behavior
+        if chain_can_give_no_answer_reply and chain_reply_no_answer:
+            # We expect the chain to use its non-response value, and it has done so, which is the expected behavior.
             return
         # Everything else isn't expected
         message = 'The RAG system cannot provide an answer when no documents are found and documents are required'
         rag_log(level=ERROR, message=message, inputs=inputs, response=response)
         raise GenAIGuardCheckException(ErrorInfo(cause=message))
 
-    return
+    if chain_reply_no_answer and not no_docs_retrieved:
+        # If the chain responds with its non-response value and the documents are retrieved,
+        # so we remove them from the RAG response.
+        message = 'The RAG gives no answer for user question, but some documents has been found!'
+        rag_log(level=WARNING, message=message, inputs=inputs, response=response)
+        response['documents'] = []
+
 
 def rag_log(level, message, inputs, response):
     """
@@ -386,7 +393,7 @@ def get_rag_documents(handler: RAGCallbackHandler) -> List[RagDocument]:
     Get documents used on RAG context
 
     Args:
-        response: the rag answer
+        handler: the RAG Callback Handler
     """
 
     return [
@@ -404,9 +411,14 @@ def get_rag_debug_data(
 ) -> RagDebugData:
     """RAG debug data assembly"""
 
+    history = []
+    if query.dialog:
+        history = query.dialog.history
+
     return RagDebugData(
         user_question=query.question_answering_prompt.inputs['question'],
         question_condensing_prompt=records_callback_handler.records['chat_prompt'],
+        question_condensing_history=history,
         condensed_question=records_callback_handler.records['chat_chain_output'],
         question_answering_prompt=records_callback_handler.records['rag_prompt'],
         documents=get_rag_documents(records_callback_handler),
