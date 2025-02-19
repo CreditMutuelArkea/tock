@@ -36,6 +36,8 @@ Options:
   --chunks-size=<size>                Size of the embedded document chunks.
   --ignore-source=<is>                Ignore source validation. Useful if sources aren't valid URLs.
                                        [default: false]
+  --append-title=<at>                 Add the title to the text to be embedded.
+                                       [default: true]
   --embedding-bulk-size=<em_bs>       Number of chunks sent in each embedding request.
                                        [default: 100]
   --env-file=<env>                    Path to an optional environment configuration file.
@@ -70,7 +72,6 @@ from docopt import docopt
 from dotenv import load_dotenv
 from gen_ai_orchestrator.models.em.azureopenai.azure_openai_em_setting import AzureOpenAIEMSetting
 from gen_ai_orchestrator.models.em.bloomz.bloomz_em_setting import BloomzEMSetting
-from gen_ai_orchestrator.models.em.ollama.ollama_em_setting import OllamaEMSetting
 from gen_ai_orchestrator.models.em.em_provider import EMProvider
 from gen_ai_orchestrator.models.em.em_setting import BaseEMSetting
 from gen_ai_orchestrator.models.em.ollama.ollama_em_setting import OllamaEMSetting
@@ -135,8 +136,10 @@ def index_documents() -> IndexingDetails:
     splitted_docs = text_splitter.split_documents(docs)
     # Add chunk id ('n/N') metadata to each chunk
     splitted_docs = generate_ids_for_each_chunks(splitted_docs)
-    # Add title to text (for better semantic search)
-    splitted_docs = add_title_to_text(splitted_docs)
+
+    if append_title:
+        # Add title to text (for better semantic search)
+        splitted_docs = add_title_to_text(splitted_docs)
 
     logging.debug(f"Get embeddings model from {embeddings_json_config} config file")
     with open(Path(embeddings_json_config), 'r') as json_file:
@@ -411,6 +414,7 @@ if __name__ == '__main__':
     vector_store_json_config = validate_file(args['--vector-store-json-config'], allowed_extension='json')
     chunks_size = validate_positive_integer(args, option_name='--chunks-size')
     ignore_source = validate_boolean(args, option_name='--ignore-source') # Default: 'false'
+    append_title = validate_boolean(args, option_name='--append-title')  # Default: 'false'
     embedding_bulk_size = validate_positive_integer(args, option_name='--embedding-bulk-size')
 
     # Load .env file if provided
