@@ -18,7 +18,7 @@ Index a CSV file (line format: 'title'|'source'|'text') into a vector database.
 Usage:
   index_documents.py --input-csv=<path> --namespace=<ns> --bot-id=<id> \
                      --embeddings-json-config=<emb_cfg> --vector-store-json-config=<vs_cfg> \
-                     --chunks-size=<size> [--ignore-source=<is>] [--embedding-bulk-size=<em_bs>] \
+                     --chunks-size=<size> [--ignore-source=<is>] [--append-title=<at>] [--embedding-bulk-size=<em_bs>] \
                      [--env-file=<env>] [-v]
   index_documents.py (-h | --help)
   index_documents.py --version
@@ -134,6 +134,9 @@ def index_documents() -> IndexingDetails:
     logging.debug(f"Split texts in {chunks_size} characters-sized chunks")
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=chunks_size)
     splitted_docs = text_splitter.split_documents(docs)
+    for doc in splitted_docs:
+        doc.page_content = f"```markdown\n{doc.page_content}\n```"
+
     # Add chunk id ('n/N') metadata to each chunk
     splitted_docs = generate_ids_for_each_chunks(splitted_docs)
 
@@ -413,8 +416,8 @@ if __name__ == '__main__':
     embeddings_json_config = validate_file(args['--embeddings-json-config'], allowed_extension='json')
     vector_store_json_config = validate_file(args['--vector-store-json-config'], allowed_extension='json')
     chunks_size = validate_positive_integer(args, option_name='--chunks-size')
-    ignore_source = validate_boolean(args, option_name='--ignore-source') # Default: 'false'
-    append_title = validate_boolean(args, option_name='--append-title')  # Default: 'false'
+    ignore_source = validate_boolean(args, option_name='--ignore-source')
+    append_title = validate_boolean(args, option_name='--append-title')
     embedding_bulk_size = validate_positive_integer(args, option_name='--embedding-bulk-size')
 
     # Load .env file if provided
