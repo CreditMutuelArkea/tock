@@ -129,9 +129,7 @@ def append_runs_langfuse(dataset_item, _runs_names):
         else:
             csv_line.append(trace.output["answer"])  # Append the answer
             csv_line.append('\n\n'.join(
-                [f'[{doc["metadata"]["title"]}]({doc["metadata"]["source"]}) : {doc["page_content"]}'
-                 f'\n################################################################################'
-                 f'################################################################################' for doc in
+                [f'[{doc["metadata"]["title"]}] : {doc["page_content"]}' for doc in
                  trace.output["documents"]]))
 
     return csv_line

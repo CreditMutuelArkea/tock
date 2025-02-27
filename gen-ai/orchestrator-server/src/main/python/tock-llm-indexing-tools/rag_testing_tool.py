@@ -44,6 +44,7 @@ import json
 import logging
 import os
 import sys
+import time
 from datetime import datetime
 from pathlib import Path
 from uuid import uuid4
@@ -116,6 +117,9 @@ def test_rag(args):
                 _construct_chain().invoke(
                     item.input, config={'callbacks': callback_handlers}
                 )
+                waiting = 15
+                print(f'Waiting {waiting}s... https://langfuse.inference-rec.s.arkea.com/project/clz1awyq8001hsgj5n7dz6nib/datasets/cm7j4nafl00ac13pbx5sli7c8/items/{item.id}')
+                time.sleep(waiting)
             client.flush()
 
     document_index_name = rag_query['document_index_name']
