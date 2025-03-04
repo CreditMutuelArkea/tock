@@ -1,9 +1,9 @@
 """
 Export a LangSmith or LangFuse dataset run results.
 Usage:
-        export_run_results_both.py [-v] <dataset_provider> <dataset_id_or_name> <session_or_run_ids>...
-        export_run_results_both.py -h | --help
-        export_run_results_both.py --version
+        export_experiments.py [-v] <dataset_provider> <dataset_id_or_name> <session_or_run_ids>...
+        export_experiments.py -h | --help
+        export_experiments.py --version
 
 Arguments:
     dataset_provider       specify either 'langfuse' or 'langsmith'

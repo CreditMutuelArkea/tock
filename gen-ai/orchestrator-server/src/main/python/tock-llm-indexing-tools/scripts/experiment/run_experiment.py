@@ -17,9 +17,9 @@ on LangFuse's SDK: runs a specific RAG Settings configuration against a
 reference dataset.
 
 Usage:
-    experiment_tool.py [-v] <rag_query> <dataset_name> <test_name> <metrics_json_file>
-    experiment_tool.py -h | --help
-    experiment_tool.py --version
+    run_experiment.py [-v] <rag_query> <dataset_name> <test_name> <metrics_json_file>
+    run_experiment.py -h | --help
+    run_experiment.py --version
 
 Arguments:
     rag_query       path to a JSON 'RAGQuery' JSON file containing RAG settings
