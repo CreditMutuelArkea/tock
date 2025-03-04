@@ -30,17 +30,19 @@ import logging
 import os
 import sys
 import time
+from typing import Optional
 
 from docopt import docopt
 from dotenv import load_dotenv
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
+from langfuse.api import TraceWithFullDetails
 
 from generate_dataset import init_langfuse
 from scripts.evaluation.ragas_evaluator import RagasEvaluator
 
 
 # LangFuse-specific functions
-def fetch_trace_by_item_and_dataset_run(_dataset_run, _item):
+def fetch_trace_by_item_and_dataset_run(_dataset_run, _item) -> Optional[TraceWithFullDetails]:
     """
     Fetches the trace for a dataset item from a LangFuse dataset run.
 
@@ -99,13 +101,13 @@ if __name__ == '__main__':
 
     for item in dataset.items:
         dataset_run = client.get_dataset_run(dataset_name=dataset_name, dataset_run_name=experiment_name)
-        run_trace = fetch_trace_by_item_and_dataset_run(dataset_run.dataset_run_items, item)
-        if run_trace and run_trace.output and isinstance(run_trace.output, dict):
-            if run_trace.output['answer'] != 'NO_RAG_SENTENCEd':
+        run_trace_details = fetch_trace_by_item_and_dataset_run(dataset_run.dataset_run_items, item)
+        if run_trace_details and run_trace_details.output and isinstance(run_trace_details.output, dict):
+            if run_trace_details.output['answer'] != 'NO_RAG_SENTENCEd':
                 time.sleep(3)  # waiting for trace update
                 ragas_evaluator.score_with_ragas(
                     item=item,
-                    run_trace=run_trace,
+                    run_trace_details=run_trace_details,
                     experiment_name=experiment_name
                 )
         else:
