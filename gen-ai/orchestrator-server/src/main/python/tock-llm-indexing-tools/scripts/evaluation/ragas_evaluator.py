@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import time
 
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
@@ -64,20 +65,24 @@ class RagasEvaluator:
                 trace_name=metric_name,
             )
             score = metric.single_turn_score(sample, callbacks=[observability_handler])
-            logging.debug(
-                f'Calculating {metric_name} score = {score}'
-            )
+            if math.isnan(float(score)):
+                score = -1
+
+            logging.info(f"Metric {metric_name} -> score = {score}")
             trace = observability_handler.trace
             statements_reasons = ""
-            if m['hasReason']:
-                time.sleep(3) # waiting for trace update
-                trace_full: TraceWithFullDetails = self.client_langfuse.get_trace(trace.id)
-                observations = trace_full.observations
-                last_gen_item = next((obs for obs in reversed(observations) if obs.type == "GENERATION"), None)
-                if last_gen_item is not None and last_gen_item.output is not None:
-                    parsed_data = json.loads(last_gen_item.output["content"].strip("```json").strip("```").strip())
-                    if parsed_data.get("statements", []) :
-                        statements_reasons = " | ".join([stmt["reason"] for stmt in parsed_data["statements"]])
+            if score != -1 :
+                if m['hasReason']:
+                    time.sleep(3) # waiting for trace update
+                    trace_full: TraceWithFullDetails = self.client_langfuse.get_trace(trace.id)
+                    observations = trace_full.observations
+                    last_gen_item = next((obs for obs in reversed(observations) if obs.type == "GENERATION"), None)
+                    if last_gen_item is not None and last_gen_item.output is not None:
+                        parsed_data = json.loads(last_gen_item.output["content"].strip("```json").strip("```").strip())
+                        if parsed_data.get("statements", []) :
+                            statements_reasons = " | ".join([stmt["reason"] for stmt in parsed_data["statements"]])
+            else:
+                statements_reasons = "The score is not a number ! There must be an error in the metric calculation."
 
             scores[metric_name] = {
                 'value': score,

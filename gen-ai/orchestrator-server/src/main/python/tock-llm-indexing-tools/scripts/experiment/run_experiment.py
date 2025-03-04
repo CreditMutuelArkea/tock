@@ -101,7 +101,7 @@ def test_rag(args):
                     item.input, config={'callbacks': callback_handlers}
                 )
 
-                # TODO MASS
+                # TODO MASS: add waiting time as arg
                 waiting = 15
                 url_local = "http://localhost:3000/project/cm3ppuejm00017mhij24ybw19/datasets/cm7uketek0034tlv25m9cpc4t/items"
                 url_rec = "https://langfuse.inference-rec.s.arkea.com/project/clz1awyq8001hsgj5n7dz6nib/datasets/cm7j4nafl00ac13pbx5sli7c8/items"
