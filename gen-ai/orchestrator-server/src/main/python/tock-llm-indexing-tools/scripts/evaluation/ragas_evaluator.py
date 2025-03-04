@@ -6,6 +6,7 @@ from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import create_observability_callback_handler, \
     get_llm_factory, get_em_factory
 from langfuse.api import TraceWithFullDetails
+from langfuse.client import DatasetItemClient
 from ragas.dataset_schema import SingleTurnSample
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
@@ -39,9 +40,14 @@ class RagasEvaluator:
         self.client_langfuse = init_langfuse()
 
 
-    def score_with_ragas(self, query, chunks, answer, ground_truth, run_trace):
-        scores = {}
+    def score_with_ragas(self, item: DatasetItemClient, run_trace: TraceWithFullDetails, experiment_name: str):
+        query = item.input["question"]
+        chunks = list(map(lambda doc: doc["page_content"], run_trace.output["documents"]))
+        answer = run_trace.output["answer"]
+        ground_truth = item.expected_output['answer']
+        run_trace = self.client_langfuse.trace(id=run_trace.id)
 
+        scores = {}
         for m in self.metrics:
             metric = m['metric']
             metric_name = m["name"]
@@ -51,9 +57,8 @@ class RagasEvaluator:
                 response=answer,
                 reference=ground_truth
             )
-            logging.info(
-                f'Calculating {metric_name} score...'
-            )
+            logging.info(f"Calculating {metric_name} score for item '{item.id}' of dataset '{item.dataset_name}' in experiment '{experiment_name}")
+
             observability_handler = create_observability_callback_handler(
                 observability_setting=self.observability_setting,
                 trace_name=metric_name,

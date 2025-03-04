@@ -17,7 +17,7 @@ on LangFuse's SDK: runs a specific RAG Settings configuration against a
 reference dataset.
 
 Usage:
-    run_experiment.py [-v] <rag_query> <dataset_name> <test_name> <metrics_json_file>
+    run_experiment.py [-v] <rag_query> <dataset_name> <test_name>
     run_experiment.py -h | --help
     run_experiment.py --version
 
@@ -73,9 +73,6 @@ def test_rag(args):
     with open(args['<rag_query>'], 'r') as file:
         rag_query = json.load(file)
 
-    with open(args['<metrics_json_file>'], 'r') as file:
-        metric_json = json.load(file)
-
     def _construct_chain():
         # Modify this if you are testing against a dataset that follows another
         # format
@@ -90,8 +87,6 @@ def test_rag(args):
             client = init_langfuse()
             dataset = client.get_dataset(args['<dataset_name>'])
 
-            ragas_evaluator = RagasEvaluator(rag_query = RagQuery(**rag_query), metric_names = metric_json["metric_names"])
-
             for item in dataset.items:
                 callback_handlers = []
                 handler = item.get_langchain_handler(
@@ -102,24 +97,17 @@ def test_rag(args):
                     },
                 )
                 callback_handlers.append(handler)
-                response = _construct_chain().invoke(
+                _construct_chain().invoke(
                     item.input, config={'callbacks': callback_handlers}
                 )
 
-                ragas_evaluator.score_with_ragas(
-                    query = item.input["question"],
-                    chunks = list(map(lambda doc: doc.page_content, response['documents'])),
-                    answer = response['answer'],
-                    ground_truth = item.expected_output['answer'],
-                    run_trace = handler.trace,
-                )
-
+                # TODO MASS
                 waiting = 15
-                url_local = "http://localhost:3000/project/cm3ppuejm00017mhij24ybw19/datasets/cm60x54qs0007qbtm8v7cbahv/items"
+                url_local = "http://localhost:3000/project/cm3ppuejm00017mhij24ybw19/datasets/cm7uketek0034tlv25m9cpc4t/items"
                 url_rec = "https://langfuse.inference-rec.s.arkea.com/project/clz1awyq8001hsgj5n7dz6nib/datasets/cm7j4nafl00ac13pbx5sli7c8/items"
                 print(f'Waiting {waiting}s... {url_local}/{item.id}')
                 client.flush()
-                exit(1)
+
                 time.sleep(waiting)
             client.flush()
 
