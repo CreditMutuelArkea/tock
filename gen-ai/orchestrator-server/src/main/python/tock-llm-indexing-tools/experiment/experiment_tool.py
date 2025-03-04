@@ -39,7 +39,6 @@ Options:
 Build a RAG (Lang)chain from the RAG Query and runs it against the provided
 LangFuse dataset. The chain is created anew for each entry of the dataset.
 """
-import asyncio
 import json
 import logging
 import os
@@ -54,9 +53,8 @@ from dotenv import load_dotenv
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.rag_chain import create_rag_chain
 
-
+from evaluation.ragas_evaluator import RagasEvaluator
 from generate_dataset import init_langfuse
-from ragas_evaluator import RagasEvaluator
 
 
 def test_rag(args):

@@ -9,16 +9,11 @@ from langfuse.api import TraceWithFullDetails
 from ragas.dataset_schema import SingleTurnSample
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
-from ragas.metrics import (
-    Faithfulness, ResponseRelevancy, LLMContextPrecisionWithoutReference, LLMContextRecall, FactualCorrectness,
-    SemanticSimilarity, NonLLMStringSimilarity, BleuScore, RougeScore, StringPresence, ExactMatch,
-)
 from ragas.metrics.base import MetricWithLLM, MetricWithEmbeddings
 from ragas.run_config import RunConfig
 
-import ragas_metrics
+from evaluation.ragas_metrics import ragas_available_metrics
 from generate_dataset import init_langfuse
-from ragas_metrics import ragas_available_metrics
 
 
 class RagasEvaluator:
