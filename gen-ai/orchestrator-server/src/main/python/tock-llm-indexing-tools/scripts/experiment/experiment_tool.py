@@ -17,9 +17,9 @@ on LangFuse's SDK: runs a specific RAG Settings configuration against a
 reference dataset.
 
 Usage:
-    rag_testing_tool.py [-v] <rag_query> <dataset_name> <test_name> <metrics_json_file>
-    rag_testing_tool.py -h | --help
-    rag_testing_tool.py --version
+    experiment_tool.py [-v] <rag_query> <dataset_name> <test_name> <metrics_json_file>
+    experiment_tool.py -h | --help
+    experiment_tool.py --version
 
 Arguments:
     rag_query       path to a JSON 'RAGQuery' JSON file containing RAG settings
@@ -53,8 +53,8 @@ from dotenv import load_dotenv
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.rag_chain import create_rag_chain
 
-from evaluation.ragas_evaluator import RagasEvaluator
 from generate_dataset import init_langfuse
+from scripts.evaluation.ragas_evaluator import RagasEvaluator
 
 
 def test_rag(args):
@@ -67,7 +67,6 @@ def test_rag(args):
                         Expecting keys: '<rag_query>'
                                         '<dataset_name>'
                                         '<test_name>'
-                                        '<metrics_json_file>'
     """
     start_time = datetime.now()
 

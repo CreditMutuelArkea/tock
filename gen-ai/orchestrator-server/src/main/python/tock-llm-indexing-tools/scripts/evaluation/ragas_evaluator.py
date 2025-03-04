@@ -12,8 +12,8 @@ from ragas.llms import LangchainLLMWrapper
 from ragas.metrics.base import MetricWithLLM, MetricWithEmbeddings
 from ragas.run_config import RunConfig
 
-from evaluation.ragas_metrics import ragas_available_metrics
 from generate_dataset import init_langfuse
+from scripts.evaluation.ragas_metrics import ragas_available_metrics
 
 
 class RagasEvaluator:
