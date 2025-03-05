@@ -4,7 +4,6 @@ import math
 import time
 from typing import List
 
-from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.factories.langchain_factory import create_observability_callback_handler, \
     get_llm_factory, get_em_factory
 from langfuse.api import TraceWithFullDetails
@@ -15,25 +14,29 @@ from ragas.llms import LangchainLLMWrapper
 from ragas.metrics.base import MetricWithLLM, MetricWithEmbeddings
 from ragas.run_config import RunConfig
 
-from generate_dataset import init_langfuse
+from scripts.common.logging_config import configure_logging
+from scripts.evaluation.models import RunEvaluationInput, MetricScore
 from scripts.evaluation.ragas_metrics import ragas_available_metrics
 
+logger = logging.getLogger(__name__)
 
 class RagasEvaluator:
-    def __init__(self, rag_query: RagQuery, metric_names: List[str]):
+    def __init__(self, langfuse_client, evaluation_input: RunEvaluationInput):
+        global logger
+        logger = configure_logging([])
         # Initialize LLM and embedding models
-        llm_factory = get_llm_factory(setting=rag_query.question_answering_llm_setting)
-        em_factory = get_em_factory(setting=rag_query.embedding_question_em_setting)
+        llm_factory = get_llm_factory(setting=evaluation_input.llm_setting)
+        em_factory = get_em_factory(setting=evaluation_input.em_setting)
 
         llm = llm_factory.get_language_model()
         embedding = em_factory.get_embedding_model()
 
-        self.observability_setting = rag_query.observability_setting
-        self.client_langfuse = init_langfuse()
+        self.observability_setting = evaluation_input.observability_setting
+        self.langfuse_client = langfuse_client
 
         # Filter selected metrics
         self.metrics = [
-            metric for metric in ragas_available_metrics if metric["name"] in metric_names
+            metric for metric in ragas_available_metrics if metric["name"] in evaluation_input.metric_names
         ]
 
         # Initialize metrics
@@ -45,18 +48,19 @@ class RagasEvaluator:
             if isinstance(metric, MetricWithEmbeddings):
                 metric.embeddings = LangchainEmbeddingsWrapper(embedding)
             metric.init(run_config)
+            logger.debug(f"Init run configuration of '{metric.name}'")
 
     def extract_input_data(self, item, run_trace):
         query = item.input["question"]
         chunks = [doc["page_content"] for doc in run_trace.output["documents"]]
         answer = run_trace.output["answer"]
-        ground_truth = item.expected_output['answer']
-        run_trace = self.client_langfuse.trace(id=run_trace.id)
+        ground_truth = item.expected_output.get("answer") or ""
+        run_trace = self.langfuse_client.trace(id=run_trace.id)
         return query, chunks, answer, ground_truth, run_trace
 
     def fetch_statements_reasons(self, trace_id):
         time.sleep(3)  # Waiting for trace update
-        trace_full = self.client_langfuse.get_trace(trace_id)
+        trace_full = self.langfuse_client.get_trace(trace_id)
         observations = trace_full.observations
         last_gen_item = next((obs for obs in reversed(observations) if obs.type == "GENERATION"), None)
         if last_gen_item and last_gen_item.output:
@@ -66,7 +70,7 @@ class RagasEvaluator:
         return ""
 
     def calculate_metric_score(self, metric, metric_name, sample, item, experiment_name):
-        logging.info(
+        logger.info(
             f"Calculating {metric_name} score for item '{item.id}' of dataset '{item.dataset_name}' in experiment '{experiment_name}"
         )
         observability_handler = create_observability_callback_handler(
@@ -75,10 +79,10 @@ class RagasEvaluator:
         score = metric.single_turn_score(sample, callbacks=[observability_handler])
         return -1 if math.isnan(float(score)) else score, observability_handler.trace
 
-    def score_with_ragas(self, item: DatasetItemClient, run_trace_details: TraceWithFullDetails, experiment_name: str):
+    def score_with_ragas(self, item: DatasetItemClient, run_trace_details: TraceWithFullDetails, experiment_name: str) -> List[MetricScore]:
         query, chunks, answer, ground_truth, run_trace = self.extract_input_data(item, run_trace_details)
 
-        scores = {}
+        metric_scores: List[MetricScore] = []
         for m in self.metrics:
             metric = m['metric']
             metric_name = m["name"]
@@ -91,14 +95,20 @@ class RagasEvaluator:
             if score != -1 and m['hasReason']:
                 statements_reasons = self.fetch_statements_reasons(trace.id)
 
-            scores[metric_name] = {'value': score, 'reasons': statements_reasons, 'trace_id': trace.id}
-            logging.info(f"Metric {metric_name} -> score = {score}")
+            metric_scores.append(MetricScore(
+                metric_name=metric_name,
+                value=score,
+                reason=statements_reasons,
+                trace_id=trace.id,
+            ))
+            logger.info(f"Metric {metric_name} -> score = {score}")
 
-        for metric_name, score_data in scores.items():
+
+        for metric_score in metric_scores:
             run_trace.score(
-                name=metric_name,
-                value=score_data['value'],
-                comment=" : ".join(filter(None, [score_data['trace_id'], score_data['reasons']]))
+                name=metric_score.metric_name,
+                value=metric_score.value,
+                comment=" : ".join(filter(None, [metric_score.trace_id, metric_score.reason]))
             )
 
-        return scores
+        return metric_scores
