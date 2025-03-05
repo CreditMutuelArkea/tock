@@ -103,14 +103,12 @@ if __name__ == '__main__':
         dataset_run = client.get_dataset_run(dataset_name=dataset_name, dataset_run_name=experiment_name)
         run_trace_details = fetch_trace_by_item_and_dataset_run(dataset_run.dataset_run_items, item)
         if run_trace_details and run_trace_details.output and isinstance(run_trace_details.output, dict):
-            if run_trace_details.output['answer'] != 'NO_RAG_SENTENCEd':
-                time.sleep(3)  # waiting for trace update
-                ragas_evaluator.score_with_ragas(
-                    item=item,
-                    run_trace_details=run_trace_details,
-                    experiment_name=experiment_name
-                )
+            ragas_evaluator.score_with_ragas(
+                item=item,
+                run_trace_details=run_trace_details,
+                experiment_name=experiment_name
+            )
         else:
-                logging.info(f"Impossible to evaluate item '{item.id}' of dataset '{dataset_name}' in experiment '{experiment_name}'!")
+            logging.info(f"Impossible to evaluate item '{item.id}' of dataset '{dataset_name}' in experiment '{experiment_name}'!")
 
     logging.info(f"Total execution time: {time.time() - start_time:.2f} seconds")
