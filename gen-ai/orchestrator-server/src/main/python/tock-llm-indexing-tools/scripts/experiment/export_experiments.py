@@ -372,7 +372,7 @@ def check_environment_variables(provider):
 def create_excel_output(iterations: list[str], dataset_items, output_file):
     # Create a new workbook and sheet
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    wb = load_workbook(os.path.join(script_dir, "examples/generate_dataset_input.example.xlsx"))
+    wb = load_workbook(os.path.join(script_dir, "../../examples/generate_dataset_input.example.xlsx"))
 
     sheet = wb['Template_Suivi_Recette']
 

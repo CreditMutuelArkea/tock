@@ -29,6 +29,7 @@ ragas = "^0.2.13"
 rapidfuzz = "^3.12.2"
 sacrebleu = "^2.5.1"
 rouge_score = "^0.1.2"
+python-pptx = "^1.0.2"
 
 [build-system]
 requires = ["poetry-core"]

@@ -104,8 +104,8 @@ def test_rag(args):
                 # TODO MASS: add waiting time as arg
                 waiting = 15
                 url_local = "http://localhost:3000/project/cm3ppuejm00017mhij24ybw19/datasets/cm7uketek0034tlv25m9cpc4t/items"
-                url_rec = "https://langfuse.inference-rec.s.arkea.com/project/clz1awyq8001hsgj5n7dz6nib/datasets/cm7j4nafl00ac13pbx5sli7c8/items"
-                print(f'Waiting {waiting}s... {url_local}/{item.id}')
+                url_rec = "https://langfuse.inference-rec.s.arkea.com/project/cm7xenyls00019idbzyvot3cj/datasets/cm7xfq11700079idblr8ddhm9/items"
+                print(f'Waiting {waiting}s... {url_rec}/{item.id}')
                 client.flush()
 
                 time.sleep(waiting)

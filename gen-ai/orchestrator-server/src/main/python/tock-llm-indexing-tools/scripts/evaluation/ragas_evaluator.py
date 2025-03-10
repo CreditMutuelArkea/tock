@@ -50,12 +50,12 @@ class RagasEvaluator:
             metric.init(run_config)
             logger.debug(f"Init run configuration of '{metric.name}'")
 
-    def extract_input_data(self, item, run_trace):
+    def extract_input_data(self, item, run_trace_details):
         query = item.input["question"]
-        chunks = [doc["page_content"] for doc in run_trace.output["documents"]]
-        answer = run_trace.output["answer"]
+        chunks = [doc["page_content"] for doc in run_trace_details.output["documents"]]
+        answer = run_trace_details.output["answer"]
         ground_truth = item.expected_output.get("answer") or ""
-        run_trace = self.langfuse_client.trace(id=run_trace.id)
+        run_trace = self.langfuse_client.trace(id=run_trace_details.id)
         return query, chunks, answer, ground_truth, run_trace
 
     def fetch_statements_reasons(self, trace_id):
