@@ -17,7 +17,7 @@ on LangFuse's SDK: runs a specific RAG Settings configuration against a
 reference dataset.
 
 Usage:
-    run_experiment.py [-v] <rag_query> <dataset_name> <test_name>
+    run_experiment.py [-v] <rag_query> <dataset_name> <test_name> <rate_limit_delay>
     run_experiment.py -h | --help
     run_experiment.py --version
 
@@ -29,6 +29,7 @@ Arguments:
                     as they will come from the dataset)
     dataset_name    the reference dataset name
     test_name       name of the test run
+    rate_limit_delay waiting time (in seconds) to prevent the LLM rate limite
 
 Options:
     -h --help   Show this screen
@@ -67,11 +68,13 @@ def test_rag(args):
                         Expecting keys: '<rag_query>'
                                         '<dataset_name>'
                                         '<test_name>'
+                                        '<rate_limit_delay>'
     """
     start_time = datetime.now()
 
     with open(args['<rag_query>'], 'r') as file:
         rag_query = json.load(file)
+
 
     def _construct_chain():
         # Modify this if you are testing against a dataset that follows another
@@ -100,15 +103,10 @@ def test_rag(args):
                 _construct_chain().invoke(
                     item.input, config={'callbacks': callback_handlers}
                 )
+                print(f'Item:{item.id} - Trace:{handler.get_trace_url()}')
 
-                # TODO MASS: add waiting time as arg
-                waiting = 15
-                url_local = "http://localhost:3000/project/cm3ppuejm00017mhij24ybw19/datasets/cm7uketek0034tlv25m9cpc4t/items"
-                url_rec = "https://langfuse.inference-rec.s.arkea.com/project/cm7xenyls00019idbzyvot3cj/datasets/cm7xfq11700079idblr8ddhm9/items"
-                print(f'Waiting {waiting}s... {url_rec}/{item.id}')
-                client.flush()
-
-                time.sleep(waiting)
+                print(f'Waiting for rate limit delay ({rate_limit_delay}s)...')
+                time.sleep(rate_limit_delay)
             client.flush()
 
     document_index_name = rag_query['document_index_name']
@@ -176,6 +174,8 @@ if __name__ == '__main__':
 
     # - dataset name is always valid
     # - test name is always valid
+
+    rate_limit_delay = 3 if not cli_args['<rate_limit_delay>'] else int(cli_args['<rate_limit_delay>'])
 
     # Main func
     test_rag(cli_args)
