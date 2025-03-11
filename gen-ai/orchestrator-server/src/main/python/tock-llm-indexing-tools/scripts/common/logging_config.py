@@ -1,5 +1,7 @@
 import logging
 import os
+import sys
+import traceback
 from datetime import datetime
 import colorlog
 
@@ -36,5 +38,30 @@ def configure_logging(cli_args):
     app_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)
     app_logger.addHandler(file_handler)
     app_logger.addHandler(console_handler)
+
+    # Ajouter le handler du logger à langfuse
+    langfuse_logger = logging.getLogger("langfuse")
+    langfuse_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)  # Ajuste selon ton besoin
+    langfuse_logger.addHandler(file_handler)
+    langfuse_logger.addHandler(console_handler)
+    langfuse_logger.propagate = False
+
+    gen_ai_orchestrator_logger = logging.getLogger("gen_ai_orchestrator")
+    gen_ai_orchestrator_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)  # Ajuste selon ton besoin
+    gen_ai_orchestrator_logger.addHandler(file_handler)
+    gen_ai_orchestrator_logger.addHandler(console_handler)
+    gen_ai_orchestrator_logger.propagate = False
+
+    # Capture des exceptions non gérées et log dans le fichier
+    def log_exceptions(exc_type, exc_value, exc_traceback):
+        if issubclass(exc_type, KeyboardInterrupt):
+            sys.__excepthook__(exc_type, exc_value, exc_traceback)  # Ne pas intercepter Ctrl+C
+            return
+
+        log_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        app_logger.error("Unhandled exception:\n%s", log_message)
+
+    # Rediriger toutes les erreurs vers le logger
+    sys.excepthook = log_exceptions
 
     return app_logger
