@@ -46,7 +46,7 @@ def main():
     logger.debug(f"\n{evaluation_input.format()}")
 
     client = Langfuse(
-        host=evaluation_input.observability_setting.url,
+        host=str(evaluation_input.observability_setting.url),
         public_key=evaluation_input.observability_setting.public_key,
         secret_key=fetch_secret_key_value(evaluation_input.observability_setting.secret_key),
     )
@@ -58,6 +58,14 @@ def main():
 
     experiment_scores: List[DatasetExperimentItemScores] = []
     for item in dataset.items:
+#         if item.id in ["ee308610-75eb-41fa-9b02-df6ad8b19202",
+# "fae5483b-34f0-4b66-a272-94a464b595a7",
+# "70d2e67a-b56e-452a-869e-c18e507dd739",
+# "00b03f66-7b1b-4fbe-91c5-5f79cfe55717",
+#                        "d00ea340-37d8-426d-8077-fb49c5f55e5e",
+#                        "89a62831-27c6-4cc8-884b-64d8fb1ef7e1",
+#                        "08b0eeef-e7cb-4861-ba86-9b64672bbc85"
+# ]:
         dataset_run = client.get_dataset_run(
             dataset_name=dataset_name,
             dataset_run_name=experiment_name

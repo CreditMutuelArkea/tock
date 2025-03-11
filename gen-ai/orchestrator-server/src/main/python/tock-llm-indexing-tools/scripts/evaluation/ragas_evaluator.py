@@ -50,14 +50,6 @@ class RagasEvaluator:
             metric.init(run_config)
             logger.debug(f"Init run configuration of '{metric.name}'")
 
-    def extract_input_data(self, item, run_trace_details):
-        query = item.input["question"]
-        chunks = [doc["page_content"] for doc in run_trace_details.output["documents"]]
-        answer = run_trace_details.output["answer"]
-        ground_truth = item.expected_output.get("answer") or ""
-        run_trace = self.langfuse_client.trace(id=run_trace_details.id)
-        return query, chunks, answer, ground_truth, run_trace
-
     def fetch_statements_reasons(self, trace_id):
         time.sleep(3)  # Waiting for trace update
         trace_full = self.langfuse_client.get_trace(trace_id)
@@ -80,7 +72,10 @@ class RagasEvaluator:
         return -1 if math.isnan(float(score)) else score, observability_handler.trace
 
     def score_with_ragas(self, item: DatasetItemClient, run_trace_details: TraceWithFullDetails, experiment_name: str) -> List[MetricScore]:
-        query, chunks, answer, ground_truth, run_trace = self.extract_input_data(item, run_trace_details)
+        query = item.input["question"]
+        chunks = [doc["page_content"] for doc in run_trace_details.output["documents"]]
+        answer = run_trace_details.output["answer"]
+        ground_truth = item.expected_output.get("answer") or ""
 
         metric_scores: List[MetricScore] = []
         for m in self.metrics:
@@ -105,7 +100,8 @@ class RagasEvaluator:
 
 
         for metric_score in metric_scores:
-            run_trace.score(
+            self.langfuse_client.score(
+                trace_id=run_trace_details.id,
                 name=metric_score.metric_name,
                 value=metric_score.value,
                 comment=" : ".join(filter(None, [metric_score.trace_id, metric_score.reason]))
