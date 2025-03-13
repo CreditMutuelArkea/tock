@@ -43,6 +43,7 @@ def main():
     cli_args = docopt(__doc__, version='Run Evaluation 1.0.0')
     logger = configure_logging(cli_args)
 
+
     dataset_experiment = DatasetExperiment()
     experiment_scores: List[DatasetExperimentItemScores] = []
     dataset_items: List[DatasetItemClient] = []
@@ -66,14 +67,6 @@ def main():
         dataset_items = dataset.items
 
         for item in dataset_items:
-    #         if item.id in ["ee308610-75eb-41fa-9b02-df6ad8b19202",
-    # "fae5483b-34f0-4b66-a272-94a464b595a7",
-    # "70d2e67a-b56e-452a-869e-c18e507dd739",
-    # "00b03f66-7b1b-4fbe-91c5-5f79cfe55717",
-    #                        "d00ea340-37d8-426d-8077-fb49c5f55e5e",
-    #                        "89a62831-27c6-4cc8-884b-64d8fb1ef7e1",
-    #                        "08b0eeef-e7cb-4861-ba86-9b64672bbc85"
-    # ]:
             dataset_run = client.get_dataset_run(
                 dataset_name=dataset_name,
                 dataset_run_name=experiment_name
@@ -95,12 +88,14 @@ def main():
             else:
                 logger.warn(f"Impossible to evaluate item '{item.id}' of dataset '{dataset_name}' in experiment '{experiment_name}'!")
 
+        activity_status = ActivityStatus.COMPLETED
     except Exception as e:
+        activity_status = ActivityStatus.FAILED
         logger.error(e)
 
     len_dataset_items = len(dataset_items)
     output = RunEvaluationOutput(
-        status = ActivityStatus.FAILED,
+        status = activity_status,
         dataset_experiment=dataset_experiment,
         dataset_experiment_scores=experiment_scores,
         duration = datetime.now() - start_time,

@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from datetime import timedelta
 from enum import Enum, auto, unique
@@ -8,32 +9,22 @@ import humanize
 from gen_ai_orchestrator.models.em.em_types import EMSetting
 from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
 from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
+from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from pydantic import BaseModel, Field
 from colorama import Fore, init, Style
 
-class DatasetExperiment(BaseModel):
-    dataset_name: str = Field(description='The dataset name.', default='UNKNOWN')
-    experiment_name: str = Field(description='The name of the dataset experiment.', default='UNKNOWN')
+from scripts.evaluation.models import DatasetExperiment, OutputStatus
 
 
-class RunEvaluationInput(BaseModel):
-    metric_names: List[str] = Field(
-        description='The list of RAGAS metric names.',
-        default=["SemanticSimilarity"]
-    )
-    llm_setting: Optional[LLMSetting] = Field(
-        description='LLM setting, used to calculate the LLM-based metric.',
-        default=None
-    )
-    em_setting: Optional[EMSetting] = Field(
-        description='Embeddings setting, used to calculate the Embeddings-based metric.',
-        default=None
-    )
-    observability_setting: LangfuseObservabilitySetting = Field(
-        description='The Langfuse observability settings.'
+class RunExperimentInput(BaseModel):
+    rag_query: RagQuery = Field(
+        description='The RAG query.'
     )
     dataset_experiment: DatasetExperiment = Field(
-        description='The dataset experiment to evaluate.'
+        description='The dataset to experiment.'
+    )
+    rate_limit_delay: int = Field(
+        description='Waiting time (in seconds) to prevent the LLM rate limite.'
     )
 
     @classmethod
@@ -50,10 +41,10 @@ class RunEvaluationInput(BaseModel):
     def format(self):
         # Format the details string
         details_str = f"""
-            Langfuse environment : {str(self.observability_setting.url)}
+            Langfuse environment : {str(self.rag_query.observability_setting.url)}
             The dataset name     : {self.dataset_experiment.dataset_name}
             The experiment name  : {self.dataset_experiment.experiment_name}
-            Metrics              : {" | ".join(self.metric_names)}
+            Rate limit delay     : {self.rate_limit_delay}s
         """
 
         # Find the longest line in the details
@@ -61,7 +52,7 @@ class RunEvaluationInput(BaseModel):
         max_line_length = max(len(line) for line in lines)
 
         # The text for the header
-        header_text = " RUN EVALUATION INPUT "
+        header_text = " RUN EXPERIMENT INPUT "
 
         # Calculate the number of dashes needed on both sides
         total_dashes = max_line_length - len(header_text)
@@ -77,51 +68,16 @@ class RunEvaluationInput(BaseModel):
         return "\n".join(line.strip() for line in to_string.splitlines() if line.strip())
 
 
-class MetricScore(BaseModel):
-    metric_name: str = Field(description='The metric name.')
-    value: float = Field(description='The metric value.')
-    reason: str = Field(description='The reason for the score value.')
-    trace_id: str = Field(description='The trace ID for metric calculation.')
-
-class DatasetExperimentItemScores(BaseModel):
-    run_item_id: str = Field(description='The item ID in the dataset experience.')
-    run_trace_id: str = Field(description='The trace ID for the item in the dataset experience.')
-    metric_scores: List[MetricScore] = Field(
-        description='The metric scores.',
-        default=["SemanticSimilarity"]
+class RunExperimentOutput(OutputStatus):
+    rag_query: Optional[RagQuery] = Field(
+        description='The RAG query.'
     )
-
-@unique
-class ActivityStatus(str, Enum):
-    COMPLETED = auto()
-    STARTED = auto()
-    STOPPED = auto()
-    FAILED = auto()
-    ABANDONED = auto()
-
-class StatusWithReason(BaseModel):
-    status: ActivityStatus = Field(
-        description='The activity status.'
-    )
-    status_reason: str = Field(
-        description='The status reason.', default=""
-    )
-
-class OutputStatus(BaseModel):
-    status: StatusWithReason = Field(
-        description='The activity status.'
-    )
-
-class RunEvaluationOutput(OutputStatus):
     dataset_experiment: DatasetExperiment = Field(
-        description='The dataset experiment to evaluate.'
+        description='The dataset to experiment.'
     )
-    dataset_experiment_scores: List[DatasetExperimentItemScores] = Field(
-        description='Scores for the dataset experiment.'
-    )
-    duration: timedelta = Field(description='The evaluation time.')
+    duration: timedelta = Field(description='The experiment time.')
     nb_dataset_items: int = Field(description='Number of items in dataset.')
-    pass_rate: float = Field(description='Rate of successful evaluations.')
+    pass_rate: float = Field(description='Rate of successful experiment.')
 
     def format(self):
         # Format the details string
@@ -129,27 +85,40 @@ class RunEvaluationOutput(OutputStatus):
             The dataset name               : {self.dataset_experiment.dataset_name}
             The experiment name            : {self.dataset_experiment.experiment_name}
             Number of items in dataset     : {self.nb_dataset_items}
-            Rate of successful evaluations : {self.pass_rate:.2f}%
+            Rate of successful experiment  : {self.pass_rate:.2f}%
             Duration                       : {humanize.precisedelta(self.duration)}
             Date                           : {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         """
 
+        rag_config_str = "UNKNOWN"
+        if self.rag_query is not None:
+            rag_config_str = f"""
+                The document index name        : {self.rag_query.document_index_name}
+                The knn                        : {self.rag_query.document_search_params.k}
+                The LLM model                  : {self.rag_query.question_answering_llm_setting.model} ({self.rag_query.question_answering_llm_setting.provider})
+                The EM model                   : {self.rag_query.embedding_question_em_setting.model} ({self.rag_query.embedding_question_em_setting.provider})
+                The LLM temperature            : {self.rag_query.question_answering_llm_setting.temperature}
+            """
+
         # Find the longest line in the details
-        lines = details_str.splitlines()
-        max_line_length = max(len(line.strip()) for line in lines)
+        max_line_length = max(max(len(line.strip()) for line in details_str.splitlines()), max(len(line.strip()) for line in rag_config_str.splitlines()))
 
         # The text for the header
-        header_text = " RUN EVALUATION OUTPUT "
+        header_text = " RUN EXPERIMENT OUTPUT "
 
         # Construct the header and separator lines
         separator = '-' * max_line_length
         header_line = header_text.center(max_line_length, '-')
 
         # Format status line
-        status_line = f" STATUS: {self.status.name} ".center(max_line_length)
+        status_line = f" STATUS: {self.status.status.name} ".center(max_line_length)
+
+        if self.status.status_reason:
+            status_reason_line = f" REASON: {self.status.status_reason} ".center(max_line_length)
+            status_line = f'{status_line}\n{status_reason_line}'
 
         # Return the formatted string
-        to_string = f"{header_line}\n{details_str}\n{separator}"
+        to_string = f"{header_line}\n{details_str}\n{separator}\n{rag_config_str}\n{separator}"
         to_string_strip="\n".join(line.strip() for line in to_string.splitlines() if line.strip())
         return f'{to_string_strip}\n{status_line}\n{separator}'
 

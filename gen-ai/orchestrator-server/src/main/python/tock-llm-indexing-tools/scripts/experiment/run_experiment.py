@@ -17,7 +17,7 @@ on LangFuse's SDK: runs a specific RAG Settings configuration against a
 reference dataset.
 
 Usage:
-    run_experiment.py [-v] <rag_query> <dataset_name> <test_name> <rate_limit_delay>
+    run_experiment.py [-v] <experiment_input_file>
     run_experiment.py -h | --help
     run_experiment.py --version
 
@@ -40,142 +40,102 @@ Options:
 Build a RAG (Lang)chain from the RAG Query and runs it against the provided
 LangFuse dataset. The chain is created anew for each entry of the dataset.
 """
-import json
-import logging
-import os
-import sys
 import time
 from datetime import datetime
-from pathlib import Path
+from typing import List, Optional
 from uuid import uuid4
 
 from docopt import docopt
-from dotenv import load_dotenv
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
 from gen_ai_orchestrator.services.langchain.rag_chain import create_rag_chain
+from gen_ai_orchestrator.services.security.security_service import fetch_secret_key_value
+from langfuse import Langfuse
+from langfuse.client import DatasetItemClient
 
-from generate_dataset import init_langfuse
-from scripts.evaluation.ragas_evaluator import RagasEvaluator
+from scripts.common.logging_config import configure_logging
+from scripts.evaluation.models import DatasetExperiment, ActivityStatus, StatusWithReason
+from scripts.experiment.models import RunExperimentInput, RunExperimentOutput
 
 
-def test_rag(args):
-    """
-    Test RAG endpoint settings against a reference dataset.
+def construct_chain(rag_query: RagQuery):
+    # Modify this if you are testing against a dataset that follows another
+    # format
+    return {
+        'question': lambda x: x['question'],
+        'locale': lambda x: x['locale'],
+        'no_answer': lambda x: x['no_answer'],
+        'chat_history': lambda x: x['chat_history'] if 'chat_history' in x else [],
+    } | create_rag_chain(rag_query, vector_db_async_mode=False)
 
-    Args:
 
-        args (dict):    A dictionary containing command-line arguments.
-                        Expecting keys: '<rag_query>'
-                                        '<dataset_name>'
-                                        '<test_name>'
-                                        '<rate_limit_delay>'
-    """
+
+def main():
     start_time = datetime.now()
+    cli_args = docopt(__doc__, version='Run Experiment 1.0.0')
+    logger = configure_logging(cli_args)
 
-    with open(args['<rag_query>'], 'r') as file:
-        rag_query = json.load(file)
+    dataset_experiment = DatasetExperiment()
+    dataset_items: List[DatasetItemClient] = []
+    tested_items: List[DatasetItemClient] = []
+    rag_query: Optional[RagQuery] = None
+    try:
+        logger.info("Loading input data...")
+        experiment_input = RunExperimentInput.from_json_file(cli_args["<experiment_input_file>"])
+        logger.debug(f"\n{experiment_input.format()}")
 
 
-    def _construct_chain():
-        # Modify this if you are testing against a dataset that follows another
-        # format
-        return {
-            'question': lambda x: x['question'],
-            'locale': lambda x: x['locale'],
-            'no_answer': lambda x: x['no_answer'],
-            'chat_history': lambda x: x['chat_history'] if 'chat_history' in x else [],
-        } | create_rag_chain(RagQuery(**rag_query), vector_db_async_mode=False)
+        dataset_experiment = experiment_input.dataset_experiment
+        rag_query=experiment_input.rag_query
+        client = Langfuse(  # TODO MASS : Refacto
+            host=str(rag_query.observability_setting.url),
+            public_key=rag_query.observability_setting.public_key,
+            secret_key=fetch_secret_key_value(rag_query.observability_setting.secret_key),
+        )
+        dataset = client.get_dataset(dataset_experiment.dataset_name)
+        dataset_items = dataset.items
 
-    def run_dataset():
-            client = init_langfuse()
-            dataset = client.get_dataset(args['<dataset_name>'])
+        for item in dataset_items:
+            callback_handlers = []
+            handler = item.get_langchain_handler(
+                run_name=f'{dataset_experiment}-{str(uuid4())[:8]}',
+                run_metadata={
+                    'document_index_name': rag_query.document_index_name,
+                    'k': rag_query.document_search_params.k,
+                },
+            )
+            callback_handlers.append(handler)
+            construct_chain(rag_query).invoke(
+                item.input, config={'callbacks': callback_handlers}
+            )
+            tested_items.append(item)
+            if item.id == '7b985562-8d89-43d8-9a1c-d9339f849695':
+                break
 
-            for item in dataset.items:
-                callback_handlers = []
-                handler = item.get_langchain_handler(
-                    run_name=run_name_dataset,
-                    run_metadata={
-                        'document_index_name': document_index_name,
-                        'k': k,
-                    },
-                )
-                callback_handlers.append(handler)
-                _construct_chain().invoke(
-                    item.input, config={'callbacks': callback_handlers}
-                )
-                print(f'Item:{item.id} - Trace:{handler.get_trace_url()}')
+            print(f'Item:{item.id} - Trace:{handler.get_trace_url()}')
+            print(f'Waiting for rate limit delay ({experiment_input.rate_limit_delay}s)...')
+            time.sleep(experiment_input.rate_limit_delay)
+        client.flush()
+        activity_status = StatusWithReason(status=ActivityStatus.COMPLETED)
+    except Exception as e:
+        full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
+        activity_status = StatusWithReason(status=ActivityStatus.FAILED, status_reason=f"{full_exception_name} : {e}")
+        logger.error(e, exc_info=True)
+    except BaseException as e:
+        full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
+        activity_status = StatusWithReason(status=ActivityStatus.STOPPED, status_reason=f"{full_exception_name} : {e}")
+        logger.error(e, exc_info=True)
 
-                print(f'Waiting for rate limit delay ({rate_limit_delay}s)...')
-                time.sleep(rate_limit_delay)
-            client.flush()
-
-    document_index_name = rag_query['document_index_name']
-    search_params = rag_query['document_search_params']
-    k = search_params['k']
-
-    run_name_dataset = args['<test_name>'] + '-' + str(uuid4())[:8]
-    run_dataset()
-
-    duration = datetime.now() - start_time
-    hours, remainder = divmod(duration.seconds, 3600)
-    minutes, seconds = divmod(remainder, 60)
-    formatted_duration = '{:02}:{:02}:{:02}'.format(hours, minutes, seconds)
-    logging.debug(
-        f'Ran RAGQuery (k={k}, document_index_name={document_index_name}) on '
-        f"{args['<dataset_name>']} dataset (duration: {formatted_duration})"
+    len_dataset_items = len(dataset_items)
+    output = RunExperimentOutput(
+        status = activity_status,
+        rag_query=rag_query,
+        dataset_experiment=dataset_experiment,
+        duration = datetime.now() - start_time,
+        nb_dataset_items=len(dataset_items),
+        pass_rate=100 * (len(tested_items) / len_dataset_items) if len_dataset_items > 0 else 0
     )
-
+    logger.debug(f"\n{output.format()}")
 
 if __name__ == '__main__':
-    cli_args = docopt(__doc__, version='RAG Testing Tool 0.1.0')
+    main()
 
-    # Set logging level
-    log_format = '%(levelname)s:%(module)s:%(message)s'
-    logging.basicConfig(
-        level=logging.DEBUG if cli_args['-v'] else logging.WARNING, format=log_format
-    )
-
-    load_dotenv()
-    langfuse_secret_key = os.getenv('LANGFUSE_SECRET_KEY')
-    if not langfuse_secret_key:
-        logging.error(
-            'Cannot proceed: LANGFUSE_SECRET_KEY env variable is not defined (define it in a .env file)'
-        )
-        sys.exit(1)
-    langchain_host = os.getenv('LANGFUSE_HOST')
-    if not langchain_host:
-        logging.error(
-            'Cannot proceed: LANGFUSE_HOST env variable is not defined (define it in a .env file)'
-        )
-        sys.exit(1)
-    langfuse_public_key = os.getenv('LANGFUSE_PUBLIC_KEY')
-    if not langfuse_public_key:
-        logging.error(
-            'Cannot proceed: LANGFUSE_PUBLIC_KEY env variable is not defined (define it in a .env file)'
-        )
-        sys.exit(1)
-
-    # Check args:
-    # - RAGQuery JSON file
-    rag_query_file_path = Path(cli_args['<rag_query>'])
-    if not rag_query_file_path.exists():
-        logging.error(
-            f"Cannot proceed: RAGQuery JSON file '{cli_args['<rag_query>']}' does not exist"
-        )
-        sys.exit(1)
-    try:
-        with open(rag_query_file_path, 'r') as file:
-            rag_query = json.load(file)
-    except json.JSONDecodeError:
-        logging.error(
-            f"Cannot proceed: RAGQuery JSON file '{cli_args['<rag_query>']}' is not a valid JSON file"
-        )
-        sys.exit(1)
-
-    # - dataset name is always valid
-    # - test name is always valid
-
-    rate_limit_delay = 3 if not cli_args['<rate_limit_delay>'] else int(cli_args['<rate_limit_delay>'])
-
-    # Main func
-    test_rag(cli_args)

@@ -52,16 +52,18 @@ def configure_logging(cli_args):
     gen_ai_orchestrator_logger.addHandler(console_handler)
     gen_ai_orchestrator_logger.propagate = False
 
+    # TODO MASS anglais
     # Capture des exceptions non gérées et log dans le fichier
-    def log_exceptions(exc_type, exc_value, exc_traceback):
+    def handle_exception(exc_type, exc_value, exc_traceback):
         if issubclass(exc_type, KeyboardInterrupt):
-            sys.__excepthook__(exc_type, exc_value, exc_traceback)  # Ne pas intercepter Ctrl+C
-            return
+            app_logger.warning("KeyboardInterrupt: User interruption detected, program closes automatically.")
+
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)  # Comportement par défaut
 
         log_message = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
         app_logger.error("Unhandled exception:\n%s", log_message)
 
     # Rediriger toutes les erreurs vers le logger
-    sys.excepthook = log_exceptions
+    sys.excepthook = handle_exception
 
     return app_logger

@@ -65,9 +65,8 @@ from gen_ai_orchestrator.configurations.environment.settings import application_
 from gen_ai_orchestrator.models.security.proxy_server_type import ProxyServerType
 from httpx_auth_awssigv4 import SigV4Auth
 from langfuse import Langfuse
+from langfuse.api import DatasetItem
 from langsmith import Client
-
-from models import DatasetItem
 
 
 def _extract_dataset_items(filename: str, locale: str, no_answer: str) -> list[DatasetItem]:
