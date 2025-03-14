@@ -58,14 +58,17 @@ def main():
 
         From the document content, determine the name of the financial product it describes. 
 
-        Then, for each chunk, generate a succinct yet comprehensive context that allows for better search retrieval. The context must:
-        - Clearly indicate the financial product it belongs to.
-        - Include all relevant details needed to understand the chunk.
-        - Resolve any references (e.g., dates, terms, or entities) so they are explicit.
-        - Maintain clarity and conciseness while preserving critical information.
-        - Please provide context in the language of the original document. If the document is in French, answer in French. If the document is in English, answer in English. Please follow these instructions for all chunks.
-        - Uses the correct chunk Id when generating the json response
-
+        For each chunk:
+        - Identify any references to data (e.g., "Niveau Initial(2)", "Date d'Observation Finale(1)").
+        - Look for these values in the document and replace the references with their corresponding values.
+        - Generate a succinct yet comprehensive context that allows for better search retrieval. The context must:
+            - Clearly indicate the financial product it belongs to.
+            - Include all relevant details needed to understand the chunk.
+            - Resolve any references (e.g., dates, terms, or entities) so they are explicit and replaced with actual values from the document.
+            - Maintain clarity and conciseness while preserving critical information.
+            - Please provide context in the language of the original document. If the document is in French, answer in French. If the document is in English, answer in English. Please follow these instructions for all chunks.
+            - Uses the correct chunk Id when generating the json response
+    
         Respond only in the following JSON format, and make sure you use the same chunk Id as the one you received as input:
 
         ```json
