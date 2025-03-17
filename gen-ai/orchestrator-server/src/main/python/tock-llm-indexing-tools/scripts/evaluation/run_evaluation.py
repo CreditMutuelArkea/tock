@@ -5,10 +5,6 @@ Usage:
         run_evaluation.py -h | --help
         run_evaluation.py --version
 
-Arguments:
-    dataset_name        the dataset name
-    experiment_name     the experiment name
-
 Options:
     -v          Verbose output
     -h --help   Show this screen
@@ -25,7 +21,7 @@ from langfuse.client import DatasetItemClient
 
 from scripts.common.logging_config import configure_logging
 from scripts.evaluation.models import RunEvaluationInput, DatasetExperimentItemScores, RunEvaluationOutput, \
-    DatasetExperiment, ActivityStatus
+    DatasetExperiment, ActivityStatus, StatusWithReason
 from scripts.evaluation.ragas_evaluator import RagasEvaluator
 
 
@@ -88,10 +84,15 @@ def main():
             else:
                 logger.warn(f"Impossible to evaluate item '{item.id}' of dataset '{dataset_name}' in experiment '{experiment_name}'!")
 
-        activity_status = ActivityStatus.COMPLETED
+        activity_status = StatusWithReason(status=ActivityStatus.COMPLETED)
     except Exception as e:
-        activity_status = ActivityStatus.FAILED
-        logger.error(e)
+        full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
+        activity_status = StatusWithReason(status=ActivityStatus.FAILED, status_reason=f"{full_exception_name} : {e}")
+        logger.error(e, exc_info=True)
+    except BaseException as e:
+        full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
+        activity_status = StatusWithReason(status=ActivityStatus.STOPPED, status_reason=f"{full_exception_name} : {e}")
+        logger.error(e, exc_info=True)
 
     len_dataset_items = len(dataset_items)
     output = RunEvaluationOutput(

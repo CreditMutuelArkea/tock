@@ -21,16 +21,6 @@ Usage:
     run_experiment.py -h | --help
     run_experiment.py --version
 
-Arguments:
-    rag_query       path to a JSON 'RAGQuery' JSON file containing RAG settings
-                    to be tested: llm model, embedding model, vector database
-                    provider, indexation session's unique id, and 'k', i.e. nb
-                    of retrieved docs (question and chat history are ignored,
-                    as they will come from the dataset)
-    dataset_name    the reference dataset name
-    test_name       name of the test run
-    rate_limit_delay waiting time (in seconds) to prevent the LLM rate limite
-
 Options:
     -h --help   Show this screen
     --version   Show version
