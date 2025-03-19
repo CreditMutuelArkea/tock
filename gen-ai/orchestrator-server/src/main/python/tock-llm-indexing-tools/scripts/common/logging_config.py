@@ -34,20 +34,28 @@ def configure_logging(cli_args):
     # Configuration du logger
     app_logger.propagate = False
 
+    log_level = logging.DEBUG if cli_args['-v'] else logging.INFO
+
     # Ajouter les gestionnaires au logger
-    app_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)
+    app_logger.setLevel(log_level)
     app_logger.addHandler(file_handler)
     app_logger.addHandler(console_handler)
 
     # Ajouter le handler du logger à langfuse
     langfuse_logger = logging.getLogger("langfuse")
-    langfuse_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)  # Ajuste selon ton besoin
+    langfuse_logger.setLevel(log_level)
     langfuse_logger.addHandler(file_handler)
     langfuse_logger.addHandler(console_handler)
     langfuse_logger.propagate = False
 
+    opensearch_logger = logging.getLogger("opensearch")
+    opensearch_logger.setLevel(logging.INFO)
+    opensearch_logger.addHandler(file_handler)
+    opensearch_logger.addHandler(console_handler)
+    opensearch_logger.propagate = False
+
     gen_ai_orchestrator_logger = logging.getLogger("gen_ai_orchestrator")
-    gen_ai_orchestrator_logger.setLevel(logging.DEBUG if cli_args['-v'] else logging.INFO)  # Ajuste selon ton besoin
+    gen_ai_orchestrator_logger.setLevel(log_level)
     gen_ai_orchestrator_logger.addHandler(file_handler)
     gen_ai_orchestrator_logger.addHandler(console_handler)
     gen_ai_orchestrator_logger.propagate = False

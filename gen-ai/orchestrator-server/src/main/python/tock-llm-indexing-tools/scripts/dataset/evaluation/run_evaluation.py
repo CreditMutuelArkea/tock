@@ -1,14 +1,23 @@
 """
-Run an evaluation on LangFuse dataset experiment.
+Run an evaluation on LangFuse dataset experiment using Ragas.
+
 Usage:
-        run_evaluation.py [-v] <evaluation_input_file>
-        run_evaluation.py -h | --help
-        run_evaluation.py --version
+    run_evaluation.py [-v] --json-config-file=<jcf>
+
+Description:
+    This script is used to run an evaluation on Langfuse dataset experiment based on a json configuration file.
+    The configuration file specifies the Ragas metrics to be calculated.
+
+Arguments:
+    --json-config-file=<jcf>   Path to the input config file. This is a required argument.
 
 Options:
-    -v          Verbose output
-    -h --help   Show this screen
-    --version   Show version
+    -v                         Enable verbose output for debugging purposes. If not set, the script runs silently except for errors.
+    -h, --help                 Display this help message and exit.
+    --version                  Display the version of the script.
+
+Examples:
+        python run_evaluation.py --json-config-file=path/to/config-file.json
 """
 from datetime import datetime
 from typing import Optional, List
@@ -20,12 +29,14 @@ from langfuse.api import TraceWithFullDetails, DatasetRunItem
 from langfuse.client import DatasetItemClient
 
 from scripts.common.logging_config import configure_logging
-from scripts.evaluation.models import RunEvaluationInput, DatasetExperimentItemScores, RunEvaluationOutput, \
-    DatasetExperiment, ActivityStatus, StatusWithReason
-from scripts.evaluation.ragas_evaluator import RagasEvaluator
+from scripts.common.models import StatusWithReason, ActivityStatus
+from scripts.dataset.evaluation.models import DatasetExperiment, DatasetExperimentItemScores, RunEvaluationInput, \
+    RunEvaluationOutput
+from scripts.dataset.evaluation.ragas_evaluator import RagasEvaluator
 
 
-def get_trace_if_exists(logger, client, dataset_name, experiment_name, _dataset_run, item) -> [Optional[DatasetRunItem], Optional[TraceWithFullDetails]]:
+def get_trace_if_exists(logger, client, dataset_name, experiment_name, _dataset_run,
+                        item) -> [Optional[DatasetRunItem], Optional[TraceWithFullDetails]]:
     item_run = next((r for r in _dataset_run if r.dataset_item_id == item.id), None)
 
     if item_run:
@@ -39,24 +50,23 @@ def main():
     cli_args = docopt(__doc__, version='Run Evaluation 1.0.0')
     logger = configure_logging(cli_args)
 
-
     dataset_experiment = DatasetExperiment()
     experiment_scores: List[DatasetExperimentItemScores] = []
     dataset_items: List[DatasetItemClient] = []
 
     try:
         logger.info("Loading input data...")
-        evaluation_input = RunEvaluationInput.from_json_file(cli_args["<evaluation_input_file>"])
-        logger.debug(f"\n{evaluation_input.format()}")
+        input_config = RunEvaluationInput.from_json_file(cli_args['--json-config-file'])
+        logger.debug(f"\n{input_config.format()}")
 
         client = Langfuse(
-            host=str(evaluation_input.observability_setting.url),
-            public_key=evaluation_input.observability_setting.public_key,
-            secret_key=fetch_secret_key_value(evaluation_input.observability_setting.secret_key),
+            host=str(input_config.observability_setting.url),
+            public_key=input_config.observability_setting.public_key,
+            secret_key=fetch_secret_key_value(input_config.observability_setting.secret_key),
         )
-        ragas_evaluator = RagasEvaluator(langfuse_client=client, evaluation_input=evaluation_input)
+        ragas_evaluator = RagasEvaluator(langfuse_client=client, evaluation_input=input_config)
 
-        dataset_experiment=evaluation_input.dataset_experiment
+        dataset_experiment=input_config.dataset_experiment
         dataset_name=dataset_experiment.dataset_name
         experiment_name=dataset_experiment.experiment_name
         dataset = client.get_dataset(name=dataset_name)
@@ -89,10 +99,6 @@ def main():
         full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
         activity_status = StatusWithReason(status=ActivityStatus.FAILED, status_reason=f"{full_exception_name} : {e}")
         logger.error(e, exc_info=True)
-    except BaseException as e:
-        full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
-        activity_status = StatusWithReason(status=ActivityStatus.STOPPED, status_reason=f"{full_exception_name} : {e}")
-        logger.error(e, exc_info=True)
 
     len_dataset_items = len(dataset_items)
     output = RunEvaluationOutput(
@@ -101,7 +107,7 @@ def main():
         dataset_experiment_scores=experiment_scores,
         duration = datetime.now() - start_time,
         nb_dataset_items=len(dataset_items),
-        pass_rate=100 * (len(experiment_scores) / len_dataset_items) if len_dataset_items > 0 else 0
+        success_rate=100 * (len(experiment_scores) / len_dataset_items) if len_dataset_items > 0 else 0
     )
     logger.debug(f"\n{output.format()}")
 

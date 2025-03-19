@@ -1,22 +1,16 @@
-import json
-import os
 from datetime import datetime
-from datetime import timedelta
-from enum import Enum, auto, unique
-from typing import List, Optional
+from typing import Optional
 
 import humanize
-from gen_ai_orchestrator.models.em.em_types import EMSetting
-from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
-from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
 from gen_ai_orchestrator.routers.requests.requests import RagQuery
-from pydantic import BaseModel, Field
-from colorama import Fore, init, Style
+from pydantic import Field
 
-from scripts.evaluation.models import DatasetExperiment, OutputStatus
+from scripts.common.models import FromJsonMixin, BotInfo, ActivityOutput
+from scripts.dataset.evaluation.models import DatasetExperiment
 
 
-class RunExperimentInput(BaseModel):
+class RunExperimentInput(FromJsonMixin):
+    bot: BotInfo = Field(description='The bot information.')
     rag_query: RagQuery = Field(
         description='The RAG query.'
     )
@@ -27,16 +21,6 @@ class RunExperimentInput(BaseModel):
         description='Waiting time (in seconds) to prevent the LLM rate limite.'
     )
 
-    @classmethod
-    def from_json_file(cls, file_path: str):
-        try:
-            with open(file_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
-            return cls(**data)
-        except FileNotFoundError:
-            raise ValueError(f"The file '{file_path}' is not found!")
-        except json.JSONDecodeError:
-            raise ValueError(f"the file '{file_path}' is not a valid JSON!")
 
     def format(self):
         # Format the details string
@@ -68,16 +52,15 @@ class RunExperimentInput(BaseModel):
         return "\n".join(line.strip() for line in to_string.splitlines() if line.strip())
 
 
-class RunExperimentOutput(OutputStatus):
+class RunExperimentOutput(ActivityOutput):
     rag_query: Optional[RagQuery] = Field(
         description='The RAG query.'
     )
     dataset_experiment: DatasetExperiment = Field(
         description='The dataset to experiment.'
     )
-    duration: timedelta = Field(description='The experiment time.')
+
     nb_dataset_items: int = Field(description='Number of items in dataset.')
-    pass_rate: float = Field(description='Rate of successful experiment.')
 
     def format(self):
         # Format the details string
@@ -85,7 +68,7 @@ class RunExperimentOutput(OutputStatus):
             The dataset name               : {self.dataset_experiment.dataset_name}
             The experiment name            : {self.dataset_experiment.experiment_name}
             Number of items in dataset     : {self.nb_dataset_items}
-            Rate of successful experiment  : {self.pass_rate:.2f}%
+            Rate of successful experiment  : {self.success_rate:.2f}%
             Duration                       : {humanize.precisedelta(self.duration)}
             Date                           : {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
         """
@@ -105,7 +88,7 @@ class RunExperimentOutput(OutputStatus):
 
         # The text for the header
         header_text = " RUN EXPERIMENT OUTPUT "
-
+# TODO MASS
         # Construct the header and separator lines
         separator = '-' * max_line_length
         header_line = header_text.center(max_line_length, '-')

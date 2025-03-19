@@ -23,8 +23,10 @@ from langchain_core.output_parsers import StrOutputParser
 from langfuse import Langfuse
 
 from scripts.common.logging_config import configure_logging
-from scripts.evaluation.models import ActivityStatus, StatusWithReason
-from scripts.normalization.models import RunChunkContextualizationInput, RunChunkContextualizationOutput
+from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
+
+from scripts.common.models import StatusWithReason, ActivityStatus
+from scripts.indexing.normalization.models import RunChunkContextualizationInput, RunChunkContextualizationOutput
 
 
 def main():
@@ -39,15 +41,8 @@ def main():
         chunk_contextualization_input = RunChunkContextualizationInput.from_json_file(cli_args["<chunk_contextualization_input_file>"])
         logger.debug(f"\n{chunk_contextualization_input.format()}")
 
-        client = Langfuse(
-            host=str(chunk_contextualization_input.observability_setting.url),
-            public_key=chunk_contextualization_input.observability_setting.public_key,
-            secret_key=fetch_secret_key_value(chunk_contextualization_input.observability_setting.secret_key),
-        )
-
         chunks = chunk_contextualization_input.chunks
 
-        from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
 
         # Define the prompt for generating contextual information
         anthropic_contextual_retrieval_system_prompt = """<document>

@@ -8,7 +8,8 @@ from gen_ai_orchestrator.models.llm.llm_types import LLMSetting
 from gen_ai_orchestrator.models.observability.langfuse.langfuse_setting import LangfuseObservabilitySetting
 from pydantic import BaseModel, Field
 
-from scripts.evaluation.models import OutputStatus
+from scripts.common.models import OutputStatus
+
 
 class DocumentChunk(BaseModel):
     id: str = Field(description='The chunk id.')
@@ -81,7 +82,7 @@ class RunChunkContextualizationOutput(OutputStatus):
 
     duration: timedelta = Field(description='The evaluation time.')
     nb_chunks: int = Field(description='Number of chunks.') # TODO MASS : a factoriser
-    pass_rate: float = Field(description='Rate of successful contextualization.')
+    success_rate: float = Field(description='Rate of successful contextualization.')
 
     def format(self):
         # Format the details string

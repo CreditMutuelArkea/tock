@@ -15,8 +15,8 @@ from ragas.metrics.base import MetricWithLLM, MetricWithEmbeddings
 from ragas.run_config import RunConfig
 
 from scripts.common.logging_config import configure_logging
-from scripts.evaluation.models import RunEvaluationInput, MetricScore
-from scripts.evaluation.ragas_metrics import ragas_available_metrics
+from scripts.dataset.evaluation.models import MetricScore, RunEvaluationInput
+from scripts.dataset.evaluation.ragas_metrics import ragas_available_metrics
 
 logger = logging.getLogger(__name__)
 
