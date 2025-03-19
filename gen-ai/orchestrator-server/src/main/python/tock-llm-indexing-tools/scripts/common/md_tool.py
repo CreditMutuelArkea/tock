@@ -19,8 +19,11 @@ def clean_markdown(md_text: str) -> str:
     # Conserver les listes Markdown en supprimant les espaces inutiles
     md_text = re.sub(r'^[\-*+]\s+', '- ', md_text, flags=re.MULTILINE)
 
-    # Réduire les espaces multiples
-    md_text = re.sub(r'\n{2,}', '\n\n', md_text).strip()
+    # Assurer qu'il y a un retour à la ligne autour des tableaux
+    md_text = re.sub(r'(\n?)(\|.+?\|)(\n?)', r'\n\2\n', md_text)
+
+    # Réduire les sauts de ligne multiples à un seul sauf autour des tableaux
+    md_text = re.sub(r'\n{3,}', '\n\n', md_text).strip()
 
     return md_text
 
