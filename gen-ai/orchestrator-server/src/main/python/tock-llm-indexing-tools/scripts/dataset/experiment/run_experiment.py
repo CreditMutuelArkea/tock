@@ -45,7 +45,7 @@ from scripts.dataset.experiment.models import RunExperimentInput, RunExperimentO
 
 UUID_SUFFIX_RE = re.compile(r".*-[0-9a-fA-F]{8}$")
 
-async def main() -> None:
+async def main():
     start_time = datetime.now()
     cli_args = docopt(__doc__, version='Run Experiment 1.0.0')
     logger = configure_logging(cli_args)
@@ -56,8 +56,8 @@ async def main() -> None:
     rag_query: Optional[RagQuery] = None
 
     try:
-        logger.info("Loading input data…")
-        input_config = RunExperimentInput.from_json_file(cli_args["--json-config-file"])
+        logger.info("Loading input data...")
+        input_config = RunExperimentInput.from_json_file(cli_args['--json-config-file'])
         dataset_experiment = input_config.dataset_experiment
 
         base_name = dataset_experiment.experiment_name
@@ -139,10 +139,7 @@ async def main() -> None:
 
     except Exception as e:
         full_exception_name = f"{type(e).__module__}.{type(e).__name__}"
-        activity_status = StatusWithReason(
-            status=ActivityStatus.FAILED,
-            status_reason=f"{full_exception_name} : {e}",
-        )
+        activity_status = StatusWithReason(status=ActivityStatus.FAILED, status_reason=f"{full_exception_name} : {e}")
         logger.error(e, exc_info=True)
 
     len_dataset_items = len(dataset_items)
