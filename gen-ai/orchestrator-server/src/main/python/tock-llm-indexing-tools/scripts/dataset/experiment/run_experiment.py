@@ -5,9 +5,12 @@ Usage:
     run_experiment.py [-v] --json-config-file=<jcf>
 
 Description:
+    This script is used to run an experiment on Langfuse dataset based on a json configuration file.
+    The configuration file specifies the RAG settings to use.
+    It builds a RAG chain from the RAG Query and runs it against the provided LangFuse dataset.
+    
     • If dataset_experiment.experiment_name in the JSON config already ends with a UUID the script resumes that existing experiment and
       skips items that are already present in the Langfuse run.
-
     • If it does not contain a UUID, a fresh experiment is started.
 
 Arguments:
