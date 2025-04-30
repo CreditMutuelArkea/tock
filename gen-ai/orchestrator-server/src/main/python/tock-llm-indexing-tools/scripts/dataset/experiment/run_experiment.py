@@ -5,13 +5,10 @@ Usage:
     run_experiment.py [-v] --json-config-file=<jcf>
 
 Description:
-    • If *dataset_experiment.experiment_name* in the JSON config **already ends with a UUID
-      (the pattern “-XXXXXXXX”)**, the script resumes that existing experiment and
+    • If dataset_experiment.experiment_name in the JSON config already ends with a UUID the script resumes that existing experiment and
       skips items that are already present in the Langfuse run.
 
-    • If it **does not** contain a UUID, a fresh experiment is started: the script
-      appends “-XXXXXXXX” (first 8 chars of a new UUID-4) to the name exactly like
-      the previous version.
+    • If it does not contain a UUID, a fresh experiment is started.
 
 Arguments:
     --json-config-file=<jcf>   Path to the input config file. This is a required argument.
