@@ -111,7 +111,8 @@ def create_excel_output(iterations: list[str], items: list[DatasetExperimentItem
         sheet[f"C{start_row}"] = items[0].runs[i].metadata["llm"]["model"]
         sheet[f"D{start_row}"] = items[0].runs[i].metadata["llm"]["temperature"]
         sheet[f"E{start_row}"] = no_rag_percentages.get(i, "N/A") if "NoRagStat" in metric_names else ""
-        sheet[f"F{start_row}"] = items[0].runs[i].metadata["document_index_name"]
+        sheet[f"F{start_row}"] = items[0].runs[0].metadata["k"]
+        sheet[f"G{start_row}"] = items[0].runs[i].metadata["document_index_name"]
 
     for i in range(len(items)):
         col_letter = get_column_letter(9 + i)
