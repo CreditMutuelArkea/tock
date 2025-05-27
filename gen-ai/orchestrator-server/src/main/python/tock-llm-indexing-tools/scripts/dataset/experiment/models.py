@@ -20,7 +20,7 @@ class RunExperimentInput(FromJsonMixin):
     rate_limit_delay: int = Field(
         description='Waiting time (in seconds) to prevent the LLM rate limite.'
     )
-    export_settings: dict | None = Field(
+    export_settings: Optional[dict] = Field(
         default=None,
         description="Optional export parameters (exclude keys)"
     )
