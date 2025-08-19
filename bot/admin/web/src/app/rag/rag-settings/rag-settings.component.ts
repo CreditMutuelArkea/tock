@@ -16,11 +16,9 @@
 
 import { Component, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { debounceTime, forkJoin, Observable, of, Subject, take, takeUntil, pairwise } from 'rxjs';
+import { debounceTime, forkJoin, Observable, Subject, takeUntil, pairwise } from 'rxjs';
 import { NbDialogRef, NbDialogService, NbToastrService, NbWindowService } from '@nebular/theme';
 
-import { BotService } from '../../bot/bot-service';
-import { StoryDefinitionConfiguration, StorySearchQuery } from '../../bot/model/story';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
 import { EnginesConfigurations, QuestionCondensing_prompt, QuestionAnswering_prompt } from './models/engines-configurations';
@@ -46,9 +44,6 @@ interface RagSettingsForm {
   enabled: FormControl<boolean>;
 
   debugEnabled: FormControl<boolean>;
-
-  noAnswerSentence: FormControl<string>;
-  noAnswerStoryId: FormControl<string>;
 
   indexSessionId: FormControl<string>;
   indexName: FormControl<string>;
@@ -89,10 +84,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   questionAnswering_prompt = QuestionAnswering_prompt;
 
-  availableStories: StoryDefinitionConfiguration[];
-
-  filteredStories$: Observable<StoryDefinitionConfiguration[]>;
-
   settingsBackup: RagSettings;
 
   isSubmitted: boolean = false;
@@ -103,7 +94,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
   @ViewChild('importModal') importModal: TemplateRef<any>;
 
   constructor(
-    private botService: BotService,
     private state: StateService,
     private rest: RestService,
     private toastrService: NbToastrService,
@@ -176,14 +166,9 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       this.configurations = confs;
 
       if (confs.length) {
-        forkJoin([this.getStoriesLoader(), this.getRagSettingsLoader()]).subscribe((res) => {
-          this.availableStories = res[0];
-
-          const settings = res[1];
+        forkJoin([this.getRagSettingsLoader()]).subscribe((res) => {
+          const settings = res[0];
           if (settings?.id) {
-            if (!settings.noAnswerStoryId) {
-              settings.noAnswerStoryId = null;
-            }
             this.settingsBackup = deepCopy(settings);
             setTimeout(() => {
               this.initForm(settings);
@@ -208,9 +193,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     enabled: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
 
     debugEnabled: new FormControl({ value: undefined, disabled: !this.canRagBeActivated() }),
-
-    noAnswerSentence: new FormControl(undefined, [Validators.required]),
-    noAnswerStoryId: new FormControl(undefined),
 
     indexSessionId: new FormControl(undefined),
     indexName: new FormControl(undefined),
@@ -256,13 +238,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     return this.form.get('maxMessagesFromHistory') as FormControl;
   }
 
-  get noAnswerSentence(): FormControl {
-    return this.form.get('noAnswerSentence') as FormControl;
-  }
-  get noAnswerStoryId(): FormControl {
-    return this.form.get('noAnswerStoryId') as FormControl;
-  }
-
   get indexSessionId(): FormControl {
     return this.form.get('indexSessionId') as FormControl;
   }
@@ -281,11 +256,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   get canSave(): boolean {
     return this.isSubmitted ? this.form.valid : this.form.dirty;
-  }
-
-  get getCurrentStoryLabel(): string {
-    const currentStory = this.availableStories?.find((story) => story.storyId === this.noAnswerStoryId.value);
-    return currentStory?.name || '';
   }
 
   accordionItemsExpandedState: Map<string, boolean>;
@@ -455,66 +425,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     return EnginesConfigurations[AiEngineSettingKeyName.emSetting].find((e) => e.key === this.emProvider.value);
   }
 
-  private getStoriesLoader(): Observable<StoryDefinitionConfiguration[]> {
-    return this.botService
-      .getStories(
-        new StorySearchQuery(
-          this.state.currentApplication.namespace,
-          this.state.currentApplication.name,
-          this.state.currentLocale,
-          0,
-          10000,
-          undefined,
-          undefined,
-          false
-        )
-      )
-      .pipe(take(1));
-  }
-
-  isStoryEnabled(story: StoryDefinitionConfiguration): boolean {
-    for (let i = 0; i < story.features.length; i++) {
-      if (!story.features[i].enabled && !story.features[i].switchToStoryId && !story.features[i].endWithStoryId) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  storySelectedChange(storyId: string): void {
-    this.noAnswerStoryId.patchValue(storyId);
-    this.form.markAsDirty();
-  }
-
-  onStoryChange(value: string): void {
-    if (value?.trim() == '') {
-      this.removeNoAnswerStoryId();
-    }
-  }
-
-  removeNoAnswerStoryId(): void {
-    this.noAnswerStoryId.patchValue(null);
-    this.form.markAsDirty();
-  }
-
-  filterStoriesList(e: string): void {
-    this.filteredStories$ = of(this.availableStories.filter((optionValue) => optionValue.name.toLowerCase().includes(e.toLowerCase())));
-  }
-
-  storyInputFocus(): void {
-    this.filteredStories$ = of(this.availableStories);
-  }
-
-  storyInputBlur(e: FocusEvent): void {
-    setTimeout(() => {
-      // timeout needed to avoid reseting input and filtered stories when clicking on autocomplete suggestions (which fires blur event)
-      const target: HTMLInputElement = e.target as HTMLInputElement;
-      target.value = this.getCurrentStoryLabel;
-
-      this.filteredStories$ = of(this.availableStories);
-    }, 100);
-  }
-
   cancel(): void {
     this.initForm(this.settingsBackup);
   }
@@ -529,14 +439,10 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
       delete formValue['emProvider'];
       formValue.namespace = this.state.currentApplication.namespace;
       formValue.botId = this.state.currentApplication.name;
-      formValue.noAnswerStoryId = this.noAnswerStoryId.value === 'null' ? null : this.noAnswerStoryId.value;
 
       const url = `/gen-ai/bots/${this.state.currentApplication.name}/configuration/rag`;
       this.rest.post(url, formValue, null, null, true).subscribe({
         next: (ragSettings: RagSettings) => {
-          if (!ragSettings.noAnswerStoryId) {
-            ragSettings.noAnswerStoryId = null;
-          }
           this.settingsBackup = ragSettings;
 
           this.indexName.reset();

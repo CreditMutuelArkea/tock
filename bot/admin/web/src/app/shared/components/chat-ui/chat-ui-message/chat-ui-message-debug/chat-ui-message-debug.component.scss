@@ -19,21 +19,26 @@
 
 :host {
   display: flex;
-  justify-content: center;
+  // justify-content: center;
 
   .debug {
+    width: 100%;
     cursor: pointer;
 
+    font-size: 0.75rem;
     color: var(--chat-message-sender-text-color);
+    border-top: 1px dashed var(--chat-message-sender-text-color);
     border-bottom: 1px dashed var(--chat-message-sender-text-color);
+    background-color: var(--background-basic-color-3);
 
-    height: 11px;
-    margin-bottom: 10px;
+    margin-left: 1em;
+    // height: 11px;
+    // margin-bottom: 10px;
 
-    span {
-      background: var(--card-background-color);
-      padding: 0 5px;
-      border-radius: 0.5rem;
-    }
+    // span {
+    //   background: var(--card-background-color);
+    //   padding: 0 5px;
+    //   border-radius: 0.5rem;
+    // }
   }
 }
