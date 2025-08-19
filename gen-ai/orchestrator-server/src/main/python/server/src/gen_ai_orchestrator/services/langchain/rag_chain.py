@@ -21,8 +21,9 @@ import json
 import logging
 import time
 from functools import partial
+from logging import ERROR, WARNING
 from operator import itemgetter
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from langchain.retrievers.contextual_compression import (
     ContextualCompressionRetriever,
@@ -30,12 +31,8 @@ from langchain.retrievers.contextual_compression import (
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
-from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.output_parsers import (
-    JsonOutputParser,
-    PydanticOutputParser,
-    StrOutputParser,
-)
+from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.runnables import (
@@ -43,6 +40,8 @@ from langchain_core.runnables import (
     RunnableParallel,
     RunnablePassthrough,
     RunnableSerializable,
+    RunnableConfig,
+    RunnableLambda,
 )
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.vectorstores import VectorStoreRetriever
@@ -73,9 +72,12 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     RAGDebugData,
     RAGDocument,
     RAGDocumentMetadata,
+    LLMAnswer,
 )
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
-from gen_ai_orchestrator.routers.responses.responses import RAGResponse
+from gen_ai_orchestrator.routers.responses.responses import (
+    RAGResponse,
+)
 from gen_ai_orchestrator.services.langchain.callbacks.rag_callback_handler import (
     RAGCallbackHandler,
 )
@@ -98,7 +100,7 @@ logger = logging.getLogger(__name__)
 
 
 @opensearch_exception_handler
-@openai_exception_handler(provider='OpenAI or AzureOpenAIService')
+@openai_exception_handler(provider="OpenAI or AzureOpenAIService")
 async def execute_rag_chain(
     request: RAGRequest,
     debug: bool,
@@ -115,16 +117,12 @@ async def execute_rag_chain(
         The RAG response (Answer and document sources)
     """
 
-    logger.info('RAG chain - Start of execution...')
+    logger.info("RAG chain - Start of execution...")
     start_time = time.time()
 
-    conversational_retrieval_chain = create_rag_chain(
-        request=request, vector_db_async_mode=False  # TODO MASS
-    )
+    conversational_retrieval_chain = create_rag_chain(request=request, vector_db_async_mode=False)  # TODO MASS
 
     message_history = ChatMessageHistory()
-    metadata = {}
-
     if request.dialog:
         for msg in request.dialog.history:
             if ChatMessageType.HUMAN == msg.type:
@@ -132,95 +130,83 @@ async def execute_rag_chain(
             else:
                 message_history.add_ai_message(msg.text)
 
-        if request.dialog.user_id is not None:
-            metadata['langfuse_user_id'] = request.dialog.user_id
-        if request.dialog.dialog_id is not None:
-            metadata['langfuse_session_id'] = request.dialog.dialog_id
-        if request.dialog.tags:
-            metadata['langfuse_tags'] = request.dialog.tags
+    logger.debug("RAG chain - Use chat history: %s", len(message_history.messages) > 0)
+    logger.debug("RAG chain - Use RAGCallbackHandler for debugging : %s", debug)
 
-    logger.debug(
-        'RAG chain - Use chat history: %s',
-        'Yes' if len(message_history.messages) > 0 else 'No',
-    )
+    records_handler, observability_handler = get_callback_handlers(request, debug)
+
+    callbacks = [
+        handler
+        for handler in (records_handler, observability_handler, custom_observability_handler)
+        if handler is not None
+    ]
 
     inputs = {
         **request.question_answering_prompt.inputs,
-        'chat_history': message_history.messages,
+        "chat_history": message_history.messages,
     }
 
-    logger.debug(
-        'RAG chain - Use RAGCallbackHandler for debugging : %s',
-        debug,
-    )
+    response = await conversational_retrieval_chain.ainvoke(input=inputs, config=RunnableConfig(callbacks=callbacks))
+    llm_answer = LLMAnswer(**response["answer"])
 
-    callback_handlers = []
-    records_callback_handler = RAGCallbackHandler()
-    observability_handler = None
-    if debug:
-        # Debug callback handler
-        callback_handlers.append(records_callback_handler)
-    if custom_observability_handler is not None:
-        callback_handlers.append(custom_observability_handler)
-    if request.observability_setting is not None:
-        # Langfuse callback handler
-        observability_handler = create_observability_callback_handler(
-            observability_setting=request.observability_setting,
-        )
-        callback_handlers.append(observability_handler)
-
-    response = await conversational_retrieval_chain.ainvoke(
-        input=inputs,
-        config=RunnableConfig(
-            callbacks=callback_handlers,
-            metadata=metadata,
-        ),
-    )
-
-    llm_answer: LLMAnswer = response['answer']
+    # RAG Guard
+    rag_guard(inputs, llm_answer, response, request.documents_required)
 
     # Guardrail
     if request.guardrail_setting:
-        guardrail = get_guardrail_factory(
-            setting=request.guardrail_setting
-        ).get_parser()
+        guardrail = get_guardrail_factory(setting=request.guardrail_setting).get_parser()
         guardrail_output = guardrail.parse(llm_answer.answer)
         check_guardrail_output(guardrail_output)
 
     # Calculation of RAG processing time
-    rag_duration = '{:.2f}'.format(time.time() - start_time)
-    logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
+    rag_duration = "{:.2f}".format(time.time() - start_time)
+    logger.info("RAG chain - End of execution. (Duration : %s seconds)", rag_duration)
 
     # Group contexts by chunk id
-    contexts_by_chunk = {
-        ctx.chunk: ctx
-        for ctx in (llm_answer.context_usage or [])
-        if ctx.used_in_response
-    }
-
-    footnotes = {
-        Footnote(
-            identifier=doc.metadata['id'],
-            title=doc.metadata['title'],
-            url=doc.metadata['source'],
-            content=get_source_content(doc),
-            score=doc.metadata.get('retriever_score', None),
-        )
-        for doc in response['documents']
-        if doc.metadata['id'] in contexts_by_chunk
-    }
+    contexts_by_chunk = {ctx.chunk: ctx for ctx in (llm_answer.context or []) if ctx.sentences}
 
     # Returning RAG response
     return RAGResponse(
         answer=llm_answer,
-        footnotes=footnotes,
-        observability_info=get_observability_info(
-            observability_handler,
-            ObservabilityTrace.RAG.value if observability_handler is not None else None,
-        ),
-        debug=get_rag_debug_data(request, records_callback_handler, rag_duration)
-        if debug
-        else None,
+        footnotes={
+            Footnote(
+                identifier=doc.metadata["id"],
+                title=doc.metadata["title"],
+                url=doc.metadata["source"],
+                content=get_source_content(doc),
+                score=doc.metadata.get("retriever_score", None),
+            )
+            for doc in response["documents"]
+            if doc.metadata["id"] in contexts_by_chunk
+        },
+        observability_info=get_observability_info(observability_handler),
+        debug=get_rag_debug_data(request, records_handler, rag_duration) if debug else None,
+    )
+
+
+def get_callback_handlers(request, debug) -> Tuple[
+    Optional[RAGCallbackHandler],
+    Optional[object],
+]:
+    records_handler = RAGCallbackHandler() if debug else None
+    observability_handler = None
+
+    if request.observability_setting is not None:
+        if request.dialog:
+            session_id = request.dialog.dialog_id
+            user_id = request.dialog.user_id
+            tags = request.dialog.tags
+        else:
+            session_id = None
+            user_id = None
+            tags = None
+        observability_handler = create_observability_callback_handler(
+            observability_setting=request.observability_setting,
+        )
+
+    return (
+        records_handler,
+        observability_handler,
     )
 
 
@@ -254,23 +240,15 @@ def create_rag_chain(
     """
 
     # Log progress and validate prompt template
-    logger.info('RAG chain - Validating LLM prompt template')
-    validate_prompt_template(
-        request.question_answering_prompt, 'Question answering prompt'
-    )
+    logger.info("RAG chain - Validating LLM prompt template")
+    validate_prompt_template(request.question_answering_prompt, "Question answering prompt")
     if request.question_condensing_prompt is not None:
-        validate_prompt_template(
-            request.question_condensing_prompt, 'Question condensing prompt'
-        )
+        validate_prompt_template(request.question_condensing_prompt, "Question condensing prompt")
 
     question_condensing_llm_factory = None
     if request.question_condensing_llm_setting is not None:
-        question_condensing_llm_factory = get_llm_factory(
-            setting=request.question_condensing_llm_setting
-        )
-    question_answering_llm_factory = get_llm_factory(
-        setting=request.question_answering_llm_setting
-    )
+        question_condensing_llm_factory = get_llm_factory(setting=request.question_condensing_llm_setting)
+    question_answering_llm_factory = get_llm_factory(setting=request.question_answering_llm_setting)
     em_factory = get_em_factory(setting=request.embedding_question_em_setting)
     vector_store_factory = get_vector_store_factory(
         setting=request.vector_store_setting,
@@ -285,7 +263,7 @@ def create_rag_chain(
     if request.compressor_setting:
         retriever = add_document_compressor(retriever, request.compressor_setting)
 
-    logger.debug('RAG chain - Document index name: %s', request.document_index_name)
+    logger.debug("RAG chain - Document index name: %s", request.document_index_name)
 
     # Build LLM and prompt templates
     question_condensing_llm = None
@@ -300,9 +278,7 @@ def create_rag_chain(
         condensing_llm = question_answering_llm
 
     # Build the chat chain for question contextualization
-    chat_chain = build_question_condensation_chain(
-        condensing_llm, request.question_condensing_prompt
-    )
+    chat_chain = build_question_condensation_chain(condensing_llm, request.question_condensing_prompt)
     rag_prompt = build_rag_prompt(request)
 
     # Function to contextualize the question based on chat history
@@ -311,22 +287,22 @@ def create_rag_chain(
     # Calculate the condensed question
     with_condensed_question = RunnableParallel(
         {
-            'condensed_question': contextualize_question_fn,
-            'question': itemgetter('question'),
-            'chat_history': itemgetter('chat_history'),
+            "condensed_question": contextualize_question_fn,
+            "question": itemgetter("question"),
+            "chat_history": itemgetter("chat_history"),
         }
     )
 
     def retrieve_with_variants(inputs):
         variants = [
             # inputs["question"], Deactivated. It's an example to prove the multi retriever process
-            inputs['condensed_question']
+            inputs["condensed_question"]
         ]
         docs = []
         for v in variants:
             docs.extend(retriever.invoke(v))
         # Deduplicate docs
-        unique_docs = {d.metadata['id']: d for d in docs}
+        unique_docs = {d.metadata["id"]: d for d in docs}
 
         # TODO [DERCBOT-1649] Apply the RRF Algo on unique_docs.
         return list(unique_docs.values())
@@ -334,33 +310,31 @@ def create_rag_chain(
     # Build the RAG inputs
     rag_inputs = with_condensed_question | RunnableParallel(
         {
-            'question': itemgetter('condensed_question'),
-            'chat_history': itemgetter('chat_history'),
-            'documents': RunnableLambda(retrieve_with_variants),
+            "question": itemgetter("condensed_question"),
+            "chat_history": itemgetter("chat_history"),
+            "documents": RunnableLambda(retrieve_with_variants),
         }
     )
-
-    parser = PydanticOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
 
     return rag_inputs | RunnablePassthrough.assign(
         answer=(
             {
-                'context': lambda x: json.dumps(
+                "context": lambda x: json.dumps(
                     [
                         {
-                            'chunk_id': doc.metadata['id'],
-                            'chunk_text': doc.page_content,
+                            "chunk_id": doc.metadata["id"],
+                            "chunk_text": doc.page_content,
                         }
-                        for doc in x['documents']
+                        for doc in x["documents"]
                     ],
                     ensure_ascii=False,
                     indent=2,
                 ),
-                'chat_history': format_chat_history,
+                "chat_history": format_chat_history,
             }
             | rag_prompt
             | question_answering_llm
-            | parser
+            | JsonOutputParser(pydantic_object=LLMAnswer, name="rag_chain_output")
         )
     )
 
@@ -378,17 +352,15 @@ def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
 
 def format_chat_history(x):
     messages = []
-    for msg in x['chat_history']:
+    for msg in x["chat_history"]:
         if isinstance(msg, HumanMessage):
-            messages.append({'user': msg.content})
+            messages.append({"user": msg.content})
         elif isinstance(msg, AIMessage):
-            messages.append({'assistant': msg.content})
+            messages.append({"assistant": msg.content})
     return json.dumps(messages, ensure_ascii=False, indent=2)
 
 
-def build_question_condensation_chain(
-    llm, prompt: Optional[PromptTemplate]
-) -> ChatPromptTemplate:
+def build_question_condensation_chain(llm, prompt: Optional[PromptTemplate]) -> ChatPromptTemplate:
     """
     Build the chat chain for contextualizing questions.
     """
@@ -418,13 +390,13 @@ Return only the reformulated question.
     return (
         ChatPromptTemplate.from_messages(
             [
-                ('system', prompt.template),
-                MessagesPlaceholder(variable_name='chat_history'),
-                ('human', '{question}'),
+                ("system", prompt.template),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("human", "{question}"),
             ]
         ).partial(**prompt.inputs)
         | llm
-        | StrOutputParser(name='chat_chain_output')
+        | StrOutputParser(name="chat_chain_output")
     )
 
 
@@ -432,9 +404,33 @@ def contextualize_question(inputs: dict, chat_chain) -> str:
     """
     Contextualize the question based on the chat history.
     """
-    if inputs.get('chat_history') and len(inputs['chat_history']) > 0:
+    if inputs.get("chat_history") and len(inputs["chat_history"]) > 0:
         return chat_chain
-    return inputs['question']
+    return inputs["question"]
+
+
+def rag_guard(question, answer, response, documents_required):
+    """
+    Validates the RAG system's response based on the presence or absence of source documents
+    and the `documentsRequired` setting.
+
+    Args:
+        question: user question
+        answer: the LLM answer
+        response: the RAG response
+        documents_required (bool): Specifies whether documents are mandatory for the response.
+    """
+
+    if documents_required and answer.status == "found_in_context" and len(response["documents"]) == 0:
+        message = "No documents were retrieved, yet an answer was attempted."
+        rag_log(level=ERROR, message=message, question=question, answer=answer.answer, response=response)
+        raise GenAIGuardCheckException(ErrorInfo(cause=message))
+
+    if answer.status == "not_found_in_context" and len(response["documents"]) > 0:
+        # If the answer is not found in context and some documents are retrieved, so we remove them from the RAG response.
+        message = "No answer found in the retrieved context. The documents are therefore removed from the RAG response."
+        rag_log(level=WARNING, message=message, question=question, answer=answer.answer, response=response)
+        response["documents"] = []
 
 
 def rag_log(level, message, question, answer, response):
@@ -451,13 +447,12 @@ def rag_log(level, message, question, answer, response):
 
     logger.log(
         level,
-        '%(message)s \n'
-        'RAG chain - question="%(question)s", answer="%(answer)s", documents="%(documents)s"',
+        "%(message)s \n" 'RAG chain - question="%(question)s", answer="%(answer)s", documents="%(documents)s"',
         {
-            'message': message,
-            'question': question,
-            'answer': answer,
-            'documents': len(response['documents']),
+            "message": message,
+            "question": question,
+            "answer": answer,
+            "documents": len(response["documents"]),
         },
     )
 
@@ -470,33 +465,31 @@ def get_rag_documents(handler: RAGCallbackHandler) -> List[RAGDocument]:
         handler: the RAG Callback Handler
     """
 
-    if handler.records['documents'] is None:
+    if handler.records["documents"] is None:
         return []
 
     return [
         # Get first 100 char of content
         RAGDocument(
-            content=doc.page_content[0 : len(doc.metadata['title']) + 100] + '...',
+            content=doc.page_content[0 : len(doc.metadata["title"]) + 100] + "...",
             metadata=RAGDocumentMetadata(**doc.metadata),
         )
-        for doc in handler.records['documents']
+        for doc in handler.records["documents"]
     ]
+
+
+def get_llm_answer(rag_chain_output) -> LLMAnswer:
+    return LLMAnswer(**json.loads(rag_chain_output.strip().removeprefix("```json").removesuffix("```").strip()))
 
 
 def get_llm_answer(rag_chain_output) -> LLMAnswer:
     if rag_chain_output is None:
         return LLMAnswer()
 
-    return LLMAnswer(
-        **json.loads(
-            rag_chain_output.strip().removeprefix('```json').removesuffix('```').strip()
-        )
-    )
+    return LLMAnswer(**json.loads(rag_chain_output.strip().removeprefix("```json").removesuffix("```").strip()))
 
 
-def get_rag_debug_data(
-    request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration
-) -> RAGDebugData:
+def get_rag_debug_data(request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration) -> RAGDebugData:
     """RAG debug data assembly"""
 
     history = []
@@ -504,15 +497,15 @@ def get_rag_debug_data(
         history = request.dialog.history
 
     return RAGDebugData(
-        user_question=request.question_answering_prompt.inputs['question'],
-        question_condensing_prompt=records_callback_handler.records['chat_prompt'],
+        user_question=request.question_answering_prompt.inputs["question"],
+        question_condensing_prompt=records_callback_handler.records["chat_prompt"],
         question_condensing_history=history,
-        condensed_question=records_callback_handler.records['chat_chain_output'],
-        question_answering_prompt=records_callback_handler.records['rag_prompt'],
+        condensed_question=records_callback_handler.records["chat_chain_output"],
+        question_answering_prompt=records_callback_handler.records["rag_prompt"],
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,
         document_search_params=request.document_search_params,
-        answer=get_llm_answer(records_callback_handler.records['rag_chain_output']),
+        answer=get_llm_answer(records_callback_handler.records["rag_chain_output"]),
         duration=rag_duration,
     )
 
@@ -524,7 +517,7 @@ def check_guardrail_output(guardrail_output: dict) -> bool:
     Returns:
         Returns True if nothing is detected, raises an exception otherwise.
     """
-    if guardrail_output['output_toxicity']:
+    if guardrail_output["output_toxicity"]:
         message = f"Toxicity detected in LLM output ({','.join(guardrail_output['output_toxicity_reason'])})"
         raise GenAIGuardCheckException(ErrorInfo(cause=message))
     return True

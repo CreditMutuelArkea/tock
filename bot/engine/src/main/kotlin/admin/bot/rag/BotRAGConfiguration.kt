@@ -35,6 +35,10 @@ data class BotRAGConfiguration(
     val llmSetting: LLMSetting? = null,
     val emSetting: EMSetting,
     val indexSessionId: String? = null,
+    @Deprecated("Replaced by LLM answer status")
+    val noAnswerSentence: String,
+    val noAnswerStoryId: String? = null,
+    val documentsRequired: Boolean = true,
     val debugEnabled: Boolean = false,
     val maxDocumentsRetrieved: Int = 4,
     val maxMessagesFromHistory: Int = 5,

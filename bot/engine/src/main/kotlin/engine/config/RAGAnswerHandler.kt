@@ -28,10 +28,7 @@ import ai.tock.bot.engine.action.SendSentence
 import ai.tock.bot.engine.action.SendSentenceWithFootnotes
 import ai.tock.bot.engine.dialog.Dialog
 import ai.tock.bot.engine.user.PlayerType
-import ai.tock.genai.orchestratorclient.requests.ChatMessage
-import ai.tock.genai.orchestratorclient.requests.ChatMessageType
-import ai.tock.genai.orchestratorclient.requests.DialogDetails
-import ai.tock.genai.orchestratorclient.requests.RAGRequest
+import ai.tock.genai.orchestratorclient.requests.*
 import ai.tock.genai.orchestratorclient.responses.LLMAnswer
 import ai.tock.genai.orchestratorclient.responses.ObservabilityInfo
 import ai.tock.genai.orchestratorclient.responses.RAGResponse
@@ -62,7 +59,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
             BotRepository.saveMetric(createMetric(MetricType.STORY_HANDLED))
 
             // Call RAG Api - Gen AI Orchestrator
-            val (answer, footnotes, debug, redirectStory, observabilityInfo) = rag(this)
+            val (answer, footnotes, debug, noAnswerStory, observabilityInfo) = rag(this)
 
             // Add debug data if available and if debugging is enabled
             if (debug != null) {
@@ -72,15 +69,23 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
 
             val modifiedObservabilityInfo = observabilityInfo?.let { updateObservabilityInfo(this, it) }
 
-            // Footnotes building
-            val preparedFootnotes =
-                footnotes?.map {
-                    Footnote(
-                        it.identifier,
-                        it.title,
-                        it.url,
-                        if (action.metadata.sourceWithContent) it.content else null,
-                        it.score,
+                val modifiedObservabilityInfo = observabilityInfo?.let { updateObservabilityInfo(this, it) }
+
+                send(
+                    action = SendSentenceWithFootnotes(
+                        playerId = botId,
+                        applicationId = connectorId,
+                        recipientId = userId,
+                        text = answer.answer,
+                        footnotes = footnotes?.map {
+                            Footnote(
+                                it.identifier, it.title, it.url,
+                                if(action.metadata.sourceWithContent) it.content else null,
+                                it.score
+                            )
+                        }?.toMutableList() ?: mutableListOf<Footnote>(),
+                        // modifiedObservabilityInfo includes the public langfuse URL if filled.
+                        metadata = ActionMetadata(isGenAiRagAnswer = true, observabilityInfo = modifiedObservabilityInfo)
                     )
                 }?.toMutableList() ?: mutableListOf()
 
@@ -130,12 +135,24 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
      * @param botBus the bot Bus
      * @param response the RAG response
      */
-    private fun ragStoryRedirection(
-        botBus: BotBus,
-        response: RAGResponse?,
-    ): StoryDefinition? {
-        return response?.answer?.redirectionIntent?.let {
-            botBus.botDefinition.findStoryDefinition(it, "")
+    private fun ragStoryRedirection(botBus: BotBus, response: RAGResponse?): StoryDefinition? {
+        return with(botBus) {
+            botDefinition.ragConfiguration?.let { ragConfig ->
+                if (response?.answer?.status.equals("not_found_in_context", ignoreCase = true)) {
+                    // Save no answer metric
+                    saveRagMetric(IndicatorValues.NO_ANSWER)
+
+                    // Switch to no answer story if configured
+                    if (!ragConfig.noAnswerStoryId.isNullOrBlank()) {
+                        logger.info { "Switch to the no-answer RAG story." }
+                        getNoAnswerRAGStory(ragConfig)
+                    } else null
+                } else {
+                    // Save success metric
+                    saveRagMetric(IndicatorValues.SUCCESS)
+                    null
+                }
+            }
         }
     }
 
@@ -214,26 +231,23 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                 }
 
                 // Handle RAG response
-                return RAGResult(
-                    response?.answer,
-                    response?.footnotes,
-                    response?.debug,
-                    ragStoryRedirection(this, response),
-                    response?.observabilityInfo,
-                )
+                return RAGResult(response?.answer, response?.footnotes, response?.debug, ragStoryRedirection(this, response), response?.observabilityInfo)
             } catch (exc: Exception) {
                 logger.error { exc }
                 // Save failure metric
                 saveRagMetric(IndicatorValues.FAILURE)
 
-                return RAGResult(
-                    answer = LLMAnswer(status = "error", answer = technicalErrorMessage),
-                    debug =
-                        when (exc) {
-                            is GenAIOrchestratorBusinessError -> RAGError(exc.message, exc.error)
-                            is GenAIOrchestratorValidationError -> RAGError(exc.message, exc.detail)
-                            else -> RAGError(errorMessage = exc.message)
-                        },
+                return if (exc is GenAIOrchestratorBusinessError && exc.error.info.error == "APITimeoutError") {
+                    logger.info { "The APITimeoutError is raised, so switch to the no-answer story." }
+                    RAGResult(noAnswerStory = getNoAnswerRAGStory(ragConfiguration))
+                }
+                else RAGResult(
+                    answer = LLMAnswer(status="error", answer = technicalErrorMessage),
+                    debug = when(exc) {
+                        is GenAIOrchestratorBusinessError -> RAGError(exc.message, exc.error)
+                        is GenAIOrchestratorValidationError -> RAGError(exc.message, exc.detail)
+                        else -> RAGError(errorMessage = exc.message)
+                    }
                 )
             }
         }
