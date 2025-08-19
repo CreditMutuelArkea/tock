@@ -27,7 +27,6 @@ from gen_ai_orchestrator.models.errors.errors_models import (
 from gen_ai_orchestrator.models.llm.llm_provider import LLMProvider
 from gen_ai_orchestrator.models.rag.rag_models import Source, TextWithFootnotes, LLMAnswer
 from gen_ai_orchestrator.models.observability.observability_provider import ObservabilityProvider
-from gen_ai_orchestrator.models.rag.rag_models import TextWithFootnotes
 from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import VectorStoreProvider
 
 

@@ -69,7 +69,7 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     RAGDebugData,
     RAGDocument,
     RAGDocumentMetadata,
-    TextWithFootnotes,
+    TextWithFootnotes, LLMAnswer,
 )
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
 from gen_ai_orchestrator.routers.responses.responses import (
@@ -189,11 +189,11 @@ async def execute_rag_chain(
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
     # Returning RAG response
-    llm_answer = json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip())
+    llm_answer = LLMAnswer(**json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()))
     return RAGResponse(
-        llm_answer=json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()),
+        llm_answer=llm_answer,
         answer=TextWithFootnotes(
-            text=llm_answer['answer'] or request.question_answering_prompt.inputs['no_answer'],
+            text=llm_answer.answer or request.question_answering_prompt.inputs['no_answer'],
             footnotes=set(
                 map(
                     lambda doc: Footnote(
@@ -393,7 +393,7 @@ def rag_guard(inputs, response, documents_required):
     chain_can_give_no_answer_reply = 'no_answer' in inputs
     chain_reply_no_answer = False
 
-    if chain_can_give_no_answer_reply:
+    if chain_can_give_no_answer_reply: # TODO MASS, use the answer status
         chain_reply_no_answer = response['answer'] == inputs['no_answer']
 
     if no_docs_but_required:
