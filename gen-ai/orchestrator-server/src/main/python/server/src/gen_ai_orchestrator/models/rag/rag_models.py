@@ -52,6 +52,11 @@ class Footnote(Source):
 
     identifier: str = Field(description='Footnote identifier', examples=['1'])
 
+class LLMAnswer(BaseModel):
+    status: Optional[str]
+    answer: Optional[str]
+    topic: Optional[str]
+    suggested_topics: Optional[List[str]]
 
 class TextWithFootnotes(BaseModel):
     """Text with its footnotes. Used for RAG response"""

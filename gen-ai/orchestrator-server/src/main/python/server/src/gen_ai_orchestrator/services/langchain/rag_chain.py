@@ -17,6 +17,7 @@ Module for the RAG Chain
 It uses LangChain to perform a Conversational Retrieval Chain
 """
 
+import json
 import logging
 import time
 from functools import partial
@@ -188,9 +189,11 @@ async def execute_rag_chain(
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
     # Returning RAG response
+    llm_answer = json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip())
     return RAGResponse(
+        llm_answer=json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()),
         answer=TextWithFootnotes(
-            text=response['answer'],
+            text=llm_answer['answer'] or request.question_answering_prompt.inputs['no_answer'],
             footnotes=set(
                 map(
                     lambda doc: Footnote(
