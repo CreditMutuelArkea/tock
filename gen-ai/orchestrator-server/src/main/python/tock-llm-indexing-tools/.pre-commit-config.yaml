@@ -29,7 +29,7 @@ repos:
             files: "\\.(py)$"
             args: [--settings-path=gen-ai/orchestrator-server/src/main/python/server/pyproject.toml]
   -   repo: https://github.com/hadialqattan/pycln
-      rev: v2.3.0
+      rev: v2.6.0
       hooks:
         - id: pycln
   - repo: https://github.com/pypa/pip-audit
@@ -37,6 +37,6 @@ repos:
     hooks:
       - id: pip-audit
         additional_dependencies:
-          - "pip>=25.3"
-          - "filelock>=3.20.1"
+          - "pip>=26.0"
+          - "filelock>=3.20.3"
           - "urllib3>=2.6.3"
