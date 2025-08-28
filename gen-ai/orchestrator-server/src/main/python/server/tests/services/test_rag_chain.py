@@ -28,6 +28,7 @@ from gen_ai_orchestrator.errors.exceptions.exceptions import (
 from gen_ai_orchestrator.models.guardrail.bloomz.bloomz_guardrail_setting import (
     BloomzGuardrailSetting,
 )
+from gen_ai_orchestrator.models.rag.rag_models import LLMAnswer
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
 from gen_ai_orchestrator.services.langchain import rag_chain
 
@@ -48,12 +49,12 @@ from gen_ai_orchestrator.services.langchain.rag_chain import (
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGCallbackHandler')
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.rag_guard')
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGResponse')
-@patch('gen_ai_orchestrator.services.langchain.rag_chain.TextWithFootnotes')
+@patch('gen_ai_orchestrator.services.langchain.rag_chain.Footnote')
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGDebugData')
 @pytest.mark.asyncio
 async def test_rag_chain(
     mocked_rag_debug_data,
-    mocked_text_with_footnotes,
+    mocked_footnotes,
     mocked_rag_response,
     mocked_rag_guard,
     mocked_callback_init,
@@ -186,10 +187,8 @@ Answer in {locale}:""",
     )
     # Assert the response is build using the expected settings
     mocked_rag_response.assert_called_once_with(
-        # TextWithFootnotes must be mocked or mapping the footnotes will fail
-        answer=mocked_text_with_footnotes(
-            text=mocked_rag_answer['answer'], footnotes=[]
-        ),
+        answer=mocked_rag_answer['answer'],
+        footnotes=[],
         debug=mocked_rag_debug_data(request, mocked_rag_answer, mocked_callback, 1),
         observability_info=None
     )
@@ -409,13 +408,16 @@ def test_check_guardrail_output_is_ok():
 
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.rag_log')
 def test_rag_guard_fails_if_no_docs_in_valid_answer(mocked_log):
-    inputs = {'no_answer': "Sorry, I don't know."}
+    question = 'hey !'
+    llm_answer = LLMAnswer(**{
+        'status': 'found_in_context',
+        'answer': 'a valid answer'
+    })
     response = {
-        'answer': 'a valid answer',
         'documents': [],
     }
     try:
-        rag_chain.rag_guard(inputs, response,documents_required=True)
+        rag_chain.rag_guard(question, llm_answer, response, documents_required=True)
     except Exception as e:
         assert isinstance(e, GenAIGuardCheckException)
 

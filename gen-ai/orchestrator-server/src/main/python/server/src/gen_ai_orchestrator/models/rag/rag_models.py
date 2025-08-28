@@ -52,21 +52,17 @@ class Footnote(Source):
 
     identifier: str = Field(description='Footnote identifier', examples=['1'])
 
+class ChunkSentences(BaseModel):
+    chunk: int
+    sentences: List[str] = None
+    reason: Optional[str] = None
+
 class LLMAnswer(BaseModel):
-    status: Optional[str]
-    answer: Optional[str]
-    topic: Optional[str]
-    suggested_topics: Optional[List[str]]
-
-class TextWithFootnotes(BaseModel):
-    """Text with its footnotes. Used for RAG response"""
-
-    text: str = Field(
-        description='Text with footnotes used to list outside sources',
-        examples=['This is page content [1], and this is more content [2]'],
-    )
-    footnotes: set[Footnote] = Field(description='Set of footnotes')
-
+    status: Optional[str] = None
+    answer: Optional[str] = None
+    topic: Optional[str] = None
+    suggested_topics: Optional[List[str]] = None
+    context: Optional[List[ChunkSentences]] = None
 
 @unique
 class ChatMessageType(str, Enum):

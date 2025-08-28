@@ -69,7 +69,7 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     RAGDebugData,
     RAGDocument,
     RAGDocumentMetadata,
-    TextWithFootnotes, LLMAnswer,
+    LLMAnswer,
 )
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
 from gen_ai_orchestrator.routers.responses.responses import (
@@ -95,6 +95,10 @@ from gen_ai_orchestrator.services.utils.prompt_utility import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def get_llm_answer(response) -> LLMAnswer:
+    return LLMAnswer(**json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()))
 
 
 @opensearch_exception_handler
@@ -173,8 +177,10 @@ async def execute_rag_chain(
         config={'callbacks': callback_handlers},
     )
 
+    llm_answer = get_llm_answer(response)
+
     # RAG Guard
-    rag_guard(inputs, response, request.documents_required)
+    rag_guard(inputs, llm_answer, response, request.documents_required)
 
     # Guardrail
     if request.guardrail_setting:
@@ -189,23 +195,19 @@ async def execute_rag_chain(
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
     # Returning RAG response
-    llm_answer = LLMAnswer(**json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()))
     return RAGResponse(
-        llm_answer=llm_answer,
-        answer=TextWithFootnotes(
-            text=llm_answer.answer or request.question_answering_prompt.inputs['no_answer'],
-            footnotes=set(
-                map(
-                    lambda doc: Footnote(
-                        identifier=doc.metadata['id'],
-                        title=doc.metadata['title'],
-                        url=doc.metadata['source'],
-                        content=get_source_content(doc),
-                        score=doc.metadata.get('retriever_score', None),
-                    ),
-                    response['documents'],
-                )
-            ),
+        answer=llm_answer,
+        footnotes=set(
+            map(
+                lambda doc: Footnote(
+                    identifier=doc.metadata['id'],
+                    title=doc.metadata['title'],
+                    url=doc.metadata['source'],
+                    content=get_source_content(doc),
+                    score=doc.metadata.get('retriever_score', None),
+                ),
+                response['documents'],
+            )
         ),
         observability_info=get_observability_info(observability_handler),
         debug=get_rag_debug_data(request, records_callback_handler, rag_duration)
@@ -377,50 +379,39 @@ def contextualize_question(inputs: dict, chat_chain) -> str:
     return inputs['question']
 
 
-def rag_guard(inputs, response, documents_required):
+def rag_guard(question, answer, response, documents_required):
     """
     Validates the RAG system's response based on the presence or absence of source documents
     and the `documentsRequired` setting.
 
     Args:
-        inputs: question answering prompt inputs
+        question: user question
+        answer: the LLM answer
         response: the RAG response
         documents_required (bool): Specifies whether documents are mandatory for the response.
     """
 
-    no_docs_retrieved = response['documents'] == []
-    no_docs_but_required = no_docs_retrieved and documents_required
-    chain_can_give_no_answer_reply = 'no_answer' in inputs
-    chain_reply_no_answer = False
-
-    if chain_can_give_no_answer_reply: # TODO MASS, use the answer status
-        chain_reply_no_answer = response['answer'] == inputs['no_answer']
-
-    if no_docs_but_required:
-        if chain_can_give_no_answer_reply and chain_reply_no_answer:
-            # We expect the chain to use its non-response value, and it has done so, which is the expected behavior.
-            return
-        # Everything else isn't expected
-        message = 'The RAG system cannot provide an answer when no documents are found and documents are required'
-        rag_log(level=ERROR, message=message, inputs=inputs, response=response)
+    if documents_required and answer.status == "found_in_context" and len(response['documents']) == 0:
+        message = 'No documents were retrieved, yet an answer was attempted.'
+        rag_log(level=ERROR, message=message, question=question, answer=answer.answer, response=response)
         raise GenAIGuardCheckException(ErrorInfo(cause=message))
 
-    if chain_reply_no_answer and not no_docs_retrieved:
-        # If the chain responds with its non-response value and the documents are retrieved,
-        # so we remove them from the RAG response.
-        message = 'The RAG gives no answer for user question, but some documents has been found!'
-        rag_log(level=WARNING, message=message, inputs=inputs, response=response)
+    if answer.status == "not_found_in_context" and len(response['documents']) > 0:
+        # If the answer is not found in context and some documents are retrieved, so we remove them from the RAG response.
+        message = 'No answer found in the retrieved context. The documents are therefore removed from the RAG response.'
+        rag_log(level=WARNING, message=message, question=question, answer=answer.answer, response=response)
         response['documents'] = []
 
 
-def rag_log(level, message, inputs, response):
+def rag_log(level, message, question, answer, response):
     """
     RAG logging
 
     Args:
         level: logging level
         message: message to log
-        inputs: question answering prompt inputs
+        question: question answering prompt inputs
+        answer: LLM answer
         response: the RAG response
     """
 
@@ -430,9 +421,9 @@ def rag_log(level, message, inputs, response):
         'RAG chain - question="%(question)s", answer="%(answer)s", documents="%(documents)s"',
         {
             'message': message,
-            'question': inputs['question'],
-            'answer': response['answer'],
-            'documents': response['documents'],
+            'question': question,
+            'answer': answer,
+            'documents': len(response['documents']),
         },
     )
 
