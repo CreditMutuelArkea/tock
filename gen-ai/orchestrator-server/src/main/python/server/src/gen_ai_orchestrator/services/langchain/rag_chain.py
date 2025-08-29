@@ -33,7 +33,7 @@ from langchain.retrievers.contextual_compression import (
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
-from langchain_core.output_parsers import StrOutputParser
+from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.runnables import (
@@ -95,11 +95,6 @@ from gen_ai_orchestrator.services.utils.prompt_utility import (
 )
 
 logger = logging.getLogger(__name__)
-
-
-def get_llm_answer(answer) -> LLMAnswer:
-    return LLMAnswer(**json.loads(answer.strip().removeprefix("```json").removesuffix("```").strip()))
-
 
 @opensearch_exception_handler
 @openai_exception_handler(provider='OpenAI or AzureOpenAIService')
@@ -176,8 +171,7 @@ async def execute_rag_chain(
         input=inputs,
         config={'callbacks': callback_handlers},
     )
-
-    llm_answer = get_llm_answer(response['answer'])
+    llm_answer = LLMAnswer(**response['answer'])
 
     # RAG Guard
     rag_guard(inputs, llm_answer, response, request.documents_required)
@@ -187,7 +181,7 @@ async def execute_rag_chain(
         guardrail = get_guardrail_factory(
             setting=request.guardrail_setting
         ).get_parser()
-        guardrail_output = guardrail.parse(response['answer'])
+        guardrail_output = guardrail.parse(llm_answer.answer)
         check_guardrail_output(guardrail_output)
 
     # Calculation of RAG processing time
@@ -206,7 +200,7 @@ async def execute_rag_chain(
                 score=doc.metadata.get('retriever_score', None),
             )
             for doc, ctx in zip(response["documents"], llm_answer.context)
-            if ctx.sentences  # garde seulement si sentences non vide
+            if ctx.sentences
         },
         observability_info=get_observability_info(observability_handler),
         debug=get_rag_debug_data(request, records_callback_handler, rag_duration)
@@ -336,7 +330,7 @@ def construct_rag_chain(llm, rag_prompt):
         }
         | rag_prompt
         | llm
-        | StrOutputParser(name='rag_chain_output')
+        | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
     )
 
 
@@ -444,6 +438,8 @@ def get_rag_documents(handler: RAGCallbackHandler) -> List[RAGDocument]:
         for doc in handler.records['documents']
     ]
 
+def get_llm_answer(rag_chain_output) -> LLMAnswer:
+    return LLMAnswer(**json.loads(rag_chain_output.strip().removeprefix("```json").removesuffix("```").strip()))
 
 def get_rag_debug_data(
     request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration
