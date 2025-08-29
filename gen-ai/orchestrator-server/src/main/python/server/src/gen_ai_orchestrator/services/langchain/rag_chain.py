@@ -97,8 +97,8 @@ from gen_ai_orchestrator.services.utils.prompt_utility import (
 logger = logging.getLogger(__name__)
 
 
-def get_llm_answer(response) -> LLMAnswer:
-    return LLMAnswer(**json.loads(response['answer'].strip().removeprefix("```json").removesuffix("```").strip()))
+def get_llm_answer(answer) -> LLMAnswer:
+    return LLMAnswer(**json.loads(answer.strip().removeprefix("```json").removesuffix("```").strip()))
 
 
 @opensearch_exception_handler
@@ -177,7 +177,7 @@ async def execute_rag_chain(
         config={'callbacks': callback_handlers},
     )
 
-    llm_answer = get_llm_answer(response)
+    llm_answer = get_llm_answer(response['answer'])
 
     # RAG Guard
     rag_guard(inputs, llm_answer, response, request.documents_required)
@@ -197,18 +197,17 @@ async def execute_rag_chain(
     # Returning RAG response
     return RAGResponse(
         answer=llm_answer,
-        footnotes=set(
-            map(
-                lambda doc: Footnote(
-                    identifier=doc.metadata['id'],
-                    title=doc.metadata['title'],
-                    url=doc.metadata['source'],
-                    content=get_source_content(doc),
-                    score=doc.metadata.get('retriever_score', None),
-                ),
-                response['documents'],
+        footnotes={
+            Footnote(
+                identifier=doc.metadata['id'],
+                title=doc.metadata['title'],
+                url=doc.metadata['source'],
+                content=get_source_content(doc),
+                score=doc.metadata.get('retriever_score', None),
             )
-        ),
+            for doc, ctx in zip(response["documents"], llm_answer.context)
+            if ctx.sentences  # garde seulement si sentences non vide
+        },
         observability_info=get_observability_info(observability_handler),
         debug=get_rag_debug_data(request, records_callback_handler, rag_duration)
         if debug
@@ -464,7 +463,7 @@ def get_rag_debug_data(
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,
         document_search_params=request.document_search_params,
-        answer=records_callback_handler.records['rag_chain_output'],
+        answer=get_llm_answer(records_callback_handler.records['rag_chain_output']),
         duration=rag_duration,
     )
 

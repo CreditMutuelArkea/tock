@@ -54,7 +54,7 @@ class Footnote(Source):
 
 class ChunkSentences(BaseModel):
     chunk: int
-    sentences: List[str] = None
+    sentences: List[str] = []
     reason: Optional[str] = None
 
 class LLMAnswer(BaseModel):
@@ -155,4 +155,4 @@ class RAGDebugData(QADebugData):
             'Question: Hello, how to plan a trip to Morocco ?. Answer in French.'
         ],
     )
-    answer: str = Field(description='The RAG answer.')
+    answer: LLMAnswer = Field(description='The RAG answer.')
