@@ -22,6 +22,7 @@ import logging
 import time
 from functools import partial
 from logging import ERROR, WARNING
+from operator import itemgetter
 from typing import List, Optional
 
 from langchain.chains.conversational_retrieval.base import (
@@ -123,15 +124,22 @@ async def execute_rag_chain(
     session_id = None
     user_id = None
     tags = []
+    history_str = ""
     if request.dialog:
+        lines = []
         for msg in request.dialog.history:
             if ChatMessageType.HUMAN == msg.type:
                 message_history.add_user_message(msg.text)
+                lines.append(f"User: {msg.text}")
             else:
                 message_history.add_ai_message(msg.text)
+                lines.append(f"Assistant: {msg.text}")
         session_id = (request.dialog.dialog_id,)
         user_id = (request.dialog.user_id,)
         tags = (request.dialog.tags,)
+        history_str = "\n".join(lines)
+
+    print(history_str)
 
     logger.debug(
         'RAG chain - Use chat history: %s',
@@ -141,6 +149,7 @@ async def execute_rag_chain(
     inputs = {
         **request.question_answering_prompt.inputs,
         'chat_history': message_history.messages,
+        'history_str': history_str,
     }
 
     logger.debug(
@@ -291,14 +300,28 @@ def create_rag_chain(
         request.question_condensing_prompt,
     )
 
-    # Function to contextualize the question based on chat history
-    contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
+    rag_prompt = build_rag_prompt(request)
+    rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
-    # Final RAG chain with retriever and source documents
+    # Chaîne de condensation de question qui NE remplace pas l’input global
+    contextualize_q = (
+        {  # on ne donne à chat_chain que ce dont il a besoin
+            "chat_history": itemgetter("chat_history"),
+            "question": itemgetter("question"),
+        }
+        | chat_chain  # -> renvoie une chaîne: la question (condensée ou non)
+    )
+
+    # Construire l'input pour la RAG: on garde history_str tel quel
+    rag_inputs = RunnableParallel({
+        "question": contextualize_q,               # string condensée
+        "history_str": itemgetter("history_str"),  # string d'origine
+        "documents": contextualize_q | retriever,  # retrieve avec la question condensée
+    })
+
     rag_chain_with_retriever = (
-        contextualize_question_fn
-        | RunnableParallel({'documents': retriever, 'question': RunnablePassthrough()})
-        | RunnablePassthrough.assign(answer=rag_chain)
+        rag_inputs
+        | RunnablePassthrough.assign(answer=rag_chain)  # rag_chain lit question/history_str/documents
     )
 
     return rag_chain_with_retriever
@@ -316,21 +339,14 @@ def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
 
 
 def construct_rag_chain(llm, rag_prompt):
-    """
-    Construct the RAG chain from LLM and prompt.
-    """
     return (
         {
-            'context': lambda inputs: '\n\n'.join(
-                doc.page_content for doc in inputs['documents']
-            ),
-            'question': lambda inputs: inputs[
-                'question'
-            ],  # Override the user's original question with the condensed one
+            "context": lambda x: "\n\n".join(doc.page_content for doc in x["documents"]),
+            "history_str": itemgetter("history_str"),  # >>> passe au prompt
         }
         | rag_prompt
         | llm
-        | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
+        | JsonOutputParser(pydantic_object=LLMAnswer, name="rag_chain_output")
     )
 # TODO MASS
 # https://medium.com/@saurabhzodex/memory-enhanced-rag-chatbot-with-langchain-integrating-chat-history-for-context-aware-845100184c4f
@@ -385,7 +401,6 @@ def contextualize_question(inputs: dict, chat_chain) -> str:
     if inputs.get('chat_history') and len(inputs['chat_history']) > 0:
         return chat_chain
     return inputs['question']
-
 
 def rag_guard(question, answer, response, documents_required):
     """

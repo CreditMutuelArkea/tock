@@ -272,7 +272,7 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
         // drop the last message, because it corresponds to the user's current question
         .dropLast(n = 1)
         // take last 10 messages
-        .takeLast(n = nLastMessages)
+        .takeLast(n = nLastMessages) // TODO MASS
 
     private fun BotBus.saveRagMetric(indicator: IndicatorValues) {
         BotRepository.saveMetric(
