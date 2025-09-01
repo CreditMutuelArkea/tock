@@ -332,8 +332,8 @@ def construct_rag_chain(llm, rag_prompt):
         | llm
         | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
     )
-
-
+# TODO MASS
+# https://medium.com/@saurabhzodex/memory-enhanced-rag-chatbot-with-langchain-integrating-chat-history-for-context-aware-845100184c4f
 def build_question_condensation_chain(
     llm, prompt: Optional[PromptTemplate]
 ) -> ChatPromptTemplate:
