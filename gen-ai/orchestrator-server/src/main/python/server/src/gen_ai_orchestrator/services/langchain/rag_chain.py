@@ -40,7 +40,7 @@ from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.runnables import (
     RunnableParallel,
     RunnablePassthrough,
-    RunnableSerializable,
+    RunnableSerializable, RunnableConfig, RunnableBranch,
 )
 from langchain_core.vectorstores import VectorStoreRetriever
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
@@ -176,7 +176,7 @@ async def execute_rag_chain(
 
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
-        config={'callbacks': callback_handlers},
+        config=RunnableConfig(callbacks=callback_handlers)
     )
     llm_answer = LLMAnswer(**response['answer'])
 
@@ -301,25 +301,26 @@ def create_rag_chain(
     rag_prompt = build_rag_prompt(request)
     rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
-    # Chaîne de condensation de question qui ne remplace pas l’input global
-    contextualize_q = (
-        {  # on ne donne à chat_chain que ce dont il a besoin
-            "chat_history": itemgetter("chat_history"),
-            "question": itemgetter("question"),
-        }
-        | chat_chain  # -> renvoie une chaîne: la question (condensée ou non)
-    )
+    # Function to contextualize the question based on chat history
+    contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
 
-    # Construire l'input pour la RAG: on garde history_str tel quel
-    rag_inputs = RunnableParallel({
-        "question": contextualize_q,               # question condensée ou non
-        "history_str": itemgetter("history_str"),  # string d'origine
-        "documents": contextualize_q | retriever,  # retrieve avec la question condensée
+    # 3️⃣ Calculer la question condensée une seule fois et la garder sous un champ dédié
+    with_condensed_question = RunnableParallel({
+        "condensed_question": contextualize_question_fn,
+        "history_str": itemgetter("history_str"),
     })
 
+    # 4️⃣ Construire l'input pour la RAG en réutilisant condensed_question
+    rag_inputs = with_condensed_question | RunnableParallel({
+        "question": itemgetter("condensed_question"),
+        "history_str": itemgetter("history_str"),
+        "documents": itemgetter("condensed_question") | retriever,
+    })
+
+    # 5️⃣ Chaîne finale avec RAG
     rag_chain_with_retriever = (
-        rag_inputs
-        | RunnablePassthrough.assign(answer=rag_chain)  # rag_chain lit question/history_str/documents
+            rag_inputs
+            | RunnablePassthrough.assign(answer=rag_chain)  # rag_chain lit question/history_str/documents
     )
 
     return rag_chain_with_retriever
@@ -365,19 +366,19 @@ Do NOT answer the question, just reformulate it if needed and otherwise return i
         )
 
     # TODO MASS: a mettre ds la default config
-        prompt.template = """You are an assistant whose sole task is to STRICTLY REFORMULATE the user's latest message into a single standalone phrase, in the same language, while respecting the STYLE (register, tone, capitalization, level of formality). Apply the following rules:
+    prompt.template = """You are an assistant whose sole task is to STRICTLY REFORMULATE the user's latest message into a single standalone phrase, in the same language, while respecting the STYLE (register, tone, capitalization, level of formality). Apply the following rules:
 
-        1) Question detection: treat the message as a question if it ends with a question mark, or contains an interrogative word (e.g. who, what, which, how, why, where, when, how much), or has an interrogative construction (e.g. "is it", "can you", "could you", "would you").  
-           - IF it is a question → REFORMULATE it AS A QUESTION. Preserve tone, register (formal/informal, you vs. thou, etc.), capitalization. Add a single "?" at the end if necessary. Do not add any new information.
+    1) Question detection: treat the message as a question if it ends with a question mark, or contains an interrogative word (e.g. who, what, which, how, why, where, when, how much), or has an interrogative construction (e.g. "is it", "can you", "could you", "would you").  
+       - IF it is a question → REFORMULATE it AS A QUESTION. Preserve tone, register (formal/informal, you vs. thou, etc.), capitalization. Add a single "?" at the end if necessary. Do not add any new information.
 
-        2) IF the message is NOT a question (greeting, statement, command, fragment) → REFORMULATE WITHOUT TURNING IT INTO A QUESTION. Do not rephrase it into interrogative form.
+    2) IF the message is NOT a question (greeting, statement, command, fragment) → REFORMULATE WITHOUT TURNING IT INTO A QUESTION. Do not rephrase it into interrogative form.
 
-        3) Do not guess: if the message is short, vague, or incomplete (e.g. "to understand", "the rate"), DO NOT invent missing meaning. Return it as is or make minimal grammatical adjustments — but do not add content.
+    3) Do not guess: if the message is short, vague, or incomplete (e.g. "to understand", "the rate"), DO NOT invent missing meaning. Return it as is or make minimal grammatical adjustments — but do not add content.
 
-        4) References to context: if the message is anaphoric (e.g. "and the rate?") AND the provided chat history clearly contains the antecedent, you may replace the anaphor with a minimal standalone version (e.g. "What is the interest rate?"). If the antecedent is absent or unclear → leave the message unchanged.
+    4) References to context: if the message is anaphoric (e.g. "and the rate?") AND the provided chat history clearly contains the antecedent, you may replace the anaphor with a minimal standalone version (e.g. "What is the interest rate?"). If the antecedent is absent or unclear → leave the message unchanged.
 
-        5) Do not answer the message. Do not provide explanations, labels, or metadata. Return **only** the reformulated phrase (a single line).
-        """
+    5) Do not answer the message. Do not provide explanations, labels, or metadata. Return **only** the reformulated phrase (a single line).
+    """
 
     return (
         ChatPromptTemplate.from_messages(
