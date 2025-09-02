@@ -139,8 +139,6 @@ async def execute_rag_chain(
         tags = (request.dialog.tags,)
         history_str = "\n".join(lines)
 
-    print(history_str)
-
     logger.debug(
         'RAG chain - Use chat history: %s',
         'Yes' if len(message_history.messages) > 0 else 'No',
@@ -286,24 +284,24 @@ def create_rag_chain(
     if question_condensing_llm_factory is not None:
         question_condensing_llm = question_condensing_llm_factory.get_language_model()
     question_answering_llm = question_answering_llm_factory.get_language_model()
-    rag_prompt = build_rag_prompt(request)
+    # rag_prompt = build_rag_prompt(request)
+    #
+    # # Construct the RAG chain using the prompt and LLM,
+    # # This chain will consume the documents retrieved by the retriever as input.
+    # rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
-    # Construct the RAG chain using the prompt and LLM,
-    # This chain will consume the documents retrieved by the retriever as input.
-    rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
+
+    if question_condensing_llm is not None:
+        condensing_llm = question_condensing_llm
+    else :
+        condensing_llm = question_answering_llm
 
     # Build the chat chain for question contextualization
-    chat_chain = build_question_condensation_chain(
-        question_condensing_llm
-        if question_condensing_llm is not None
-        else question_answering_llm,
-        request.question_condensing_prompt,
-    )
-
+    chat_chain = build_question_condensation_chain(condensing_llm, request.question_condensing_prompt)
     rag_prompt = build_rag_prompt(request)
     rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
-    # Chaîne de condensation de question qui NE remplace pas l’input global
+    # Chaîne de condensation de question qui ne remplace pas l’input global
     contextualize_q = (
         {  # on ne donne à chat_chain que ce dont il a besoin
             "chat_history": itemgetter("chat_history"),
@@ -314,7 +312,7 @@ def create_rag_chain(
 
     # Construire l'input pour la RAG: on garde history_str tel quel
     rag_inputs = RunnableParallel({
-        "question": contextualize_q,               # string condensée
+        "question": contextualize_q,               # question condensée ou non
         "history_str": itemgetter("history_str"),  # string d'origine
         "documents": contextualize_q | retriever,  # retrieve avec la question condensée
     })
