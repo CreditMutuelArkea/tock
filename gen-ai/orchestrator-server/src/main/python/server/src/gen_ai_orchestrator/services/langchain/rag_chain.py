@@ -147,7 +147,6 @@ async def execute_rag_chain(
     inputs = {
         **request.question_answering_prompt.inputs,
         'chat_history': message_history.messages,
-        'history_str': history_str,
     }
 
     logger.debug(
@@ -307,13 +306,13 @@ def create_rag_chain(
     # 3️⃣ Calculer la question condensée une seule fois et la garder sous un champ dédié
     with_condensed_question = RunnableParallel({
         "condensed_question": contextualize_question_fn,
-        "history_str": itemgetter("history_str"),
+        "chat_history": itemgetter("chat_history"),
     })
 
     # 4️⃣ Construire l'input pour la RAG en réutilisant condensed_question
     rag_inputs = with_condensed_question | RunnableParallel({
         "question": itemgetter("condensed_question"),
-        "history_str": itemgetter("history_str"),
+        "chat_history": itemgetter("chat_history"),
         "documents": itemgetter("condensed_question") | retriever,
     })
 
@@ -340,8 +339,8 @@ def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
 def construct_rag_chain(llm, rag_prompt):
     return (
         {
-            "context": lambda x: "\n\n".join(doc.page_content for doc in x["documents"]),
-            "history_str": itemgetter("history_str"),  # >>> passe au prompt
+            "context": lambda x: "\n\n".join(doc.page_content for doc in x["documents"]), # TODO MASS: use doc.id or give a structued context
+            "chat_history": itemgetter("chat_history"),  # >>> passe au prompt
         }
         | rag_prompt
         | llm
