@@ -34,6 +34,7 @@ from langchain.retrievers.contextual_compression import (
 from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
@@ -335,12 +336,26 @@ def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
         partial_variables=request.question_answering_prompt.inputs,
     )
 
+def format_chat_history(x):
+    messages = []
+    for msg in x["chat_history"]:
+        if isinstance(msg, HumanMessage):
+            messages.append({"user": msg.content})
+        elif isinstance(msg, AIMessage):
+            messages.append({"assistant": msg.content})
+    return json.dumps(messages, ensure_ascii=False, indent=2)
 
 def construct_rag_chain(llm, rag_prompt):
     return (
         {
-            "context": lambda x: "\n\n".join(doc.page_content for doc in x["documents"]), # TODO MASS: use doc.id or give a structued context
-            "chat_history": itemgetter("chat_history"),  # >>> passe au prompt
+            "context": lambda x: json.dumps([
+                {
+                    "chunk_id": doc.metadata['id'] or getattr(doc, "id", None),
+                    "chunk_text": doc.page_content,
+                }
+                for doc in x["documents"]
+            ], ensure_ascii=False, indent=2),
+            "chat_history": format_chat_history,
         }
         | rag_prompt
         | llm
