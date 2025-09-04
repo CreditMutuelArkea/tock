@@ -45,7 +45,7 @@ from langchain_core.runnables import (
 )
 from langchain_core.vectorstores import VectorStoreRetriever
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
-from typing_extensions import Any
+from typing_extensions import Any, deprecated
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
     GenAIGuardCheckException,
@@ -305,7 +305,7 @@ def create_rag_chain(
     # Function to contextualize the question based on chat history
     contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
 
-    # 3️⃣ Calculer la question condensée une seule fois et la garder sous un champ dédié
+    # Calculate the condensed question
     with_condensed_question = RunnableParallel({
         "condensed_question": contextualize_question_fn,
         "question": itemgetter("question"),
@@ -313,7 +313,6 @@ def create_rag_chain(
     })
 
     def retrieve_with_variants(inputs):
-        print("inputs:", inputs)
         variants = [
             inputs["question"],
             inputs["condensed_question"]
@@ -321,13 +320,12 @@ def create_rag_chain(
         docs = []
         for v in variants:
             docs.extend(retriever.invoke(v))
-        # optionnel : dédupliquer les docs par id
+        # Deduplicate docs
         unique_docs = {d.metadata['id']: d for d in docs}
-        print("docs:" + str(len(docs)))
-        print("unique_docs:" + str(len(unique_docs)))
+
         return list(unique_docs.values())
 
-    # 4️⃣ Construire l'input pour la RAG en réutilisant condensed_question
+    # Build the RAG inputs
     rag_inputs = with_condensed_question | RunnableParallel({
         "question": itemgetter("condensed_question"),
         "chat_history": itemgetter("chat_history"),
@@ -385,18 +383,14 @@ def build_question_condensation_chain(
     """
     Build the chat chain for contextualizing questions.
     """
+    # TODO deprecated : All Gen configurations are supposed to have this prompt now. It is mandatory in the RAG configuration.
     if prompt is None:
         # Default prompt
         prompt = PromptTemplate(
             formatter=PromptFormatter.F_STRING,
             inputs={},
-            template='Given a chat history and the latest user question which might reference context in \
-the chat history, formulate a standalone question which can be understood without the chat history. \
-Do NOT answer the question, just reformulate it if needed and otherwise return it as is.',
-        )
-
-    # TODO MASS: a mettre ds la default config
-    prompt.template = """You are a helpful assistant that reformulates questions.
+            template="""
+You are a helpful assistant that reformulates questions.
 
 You are given:
 - The conversation history between the user and the assistant
@@ -410,6 +404,7 @@ Your task:
 
 Return only the reformulated question.
 """
+        )
 
     return (
         ChatPromptTemplate.from_messages(
