@@ -98,6 +98,7 @@ from gen_ai_orchestrator.services.utils.prompt_utility import (
 
 logger = logging.getLogger(__name__)
 
+
 @opensearch_exception_handler
 @openai_exception_handler(provider='OpenAI or AzureOpenAIService')
 async def execute_rag_chain(
@@ -122,57 +123,32 @@ async def execute_rag_chain(
     conversational_retrieval_chain = create_rag_chain(request=request)
 
     message_history = ChatMessageHistory()
-    session_id = None
-    user_id = None
-    tags = []
-    history_str = ""
     if request.dialog:
-        lines = []
         for msg in request.dialog.history:
             if ChatMessageType.HUMAN == msg.type:
                 message_history.add_user_message(msg.text)
-                lines.append(f"User: {msg.text}")
             else:
                 message_history.add_ai_message(msg.text)
-                lines.append(f"Assistant: {msg.text}")
-        session_id = (request.dialog.dialog_id,)
-        user_id = (request.dialog.user_id,)
-        tags = (request.dialog.tags,)
-        history_str = "\n".join(lines)
 
-    logger.debug(
-        'RAG chain - Use chat history: %s',
-        'Yes' if len(message_history.messages) > 0 else 'No',
+    logger.debug('RAG chain - Use chat history: %s', len(message_history.messages) > 0)
+    logger.debug('RAG chain - Use RAGCallbackHandler for debugging : %s', debug)
+
+    callback_handlers = get_callback_handlers(request, custom_observability_handler, debug)
+    records_callback_handler = None
+    if debug:
+        records_callback_handler = next(
+            (x for x in callback_handlers if isinstance(x, RAGCallbackHandler)),
+            None
+        )
+    observability_handler = next(
+        (x for x in callback_handlers if isinstance(x, LangfuseCallbackHandler)),
+        None
     )
 
     inputs = {
         **request.question_answering_prompt.inputs,
         'chat_history': message_history.messages,
     }
-
-    logger.debug(
-        'RAG chain - Use RAGCallbackHandler for debugging : %s',
-        debug,
-    )
-
-    callback_handlers = []
-    records_callback_handler = RAGCallbackHandler()
-    observability_handler = None
-    if debug:
-        # Debug callback handler
-        callback_handlers.append(records_callback_handler)
-    if custom_observability_handler is not None:
-        callback_handlers.append(custom_observability_handler)
-    if request.observability_setting is not None:
-        # Langfuse callback handler
-        observability_handler = create_observability_callback_handler(
-            observability_setting=request.observability_setting,
-            trace_name=ObservabilityTrace.RAG.value,
-            session_id=session_id,
-            user_id=user_id,
-            tags=tags,
-        )
-        callback_handlers.append(observability_handler)
 
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
@@ -195,7 +171,7 @@ async def execute_rag_chain(
     rag_duration = '{:.2f}'.format(time.time() - start_time)
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
-    # Indexer les contextes par chunk
+    # Group contexts by chunk id
     contexts_by_chunk = {
         ctx.chunk: ctx
         for ctx in (llm_answer.context or [])
@@ -222,6 +198,34 @@ async def execute_rag_chain(
         else None,
     )
 
+def get_callback_handlers(request, custom_observability_handler, debug):
+    callback_handlers = []
+    records_callback_handler = RAGCallbackHandler()
+    if debug:
+        # Debug callback handler
+        callback_handlers.append(records_callback_handler)
+    if custom_observability_handler is not None:
+        callback_handlers.append(custom_observability_handler)
+    if request.observability_setting is not None:
+        if request.dialog:
+            session_id = request.dialog.dialog_id
+            user_id = request.dialog.user_id
+            tags = request.dialog.tags
+        else:
+            session_id = None
+            user_id = None
+            tags = None
+        # Langfuse callback handler
+        observability_handler = create_observability_callback_handler(
+            observability_setting=request.observability_setting,
+            trace_name=ObservabilityTrace.RAG.value,
+            session_id=session_id,
+            user_id=user_id,
+            tags=tags,
+        )
+        callback_handlers.append(observability_handler)
+
+    return callback_handlers
 
 def get_source_content(doc: Document) -> str:
     """
@@ -300,7 +304,7 @@ def create_rag_chain(
     # Build the chat chain for question contextualization
     chat_chain = build_question_condensation_chain(condensing_llm, request.question_condensing_prompt)
     rag_prompt = build_rag_prompt(request)
-    rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
+    # rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
     # Function to contextualize the question based on chat history
     contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
@@ -314,7 +318,7 @@ def create_rag_chain(
 
     def retrieve_with_variants(inputs):
         variants = [
-            inputs["question"],
+            # inputs["question"], Deactivated. It's an example to prove the multi retriever process
             inputs["condensed_question"]
         ]
         docs = []
@@ -323,6 +327,7 @@ def create_rag_chain(
         # Deduplicate docs
         unique_docs = {d.metadata['id']: d for d in docs}
 
+        # TODO [DERCBOT-1649] Apply the RRF Algo on unique_docs.
         return list(unique_docs.values())
 
     # Build the RAG inputs
@@ -332,13 +337,20 @@ def create_rag_chain(
         "documents": RunnableLambda(retrieve_with_variants),
     })
 
-    # 5️⃣ Chaîne finale avec RAG
-    rag_chain_with_retriever = (
-            rag_inputs
-            | RunnablePassthrough.assign(answer=rag_chain)  # rag_chain lit question/history_str/documents
-    )
-
-    return rag_chain_with_retriever
+    return rag_inputs | RunnablePassthrough.assign(answer=(
+            {
+                "context": lambda x: json.dumps([
+                    {
+                        "chunk_id": doc.metadata['id'],
+                        "chunk_text": doc.page_content,
+                    }
+                    for doc in x["documents"]
+                ], ensure_ascii=False, indent=2),
+                "chat_history": format_chat_history,
+            }
+            | rag_prompt
+            | question_answering_llm
+            | JsonOutputParser(pydantic_object=LLMAnswer, name="rag_chain_output")))
 
 
 def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
