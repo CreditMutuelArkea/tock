@@ -41,7 +41,7 @@ from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.runnables import (
     RunnableParallel,
     RunnablePassthrough,
-    RunnableSerializable, RunnableConfig, RunnableBranch,
+    RunnableSerializable, RunnableConfig, RunnableBranch, RunnableLambda,
 )
 from langchain_core.vectorstores import VectorStoreRetriever
 from langfuse.callback import CallbackHandler as LangfuseCallbackHandler
@@ -195,6 +195,13 @@ async def execute_rag_chain(
     rag_duration = '{:.2f}'.format(time.time() - start_time)
     logger.info('RAG chain - End of execution. (Duration : %s seconds)', rag_duration)
 
+    # Indexer les contextes par chunk
+    contexts_by_chunk = {
+        ctx.chunk: ctx
+        for ctx in (llm_answer.context or [])
+        if ctx.sentences
+    }
+
     # Returning RAG response
     return RAGResponse(
         answer=llm_answer,
@@ -206,8 +213,8 @@ async def execute_rag_chain(
                 content=get_source_content(doc),
                 score=doc.metadata.get('retriever_score', None),
             )
-            for doc, ctx in zip(response["documents"], llm_answer.context)
-            if ctx.sentences
+            for doc in response["documents"]
+            if doc.metadata['id'] in contexts_by_chunk
         },
         observability_info=get_observability_info(observability_handler),
         debug=get_rag_debug_data(request, records_callback_handler, rag_duration)
@@ -284,12 +291,6 @@ def create_rag_chain(
     if question_condensing_llm_factory is not None:
         question_condensing_llm = question_condensing_llm_factory.get_language_model()
     question_answering_llm = question_answering_llm_factory.get_language_model()
-    # rag_prompt = build_rag_prompt(request)
-    #
-    # # Construct the RAG chain using the prompt and LLM,
-    # # This chain will consume the documents retrieved by the retriever as input.
-    # rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
-
 
     if question_condensing_llm is not None:
         condensing_llm = question_condensing_llm
@@ -307,14 +308,30 @@ def create_rag_chain(
     # 3️⃣ Calculer la question condensée une seule fois et la garder sous un champ dédié
     with_condensed_question = RunnableParallel({
         "condensed_question": contextualize_question_fn,
+        "question": itemgetter("question"),
         "chat_history": itemgetter("chat_history"),
     })
+
+    def retrieve_with_variants(inputs):
+        print("inputs:", inputs)
+        variants = [
+            inputs["question"],
+            inputs["condensed_question"]
+        ]
+        docs = []
+        for v in variants:
+            docs.extend(retriever.invoke(v))
+        # optionnel : dédupliquer les docs par id
+        unique_docs = {d.metadata['id']: d for d in docs}
+        print("docs:" + str(len(docs)))
+        print("unique_docs:" + str(len(unique_docs)))
+        return list(unique_docs.values())
 
     # 4️⃣ Construire l'input pour la RAG en réutilisant condensed_question
     rag_inputs = with_condensed_question | RunnableParallel({
         "question": itemgetter("condensed_question"),
         "chat_history": itemgetter("chat_history"),
-        "documents": itemgetter("condensed_question") | retriever,
+        "documents": RunnableLambda(retrieve_with_variants),
     })
 
     # 5️⃣ Chaîne finale avec RAG
@@ -350,7 +367,7 @@ def construct_rag_chain(llm, rag_prompt):
         {
             "context": lambda x: json.dumps([
                 {
-                    "chunk_id": doc.metadata['id'] or getattr(doc, "id", None),
+                    "chunk_id": doc.metadata['id'],
                     "chunk_text": doc.page_content,
                 }
                 for doc in x["documents"]
@@ -361,8 +378,7 @@ def construct_rag_chain(llm, rag_prompt):
         | llm
         | JsonOutputParser(pydantic_object=LLMAnswer, name="rag_chain_output")
     )
-# TODO MASS
-# https://medium.com/@saurabhzodex/memory-enhanced-rag-chatbot-with-langchain-integrating-chat-history-for-context-aware-845100184c4f
+
 def build_question_condensation_chain(
     llm, prompt: Optional[PromptTemplate]
 ) -> ChatPromptTemplate:
@@ -380,19 +396,20 @@ Do NOT answer the question, just reformulate it if needed and otherwise return i
         )
 
     # TODO MASS: a mettre ds la default config
-    prompt.template = """You are an assistant whose sole task is to STRICTLY REFORMULATE the user's latest message into a single standalone phrase, in the same language, while respecting the STYLE (register, tone, capitalization, level of formality). Apply the following rules:
+    prompt.template = """You are a helpful assistant that reformulates questions.
 
-    1) Question detection: treat the message as a question if it ends with a question mark, or contains an interrogative word (e.g. who, what, which, how, why, where, when, how much), or has an interrogative construction (e.g. "is it", "can you", "could you", "would you").  
-       - IF it is a question → REFORMULATE it AS A QUESTION. Preserve tone, register (formal/informal, you vs. thou, etc.), capitalization. Add a single "?" at the end if necessary. Do not add any new information.
+You are given:
+- The conversation history between the user and the assistant
+- The most recent user question
 
-    2) IF the message is NOT a question (greeting, statement, command, fragment) → REFORMULATE WITHOUT TURNING IT INTO A QUESTION. Do not rephrase it into interrogative form.
+Your task:
+- Reformulate the user’s latest question into a clear, standalone query.
+- Incorporate relevant context from the conversation history.
+- Do NOT answer the question.
+- If the history does not provide additional context, keep the question as is.
 
-    3) Do not guess: if the message is short, vague, or incomplete (e.g. "to understand", "the rate"), DO NOT invent missing meaning. Return it as is or make minimal grammatical adjustments — but do not add content.
-
-    4) References to context: if the message is anaphoric (e.g. "and the rate?") AND the provided chat history clearly contains the antecedent, you may replace the anaphor with a minimal standalone version (e.g. "What is the interest rate?"). If the antecedent is absent or unclear → leave the message unchanged.
-
-    5) Do not answer the message. Do not provide explanations, labels, or metadata. Return **only** the reformulated phrase (a single line).
-    """
+Return only the reformulated question.
+"""
 
     return (
         ChatPromptTemplate.from_messages(
