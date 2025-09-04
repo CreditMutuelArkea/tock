@@ -304,7 +304,6 @@ def create_rag_chain(
     # Build the chat chain for question contextualization
     chat_chain = build_question_condensation_chain(condensing_llm, request.question_condensing_prompt)
     rag_prompt = build_rag_prompt(request)
-    # rag_chain = construct_rag_chain(question_answering_llm, rag_prompt)
 
     # Function to contextualize the question based on chat history
     contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
