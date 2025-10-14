@@ -56,7 +56,9 @@ abstract class SSOTockAuthProvider(val vertx: Vertx) : TockAuthProvider {
             router.route().handler(WithExcludedPathHandler(excludedPaths(verticle), authHandler))
             router.route().handler(AddSSOCookieHandler)
 
-            router.get("$basePath/user").handler { it.response().end(mapper.writeValueAsString(toTockUser(it))) }
+            router.get("$basePath/user").handler {
+                it.response().end(mapper.writeValueAsString(toTockUser(it)))
+            }
         }
         return authHandler
     }

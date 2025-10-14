@@ -227,6 +227,13 @@
                 <artifactId>tock-bot-api-websocket-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            <!-- TODO MASS: tmp, revert change -->
+            <dependency>
+                <groupId>ai.tock</groupId>
+                <artifactId>tock-cas-arkea</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <!-- -->
         </dependencies>
     </dependencyManagement>
 

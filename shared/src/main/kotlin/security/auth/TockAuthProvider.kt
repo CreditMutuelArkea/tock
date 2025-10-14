@@ -18,10 +18,14 @@ package ai.tock.shared.security.auth
 
 import ai.tock.shared.security.TockUser
 import ai.tock.shared.vertx.WebVerticle
+import io.vertx.codegen.annotations.Nullable
+import io.vertx.ext.auth.User
 import io.vertx.ext.auth.authentication.AuthenticationProvider
 import io.vertx.ext.web.RoutingContext
 import io.vertx.ext.web.handler.AuthenticationHandler
 import io.vertx.ext.web.handler.SessionHandler
+import io.vertx.ext.web.impl.UserContextInternal
+import org.pac4j.vertx.auth.Pac4jUser
 
 /**
  * Base interface for [AuthenticationProvider] in Tock framework.
@@ -58,5 +62,7 @@ interface TockAuthProvider : AuthenticationProvider {
     /**
      * Gets a [TockUser] from current vert.x state.
      */
-    fun toTockUser(context: RoutingContext): TockUser? = context.user() as? TockUser
+    fun toTockUser(context: RoutingContext): TockUser? {
+        return context.user() as? TockUser ?: context.session().get("tockUser") as? TockUser
+    }
 }

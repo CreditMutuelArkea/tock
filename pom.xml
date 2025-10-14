@@ -75,7 +75,7 @@
         <aws-sdk>1.12.792</aws-sdk>
         <aws-sagemaker>2.35.3</aws-sagemaker>
         <pac4j>6.2.2</pac4j>
-        <vertx-pac4j>7.0.1</vertx-pac4j>
+        <vertx-pac4j>7.0.2-SNAPSHOT</vertx-pac4j>
         <okhttp-eventsource>4.1.1</okhttp-eventsource>
         <graphql-kotlin>6.3.0</graphql-kotlin>
 
@@ -139,6 +139,13 @@
                 <artifactId>kotlin-stdlib</artifactId>
                 <version>${kotlin}</version>
             </dependency>
+            <!-- TODO MASS: tmp, revert change -->
+            <dependency>
+                <groupId>ai.tock</groupId>
+                <artifactId>tock-cas-arkea</artifactId>
+                <version>25.9.1-e72031e8</version>
+            </dependency>
+            <!-- -->
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib-jdk8</artifactId>
