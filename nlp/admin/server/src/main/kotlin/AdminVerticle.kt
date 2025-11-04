@@ -1258,8 +1258,7 @@ open class AdminVerticle : WebVerticle() {
 
     override fun configure() {
         configureServices()
-        // TODO MASS: tmp, revert change
-        // configureStaticHandling()
+        configureStaticHandling()
     }
 
     override fun defaultHealthcheck(): (RoutingContext) -> Unit {

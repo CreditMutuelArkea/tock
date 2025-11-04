@@ -1049,9 +1049,7 @@ open class BotAdminVerticle : AdminVerticle() {
 
         findTestService().registerServices().invoke(this)
 
-        // TODO MASS: tmp, revert change
-        // configureStaticHandling()
-        router.route("/*").handler(StaticHandler.create("bot/admin/web/dist"))
+         configureStaticHandling()
     }
 
     override fun deleteApplication(app: ApplicationDefinition) {
