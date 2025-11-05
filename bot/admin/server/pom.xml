@@ -33,6 +33,12 @@
             <groupId>ai.tock</groupId>
             <artifactId>tock-nlp-admin-server</artifactId>
         </dependency>
+        <!-- TODO MASS: tmp, revert change -->
+        <dependency>
+            <groupId>ai.tock</groupId>
+            <artifactId>tock-cas-arkea</artifactId>
+        </dependency>
+        <!-- -->
         <dependency>
             <groupId>ai.tock</groupId>
             <artifactId>bot-toolkit</artifactId>

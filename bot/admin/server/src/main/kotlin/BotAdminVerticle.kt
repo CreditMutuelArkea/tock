@@ -66,6 +66,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.salomonbrys.kodein.instance
 import io.vertx.core.http.HttpMethod.GET
 import io.vertx.ext.web.RoutingContext
+import io.vertx.ext.web.handler.StaticHandler
 import mu.KLogger
 import mu.KotlinLogging
 import org.litote.kmongo.toId
@@ -1048,7 +1049,8 @@ open class BotAdminVerticle : AdminVerticle() {
 
         findTestService().registerServices().invoke(this)
 
-        configureStaticHandling()
+        // configureStaticHandling()
+        router.route("/*").handler(StaticHandler.create("bot/admin/web/dist"))
     }
 
     override fun deleteApplication(app: ApplicationDefinition) {

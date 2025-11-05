@@ -1,24 +1,35 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="BotAdmin" type="JetRunConfigurationType">
-    <envs>
-      <env name="botadminverticle_port" value="7999" />
-      <env name="botadminverticle_body_limit" value="-1" />
-    </envs>
-    <option name="MAIN_CLASS_NAME" value="ai.tock.bot.admin.StartBotAdminServerKt" />
-    <module name="tock-bot-admin-server" />
-    <shortenClasspath name="NONE" />
-    <extension name="net.ashald.envfile">
-      <option name="IS_ENABLED" value="false" />
-      <option name="IS_SUBST" value="false" />
-      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-      <option name="IS_IGNORE_MISSING_FILES" value="false" />
-      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
-      <ENTRIES>
-        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
-      </ENTRIES>
-    </extension>
-    <method v="2">
-      <option name="Make" enabled="true" />
-    </method>
-  </configuration>
+    <configuration default="false" name="BotAdmin" type="JetRunConfigurationType">
+        <envs>
+            <!-- TODO MASS: tmp, revert change -->
+            <env name="botadminverticle_body_limit" value="-1" />
+            <env name="botadminverticle_port" value="7999" />
+            <env name="arkea_cas_use_https_custom_default_requested_url" value="false" />
+            <env name="arkea_cas_use_namespace_database_check_authentication" value="true" />
+            <env name="tock_cas_auth_enabled" value="true" />
+            <env name="tock_cas_auth_property_based_enabled" value="false" />
+            <env name="tock_cas_callback_url" value="http://localhost:7999/rest/callback" />
+            <env name="tock_cas_login_url" value="https://identity.rec.arkea.com/cas/login" />
+            <env name="tock_env" value="dev" />
+            <env name="tock_https_env" value="false" />
+            <env name="tock_web_use_default_cors_handler" value="true" />
+            <env name="tock_web_use_default_cors_handler_url" value="http://localhost:7999" />
+        </envs>
+        <option name="MAIN_CLASS_NAME" value="ai.tock.bot.admin.StartBotAdminServerKt" />
+        <module name="tock-bot-admin-server" />
+        <shortenClasspath name="NONE" />
+        <extension name="net.ashald.envfile">
+            <option name="IS_ENABLED" value="false" />
+            <option name="IS_SUBST" value="false" />
+            <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+            <option name="IS_IGNORE_MISSING_FILES" value="false" />
+            <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+            <ENTRIES>
+                <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+            </ENTRIES>
+        </extension>
+        <method v="2">
+            <option name="Make" enabled="true" />
+        </method>
+    </configuration>
 </component>
