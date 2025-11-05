@@ -54,7 +54,7 @@
                                 - in the PATH defined in the ~/.profile configuration file.
                                 - or in a script that launches the maven build
                             -->
-                            <executable>poetry</executable>
+                            <executable>/home/Mohamed.Assoukti/.pyenv/shims/poetry</executable>
                             <arguments>
                                 <argument>export</argument>
                                 <argument>--without-hashes</argument>
@@ -76,7 +76,7 @@
                                 - in the PATH defined in the ~/.profile configuration file.
                                 - or in a script that launches the maven build
                             -->
-                            <executable>poetry</executable>
+                            <executable>/home/Mohamed.Assoukti/.pyenv/shims/poetry</executable>
                             <arguments>
                                 <argument>export</argument>
                                 <argument>--without-hashes</argument>
