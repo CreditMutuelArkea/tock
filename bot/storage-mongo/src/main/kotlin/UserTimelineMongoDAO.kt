@@ -20,32 +20,15 @@ import ai.tock.bot.admin.annotation.BotAnnotation
 import ai.tock.bot.admin.annotation.BotAnnotationEvent
 import ai.tock.bot.admin.annotation.BotAnnotationEventType
 import ai.tock.bot.admin.annotation.BotAnnotationState
-import ai.tock.bot.admin.dialog.CountResult
-import ai.tock.bot.admin.dialog.DialogRating
-import ai.tock.bot.admin.dialog.DialogReport
-import ai.tock.bot.admin.dialog.DialogReportDAO
-import ai.tock.bot.admin.dialog.DialogReportQuery
-import ai.tock.bot.admin.dialog.DialogReportQueryResult
-import ai.tock.bot.admin.dialog.DialogStatsQuery
-import ai.tock.bot.admin.dialog.DialogStatsQueryResult
-import ai.tock.bot.admin.dialog.IntentTypeEnum
-import ai.tock.bot.admin.dialog.RatingReportQueryResult
-import ai.tock.bot.admin.user.AnalyticsQuery
-import ai.tock.bot.admin.user.UserAnalytics
-import ai.tock.bot.admin.user.UserReportDAO
-import ai.tock.bot.admin.user.UserReportQuery
-import ai.tock.bot.admin.user.UserReportQueryResult
+import ai.tock.bot.admin.dialog.*
+import ai.tock.bot.admin.user.*
 import ai.tock.bot.connector.ConnectorMessage
 import ai.tock.bot.definition.BotDefinition
 import ai.tock.bot.definition.RAGStoryDefinition.Companion.RAG_STORY_NAME
 import ai.tock.bot.definition.StoryDefinition
 import ai.tock.bot.engine.action.Action
 import ai.tock.bot.engine.action.SendSentence
-import ai.tock.bot.engine.dialog.ArchivedEntityValue
-import ai.tock.bot.engine.dialog.Dialog
-import ai.tock.bot.engine.dialog.EntityStateValue
-import ai.tock.bot.engine.dialog.Snapshot
-import ai.tock.bot.engine.dialog.SortDirection
+import ai.tock.bot.engine.dialog.*
 import ai.tock.bot.engine.nlp.NlpCallStats
 import ai.tock.bot.engine.nlp.NlpStats
 import ai.tock.bot.engine.user.PlayerId
@@ -90,10 +73,7 @@ import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import org.bson.conversions.Bson
 import org.litote.kmongo.Id
-import org.litote.kmongo.MongoOperator.and
-import org.litote.kmongo.MongoOperator.gt
-import org.litote.kmongo.MongoOperator.or
-import org.litote.kmongo.MongoOperator.type
+import org.litote.kmongo.MongoOperator.*
 import org.litote.kmongo.addEachToSet
 import org.litote.kmongo.addToSet
 import org.litote.kmongo.and
@@ -130,7 +110,53 @@ import java.time.Instant.now
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit.DAYS
+import kotlin.Boolean
+import kotlin.Exception
+import kotlin.String
+import kotlin.Unit
+import kotlin.also
+import kotlin.apply
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.MutableList
+import kotlin.collections.Set
+import kotlin.collections.any
+import kotlin.collections.associate
+import kotlin.collections.emptyList
+import kotlin.collections.emptyMap
+import kotlin.collections.emptySet
+import kotlin.collections.filter
+import kotlin.collections.filterNotNullTo
+import kotlin.collections.find
+import kotlin.collections.firstNotNullOfOrNull
+import kotlin.collections.flatMap
+import kotlin.collections.forEach
+import kotlin.collections.indexOfFirst
+import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
+import kotlin.collections.lastOrNull
+import kotlin.collections.listOf
+import kotlin.collections.listOfNotNull
+import kotlin.collections.map
+import kotlin.collections.mapNotNull
+import kotlin.collections.mapOf
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.orEmpty
+import kotlin.collections.plus
+import kotlin.collections.plusAssign
+import kotlin.collections.setOf
+import kotlin.collections.sumOf
+import kotlin.collections.toSet
+import kotlin.let
 import kotlin.reflect.KProperty1
+import kotlin.takeIf
+import kotlin.text.isNotEmpty
+import kotlin.text.isNullOrBlank
+import kotlin.text.take
+import kotlin.text.trim
+import kotlin.to
+import kotlin.with
 
 /**
  *
@@ -727,51 +753,37 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
                         if (dialogIds.isEmpty() && !query.text.isNullOrBlank()) {
                             DialogReportQueryResult(0, 0, 0, emptyList())
                         } else {
-                            val filter =
-                                and(
-                                    DialogCol_.ApplicationIds `in` applicationsIds,
-                                    Namespace eq query.namespace,
-                                    if (query.playerId != null || query.displayTests) null else Test eq false,
-                                    if (query.playerId == null) null else PlayerIds.id eq query.playerId!!.id,
-                                    if (dialogIds.isEmpty()) null else _id `in` dialogIds,
-                                    if (from == null) null else DialogCol_.LastUpdateDate gt from?.toInstant(),
-                                    if (to == null) null else DialogCol_.LastUpdateDate lt to?.toInstant(),
-                                    if (connectorType == null) null else Stories.actions.state.targetConnectorType.id eq connectorType!!.id,
-                                    if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName,
-                                    if (query.ratings.isNotEmpty()) DialogCol_.Rating `in` query.ratings.toSet() else null,
-                                    if (query.applicationId.isNullOrBlank()) {
-                                        null
-                                    } else {
-                                        DialogCol_.ApplicationIds `in`
-                                            setOf(
-                                                query.applicationId,
-                                            )
-                                    },
-                                    if (query.isGenAiRagDialog == true) Stories.actions.botMetadata.isGenAiRagAnswer eq true else null,
-                                    if (query.withAnnotations == true) Stories.actions.annotation.state `in` BotAnnotationState.entries else null,
-                                    if (query.annotationStates.isNotEmpty()) Stories.actions.annotation.state `in` query.annotationStates else null,
-                                    if (query.annotationReasons.isNotEmpty()) Stories.actions.annotation.reason `in` query.annotationReasons else null,
-                                    if (annotationCreationDateFrom == null) {
-                                        null
-                                    } else {
-                                        Stories.actions.annotation.creationDate gt annotationCreationDateFrom?.toInstant()
-                                    },
-                                    if (annotationCreationDateTo == null) {
-                                        null
-                                    } else {
-                                        Stories.actions.annotation.creationDate lt annotationCreationDateTo?.toInstant()
-                                    },
-                                    if (dialogCreationDateFrom == null) {
-                                        null
-                                    } else {
-                                        Stories.actions.date gt dialogCreationDateFrom?.toInstant()
-                                    },
-                                    if (dialogCreationDateTo == null) {
-                                        null
-                                    } else {
-                                        Stories.actions.date lt dialogCreationDateTo?.toInstant()
-                                    },
-                                )
+                            val filter = and(
+                                DialogCol_.ApplicationIds `in` applicationsIds,
+                                Namespace eq query.namespace,
+                                if (query.playerId != null || query.displayTests) null else Test eq false,
+                                if (query.playerId == null) null else PlayerIds.id eq query.playerId!!.id,
+                                if (dialogIds.isEmpty()) null else _id `in` dialogIds,
+                                if (from == null) null else DialogCol_.LastUpdateDate gt from?.toInstant(),
+                                if (to == null) null else DialogCol_.LastUpdateDate lt to?.toInstant(),
+                                if (connectorType == null) null else Stories.actions.state.targetConnectorType.id eq connectorType!!.id,
+                                if (query.intentName.isNullOrBlank()) null else Stories.currentIntent.name_ eq query.intentName,
+                                if (query.ratings.isNotEmpty()) DialogCol_.Rating `in` query.ratings.toSet() else null,
+                                if (query.applicationId.isNullOrBlank()) null else DialogCol_.ApplicationIds `in` setOf(
+                                    query.applicationId
+                                ),
+                                if (query.isGenAiRagDialog == true) Stories.actions.botMetadata.isGenAiRagAnswer eq true else null,
+                                if (query.withAnnotations == true) Stories.actions.annotation.state `in` BotAnnotationState.entries else null,
+                                if (query.annotationStates.isNotEmpty()) Stories.actions.annotation.state `in` query.annotationStates else null,
+                                if (query.annotationReasons.isNotEmpty()) Stories.actions.annotation.reason `in` query.annotationReasons else null,
+                                if (annotationCreationDateFrom == null) null
+                                else Stories.actions.annotation.creationDate gt annotationCreationDateFrom?.toInstant(),
+                                if (annotationCreationDateTo == null) null
+                                else Stories.actions.annotation.creationDate lt annotationCreationDateTo?.toInstant(),
+                                buildDialogCreationDateFilter(
+                                    dialogCreationDateFrom,
+                                    dialogCreationDateTo
+                                ),
+                                buildDialogActivityFilter(
+                                    query.dialogActivityFrom,
+                                    query.dialogActivityTo
+                                ),
+                            )
                             logger.debug { "dialog search query: $filter" }
                             val c = dialogCol.withReadPreference(secondaryPreferred())
                             val count = c.countDocuments(filter, defaultCountOptions)
@@ -1165,6 +1177,53 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
     ) {
         fromDate?.let { filters += gte("stories.actions.date", it.toInstant()) }
         toDate?.let { filters += lte("stories.actions.date", it.toInstant()) }
+    }
+
+
+
+
+    /**
+     * Builds a filter for dialog creation date based on the first action date.
+     *
+     * Filters dialogs where the oldest action date (creation date) is within the specified period.
+     * Condition: creationDateFrom <= oldestDate <= creationDateTo
+     *
+     * @param creationDateFrom optional start date filter (inclusive)
+     * @param creationDateTo optional end date filter (inclusive)
+     * @return Bson filter expression, or null if both dates are null
+     */
+    private fun buildDialogCreationDateFilter(
+        creationDateFrom: ZonedDateTime?,
+        creationDateTo: ZonedDateTime?
+    ): Bson? {
+        return Agg.filterByOldestDateInPeriod(
+            inputField = "stories",
+            datePath = "actions.date",
+            fromDate = creationDateFrom,
+            toDate = creationDateTo
+        )
+    }
+
+    /**
+     * Builds a filter for dialog activity period overlap.
+     *
+     * A dialog is included if its activity period (from first to last action) overlaps the filter range.
+     * Condition: activityFrom <= youngest(actions.date) AND oldest(actions.date) < activityTo
+     *
+     * @param activityFrom optional start date filter (inclusive)
+     * @param activityTo optional end date filter (exclusive)
+     * @return Bson filter expression, or null if both dates are null
+     */
+    private fun buildDialogActivityFilter(
+        activityFrom: ZonedDateTime?,
+        activityTo: ZonedDateTime?
+    ): Bson? {
+        return Agg.filterByPeriodOverlap(
+            inputField = "stories",
+            datePath = "actions.date",
+            fromDate = activityFrom,
+            toDate = activityTo
+        )
     }
 
     /**
