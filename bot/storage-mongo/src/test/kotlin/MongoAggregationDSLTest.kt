@@ -37,6 +37,30 @@ internal class MongoAggregationDSLTest {
         else -> throw IllegalArgumentException("Expected Document but got ${this::class.simpleName}")
     }
 
+    /**
+     * Converts a Document to a JSON string representation, handling Instant values safely.
+     * This is needed because MongoDB's default codec doesn't support Instant serialization.
+     */
+    private fun Document.toJsonSafe(): String {
+        // Convert Instant values to ISO strings for safe JSON serialization
+        val converted = Document()
+        this.forEach { (key, value) ->
+            converted[key] = when (value) {
+                is java.time.Instant -> value.toString()
+                is Document -> value.toJsonSafe()
+                is List<*> -> value.map {
+                    when (it) {
+                        is java.time.Instant -> it.toString()
+                        is Document -> it.toJsonSafe()
+                        else -> it
+                    }
+                }
+                else -> value
+            }
+        }
+        return converted.toJson()
+    }
+
     @Test
     fun `filterByOldestDateInPeriod returns null when both dates are null`() {
         val result = Agg.filterByOldestDateInPeriod(
@@ -61,12 +85,12 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$gte"),
-            "Filter \$expr should contain \$gte for fromDate condition. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$gte for fromDate condition. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
     }
 
@@ -83,12 +107,12 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$lte"),
-            "Filter \$expr should contain \$lte for toDate condition. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$lte for toDate condition. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
     }
 
@@ -106,17 +130,17 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$and"),
-            "Filter \$expr should contain \$and for multiple conditions. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$and for multiple conditions. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
         val andConditions = (expr as Document).getList("\$and", Document::class.java)
         assertTrue(
             andConditions.size == 2,
-            "Filter should contain 2 conditions in \$and. Conditions: ${andConditions.map { it.toJson() }}"
+            "Filter should contain 2 conditions in \$and. Conditions: ${andConditions.map { it.toJsonSafe() }}"
         )
         assertTrue(
             andConditions.any { it.containsKey("\$gte") },
@@ -152,12 +176,12 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$gte"),
-            "Filter \$expr should contain \$gte for fromDate <= youngestDate condition. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$gte for fromDate <= youngestDate condition. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
     }
 
@@ -174,12 +198,12 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$lt"),
-            "Filter \$expr should contain \$lt for oldestDate < toDate condition. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$lt for oldestDate < toDate condition. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
     }
 
@@ -197,17 +221,17 @@ internal class MongoAggregationDSLTest {
         val doc = result.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$and"),
-            "Filter \$expr should contain \$and for multiple conditions. Expr: ${(expr as? Document)?.toJson()}"
+            "Filter \$expr should contain \$and for multiple conditions. Expr: ${(expr as? Document)?.toJsonSafe()}"
         )
         val andConditions = (expr as Document).getList("\$and", Document::class.java)
         assertTrue(
             andConditions.size == 2,
-            "Filter should contain 2 conditions in \$and. Conditions: ${andConditions.map { it.toJson() }}"
+            "Filter should contain 2 conditions in \$and. Conditions: ${andConditions.map { it.toJsonSafe() }}"
         )
         assertTrue(
             andConditions.any { it.containsKey("\$gte") },

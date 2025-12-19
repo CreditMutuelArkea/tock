@@ -71,6 +71,30 @@ internal class UserTimelineMongoDAOTest : AbstractTest() {
     }
 
     /**
+     * Converts a Document to a JSON string representation, handling Instant values safely.
+     * This is needed because MongoDB's default codec doesn't support Instant serialization.
+     */
+    private fun Document.toJsonSafe(): String {
+        // Convert Instant values to ISO strings for safe JSON serialization
+        val converted = Document()
+        this.forEach { (key, value) ->
+            converted[key] = when (value) {
+                is java.time.Instant -> value.toString()
+                is Document -> value.toJsonSafe()
+                is List<*> -> value.map {
+                    when (it) {
+                        is java.time.Instant -> it.toString()
+                        is Document -> it.toJsonSafe()
+                        else -> it
+                    }
+                }
+                else -> value
+            }
+        }
+        return converted.toJson()
+    }
+
+    /**
      * Verifies that a filter contains an $expr with the expected structure.
      */
     private fun assertFilterContainsExpr(filter: org.bson.conversions.Bson?, expectedOperator: String? = null) {
@@ -78,13 +102,13 @@ internal class UserTimelineMongoDAOTest : AbstractTest() {
         val doc = filter.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         if (expectedOperator != null && expr is Document) {
             assertTrue(
                 expr.containsKey(expectedOperator),
-                "Filter \$expr should contain $expectedOperator. Expr: ${expr.toJson()}"
+                "Filter \$expr should contain $expectedOperator. Expr: ${expr.toJsonSafe()}"
             )
         }
     }
@@ -97,12 +121,12 @@ internal class UserTimelineMongoDAOTest : AbstractTest() {
         val doc = filter.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && expr.containsKey("\$and"),
-            "Filter \$expr should contain \$and for multiple conditions. Expr: ${expr?.let { (it as? Document)?.toJson() }}"
+            "Filter \$expr should contain \$and for multiple conditions. Expr: ${expr?.let { (it as? Document)?.toJsonSafe() }}"
         )
     }
 
@@ -114,12 +138,12 @@ internal class UserTimelineMongoDAOTest : AbstractTest() {
         val doc = filter.toDocument()
         assertTrue(
             doc.containsKey("\$expr"),
-            "Filter should contain \$expr. Filter: ${doc.toJson()}"
+            "Filter should contain \$expr. Filter: ${doc.toJsonSafe()}"
         )
         val expr = doc.get("\$expr")
         assertTrue(
             expr is Document && !expr.containsKey("\$and"),
-            "Filter \$expr should NOT contain \$and for single condition. Expr: ${expr?.let { (it as? Document)?.toJson() }}"
+            "Filter \$expr should NOT contain \$and for single condition. Expr: ${expr?.let { (it as? Document)?.toJsonSafe() }}"
         )
     }
 
