@@ -67,6 +67,7 @@ import java.time.Duration
 import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
@@ -188,6 +189,26 @@ internal val mongoClient: MongoClient by lazy {
                 .builder()
                 .applyConnectionString(connectionString)
                 .run { credentialsProvider.getCredentials()?.let { credential(it) } ?: this }
+                .applyToConnectionPoolSettings { builder ->
+                    // Maximum connections in pool
+                    builder.maxSize(100)
+                        // Minimum connections to maintain
+                        .minSize(10)
+                        .maxWaitTime(10, TimeUnit.SECONDS)
+                        .maxConnectionIdleTime(30, TimeUnit.SECONDS)
+                        // No limit
+                        .maxConnectionLifeTime(0, TimeUnit.SECONDS)
+                }
+                .applyToSocketSettings {
+                        builder ->
+                    builder.connectTimeout(10, TimeUnit.SECONDS)
+                        .readTimeout(10, TimeUnit.SECONDS) }
+                .applyToServerSettings { builder ->
+                    builder.heartbeatFrequency(10, TimeUnit.SECONDS)
+                        .minHeartbeatFrequency(500, TimeUnit.MILLISECONDS)
+                }
+                .retryWrites(true)
+                .retryReads(true)
                 .build()
 
         KMongo.createClient(settings)
@@ -214,6 +235,26 @@ internal val asyncMongoClient: com.mongodb.reactivestreams.client.MongoClient by
                     transportSettings(TransportSettings.nettyBuilder().build())
                 }
             }
+            .applyToConnectionPoolSettings { builder ->
+                // Maximum connections in pool
+                builder.maxSize(100)
+                    // Minimum connections to maintain
+                    .minSize(10)
+                    .maxWaitTime(10, TimeUnit.SECONDS)
+                    .maxConnectionIdleTime(30, TimeUnit.SECONDS)
+                    // No limit
+                    .maxConnectionLifeTime(0, TimeUnit.SECONDS)
+            }
+            .applyToSocketSettings {
+                    builder ->
+                builder.connectTimeout(10, TimeUnit.SECONDS)
+                    .readTimeout(10, TimeUnit.SECONDS) }
+            .applyToServerSettings { builder ->
+                builder.heartbeatFrequency(10, TimeUnit.SECONDS)
+                    .minHeartbeatFrequency(500, TimeUnit.MILLISECONDS)
+            }
+            .retryWrites(true)
+            .retryReads(true)
             .build(),
     )
 }

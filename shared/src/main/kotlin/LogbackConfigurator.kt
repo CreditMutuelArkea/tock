@@ -43,6 +43,13 @@ internal class LogbackConfigurator : ContextAwareBase(), Configurator {
                 if (devEnvironment) "DEBUG" else "INFO",
             ),
         )
+    private val mongodbDriverLevel =
+        Level.toLevel(
+            property(
+                "tock_mongodb_driver_log_level",
+                "INFO",
+            ),
+        )
 
     override fun configure(loggerContext: LoggerContext): ExecutionStatus {
         if (booleanProperty("tock_logback_enabled", true)) {
@@ -87,6 +94,17 @@ internal class LogbackConfigurator : ContextAwareBase(), Configurator {
                     }
             }
             appender.start()
+
+            listOf(
+                "org.mongodb.driver.connexion",
+                "org.mongodb.driver.cluster",
+            ).forEach { loggerName ->
+                loggerContext.getLogger(loggerName).apply {
+                    level = mongodbDriverLevel
+                    isAdditive = false
+                    addAppender(appender)
+                }
+            }
 
             if (defaultLevel.toInt() <= Level.INFO.toInt()) {
                 loggerContext.getLogger("org.mongodb.driver").apply {
