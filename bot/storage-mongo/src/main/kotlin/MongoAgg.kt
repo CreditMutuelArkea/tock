@@ -18,38 +18,37 @@ package ai.tock.bot.mongo
 
 import org.bson.Document
 import org.bson.conversions.Bson
-import java.time.Instant
 import java.time.ZonedDateTime
 
 /**
  * Lightweight DSL for building MongoDB aggregation expressions.
- * 
+ *
  * This DSL provides simple functions to construct MongoDB aggregation operators
  * in a more readable way than using raw strings, while producing identical BSON output.
- * 
+ *
  * **Type Design**: Parameters are intentionally typed `Any` to support:
  * - BSON expressions (Document, Bson)
  * - MongoDB field paths ("$field")
  * - Aggregation variables ("$$value", "$$this")
  * - Primitive values (String, Int, null, etc.)
- * 
+ *
  * Usage example:
  * ```
- * val minDate = Agg.min(Agg.reduce(
- *     input = Agg.field("stories"),
+ * val minDate = MongoAgg.min(MongoAgg.reduce(
+ *     input = MongoAgg.field("stories"),
  *     initialValue = null,
- *     `in` = Agg.cond(
- *         Agg.eq(Agg.value(), null),
- *         Agg.ifNull(Agg.min("${Agg.thisVar()}.actions.date"), null),
- *         Agg.min(listOf(Agg.value(), Agg.ifNull(Agg.min("${Agg.thisVar()}.actions.date"), Agg.value())))
+ *     `in` = MongoAgg.cond(
+ *         MongoAgg.eq(MongoAgg.value(), null),
+ *         MongoAgg.ifNull(MongoAgg.min("${MongoAgg.thisVar()}.actions.date"), null),
+ *         MongoAgg.min(listOf(MongoAgg.value(), MongoAgg.ifNull(MongoAgg.min("${MongoAgg.thisVar()}.actions.date"), MongoAgg.value())))
  *     )
  * ))
  * ```
  */
-object Agg {
+object MongoAgg {
     /**
      * Creates a $min aggregation expression.
-     * 
+     *
      * @param expr the expression to find the minimum of (can be null)
      * @return Document representing $min operator
      */
@@ -57,7 +56,7 @@ object Agg {
 
     /**
      * Creates a $max aggregation expression.
-     * 
+     *
      * @param expr the expression to find the maximum of (can be null)
      * @return Document representing $max operator
      */
@@ -65,73 +64,93 @@ object Agg {
 
     /**
      * Creates an $eq (equals) aggregation expression.
-     * 
+     *
      * @param a first operand
      * @param b second operand (can be null)
      * @return Document representing $eq operator
      */
-    fun eq(a: Any, b: Any?): Document = Document("\$eq", listOf(a, b))
+    fun eq(
+        a: Any,
+        b: Any?,
+    ): Document = Document("\$eq", listOf(a, b))
 
     /**
      * Creates a $gte (greater than or equal) aggregation expression.
-     * 
+     *
      * @param a first operand
      * @param b second operand (can be null)
      * @return Document representing $gte operator
      */
-    fun gte(a: Any, b: Any?): Document = Document("\$gte", listOf(a, b))
+    fun gte(
+        a: Any,
+        b: Any?,
+    ): Document = Document("\$gte", listOf(a, b))
 
     /**
      * Creates a $lte (less than or equal) aggregation expression.
-     * 
+     *
      * @param a first operand
      * @param b second operand (can be null)
      * @return Document representing $lte operator
      */
-    fun lte(a: Any, b: Any?): Document = Document("\$lte", listOf(a, b))
+    fun lte(
+        a: Any,
+        b: Any?,
+    ): Document = Document("\$lte", listOf(a, b))
 
     /**
      * Creates a $gt (greater than) aggregation expression.
-     * 
+     *
      * @param a first operand
      * @param b second operand (can be null)
      * @return Document representing $gt operator
      */
-    fun gt(a: Any, b: Any?): Document = Document("\$gt", listOf(a, b))
+    fun gt(
+        a: Any,
+        b: Any?,
+    ): Document = Document("\$gt", listOf(a, b))
 
     /**
      * Creates a $lt (less than) aggregation expression.
-     * 
+     *
      * @param a first operand
      * @param b second operand (can be null)
      * @return Document representing $lt operator
      */
-    fun lt(a: Any, b: Any?): Document = Document("\$lt", listOf(a, b))
+    fun lt(
+        a: Any,
+        b: Any?,
+    ): Document = Document("\$lt", listOf(a, b))
 
     /**
      * Creates a $cond (conditional) aggregation expression.
-     * 
+     *
      * @param ifExpr the condition expression
      * @param thenExpr the expression to evaluate if condition is true (can be null)
      * @param elseExpr the expression to evaluate if condition is false (can be null)
      * @return Document representing $cond operator
      */
-    fun cond(ifExpr: Any, thenExpr: Any?, elseExpr: Any?): Document =
-        Document("\$cond", listOf(ifExpr, thenExpr, elseExpr))
+    fun cond(
+        ifExpr: Any,
+        thenExpr: Any?,
+        elseExpr: Any?,
+    ): Document = Document("\$cond", listOf(ifExpr, thenExpr, elseExpr))
 
     /**
      * Creates an $ifNull aggregation expression.
-     * 
+     *
      * @param expr the expression to evaluate
      * @param replacement the replacement value if expr is null (can be null)
      * @return Document representing $ifNull operator
      */
-    fun ifNull(expr: Any, replacement: Any?): Document =
-        Document("\$ifNull", listOf(expr, replacement))
+    fun ifNull(
+        expr: Any,
+        replacement: Any?,
+    ): Document = Document("\$ifNull", listOf(expr, replacement))
 
     /**
      * Creates a $reduce aggregation expression.
-     * 
+     *
      * @param input the array to reduce
      * @param initialValue the initial value for the accumulator (often null)
      * @param `in` the expression to apply to each element
@@ -140,16 +159,18 @@ object Agg {
     fun reduce(
         input: Any,
         initialValue: Any?,
-        `in`: Any
-    ): Document = Document("\$reduce",
-        Document("input", input)
-            .append("initialValue", initialValue)
-            .append("in", `in`)
-    )
+        `in`: Any,
+    ): Document =
+        Document(
+            "\$reduce",
+            Document("input", input)
+                .append("initialValue", initialValue)
+                .append("in", `in`),
+        )
 
     /**
      * Creates an $expr aggregation expression for use in queries.
-     * 
+     *
      * @param expr the expression to evaluate (can be Document, Bson, or any BSON-compatible value, can be null)
      * @return Bson representing $expr operator
      */
@@ -157,7 +178,7 @@ object Agg {
 
     /**
      * Creates a MongoDB field path reference.
-     * 
+     *
      * @param path the field path (e.g., "stories" becomes "$stories")
      * @return String representing the MongoDB field path
      */
@@ -180,7 +201,7 @@ object Agg {
 
     /**
      * Creates a $and aggregation expression.
-     * 
+     *
      * @param exprs the expressions to combine with AND logic
      * @return Document representing $and operator
      */
@@ -188,7 +209,7 @@ object Agg {
 
     /**
      * Creates an $or aggregation expression.
-     * 
+     *
      * @param exprs the expressions to combine with OR logic
      * @return Document representing $or operator
      */
@@ -197,30 +218,36 @@ object Agg {
     /**
      * Builds a MongoDB aggregation expression to calculate the oldest (earliest) date from a nested array field.
      * Uses $reduce with $min to find the minimum date across all elements.
-     * 
+     *
      * @param inputField the input array field (e.g., "stories")
      * @param datePath the path to the date field within each element (e.g., "actions.date")
      * @return Document representing the min(date) expression
      */
-    private fun oldestDateInArray(inputField: String, datePath: String): Document {
+    private fun oldestDateInArray(
+        inputField: String,
+        datePath: String,
+    ): Document {
         return dateInArray(inputField, datePath, ::min)
     }
 
     /**
      * Builds a MongoDB aggregation expression to calculate the youngest (latest) date from a nested array field.
      * Uses $reduce with $max to find the maximum date across all elements.
-     * 
+     *
      * @param inputField the input array field (e.g., "stories")
      * @param datePath the path to the date field within each element (e.g., "actions.date")
      * @return Document representing the max(date) expression
      */
-    private fun youngestDateInArray(inputField: String, datePath: String): Document {
+    private fun youngestDateInArray(
+        inputField: String,
+        datePath: String,
+    ): Document {
         return dateInArray(inputField, datePath, ::max)
     }
 
     /**
      * Generic function to build a MongoDB aggregation expression for date aggregation in nested arrays.
-     * 
+     *
      * @param inputField the input array field (e.g., "stories")
      * @param datePath the path to the date field within each element (e.g., "actions.date")
      * @param aggregationFn the aggregation function to use (min for oldest, max for youngest)
@@ -229,34 +256,36 @@ object Agg {
     private fun dateInArray(
         inputField: String,
         datePath: String,
-        aggregationFn: (Any?) -> Document
+        aggregationFn: (Any?) -> Document,
     ): Document {
         return aggregationFn(
             reduce(
                 input = field(inputField),
                 initialValue = null,
-                `in` = cond(
-                    ifExpr = eq(value(), null),
-                    thenExpr = ifNull(aggregationFn("${thisVar()}.$datePath"), null),
-                    elseExpr = aggregationFn(
-                        listOf(
-                            value(),
-                            ifNull(aggregationFn("${thisVar()}.$datePath"), value())
-                        )
-                    )
-                )
-            )
+                `in` =
+                    cond(
+                        ifExpr = eq(value(), null),
+                        thenExpr = ifNull(aggregationFn("${thisVar()}.$datePath"), null),
+                        elseExpr =
+                            aggregationFn(
+                                listOf(
+                                    value(),
+                                    ifNull(aggregationFn("${thisVar()}.$datePath"), value()),
+                                ),
+                            ),
+                    ),
+            ),
         )
     }
 
     /**
      * Filters documents where the oldest date (from array) is within a period.
-     * 
+     *
      * Condition: fromDate <= oldestDate <= toDate
-     * 
+     *
      * This is typically used for filtering by creation date, where we want to check
      * if the first action date falls within the specified period.
-     * 
+     *
      * @param inputField the input array field (e.g., "stories")
      * @param datePath the path to the date field within each element (e.g., "actions.date")
      * @param fromDate optional start date filter (inclusive)
@@ -267,19 +296,20 @@ object Agg {
         inputField: String,
         datePath: String,
         fromDate: ZonedDateTime?,
-        toDate: ZonedDateTime?
+        toDate: ZonedDateTime?,
     ): Bson? {
         val oldestDateExpr = oldestDateInArray(inputField, datePath)
-        val conditionBuilders = listOfNotNull(
-            fromDate?.let { { gte(oldestDateExpr, it.toInstant()) } },
-            toDate?.let { { lte(oldestDateExpr, it.toInstant()) } }
-        )
+        val conditionBuilders =
+            listOfNotNull(
+                fromDate?.let { { gte(oldestDateExpr, it.toInstant()) } },
+                toDate?.let { { lte(oldestDateExpr, it.toInstant()) } },
+            )
         return buildExprFromConditionBuilders(conditionBuilders)
     }
 
     /**
      * Builds a MongoDB $expr expression from a list of condition builders.
-     * 
+     *
      * @param conditionBuilders list of functions that build condition documents
      * @return Bson expression wrapping the conditions, or null if empty
      */
@@ -296,12 +326,12 @@ object Agg {
 
     /**
      * Filters documents where the activity period overlaps with the filter period.
-     * 
+     *
      * Condition: fromDate <= youngestDate AND oldestDate < toDate
-     * 
+     *
      * A document is included if its activity period (from oldest to youngest date)
      * overlaps the filter range. This implements period overlap logic.
-     * 
+     *
      * @param inputField the input array field (e.g., "stories")
      * @param datePath the path to the date field within each element (e.g., "actions.date")
      * @param fromDate optional start date filter (inclusive)
@@ -312,20 +342,19 @@ object Agg {
         inputField: String,
         datePath: String,
         fromDate: ZonedDateTime?,
-        toDate: ZonedDateTime?
+        toDate: ZonedDateTime?,
     ): Bson? {
-        val conditionBuilders = listOfNotNull(
-            // fromDate <= youngestDate (need youngest only if fromDate is set)
-            fromDate?.let {
-                { gte(youngestDateInArray(inputField, datePath), it.toInstant()) }
-            },
-            // oldestDate < toDate (need oldest only if toDate is set)
-            toDate?.let {
-                { lt(oldestDateInArray(inputField, datePath), it.toInstant()) }
-            }
-        )
+        val conditionBuilders =
+            listOfNotNull(
+                // fromDate <= youngestDate (need youngest only if fromDate is set)
+                fromDate?.let {
+                    { gte(youngestDateInArray(inputField, datePath), it.toInstant()) }
+                },
+                // oldestDate < toDate (need oldest only if toDate is set)
+                toDate?.let {
+                    { lt(oldestDateInArray(inputField, datePath), it.toInstant()) }
+                },
+            )
         return buildExprFromConditionBuilders(conditionBuilders)
     }
-
 }
-
