@@ -202,7 +202,8 @@ internal val mongoClient: MongoClient by lazy {
                 .applyToSocketSettings {
                         builder ->
                     builder.connectTimeout(10, TimeUnit.SECONDS)
-                        .readTimeout(10, TimeUnit.SECONDS) }
+                        .readTimeout(10, TimeUnit.SECONDS)
+                }
                 .applyToServerSettings { builder ->
                     builder.heartbeatFrequency(10, TimeUnit.SECONDS)
                         .minHeartbeatFrequency(500, TimeUnit.MILLISECONDS)
@@ -248,7 +249,8 @@ internal val asyncMongoClient: com.mongodb.reactivestreams.client.MongoClient by
             .applyToSocketSettings {
                     builder ->
                 builder.connectTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(10, TimeUnit.SECONDS) }
+                    .readTimeout(10, TimeUnit.SECONDS)
+            }
             .applyToServerSettings { builder ->
                 builder.heartbeatFrequency(10, TimeUnit.SECONDS)
                     .minHeartbeatFrequency(500, TimeUnit.MILLISECONDS)
