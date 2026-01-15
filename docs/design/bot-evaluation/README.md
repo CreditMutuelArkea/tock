@@ -11,13 +11,13 @@ Permettre aux utilisateurs métier d'évaluer la qualité des réponses du bot v
 | **Granularité** | Évaluation par **réponse du bot** (pas par dialog) |
 | **Collaboration** | **Plusieurs évaluateurs** simultanés |
 | **Raison KO** | **Optionnelle** (même liste que les annotations) |
-| **Données** | **Snapshotées** à la création du sample |
+| **Données** | Utilisation des dialogs existants (pas de snapshot) |
 
 ## Cycle de vie
 
 ```
 IN_PROGRESS → VALIDATED
-IN_PROGRESS -> CANCELLED
+IN_PROGRESS → CANCELLED
 ```
 
 ## Documentation
@@ -28,12 +28,13 @@ IN_PROGRESS -> CANCELLED
 | [TECHNICAL.md](./TECHNICAL.md) | Options de stockage, diagrammes de classes, flux |
 | [API.md](./API.md) | Spécification des endpoints REST |
 
-## Questions à trancher
+## Questions tranchées
 
-| # | Question |
-|---|----------|
-| Q1 | Sélection des dialogs : Aléatoire 
-| Q2 | Pas assez de réponses : Prendre tout |
-| Q4 | Stocker le `userMessage` en plus du `botMessage` ? | Non, utilisation des dialogs existants
+| # | Question | Réponse |
+|---|----------|---------|
+| Q1 | Sélection des dialogs | Aléatoire |
+| Q2 | Pas assez de réponses | Prendre tout |
+| Q4 | Stocker le `userMessage` en plus du `botMessage` ? | Non, utilisation des dialogs existants |
+| Q5 | Format d'export | PDF |
 
-→ Détails dans [FUNCTIONAL.md](./FUNCTIONAL.md#questions-à-trancher)
+→ Détails dans [FUNCTIONAL.md](./FUNCTIONAL.md#questions-tranchées)
