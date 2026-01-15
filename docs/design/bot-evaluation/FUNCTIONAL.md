@@ -10,24 +10,29 @@ Un **échantillon** représente une campagne d'évaluation. Il contient un ensem
 |----------|-------------|
 | `name` | Nom optionnel pour identifier l'échantillon |
 | `description` | Description libre de l'objectif de l'évaluation |
-| `startDate` / `endDate` | Période de sélection des dialogs |
+| `dialogActivityFrom et dialogActivityTo` | Période de sélection avec un dialogeu ayant eu une activité pendant la période|
 | `requestedDialogCount` | Nombre de dialogs demandés |
-| `includeTestDialogs` | Inclure ou non les dialogs de test |
+| `dialogsCount` | Nombre de dialogs retourné, peut différer du requested dans le cas ou pas assez de dialogs |
+
+| `totalDialogCount` | Nombre de dialog total dans la periode, indépendemment de la limite requestedDialogCount de l'echantillonnage |
+
+| `botActionCount` | nombre de total de action de bot retourné|
+| `allowTestDialogs` | Autoriser ou non les dialogs de test |
 | `status` | État de l'échantillon |
 | `createdBy` | Utilisateur ayant créé l'échantillon |
-| `validatedBy` | Utilisateur ayant validé l'évaluation |
+| `creationDate` | Utilisateur ayant créé l'échantillon |
+| `createdBy` | Utilisateur ayant créé l'échantillon |
+| `validationDate` | Utilisateur ayant validé l'évaluation |
+| `cancelDate` | Utilisateur ayant validé l'évaluation |
+| `cancelledBy` | Utilisateur ayant validé l'évaluation |
+| `evaluationsResult` | resultat de l'évalution |
 
-### 1.2 Réponse du bot (BotResponse)
 
-Une **réponse du bot** est un message envoyé par le bot à un utilisateur. C'est l'unité d'évaluation.
+evaluationsResult: 
+| `positiveCount` | |
+| `negativeCount` | |
 
-| Attribut | Description |
-|----------|-------------|
-| `dialogId` | Référence au dialog d'origine |
-| `actionId` | Référence à l'action d'origine |
-| `botMessage` | Contenu du message du bot (snapshoté) |
-| `userMessage` | Question de l'utilisateur (contexte) — *voir Q4* |
-| `date` | Date du message |
+
 
 ### 1.3 Évaluation (Evaluation)
 
@@ -35,10 +40,16 @@ Une **évaluation** est le jugement porté sur une réponse du bot.
 
 | Attribut | Description |
 |----------|-------------|
-| `status` | OK ou KO |
-| `reason` | Raison du KO (optionnelle) |
-| `comment` | Commentaire libre (optionnel) |
-| `evaluatedBy` | Utilisateur ayant évalué |
+| `evalution` | OK ou KO - nullable|
+| `reason` | Raison du KO - nullable |
+| `evaluatedBy` | Utilisateur ayant évalué - nullable |
+| `evaluationDate` | Utilisateur ayant évalué - nullable |
+| `dialogId` | Référence au dialog d'origine |
+| `actionId` | Référence à l'action d'origine |
+| `evaluationSampleId` | Référence à l'echantillon|
+
+Initialisé à la creation en BDD. 
+
 
 ### 1.4 Raisons de KO
 
@@ -56,7 +67,12 @@ Réutilisation de la liste des annotations existantes :
 | `QUESTION_MISUNDERSTOOD` | Question mal comprise |
 | `OTHER` | Autre |
 
+
+TODO: a verifier mais utiliser les même valeurs que pour les annotations
+
 ### 1.5 États du cycle de vie
+
+TODO: mettre a jour les schemas
 
 ```mermaid
 stateDiagram-v2
@@ -83,15 +99,13 @@ stateDiagram-v2
 ### 2.1 Création d'échantillon
 
 1. Les dialogs **annotés** (via le système d'annotations existant) sont **exclus**
-2. Les dialogs sont sélectionnés dans la période spécifiée — *voir Q1*
+2. Les dialogs sont sélectionnés dans la période spécifiée, par periode d'activité — *voir Q1*
 3. Si `includeTestDialogs = false`, exclure les dialogs de test
 4. Si pas assez de dialogs/réponses disponibles — *voir Q2*
 
 ### 2.2 Sélection des réponses à évaluer
 
-1. **Filtrage par date** : actions avec `date ≤ sample.creationDate`
-2. **Filtrage par émetteur** : actions du **bot** uniquement (`playerId.type = bot`)
-3. **Snapshot** : le contenu des messages est copié à la création
+1. **Filtrage par date** : 
 
 ### 2.3 Évaluation
 
@@ -111,102 +125,3 @@ stateDiagram-v2
 2. La liste affiche les échantillons des **365 derniers jours**
 
 ---
-
-## 3. Statistiques
-
-### 3.1 Métriques en temps réel
-
-| Métrique | Description |
-|----------|-------------|
-| `totalBotResponses` | Nombre total de réponses du bot à évaluer |
-| `totalDialogs` | Nombre de dialogs distincts |
-| `okCount` | Nombre de réponses évaluées OK |
-| `koCount` | Nombre de réponses évaluées KO |
-| `evaluatedCount` | Nombre total de réponses évaluées |
-| `remainingCount` | Nombre de réponses restantes à évaluer |
-| `okPercentage` | Pourcentage de OK |
-| `koPercentage` | Pourcentage de KO |
-
-### 3.2 Répartition des KO par raison
-
-Groupement des KO par raison avec nombre et pourcentage.
-
----
-
-## 4. Interface utilisateur
-
-### 4.1 Liste des échantillons
-
-- Affiche les échantillons des 365 derniers jours
-- Filtres : statut, application
-- Colonnes : nom, description, dates, créateur, statut, progression, actions
-
-### 4.2 Création d'échantillon
-
-Formulaire avec :
-- Nom (optionnel)
-- Description (optionnelle)
-- Date début / Date fin
-- Nombre de dialogs à évaluer
-- Case à cocher : inclure les dialogs de test
-
-### 4.3 Vue d'évaluation
-
-- **En-tête** : informations du sample + statistiques temps réel
-- **Liste des réponses** : 
-  - Message utilisateur (contexte)
-  - Réponse du bot
-  - Boutons OK / KO
-  - Dropdown raison (si KO, optionnel)
-  - Champ commentaire (optionnel)
-- **Actions** :
-  - Bouton "Valider" (actif si toutes les réponses évaluées)
-  - Modal de confirmation
-
----
-
-## 5. Questions à trancher
-
-### Q1 : Sélection des dialogs
-
-**Comment sélectionner les dialogs dans la période ?**
-
-| Option | Description |
-|--------|-------------|
-| Aléatoire | Sélection aléatoire parmi les dialogs éligibles |
-| Chronologique | Les plus récents d'abord (ou les plus anciens) |
-| Répartition uniforme | Répartir sur toute la période |
-
-### Q2 : Pas assez de réponses
-
-**Que faire si le nombre de réponses disponibles < nombre demandé ?**
-
-| Option | Description |
-|--------|-------------|
-| Prendre tout | Prendre toutes les réponses disponibles, informer l'utilisateur |
-| Bloquer | Empêcher la création et afficher un message d'erreur |
-| Avertir | Créer le sample avec moins de réponses et afficher un avertissement |
-
-### Q3 : Option de stockage
-
-**Option B (snapshots séparés) ou Option C (contenu intégré) ?**
-
-→ Voir [TECHNICAL.md](./TECHNICAL.md#options-de-stockage)
-
-### Q4 : Contenu à stocker
-
-**Quelles données snapshoter pour chaque réponse ?**
-
-| Donnée | Stocker ? |
-|--------|-----------|
-| `botMessage` | ✅ Oui (obligatoire) |
-| `userMessage` | ❓ À décider |
-| `date` | ✅ Oui |
-| `dialogId` / `actionId` | ✅ Oui |
-
-### Q5 : Format d'export
-
-**Format retenu : PDF**
-
-Export du rapport au format PDF (document formaté, prêt à imprimer).
-

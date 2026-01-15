@@ -16,9 +16,8 @@ Permettre aux utilisateurs métier d'évaluer la qualité des réponses du bot v
 ## Cycle de vie
 
 ```
-CREATED → IN_PROGRESS → VALIDATED
-    ↘         ↓
-      CANCELLED
+IN_PROGRESS → VALIDATED
+IN_PROGRESS -> CANCELLED
 ```
 
 ## Documentation
@@ -33,10 +32,8 @@ CREATED → IN_PROGRESS → VALIDATED
 
 | # | Question |
 |---|----------|
-| Q1 | Sélection des dialogs : Aléatoire ? Chronologique ? |
-| Q2 | Pas assez de réponses : Prendre tout ? Bloquer ? |
-| Q3 | Stockage : Option B ou C ? |
-| Q4 | Stocker le `userMessage` en plus du `botMessage` ? |
-| Q5 | ✅ Format d'export : **PDF** |
+| Q1 | Sélection des dialogs : Aléatoire 
+| Q2 | Pas assez de réponses : Prendre tout |
+| Q4 | Stocker le `userMessage` en plus du `botMessage` ? | Non, utilisation des dialogs existants
 
 → Détails dans [FUNCTIONAL.md](./FUNCTIONAL.md#questions-à-trancher)
