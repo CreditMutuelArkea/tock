@@ -1,137 +1,459 @@
 # Spécification fonctionnelle
 
-## 1. Concepts métier
+Ce document décrit les flux fonctionnels avec les appels API, les statuts et retours possibles.
 
-### 1.1 Échantillon d'évaluation (EvaluationSample)
+---
 
-Un **échantillon** représente une campagne d'évaluation. Il contient un ensemble de réponses du bot sélectionnées sur une période donnée.
+## 1. Création d'un ensemble d'évaluation
 
-| Attribut | Description |
-|----------|-------------|
-| `name` | Nom optionnel pour identifier l'échantillon |
-| `description` | Description libre de l'objectif de l'évaluation |
-| `dialogActivityFrom` | Date de début de la période d'activité des dialogs |
-| `dialogActivityTo` | Date de fin de la période d'activité des dialogs |
-| `requestedDialogCount` | Nombre de dialogs demandés |
-| `dialogsCount` | Nombre de dialogs retournés (peut différer si pas assez de dialogs) |
-| `totalDialogCount` | Nombre total de dialogs dans la période (indépendamment de la limite) |
-| `botActionCount` | Nombre total d'actions du bot retournées |
-| `allowTestDialogs` | Autoriser ou non les dialogs de test |
-| `status` | État de l'échantillon |
-| `createdBy` | Utilisateur ayant créé l'échantillon |
-| `creationDate` | Date de création |
-| `validatedBy` | Utilisateur ayant validé l'évaluation |
-| `validationDate` | Date de validation |
-| `cancelledBy` | Utilisateur ayant annulé l'échantillon |
-| `cancelDate` | Date d'annulation |
-| `evaluationsResult` | Résultat de l'évaluation (agrégé) |
-
-### 1.2 Résultat d'évaluation (EvaluationsResult)
-
-> **Note:** Calculé à la volée, non persisté en base.
-
-| Attribut | Description |
-|----------|-------------|
-| `positiveCount` | Nombre d'évaluations OK |
-| `negativeCount` | Nombre d'évaluations KO |
-
-### 1.3 Évaluation (Evaluation)
-
-Une **évaluation** est le jugement porté sur une réponse du bot. Initialisée à la création du sample en BDD (avec les champs d'évaluation à `null`).
-
-| Attribut | Description |
-|----------|-------------|
-| `id` | Identifiant unique |
-| `evaluationSampleId` | Référence à l'échantillon |
-| `dialogId` | Référence au dialog d'origine |
-| `actionId` | Référence à l'action d'origine |
-| `evaluation` | OK ou KO (nullable) |
-| `reason` | Raison du KO (nullable) |
-| `evaluatedBy` | Utilisateur ayant évalué (nullable) |
-| `evaluationDate` | Date de l'évaluation (nullable) |
-
-### 1.4 Raisons de KO
-
-Réutilisation de la liste des annotations existantes :
-
-| Valeur | Description |
-|--------|-------------|
-| `INACCURATE_ANSWER` | Réponse inexacte |
-| `INCOMPLETE_ANSWER` | Réponse incomplète |
-| `HALLUCINATION` | Hallucination |
-| `INCOMPLETE_SOURCES` | Sources incomplètes |
-| `OBSOLETE_SOURCES` | Sources obsolètes |
-| `WRONG_ANSWER_FORMAT` | Mauvais format de réponse |
-| `BUSINESS_LEXICON_PROBLEM` | Problème de lexique métier |
-| `QUESTION_MISUNDERSTOOD` | Question mal comprise |
-| `OTHER` | Autre |
-
-> **TODO:** Vérifier si on utilise les mêmes valeurs que pour les annotations existantes.
-
-### 1.5 États du cycle de vie
-
-> **Note:** Pas d'état CREATED. Le sample passe directement en IN_PROGRESS à la création.
-> Si la création échoue partiellement, le sample et les évaluations créées doivent être rollback (transaction).
+### Flux
 
 ```mermaid
-stateDiagram-v2
-    [*] --> IN_PROGRESS: Création du sample
-    IN_PROGRESS --> VALIDATED: Validation
-    IN_PROGRESS --> CANCELLED: Annulation
-    VALIDATED --> [*]
-    CANCELLED --> [*]
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Remplit formulaire (période, nb dialogs, ...)
+    UI->>API: POST /bots/:botId/evaluation-sets
+    
+    alt Succès
+        API-->>UI: 201 Created
+        Note right of API: { _id, status: "IN_PROGRESS", evaluationsResult, ... }
+        UI-->>U: Affiche vue évaluation
+    else Pas de dialogs trouvés
+        API-->>UI: 422 Unprocessable Entity
+        Note right of API: { error: "No dialogs found for the specified period" }
+        UI-->>U: Message d'erreur
+    else Erreur serveur
+        API-->>UI: 500 Internal Server Error
+        UI-->>U: Message d'erreur technique
+    end
 ```
 
-| État | Description |
-|------|-------------|
-| `IN_PROGRESS` | Évaluation en cours |
-| `VALIDATED` | Évaluation terminée et validée |
-| `CANCELLED` | Échantillon annulé |
+### Appel API
+
+```http
+POST /bots/my-bot/evaluation-sets
+Content-Type: application/json
+
+{
+  "name": "Évaluation Q1 2026",
+  "description": "Vérification qualité avant mise en prod",
+  "dialogActivityFrom": "2026-01-01T00:00:00Z",
+  "dialogActivityTo": "2026-01-14T23:59:59Z",
+  "requestedDialogCount": 50,
+  "allowTestDialogs": false
+}
+```
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 201 | Succès | Ensemble créé avec `evaluationsResult` |
+| 422 | Aucun dialog trouvé | `{ error: "No dialogs found..." }` |
+| 422 | Période invalide | `{ error: "Invalid date range" }` |
+| 500 | Erreur technique | `{ error: "Internal server error" }` |
 
 ---
 
-## 2. Règles métier
+## 2. Liste des ensembles
 
-### 2.1 Création d'échantillon
+### Flux
 
-1. Les dialogs **annotés** (via le système d'annotations existant) sont **exclus**
-2. Les dialogs sont sélectionnés dans la période spécifiée, par période d'activité (aléatoirement)
-3. Si `allowTestDialogs = false`, exclure les dialogs de test
-4. Si pas assez de dialogs/réponses disponibles → prendre tout ce qui est disponible
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
 
-### 2.2 Sélection des réponses à évaluer
+    U->>UI: Accède à la page d'évaluation
+    UI->>API: GET /bots/:botId/evaluation-sets
+    
+    API-->>UI: 200 OK
+    Note right of API: [ { _id, name, status, evaluationsResult, ... }, ... ]
+    UI-->>U: Affiche liste des ensembles
+```
 
-1. **Filtrage par période** : dialogs ayant eu une activité entre `dialogActivityFrom` et `dialogActivityTo`
-2. **Filtrage par émetteur** : actions du **bot** uniquement
+### Appel API
 
-### 2.3 Évaluation
+```http
+GET /bots/my-bot/evaluation-sets?status=IN_PROGRESS
+```
 
-1. Une réponse peut être **réévaluée** tant que l'échantillon n'est pas validé
-2. Les dialogs déjà évalués peuvent réapparaître dans un nouvel échantillon (vierges)
-3. La **raison du KO est optionnelle**
-4. **Plusieurs évaluateurs** peuvent travailler simultanément
-5. Un évaluateur **peut modifier** l'évaluation d'un autre évaluateur
-6. En cas de **conflit d'écriture** (erreur BDD), retourner une erreur 409 Conflict
+### Réponses possibles
 
-### 2.4 Validation et Annulation
-
-1. **Toutes les réponses** doivent être évaluées avant validation
-2. Une fois validé, l'échantillon **ne peut plus être modifié**
-3. **Tout utilisateur** avec les droits peut valider ou annuler un échantillon
-4. L'**export PDF** est une feature séparée (hors scope de ce design)
-
-### 2.5 Conservation et purge
-
-1. Les échantillons sont **purgés** selon la même politique que les dialogs
-2. La liste affiche les échantillons des **365 derniers jours**
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | Liste des ensembles (peut être vide `[]`) |
 
 ---
 
-## 3. Questions tranchées
+## 3. Récupération d'un ensemble
 
-| # | Question | Réponse |
-|---|----------|---------|
-| Q1 | Sélection des dialogs | Aléatoire |
-| Q2 | Pas assez de réponses | Prendre tout |
-| Q4 | Stocker `userMessage` / `botMessage` ? | Non, utilisation des dialogs existants |
-| Q5 | Format d'export | PDF |
+### Flux
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique sur un ensemble
+    UI->>API: GET /bots/:botId/evaluation-sets/:setId
+    
+    alt Trouvé
+        API-->>UI: 200 OK
+        Note right of API: { _id, status, evaluationsResult, ... }
+        UI-->>U: Affiche détails de l'ensemble
+    else Non trouvé
+        API-->>UI: 404 Not Found
+        UI-->>U: Message "Ensemble non trouvé"
+    end
+```
+
+### Appel API
+
+```http
+GET /bots/my-bot/evaluation-sets/507f1f77bcf86cd799439011
+```
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | Ensemble avec `evaluationsResult` |
+| 404 | Non trouvé | `{ error: "Evaluation set not found" }` |
+
+---
+
+## 4. Récupération des bot-refs (paginé)
+
+### Flux - Chargement initial
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Ouvre la vue évaluation
+    
+    UI->>API: GET /bots/:botId/evaluation-sets/:id/bot-refs?start=0&size=20&includeDialogs=true&includeEvaluations=true
+    
+    API-->>UI: 200 OK
+    Note right of API: { botRefs[], dialogs: { found[], missing[] } }
+    
+    UI-->>U: Affiche page 1 des évaluations
+```
+
+### Flux - Pagination
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "Page suivante"
+    
+    UI->>API: GET /bots/:botId/evaluation-sets/:id/bot-refs?start=20&size=20&includeDialogs=true&includeEvaluations=true
+    
+    API-->>UI: 200 OK
+    Note right of API: { botRefs[], dialogs: { found[], missing[] } }
+    
+    UI-->>U: Affiche page 2
+```
+
+### Flux - Filtrage par statut
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Filtre "Non évalués uniquement"
+    
+    UI->>API: GET /bots/:botId/evaluation-sets/:id/bot-refs?start=0&size=20&status=UNSET&includeDialogs=true&includeEvaluations=true
+    
+    API-->>UI: 200 OK
+    Note right of API: { botRefs[] (filtrés), dialogs: { found[], missing[] } }
+    
+    UI-->>U: Affiche uniquement les UNSET
+```
+
+### Appel API
+
+```http
+GET /bots/my-bot/evaluation-sets/507f1f77bcf86cd799439011/bot-refs?start=0&size=20&includeDialogs=true&includeEvaluations=true&status=UNSET
+```
+
+### Query Parameters
+
+| Param | Type | Défaut | Description |
+|-------|------|--------|-------------|
+| `start` | int | 0 | Index de début |
+| `size` | int | 20 | Nombre d'éléments |
+| `includeDialogs` | boolean | false | Inclure les dialogs |
+| `includeEvaluations` | boolean | true | Inclure les évaluations |
+| `status` | string | - | Filtrer par `UNSET`, `UP`, `DOWN` |
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | `{ start, end, total, botRefs[], dialogs: { found[], missing[] } }` |
+| 404 | Set non trouvé | `{ error: "Evaluation set not found" }` |
+
+---
+
+## 5. Évaluer une réponse
+
+### Flux - Évaluation UP
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "UP" sur une réponse
+    UI->>API: PATCH /bots/:botId/evaluation-sets/:setId/evaluations/:evalId
+    Note right of UI: { status: "UP" }
+    
+    alt Succès
+        API-->>UI: 200 OK
+        Note right of API: { _id, status: "UP", evaluator: {...}, ... }
+        UI-->>U: Met à jour l'affichage + statistiques
+    else Conflit
+        API-->>UI: 409 Conflict
+        UI-->>U: "Modifié par un autre utilisateur"
+    else Set validé/annulé
+        API-->>UI: 422 Unprocessable Entity
+        Note right of API: { error: "Cannot evaluate: set is VALIDATED" }
+        UI-->>U: "L'ensemble est déjà validé"
+    end
+```
+
+### Flux - Évaluation DOWN avec raison
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "DOWN" sur une réponse
+    UI->>UI: Affiche liste des raisons (optionnel)
+    U->>UI: Sélectionne "HALLUCINATION"
+    
+    UI->>API: PATCH /bots/:botId/evaluation-sets/:setId/evaluations/:evalId
+    Note right of UI: { status: "DOWN", reason: "HALLUCINATION" }
+    
+    API-->>UI: 200 OK
+    Note right of API: { _id, status: "DOWN", reason: "HALLUCINATION", evaluator: {...}, ... }
+    UI-->>U: Met à jour l'affichage + statistiques
+```
+
+### Flux - Modification d'une évaluation
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Change évaluation (UP → DOWN)
+    UI->>API: PATCH /bots/:botId/evaluation-sets/:setId/evaluations/:evalId
+    Note right of UI: { status: "DOWN", reason: "INCOMPLETE_ANSWER" }
+    
+    alt Succès
+        API-->>UI: 200 OK
+        UI-->>U: Met à jour l'affichage
+    else Conflit concurrent
+        API-->>UI: 409 Conflict
+        Note right of API: { error: "Conflict: evaluation was modified by another user" }
+        UI-->>U: Propose de rafraîchir
+    end
+```
+
+### Appel API
+
+```http
+PATCH /bots/my-bot/evaluation-sets/507f1f77bcf86cd799439011/evaluations/507f1f77bcf86cd799439012
+Content-Type: application/json
+
+{
+  "status": "DOWN",
+  "reason": "HALLUCINATION"
+}
+```
+
+### Request Body
+
+| Champ | Type | Required | Description |
+|-------|------|----------|-------------|
+| `status` | string | Oui | `UP` ou `DOWN` |
+| `reason` | string | Non | Raison du DOWN |
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | Évaluation mise à jour |
+| 404 | Évaluation non trouvée | `{ error: "Evaluation not found" }` |
+| 409 | Conflit concurrent | `{ error: "Conflict: evaluation was modified..." }` |
+| 422 | Set validé/annulé | `{ error: "Cannot evaluate: set is VALIDATED" }` |
+
+---
+
+## 6. Validation d'un ensemble
+
+### Flux - Succès
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "Valider"
+    UI->>UI: Affiche modal confirmation
+    U->>UI: Confirme + ajoute commentaire
+    
+    UI->>API: POST /bots/:botId/evaluation-sets/:id/change-status
+    Note right of UI: { targetStatus: "VALIDATED", comment: "..." }
+    
+    API-->>UI: 200 OK
+    Note right of API: { _id, status: "VALIDATED", statusChangedBy, statusChangeDate, ... }
+    UI-->>U: "Ensemble validé avec succès"
+```
+
+### Flux - Évaluations manquantes
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "Valider"
+    UI->>API: POST /bots/:botId/evaluation-sets/:id/change-status
+    Note right of UI: { targetStatus: "VALIDATED" }
+    
+    API-->>UI: 422 Unprocessable Entity
+    Note right of API: { error: "All bot responses must be evaluated...", details: { remaining: 5, total: 125 } }
+    
+    UI-->>U: "5 évaluations restantes sur 125"
+```
+
+### Appel API
+
+```http
+POST /bots/my-bot/evaluation-sets/507f1f77bcf86cd799439011/change-status
+Content-Type: application/json
+
+{
+  "targetStatus": "VALIDATED",
+  "comment": "Évaluation complète, bot validé pour mise en prod"
+}
+```
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | Ensemble avec nouveau statut |
+| 404 | Set non trouvé | `{ error: "Evaluation set not found" }` |
+| 422 | Évaluations manquantes | `{ error: "All bot responses must be evaluated...", details: { remaining, total } }` |
+| 422 | Déjà validé/annulé | `{ error: "Invalid status transition", details: { currentStatus, targetStatus, allowedTransitions } }` |
+
+---
+
+## 7. Annulation d'un ensemble
+
+### Flux - Succès
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "Annuler"
+    UI->>UI: Affiche modal confirmation
+    U->>UI: Confirme + ajoute raison
+    
+    UI->>API: POST /bots/:botId/evaluation-sets/:id/change-status
+    Note right of UI: { targetStatus: "CANCELLED", comment: "Période incorrecte" }
+    
+    API-->>UI: 200 OK
+    Note right of API: { _id, status: "CANCELLED", statusChangedBy, statusChangeDate, ... }
+    UI-->>U: "Ensemble annulé"
+```
+
+### Flux - Déjà validé
+
+```mermaid
+sequenceDiagram
+    participant U as Utilisateur
+    participant UI as Interface
+    participant API as API
+
+    U->>UI: Clique "Annuler"
+    UI->>API: POST /bots/:botId/evaluation-sets/:id/change-status
+    Note right of UI: { targetStatus: "CANCELLED" }
+    
+    API-->>UI: 422 Unprocessable Entity
+    Note right of API: { error: "Invalid status transition", details: { currentStatus: "VALIDATED", allowedTransitions: [] } }
+    
+    UI-->>U: "Impossible d'annuler un ensemble validé"
+```
+
+### Appel API
+
+```http
+POST /bots/my-bot/evaluation-sets/507f1f77bcf86cd799439011/change-status
+Content-Type: application/json
+
+{
+  "targetStatus": "CANCELLED",
+  "comment": "Période d'évaluation incorrecte"
+}
+```
+
+### Réponses possibles
+
+| Code | Cas | Body |
+|------|-----|------|
+| 200 | Succès | Ensemble avec nouveau statut |
+| 404 | Set non trouvé | `{ error: "Evaluation set not found" }` |
+| 422 | Déjà validé | `{ error: "Invalid status transition", details: { currentStatus, allowedTransitions } }` |
+
+---
+
+## 8. Résumé des codes de retour
+
+| Code | Signification | Cas d'usage |
+|------|---------------|-------------|
+| 200 | OK | Requête réussie (GET, PATCH, POST change-status) |
+| 201 | Created | Création réussie (POST création) |
+| 404 | Not Found | Ressource non trouvée |
+| 409 | Conflict | Conflit de modification concurrente |
+| 422 | Unprocessable Entity | Règle métier non respectée |
+| 500 | Internal Server Error | Erreur technique |
+
+---
+
+## 9. Résumé des endpoints
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| `GET` | `/bots/:botId/evaluation-sets` | Liste des ensembles |
+| `POST` | `/bots/:botId/evaluation-sets` | Créer un ensemble |
+| `GET` | `/bots/:botId/evaluation-sets/:id` | Récupérer un ensemble |
+| `GET` | `/bots/:botId/evaluation-sets/:id/bot-refs` | Liste des bot-refs paginée |
+| `PATCH` | `/bots/:botId/evaluation-sets/:id/evaluations/:evalId` | Évaluer une réponse |
+| `POST` | `/bots/:botId/evaluation-sets/:id/change-status` | Changer le statut |

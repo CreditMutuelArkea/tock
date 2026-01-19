@@ -1,5 +1,7 @@
 # Repenser le domaine d'évaluation pour Tock
 
+> ⚠️ **TOO EARLY** - Ce document contient des réflexions exploratoires sur une évolution future du modèle d'évaluation vers un domaine plus générique et agnostique. Ces concepts ne sont pas encore applicables au design actuel.
+
 ## 1. Constat initial
 
 Le design actuel de l'évaluation dans Tock présente plusieurs limitations :

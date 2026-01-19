@@ -1,15 +1,16 @@
 # Spécification technique
 
-## 1. Diagramme de classes
+Ce document décrit l'implémentation technique : diagrammes de classes, collections MongoDB, index et requêtes.
 
-### 1.1 Modèle de données
+---
+
+## 1. Diagramme de classes
 
 ```mermaid
 classDiagram
-    class EvaluationSample {
+    class EvaluationSet {
         +ObjectId _id
-        +String applicationName
-        +String namespace
+        +String botId
         +String name
         +String description
         +Instant dialogActivityFrom
@@ -20,14 +21,12 @@ classDiagram
         +int botActionCount
         +boolean allowTestDialogs
         +List~BotActionRef~ botActionRefs
-        +EvaluationSampleStatus status
+        +EvaluationSetStatus status
         +String createdBy
         +Instant creationDate
-        +String validatedBy
-        +Instant validationDate
-        +String validationComment
-        +String cancelledBy
-        +Instant cancelDate
+        +String statusChangedBy
+        +Instant statusChangeDate
+        +String statusComment
         +Instant lastUpdateDate
     }
 
@@ -38,15 +37,19 @@ classDiagram
 
     class Evaluation {
         +ObjectId _id
-        +ObjectId evaluationSampleId
+        +ObjectId evaluationSetId
         +String dialogId
         +String actionId
-        +EvaluationStatus evaluation
+        +EvaluationStatus status
         +EvaluationReason reason
-        +String evaluatedBy
+        +Evaluator evaluator
         +Instant evaluationDate
         +Instant creationDate
         +Instant lastUpdateDate
+    }
+
+    class Evaluator {
+        +String id
     }
 
     class EvaluationsResult {
@@ -58,7 +61,7 @@ classDiagram
         +int negativeCount
     }
 
-    class EvaluationSampleStatus {
+    class EvaluationSetStatus {
         <<enumeration>>
         IN_PROGRESS
         VALIDATED
@@ -67,8 +70,9 @@ classDiagram
 
     class EvaluationStatus {
         <<enumeration>>
-        OK
-        KO
+        UNSET
+        UP
+        DOWN
     }
 
     class EvaluationReason {
@@ -84,38 +88,39 @@ classDiagram
         OTHER
     }
 
-    EvaluationSample "1" *-- "many" BotActionRef : botActionRefs
-    EvaluationSample "1" ..> "1" EvaluationsResult : computed
-    EvaluationSample "1" -- "0..*" Evaluation : évaluations
-    EvaluationSample --> EvaluationSampleStatus : status
-    Evaluation --> EvaluationStatus : evaluation
+    EvaluationSet "1" *-- "many" BotActionRef : botActionRefs
+    EvaluationSet "1" ..> "1" EvaluationsResult : computed
+    EvaluationSet "1" -- "0..*" Evaluation : évaluations
+    EvaluationSet --> EvaluationSetStatus : status
+    Evaluation --> EvaluationStatus : status
     Evaluation --> EvaluationReason : reason
+    Evaluation *-- "0..1" Evaluator : evaluator
 ```
 
-### 1.2 Relations
+### Relations
 
 | Relation | Description |
 |----------|-------------|
-| `EvaluationSample` → `BotActionRef` | Liste des actions à évaluer (embedded) |
-| `EvaluationSample` → `EvaluationsResult` | Calculé à la volée (non persisté) |
-| `EvaluationSample` → `Evaluation` | 0 à N évaluations (créées seulement si évaluées) |
-| `Evaluation` → `Dialog` | Référence au dialog existant (pas de snapshot) |
+| `EvaluationSet` → `BotActionRef` | Liste des actions à évaluer (embedded, paginable via `/bot-refs`) |
+| `EvaluationSet` → `EvaluationsResult` | Calculé à la volée (non persisté) |
+| `EvaluationSet` → `Evaluation` | 1 évaluation par BotActionRef (créées à l'initialisation avec `UNSET`) |
+| `Evaluation` → `Evaluator` | Évaluateur (null si UNSET) |
+| `Evaluation` → `Dialog` | Référence au dialog existant (peut être purgé → `dialogs.missing`) |
 
 ---
 
 ## 2. Collections MongoDB
 
-### 2.1 Collection `evaluation_samples`
+### 2.1 Collection `evaluation_sets`
 
-**Description :** Stocke les échantillons d'évaluation avec les références aux actions à évaluer.
+**Description :** Stocke les ensembles d'évaluation avec les références aux actions à évaluer.
 
 ```javascript
 {
   "_id": ObjectId("507f1f77bcf86cd799439011"),
   
   // Identification
-  "applicationName": "my-bot",
-  "namespace": "my-namespace",
+  "botId": "my-bot",
   "name": "Évaluation Q1 2026",
   "description": "Vérification qualité avant mise en prod",
   
@@ -145,15 +150,10 @@ classDiagram
   "createdBy": "user-id-123",
   "creationDate": ISODate("2026-01-14T10:30:00Z"),
   
-  // Validation (nullable)
-  "validatedBy": null,
-  "validationDate": null,
-  "validationComment": null,
-  
-  // Annulation (nullable)
-  "cancelledBy": null,
-  "cancelDate": null,
-  "cancelComment": null,
+  // Changement de statut (initialisé à la création)
+  "statusChangedBy": "user-id-123",        // = createdBy à la création
+  "statusChangeDate": ISODate("2026-01-14T10:30:00Z"),  // = creationDate à la création
+  "statusComment": null,
   
   // Métadonnées
   "lastUpdateDate": ISODate("2026-01-14T10:30:00Z")
@@ -165,42 +165,71 @@ classDiagram
 | Index | Champs | Type | Justification |
 |-------|--------|------|---------------|
 | `_id_` | `_id` | Primary | Par défaut MongoDB |
-| `idx_app_ns_status` | `applicationName`, `namespace`, `status` | Compound | Liste des samples par app/namespace |
+| `idx_bot_status` | `botId`, `status` | Compound | Liste des sets par bot |
 | `idx_creation_date` | `creationDate` | Single (DESC) | Tri par date, purge |
 | `idx_status` | `status` | Single | Filtrage par statut |
 
 ```javascript
 // Création des index
-db.evaluation_samples.createIndex({ "applicationName": 1, "namespace": 1, "status": 1 })
-db.evaluation_samples.createIndex({ "creationDate": -1 })
-db.evaluation_samples.createIndex({ "status": 1 })
+db.evaluation_sets.createIndex({ "botId": 1, "status": 1 })
+db.evaluation_sets.createIndex({ "creationDate": -1 })
+db.evaluation_sets.createIndex({ "status": 1 })
 ```
+
+> **Note:** Le namespace est géré au niveau de la session utilisateur, pas dans les données.
 
 ---
 
 ### 2.2 Collection `evaluations`
 
-**Description :** Stocke les évaluations effectuées. Un document est créé uniquement quand une action est évaluée.
+**Description :** Stocke les évaluations. Un document est créé pour chaque action à évaluer lors de la création de l'ensemble, avec `status = UNSET`.
 
 ```javascript
 {
   "_id": ObjectId("507f1f77bcf86cd799439012"),
   
   // Références
-  "evaluationSampleId": ObjectId("507f1f77bcf86cd799439011"),
+  "evaluationSetId": ObjectId("507f1f77bcf86cd799439011"),
   "dialogId": "dialog_abc123",
   "actionId": "action_001",
   
-  // Évaluation
-  "evaluation": "OK",  // OK | KO
-  "reason": null,      // Si KO : INACCURATE_ANSWER, HALLUCINATION, etc.
+  // Évaluation (UNSET par défaut)
+  "status": "UNSET",  // UNSET | UP | DOWN
+  "reason": null,     // Si DOWN : INACCURATE_ANSWER, HALLUCINATION, etc.
   
-  // Évaluateur
-  "evaluatedBy": "user-id-456",
-  "evaluationDate": ISODate("2026-01-14T11:00:00Z"),
+  // Évaluateur (null si UNSET)
+  "evaluator": null,
+  // Exemple après évaluation:
+  // "evaluator": {
+  //   "id": "user-id-456"
+  // },
+  
+  "evaluationDate": null,
   
   // Métadonnées
-  "creationDate": ISODate("2026-01-14T11:00:00Z"),
+  "creationDate": ISODate("2026-01-14T10:30:00Z"),
+  "lastUpdateDate": ISODate("2026-01-14T10:30:00Z")
+}
+```
+
+**Exemple après évaluation :**
+
+```javascript
+{
+  "_id": ObjectId("507f1f77bcf86cd799439012"),
+  "evaluationSetId": ObjectId("507f1f77bcf86cd799439011"),
+  "dialogId": "dialog_abc123",
+  "actionId": "action_001",
+  
+  "status": "DOWN",
+  "reason": "HALLUCINATION",
+  
+  "evaluator": {
+    "id": "user-id-456"
+  },
+  "evaluationDate": ISODate("2026-01-14T11:00:00Z"),
+  
+  "creationDate": ISODate("2026-01-14T10:30:00Z"),
   "lastUpdateDate": ISODate("2026-01-14T11:00:00Z")
 }
 ```
@@ -210,19 +239,19 @@ db.evaluation_samples.createIndex({ "status": 1 })
 | Index | Champs | Type | Justification |
 |-------|--------|------|---------------|
 | `_id_` | `_id` | Primary | Par défaut MongoDB |
-| `idx_sample_id` | `evaluationSampleId` | Single | Récupérer toutes les évaluations d'un sample |
-| `idx_sample_dialog_action` | `evaluationSampleId`, `dialogId`, `actionId` | Compound + Unique | Unicité, recherche rapide |
-| `idx_evaluation` | `evaluation` | Single | Stats par statut (OK/KO) |
+| `idx_set_id` | `evaluationSetId` | Single | Récupérer toutes les évaluations d'un set |
+| `idx_set_dialog_action` | `evaluationSetId`, `dialogId`, `actionId` | Compound + Unique | Unicité, recherche rapide |
+| `idx_status` | `status` | Single | Stats par statut (UNSET/UP/DOWN) |
 | `idx_creation_date` | `creationDate` | Single (DESC) | Purge |
 
 ```javascript
 // Création des index
-db.evaluations.createIndex({ "evaluationSampleId": 1 })
+db.evaluations.createIndex({ "evaluationSetId": 1 })
 db.evaluations.createIndex(
-  { "evaluationSampleId": 1, "dialogId": 1, "actionId": 1 }, 
+  { "evaluationSetId": 1, "dialogId": 1, "actionId": 1 }, 
   { unique: true }
 )
-db.evaluations.createIndex({ "evaluation": 1 })
+db.evaluations.createIndex({ "status": 1 })
 db.evaluations.createIndex({ "creationDate": -1 })
 ```
 
@@ -263,245 +292,83 @@ db.evaluations.createIndex({ "creationDate": -1 })
 
 ---
 
-## 3. Flux de données
+## 3. Requêtes MongoDB fréquentes
 
-### 3.1 Création du sample
-
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant UI as Interface
-    participant API as API
-    participant Samples as evaluation_samples
-    participant Dialogs as dialogs
-    participant Annotations as annotations
-
-    U->>UI: Remplit formulaire
-    UI->>API: POST /evaluation-samples
-    
-    API->>Dialogs: find(période, applicationName)
-    Dialogs-->>API: dialogs[]
-    
-    API->>Annotations: find(dialogIds)
-    Annotations-->>API: annotatedDialogIds[]
-    
-    API->>API: Exclut dialogs annotés
-    API->>API: Sélectionne N dialogs (aléatoire)
-    API->>API: Extrait botActionRefs (actions bot)
-    
-    API->>Samples: insertOne(sample + botActionRefs)
-    Samples-->>API: sample créé
-    
-    API-->>UI: 201 Created + sample
-    UI-->>U: Affiche vue évaluation
-```
-
-### 3.2 Chargement des évaluations
-
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant UI as Interface
-    participant API as API
-    participant Samples as evaluation_samples
-    participant Evals as evaluations
-    participant Dialogs as dialogs
-
-    U->>UI: Ouvre un sample
-    
-    UI->>API: GET /evaluation-samples/:id
-    API->>Samples: findOne(_id)
-    Samples-->>API: sample (avec botActionRefs)
-    
-    API->>Evals: count(evaluationSampleId, evaluation=OK)
-    API->>Evals: count(evaluationSampleId, evaluation=KO)
-    API->>API: Calcule evaluationsResult
-    
-    API-->>UI: sample + evaluationsResult
-    
-    UI->>API: GET /evaluations?includeDialogs=true
-    API->>Evals: find(evaluationSampleId).skip().limit()
-    Evals-->>API: evaluations[]
-    
-    API->>Dialogs: find(dialogIds)
-    Dialogs-->>API: dialogs[]
-    
-    API-->>UI: evaluations[] + dialogs[]
-    
-    UI->>UI: Fusionne botActionRefs + evaluations + dialogs
-    UI-->>U: Affiche liste avec statut évaluation
-```
-
-### 3.3 Évaluer une action
-
-```mermaid
-sequenceDiagram
-    participant E1 as Évaluateur 1
-    participant E2 as Évaluateur 2
-    participant UI as Interface
-    participant API as API
-    participant Evals as evaluations
-
-    Note over E1,E2: Évaluations simultanées
-
-    E1->>UI: Clique OK sur action A
-    UI->>API: POST /evaluations {dialogId, actionId, evaluation: OK}
-    API->>Evals: insertOne(evaluation)
-    Note over API,Evals: Ou updateOne si déjà existe
-    Evals-->>API: evaluation créée
-    API-->>UI: 201 Created
-    UI-->>E1: Rafraîchit statistiques
-
-    E2->>UI: Clique KO sur action B
-    UI->>API: POST /evaluations {dialogId, actionId, evaluation: KO, reason}
-    API->>Evals: insertOne(evaluation)
-    Evals-->>API: evaluation créée
-    API-->>UI: 201 Created
-    UI-->>E2: Rafraîchit statistiques
-```
-
-### 3.4 Modifier une évaluation
-
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant UI as Interface
-    participant API as API
-    participant Evals as evaluations
-
-    U->>UI: Modifie évaluation existante
-    UI->>API: PATCH /evaluations/:id {evaluation: KO, reason}
-    
-    API->>Evals: findOneAndUpdate(_id, $set, returnDocument: after)
-    
-    alt Conflit (version)
-        Evals-->>API: null (document modifié)
-        API-->>UI: 409 Conflict
-        UI-->>U: Message "Modifié par un autre utilisateur"
-    else Succès
-        Evals-->>API: evaluation mise à jour
-        API-->>UI: 200 OK
-        UI-->>U: Rafraîchit vue
-    end
-```
-
-### 3.5 Validation
-
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant UI as Interface
-    participant API as API
-    participant Samples as evaluation_samples
-    participant Evals as evaluations
-
-    U->>UI: Clique "Valider"
-    UI->>UI: Affiche modal confirmation
-    U->>UI: Confirme (+ commentaire)
-    
-    UI->>API: POST /validate {validationComment}
-    
-    API->>Samples: findOne(_id)
-    Samples-->>API: sample (avec botActionRefs.length)
-    
-    API->>Evals: count(evaluationSampleId)
-    Evals-->>API: evaluatedCount
-    
-    API->>API: Vérifie evaluatedCount == botActionRefs.length
-    
-    alt Évaluations manquantes
-        API-->>UI: 422 Unprocessable Entity
-        UI-->>U: "X évaluations restantes"
-    else Toutes évaluées
-        API->>Samples: updateOne(_id, status=VALIDATED, validatedBy, validationDate)
-        Samples-->>API: OK
-        API-->>UI: 200 OK
-        UI-->>U: "Sample validé"
-    end
-```
-
-### 3.6 Annulation
-
-```mermaid
-sequenceDiagram
-    participant U as Utilisateur
-    participant UI as Interface
-    participant API as API
-    participant Samples as evaluation_samples
-
-    U->>UI: Clique "Annuler"
-    UI->>UI: Affiche modal confirmation
-    U->>UI: Confirme (+ raison)
-    
-    UI->>API: POST /cancel {cancelComment}
-    
-    API->>Samples: findOne(_id)
-    Samples-->>API: sample
-    
-    alt Déjà validé
-        API-->>UI: 422 Unprocessable Entity
-        UI-->>U: "Sample déjà validé"
-    else Peut annuler
-        API->>Samples: updateOne(_id, status=CANCELLED, cancelledBy, cancelDate)
-        Samples-->>API: OK
-        API-->>UI: 200 OK
-        UI-->>U: "Sample annulé"
-    end
-```
-
----
-
-## 4. Requêtes MongoDB fréquentes
-
-### 4.1 Calculer evaluationsResult
+### 3.1 Calculer evaluationsResult
 
 ```javascript
-// Nombre d'évaluations par statut pour un sample
+// Nombre d'évaluations par statut pour un set
 db.evaluations.aggregate([
-  { $match: { evaluationSampleId: ObjectId("...") } },
+  { $match: { evaluationSetId: ObjectId("...") } },
   { $group: {
-      _id: "$evaluation",
+      _id: "$status",
       count: { $sum: 1 }
   }}
 ])
 
 // Résultat:
-// [{ _id: "OK", count: 60 }, { _id: "KO", count: 20 }]
+// [{ _id: "UP", count: 60 }, { _id: "DOWN", count: 20 }, { _id: "UNSET", count: 45 }]
 ```
 
-### 4.2 Vérifier si toutes les actions sont évaluées
+### 3.2 Vérifier si toutes les actions sont évaluées
 
 ```javascript
-// Comparer botActionRefs.length avec le nombre d'évaluations
-const sample = db.evaluation_samples.findOne({ _id: ObjectId("...") })
-const evaluatedCount = db.evaluations.countDocuments({ 
-  evaluationSampleId: sample._id 
+// Compter le nombre d'évaluations UNSET
+const unsetCount = db.evaluations.countDocuments({ 
+  evaluationSetId: ObjectId("..."),
+  status: "UNSET"
 })
-const allEvaluated = evaluatedCount === sample.botActionRefs.length
+const allEvaluated = unsetCount === 0
 ```
 
-### 4.3 Liste paginée des évaluations avec dialogs
+### 3.3 Liste paginée des bot-refs avec dialogs
 
 ```javascript
-// Évaluations paginées
-const evaluations = db.evaluations
-  .find({ evaluationSampleId: ObjectId("...") })
-  .skip(0)
-  .limit(20)
-  .toArray()
+// 1. Récupérer le set et paginer les botActionRefs
+const set = db.evaluation_sets.findOne({ _id: ObjectId("...") })
+const pagedRefs = set.botActionRefs.slice(start, start + size)
 
-// Dialogs associés
-const dialogIds = [...new Set(evaluations.map(e => e.dialogId))]
-const dialogs = db.dialogs.find({ _id: { $in: dialogIds } }).toArray()
+// 2. Récupérer les évaluations correspondantes
+const refFilters = pagedRefs.map(r => ({ dialogId: r.dialogId, actionId: r.actionId }))
+const evaluations = db.evaluations.find({
+  evaluationSetId: set._id,
+  $or: refFilters
+}).toArray()
+
+// 3. Récupérer les dialogs (certains peuvent avoir été purgés)
+const dialogIds = [...new Set(pagedRefs.map(r => r.dialogId))]
+const foundDialogs = db.dialogs.find({ _id: { $in: dialogIds } }).toArray()
+const foundDialogIds = new Set(foundDialogs.map(d => d._id))
+
+// 4. Identifier les refs dont le dialog a été purgé
+const missingRefs = pagedRefs.filter(r => !foundDialogIds.has(r.dialogId))
+```
+
+### 3.4 Statistiques rapides pour la liste des sets
+
+```javascript
+// Pour chaque set, calculer les stats rapidement
+db.evaluations.aggregate([
+  { $match: { evaluationSetId: { $in: [ObjectId("..."), ObjectId("...")] } } },
+  { $group: {
+      _id: { setId: "$evaluationSetId", status: "$status" },
+      count: { $sum: 1 }
+  }},
+  { $group: {
+      _id: "$_id.setId",
+      stats: { $push: { status: "$_id.status", count: "$count" } }
+  }}
+])
 ```
 
 ---
 
-## 5. Points d'attention
+## 4. Points d'attention
 
-1. **Performance** : La génération d'échantillon peut être lente si beaucoup de dialogs
+1. **Performance** : La génération d'ensemble peut être lente si beaucoup de dialogs
 2. **Concurrence** : Gérer les mises à jour simultanées (plusieurs évaluateurs)
 3. **Rafraîchissement UI** : Polling ou WebSocket pour afficher les évaluations des autres
 4. **Permissions** : Vérifier les droits d'accès (rôle `botUser`)
 5. **Purge** : Les évaluations sans dialogs restent consultables mais sans contexte
 6. **Taille botActionRefs** : Attention si beaucoup d'actions (limite document MongoDB 16MB)
+7. **Transaction** : La création de l'ensemble et des évaluations doit être atomique

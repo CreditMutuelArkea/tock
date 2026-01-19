@@ -3,23 +3,34 @@
 ## Base URL
 
 ```
-/bot/evaluation-samples
+/bots/:botId/evaluation-sets
 ```
+
+> **Note sur l'identité du bot :**
+> - Le `botId` correspond à l'`applicationName` dans Tock
+> - Le **namespace** est récupéré depuis le **contexte utilisateur** (session/token), pas dans l'URL
+> - Un bot est **uniquement identifié** par le couple `namespace + applicationName`
+> - Un même `applicationName` peut exister dans différents namespaces (multi-tenant)
+> - Le backend résout l'identité complète en combinant le `botId` de l'URL avec le `namespace` du contexte
 
 ---
 
-## 1. Liste des échantillons
+## 1. Liste des ensembles d'évaluation
 
-**GET** `/bot/evaluation-samples`
+**GET** `/bots/:botId/evaluation-sets`
 
-Liste les échantillons des 365 derniers jours.
+Liste les ensembles des 365 derniers jours pour le bot spécifié.
+
+### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
 
 ### Query Parameters
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `applicationName` | string | Non | Filtrer par application |
-| `namespace` | string | Non | Filtrer par namespace |
 | `status` | string | Non | Filtrer par statut (`IN_PROGRESS`, `VALIDATED`, `CANCELLED`). Par défaut : `IN_PROGRESS`, `VALIDATED` |
 
 ### Response 200
@@ -28,8 +39,7 @@ Liste les échantillons des 365 derniers jours.
 [
   {
     "_id": "507f1f77bcf86cd799439011",
-    "applicationName": "my-bot",
-    "namespace": "my-namespace",
+    "botId": "my-bot",
     "name": "Évaluation Q1 2026",
     "description": "Vérification qualité avant mise en prod",
     "dialogActivityFrom": "2026-01-01T00:00:00Z",
@@ -42,12 +52,14 @@ Liste les échantillons des 365 derniers jours.
     "status": "IN_PROGRESS",
     "createdBy": "user-id-123",
     "creationDate": "2026-01-14T10:30:00Z",
-    "validatedBy": null,
-    "validationDate": null,
-    "cancelledBy": null,
-    "cancelDate": null,
+    "statusChangedBy": "user-id-123",
+    "statusChangeDate": "2026-01-14T10:30:00Z",
+    "statusComment": null,
     "evaluationsResult": {
-      "positiveCount": 80,
+      "total": 125,
+      "evaluated": 80,
+      "remaining": 45,
+      "positiveCount": 60,
       "negativeCount": 20
     }
   }
@@ -58,19 +70,23 @@ Liste les échantillons des 365 derniers jours.
 
 ---
 
-## 2. Créer un échantillon
+## 2. Créer un ensemble d'évaluation
 
-**POST** `/bot/evaluation-samples`
+**POST** `/bots/:botId/evaluation-sets`
 
 Le `createdBy` est récupéré depuis le contexte utilisateur.
+
+### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
 
 ### Request Body
 
 | Champ | Type | Required | Description |
 |-------|------|----------|-------------|
-| `applicationName` | string | Oui | Nom de l'application |
-| `namespace` | string | Oui | Namespace |
-| `name` | string | Non | Nom de l'échantillon |
+| `name` | string | Non | Nom de l'ensemble |
 | `description` | string | Non | Description libre |
 | `dialogActivityFrom` | instant | Oui | Début de la période d'activité |
 | `dialogActivityTo` | instant | Oui | Fin de la période d'activité |
@@ -79,8 +95,6 @@ Le `createdBy` est récupéré depuis le contexte utilisateur.
 
 ```json
 {
-  "applicationName": "my-bot",
-  "namespace": "my-namespace",
   "name": "Évaluation Q1 2026",
   "description": "Vérification qualité avant mise en prod",
   "dialogActivityFrom": "2026-01-01T00:00:00Z",
@@ -95,8 +109,7 @@ Le `createdBy` est récupéré depuis le contexte utilisateur.
 ```json
 {
   "_id": "507f1f77bcf86cd799439011",
-  "applicationName": "my-bot",
-  "namespace": "my-namespace",
+  "botId": "my-bot",
   "name": "Évaluation Q1 2026",
   "description": "Vérification qualité avant mise en prod",
   "dialogActivityFrom": "2026-01-01T00:00:00Z",
@@ -109,32 +122,44 @@ Le `createdBy` est récupéré depuis le contexte utilisateur.
   "status": "IN_PROGRESS",
   "createdBy": "user-id-123",
   "creationDate": "2026-01-14T10:30:00Z",
-  "validatedBy": null,
-  "validationDate": null,
-  "cancelledBy": null,
-  "cancelDate": null,
+  "statusChangedBy": "user-id-123",
+  "statusChangeDate": "2026-01-14T10:30:00Z",
+  "statusComment": null,
   "evaluationsResult": {
+    "total": 125,
+    "evaluated": 0,
+    "remaining": 125,
     "positiveCount": 0,
     "negativeCount": 0
   }
 }
 ```
 
+> **Note:** 
+> - Les évaluations sont créées en parallèle avec `status = UNSET`
+> - `statusChangedBy` et `statusChangeDate` sont initialisés avec les valeurs de création
+
 ---
 
-## 3. Récupérer un échantillon
+## 3. Récupérer un ensemble d'évaluation
 
-**GET** `/bot/evaluation-samples/:sampleId`
+**GET** `/bots/:botId/evaluation-sets/:setId`
 
-Retourne l'échantillon avec ses métadonnées.
+Retourne l'ensemble avec ses métadonnées et statistiques.
+
+### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
+| `setId` | string | Identifiant de l'ensemble |
 
 ### Response 200
 
 ```json
 {
   "_id": "507f1f77bcf86cd799439011",
-  "applicationName": "my-bot",
-  "namespace": "my-namespace",
+  "botId": "my-bot",
   "name": "Évaluation Q1 2026",
   "description": "Vérification qualité avant mise en prod",
   "dialogActivityFrom": "2026-01-01T00:00:00Z",
@@ -147,12 +172,14 @@ Retourne l'échantillon avec ses métadonnées.
   "status": "IN_PROGRESS",
   "createdBy": "user-id-123",
   "creationDate": "2026-01-14T10:30:00Z",
-  "validatedBy": null,
-  "validationDate": null,
-  "cancelledBy": null,
-  "cancelDate": null,
+  "statusChangedBy": "user-id-123",
+  "statusChangeDate": "2026-01-14T10:30:00Z",
+  "statusComment": null,
   "evaluationsResult": {
-    "positiveCount": 80,
+    "total": 125,
+    "evaluated": 80,
+    "remaining": 45,
+    "positiveCount": 60,
     "negativeCount": 20
   }
 }
@@ -160,39 +187,28 @@ Retourne l'échantillon avec ses métadonnées.
 
 ---
 
-## 4. Récupérer les évaluations (paginé)
+## 4. Récupérer les bot-refs (paginé)
 
-Récupère les évaluations avec pagination et optionnellement les dialogs associés.
+**GET** `/bots/:botId/evaluation-sets/:setId/bot-refs`
 
-### Option A : GET (RESTful) ✅
+Récupère les références aux actions à évaluer avec pagination, et optionnellement les évaluations et dialogs associés.
 
-**GET** `/bot/evaluation-samples/:sampleId/evaluations`
+### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
+| `setId` | string | Identifiant de l'ensemble |
+
+### Query Parameters
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
 | `start` | int | Non | Index de début (défaut: 0) |
 | `size` | int | Non | Nombre d'éléments (défaut: 20) |
 | `includeDialogs` | boolean | Non | Inclure les dialogs associés (défaut: false) |
-
-**Avantages :** Standard REST, cacheable, idempotent.
-
-### Option B : POST (Search)
-
-**POST** `/bot/evaluation-samples/:sampleId/evaluations/search`
-
-```json
-{
-  "start": 0,
-  "size": 20,
-  "includeDialogs": true
-}
-```
-
-**Avantages :** Extensible pour des filtres complexes futurs.
-
----
-
-> **À trancher :** Quelle option retenir ?
+| `includeEvaluations` | boolean | Non | Inclure les évaluations associées (défaut: true) |
+| `status` | string | Non | Filtrer par statut d'évaluation (`UNSET`, `UP`, `DOWN`) |
 
 ### Response 200
 
@@ -201,60 +217,132 @@ Récupère les évaluations avec pagination et optionnellement les dialogs assoc
   "start": 0,
   "end": 20,
   "total": 125,
-  "evaluations": [
+  "botRefs": [
     {
-      "_id": "eval_001",
-      "evaluationSampleId": "507f1f77bcf86cd799439011",
       "dialogId": "dialog_abc123",
       "actionId": "action_002",
-      "evaluation": "OK",
-      "reason": null,
-      "evaluatedBy": "user-id-456",
-      "evaluationDate": "2026-01-14T11:00:00Z"
+      "evaluation": {
+        "_id": "eval_001",
+        "status": "UP",
+        "reason": null,
+        "evaluator": {
+          "id": "user-id-456"
+        },
+        "evaluationDate": "2026-01-14T11:00:00Z"
+      }
     },
     {
-      "_id": "eval_002",
-      "evaluationSampleId": "507f1f77bcf86cd799439011",
       "dialogId": "dialog_def456",
       "actionId": "action_011",
-      "evaluation": null,
-      "reason": null,
-      "evaluatedBy": null,
-      "evaluationDate": null
-    }
-  ],
-  "dialogs": [
-    {
-      "_id": "dialog_abc123",
-      "actions": [...]
+      "evaluation": {
+        "_id": "eval_002",
+        "status": "UNSET",
+        "reason": null,
+        "evaluator": null,
+        "evaluationDate": null
+      }
     },
     {
-      "_id": "dialog_def456",
-      "actions": [...]
+      "dialogId": "dialog_ghi789",
+      "actionId": "action_005",
+      "evaluation": {
+        "_id": "eval_003",
+        "status": "DOWN",
+        "reason": "HALLUCINATION",
+        "evaluator": {
+          "id": "user-id-789"
+        },
+        "evaluationDate": "2026-01-14T11:05:00Z"
+      }
+    },
+    {
+      "dialogId": "dialog_purged999",
+      "actionId": "action_007",
+      "evaluation": {
+        "_id": "eval_004",
+        "status": "UP",
+        "reason": null,
+        "evaluator": {
+          "id": "user-id-456"
+        },
+        "evaluationDate": "2026-01-14T11:02:00Z"
+      }
     }
-  ]
+  ],
+  "dialogs": {
+    "found": [
+      {
+        "_id": "dialog_abc123",
+        "actions": [...]
+      },
+      {
+        "_id": "dialog_def456",
+        "actions": [...]
+      },
+      {
+        "_id": "dialog_ghi789",
+        "actions": [...]
+      }
+    ],
+    "missing": [
+      {
+        "dialogId": "dialog_purged999",
+        "actionId": "action_007"
+      }
+    ]
+  }
 }
 ```
+
+> **Note:** `dialogs.missing` contient les références dont le dialog a été purgé. L'évaluation reste disponible mais sans contexte.
 
 ---
 
 ## 5. Évaluer une réponse
 
-**PATCH** `/bot/evaluation-samples/:sampleId/evaluations/:evaluationId`
+**PATCH** `/bots/:botId/evaluation-sets/:setId/evaluations/:evaluationId`
 
-Met à jour l'évaluation d'une action. Le `evaluatedBy` est récupéré depuis le contexte utilisateur.
+Met à jour l'évaluation d'une action. L'évaluateur est **détecté automatiquement** depuis le contexte utilisateur (comme pour les autres opérations de création/modification).
+
+### Path Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
+| `setId` | string | Identifiant de l'ensemble |
+| `evaluationId` | string | Identifiant de l'évaluation |
 
 ### Request Body
 
 | Champ | Type | Required | Description |
 |-------|------|----------|-------------|
-| `evaluation` | string | Oui | `OK` ou `KO` |
-| `reason` | string | Non | Raison du KO (null si OK) |
+| `status` | string | Oui | `UP` ou `DOWN` |
+| `reason` | string | Non | Raison du DOWN (null si UP) |
+
+> **Note:** L'`evaluator` est renseigné automatiquement côté serveur à partir du contexte utilisateur avant l'entrée dans le service.
+
+#### Exemple : Évaluation positive (UP)
 
 ```json
 {
-  "evaluation": "KO",
+  "status": "UP"
+}
+```
+
+#### Exemple : Évaluation négative (DOWN)
+
+```json
+{
+  "status": "DOWN",
   "reason": "QUESTION_MISUNDERSTOOD"
+}
+```
+
+#### Exemple : Évaluation négative sans raison
+
+```json
+{
+  "status": "DOWN"
 }
 ```
 
@@ -263,12 +351,14 @@ Met à jour l'évaluation d'une action. Le `evaluatedBy` est récupéré depuis 
 ```json
 {
   "_id": "eval_002",
-  "evaluationSampleId": "507f1f77bcf86cd799439011",
+  "evaluationSetId": "507f1f77bcf86cd799439011",
   "dialogId": "dialog_def456",
   "actionId": "action_011",
-  "evaluation": "KO",
+  "status": "DOWN",
   "reason": "QUESTION_MISUNDERSTOOD",
-  "evaluatedBy": "user-id-456",
+  "evaluator": {
+    "id": "user-id-456"
+  },
   "evaluationDate": "2026-01-14T11:10:00Z"
 }
 ```
@@ -283,7 +373,7 @@ En cas de conflit d'écriture concurrent.
 }
 ```
 
-### Raisons possibles
+### Raisons possibles (pour DOWN)
 
 | Valeur | Description |
 |--------|-------------|
@@ -299,94 +389,141 @@ En cas de conflit d'écriture concurrent.
 
 ---
 
-## 6. Annuler un échantillon
+## 6. Changer le statut d'un ensemble
 
-**POST** `/bot/evaluation-samples/:sampleId/cancel`
+**POST** `/bots/:botId/evaluation-sets/:setId/change-status`
 
-Annule un échantillon en cours. Le `cancelledBy` est récupéré depuis le contexte utilisateur.
+API unique pour valider ou annuler un ensemble. Le `statusChangedBy` est récupéré depuis le contexte utilisateur.
 
-### Request Body
+### Path Parameters
 
-| Champ | Type | Required | Description |
-|-------|------|----------|-------------|
-| `cancelComment` | string | Non | Raison de l'annulation |
-
-```json
-{
-  "cancelComment": "Période d'évaluation incorrecte"
-}
-```
-
-### Response 200
-
-```json
-{
-  "_id": "507f1f77bcf86cd799439011",
-  "status": "CANCELLED",
-  "cancelledBy": "user-id-789",
-  "cancelDate": "2026-01-14T12:00:00Z",
-  "cancelComment": "Période d'évaluation incorrecte"
-}
-```
-
-### Response 422
-
-```json
-{
-  "error": "Sample cannot be cancelled (status: VALIDATED)"
-}
-```
-
----
-
-## 7. Valider l'évaluation
-
-**POST** `/bot/evaluation-samples/:sampleId/validate`
-
-Toutes les réponses doivent être évaluées. Le `validatedBy` est récupéré depuis le contexte utilisateur.
+| Param | Type | Description |
+|-------|------|-------------|
+| `botId` | string | Identifiant du bot (applicationName) |
+| `setId` | string | Identifiant de l'ensemble |
 
 ### Request Body
 
 | Champ | Type | Required | Description |
 |-------|------|----------|-------------|
-| `validationComment` | string | Non | Commentaire de validation |
+| `targetStatus` | string | Oui | `VALIDATED` ou `CANCELLED` |
+| `comment` | string | Non | Commentaire associé au changement |
+
+#### Exemple : Validation
 
 ```json
 {
-  "validationComment": "Évaluation complète, bot validé pour mise en prod"
+  "targetStatus": "VALIDATED",
+  "comment": "Évaluation complète, bot validé pour mise en prod"
 }
 ```
 
-### Response 200
+#### Exemple : Annulation
+
+```json
+{
+  "targetStatus": "CANCELLED",
+  "comment": "Période d'évaluation incorrecte"
+}
+```
+
+### Response 200 (Validation réussie)
 
 ```json
 {
   "_id": "507f1f77bcf86cd799439011",
   "status": "VALIDATED",
-  "validatedBy": "user-id-789",
-  "validationDate": "2026-01-14T12:00:00Z",
-  "validationComment": "Évaluation complète, bot validé pour mise en prod"
+  "statusChangedBy": "user-id-789",
+  "statusChangeDate": "2026-01-14T12:00:00Z",
+  "statusComment": "Évaluation complète, bot validé pour mise en prod"
 }
 ```
 
-### Response 422
+### Response 200 (Annulation réussie)
 
 ```json
 {
-  "error": "All bot responses must be evaluated before validation (5 remaining)"
+  "_id": "507f1f77bcf86cd799439011",
+  "status": "CANCELLED",
+  "statusChangedBy": "user-id-789",
+  "statusChangeDate": "2026-01-14T12:00:00Z",
+  "statusComment": "Période d'évaluation incorrecte"
 }
 ```
 
+### Response 422 (Validation impossible)
+
+```json
+{
+  "error": "All bot responses must be evaluated before validation",
+  "details": {
+    "remaining": 5,
+    "total": 125
+  }
+}
+```
+
+### Response 422 (Annulation impossible)
+
+```json
+{
+  "error": "Set cannot be cancelled",
+  "details": {
+    "currentStatus": "VALIDATED",
+    "allowedTransitions": []
+  }
+}
+```
+
+### Transitions de statut autorisées
+
+| Statut actuel | Transitions autorisées |
+|---------------|------------------------|
+| `IN_PROGRESS` | `VALIDATED`, `CANCELLED` |
+| `VALIDATED` | aucune |
+| `CANCELLED` | aucune |
+
 ---
 
-## Résumé
+## Résumé des endpoints
 
 | Méthode | Endpoint | Description |
 |---------|----------|-------------|
-| `GET` | `/bot/evaluation-samples` | Liste des échantillons |
-| `POST` | `/bot/evaluation-samples` | Créer un échantillon |
-| `GET` | `/bot/evaluation-samples/:id` | Récupérer un échantillon |
-| `GET` ou `POST` | `/bot/evaluation-samples/:id/evaluations` ou `.../search` | Liste des évaluations (paginé) — *à trancher* |
-| `PATCH` | `/bot/evaluation-samples/:id/evaluations/:evalId` | Évaluer une réponse |
-| `POST` | `/bot/evaluation-samples/:id/cancel` | Annuler l'échantillon |
-| `POST` | `/bot/evaluation-samples/:id/validate` | Valider l'évaluation |
+| `GET` | `/bots/:botId/evaluation-sets` | Liste des ensembles |
+| `POST` | `/bots/:botId/evaluation-sets` | Créer un ensemble |
+| `GET` | `/bots/:botId/evaluation-sets/:setId` | Récupérer un ensemble |
+| `GET` | `/bots/:botId/evaluation-sets/:setId/bot-refs` | Liste des bot-refs paginée |
+| `PATCH` | `/bots/:botId/evaluation-sets/:setId/evaluations/:evalId` | Évaluer une réponse |
+| `POST` | `/bots/:botId/evaluation-sets/:setId/change-status` | Changer le statut |
+
+---
+
+## Types et Enums
+
+### EvaluationStatus
+
+```typescript
+enum EvaluationStatus {
+  UNSET = "UNSET",  // Non évalué (valeur initiale)
+  UP = "UP",        // Évaluation positive
+  DOWN = "DOWN"     // Évaluation négative
+}
+```
+
+### EvaluationSetStatus
+
+```typescript
+enum EvaluationSetStatus {
+  IN_PROGRESS = "IN_PROGRESS",
+  VALIDATED = "VALIDATED",
+  CANCELLED = "CANCELLED"
+}
+```
+
+### Evaluator
+
+```typescript
+interface Evaluator {
+  id: string;
+}
+```
