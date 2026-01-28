@@ -1,0 +1,194 @@
+<div class="d-flex align-items-center mb-4">
+  <h1 class="flex-grow-1 m-0">Evaluation Samples</h1>
+  <section class="grid-actions">
+    <button
+      nbButton
+      status="primary"
+      size="medium"
+      nbTooltip="Create new evaluation sample"
+      class="d-flex align-items-center"
+      (click)="createSample()"
+    >
+      <nb-icon
+        icon="plus-lg"
+        class="mr-2"
+      ></nb-icon>
+      <span>NEW SAMPLE</span>
+    </button>
+  </section>
+</div>
+
+<nb-card
+  *ngIf="loading"
+  [nbSpinner]="loading"
+  class="shadow-sm"
+>
+  <nb-card-body class="main-card-body p-4">&nbsp;</nb-card-body>
+</nb-card>
+
+<tock-no-data-found
+  *ngIf="!samples?.length && !loading"
+  title="No evaluation samples found"
+  message="Create your first sample using the &#34;NEW SAMPLE&#34; button above."
+></tock-no-data-found>
+
+<div class="row">
+  <div
+    class="col-12 col-xl-6 mb-3"
+    *ngFor="let sample of samples"
+  >
+    <nb-card class="shadow-sm hover-lift mb-0">
+      <nb-card-header
+        (click)="navigateToDetail(sample._id)"
+        class="pointer"
+      >
+        <div class="d-flex gap-1 align-items-center justify-content-between">
+          <h5 class="mb-0 text-truncate">
+            {{ sample.name }}
+          </h5>
+          <nb-tag
+            appearance="filled"
+            [status]="getStatusInfo(sample.status).status"
+            [text]="getStatusInfo(sample.status).text"
+            class="text-nowrap"
+          ></nb-tag>
+        </div>
+      </nb-card-header>
+
+      <nb-card-body
+        (click)="navigateToDetail(sample._id)"
+        class="pointer"
+      >
+        <p
+          class="text-muted mb-3"
+          *ngIf="sample.description"
+        >
+          {{ sample.description }}
+        </p>
+
+        <div class="d-flex align-items-center justify-content-between">
+          <div
+            class="d-flex align-items-center text-muted small"
+            nbTooltip="Created by"
+          >
+            <nb-icon
+              icon="person-plus"
+              class="mr-2"
+            ></nb-icon>
+            <span>{{ sample.createdBy }}</span>
+          </div>
+
+          <div
+            class="d-flex align-items-center text-muted small"
+            nbTooltip="Creation date"
+          >
+            <nb-icon
+              icon="clock"
+              class="mr-2"
+            ></nb-icon>
+            <span>{{ sample.creationDate | date: 'y/MM/dd HH:mm:ss' }}</span>
+          </div>
+        </div>
+
+        <div
+          class="d-flex align-items-center justify-content-between mt-2"
+          *ngIf="sample.status === evaluationSampleStatus.VALIDATED"
+        >
+          <div
+            class="d-flex align-items-center text-muted small"
+            nbTooltip="Validated by"
+          >
+            <nb-icon
+              icon="person-check"
+              class="mr-2"
+              style="margin-left: -3px"
+            ></nb-icon>
+            <span>{{ sample.validatedBy }}</span>
+          </div>
+
+          <div
+            class="d-flex align-items-center text-muted small"
+            nbTooltip="Validation date"
+          >
+            <nb-icon
+              icon="check-circle"
+              class="mr-2"
+            ></nb-icon>
+            <span>{{ sample.validationDate | date: 'y/MM/dd HH:mm:ss' }}</span>
+          </div>
+        </div>
+      </nb-card-body>
+
+      <nb-card-footer class="d-flex justify-content-between align-items-center background-basic-color-2 border-top-0 py-2">
+        <div class="d-flex flex-grow-1 align-items-center">
+          <div
+            class="d-flex align-items-center text-muted small mr-4"
+            nbTooltip="Number of dialogues contained in this sample"
+          >
+            <nb-icon
+              icon="wechat"
+              class="mr-2"
+            ></nb-icon>
+            <span class="lineHeight-1">{{ sample.dialogsCount }} dialogues</span>
+          </div>
+
+          <div
+            class="d-flex align-items-center text-muted small mr-4"
+            nbTooltip="Number of answers contained in this sample"
+          >
+            <nb-icon
+              icon="chat"
+              class="mr-2"
+            ></nb-icon>
+            <span class="lineHeight-1">{{ sample.botActionCount }} answers</span>
+          </div>
+
+          <div
+            class="d-flex align-items-center small"
+            [ngClass]="{ 'text-success': getScore(sample).percentage >= 75, 'text-warning': getScore(sample).percentage < 75 }"
+            nbTooltip="Evaluation score: {{ getScore(sample).ok }} OK / {{ sample.botActionCount }} answers"
+          >
+            <nb-icon
+              icon="check-circle"
+              class="mr-1"
+              [status]="getScore(sample).percentage >= 75 ? 'success' : 'warning'"
+            ></nb-icon>
+            <span class="lineHeight-1">
+              <strong>{{ getScore(sample).ok }}</strong
+              >/
+              {{ sample.botActionCount }}
+              <span class="text-muted">({{ getScore(sample).percentage }}%)</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="d-flex">
+          <button
+            nbButton
+            ghost
+            shape="round"
+            status="{{ sample.status === evaluationSampleStatus.IN_PROGRESS ? 'success' : 'info' }}"
+            size="small"
+            nbTooltip="{{ sample.status === evaluationSampleStatus.IN_PROGRESS ? 'Resume evaluation' : 'View details' }}"
+            class="mr-2"
+            routerLink="/evaluations/samples/detail/{{ sample._id }}"
+          >
+            <nb-icon icon="{{ sample.status === evaluationSampleStatus.IN_PROGRESS ? 'play-circle-fill' : 'eye-fill' }}"></nb-icon>
+          </button>
+          <button
+            *ngIf="sample.status === evaluationSampleStatus.IN_PROGRESS"
+            nbButton
+            ghost
+            shape="round"
+            status="danger"
+            size="small"
+            nbTooltip="Delete sample"
+            (click)="confirmDeleteSample(sample)"
+          >
+            <nb-icon icon="trash"></nb-icon>
+          </button>
+        </div>
+      </nb-card-footer>
+    </nb-card>
+  </div>
+</div>

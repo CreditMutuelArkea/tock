@@ -25,11 +25,15 @@
   text-overflow: ellipsis;
 }
 
-// Should disappear with bootstrap update to v5. The erroneous unit will be corrected (1 = 0.5, 2 = 0.5, 3 = 1, etc...).
+// Should disappear with bootstrap update to v5. The erroneous unit will be corrected (1 = 0.5, 2 = 1, 3 = 1.5, etc...).
 @for $i from 1 through 4 {
   .gap-#{$i} {
     gap: #{$i}rem;
   }
+}
+
+.gap-05 {
+  gap: 0.5rem;
 }
 
 // Should disappear with bootstrap update to v5.
@@ -114,13 +118,13 @@
 }
 
 .pointer {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 .cursor-move {
-  cursor: move;
+  cursor: move !important;
 }
 .cursor-default {
-  cursor: default;
+  cursor: default !important;
 }
 .initial-capitalize::first-letter {
   text-transform: uppercase;
@@ -199,6 +203,14 @@ nb-card.selected {
 
 .unClickable {
   pointer-events: none;
+}
+
+.background-basic-color-2 {
+  background-color: var(--background-basic-color-2) !important;
+}
+
+.background-basic-color-3 {
+  background-color: var(--background-basic-color-3) !important;
 }
 
 .card-footer-actions {
@@ -407,4 +419,10 @@ nb-menu {
 }
 .nb-theme-dark .scrollbar-narrow::-webkit-scrollbar-corner {
   background: #192038;
+}
+
+.progress-bar-bg-card {
+  .progress-container {
+    background-color: var(--card-background-color) !important;
+  }
 }

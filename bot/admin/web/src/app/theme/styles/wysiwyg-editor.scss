@@ -45,7 +45,7 @@
 
 @mixin code-blocks-styling() {
   overflow-x: auto;
-  background-color: var(--background-basic-color-1);
+  background-color: rgb(from var(--background-basic-color-1) r g b / 0.7);
   border: 1px solid var(--border-basic-color-5);
   margin: 0 2px;
   padding: 3px 5px 1px 5px;

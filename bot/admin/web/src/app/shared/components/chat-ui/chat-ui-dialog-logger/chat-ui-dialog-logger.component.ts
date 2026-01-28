@@ -118,10 +118,7 @@ export class ChatUiDialogLoggerComponent implements OnDestroy {
   }
 
   nbBotAnswers(): number {
-    return this.dialog.actions.filter(
-      (action) =>
-        action.isBot() && !action.message?.isDebug() && ((action.message as Sentence).text || (action.message as Sentence).messages?.length)
-    ).length;
+    return this.dialog.actions.filter((action) => action.isBotAnswerWithContent()).length;
   }
 
   nbRagAnswers(): number {

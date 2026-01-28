@@ -40,6 +40,10 @@ const routes: Routes = [
     loadChildren: () => import('./test/test.module').then((m) => m.BotTestModule)
   },
   {
+    path: 'evaluations',
+    loadChildren: () => import('./evaluations/evaluations.module').then((m) => m.EvaluationsModule)
+  },
+  {
     path: 'analytics',
     loadChildren: () => import('./analytics/analytics.module').then((m) => m.BotAnalyticsModule)
   },
