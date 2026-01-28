@@ -37,16 +37,31 @@ export enum EvaluationStatus {
   DOWN = 'down'
 }
 
-export interface EvaluationDefinition {
+type EvaluationBase = {
   _id: string;
   dialogId: string;
   actionId: string;
   evaluationSampleId: string;
-  status: EvaluationStatus;
-  reason: string | null;
   evaluatedBy: string;
   evaluationDate: string;
-}
+};
+
+type EvaluationUnset = EvaluationBase & {
+  status: EvaluationStatus.UNSET;
+  reason?: null;
+};
+
+type EvaluationUp = EvaluationBase & {
+  status: EvaluationStatus.UP;
+  reason?: null;
+};
+
+type EvaluationDown = EvaluationBase & {
+  status: EvaluationStatus.DOWN;
+  reason: string;
+};
+
+export type EvaluationDefinition = EvaluationUnset | EvaluationUp | EvaluationDown;
 
 export interface EvaluationSampleDataDefinition {
   dialogs: DialogReport[];

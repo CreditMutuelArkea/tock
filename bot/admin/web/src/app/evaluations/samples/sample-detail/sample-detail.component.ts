@@ -196,18 +196,31 @@ export class SampleDetailComponent implements OnInit, OnDestroy {
   mockedEvaluationNegativeCount: number = 0;
 
   getMockedEvaluation(dialogId: string, action: any): EvaluationDefinition {
-    const buildEvaluation = (evaluation: EvaluationStatus, reason?: ResponseIssueReason): EvaluationDefinition => ({
-      _id: 'eval_' + action.id,
-      evaluationSampleId: this.sample._id,
-      dialogId: dialogId,
-      actionId: action.id,
-      status: evaluation,
-      reason: reason || null,
-      evaluatedBy: ['LS661', 'CX404', 'Marie-Thérèse-Antoinette de la Fontaine-Chaumont-Saint-Michel', 'Jean Dupont'][
-        Math.floor(Math.random() * 3)
-      ],
-      evaluationDate: new Date().toISOString()
-    });
+    const buildEvaluation = (evaluation: EvaluationStatus, reason?: ResponseIssueReason): EvaluationDefinition => {
+      const base = {
+        _id: 'eval_' + action.id,
+        evaluationSampleId: this.sample._id,
+        dialogId: dialogId,
+        actionId: action.id,
+        evaluatedBy: ['LS661', 'CX404', 'Marie-Thérèse-Antoinette de la Fontaine-Chaumont-Saint-Michel', 'Jean Dupont'][
+          Math.floor(Math.random() * 3)
+        ],
+        evaluationDate: new Date().toISOString()
+      };
+
+      if (evaluation === EvaluationStatus.DOWN) {
+        return {
+          ...base,
+          status: EvaluationStatus.DOWN,
+          reason: reason
+        };
+      } else {
+        return {
+          ...base,
+          status: evaluation
+        };
+      }
+    };
 
     if (
       this.mockedEvaluationPositiveCount + this.mockedEvaluationNegativeCount < this.sample.botActionCount &&
