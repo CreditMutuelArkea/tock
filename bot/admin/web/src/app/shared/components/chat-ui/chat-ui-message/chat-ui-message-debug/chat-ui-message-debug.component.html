@@ -21,13 +21,20 @@
 >
   <div><strong>Status:</strong> {{ message.data.answer?.status }}</div>
 
-  <div *ngIf="message.data.answer?.confidence_score"><strong>Confidence score:</strong>: {{ message.data.answer?.confidence_score }}</div>
-
   <div *ngIf="message.data.answer?.topic && message.data.answer?.topic !== 'unknown'">
     <strong>Topic:</strong> {{ message.data.answer?.topic }}
+  </div>
+
+  <div *ngIf="message.data.answer?.suggested_topics?.length">
+    <strong>Suggested topics:</strong>
+    <span *ngFor="let suggestion of message.data.answer.suggested_topics">
+      {{ suggestion }}
+    </span>
   </div>
 
   <div *ngIf="message.data.answer?.redirection_intent">
     <strong>Redirection intent:</strong> {{ message.data.answer?.redirection_intent }}
   </div>
+
+  <div *ngIf="message.data.answer?.confidence_score"><strong>Confidence score:</strong>: {{ message.data.answer?.confidence_score }}</div>
 </div>
