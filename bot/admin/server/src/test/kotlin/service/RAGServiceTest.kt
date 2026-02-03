@@ -97,7 +97,6 @@ class RAGServiceTest : AbstractTest() {
                         model = "model",
                         apiBase = "url",
                     ),
-                documentsRequired = true,
                 debugEnabled = false,
                 maxDocumentsRetrieved = 2,
                 maxMessagesFromHistory = 2,

@@ -201,7 +201,6 @@ object RAGAnswerHandler : AbstractProactiveAnswerHandler {
                                 compressorSetting = botDefinition.documentCompressorConfiguration?.setting,
                                 vectorStoreSetting = vectorStoreSetting,
                                 observabilitySetting = botDefinition.observabilityConfiguration?.setting,
-                                documentsRequired = ragConfiguration.documentsRequired,
                             ),
                         debug = action.metadata.debugEnabled || ragConfiguration.debugEnabled,
                     )

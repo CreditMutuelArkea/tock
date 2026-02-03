@@ -90,7 +90,6 @@ class RAGValidationServiceTest {
             questionAnsweringLlmSetting = openAILLMSetting,
             questionAnsweringPrompt = PromptTemplate(template = "How to bike in the rain"),
             emSetting = azureOpenAIEMSetting,
-            documentsRequired = true,
             debugEnabled = false,
             maxDocumentsRetrieved = 2,
             maxMessagesFromHistory = 2,

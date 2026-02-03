@@ -21,7 +21,6 @@ import json
 import logging
 import time
 from functools import partial
-from logging import ERROR, WARNING
 from operator import itemgetter
 from typing import List, Optional
 
@@ -32,11 +31,14 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.output_parsers import (
+    JsonOutputParser,
+    PydanticOutputParser,
+    StrOutputParser,
+)
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.runnables import (
-    RunnableConfig,
     RunnableLambda,
     RunnableParallel,
     RunnablePassthrough,
@@ -44,7 +46,6 @@ from langchain_core.runnables import (
 )
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.vectorstores import VectorStoreRetriever
-from langfuse import get_client, propagate_attributes
 from typing_extensions import Any
 
 from gen_ai_orchestrator.errors.exceptions.exceptions import (
@@ -122,18 +123,21 @@ async def execute_rag_chain(
     )
 
     message_history = ChatMessageHistory()
-    session_id = None
-    user_id = None
-    tags = []
+    metadata = {}
+
     if request.dialog:
         for msg in request.dialog.history:
             if ChatMessageType.HUMAN == msg.type:
                 message_history.add_user_message(msg.text)
             else:
                 message_history.add_ai_message(msg.text)
-        session_id = request.dialog.dialog_id
-        user_id = request.dialog.user_id
-        tags = request.dialog.tags or []
+
+        if request.dialog.user_id is not None:
+            metadata['langfuse_user_id'] = request.dialog.user_id
+        if request.dialog.dialog_id is not None:
+            metadata['langfuse_session_id'] = request.dialog.dialog_id
+        if request.dialog.tags:
+            metadata['langfuse_tags'] = request.dialog.tags
 
     logger.debug(
         'RAG chain - Use chat history: %s',
@@ -165,14 +169,6 @@ async def execute_rag_chain(
         )
         callback_handlers.append(observability_handler)
 
-    metadata = {}
-    if user_id is not None:
-        metadata['langfuse_user_id'] = user_id
-    if session_id is not None:
-        metadata['langfuse_session_id'] = session_id
-    if tags:
-        metadata['langfuse_tags'] = tags
-
     response = await conversational_retrieval_chain.ainvoke(
         input=inputs,
         config=RunnableConfig(
@@ -180,10 +176,8 @@ async def execute_rag_chain(
             metadata=metadata,
         ),
     )
-    llm_answer = LLMAnswer(**response['answer'])
 
-    # RAG Guard
-    rag_guard(inputs, llm_answer, response, request.documents_required)
+    llm_answer: LLMAnswer = response['answer']
 
     # Guardrail
     if request.guardrail_setting:
@@ -204,20 +198,22 @@ async def execute_rag_chain(
         if ctx.used_in_response
     }
 
+    footnotes = {
+        Footnote(
+            identifier=doc.metadata['id'],
+            title=doc.metadata['title'],
+            url=doc.metadata['source'],
+            content=get_source_content(doc),
+            score=doc.metadata.get('retriever_score', None),
+        )
+        for doc in response['documents']
+        if doc.metadata['id'] in contexts_by_chunk
+    }
+
     # Returning RAG response
     return RAGResponse(
         answer=llm_answer,
-        footnotes={
-            Footnote(
-                identifier=doc.metadata['id'],
-                title=doc.metadata['title'],
-                url=doc.metadata['source'],
-                content=get_source_content(doc),
-                score=doc.metadata.get('retriever_score', None),
-            )
-            for doc in response['documents']
-            if doc.metadata['id'] in contexts_by_chunk
-        },
+        footnotes=footnotes,
         observability_info=get_observability_info(
             observability_handler,
             ObservabilityTrace.RAG.value if observability_handler is not None else None,
@@ -344,6 +340,8 @@ def create_rag_chain(
         }
     )
 
+    parser = PydanticOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
+
     return rag_inputs | RunnablePassthrough.assign(
         answer=(
             {
@@ -362,7 +360,7 @@ def create_rag_chain(
             }
             | rag_prompt
             | question_answering_llm
-            | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
+            | parser
         )
     )
 
@@ -437,46 +435,6 @@ def contextualize_question(inputs: dict, chat_chain) -> str:
     if inputs.get('chat_history') and len(inputs['chat_history']) > 0:
         return chat_chain
     return inputs['question']
-
-
-def rag_guard(question, answer, response, documents_required):
-    """
-    Validates the RAG system's response based on the presence or absence of source documents
-    and the `documentsRequired` setting.
-
-    Args:
-        question: user question
-        answer: the LLM answer
-        response: the RAG response
-        documents_required (bool): Specifies whether documents are mandatory for the response.
-    """
-
-    if (
-        documents_required
-        and answer.status == 'found_in_context'
-        and len(response['documents']) == 0
-    ):
-        message = 'No documents were retrieved, yet an answer was attempted.'
-        rag_log(
-            level=ERROR,
-            message=message,
-            question=question,
-            answer=answer.answer,
-            response=response,
-        )
-        raise GenAIGuardCheckException(ErrorInfo(cause=message))
-
-    if answer.status == 'not_found_in_context' and len(response['documents']) > 0:
-        # If the answer is not found in context and some documents are retrieved, so we remove them from the RAG response.
-        message = 'No answer found in the retrieved context. The documents are therefore removed from the RAG response.'
-        rag_log(
-            level=WARNING,
-            message=message,
-            question=question,
-            answer=answer.answer,
-            response=response,
-        )
-        response['documents'] = []
 
 
 def rag_log(level, message, question, answer, response):

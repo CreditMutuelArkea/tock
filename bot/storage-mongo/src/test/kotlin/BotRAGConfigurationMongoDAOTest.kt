@@ -118,11 +118,11 @@ internal class BotRAGConfigurationMongoDAOTest : AbstractTest() {
         BotRAGConfigurationMongoDAO.save(config1)
         BotRAGConfigurationMongoDAO.save(config2)
 
-        BotRAGConfigurationMongoDAO.save(config1.copy(documentsRequired = true))
+        BotRAGConfigurationMongoDAO.save(config1.copy(debugEnabled = true))
 
         val configBDD = BotRAGConfigurationMongoDAO.findByNamespaceAndBotId("namespace1", "botId1")
 
-        assertEquals(config1.copy(documentsRequired = true), configBDD)
+        assertEquals(config1.copy(debugEnabled = true), configBDD)
     }
 
     @Test
