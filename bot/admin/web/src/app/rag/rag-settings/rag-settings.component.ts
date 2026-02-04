@@ -50,8 +50,6 @@ interface RagSettingsForm {
 
   maxDocumentsRetrieved: FormControl<number>;
 
-  documentsRequired: FormControl<boolean>;
-
   questionCondensingLlmProvider: FormControl<AiEngineProvider>;
   questionCondensingLlmSetting: FormGroup<any>;
   questionCondensingPrompt: FormGroup<any>;
@@ -197,7 +195,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
     indexSessionId: new FormControl(undefined),
     indexName: new FormControl(undefined),
 
-    documentsRequired: new FormControl(undefined),
     maxDocumentsRetrieved: new FormControl(undefined),
 
     questionCondensingLlmProvider: new FormControl(undefined, [Validators.required]),
@@ -240,10 +237,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   get indexSessionId(): FormControl {
     return this.form.get('indexSessionId') as FormControl;
-  }
-
-  get documentsRequired(): FormControl {
-    return this.form.get('documentsRequired') as FormControl;
   }
 
   get maxDocumentsRetrieved(): FormControl {
@@ -363,7 +356,6 @@ export class RagSettingsComponent implements OnInit, OnDestroy {
 
   setFormDefaultValues(): void {
     this.form.patchValue({
-      documentsRequired: false,
       debugEnabled: false,
       maxMessagesFromHistory: 5,
       maxDocumentsRetrieved: 4

@@ -408,24 +408,6 @@
                 />
               </tock-form-control>
             </div>
-
-            <div class="col-6 px-3">
-              <tock-form-control
-                label="Documents required"
-                name="documentsRequired"
-                [controls]="documentsRequired"
-                [required]="false"
-                [boldLabel]="false"
-                information="Prohibits LLM from responding if no document could be retrieved. Prevents the bot from engaging in informal conversation and responding to more general questions."
-              >
-                <nb-toggle
-                  formControlName="documentsRequired"
-                  class="nb-toggle-small mt-1"
-                >
-                  Don't allow undocumented answers
-                </nb-toggle>
-              </tock-form-control>
-            </div>
           </div>
         </nb-card-body>
       </nb-card>
