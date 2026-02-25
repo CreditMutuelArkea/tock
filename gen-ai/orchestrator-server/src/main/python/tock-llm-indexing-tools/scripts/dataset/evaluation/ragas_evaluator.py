@@ -20,7 +20,6 @@ from typing import Any, List
 
 from langfuse._client.datasets import DatasetItemClient
 from langfuse.api import TraceWithFullDetails
-from openai import NOT_GIVEN
 from ragas.dataset_schema import SingleTurnSample
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
@@ -48,23 +47,6 @@ class RagasEvaluator:
         em_factory = get_em_factory(setting=evaluation_input.em_setting)
 
         llm = llm_factory.get_language_model()
-        if hasattr(llm, 'reasoning_effort'):
-            # Older APIM gateways can reject this field for chat/completions.
-            llm.reasoning_effort = None
-        model_name = str(getattr(llm, 'model_name', '') or '').lower()
-        if 'gpt5' in model_name or 'gpt-5' in model_name:
-            # For GPT-5, align model with deployment and omit params commonly rejected by APIM.
-            deployment_name = getattr(llm, 'deployment_name', None)
-            if deployment_name:
-                llm.model_kwargs = {
-                    **getattr(llm, 'model_kwargs', {}),
-                    'model': deployment_name,
-                }
-            llm.model_kwargs = {
-                **getattr(llm, 'model_kwargs', {}),
-                'n': NOT_GIVEN,
-                'temperature': NOT_GIVEN,
-            }
         embedding = em_factory.get_embedding_model()
 
         self.observability_setting = evaluation_input.observability_setting
@@ -83,6 +65,11 @@ class RagasEvaluator:
             metric = metric_entry['metric']
             if isinstance(metric, MetricWithLLM):
                 metric.llm = LangchainLLMWrapper(llm)
+                # Ragas defaults to 1e-8 for single-completion calls, which can be
+                # rejected by some API gateways. Reuse the configured model temperature.
+                metric.llm.get_temperature = (
+                    lambda n, llm_temp=float(getattr(llm, 'temperature', 0.0) or 0.0): llm_temp
+                )
             if isinstance(metric, MetricWithEmbeddings):
                 metric.embeddings = LangchainEmbeddingsWrapper(embedding)
             metric.init(run_config)
