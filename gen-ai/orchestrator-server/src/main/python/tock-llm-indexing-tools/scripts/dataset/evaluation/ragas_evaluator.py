@@ -20,6 +20,7 @@ from typing import Any, List
 
 from langfuse._client.datasets import DatasetItemClient
 from langfuse.api import TraceWithFullDetails
+from openai import NOT_GIVEN
 from ragas.dataset_schema import SingleTurnSample
 from ragas.embeddings import LangchainEmbeddingsWrapper
 from ragas.llms import LangchainLLMWrapper
@@ -47,6 +48,23 @@ class RagasEvaluator:
         em_factory = get_em_factory(setting=evaluation_input.em_setting)
 
         llm = llm_factory.get_language_model()
+        if hasattr(llm, 'reasoning_effort'):
+            # Older APIM gateways can reject this field for chat/completions.
+            llm.reasoning_effort = None
+        model_name = str(getattr(llm, 'model_name', '') or '').lower()
+        if 'gpt5' in model_name or 'gpt-5' in model_name:
+            # For GPT-5, align model with deployment and omit params commonly rejected by APIM.
+            deployment_name = getattr(llm, 'deployment_name', None)
+            if deployment_name:
+                llm.model_kwargs = {
+                    **getattr(llm, 'model_kwargs', {}),
+                    'model': deployment_name,
+                }
+            llm.model_kwargs = {
+                **getattr(llm, 'model_kwargs', {}),
+                'n': NOT_GIVEN,
+                'temperature': NOT_GIVEN,
+            }
         embedding = em_factory.get_embedding_model()
 
         self.observability_setting = evaluation_input.observability_setting
@@ -105,19 +123,36 @@ class RagasEvaluator:
         return str(value)
 
     def fetch_statements_reasons(self, trace_id):
-        time.sleep(3)  # Waiting for trace update
-        trace_full = self.langfuse_client.api.trace.get(trace_id)
+        trace_full = None
+        for attempt in range(5):
+            try:
+                # Langfuse trace ingestion is async; trace can be temporarily unavailable.
+                time.sleep(3)
+                trace_full = self.langfuse_client.api.trace.get(trace_id)
+                break
+            except Exception as e:
+                if getattr(e, 'status_code', None) == 404 and attempt < 4:
+                    continue
+
+                return ''
+
+        if trace_full is None:
+            return ''
+
         observations = trace_full.observations
         last_gen_item = next(
             (obs for obs in reversed(observations) if obs.type == 'GENERATION'), None
         )
         if last_gen_item and last_gen_item.output:
-            parsed_data = json.loads(
-                last_gen_item.output['content'].strip('```json').strip('```')
-            )
-            logger.info(parsed_data.get('statements', []))
-            if parsed_data.get('statements', []):
-                return ' | '.join(parsed_data['statements'])
+            try:
+                parsed_data = json.loads(
+                    last_gen_item.output['content'].strip('```json').strip('```')
+                )
+                logger.info(parsed_data.get('statements', []))
+                if parsed_data.get('statements', []):
+                    return ' | '.join(parsed_data['statements'])
+            except Exception:
+                return ''
         return ''
 
     def calculate_metric_score(
@@ -180,7 +215,6 @@ class RagasEvaluator:
                 response=answer,
                 reference=ground_truth,
             )
-
             score, trace_id = self.calculate_metric_score(
                 metric, metric_name, sample, item, experiment_name
             )
