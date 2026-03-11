@@ -70,11 +70,12 @@
                     #questionInput
                     nbInput
                     fullWidth
+                    class="flex-grow-1"
                     formControlName="question"
                     placeholder="Question {{ i + 1 }}…"
                     [status]="isSubmitted && questionGroup.controls.question.invalid && !isLastEntry(i) ? 'danger' : 'basic'"
                     (input)="onQuestionInput(i)"
-                    class="flex-grow-1"
+                    (paste)="onQuestionPaste($event, i)"
                   />
 
                   <button

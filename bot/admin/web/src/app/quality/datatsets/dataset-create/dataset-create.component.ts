@@ -186,6 +186,63 @@ export class DatasetCreateComponent implements OnInit, OnDestroy {
       });
   }
 
+  onQuestionPaste(event: ClipboardEvent, index: number): void {
+    const plainText = event.clipboardData?.getData('text');
+    if (!plainText) return;
+
+    // Check for spreadsheet origin by inspecting the HTML clipboard format.
+    // When copying from Excel / Google Sheets / LibreOffice Calc, the clipboard
+    // always contains a text/html payload structured as an HTML table.
+    const html = event.clipboardData?.getData('text/html') ?? '';
+    const isFromSpreadsheet = /<table[\s>]/i.test(html);
+
+    // Split on all line break variants (Windows \r\n, Unix \n, legacy Mac \r)
+    const lines = plainText
+      .split(/\r\n|\r|\n/)
+      .map((l) => l.trim())
+      .filter((l) => l.length > 0);
+
+    // Fall back to native paste if:
+    // - only one line, OR
+    // - multiple lines but content does NOT come from a spreadsheet
+    //   (likely a multi-line question typed or pasted from a text editor)
+    if (lines.length <= 1 || !isFromSpreadsheet) return;
+
+    // Prevent native paste since we handle distribution ourselves
+    event.preventDefault();
+
+    lines.forEach((line, i) => {
+      const targetIndex = index + i;
+
+      if (targetIndex < this.questions.length) {
+        // Reuse an existing form group (including the current trailing empty row)
+        this.questions.at(targetIndex).controls.question.setValue(line);
+      } else {
+        // No existing row at this position: create a new form group
+        this.questions.push(
+          new FormGroup<QuestionForm>({
+            question: new FormControl(line, [Validators.minLength(5), Validators.maxLength(500)]),
+            groundTruth: new FormControl('', [Validators.maxLength(1000)])
+          })
+        );
+      }
+    });
+
+    // Ensure there is always one trailing empty row for adding new questions
+    const last = this.questions.at(this.questions.length - 1);
+    if (last.controls.question.value.trim()) {
+      this._appendEmptyQuestion();
+    }
+
+    this.questions.updateValueAndValidity();
+
+    // Move focus to the trailing empty row after paste
+    setTimeout(() => {
+      const inputs = this.questionInputs.toArray();
+      inputs[index + lines.length]?.nativeElement.focus();
+    });
+  }
+
   ngOnDestroy(): void {
     this.destroy$.next(true);
     this.destroy$.complete();
