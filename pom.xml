@@ -74,7 +74,7 @@
         <google>26.78.0</google>
         <aws-sdk>1.12.797</aws-sdk>
         <aws-sagemaker>2.42.19</aws-sagemaker>
-        <pac4j>6.3.3</pac4j>
+        <pac4j>6.2.2</pac4j>
         <vertx-pac4j>7.0.2</vertx-pac4j>
         <okhttp-eventsource>4.2.0</okhttp-eventsource>
         <graphql-kotlin>6.3.0</graphql-kotlin>
