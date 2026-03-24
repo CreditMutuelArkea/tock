@@ -67,6 +67,7 @@ import java.time.Duration
 import java.time.Period
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
@@ -176,24 +177,63 @@ private val asyncMongoUrl =
 
 private val credentialsProvider = injector.provide<MongoCredentialsProvider>()
 
+private fun MongoClientSettings.toDebugJson(): String {
+    return """
+        {
+          "retryWrites": $retryWrites,
+          "retryReads": $retryReads,
+          "applicationName": "$applicationName",
+          "clusterSettings": {
+            "hosts": ${clusterSettings.hosts},
+            "mode": "${clusterSettings.mode}",
+            "serverSelectionTimeoutMS": ${clusterSettings.getServerSelectionTimeout(TimeUnit.MILLISECONDS)}
+          },
+          "connectionPoolSettings": {
+            "maxSize": ${connectionPoolSettings.maxSize},
+            "minSize": ${connectionPoolSettings.minSize},
+            "maxConnecting": ${connectionPoolSettings.maxConnecting},
+            "maxWaitTimeMS": ${connectionPoolSettings.getMaxWaitTime(TimeUnit.MILLISECONDS)},
+            "maxConnectionIdleTimeMS": ${connectionPoolSettings.getMaxConnectionIdleTime(TimeUnit.MILLISECONDS)}
+          },
+          "socketSettings": {
+            "connectTimeoutMS": ${socketSettings.getConnectTimeout(TimeUnit.MILLISECONDS)},
+            "readTimeoutMS": ${socketSettings.getReadTimeout(TimeUnit.MILLISECONDS)}
+          },
+          "heartbeatFrequencyMS": ${serverSettings.getHeartbeatFrequency(TimeUnit.MILLISECONDS)},
+          "sslEnabled": ${sslSettings.isEnabled},
+          "invalidHostNameAllowed": ${sslSettings.isInvalidHostNameAllowed}
+        }
+        """.trimIndent()
+}
+
 /**
  * The sync [MongoClient] of Tock.
  */
 internal val mongoClient: MongoClient by lazy {
     TockKMongoConfiguration.configure()
-    if (mongoUrl.credential == null) {
-        val connectionString = mongoUrl
-        val settings =
-            MongoClientSettings
-                .builder()
-                .applyConnectionString(connectionString)
-                .run { credentialsProvider.getCredentials()?.let { credential(it) } ?: this }
-                .build()
 
-        KMongo.createClient(settings)
-    } else {
-        KMongo.createClient(mongoUrl)
-    }
+    val builder =
+        MongoClientSettings.builder()
+            .applyConnectionString(mongoUrl)
+            .apply {
+                if (mongoUrl.credential == null) {
+                    credentialsProvider.getCredentials()?.let {
+                        logger.info("(SYNC) Mongo - applying external credentials")
+                        this.credential(it)
+                    }
+                }
+
+                if (mongoUrl.sslEnabled == true) {
+                    logger.info("(SYNC) Mongo - enabling Netty transport (SSL)")
+                    transportSettings(TransportSettings.nettyBuilder().build())
+                }
+            }
+
+    val settings = builder.build()
+
+    logger.info("(SYNC) Mongo Settings: {}", settings.toDebugJson())
+
+    KMongo.createClient(settings)
 }
 
 /**
@@ -201,21 +241,29 @@ internal val mongoClient: MongoClient by lazy {
  */
 internal val asyncMongoClient: com.mongodb.reactivestreams.client.MongoClient by lazy {
     TockKMongoConfiguration.configure(true)
-    org.litote.kmongo.reactivestreams.KMongo.createClient(
+
+    val builder =
         MongoClientSettings.builder()
             .applyConnectionString(asyncMongoUrl)
             .apply {
                 if (asyncMongoUrl.credential == null) {
                     credentialsProvider.getCredentials()?.let {
+                        logger.info("(ASYNC) Mongo - applying external credentials")
                         this.credential(it)
                     }
                 }
+
                 if (asyncMongoUrl.sslEnabled == true) {
+                    logger.info("(ASYNC) Mongo - enabling Netty transport (SSL)")
                     transportSettings(TransportSettings.nettyBuilder().build())
                 }
             }
-            .build(),
-    )
+
+    val settings = builder.build()
+
+    logger.info("(ASYNC) Mongo Settings: {}", settings.toDebugJson())
+
+    org.litote.kmongo.reactivestreams.KMongo.createClient(settings)
 }
 
 /**
