@@ -44,6 +44,10 @@ import com.mongodb.client.model.IndexOptions
 import com.mongodb.client.model.changestream.ChangeStreamDocument
 import com.mongodb.client.model.changestream.FullDocument
 import com.mongodb.connection.TransportSettings
+import com.mongodb.event.CommandFailedEvent
+import com.mongodb.event.CommandListener
+import com.mongodb.event.CommandStartedEvent
+import com.mongodb.event.CommandSucceededEvent
 import com.mongodb.reactivestreams.client.MongoCollection
 import de.undercouch.bson4jackson.types.Decimal128
 import mu.KotlinLogging
@@ -206,6 +210,29 @@ private fun MongoClientSettings.toDebugJson(): String {
         """.trimIndent()
 }
 
+private  val commandListener = object : CommandListener {
+
+    override fun commandStarted(event: CommandStartedEvent) {
+        logger.debug(
+            "Mongo START - {} - {}",
+            event.commandName,
+            event.command.toJson()
+        )
+    }
+
+    override fun commandSucceeded(event: CommandSucceededEvent) {
+        logger.debug("Mongo OK - {}", event.commandName)
+    }
+
+    override fun commandFailed(event: CommandFailedEvent) {
+        logger.warn(
+            "Mongo FAIL - {} - {}",
+            event.commandName,
+            event.throwable.message
+        )
+    }
+}
+
 /**
  * The sync [MongoClient] of Tock.
  */
@@ -227,7 +254,7 @@ internal val mongoClient: MongoClient by lazy {
                     logger.info("(SYNC) Mongo - enabling Netty transport (SSL)")
                     transportSettings(TransportSettings.nettyBuilder().build())
                 }
-            }
+            }.addCommandListener(commandListener)
 
     val settings = builder.build()
 
@@ -257,7 +284,7 @@ internal val asyncMongoClient: com.mongodb.reactivestreams.client.MongoClient by
                     logger.info("(ASYNC) Mongo - enabling Netty transport (SSL)")
                     transportSettings(TransportSettings.nettyBuilder().build())
                 }
-            }
+            }.addCommandListener(commandListener)
 
     val settings = builder.build()
 
