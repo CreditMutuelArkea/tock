@@ -210,28 +210,28 @@ private fun MongoClientSettings.toDebugJson(): String {
         """.trimIndent()
 }
 
-private  val commandListener = object : CommandListener {
+private val commandListener =
+    object : CommandListener {
+        override fun commandStarted(event: CommandStartedEvent) {
+            logger.debug(
+                "Mongo START - {} - {}",
+                event.commandName,
+                event.command.toJson(),
+            )
+        }
 
-    override fun commandStarted(event: CommandStartedEvent) {
-        logger.debug(
-            "Mongo START - {} - {}",
-            event.commandName,
-            event.command.toJson()
-        )
-    }
+        override fun commandSucceeded(event: CommandSucceededEvent) {
+            logger.debug("Mongo OK - {}", event.commandName)
+        }
 
-    override fun commandSucceeded(event: CommandSucceededEvent) {
-        logger.debug("Mongo OK - {}", event.commandName)
+        override fun commandFailed(event: CommandFailedEvent) {
+            logger.warn(
+                "Mongo FAIL - {} - {}",
+                event.commandName,
+                event.throwable.message,
+            )
+        }
     }
-
-    override fun commandFailed(event: CommandFailedEvent) {
-        logger.warn(
-            "Mongo FAIL - {} - {}",
-            event.commandName,
-            event.throwable.message
-        )
-    }
-}
 
 /**
  * The sync [MongoClient] of Tock.
@@ -322,7 +322,7 @@ inline fun <reified T : Any> MongoCollection<T>.watch(
     watchIndefinitely(
         fullDocument = fullDocument,
         subscribeListener = { (KotlinLogging.logger {}).info { "Subscribe stream" } },
-        errorListener = { (KotlinLogging.logger {}).error(it) },
+        errorListener = { (KotlinLogging.logger {}).error(it) { "Error stream" }},
         reopenListener = { (KotlinLogging.logger {}).warn { "Reopen stream" } },
         listener = listener,
     )
