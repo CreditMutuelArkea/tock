@@ -9,6 +9,14 @@
       "all": "All",
       "display-tests": "Display tests",
       "unknown": "Unknown"
+    },
+    "sort": {
+      "ascending": "Ascending",
+      "descending": "Descending"
+    },
+    "feedback": {
+      "positive": "Positive feedback",
+      "negative": "Negative feedback"
     }
   },
   "header": {

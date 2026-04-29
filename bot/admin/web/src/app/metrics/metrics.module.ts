@@ -16,6 +16,7 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoModule } from '@jsverse/transloco';
 import { MetricsBoardComponent } from './metrics-board/metrics-board.component';
 import { MetricsRoutingModule } from './metrics-routing.module';
 import { BotSharedModule } from '../shared/bot-shared.module';
@@ -62,6 +63,7 @@ import { MetricsIndicatorDetailsComponent } from './metrics-board/metrics-indica
   imports: [
     ReactiveFormsModule,
     CommonModule,
+    TranslocoModule,
     FormsModule,
     BotSharedModule,
     NbRouteTabsetModule,

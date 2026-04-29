@@ -371,7 +371,7 @@
                     icon="hand-thumbs-{{ vote.value.toLowerCase() }}"
                     class="select-icon align-self-center mr-2 font-size-small"
                   ></nb-icon>
-                  {{ vote.label }}
+                  {{ vote.labelKey | transloco }}
                 </nb-option>
               </nb-select>
             </nb-form-field>
@@ -553,7 +553,7 @@
                 *ngFor="let order of sortOrders"
                 [value]="order.value"
               >
-                {{ order.label }}
+                {{ order.labelKey | transloco }}
               </nb-radio>
             </nb-radio-group>
           </div>

@@ -9,6 +9,14 @@
       "all": "Tout",
       "display-tests": "Afficher les tests",
       "unknown": "Unknown"
+    },
+    "sort": {
+      "ascending": "Croissant",
+      "descending": "Décroissant"
+    },
+    "feedback": {
+      "positive": "Retour positif",
+      "negative": "Retour négatif"
     }
   },
   "header": {

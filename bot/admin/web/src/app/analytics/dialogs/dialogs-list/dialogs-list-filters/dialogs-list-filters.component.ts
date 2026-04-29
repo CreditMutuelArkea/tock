@@ -28,9 +28,10 @@ import { SortOrder, SortOrders } from '../../../../shared/model/misc';
 import { FeedbackVote } from '../../dialogs';
 
 export const FeedbackVotes = [
-  { label: 'Positive feedback', value: FeedbackVote.UP },
-  { label: 'Negative feedback', value: FeedbackVote.DOWN }
+  { labelKey: 'common.feedback.positive', value: FeedbackVote.UP },
+  { labelKey: 'common.feedback.negative', value: FeedbackVote.DOWN }
 ] as const;
+
 import { ResponseIssueReason, ResponseIssueReasons } from '../../../../shared/model/response-issue';
 import { RagAnswerStatusDisplayOrder, RagAnswerStatusIcons, RagAnswerStatusLabels } from '../../../../shared/utils';
 
