@@ -1,0 +1,91 @@
+{
+  "common": {
+    "actions": {
+      "refresh": "Refresh",
+      "refresh-dialogs": "Refresh dialogs",
+      "clear": "Clear",
+      "clear-selection": "Clear selection",
+      "clear-filter": "Clear filter",
+      "all": "All",
+      "display-tests": "Display tests",
+      "unknown": "Unknown"
+    }
+  },
+  "header": {
+    "interface-language": "Interface language",
+    "theme-switch-light": "Use light mode",
+    "theme-switch-dark": "Use dark mode",
+    "select-application": "Select current application",
+    "select-namespace": "Select current namespace",
+    "select-locale": "Select current locale",
+    "go-to-dialogs": "Go to dialogs monitoring",
+    "open-test-dialog": "Open a test dialog",
+    "logout": "Logout"
+  },
+  "menu": {
+    "language-understanding": "Language Understanding",
+    "stories-answers": "Stories & Answers",
+    "gen-ai": "Gen AI",
+    "test": "Test",
+    "analytics": "Analytics",
+    "custom-metrics": "Custom Metrics",
+    "answers-quality": "Answers Quality",
+    "model-quality": "Model Quality",
+    "settings": "Settings"
+  },
+  "menu-items": {
+    "new-sentence": "New sentence",
+    "inbox-sentences": "Inbox sentences",
+    "search-sentences": "Search sentences",
+    "unknown-sentences": "Unknown sentences",
+    "intents": "Intents",
+    "entities": "Entities",
+    "sentences-logs": "Sentences logs",
+    "new-story": "New Story",
+    "all-stories": "All stories",
+    "faq-stories": "FAQs stories",
+    "answers": "Answers",
+    "documents": "Documents",
+    "rules": "Rules",
+    "rag-settings": "Rag settings",
+    "rag-exclusions": "Sentences Rag exclusions",
+    "compressor-settings": "Compressor settings",
+    "sentence-generation-settings": "Sentence generation settings",
+    "observability-settings": "Observability settings",
+    "vector-db-settings": "Vector DB settings",
+    "playground": "Playground",
+    "test": "Test",
+    "test-plans": "Test plans",
+    "activity": "Activity",
+    "behavior": "Behavior",
+    "flow": "Flow",
+    "users": "Users",
+    "dialogs": "Dialogs",
+    "preferences": "Preferences",
+    "satisfaction": "Satisfaction",
+    "metrics": "Metrics",
+    "indicators": "Indicators",
+    "evaluations": "Evaluations",
+    "datasets": "Datasets",
+    "model-stats": "Model Stats",
+    "intent-distance": "Intent Distance",
+    "count-stats": "Count Stats",
+    "model-builds": "Model Builds",
+    "test-trends": "Test Trends",
+    "test-intent-errors": "Test Intent Errors",
+    "test-entity-errors": "Test Entity Errors",
+    "applications": "Applications",
+    "configurations": "Configurations",
+    "namespaces": "Namespaces",
+    "log": "Log",
+    "synchronization": "Synchronization"
+  },
+  "shared": {
+    "pagination": {
+      "items-per-page": "Items per page",
+      "previous-page": "Previous page",
+      "next-page": "Next page",
+      "summary": "{{start}} - {{end}} of {{total}}"
+    }
+  }
+}

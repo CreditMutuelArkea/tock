@@ -55,6 +55,7 @@ import { IntentsListComponent } from './intents/intents-list/intents-list.compon
 import { AddStateDialogComponent } from './intents/add-state/add-state-dialog.component';
 import { AddSharedIntentDialogComponent } from './intents/add-shared-intent/add-shared-intent-dialog.component';
 import { IntentDialogComponent } from './intent-dialog/intent-dialog.component';
+import { TranslocoModule, provideTranslocoScope } from '@jsverse/transloco';
 
 @NgModule({
   imports: [
@@ -80,7 +81,8 @@ import { IntentDialogComponent } from './intent-dialog/intent-dialog.component';
     NgJsonEditorModule,
     MomentModule,
     InfiniteScrollModule,
-    FileUploadModule
+    FileUploadModule,
+    TranslocoModule
   ],
   declarations: [
     LanguageUnderstandingTabsComponent,
@@ -99,6 +101,12 @@ import { IntentDialogComponent } from './intent-dialog/intent-dialog.component';
     AddStateDialogComponent,
     AddSharedIntentDialogComponent,
     IntentDialogComponent
+  ],
+  providers: [
+    provideTranslocoScope({
+      scope: 'language-understanding',
+      alias: 'lu'
+    })
   ]
 })
 export class LanguageUnderstandingModule {}

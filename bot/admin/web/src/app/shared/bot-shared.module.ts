@@ -100,6 +100,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ScrollComponent } from '../scroll/scroll.component';
 import { SortByOrderPipe } from './pipes/sort-by-order.pipe';
 import { ResilientDatePipe } from './pipes/resilient-date.pipe';
+import { TranslocoModule } from '@jsverse/transloco';
 
 @NgModule({
   imports: [
@@ -128,7 +129,8 @@ import { ResilientDatePipe } from './pipes/resilient-date.pipe';
     NbListModule,
     NbToggleModule,
     NbTagModule,
-    NbContextMenuModule
+    NbContextMenuModule,
+    TranslocoModule
   ],
   declarations: [
     SelectBotComponent,

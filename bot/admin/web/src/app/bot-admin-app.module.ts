@@ -39,6 +39,7 @@ import { APP_BASE_HREF, PlatformLocation } from '@angular/common';
 import { BotService } from './bot/bot-service';
 import { BotAdminAppRoutingModule } from './bot-admin-app-routing.module';
 import { NlpService } from './core-nlp/nlp.service';
+import { TranslocoRootModule } from './transloco-root.module';
 
 @NgModule({
   declarations: [BotAdminAppComponent],
@@ -60,7 +61,8 @@ import { NlpService } from './core-nlp/nlp.service';
     NbDialogModule.forRoot(),
     NbWindowModule.forRoot(),
     NbToastrModule.forRoot(),
-    NbThemeModule.forRoot({ name: 'default' })
+    NbThemeModule.forRoot({ name: 'default' }),
+    TranslocoRootModule
   ],
   providers: [
     {

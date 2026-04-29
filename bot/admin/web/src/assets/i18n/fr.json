@@ -1,0 +1,91 @@
+{
+  "common": {
+    "actions": {
+      "refresh": "Rafraichir",
+      "refresh-dialogs": "Rafraichir les dialogues",
+      "clear": "Effacer",
+      "clear-selection": "Tout désélectionner",
+      "clear-filter": "Effacer le filtre",
+      "all": "Tout",
+      "display-tests": "Afficher les tests",
+      "unknown": "Unknown"
+    }
+  },
+  "header": {
+    "interface-language": "Langue de l'interface",
+    "theme-switch-light": "Passer en mode clair",
+    "theme-switch-dark": "Passer en mode sombre",
+    "select-application": "Sélectionner l'application courante",
+    "select-namespace": "Sélectionner le namespace courant",
+    "select-locale": "Sélectionner la locale courante",
+    "go-to-dialogs": "Accéder au monitoring des dialogues",
+    "open-test-dialog": "Ouvrir un dialogue de test",
+    "logout": "Se déconnecter"
+  },
+  "menu": {
+    "language-understanding": "Compréhension du langage",
+    "stories-answers": "Stories & Réponses",
+    "gen-ai": "IA Générative",
+    "test": "Test",
+    "analytics": "Analytique",
+    "custom-metrics": "Métriques personnalisées",
+    "answers-quality": "Qualité des réponses",
+    "model-quality": "Qualité du modèle",
+    "settings": "Paramètres"
+  },
+  "menu-items": {
+    "new-sentence": "Nouvelle phrase",
+    "inbox-sentences": "Phrases à entrainer",
+    "search-sentences": "Rechercher des phrases",
+    "unknown-sentences": "Phrases inconnues",
+    "intents": "Intentions",
+    "entities": "Entités",
+    "sentences-logs": "Journaux des phrases",
+    "new-story": "Nouvelle story",
+    "all-stories": "Toutes les stories",
+    "faq-stories": "Stories FAQ",
+    "answers": "Réponses",
+    "documents": "Documents",
+    "rules": "Règles",
+    "rag-settings": "Paramètres RAG",
+    "rag-exclusions": "Exclusions RAG",
+    "compressor-settings": "Paramètres de compression",
+    "sentence-generation-settings": "Génération de phrases",
+    "observability-settings": "Paramètres d'observabilité",
+    "vector-db-settings": "Paramètres base vectorielle",
+    "playground": "Bac à sable",
+    "test": "Test",
+    "test-plans": "Plans de test",
+    "activity": "Activité",
+    "behavior": "Comportement",
+    "flow": "Flux",
+    "users": "Utilisateurs",
+    "dialogs": "Dialogues",
+    "preferences": "Préférences",
+    "satisfaction": "Satisfaction",
+    "metrics": "Métriques",
+    "indicators": "Indicateurs",
+    "evaluations": "Évaluations",
+    "datasets": "Datasets",
+    "model-stats": "Statistiques du modèle",
+    "intent-distance": "Distance des intentions",
+    "count-stats": "Statistiques de comptage",
+    "model-builds": "Compilations du modèle",
+    "test-trends": "Tendances des tests",
+    "test-intent-errors": "Erreurs d'intentions (test)",
+    "test-entity-errors": "Erreurs d'entités (test)",
+    "applications": "Applications",
+    "configurations": "Configurations",
+    "namespaces": "Namespaces",
+    "log": "Journal",
+    "synchronization": "Synchronisation"
+  },
+  "shared": {
+    "pagination": {
+      "items-per-page": "Éléments par page",
+      "previous-page": "Page précédente",
+      "next-page": "Page suivante",
+      "summary": "{{start}} - {{end}} sur {{total}}"
+    }
+  }
+}

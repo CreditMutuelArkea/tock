@@ -1,0 +1,52 @@
+{
+  "dialogs": {
+    "title": "Dialogs"
+  },
+  "dialogs-list": {
+    "no-dialogs-found": "No dialogs found",
+    "sort-by-creation-date": "Sort dialogs by creation date"
+  },
+  "dialogs-list-filters": {
+    "search-user-questions": "Search user questions",
+    "with-rag-responses": "With RAG responses",
+    "with-annotation": "With annotation",
+    "sort-order-of-annotations": "Sort order of annotations",
+    "placeholder": {
+      "data-collected-after": "Data collected after",
+      "data-collected-before": "Data collected before",
+      "configuration": "Configuration",
+      "connector": "Connector",
+      "intent": "Intent",
+      "hide-intents": "Hide intents",
+      "dialog-id": "Dialog id",
+      "rag-answer-status": "RAG answer status",
+      "feedback": "Feedback",
+      "annotations-state": "Annotations state",
+      "annotations-reasons": "Annotations reasons",
+      "annotations-created-after": "Annotations created after",
+      "annotations-created-before": "Annotations created before"
+    },
+    "tooltips": {
+      "exact-text-match": "Exact text match: Search dialogs containing a user question corresponding exactly to the text indicated. Click to launch a partial search.",
+      "partial-text-match": "Partial text match: Search dialogs containing a user question containing the text indicated. Click to search exactly the given text.",
+      "display-advanced-search": "Display advanced search options",
+      "hide-advanced-search": "Hide advanced search options",
+      "show-dialogs-after-date": "Show dialogs containing messages created after this date",
+      "show-dialogs-before-date": "Show dialogs containing messages created before this date",
+      "search-dialogs-by-config": "Search for dialogs using this configuration.",
+      "search-dialogs-by-connector": "Search for dialogs using this connector.",
+      "search-dialogs-by-intent": "Search dialogs containing exchanges corresponding to the selected intent.",
+      "hide-exchanges-by-intent": "Hide exchanges corresponding to selected intents.",
+      "search-dialog-by-id": "Search a dialog by id",
+      "filter-by-rag-status": "Filter by RAG answer status.",
+      "dialogs-with-feedback": "Dialogues containing messages with feedback.",
+      "display-studio-test-dialogs": "Display dialogues held from the studio test view",
+      "display-only-rag-dialogs": "Display only dialogs containing Rag responses",
+      "display-only-annotated-dialogs": "Display only annotated dialogs",
+      "filter-annotations-by-state": "Filter annotations by state",
+      "filter-annotations-by-reason": "Filter annotations by reason",
+      "show-annotations-after-date": "Show annotations created after this date",
+      "show-annotations-before-date": "Show annotations created before this date"
+    }
+  }
+}

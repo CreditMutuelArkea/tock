@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, Inject, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, Input, OnDestroy, OnInit, inject } from '@angular/core';
 
 import { NbMenuService, NbSidebarService, NbThemeService } from '@nebular/theme';
 import { StateService } from '../../../core-nlp/state.service';
@@ -27,6 +27,7 @@ import { BotConfigurationService } from '../../../core/bot-configuration.service
 import { CoreConfig } from '../../../core-nlp/core.config';
 import { Router } from '@angular/router';
 import { TestDialogService } from '../../../shared/components/test-dialog/test-dialog.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'tock-header',
@@ -55,7 +56,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     private botConfiguration: BotConfigurationService,
     private config: CoreConfig,
     private router: Router,
-    private testDialogService: TestDialogService
+    private testDialogService: TestDialogService,
+    public transloco: TranslocoService
   ) {}
 
   ngOnInit() {
@@ -77,6 +79,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       });
       this.refreshNamespaceName();
     });
+  }
+
+  setLang(lang: string) {
+    this.transloco.setActiveLang(lang);
+    localStorage.setItem('preferred-lang', lang);
   }
 
   private refreshNamespaceName() {

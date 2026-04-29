@@ -1,0 +1,52 @@
+{
+  "dialogs": {
+    "title": "Dialogues"
+  },
+  "dialogs-list": {
+    "no-dialogs-found": "Aucun dialogue enregistré",
+    "sort-by-creation-date": "Classer les dialogues par date de création"
+  },
+  "dialogs-list-filters": {
+    "search-user-questions": "Rechercher dans les questions des utilisateurs",
+    "with-rag-responses": "Avec responses RAG",
+    "with-annotation": "Avec annotation",
+    "sort-order-of-annotations": "Ordre de tri des annotations",
+    "placeholder": {
+      "data-collected-after": "Données collectées après",
+      "data-collected-before": "Données collectées avant",
+      "configuration": "Configuration",
+      "connector": "Connecteur",
+      "intent": "Intention",
+      "hide-intents": "Masquer les intentions",
+      "dialog-id": "ID du dialogue",
+      "rag-answer-status": "Statut de la réponse RAG",
+      "feedback": "Retour utilisateur",
+      "annotations-state": "État des annotations",
+      "annotations-reasons": "Raisons des annotations",
+      "annotations-created-after": "Annotations créées après",
+      "annotations-created-before": "Annotations créées avant"
+    },
+    "tooltips": {
+      "exact-text-match": "Correspondance exacte : Recherche les dialogues contenant une question utilisateur correspondant exactement au texte indiqué. Cliquez pour lancer une recherche partielle.",
+      "partial-text-match": "Correspondance partielle : Recherche les dialogues contenant une question utilisateur incluant le texte indiqué. Cliquez pour rechercher exactement le texte saisi.",
+      "display-advanced-search": "Afficher les options de recherche avancée",
+      "hide-advanced-search": "Masquer les options de recherche avancée",
+      "show-dialogs-after-date": "Afficher les dialogues contenant des messages créés après cette date",
+      "show-dialogs-before-date": "Afficher les dialogues contenant des messages créés avant cette date",
+      "search-dialogs-by-config": "Rechercher des dialogues utilisant cette configuration.",
+      "search-dialogs-by-connector": "Rechercher des dialogues utilisant ce connecteur.",
+      "search-dialogs-by-intent": "Rechercher des dialogues contenant des échanges correspondant à l'intention sélectionnée.",
+      "hide-exchanges-by-intent": "Masquer les échanges correspondant aux intentions sélectionnées.",
+      "search-dialog-by-id": "Rechercher un dialogue par ID",
+      "filter-by-rag-status": "Filtrer par statut de réponse RAG.",
+      "dialogs-with-feedback": "Dialogues contenant des messages avec retour utilisateur.",
+      "display-studio-test-dialogs": "Afficher les dialogues issus de la vue de test du studio",
+      "display-only-rag-dialogs": "Afficher uniquement les dialogues contenant des réponses RAG",
+      "display-only-annotated-dialogs": "Afficher uniquement les dialogues annotés",
+      "filter-annotations-by-state": "Filtrer les annotations par état",
+      "filter-annotations-by-reason": "Filtrer les annotations par raison",
+      "show-annotations-after-date": "Afficher les annotations créées après cette date",
+      "show-annotations-before-date": "Afficher les annotations créées avant cette date"
+    }
+  }
+}
