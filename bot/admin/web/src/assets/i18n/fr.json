@@ -17,6 +17,9 @@
     "feedback": {
       "positive": "Retour positif",
       "negative": "Retour négatif"
+    },
+    "connectors": {
+      "unknown-connector": "Inconnu"
     }
   },
   "header": {
@@ -94,6 +97,24 @@
       "previous-page": "Page précédente",
       "next-page": "Page suivante",
       "summary": "{{start}} - {{end}} sur {{total}}"
+    },
+    "chat-ui-dialog-logger": {
+      "nb-user-inputs": "Nombre d'entrées utilisateur",
+      "nb-bot-responses": "Nombre de réponses du bot",
+      "nb-rag-answers": "Nombre de réponses RAG",
+      "nb-annotations": "Nombre d'annotations",
+      "replay-dialog": "Rejouer tout le dialogue",
+      "replay-sentence": "Rejouer cette phrase",
+      "show-nlp-stats": "Afficher les stats NLP",
+      "show-debug": "Afficher les infos de débogage",
+      "open-playground": "Ouvrir la requête dans le playground",
+      "display-dialog-alone": "Afficher ce dialogue seul",
+      "display-annotation": "Afficher l'annotation",
+      "annotate-exchange": "Annoter cet échange",
+      "create-faq": "Créer une FAQ avec cette paire question/réponse",
+      "view-observability": "Voir les détails d'observabilité",
+      "feedback-positive": "Ce message a reçu un retour positif.",
+      "feedback-negative": "Ce message a reçu un retour négatif."
     }
   }
 }

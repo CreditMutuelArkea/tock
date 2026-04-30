@@ -30,6 +30,7 @@ import { RagAnswerToFaqAnswerInfos } from '../../../../faq/faq-management/faq-ma
 import { AnnotationComponent } from 'src/app/shared/components';
 import { FeedbackVote } from '../../../../analytics/dialogs/dialogs';
 import { UserRole } from '../../../../model/auth';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'tock-chat-ui-dialog-logger',
@@ -58,7 +59,8 @@ export class ChatUiDialogLoggerComponent implements OnInit, OnDestroy {
     private nbDialogService: NbDialogService,
     private router: Router,
     public state: StateService,
-    private botConfiguration: BotConfigurationService
+    private botConfiguration: BotConfigurationService,
+    private transloco: TranslocoService
   ) {}
 
   ngOnInit() {
@@ -108,7 +110,7 @@ export class ChatUiDialogLoggerComponent implements OnInit, OnDestroy {
     if (configuration) {
       return `${configuration.name} > ${configuration.connectorType.label()} (${configuration.applicationId})`;
     }
-    return 'Unknown';
+    return this.transloco.translate('common.connectors.unknown-connector');
   }
 
   normalizeLocaleCode(code: string): string {
