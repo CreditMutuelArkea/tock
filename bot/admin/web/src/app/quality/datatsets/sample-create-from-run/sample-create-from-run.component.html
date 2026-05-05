@@ -13,17 +13,6 @@
         <nb-icon icon="x-lg"></nb-icon>
       </button>
     </div>
-
-    <nb-alert
-      *ngIf="isSubmitted && !form.valid"
-      status="danger"
-      class="mb-3"
-    >
-      <ul class="mb-0 ps-3 font-color-white">
-        <li *ngIf="form.controls.name.invalid">The sample name is invalid.</li>
-        <li *ngIf="form.controls.description.invalid">The sample description is invalid.</li>
-      </ul>
-    </nb-alert>
   </nb-card-header>
 
   <nb-card-body>
