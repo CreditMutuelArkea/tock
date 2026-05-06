@@ -38,6 +38,8 @@ open class SendSentenceWithFootnotes(
     override var annotation: BotAnnotation? = null,
 ) :
     Action(playerId, recipientId, applicationId, id, date, state, metadata) {
+    var ragDebug: Any? = null
+
     @Deprecated(
         "Use constructor with connectorId",
         ReplaceWith(
@@ -67,6 +69,22 @@ open class SendSentenceWithFootnotes(
         annotation: BotAnnotation? = null,
         _deprecatedConstructor: Nothing? = null,
     ) : this(playerId, applicationId, recipientId, text, footnotes, id, date, state, metadata, annotation)
+
+    constructor(
+        playerId: PlayerId,
+        applicationId: String,
+        recipientId: PlayerId,
+        text: CharSequence,
+        footnotes: MutableList<Footnote> = mutableListOf(),
+        id: Id<Action> = newId(),
+        date: Instant = Instant.now(),
+        state: EventState = EventState(),
+        metadata: ActionMetadata = ActionMetadata(),
+        annotation: BotAnnotation? = null,
+        ragDebug: Any?,
+    ) : this(playerId, applicationId, recipientId, text, footnotes, id, date, state, metadata, annotation) {
+        this.ragDebug = ragDebug
+    }
 
     override fun toMessage(): Message = SentenceWithFootnotes(text.toString(), footnotes.toList())
 }
