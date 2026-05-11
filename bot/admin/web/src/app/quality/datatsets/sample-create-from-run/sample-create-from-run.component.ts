@@ -83,7 +83,7 @@ export class SampleCreateFromRunComponent implements OnInit, OnDestroy {
     };
 
     this.datasetsService
-      .createEvaluationSampleFromRun(this.dataset.id, this.run.id, payload)
+      .createEvaluationSampleFromRun(this.run.id, payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (sample) => {

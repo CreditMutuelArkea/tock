@@ -42,8 +42,6 @@ import ai.tock.bot.admin.model.dataset.DatasetRunCreateRequest
 import ai.tock.bot.admin.model.dataset.DatasetRunDTO
 import ai.tock.bot.admin.model.dataset.DatasetRunStatsDTO
 import ai.tock.bot.admin.model.dataset.DatasetUpdateRequest
-import ai.tock.bot.admin.model.evaluation.CreateEvaluationSampleFromRunRequest
-import ai.tock.bot.admin.model.evaluation.EvaluationSampleDTO
 import ai.tock.bot.admin.model.genai.BotRAGConfigurationDTO
 import ai.tock.bot.admin.test.TestTalkService
 import ai.tock.bot.connector.ConnectorType
@@ -62,6 +60,11 @@ import java.time.Instant
 import java.util.Locale
 
 object DatasetService {
+    data class RunEvaluationData(
+        val run: DatasetRun,
+        val actionRefs: List<ActionRef>,
+    )
+
     private val datasetDAO: DatasetDAO get() = injector.provide()
     private val datasetRunDAO: DatasetRunDAO get() = injector.provide()
     private val applicationConfigurationDAO: BotApplicationConfigurationDAO get() = injector.provide()
@@ -219,32 +222,20 @@ object DatasetService {
         datasetRunDAO.deleteRun(run._id)
     }
 
-    fun createEvaluationSampleFromRun(
+    fun getRunEvaluationData(
         namespace: String,
         botId: String,
-        datasetId: String,
         runId: String,
-        request: CreateEvaluationSampleFromRunRequest,
-        userLogin: String,
-    ): EvaluationSampleDTO {
-        val dataset = getDatasetEntity(namespace, botId, datasetId)
-        val run = getRunEntity(namespace, botId, dataset._id.toString(), runId)
+    ): RunEvaluationData {
+        val run = getRunEntity(namespace, botId, runId)
 
-        if (run.state == DatasetRunState.QUEUED || run.state == DatasetRunState.RUNNING) {
+        if (run.state != DatasetRunState.COMPLETED) {
             throw DatasetError.RunNotFinished(runId, run.state)
         }
 
-        if (run.endTime == null) {
-            throw DatasetError.InvalidRequest("Run $runId has no endTime")
-        }
-
-        return EvaluationService.createEvaluationSampleFromRun(
-            namespace = namespace,
-            botId = botId,
-            request = request,
+        return RunEvaluationData(
             run = run,
             actionRefs = getRunActionRefs(run),
-            createdBy = userLogin,
         )
     }
 
@@ -357,6 +348,19 @@ object DatasetService {
         val id = runId.toId<DatasetRun>()
         val run = datasetRunDAO.getRunById(id) ?: throw DatasetError.RunNotFound(runId)
         if (run.namespace != namespace || run.botId != botId || run.datasetId.toString() != datasetId) {
+            throw DatasetError.RunNotFound(runId)
+        }
+        return run
+    }
+
+    private fun getRunEntity(
+        namespace: String,
+        botId: String,
+        runId: String,
+    ): DatasetRun {
+        val id = runId.toId<DatasetRun>()
+        val run = datasetRunDAO.getRunById(id) ?: throw DatasetError.RunNotFound(runId)
+        if (run.namespace != namespace || run.botId != botId) {
             throw DatasetError.RunNotFound(runId)
         }
         return run

@@ -152,16 +152,24 @@ export class DatasetsService {
   }
 
   // ---------------------------------------------------------------------------
-  // POST /bots/:botId/datasets/:datasetId/runs/:runId/evaluation-samples
+  // POST /bots/:botId/evaluation-samples
   // ---------------------------------------------------------------------------
   createEvaluationSampleFromRun(
-    datasetId: string,
     runId: string,
     payload: { name: string; description?: string | null }
   ): Observable<EvaluationSampleDefinition> {
-    return this.rest.post<typeof payload, EvaluationSampleDefinition>(
-      `${this.apiBase()}/${datasetId}/runs/${runId}/evaluation-samples`,
-      payload,
+    const body = {
+      name: payload.name,
+      description: payload.description,
+      dialogInfo: null,
+      datasetRunInfo: {
+        runIds: [runId]
+      }
+    };
+
+    return this.rest.post<typeof body, EvaluationSampleDefinition>(
+      `/bots/${this.stateService.currentApplication.name}/evaluation-samples`,
+      body,
       (res) => res as EvaluationSampleDefinition
     );
   }

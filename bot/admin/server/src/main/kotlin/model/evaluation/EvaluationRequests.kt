@@ -33,23 +33,31 @@ import java.time.Instant
 data class CreateEvaluationSampleRequest(
     val name: String?,
     val description: String?,
+    val dialogInfo: DialogInfo?,
+    val datasetRunInfo: DatasetRunInfo?,
+) : ToValidate {
+    override fun validate(): List<String> =
+        when {
+            dialogInfo == null && datasetRunInfo == null ->
+                listOf("Either dialogInfo or datasetRunInfo is required")
+            dialogInfo != null && datasetRunInfo != null ->
+                listOf("Only one of dialogInfo or datasetRunInfo can be set")
+            datasetRunInfo != null && datasetRunInfo.runIds.isEmpty() ->
+                listOf("At least one dataset run is required")
+            else -> emptyList()
+        }
+}
+
+data class DialogInfo(
     val dialogActivityFrom: Instant,
     val dialogActivityTo: Instant,
     val requestedDialogCount: Int,
     val allowTestDialogs: Boolean = false,
 )
 
-data class CreateEvaluationSampleFromRunRequest(
-    val name: String,
-    val description: String? = null,
-) : ToValidate {
-    override fun validate(): List<String> =
-        if (name.isBlank()) {
-            listOf("Evaluation name is required")
-        } else {
-            emptyList()
-        }
-}
+data class DatasetRunInfo(
+    val runIds: List<String>,
+)
 
 /**
  * Query for paginated evaluation dialogs.

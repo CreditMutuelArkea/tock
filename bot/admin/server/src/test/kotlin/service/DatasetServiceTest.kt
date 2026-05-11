@@ -41,7 +41,8 @@ import ai.tock.bot.admin.model.ValidationError
 import ai.tock.bot.admin.model.dataset.DatasetCreateRequest
 import ai.tock.bot.admin.model.dataset.DatasetRunActionState
 import ai.tock.bot.admin.model.dataset.DatasetRunCreateRequest
-import ai.tock.bot.admin.model.evaluation.CreateEvaluationSampleFromRunRequest
+import ai.tock.bot.admin.model.evaluation.CreateEvaluationSampleRequest
+import ai.tock.bot.admin.model.evaluation.DatasetRunInfo
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.engine.action.ActionMetadata
 import ai.tock.bot.engine.dialog.Dialog
@@ -387,7 +388,7 @@ class DatasetServiceTest : AbstractTest() {
     }
 
     @Test
-    fun `createEvaluationSampleFromRun creates sample from valid run actions`() {
+    fun `createEvaluationSample creates sample from valid run actions`() {
         val dataset = newDataset()
         val run = newFinishedRun(dataset, DatasetRunState.COMPLETED)
         val answerAction = botSentenceWithFootnotesAction("answer-action-id")
@@ -420,13 +421,17 @@ class DatasetServiceTest : AbstractTest() {
         every { evaluationDAO.createAll(capture(evaluationsSlot)) } returns Unit
 
         val result =
-            DatasetService.createEvaluationSampleFromRun(
+            EvaluationService.createEvaluationSample(
                 namespace = NAMESPACE,
                 botId = BOT_ID,
-                datasetId = dataset._id.toString(),
-                runId = run._id.toString(),
-                request = CreateEvaluationSampleFromRunRequest(name = " Evaluation from run ", description = " description "),
-                userLogin = USER,
+                request =
+                    CreateEvaluationSampleRequest(
+                        name = " Evaluation from run ",
+                        description = " description ",
+                        dialogInfo = null,
+                        datasetRunInfo = DatasetRunInfo(runIds = listOf(run._id.toString())),
+                    ),
+                createdBy = USER,
             )
 
         assertEquals("Evaluation from run", result.name)
@@ -452,7 +457,7 @@ class DatasetServiceTest : AbstractTest() {
     }
 
     @Test
-    fun `createEvaluationSampleFromRun rejects active run`() {
+    fun `createEvaluationSample rejects active run`() {
         val dataset = newDataset()
         val run =
             DatasetRun(
@@ -468,13 +473,17 @@ class DatasetServiceTest : AbstractTest() {
         every { datasetRunDAO.getRunById(any()) } returns run
 
         assertThrows<DatasetError.RunNotFinished> {
-            DatasetService.createEvaluationSampleFromRun(
+            EvaluationService.createEvaluationSample(
                 namespace = NAMESPACE,
                 botId = BOT_ID,
-                datasetId = dataset._id.toString(),
-                runId = run._id.toString(),
-                request = CreateEvaluationSampleFromRunRequest(name = "Evaluation"),
-                userLogin = USER,
+                request =
+                    CreateEvaluationSampleRequest(
+                        name = "Evaluation",
+                        description = null,
+                        dialogInfo = null,
+                        datasetRunInfo = DatasetRunInfo(runIds = listOf(run._id.toString())),
+                    ),
+                createdBy = USER,
             )
         }
 
@@ -483,7 +492,33 @@ class DatasetServiceTest : AbstractTest() {
     }
 
     @Test
-    fun `createEvaluationSampleFromRun rejects run without valid dialog`() {
+    fun `createEvaluationSample rejects cancelled run`() {
+        val dataset = newDataset()
+        val run = newFinishedRun(dataset, DatasetRunState.CANCELLED)
+
+        every { datasetRunDAO.getRunById(any()) } returns run
+
+        assertThrows<DatasetError.RunNotFinished> {
+            EvaluationService.createEvaluationSample(
+                namespace = NAMESPACE,
+                botId = BOT_ID,
+                request =
+                    CreateEvaluationSampleRequest(
+                        name = "Evaluation",
+                        description = null,
+                        dialogInfo = null,
+                        datasetRunInfo = DatasetRunInfo(runIds = listOf(run._id.toString())),
+                    ),
+                createdBy = USER,
+            )
+        }
+
+        verify(exactly = 0) { evaluationSampleDAO.save(any()) }
+        verify(exactly = 0) { evaluationDAO.createAll(any()) }
+    }
+
+    @Test
+    fun `createEvaluationSample rejects run without valid dialog`() {
         val dataset = newDataset()
         val run = newFinishedRun(dataset, DatasetRunState.COMPLETED)
         val questionResult =
@@ -503,13 +538,17 @@ class DatasetServiceTest : AbstractTest() {
         every { dialogReportDAO.findByDialogByIds(emptySet()) } returns emptySet()
 
         assertThrows<UnprocessableEntityException> {
-            DatasetService.createEvaluationSampleFromRun(
+            EvaluationService.createEvaluationSample(
                 namespace = NAMESPACE,
                 botId = BOT_ID,
-                datasetId = dataset._id.toString(),
-                runId = run._id.toString(),
-                request = CreateEvaluationSampleFromRunRequest(name = "Evaluation"),
-                userLogin = USER,
+                request =
+                    CreateEvaluationSampleRequest(
+                        name = "Evaluation",
+                        description = null,
+                        dialogInfo = null,
+                        datasetRunInfo = DatasetRunInfo(runIds = listOf(run._id.toString())),
+                    ),
+                createdBy = USER,
             )
         }
 
