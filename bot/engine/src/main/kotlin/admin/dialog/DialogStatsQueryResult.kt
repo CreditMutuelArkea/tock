@@ -54,6 +54,7 @@ data class CountByDateResult(
  */
 data class DialogStatsQueryResult(
     val allUserActions: List<CountResult> = emptyList(),
+    val allUserActionsByDate: List<CountByDateResult> = emptyList(),
     val allUserActionsExceptRag: List<CountResult> = emptyList(),
     val allUserRagActions: List<CountResult> = emptyList(),
     val knownIntentUserActions: List<CountResult> = emptyList(),

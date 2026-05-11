@@ -28,8 +28,6 @@ import {
   NbDialogService
 } from '@nebular/theme';
 import { of } from 'rxjs';
-import { AnalyticsService } from '../../analytics/analytics.service';
-import { UserAnalyticsQueryResult } from '../../analytics/users/users';
 import { AnswerConfigurationType } from '../../bot/model/story';
 import { RestService } from '../../core-nlp/rest/rest.service';
 import { StateService } from '../../core-nlp/state.service';
@@ -54,13 +52,6 @@ const indicator2: IndicatorDefinition = {
   type: IndicatorType.CUSTOM,
   dimensions: ['test', 'Other test dim'],
   values: []
-};
-
-const messagesStats: UserAnalyticsQueryResult = {
-  dates: [new Date('2023-04-15'), new Date('2023-04-16'), new Date('2023-04-17')],
-  usersData: [[0, 0], [5], [12]],
-  connectorsType: [],
-  intents: []
 };
 
 const storiesSummaries: StorySummary[] = [
@@ -140,6 +131,7 @@ const dimensionMetrics: MetricResult[] = [
 
 const emptyDialogStats = {
   allUserActions: [],
+  allUserActionsByDate: [],
   allUserActionsExceptRag: [],
   allUserRagActions: [],
   knownIntentUserActions: [],
@@ -150,8 +142,36 @@ const emptyDialogStats = {
 };
 
 const dialogStats = {
-  test: emptyDialogStats,
-  prod: emptyDialogStats
+  test: {
+    ...emptyDialogStats,
+    allUserActionsByDate: [
+      {
+        applicationId: 'test-test',
+        date: '2023-04-17',
+        total: 3
+      }
+    ]
+  },
+  prod: {
+    ...emptyDialogStats,
+    allUserActionsByDate: [
+      {
+        applicationId: 'test',
+        date: '2023-04-15',
+        total: 0
+      },
+      {
+        applicationId: 'test',
+        date: '2023-04-16',
+        total: 5
+      },
+      {
+        applicationId: 'test',
+        date: '2023-04-17',
+        total: 12
+      }
+    ]
+  }
 };
 
 describe('MetricsBoardComponent', () => {
@@ -186,10 +206,6 @@ describe('MetricsBoardComponent', () => {
           useValue: { currentApplication: { name: 'TestApp', namespace: 'TestNamespace' }, currentLocale: 'fr' }
         },
         {
-          provide: AnalyticsService,
-          useValue: { messagesAnalytics: () => of(messagesStats) }
-        },
-        {
           provide: BotConfigurationService,
           useValue: { configurations: of([{}]) }
         },
@@ -198,9 +214,6 @@ describe('MetricsBoardComponent', () => {
           useValue: {
             get: () => of([indicator1, indicator2]),
             post: (url, payload) => {
-              if (url === '/dialogs/stats/messages-by-date') {
-                return of(messagesStats);
-              }
               if (url === '/dialogs/stats') {
                 return of(dialogStats);
               }
@@ -208,10 +221,10 @@ describe('MetricsBoardComponent', () => {
                 return of(storiesSummaries);
               }
               if (url === '/bot/TestApp/metrics') {
-                if (payload.groupBy[0] === 'TRACKED_STORY_ID') {
-                  return of(storiesHits);
+                if (payload.groupBy.includes('TRACKED_STORY_ID')) {
+                  return of({ test: [], prod: storiesHits });
                 }
-                return of(dimensionMetrics);
+                return of({ test: [], prod: dimensionMetrics });
               }
             }
           }
@@ -296,7 +309,12 @@ describe('MetricsBoardComponent', () => {
   });
 
   it('should init messages stats chart', () => {
-    expect(component.messagesChartOptions.series[0].data).toEqual([0, 5, 12]);
+    expect(component.messagesChartOptions.series[0].data).toEqual([0, 0, 0, 0, 0, 5, 12]);
+  });
+
+  it('should refresh messages stats chart when display tests changes', () => {
+    component.onToggleDisplayTests();
+    expect(component.messagesChartOptions.series[0].data).toEqual([0, 0, 0, 0, 0, 5, 15]);
   });
 
   it('should retrieve indicators by name', () => {

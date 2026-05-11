@@ -47,6 +47,7 @@ import ai.tock.bot.admin.bot.sentencegeneration.BotSentenceGenerationConfigurati
 import ai.tock.bot.admin.bot.vectorstore.BotVectorStoreConfigurationDAO
 import ai.tock.bot.admin.dataset.DatasetDAO
 import ai.tock.bot.admin.dialog.ApplicationDialogFlowData
+import ai.tock.bot.admin.dialog.CountByDateResult
 import ai.tock.bot.admin.dialog.CountResult
 import ai.tock.bot.admin.dialog.DialogReport
 import ai.tock.bot.admin.dialog.DialogReportDAO
@@ -93,7 +94,6 @@ import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDump
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpController
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationDumpImport
 import ai.tock.bot.admin.story.dump.StoryDefinitionConfigurationFeatureDump
-import ai.tock.bot.admin.user.UserAnalyticsQueryResult
 import ai.tock.bot.admin.user.UserReportDAO
 import ai.tock.bot.connector.ConnectorType
 import ai.tock.bot.definition.IntentWithoutNamespace
@@ -139,8 +139,6 @@ import org.litote.kmongo.Id
 import org.litote.kmongo.newId
 import org.litote.kmongo.toId
 import java.time.Instant
-import java.time.LocalDate
-import java.time.ZonedDateTime
 import java.util.Locale
 
 object BotAdminService {
@@ -622,10 +620,22 @@ object BotAdminService {
         return grouped
     }
 
+    private fun groupCountByDateByAppConfigType(
+        results: List<CountByDateResult>,
+    ): Map<String, List<CountByDateResult>> {
+        val grouped: Map<String, List<CountByDateResult>> =
+            results.groupBy { stat ->
+                // At the moment, we rely on the `test-` prefix to distinguish test configurations
+                if (stat.applicationId.startsWith("test-")) APP_CONFIG_TEST_TYPE else APP_CONFIG_PROD_TYPE
+            }
+        return grouped
+    }
+
     fun getDialogStats(query: DialogStatsQuery): DialogStatsGroupResponse {
         val stats = dialogReportDAO.calculateDialogStats(query)
 
         val allUserActionsGroup = groupByAppConfigType(stats.allUserActions)
+        val allUserActionsByDateGroup = groupCountByDateByAppConfigType(stats.allUserActionsByDate)
         val allUserActionsExceptRagGroup = groupByAppConfigType(stats.allUserActionsExceptRag)
         val allUserRagActionsGroup = groupByAppConfigType(stats.allUserRagActions)
         val knownIntentUserActionsGroup = groupByAppConfigType(stats.knownIntentUserActions)
@@ -637,6 +647,7 @@ object BotAdminService {
         fun buildResult(env: String) =
             DialogStatsQueryResult(
                 allUserActions = allUserActionsGroup[env] ?: emptyList(),
+                allUserActionsByDate = allUserActionsByDateGroup[env] ?: emptyList(),
                 allUserActionsExceptRag = allUserActionsExceptRagGroup[env] ?: emptyList(),
                 allUserRagActions = allUserRagActionsGroup[env] ?: emptyList(),
                 knownIntentUserActions = knownIntentUserActionsGroup[env] ?: emptyList(),
@@ -650,36 +661,6 @@ object BotAdminService {
             test = buildResult(APP_CONFIG_TEST_TYPE),
             prod = buildResult(APP_CONFIG_PROD_TYPE),
         )
-    }
-
-    fun getDialogUserMessagesByDate(query: DialogStatsQuery): UserAnalyticsQueryResult {
-        val from = query.from ?: query.to ?: ZonedDateTime.now()
-        val to = query.to ?: from
-        val countsByDate =
-            dialogReportDAO
-                .countUserActionsByDate(query)
-                .groupBy { it.date }
-                .mapValues { (_, counts) -> counts.sumOf { it.total }.toInt() }
-        val dates = getDatesBetween(from.toLocalDate(), to.toLocalDate())
-
-        return UserAnalyticsQueryResult(
-            dates = dates,
-            usersData = dates.map { listOf(countsByDate[it] ?: 0) },
-            connectorsType = listOf("Messages"),
-        )
-    }
-
-    private fun getDatesBetween(
-        startDate: LocalDate,
-        endDate: LocalDate,
-    ): List<String> {
-        val dates = mutableListOf<String>()
-        var date = startDate
-        while (!date.isAfter(endDate)) {
-            dates += date.toString()
-            date = date.plusDays(1)
-        }
-        return dates
     }
 
     fun deleteApplicationConfiguration(conf: BotApplicationConfiguration) {

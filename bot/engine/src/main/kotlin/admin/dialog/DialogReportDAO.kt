@@ -53,8 +53,6 @@ interface DialogReportDAO {
 
     fun calculateDialogStats(query: DialogStatsQuery): DialogStatsQueryResult
 
-    fun countUserActionsByDate(query: DialogStatsQuery): List<CountByDateResult>
-
     // ANNOTATION FUNCTIONS
     fun insertAnnotation(
         dialogId: String,

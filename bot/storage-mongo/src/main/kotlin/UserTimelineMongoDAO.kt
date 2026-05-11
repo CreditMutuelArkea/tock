@@ -1165,23 +1165,19 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
         return runBlocking { buildAndExecuteCountPipeline(namespace, applicationIds, filters) }
     }
 
-    override fun countUserActionsByDate(query: DialogStatsQuery): List<CountByDateResult> {
-        val applicationIds =
-            getConfigurationsByNamespaceAndNlpModel(
-                namespace = query.namespace,
-                nlpModel = query.applicationName,
-            )
-                .filter { query.includeTestConfigurations || !it.applicationId.startsWith("test-") }
-                .map { it.applicationId }
-                .toSet()
-
+    fun countUserActionsByDate(
+        namespace: String,
+        applicationIds: Set<String>,
+        fromDate: ZonedDateTime? = null,
+        toDate: ZonedDateTime? = null,
+    ): List<CountByDateResult> {
         val filters =
             mutableListOf<Bson>(
                 eq("stories.actions.playerId.type", "user"),
             )
-        applyDateFilters(filters, query.from, query.to)
+        applyDateFilters(filters, fromDate, toDate)
 
-        return runBlocking { buildAndExecuteCountByDatePipeline(query.namespace, applicationIds, filters) }
+        return runBlocking { buildAndExecuteCountByDatePipeline(namespace, applicationIds, filters) }
     }
 
     /**
@@ -1376,6 +1372,14 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
                 includeGenAIRag = true,
             )
 
+        val allUserActionsByDate =
+            countUserActionsByDate(
+                namespace = query.namespace,
+                applicationIds = applicationIds,
+                fromDate = query.from,
+                toDate = query.to,
+            )
+
         // Get all user actions, excluding GenAI RAG interactions.
         val allUserActionsExceptRag =
             countUserActions(
@@ -1449,6 +1453,7 @@ internal object UserTimelineMongoDAO : UserTimelineDAO, UserReportDAO, DialogRep
 
         return DialogStatsQueryResult(
             allUserActions = allUserActions,
+            allUserActionsByDate = allUserActionsByDate,
             allUserActionsExceptRag = allUserActionsExceptRag,
             allUserRagActions = allUserRagActions,
             knownIntentUserActions = allUserActionsOnlyKnownIntent,
