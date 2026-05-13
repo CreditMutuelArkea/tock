@@ -167,6 +167,8 @@
         <div class="ellipsis">Questions</div>
         <div class="ellipsis">Failed</div>
         <div class="ellipsis">Completed</div>
+        <div class="ellipsis">Found in context</div>
+        <div class="ellipsis">Not found in context</div>
         <div class="ellipsis">Run State</div>
         <div class="ellipsis"></div>
       </div>
@@ -199,6 +201,9 @@
           <div class="runs-grid-entry text-muted">{{ run.stats.totalQuestions }}</div>
           <div class="runs-grid-entry text-muted">{{ run.stats.failedQuestions }}</div>
           <div class="runs-grid-entry text-muted">{{ run.stats.completedQuestions }}</div>
+
+          <div class="runs-grid-entry text-muted">{{ run.stats.ragAnswerStatusCounts.found_in_context }}</div>
+          <div class="runs-grid-entry text-muted">{{ run.stats.ragAnswerStatusCounts.not_found_in_context }}</div>
 
           <div
             class="runs-grid-entry"

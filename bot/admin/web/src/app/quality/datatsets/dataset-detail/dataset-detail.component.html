@@ -53,6 +53,21 @@
             {{ currentRun.settingsSnapshot.indexSessionId }}
           </div>
         </div>
+
+        <div class="font-size-small lineHeight-1 d-flex flex-wrap gap-05 row-gap-05 justify-content-between mt-1">
+          <div class="text-nowrap">Completed questions : {{ currentRun.stats.completedQuestions }}</div>
+          <div class="text-nowrap">Failed questions : {{ currentRun.stats.failedQuestions }}</div>
+          <div class="text-nowrap">Total questions : {{ currentRun.stats.totalQuestions }}</div>
+        </div>
+        <div class="font-size-xsmall lineHeight-1 text-muted d-flex flex-wrap gap-05 row-gap-05 justify-content-between">
+          <div class="text-nowrap">Small talk : {{ currentRun.stats.ragAnswerStatusCounts.small_talk }}</div>
+          <div class="text-nowrap">Found in context : {{ currentRun.stats.ragAnswerStatusCounts.found_in_context }}</div>
+          <div class="text-nowrap">Not found in context : {{ currentRun.stats.ragAnswerStatusCounts.not_found_in_context }}</div>
+          <div class="text-nowrap">Human escalation :{{ currentRun.stats.ragAnswerStatusCounts.human_escalation }}</div>
+          <div class="text-nowrap">Out of scope : {{ currentRun.stats.ragAnswerStatusCounts.out_of_scope }}</div>
+          <div class="text-nowrap">Injection attempt : {{ currentRun.stats.ragAnswerStatusCounts.injection_attempt }}</div>
+          <div class="text-nowrap">Technical error : {{ currentRun.stats.ragAnswerStatusCounts.technical_error }}</div>
+        </div>
       </nb-card-body>
 
       <nb-card-footer
@@ -183,6 +198,21 @@
           >
             {{ comparisonRun.settingsSnapshot.indexSessionId }}
           </div>
+        </div>
+
+        <div class="font-size-small lineHeight-1 d-flex flex-wrap gap-05 row-gap-05 justify-content-between mt-1">
+          <div class="text-nowrap">Completed questions : {{ comparisonRun.stats.completedQuestions }}</div>
+          <div class="text-nowrap">Failed questions : {{ comparisonRun.stats.failedQuestions }}</div>
+          <div class="text-nowrap">Total questions : {{ comparisonRun.stats.totalQuestions }}</div>
+        </div>
+        <div class="font-size-xsmall lineHeight-1 text-muted d-flex flex-wrap gap-05 row-gap-05 justify-content-between">
+          <div class="text-nowrap">Small talk : {{ comparisonRun.stats.ragAnswerStatusCounts.small_talk }}</div>
+          <div class="text-nowrap">Found in context : {{ comparisonRun.stats.ragAnswerStatusCounts.found_in_context }}</div>
+          <div class="text-nowrap">Not found in context : {{ comparisonRun.stats.ragAnswerStatusCounts.not_found_in_context }}</div>
+          <div class="text-nowrap">Human escalation :{{ comparisonRun.stats.ragAnswerStatusCounts.human_escalation }}</div>
+          <div class="text-nowrap">Out of scope : {{ comparisonRun.stats.ragAnswerStatusCounts.out_of_scope }}</div>
+          <div class="text-nowrap">Injection attempt : {{ comparisonRun.stats.ragAnswerStatusCounts.injection_attempt }}</div>
+          <div class="text-nowrap">Technical error : {{ comparisonRun.stats.ragAnswerStatusCounts.technical_error }}</div>
         </div>
       </nb-card-body>
 

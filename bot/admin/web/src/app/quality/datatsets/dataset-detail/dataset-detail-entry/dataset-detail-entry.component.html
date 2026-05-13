@@ -118,6 +118,12 @@
               {{ getActionTypeLabel('A') }}
             </div>
 
+            <tock-chat-ui-message-debug
+              *ngIf="currentAction?.action?.metadata?.isGenAiRagAnswer"
+              [action]="currentAction.action"
+              [condensed]="true"
+            ></tock-chat-ui-message-debug>
+
             <button
               nbButton
               size="small"
@@ -155,6 +161,12 @@
             >
               {{ getActionTypeLabel('B') }}
             </div>
+
+            <tock-chat-ui-message-debug
+              *ngIf="comparisonAction?.action?.metadata?.isGenAiRagAnswer"
+              [action]="comparisonAction.action"
+              [condensed]="true"
+            ></tock-chat-ui-message-debug>
 
             <button
               nbButton
