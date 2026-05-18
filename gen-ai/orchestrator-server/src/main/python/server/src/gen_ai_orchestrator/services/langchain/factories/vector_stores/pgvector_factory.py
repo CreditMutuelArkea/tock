@@ -16,22 +16,26 @@
 import logging
 from typing import Optional
 
+from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStoreRetriever
 from langchain_postgres import PGVector
 
 from gen_ai_orchestrator.configurations.environment.settings import (
     application_settings,
 )
+from gen_ai_orchestrator.models.vector_stores.pgvector.database_pool_registry import DatabasePool
 from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import (
     PGVectorStoreSetting,
 )
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.full_text_search_retriever import \
+    FullTextSearchRetriever
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.pgvector_similarity_score_retriever import \
+    PGVectorSimilarityRetriever
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.postgresql_text_retriever import \
+    PostgreSQLTextRetriever
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
-from gen_ai_orchestrator.services.security.security_service import (
-    fetch_secret_key_value,
-)
-from gen_ai_orchestrator.utils.strings import obfuscate
 
 logger = logging.getLogger(__name__)
 
@@ -41,21 +45,19 @@ class PGVectorFactory(LangChainVectorStoreFactory):
     A class for LangChain PGVector Factory
     https://api.python.langchain.com/en/latest/vectorstores/langchain_postgres.vectorstores.PGVector.html
     """
+    """""
+    Pool injecté depuis le registry — aucune connexion créée ici.
+    """
+    pool: DatabasePool
 
     setting: PGVectorStoreSetting
 
     def get_vector_store(self, async_mode: Optional[bool] = True) -> PGVector:
-        password = fetch_secret_key_value(self.setting.password)
-        logger.info(
-            'PostgreSQL user credentials: %s:%s',
-            self.setting.username,
-            obfuscate(password),
-        )
-
+        engine = self.pool.async_engine if async_mode else self.pool.sync_engine
         return PGVector(
             embeddings=self.embedding_function,
             collection_name=self.index_name,
-            connection=f'postgresql+psycopg://{self.setting.username}:{password}@{self.setting.host}:{self.setting.port}/{self.setting.database}',
+            connection=engine,
             use_jsonb=True,
             async_mode=async_mode
         )
@@ -64,6 +66,29 @@ class PGVectorFactory(LangChainVectorStoreFactory):
         return self.get_vector_store(async_mode).as_retriever(
             search_kwargs=search_kwargs
         )
+
+    def get_similarity_search_with_score_retriever(
+            self,
+            search_kwargs: dict,
+            async_mode: bool = True
+    ) -> BaseRetriever:
+            return PGVectorSimilarityRetriever(
+                vector_store=self.get_vector_store(async_mode),
+                k=search_kwargs.get("k", 10),
+                filter=search_kwargs.get("filter"),
+            )
+
+    def get_text_store_retriever(
+            self,
+            search_kwargs: dict,
+            async_mode: bool = True
+    ) -> FullTextSearchRetriever:
+            engine = self.pool.async_engine if async_mode else self.pool.sync_engine
+            return PostgreSQLTextRetriever(
+                engine=engine,
+                table_name=self.index_name,
+                k=search_kwargs.get("k", 10),
+            )
 
     async def check_vector_store_connection(self) -> bool:
         """

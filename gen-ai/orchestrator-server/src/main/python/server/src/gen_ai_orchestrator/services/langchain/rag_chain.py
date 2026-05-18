@@ -16,11 +16,10 @@
 Module for the RAG Chain
 It uses LangChain to perform a Conversational Retrieval Chain
 """
-
+import asyncio
 import json
 import logging
 import time
-from functools import partial
 from operator import itemgetter
 from typing import List, Optional
 
@@ -29,12 +28,11 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.output_parsers import JsonOutputParser, StrOutputParser
+from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.prompts import PromptTemplate as LangChainPromptTemplate
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import (
-    RunnableConfig,
     RunnableLambda,
     RunnableParallel,
     RunnablePassthrough,
@@ -68,7 +66,7 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     LLMAnswer,
     RAGDebugData,
     RAGDocument,
-    RAGDocumentMetadata,
+    RAGDocumentMetadata, LLMCondensedQuestion,
 )
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
 from gen_ai_orchestrator.routers.responses.responses import RAGResponse
@@ -94,7 +92,7 @@ logger = logging.getLogger(__name__)
 
 
 async def retrieve_documents_with_variants(
-    retriever: BaseRetriever, variants: List[str]
+        retriever: BaseRetriever, variants: List[str]
 ) -> List[Document]:
     """Retrieve documents asynchronously for each variant and deduplicate by id."""
     docs = []
@@ -112,9 +110,9 @@ async def retrieve_documents_with_variants(
 @opensearch_exception_handler
 @openai_exception_handler(provider='OpenAI or AzureOpenAIService')
 async def execute_rag_chain(
-    request: RAGRequest,
-    debug: bool,
-    custom_observability_handler: Optional[BaseCallbackHandler] = None,
+        request: RAGRequest,
+        debug: bool,
+        custom_observability_handler: Optional[BaseCallbackHandler] = None,
 ) -> RAGResponse:
     """
     RAG chain execution, using the LLM and Embedding settings specified in the request
@@ -249,125 +247,148 @@ def get_source_content(doc: Document) -> str:
     """
     title_prefix = f"{doc.metadata['title']}\n\n"
     if doc.page_content.startswith(title_prefix):
-        return doc.page_content[len(title_prefix) :]
+        return doc.page_content[len(title_prefix):]
     else:
         return doc.page_content
 
 
 def create_rag_chain(
-    request: RAGRequest, vector_db_async_mode: Optional[bool] = True
+        request: RAGRequest, vector_db_async_mode: Optional[bool] = True
 ) -> RunnableSerializable[Any, dict[str, Any]]:
-    """
-    Create the RAG chain from RAGRequest, using the LLM and Embedding settings specified in the request.
 
-    Args:
-        request: The RAG request
-        vector_db_async_mode: enable/disable the async_mode for vector DB client (if supported). Default to True.
-    Returns:
-        The RAG chain.
-    """
+    validate_prompt_template(
+        request.question_condensing_prompt, 'Question condensing prompt'
+    )
+    question_condensing_llm_factory = get_llm_factory(
+        setting=request.question_condensing_llm_setting
+    )
 
-    # Log progress and validate prompt template
-    logger.info('RAG chain - Validating LLM prompt template')
     validate_prompt_template(
         request.question_answering_prompt, 'Question answering prompt'
     )
-    if request.question_condensing_prompt is not None:
-        validate_prompt_template(
-            request.question_condensing_prompt, 'Question condensing prompt'
-        )
-
-    question_condensing_llm_factory = None
-    if request.question_condensing_llm_setting is not None:
-        question_condensing_llm_factory = get_llm_factory(
-            setting=request.question_condensing_llm_setting
-        )
     question_answering_llm_factory = get_llm_factory(
         setting=request.question_answering_llm_setting
     )
+
     em_factory = get_em_factory(setting=request.embedding_question_em_setting)
+
     vector_store_factory = get_vector_store_factory(
         setting=request.vector_store_setting,
         index_name=request.document_index_name,
         embedding_function=em_factory.get_embedding_model(),
     )
 
-    retriever = vector_store_factory.get_vector_store_retriever(
+    vector_retriever = vector_store_factory.get_similarity_search_with_score_retriever(
         search_kwargs=request.document_search_params.to_dict(),
-        async_mode=vector_db_async_mode,
+        async_mode=vector_db_async_mode
     )
-    if request.compressor_setting:
-        retriever = add_document_compressor(retriever, request.compressor_setting)
 
-    logger.debug('RAG chain - Document index name: %s', request.document_index_name)
+    fts_retriever = vector_store_factory.get_text_store_retriever(
+        search_kwargs=request.document_search_params.to_dict(),
+        async_mode=vector_db_async_mode
+    )
 
-    # Build LLM and prompt templates
-    question_condensing_llm = None
-    if question_condensing_llm_factory is not None:
-        question_condensing_llm = question_condensing_llm_factory.get_language_model()
+    question_condensing_llm = question_condensing_llm_factory.get_language_model()
     question_answering_llm = question_answering_llm_factory.get_language_model()
 
-    # Fallback in case of missing condensing LLM setting using the answering LLM setting.
-    if question_condensing_llm is not None:
-        condensing_llm = question_condensing_llm
-    else:
-        condensing_llm = question_answering_llm
-
-    # Build the chat chain for question contextualization
     chat_chain = build_question_condensation_chain(
-        condensing_llm, request.question_condensing_prompt
+        question_condensing_llm, request.question_condensing_prompt
     )
+
     rag_prompt = build_rag_prompt(request)
 
-    # Function to contextualize the question based on chat history
-    contextualize_question_fn = partial(contextualize_question, chat_chain=chat_chain)
+    async def multi_query_retrieve(inputs) -> list[Document]:
+        docs_vector, docs_sql = await asyncio.gather(
+            vector_retriever.ainvoke(input=inputs["chat_chain_result"]["condensed_question"]),
+            fts_retriever.ainvoke(input=fts_retriever.prepare_query(inputs["chat_chain_result"]["key_words"])),
+        )
 
-    # Calculate the condensed question
+        results = [docs_vector, docs_sql]
+
+        return apply_rrf_ranking(results, k=60, top_n=7)
+
+
+    def apply_rrf_ranking(ranked_results: list[list[Document]], k: int, top_n: int) -> list[Document]:
+
+        scores = {}
+        for results in ranked_results:
+            for rank, doc in enumerate(results, start=1):  # 1-based rank
+                doc_id =(doc.metadata.get('id'),doc.metadata.get('chunk'))
+                score = 1.0 / (k + rank)
+                scores[doc_id] = scores.get(doc_id, 0) + score
+
+        # Sort by RRF score
+        unique_docs = {}
+        for results in ranked_results:
+            for doc in results:
+                unique_docs[(doc.metadata.get('id'),doc.metadata.get('chunk'))] = doc
+
+        ranked_docs = sorted(unique_docs.values(), key=lambda doc: scores[(doc.metadata.get('id'),doc.metadata.get('chunk'))], reverse=True)
+
+        # Storing RRF score
+        for doc in ranked_docs:
+            doc.metadata["rrf_score"] = scores[(doc.metadata.get('id'),doc.metadata.get('chunk'))]
+
+        logger.info("--------------")
+        logger.info("RRF %d docs", len(ranked_docs))
+
+        for i, d in enumerate(ranked_docs, start=1):
+            logger.info(
+                "[RRF][Doc %s] id=%s | chunk=%s | tscore=%5f | v_score=%.5f | rrf_score=%.5f | title=%s | source=%s",
+                i,
+                d.metadata.get("id"),
+                d.metadata.get("chunk"),
+                d.metadata.get("text_score", 0.0),
+                d.metadata.get("vector_score", 0.0),
+                d.metadata.get("rrf_score", 0.0),
+                d.metadata.get("title"),
+                d.metadata.get("source"),
+            )
+
+        logger.info("--------------")
+
+
+        # Return only the top N docs back.
+        return ranked_docs[:top_n]
+
     with_condensed_question = RunnableParallel(
         {
-            'condensed_question': contextualize_question_fn,
+            'chat_chain_result': chat_chain,
             'question': itemgetter('question'),
             'chat_history': itemgetter('chat_history'),
         }
     )
 
-    async def retrieve_with_variants(inputs):
-        variants = [
-            # inputs["question"], Deactivated. It's an example to prove the multi retriever process
-            inputs['condensed_question']
-        ]
-
-        # TODO [DERCBOT-1649] Apply the RRF Algo on unique_docs.
-        return await retrieve_documents_with_variants(retriever, variants)
-
-    # Build the RAG inputs
     rag_inputs = with_condensed_question | RunnableParallel(
         {
-            'question': itemgetter('condensed_question'),
+            'question': lambda x: x["chat_chain_result"]['condensed_question'],
+            'key_words': lambda x: x["chat_chain_result"]['key_words'],
             'chat_history': itemgetter('chat_history'),
-            'documents': RunnableLambda(retrieve_with_variants),
+            'documents': RunnableLambda(name="multi_query_retrieve", func=multi_query_retrieve),
         }
     )
 
     return rag_inputs | RunnablePassthrough.assign(
         answer=(
-            {
-                'context': lambda x: json.dumps(
-                    [
-                        {
-                            'chunk_id': doc.metadata['id'],
-                            'chunk_text': doc.page_content,
-                        }
-                        for doc in x['documents']
-                    ],
-                    ensure_ascii=False,
-                    indent=2,
-                ),
-                'chat_history': format_chat_history,
-            }
-            | rag_prompt
-            | question_answering_llm
-            | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
+                {
+                    'context': lambda x: json.dumps(
+                        [
+                            {
+                                'chunk_id': doc.metadata['id'],
+                                'title': doc.metadata['title'],
+                                'url': doc.metadata['source'],
+                                'chunk_text': doc.page_content,
+                            }
+                            for doc in x['documents']
+                        ],
+                        ensure_ascii=False,
+                        indent=2,
+                    ),
+                    'chat_history': format_chat_history,
+                }
+                | rag_prompt
+                | question_answering_llm
+                | JsonOutputParser(pydantic_object=LLMAnswer, name='rag_chain_output')
         )
     )
 
@@ -394,44 +415,19 @@ def format_chat_history(x):
 
 
 def build_question_condensation_chain(
-    llm, prompt: Optional[PromptTemplate]
+        llm, prompt: PromptTemplate
 ) -> ChatPromptTemplate:
-    """
-    Build the chat chain for contextualizing questions.
-    """
-    # TODO deprecated : All Gen configurations are supposed to have this prompt now. It is mandatory in the RAG configuration.
-    if prompt is None:
-        # Default prompt
-        prompt = PromptTemplate(
-            formatter=PromptFormatter.F_STRING,
-            inputs={},
-            template="""
-You are a helpful assistant that reformulates questions.
-
-You are given:
-- The conversation history between the user and the assistant
-- The most recent user question
-
-Your task:
-- Reformulate the user’s latest question into a clear, standalone query.
-- Incorporate relevant context from the conversation history.
-- Do NOT answer the question.
-- If the history does not provide additional context, keep the question as is.
-
-Return only the reformulated question.
-""",
-        )
-
     return (
-        ChatPromptTemplate.from_messages(
-            [
-                ('system', prompt.template),
-                MessagesPlaceholder(variable_name='chat_history'),
-                ('human', '{question}'),
-            ]
-        ).partial(**prompt.inputs)
-        | llm
-        | StrOutputParser(name='chat_chain_output')
+            ChatPromptTemplate.from_messages(
+                [
+                    ('system', prompt.template),
+                    MessagesPlaceholder(variable_name='chat_history'),
+                    ('human', '{{ question }}' if prompt.formatter == PromptFormatter.JINJA2 else '{question}'),
+                ]
+                ,template_format=prompt.formatter.value
+            ).partial(**prompt.inputs)
+            | llm
+            | JsonOutputParser(pydantic_object=LLMCondensedQuestion, name='rag_question_condensation_chain_output')
     )
 
 
@@ -483,7 +479,7 @@ def get_rag_documents(handler: RAGCallbackHandler) -> List[RAGDocument]:
     return [
         # Get first 100 char of content
         RAGDocument(
-            content=doc.page_content[0 : len(doc.metadata['title']) + 100] + '...',
+            content=doc.page_content[0: len(doc.metadata['title']) + 100] + '...',
             metadata=RAGDocumentMetadata(**doc.metadata),
         )
         for doc in handler.records['documents']
@@ -502,7 +498,7 @@ def get_llm_answer(rag_chain_output) -> LLMAnswer:
 
 
 def get_rag_debug_data(
-    request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration
+        request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration
 ) -> RAGDebugData:
     """RAG debug data assembly"""
 
@@ -514,7 +510,7 @@ def get_rag_debug_data(
         user_question=request.question_answering_prompt.inputs['question'],
         question_condensing_prompt=records_callback_handler.records['chat_prompt'],
         question_condensing_history=history,
-        condensed_question=records_callback_handler.records['chat_chain_output'],
+        condensed_question="",  # records_callback_handler.records['chat_chain_output'],
         question_answering_prompt=records_callback_handler.records['rag_prompt'],
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,
@@ -538,7 +534,7 @@ def check_guardrail_output(guardrail_output: dict) -> bool:
 
 
 def add_document_compressor(
-    retriever: VectorStoreRetriever, compressor_settings: BaseDocumentCompressorSetting
+        retriever: VectorStoreRetriever, compressor_settings: BaseDocumentCompressorSetting
 ) -> ContextualCompressionRetriever:
     """
     Adds a compressor to the retriever.

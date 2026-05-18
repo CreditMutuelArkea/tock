@@ -20,8 +20,10 @@ from typing import List, Optional
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
+from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
 from pydantic import BaseModel, ConfigDict
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from gen_ai_orchestrator.configurations.environment.settings import (
     application_settings,
@@ -36,6 +38,8 @@ from gen_ai_orchestrator.models.errors.errors_models import ErrorInfo
 from gen_ai_orchestrator.models.vector_stores.vector_store_setting import (
     BaseVectorStoreSetting,
 )
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.full_text_search_retriever import \
+    FullTextSearchRetriever
 
 logger = logging.getLogger(__name__)
 
@@ -67,6 +71,22 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
             async_mode: enable/disable the async_mode for vector DB client (if supported). Default to True.
         :return: A VectorStoreRetriever.
         """
+        pass
+
+    @abstractmethod
+    def get_similarity_search_with_score_retriever(
+            self,
+            search_kwargs: dict,
+            async_mode: bool = True
+    ) -> BaseRetriever:
+        pass
+
+    @abstractmethod
+    def get_text_store_retriever(
+            self,
+            search_kwargs: dict,
+            async_mode: bool = True
+    ) -> FullTextSearchRetriever:
         pass
 
     @opensearch_exception_handler
