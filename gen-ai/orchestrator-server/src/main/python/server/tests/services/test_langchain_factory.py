@@ -68,7 +68,7 @@ from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting im
 from gen_ai_orchestrator.models.vector_stores.pgvector.pgvector_setting import (
     PGVectorStoreSetting,
 )
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
     VectorStoreProvider,
 )
 from gen_ai_orchestrator.services.langchain.factories.callback_handlers.langfuse_callback_handler_factory import (

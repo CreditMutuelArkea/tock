@@ -25,7 +25,7 @@ from gen_ai_orchestrator.models.security.security_types import SecretKey
 from gen_ai_orchestrator.models.vector_stores.vector_store_setting import (
     BaseVectorStoreSetting,
 )
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
     VectorStoreProvider,
 )
 

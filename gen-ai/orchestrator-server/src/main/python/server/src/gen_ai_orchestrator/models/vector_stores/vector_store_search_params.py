@@ -16,9 +16,10 @@
 
 from abc import ABC, abstractmethod
 
+from gen_ai_orchestrator.models.vector_stores.vector_store_search_type import VectorStoreSearchType
 from pydantic import BaseModel, Field
 
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
     VectorStoreProvider,
 )
 
@@ -31,9 +32,14 @@ class BaseVectorStoreSearchParams(ABC, BaseModel):
         examples=[VectorStoreProvider.OPEN_SEARCH],
     )
     k: int = Field(
-        description='The number of Documents to return.',
+        description='The number of Documents to retrieve.',
         examples=[3],
         default=4,
+    )
+    search_type: VectorStoreSearchType = Field(
+        description='The Vector Store Search Type.',
+        examples=[VectorStoreSearchType.SIMILARITY_SEARCH],
+        default=VectorStoreSearchType.HYBRID_SEARCH,
     )
 
     @abstractmethod

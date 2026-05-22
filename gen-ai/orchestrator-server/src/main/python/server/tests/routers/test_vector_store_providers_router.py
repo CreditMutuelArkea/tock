@@ -20,7 +20,7 @@ from gen_ai_orchestrator.models.errors.errors_models import (
     ErrorCode,
     ErrorMessages,
 )
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
     VectorStoreProvider,
 )
 

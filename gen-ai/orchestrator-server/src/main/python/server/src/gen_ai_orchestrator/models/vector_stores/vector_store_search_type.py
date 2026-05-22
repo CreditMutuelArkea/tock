@@ -12,17 +12,20 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-"""Model for creating BaseVectorStoreSetting."""
+"""VectorStoreSearchType Enumeration."""
 
-from pydantic import BaseModel, Field, ConfigDict
+from enum import Enum, unique
 
-from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
-    VectorStoreProvider,
-)
+search_type: VectorStoreSearchType
 
+@unique
+class VectorStoreSearchType(str, Enum):
+    """Enumeration to list Vector Store Search Types"""
 
-class BaseVectorStoreSetting(BaseModel):
-    """A base class for Vector Store Setting."""
-    model_config = ConfigDict(frozen=True)
-    provider: VectorStoreProvider = Field(description='The Vector Store Provider.')
+    SIMILARITY_SEARCH = 'SIMILARITY_SEARCH'
+    FULL_TEXT_SEARCH = 'FULL_TEXT_SEARCH'
+    HYBRID_SEARCH = 'HYBRID_SEARCH'
 
+    @classmethod
+    def has_value(cls, value):
+        return value in cls._value2member_map_

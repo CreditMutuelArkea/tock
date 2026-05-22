@@ -35,7 +35,7 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     LLMAnswer,
     Source,
 )
-from gen_ai_orchestrator.models.vector_stores.vectore_store_provider import (
+from gen_ai_orchestrator.models.vector_stores.vector_store_provider import (
     VectorStoreProvider,
 )
 
