@@ -1,21 +1,3 @@
-#   Copyright (C) 2023-2026 Credit Mutuel Arkea
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#   http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#
-"""
-Module for the RAG Chain
-It uses LangChain to perform a Conversational Retrieval Chain
-"""
 import asyncio
 import json
 import logging
@@ -114,16 +96,6 @@ async def execute_rag_chain(
         debug: bool,
         custom_observability_handler: Optional[BaseCallbackHandler] = None,
 ) -> RAGResponse:
-    """
-    RAG chain execution, using the LLM and Embedding settings specified in the request
-
-    Args:
-        request: The RAG request
-        debug: True if RAG data debug should be returned with the response.
-        custom_observability_handler: Custom observability handler (Used in the tooling run_experiment.py script)
-    Returns:
-        The RAG response (Answer and document sources)
-    """
 
     logger.info('RAG chain - Start of execution...')
     start_time = time.time()
@@ -145,20 +117,10 @@ async def execute_rag_chain(
         user_id = request.dialog.user_id
         tags = request.dialog.tags or []
 
-    logger.debug(
-        'RAG chain - Use chat history: %s',
-        'Yes' if len(message_history.messages) > 0 else 'No',
-    )
-
     inputs = {
         **request.question_answering_prompt.inputs,
         'chat_history': message_history.messages,
     }
-
-    logger.debug(
-        'RAG chain - Use RAGCallbackHandler for debugging : %s',
-        debug,
-    )
 
     callback_handlers = []
     records_callback_handler = RAGCallbackHandler()
@@ -237,14 +199,6 @@ async def execute_rag_chain(
 
 
 def get_source_content(doc: Document) -> str:
-    """
-    Find and delete the title followed by two line breaks
-
-    The concatenation model used  is {title}\n\n{content_page}.
-    It is also used in chain_rag.py on the orchestrator server, when fetching sources.
-    The aim is to remove the ‘title’ prefix from the document content when sending the sources.
-
-    """
     title_prefix = f"{doc.metadata['title']}\n\n"
     if doc.page_content.startswith(title_prefix):
         return doc.page_content[len(title_prefix):]
@@ -295,7 +249,11 @@ def create_rag_chain(
         question_condensing_llm, request.question_condensing_prompt
     )
 
-    rag_prompt = build_rag_prompt(request)
+    rag_prompt = LangChainPromptTemplate.from_template(
+        template=request.question_answering_prompt.template,
+        template_format=request.question_answering_prompt.formatter.value,
+        partial_variables=request.question_answering_prompt.inputs,
+    )
 
     async def multi_query_retrieve(inputs) -> list[Document]:
         docs_vector, docs_sql = await asyncio.gather(
@@ -393,17 +351,6 @@ def create_rag_chain(
     )
 
 
-def build_rag_prompt(request: RAGRequest) -> LangChainPromptTemplate:
-    """
-    Build the RAG prompt template.
-    """
-    return LangChainPromptTemplate.from_template(
-        template=request.question_answering_prompt.template,
-        template_format=request.question_answering_prompt.formatter.value,
-        partial_variables=request.question_answering_prompt.inputs,
-    )
-
-
 def format_chat_history(x):
     messages = []
     for msg in x['chat_history']:
@@ -431,27 +378,7 @@ def build_question_condensation_chain(
     )
 
 
-def contextualize_question(inputs: dict, chat_chain) -> str:
-    """
-    Contextualize the question based on the chat history.
-    """
-    if inputs.get('chat_history') and len(inputs['chat_history']) > 0:
-        return chat_chain
-    return inputs['question']
-
-
 def rag_log(level, message, question, answer, response):
-    """
-    RAG logging
-
-    Args:
-        level: logging level
-        message: message to log
-        question: question answering prompt inputs
-        answer: LLM answer
-        response: the RAG response
-    """
-
     logger.log(
         level,
         '%(message)s \n'
@@ -464,15 +391,7 @@ def rag_log(level, message, question, answer, response):
         },
     )
 
-
 def get_rag_documents(handler: RAGCallbackHandler) -> List[RAGDocument]:
-    """
-    Get documents used on RAG context
-
-    Args:
-        handler: the RAG Callback Handler
-    """
-
     if handler.records['documents'] is None:
         return []
 
@@ -496,12 +415,9 @@ def get_llm_answer(rag_chain_output) -> LLMAnswer:
         )
     )
 
-
 def get_rag_debug_data(
         request: RAGRequest, records_callback_handler: RAGCallbackHandler, rag_duration
 ) -> RAGDebugData:
-    """RAG debug data assembly"""
-
     history = []
     if request.dialog:
         history = request.dialog.history
@@ -519,34 +435,9 @@ def get_rag_debug_data(
         duration=rag_duration,
     )
 
-
 def check_guardrail_output(guardrail_output: dict) -> bool:
-    """Checks if the guardrail detected toxicities.
-    Args:
-        guardrail_output: The guardrail output dictionnary
-    Returns:
-        Returns True if nothing is detected, raises an exception otherwise.
-    """
     if guardrail_output['output_toxicity']:
         message = f"Toxicity detected in LLM output ({','.join(guardrail_output['output_toxicity_reason'])})"
         raise GenAIGuardCheckException(ErrorInfo(cause=message))
     return True
 
-
-def add_document_compressor(
-        retriever: VectorStoreRetriever, compressor_settings: BaseDocumentCompressorSetting
-) -> ContextualCompressionRetriever:
-    """
-    Adds a compressor to the retriever.
-    Args:
-        retriever : the Base retriever
-        compressor_settings : the compressor settings
-    Returns:
-        New retriever with compressing feature.
-    """
-    compressor = get_compressor_factory(setting=compressor_settings).get_compressor()
-
-    return ContextualCompressionRetriever(
-        base_retriever=retriever,
-        base_compressor=compressor,
-    )
