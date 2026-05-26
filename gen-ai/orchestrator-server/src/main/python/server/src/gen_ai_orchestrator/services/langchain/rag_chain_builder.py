@@ -150,16 +150,13 @@ class HybridRetriever:
     then fuses their results with RRF.
     """
 
-    def __init__(self, vector_retriever, fts_retriever, rrf_k: int = 60, rrf_top_n: int = 13):
+    def __init__(self, vector_retriever, fts_retriever, rrf_k: int = 60, rrf_top_n: int = 10):
         self.vector_retriever = vector_retriever
         self.fts_retriever = fts_retriever
         self.rrf_k = rrf_k
         self.rrf_top_n = rrf_top_n
 
     async def retrieve(self, inputs: dict) -> list[Document]:
-        logger.info("HybridRetriever - Start of execution...")
-        start_time = time.time()
-
         condensed_question = inputs["chat_chain_result"]["condensed_question"]
         key_words = inputs["chat_chain_result"]["key_words"]
 
@@ -176,9 +173,6 @@ class HybridRetriever:
             top_n=self.rrf_top_n,
         )
 
-        duration = "{:.3f}".format(time.time() - start_time)
-        logger.info("HybridRetriever - End of execution. (%s seconds)", duration)
-
         return result
 
 
@@ -187,50 +181,30 @@ class HybridRetriever:
 # ---------------------------------------------------------------------------
 
 class SimilarityRetriever:
-    """
-    Combines a vector-store retriever and a full-text-search retriever,
-    then fuses their results with RRF.
-    """
 
     def __init__(self, vector_retriever):
         self.vector_retriever = vector_retriever
 
     async def retrieve(self, inputs: dict) -> list[Document]:
-        logger.info("SimilarityRetriever - Start of execution...")
-        start_time = time.time()
-
         condensed_question = inputs["chat_chain_result"]["condensed_question"]
-
-        docs_vector = await self.vector_retriever.ainvoke(input=condensed_question)
-
-        duration = "{:.3f}".format(time.time() - start_time)
-        logger.info("SimilarityRetriever - End of execution. (%s seconds)", duration)
-
-        return docs_vector
+        return await self.vector_retriever.ainvoke(input=condensed_question)
 
 
-# ---
-# FTS Retriever
-# ---
+# ---------------------------------------------------------------------------
+# FTS retriever
+# ---------------------------------------------------------------------------
+
 class FTSRetriever:
 
     def __init__(self, fts_retriever, ):
         self.fts_retriever = fts_retriever
 
     async def retrieve(self, inputs: dict) -> list[Document]:
-        logger.info("FTSRetriever - Start of execution...")
-        start_time = time.time()
-
         key_words = inputs["chat_chain_result"]["key_words"]
 
-        docs_fts = await self.fts_retriever.ainvoke(
+        return await self.fts_retriever.ainvoke(
             input=self.fts_retriever.prepare_query(key_words)
         )
-
-        duration = "{:.3f}".format(time.time() - start_time)
-        logger.info("FTSRetriever - End of execution. (%s seconds)", duration)
-
-        return docs_fts
 
 
 # ---------------------------------------------------------------------------
@@ -254,7 +228,7 @@ def build_question_condensation_chain(llm, prompt: PromptTemplate):
                     MessagesPlaceholder(variable_name="chat_history"),
                     ("human", human_placeholder),
                 ],
-                template_format=prompt.formatter.value,
+                template_format=prompt.formatter.value,  # type: ignore[arg-type]
             ).partial(**prompt.inputs)
             | llm
             | JsonOutputParser(
@@ -272,18 +246,6 @@ def create_rag_chain(
         request: RAGRequest,
         vector_db_async_mode: Optional[bool] = True,
 ) -> RunnableSerializable[Any, dict[str, Any]]:
-    """
-    Assemble and return the full conversational RAG chain.
-
-    Pipeline
-    --------
-    inputs
-      → question condensation  (parallel with passthrough of question + history)
-      → hybrid retrieval       (vector + FTS → RRF)
-      → answer generation      (RAG prompt → LLM → JSON parser)
-    """
-    logger.info("Create RAG Chain - Start of execution...")
-    start_time = time.time()
 
     # -- Validate prompts --------------------------------------------------
     validate_prompt_template(
@@ -363,12 +325,9 @@ def create_rag_chain(
 
     rag_prompt = LangChainPromptTemplate.from_template(
         template=request.question_answering_prompt.template,
-        template_format=request.question_answering_prompt.formatter.value,
+        template_format=request.question_answering_prompt.formatter.value, # type: ignore[arg-type]
         partial_variables=request.question_answering_prompt.inputs,
     )
-
-    duration = "{:.3f}".format(time.time() - start_time)
-    logger.info("Create RAG Chain - End of init. (%s seconds)", duration)
 
     # -- Assemble pipeline -------------------------------------------------
     with_condensed_question = RunnableParallel(
@@ -397,8 +356,5 @@ def create_rag_chain(
             | question_answering_llm
             | JsonOutputParser(pydantic_object=LLMAnswer, name="rag_chain_output")
     )
-
-    duration = "{:.3f}".format(time.time() - start_time)
-    logger.info("Create RAG Chain - End of execution. (%s seconds)", duration)
 
     return rag_inputs | RunnablePassthrough.assign(answer=answer_chain)
