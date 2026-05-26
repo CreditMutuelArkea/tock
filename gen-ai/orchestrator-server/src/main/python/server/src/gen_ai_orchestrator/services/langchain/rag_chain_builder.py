@@ -16,7 +16,7 @@ from operator import itemgetter
 from typing import Any, Optional
 
 from gen_ai_orchestrator.models.vector_stores.vector_store_provider import VectorStoreProvider
-from gen_ai_orchestrator.models.vector_stores.vector_store_search_type import VectorStoreSearchType
+from gen_ai_orchestrator.models.vector_stores.vector_store_search_type import DocumentSearchType
 from langchain_core.documents import Document
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.output_parsers import JsonOutputParser
@@ -314,7 +314,7 @@ def create_rag_chain(
 
     search_kwargs = request.document_search_params.to_dict()
 
-    if VectorStoreProvider.OPEN_SEARCH == request.document_search_params.provider or VectorStoreSearchType.SIMILARITY_SEARCH == request.document_search_params.search_type:
+    if VectorStoreProvider.OPEN_SEARCH == request.document_search_params.provider or DocumentSearchType.SIMILARITY_SEARCH == request.document_search_params.search_type:
         similarity_retriever = SimilarityRetriever(vector_retriever=vector_store_factory.get_vector_store_retriever(
             search_kwargs=search_kwargs,
             async_mode=vector_db_async_mode,
@@ -324,7 +324,7 @@ def create_rag_chain(
             name="similarity_retriever_retrieve", func=similarity_retriever.retrieve
         )
 
-    elif VectorStoreSearchType.HYBRID_SEARCH == request.document_search_params.search_type:
+    elif DocumentSearchType.HYBRID_SEARCH == request.document_search_params.search_type:
         vector_retriever = vector_store_factory.get_similarity_search_with_score_retriever(
             search_kwargs=search_kwargs,
             async_mode=vector_db_async_mode,
@@ -344,7 +344,7 @@ def create_rag_chain(
         )
 
     else:
-        # VectorStoreSearchType.FULL_TEXT_SEARCH == request.document_search_params.search_type
+        # DocumentSearchType.FULL_TEXT_SEARCH == request.document_search_params.search_type
         fts_as_retriever = FTSRetriever(
             fts_retriever=vector_store_factory.get_text_store_retriever(
                 search_kwargs=search_kwargs,

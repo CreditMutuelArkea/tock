@@ -24,24 +24,27 @@ data class OpenSearchVectorStoreSetting<T>(
     override val username: String,
     override val password: T,
 ) : VectorStoreSettingBase<T>(
-        provider = VectorStoreProvider.OpenSearch,
-        host = host,
-        port = port,
-        username = username,
-        password = password,
-    ) {
+    provider = VectorStoreProvider.OpenSearch,
+    host = host,
+    port = port,
+    username = username,
+    password = password,
+) {
     override fun normalizeDocumentIndexName(
         namespace: String,
         botId: String,
         indexSessionId: String,
     ): String = OpenSearchUtils.normalizeDocumentIndexName(namespace, botId, indexSessionId)
 
-    override fun getDocumentSearchParams(kNeighborsDocuments: Int): OpenSearchParams = OpenSearchParams(k = kNeighborsDocuments, filter = null)
+    override fun getDocumentSearchParams(kNeighborsDocuments: Int, documentSearchType: DocumentSearchType): OpenSearchParams = OpenSearchParams(
+        k = kNeighborsDocuments, filter = null, searchType = DocumentSearchType.SIMILARITY_SEARCH
+    )
 }
 
 data class OpenSearchParams(
     val k: Int,
     val filter: List<Term>? = null,
+    val searchType: DocumentSearchType,
 ) : DocumentSearchParamsBase(VectorStoreProvider.OpenSearch)
 
 data class Term(

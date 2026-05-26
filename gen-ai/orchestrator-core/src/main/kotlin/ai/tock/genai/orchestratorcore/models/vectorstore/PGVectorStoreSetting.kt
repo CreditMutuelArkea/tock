@@ -25,22 +25,25 @@ data class PGVectorStoreSetting<T>(
     override val password: T,
     val database: String,
 ) : VectorStoreSettingBase<T>(
-        provider = VectorStoreProvider.PGVector,
-        host = host,
-        port = port,
-        username = username,
-        password = password,
-    ) {
+    provider = VectorStoreProvider.PGVector,
+    host = host,
+    port = port,
+    username = username,
+    password = password,
+) {
     override fun normalizeDocumentIndexName(
         namespace: String,
         botId: String,
         indexSessionId: String,
     ): String = PGVectorUtils.normalizeDocumentIndexName(namespace, botId, indexSessionId)
 
-    override fun getDocumentSearchParams(kNeighborsDocuments: Int): PGVectorParams = PGVectorParams(k = kNeighborsDocuments, filter = null)
+    override fun getDocumentSearchParams(kNeighborsDocuments: Int, documentSearchType: DocumentSearchType): PGVectorParams = PGVectorParams(
+        k = kNeighborsDocuments, filter = null, searchType = documentSearchType
+    )
 }
 
 data class PGVectorParams(
     val k: Int,
     val filter: Map<String, String>? = null,
+    val searchType: DocumentSearchType,
 ) : DocumentSearchParamsBase(VectorStoreProvider.PGVector)

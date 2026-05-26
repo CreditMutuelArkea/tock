@@ -12,14 +12,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-"""VectorStoreSearchType Enumeration."""
+"""DocumentSearchType Enumeration."""
 
 from enum import Enum, unique
 
-search_type: VectorStoreSearchType
-
 @unique
-class VectorStoreSearchType(str, Enum):
+class DocumentSearchType(str, Enum):
     """Enumeration to list Vector Store Search Types"""
 
     SIMILARITY_SEARCH = 'SIMILARITY_SEARCH'
