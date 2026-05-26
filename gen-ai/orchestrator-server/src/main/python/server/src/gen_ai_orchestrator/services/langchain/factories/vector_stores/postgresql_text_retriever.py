@@ -26,13 +26,15 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
             WITH q AS (
                 SELECT websearch_to_tsquery(:language, unaccent(:query)) AS ts_query
             )
-            SELECT d.document, d.cmetadata,
-                ts_rank(to_tsvector(:language, unaccent(d.document)), q.ts_query) AS score
+            SELECT
+                d.document,
+                d.cmetadata,
+                ts_rank(d.fts_vector, q.ts_query) AS score
             FROM langchain_pg_embedding d
             JOIN langchain_pg_collection lpc ON lpc.uuid = d.collection_id
             CROSS JOIN q
             WHERE lpc.name = :table_name
-              AND to_tsvector(:language, unaccent(d.document)) @@ q.ts_query
+              AND d.fts_vector @@ q.ts_query
             ORDER BY score DESC
             LIMIT :k
         """)
@@ -88,7 +90,7 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
         return " OR ".join(parts)
 
 
-# # TODO TU + Log
+# # TODO TU + Log + debug
 # if __name__ == "__main__":
 #     keywords = [
 #         "Caisse primaire d'assurance maladie",

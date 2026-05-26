@@ -20,10 +20,8 @@ from typing import List, Optional
 
 from langchain_core.documents import Document
 from langchain_core.embeddings import Embeddings
-from langchain_core.retrievers import BaseRetriever
 from langchain_core.vectorstores import VectorStore, VectorStoreRetriever
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from gen_ai_orchestrator.configurations.environment.settings import (
     application_settings,
@@ -71,14 +69,6 @@ class LangChainVectorStoreFactory(ABC, BaseModel):
             async_mode: enable/disable the async_mode for vector DB client (if supported). Default to True.
         :return: A VectorStoreRetriever.
         """
-        pass
-
-    @abstractmethod
-    def get_similarity_search_with_score_retriever(
-            self,
-            search_kwargs: dict,
-            async_mode: bool = True
-    ) -> BaseRetriever:
         pass
 
     @abstractmethod

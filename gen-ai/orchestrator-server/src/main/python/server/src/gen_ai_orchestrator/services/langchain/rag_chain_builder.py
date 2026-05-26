@@ -325,7 +325,7 @@ def create_rag_chain(
         )
 
     elif DocumentSearchType.HYBRID_SEARCH == request.document_search_params.search_type:
-        vector_retriever = vector_store_factory.get_similarity_search_with_score_retriever(
+        vector_retriever = vector_store_factory.get_vector_store_retriever(
             search_kwargs=search_kwargs,
             async_mode=vector_db_async_mode,
         )
@@ -337,6 +337,7 @@ def create_rag_chain(
         hybrid_retriever = HybridRetriever(
             vector_retriever=vector_retriever,
             fts_retriever=fts_retriever,
+            rrf_top_n=request.document_search_params.k
         )
 
         retriever = RunnableLambda(
