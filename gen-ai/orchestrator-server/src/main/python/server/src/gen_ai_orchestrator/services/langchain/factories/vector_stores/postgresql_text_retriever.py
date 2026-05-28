@@ -48,21 +48,6 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
             for row in rows
         ]
 
-        logger.info("--------------")
-        logger.info("Retrieved %s documents", len(docs))
-
-        for i, d in enumerate(docs, start=1):
-            logger.info(
-                "[SQL][Doc %s] id=%s | chunk=%s | title=%s | source=%s",
-                i,
-                d.metadata.get("id"),
-                d.metadata.get("chunk"),
-                d.metadata.get("title"),
-                d.metadata.get("source"),
-            )
-
-        logger.info("--------------")
-
         return docs
 
     def _get_relevant_documents(self, query: str) -> list[Document]:
@@ -88,14 +73,3 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
 
         return " OR ".join(parts)
 
-
-# # TODO TU + Log + debug
-# if __name__ == "__main__":
-#     keywords = [
-#         "Caisse primaire d'assurance maladie",
-#         "CPAM",
-#         "assurance maladie"
-#     ]
-#
-#     print(prepare_query(keywords))
-#     # Expected : Caisse primaire d''assurance maladie OR CPAM OR assurance maladie
