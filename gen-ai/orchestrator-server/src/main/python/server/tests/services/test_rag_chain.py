@@ -55,12 +55,12 @@ from gen_ai_orchestrator.services.langchain.rag_chain import (
 )
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.create_rag_chain')
 @patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGCallbackHandler')
-@patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGResponse')
-@patch('gen_ai_orchestrator.services.langchain.rag_chain.RAGDebugData')
-@patch('gen_ai_orchestrator.services.langchain.rag_chain.get_llm_answer')
+@patch('gen_ai_orchestrator.services.langchain.rag_response_builder.RAGResponse')
+@patch('gen_ai_orchestrator.services.langchain.rag_response_builder.RAGDebugData')
+@patch('gen_ai_orchestrator.services.langchain.rag_response_builder.get_llm_answer_from_raw')
 @pytest.mark.asyncio
 async def test_rag_chain(
-    mocked_get_llm_answer,
+    mocked_get_llm_answer_from_raw,
     mocked_rag_debug_data,
     mocked_rag_response,
     mocked_callback_init,
@@ -109,6 +109,26 @@ Answer in {locale}:""",
                 'locale': 'French',
             },
         },
+
+        'question_condensing_llm_setting': {
+            'provider': 'OpenAI',
+            'api_key': {
+                'type': 'Raw',
+                'secret': 'ab7***************************A1IV4B',
+            },
+            'temperature': 1.2,
+            'model': 'gpt-3.5-turbo',
+        },
+        'question_condensing_prompt': {
+            'formatter': 'f-string',
+            'template': "Use the following history to reformulate the user question",
+            'inputs': {
+                'question': 'How to get started playing guitar ?',
+                'no_answer': 'Sorry, I don t know.',
+                'locale': 'French',
+            },
+        },
+
         'embedding_question_em_setting': {
             'provider': 'OpenAI',
             'api_key': {
@@ -217,7 +237,7 @@ Answer in {locale}:""",
     # Assert the response is build using the expected settings
     mocked_rag_response.assert_called_once_with(
         answer=llm_answer,
-        footnotes=set(),
+        footnotes=list(),
         debug=mocked_rag_debug_data(request, mocked_rag_answer, mocked_callback, 1),
         observability_info=None,
     )

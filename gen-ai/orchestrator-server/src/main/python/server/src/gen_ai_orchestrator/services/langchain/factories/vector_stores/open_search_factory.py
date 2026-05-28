@@ -31,6 +31,8 @@ from gen_ai_orchestrator.errors.handlers.opensearch.opensearch_exception_handler
 from gen_ai_orchestrator.models.vector_stores.open_search.open_search_setting import (
     OpenSearchVectorStoreSetting,
 )
+from gen_ai_orchestrator.services.langchain.factories.vector_stores.full_text_search_retriever import \
+    FullTextSearchRetriever
 from gen_ai_orchestrator.services.langchain.factories.vector_stores.vector_store_factory import (
     LangChainVectorStoreFactory,
 )
@@ -78,6 +80,13 @@ class OpenSearchFactory(LangChainVectorStoreFactory):
         return self.get_vector_store(async_mode).as_retriever(
             search_kwargs=search_kwargs
         )
+
+    def get_text_store_retriever(
+            self,
+            search_kwargs: dict,
+            async_mode: bool = True
+    ) -> FullTextSearchRetriever:
+        raise NotImplementedError
 
     @opensearch_exception_handler
     async def check_vector_store_connection(self) -> bool:

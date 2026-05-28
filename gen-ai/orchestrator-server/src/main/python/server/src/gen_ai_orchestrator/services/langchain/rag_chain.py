@@ -176,6 +176,14 @@ async def execute_rag_chain(
 
     llm_answer = LLMAnswer(**chain_output["answer"])
 
+    # Guardrail
+    if request.guardrail_setting:
+        guardrail = get_guardrail_factory(
+            setting=request.guardrail_setting
+        ).get_parser()
+        guardrail_output = guardrail.parse(llm_answer.answer)
+        check_guardrail_output(guardrail_output)
+
     rag_duration = "{:.3f}".format(time.time() - start_time)
     logger.info("RAG chain - End of execution. (Duration: %s seconds)", rag_duration)
 
@@ -188,3 +196,15 @@ async def execute_rag_chain(
         rag_duration=rag_duration,
         debug=debug,
     )
+
+def check_guardrail_output(guardrail_output: dict) -> bool:
+    """Checks if the guardrail detected toxicities.
+    Args:
+        guardrail_output: The guardrail output dictionnary
+    Returns:
+        Returns True if nothing is detected, raises an exception otherwise.
+    """
+    if guardrail_output['output_toxicity']:
+        message = f"Toxicity detected in LLM output ({','.join(guardrail_output['output_toxicity_reason'])})"
+        raise GenAIGuardCheckException(ErrorInfo(cause=message))
+    return True
