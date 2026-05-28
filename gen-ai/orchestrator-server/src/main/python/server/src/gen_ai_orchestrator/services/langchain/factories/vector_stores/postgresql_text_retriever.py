@@ -44,7 +44,7 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
 
     def build_docs(self, rows) -> list[Document]:
         docs = [
-            Document(page_content=row.document, metadata=row.cmetadata | {"text_score": row.score})
+            Document(page_content=row.document, metadata=row.cmetadata)
             for row in rows
         ]
 
@@ -53,11 +53,10 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
 
         for i, d in enumerate(docs, start=1):
             logger.info(
-                "[SQL][Doc %s] id=%s | chunk=%s | score=%.7f | title=%s | source=%s",
+                "[SQL][Doc %s] id=%s | chunk=%s | title=%s | source=%s",
                 i,
                 d.metadata.get("id"),
                 d.metadata.get("chunk"),
-                d.metadata.get("text_score", 0.0),
                 d.metadata.get("title"),
                 d.metadata.get("source"),
             )
@@ -67,13 +66,13 @@ class PostgreSQLTextRetriever(FullTextSearchRetriever):
         return docs
 
     def _get_relevant_documents(self, query: str) -> list[Document]:
-        logger.info("Query : %s ", query)
+        logger.debug("Query : %s ", query)
         with self.engine.connect() as conn:
             rows = conn.execute(self.build_sql(), self.build_params(query)).fetchall()
         return self.build_docs(rows)
 
     async def _aget_relevant_documents(self, query: str) -> list[Document]:
-        logger.info("Query : %s ", query)
+        logger.debug("Query : %s ", query)
         async with self.engine.connect() as conn:
             result = await conn.execute(self.build_sql(), self.build_params(query))
             rows = result.fetchall()

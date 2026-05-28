@@ -81,8 +81,8 @@ def format_documents_as_context(documents: list[Document]) -> str:
 
 def apply_rrf_ranking(
         ranked_results: list[list[Document]],
-        k: int = 60,
-        top_n: int = 7,
+        k: int,
+        top_n: int,
 ) -> list[Document]:
     """
     Reciprocal Rank Fusion over multiple ranked document lists.
@@ -93,10 +93,11 @@ def apply_rrf_ranking(
     """
 
     def doc_key(doc: Document) -> tuple:
-        return (doc.metadata.get("id"), doc.metadata.get("chunk"))
+        return doc.metadata.get("id"), doc.metadata.get("chunk")
 
     # Accumulate RRF scores
     scores: dict[tuple, float] = {}
+
     for results in ranked_results:
         for rank, doc in enumerate(results, start=1):
             key = doc_key(doc)
@@ -104,9 +105,20 @@ def apply_rrf_ranking(
 
     # Deduplicate while preserving any Document instance
     unique_docs: dict[tuple, Document] = {}
+
     for results in ranked_results:
         for doc in results:
-            unique_docs.setdefault(doc_key(doc), doc)
+            key = doc_key(doc)
+
+            if key not in unique_docs:
+                unique_docs[key] = doc
+            else:
+                # Merge metadata from duplicate doc
+                existing = unique_docs[key]
+
+                for meta_key, meta_value in doc.metadata.items():
+                    if meta_key not in existing.metadata:
+                        existing.metadata[meta_key] = meta_value
 
     # Attach the computed score and sort
     ranked_docs = sorted(
@@ -114,30 +126,10 @@ def apply_rrf_ranking(
         key=lambda doc: scores[doc_key(doc)],
         reverse=True,
     )
-    for doc in ranked_docs:
-        doc.metadata["rrf_score"] = scores[doc_key(doc)]
-
-    _log_rrf_results(ranked_docs)
+    for rank, doc in enumerate(ranked_docs, start=1):
+        doc.metadata["rrf_rank"] = f'{rank}/{len(ranked_docs)}'
 
     return ranked_docs[:top_n]
-
-
-def _log_rrf_results(docs: list[Document]) -> None:
-    logger.info("-" * 14)
-    logger.info("RRF %d docs", len(docs))
-    for i, d in enumerate(docs, start=1):
-        logger.info(
-            "[RRF][Doc %s] id=%s | chunk=%s | tscore=%5f | v_score=%.5f | rrf_score=%.5f | title=%s | source=%s",
-            i,
-            d.metadata.get("id"),
-            d.metadata.get("chunk"),
-            d.metadata.get("text_score", 0.0),
-            d.metadata.get("vector_score", 0.0),
-            d.metadata.get("rrf_score", 0.0),
-            d.metadata.get("title"),
-            d.metadata.get("source"),
-        )
-    logger.info("-" * 14)
 
 
 # ---------------------------------------------------------------------------
@@ -167,6 +159,9 @@ class HybridRetriever:
             ),
         )
 
+        add_rank_metadata(docs=docs_vector, metadata_key="similarity_rank")
+        add_rank_metadata(docs=docs_fts, metadata_key="fts_rank")
+
         result = apply_rrf_ranking(
             [docs_vector, docs_fts],
             k=self.rrf_k,
@@ -187,7 +182,12 @@ class SimilarityRetriever:
 
     async def retrieve(self, inputs: dict) -> list[Document]:
         condensed_question = inputs["chat_chain_result"]["condensed_question"]
-        return await self.vector_retriever.ainvoke(input=condensed_question)
+        ranked_docs = await self.vector_retriever.ainvoke(input=condensed_question)
+
+        return add_rank_metadata(
+            docs=ranked_docs,
+            metadata_key="similarity_rank",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -202,9 +202,26 @@ class FTSRetriever:
     async def retrieve(self, inputs: dict) -> list[Document]:
         key_words = inputs["chat_chain_result"]["key_words"]
 
-        return await self.fts_retriever.ainvoke(
+        ranked_docs = await self.fts_retriever.ainvoke(
             input=self.fts_retriever.prepare_query(key_words)
         )
+
+        return add_rank_metadata(
+            docs=ranked_docs,
+            metadata_key="fts_rank",
+        )
+
+
+def add_rank_metadata(
+        docs: list[Document],
+        metadata_key: str,
+) -> list[Document]:
+    total = len(docs)
+
+    for rank, doc in enumerate(docs, start=1):
+        doc.metadata[metadata_key] = f"{rank}/{total}"
+
+    return docs
 
 
 # ---------------------------------------------------------------------------
@@ -246,7 +263,6 @@ def create_rag_chain(
         request: RAGRequest,
         vector_db_async_mode: Optional[bool] = True,
 ) -> RunnableSerializable[Any, dict[str, Any]]:
-
     # -- Validate prompts --------------------------------------------------
     validate_prompt_template(
         request.question_condensing_prompt, "Question condensing prompt"
@@ -325,7 +341,7 @@ def create_rag_chain(
 
     rag_prompt = LangChainPromptTemplate.from_template(
         template=request.question_answering_prompt.template,
-        template_format=request.question_answering_prompt.formatter.value, # type: ignore[arg-type]
+        template_format=request.question_answering_prompt.formatter.value,  # type: ignore[arg-type]
         partial_variables=request.question_answering_prompt.inputs,
     )
 

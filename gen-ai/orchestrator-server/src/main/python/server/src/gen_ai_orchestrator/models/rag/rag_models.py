@@ -34,9 +34,6 @@ class Source(BaseModel):
     content: str = Field(
         description='Source content', examples=['Tock: The Open Conversation Kit']
     )
-    score: Optional[float] = Field(
-        description='The compressor score', examples=[0.9149009585380554], default=None
-    )
 
     def __eq__(self, other):
         """

@@ -130,7 +130,7 @@ class RAGResponse(BaseModel):
     """The RAG response model"""
 
     answer: Optional[LLMAnswer] = Field(description='The RAG answer')
-    footnotes: set[Footnote] = Field(description='Set of footnotes')
+    footnotes: list[Footnote] = Field(description='List of footnotes')
     debug: Optional[Any] = Field(
         description='Debug data',
         examples=[{'action': 'retrieve', 'result': 'OK', 'errors': []}],

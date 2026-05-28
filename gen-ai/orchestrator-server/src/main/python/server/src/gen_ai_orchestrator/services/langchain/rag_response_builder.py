@@ -42,11 +42,34 @@ def get_source_content(doc: Document) -> str:
         return doc.page_content[len(title_prefix):]
     return doc.page_content
 
+def extract_rank(value: str | None) -> int:
+    """
+    Convert "3/15" -> 3
+    Missing value -> very large number
+    """
+    if not value:
+        return 999999
+
+    return int(value.split("/")[0])
+
+def footnote_sort_key(doc: Document) -> tuple[int, int]:
+    metadata = doc.metadata
+
+    if "rrf_rank" in metadata:
+        return 0, extract_rank(metadata["rrf_rank"])
+
+    if "similarity_rank" in metadata:
+        return 1, extract_rank(metadata["similarity_rank"])
+
+    if "fts_rank" in metadata:
+        return 2, extract_rank(metadata["fts_rank"])
+
+    return 3, 999999
 
 def build_footnotes(
     documents: list[Document],
     llm_answer: LLMAnswer,
-) -> set[Footnote]:
+) -> list[Footnote]:
     """
     Return one Footnote per document whose chunk was actually used in the
     LLM answer (according to context_usage).
@@ -57,18 +80,27 @@ def build_footnotes(
         if ctx.used_in_response
     }
 
-    return {
+    used_docs = [
+        doc
+        for doc in documents
+        if doc.metadata["id"] in used_chunk_ids
+    ]
+
+    sorted_docs = sorted(
+        used_docs,
+        key=footnote_sort_key,
+    )
+
+    return [
         Footnote(
             identifier=doc.metadata["id"],
             title=doc.metadata["title"],
             url=doc.metadata["source"],
             content=get_source_content(doc),
-            score=doc.metadata.get("retriever_score"),
             metadata=doc.metadata.copy(),
         )
-        for doc in documents
-        if doc.metadata["id"] in used_chunk_ids
-    }
+        for doc in sorted_docs
+    ]
 
 
 # ---------------------------------------------------------------------------
