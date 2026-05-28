@@ -53,16 +53,16 @@ def extract_rank(value: str | None) -> int:
     return int(value.split("/")[0])
 
 def footnote_sort_key(doc: Document) -> tuple[int, int]:
-    metadata = doc.metadata
+    rank_metadata = doc.metadata["rank"] or {}
 
-    if "rrf_rank" in metadata:
-        return 0, extract_rank(metadata["rrf_rank"])
+    if "rrf" in rank_metadata:
+        return 0, extract_rank(rank_metadata["rrf"])
 
-    if "similarity_rank" in metadata:
-        return 1, extract_rank(metadata["similarity_rank"])
+    if "similarity" in rank_metadata:
+        return 1, extract_rank(rank_metadata["similarity"])
 
-    if "fts_rank" in metadata:
-        return 2, extract_rank(metadata["fts_rank"])
+    if "fts" in rank_metadata:
+        return 2, extract_rank(rank_metadata["fts"])
 
     return 3, 999999
 

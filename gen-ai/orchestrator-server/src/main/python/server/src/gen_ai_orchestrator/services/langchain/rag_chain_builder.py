@@ -127,7 +127,7 @@ def apply_rrf_ranking(
         reverse=True,
     )
     for rank, doc in enumerate(ranked_docs, start=1):
-        doc.metadata["rrf_rank"] = f'{rank}/{len(ranked_docs)}'
+        doc.metadata["rank"]["rrf"] = f'{rank}/{len(ranked_docs)}'
 
     return ranked_docs[:top_n]
 
@@ -159,8 +159,8 @@ class HybridRetriever:
             ),
         )
 
-        add_rank_metadata(docs=docs_vector, metadata_key="similarity_rank")
-        add_rank_metadata(docs=docs_fts, metadata_key="fts_rank")
+        add_rank_metadata(docs=docs_vector, metadata_key="similarity")
+        add_rank_metadata(docs=docs_fts, metadata_key="fts")
 
         result = apply_rrf_ranking(
             [docs_vector, docs_fts],
@@ -186,7 +186,7 @@ class SimilarityRetriever:
 
         return add_rank_metadata(
             docs=ranked_docs,
-            metadata_key="similarity_rank",
+            metadata_key="similarity",
         )
 
 
@@ -208,7 +208,7 @@ class FTSRetriever:
 
         return add_rank_metadata(
             docs=ranked_docs,
-            metadata_key="fts_rank",
+            metadata_key="fts",
         )
 
 
@@ -219,7 +219,9 @@ def add_rank_metadata(
     total = len(docs)
 
     for rank, doc in enumerate(docs, start=1):
-        doc.metadata[metadata_key] = f"{rank}/{total}"
+        if "rank" not in doc.metadata:
+            doc.metadata["rank"] = {}
+        doc.metadata["rank"][metadata_key] = f"{rank}/{total}"
 
     return docs
 
