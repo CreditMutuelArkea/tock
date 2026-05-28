@@ -193,7 +193,7 @@ async def execute_rag_chain(
         request=request,
         records_callback_handler=records_handler,
         observability_handler=observability_handler,
-        rag_duration=rag_duration,
+        rag_duration=float(rag_duration),
         debug=debug,
     )
 

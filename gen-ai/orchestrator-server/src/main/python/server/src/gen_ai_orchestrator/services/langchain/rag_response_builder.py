@@ -138,7 +138,7 @@ def get_llm_answer_from_raw(rag_chain_output: str | None) -> LLMAnswer:
 def build_rag_debug_data(
     request: RAGRequest,
     records_callback_handler: RAGCallbackHandler,
-    rag_duration: str,
+    rag_duration: float,
 ) -> RAGDebugData:
     history = request.dialog.history if request.dialog else []
 
@@ -146,7 +146,7 @@ def build_rag_debug_data(
         user_question=request.question_answering_prompt.inputs["question"],
         question_condensing_prompt=records_callback_handler.records.get("chat_prompt"),
         question_condensing_history=history,
-        condensed_question="",
+        condensed_question="", # TODO MASS
         question_answering_prompt=records_callback_handler.records.get("rag_prompt"),
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,
@@ -166,7 +166,7 @@ def build_rag_response(
     request: RAGRequest,
     records_callback_handler: RAGCallbackHandler,
     observability_handler,
-    rag_duration: str,
+    rag_duration: float,
     debug: bool,
 ) -> RAGResponse:
     """Assemble the final RAGResponse from all intermediate results."""
