@@ -1,4 +1,5 @@
 import logging
+from threading import RLock
 
 from cachetools import TTLCache
 from sqlalchemy import create_engine, Engine
@@ -28,6 +29,7 @@ class DatabasePool:
 class DatabasePoolRegistry:
     def __init__(self, ttl: int = _POOL_TTL_SECONDS):
         self._cache: TTLCache = TTLCache(maxsize=128, ttl=ttl)
+        self._lock = RLock()
 
     @staticmethod
     def _conn_string(setting: PGVectorStoreSetting) -> str:
@@ -44,13 +46,14 @@ class DatabasePoolRegistry:
         )
 
     def get_or_create(self, setting: PGVectorStoreSetting) -> DatabasePool:
-        if setting not in self._cache:
-            logger.info(f"New pool [{setting.provider.name}] {setting.host}/{setting.database}")
-            self._cache[setting] = DatabasePool(self._conn_string(setting))
-        else:
-            logger.debug(f"Pool [{setting.provider.name}] reused")
+        with self._lock:
+            if setting not in self._cache:
+                logger.info(f"New pool [{setting.provider.name}] {setting.host}/{setting.database}")
+                self._cache[setting] = DatabasePool(self._conn_string(setting))
+            else:
+                logger.debug(f"Pool [{setting.provider.name}] reused")
 
-        return self._cache[setting]
+            return self._cache[setting]
 
 
 db_pool_registry = DatabasePoolRegistry()
