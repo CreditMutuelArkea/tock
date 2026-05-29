@@ -146,7 +146,7 @@ def build_rag_debug_data(
         user_question=request.question_answering_prompt.inputs["question"],
         question_condensing_prompt=records_callback_handler.records.get("chat_prompt"),
         question_condensing_history=history,
-        condensed_question="", # TODO MASS
+        condensed_question=records_callback_handler.records.get("chat_chain_result"),
         question_answering_prompt=records_callback_handler.records.get("rag_prompt"),
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,
