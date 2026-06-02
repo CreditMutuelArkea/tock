@@ -226,10 +226,7 @@ class RAGDebugData(QADebugData):
     question_condensing_history: list[ChatMessage] = Field(
         description="Conversation history, used to reformulate the user's question."
     )
-    condensed_question: Optional[str] = Field(
-        description='The question rephrased with the history of the conversation.',
-        examples=['Hello, how to plan a trip to Morocco ?'],
-    )
+    condensing_llm_answer: LLMCondensedQuestion = Field(description='The LLM''s condensed answer.')
     question_answering_prompt: Optional[str] = Field(
         description='The question answering prompt.',
         examples=[

@@ -16,7 +16,7 @@ from gen_ai_orchestrator.models.rag.rag_models import (
     LLMAnswer,
     RAGDebugData,
     RAGDocument,
-    RAGDocumentMetadata,
+    RAGDocumentMetadata, LLMCondensedQuestion,
 )
 from gen_ai_orchestrator.routers.requests.requests import RAGRequest
 from gen_ai_orchestrator.routers.responses.responses import RAGResponse
@@ -121,19 +121,31 @@ def get_rag_documents(handler: RAGCallbackHandler) -> List[RAGDocument]:
     ]
 
 
-def get_llm_answer_from_raw(rag_chain_output: str | None) -> LLMAnswer:
+def get_llm_answer_from_raw(output: str | None) -> LLMAnswer:
     """Parse a raw JSON string (possibly fenced with ```json```) into an LLMAnswer."""
-    if rag_chain_output is None:
+    if output is None:
         return LLMAnswer()
 
     cleaned = (
-        rag_chain_output.strip()
+        output.strip()
         .removeprefix("```json")
         .removesuffix("```")
         .strip()
     )
     return LLMAnswer(**json.loads(cleaned))
 
+def get_condensing_llm_answer_from_raw(output: str | None) -> LLMCondensedQuestion:
+    """Parse a raw JSON string (possibly fenced with ```json```) into an LLMCondensedQuestion."""
+    if output is None:
+        return LLMCondensedQuestion()
+
+    cleaned = (
+        output.strip()
+        .removeprefix("```json")
+        .removesuffix("```")
+        .strip()
+    )
+    return LLMCondensedQuestion(**json.loads(cleaned))
 
 def build_rag_debug_data(
     request: RAGRequest,
@@ -146,7 +158,7 @@ def build_rag_debug_data(
         user_question=request.question_answering_prompt.inputs["question"],
         question_condensing_prompt=records_callback_handler.records.get("chat_prompt"),
         question_condensing_history=history,
-        condensed_question=records_callback_handler.records.get("chat_chain_result"),
+        condensing_llm_answer=get_condensing_llm_answer_from_raw(records_callback_handler.records.get("rag_question_condensation_chain_output")),
         question_answering_prompt=records_callback_handler.records.get("rag_prompt"),
         documents=get_rag_documents(records_callback_handler),
         document_index_name=request.document_index_name,

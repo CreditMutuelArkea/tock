@@ -51,7 +51,6 @@ def get_health() -> AppCheckResponse:
     """
     logger.debug('Health check -> OK')
     return AppCheckResponse(status='OK')
-    # TODO : Add a check for OpenSearch
     # https://docs.aws.amazon.com/opensearch-service/latest/developerguide/supported-operations.html
 
 
