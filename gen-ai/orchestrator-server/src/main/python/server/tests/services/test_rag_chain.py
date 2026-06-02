@@ -58,8 +58,10 @@ from gen_ai_orchestrator.services.langchain.rag_chain import (
 @patch('gen_ai_orchestrator.services.langchain.rag_response_builder.RAGResponse')
 @patch('gen_ai_orchestrator.services.langchain.rag_response_builder.RAGDebugData')
 @patch('gen_ai_orchestrator.services.langchain.rag_response_builder.get_llm_answer_from_raw')
+@patch('gen_ai_orchestrator.services.langchain.rag_response_builder.get_condensing_llm_answer_from_raw')
 @pytest.mark.asyncio
 async def test_rag_chain(
+    mocked_get_condensing_llm_answer_from_raw,
     mocked_get_llm_answer_from_raw,
     mocked_rag_debug_data,
     mocked_rag_response,
