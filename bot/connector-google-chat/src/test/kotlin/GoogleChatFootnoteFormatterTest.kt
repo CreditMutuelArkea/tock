@@ -76,7 +76,7 @@ class GoogleChatFootnoteFormatterTest {
             """
             Here's some info
 
-            *Source :*
+            *Sources :*
             <https://google.com|Google>
             """.trimIndent(),
             result,
@@ -102,7 +102,7 @@ class GoogleChatFootnoteFormatterTest {
             """
             Sources below
 
-            *Source:* [[1]](https://tock.ai)
+            *Sources:* [[1]](https://tock.ai)
             """.trimIndent(),
             result,
         )
@@ -184,7 +184,7 @@ class GoogleChatFootnoteFormatterTest {
                     """
                     References
 
-                    *Source :*
+                    *Sources :*
                     <https://doc.com|Doc>
                     """.trimIndent(),
                 ),
