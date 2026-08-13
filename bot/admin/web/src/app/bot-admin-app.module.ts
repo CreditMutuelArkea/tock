@@ -40,33 +40,41 @@ import { BotService } from './bot/bot-service';
 import { BotAdminAppRoutingModule } from './bot-admin-app-routing.module';
 import { NlpService } from './core-nlp/nlp.service';
 import { TranslocoRootModule } from './transloco-root.module';
+import { EnvBannerComponent } from './shared/env-banner/env-banner.component';
 
-@NgModule({ declarations: [BotAdminAppComponent],
-    bootstrap: [BotAdminAppComponent], imports: [BrowserModule,
-        BrowserAnimationsModule,
-        CoreModule,
-        BotSharedModule,
-        BotCoreModule,
-        BotAdminAppRoutingModule,
-        ThemeModule.forRoot(),
-        NbSidebarModule.forRoot(),
-        NbMenuModule.forRoot(),
-        NbDatepickerModule.forRoot(),
-        NbTimepickerModule.forRoot(),
-        NbDialogModule.forRoot(),
-        NbWindowModule.forRoot(),
-        NbToastrModule.forRoot(),
-        NbThemeModule.forRoot({ name: 'default' }),
-        TranslocoRootModule], providers: [
-        {
-            provide: APP_BASE_HREF,
-            useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
-            deps: [PlatformLocation]
-        },
-        BotService,
-        NlpService,
-        provideHttpClient(withInterceptorsFromDi())
-    ] })
+@NgModule({
+  declarations: [BotAdminAppComponent],
+  bootstrap: [BotAdminAppComponent],
+  imports: [
+    BrowserModule,
+    BrowserAnimationsModule,
+    CoreModule,
+    BotSharedModule,
+    BotCoreModule,
+    BotAdminAppRoutingModule,
+    ThemeModule.forRoot(),
+    NbSidebarModule.forRoot(),
+    NbMenuModule.forRoot(),
+    NbDatepickerModule.forRoot(),
+    NbTimepickerModule.forRoot(),
+    NbDialogModule.forRoot(),
+    NbWindowModule.forRoot(),
+    NbToastrModule.forRoot(),
+    NbThemeModule.forRoot({ name: 'default' }),
+    TranslocoRootModule,
+    EnvBannerComponent
+  ],
+  providers: [
+    {
+      provide: APP_BASE_HREF,
+      useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
+      deps: [PlatformLocation]
+    },
+    BotService,
+    NlpService,
+    provideHttpClient(withInterceptorsFromDi())
+  ]
+})
 export class BotAdminAppModule {
   constructor(private iconLibraries: NbIconLibraries) {
     this.iconLibraries.registerFontPack('bootstrap-icons', { iconClassPrefix: 'bi' });

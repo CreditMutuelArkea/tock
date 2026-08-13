@@ -98,6 +98,7 @@
     "open-test-dialog": "Open a test dialog",
     "logout": "Logout"
   },
+  "env-banner": { "hide": "Hide environment indicator" },
   "menu": {
     "language-understanding": "Language Understanding",
     "stories-answers": "Stories & Answers",

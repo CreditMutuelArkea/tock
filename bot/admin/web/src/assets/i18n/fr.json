@@ -87,6 +87,7 @@
       "bot": "Bot"
     }
   },
+  "env-banner": { "hide": "Masquer l'indicateur d'environnement" },
   "header": {
     "interface-language": "Langue de l'interface",
     "theme-switch-light": "Passer en mode clair",
