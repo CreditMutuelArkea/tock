@@ -32,6 +32,14 @@ data class GoogleChatConnectorCallback(
     val useThread: Boolean,
 ) : ConnectorCallbackBase(applicationId, googleChatConnectorType) {
     private val logger = KotlinLogging.logger {}
+    var processingMessageName: String? = null
+
+    fun initializeProcessingMessage() {
+        processingMessageName =
+            sendGoogleMessageAndGetName(
+                GoogleChatConnectorTextMessageOut("⏳ Génération en cours…"),
+            )
+    }
 
     /**
      * Called when the UserTimeline is loaded.
@@ -60,7 +68,7 @@ data class GoogleChatConnectorCallback(
             "Sending Google Chat intro message: space=$spaceName" +
                 if (useThread) ", thread=$threadName" else ""
         }
-        sendGoogleMessage(
+        sendGoogleMessageAndGetName(
             GoogleChatConnectorTextMessageOut(message),
         )
     }
@@ -68,7 +76,8 @@ data class GoogleChatConnectorCallback(
     /**
      * Sends message to the Google Chat space/thread.
      */
-    fun sendGoogleMessage(message: GoogleChatConnectorMessage) {
+    fun sendGoogleMessageAndGetName(message: GoogleChatConnectorMessage): String? {
+        var messageName: String? = null
         try {
             val googleMessage = message.toGoogleMessage()
             logger.debug { "Google Message content: $googleMessage" }
@@ -93,12 +102,39 @@ data class GoogleChatConnectorCallback(
             }
 
             val response = request.execute()
-            logger.info { "Google Chat API response: ${response?.name}" }
+            messageName = response?.name
+
+            logger.info { "Google Chat API response: $messageName" }
         } catch (e: Exception) {
             logger.error(e) {
                 "Failed to send Google Chat message: " +
                     "space=$spaceName" +
                     if (useThread) ", thread=$threadName" else ""
+            }
+        }
+        return messageName
+    }
+
+    fun patchGoogleMessage(
+        messageName: String,
+        message: GoogleChatConnectorMessage,
+    ) {
+        try {
+            chatService
+                .spaces()
+                .messages()
+                .patch(
+                    messageName,
+                    message.toGoogleMessage(),
+                )
+                .execute()
+
+            logger.info {
+                "Google Chat message patched: $messageName"
+            }
+        } catch (e: Exception) {
+            logger.error(e) {
+                "Failed to patch Google Chat message: $messageName"
             }
         }
     }
