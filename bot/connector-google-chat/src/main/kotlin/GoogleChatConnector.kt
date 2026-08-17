@@ -89,18 +89,21 @@ class GoogleChatConnector(
 
                             val event = GoogleChatRequestConverter.toEvent(chatEvent, connectorId)
                             executor.executeBlocking {
+                                val callback =
+                                    GoogleChatConnectorCallback(
+                                        connectorId,
+                                        spaceName,
+                                        threadName,
+                                        chatService,
+                                        introMessage,
+                                        useThread,
+                                    )
+
+                                callback.initializeProcessingMessage()
+
                                 controller.handle(
                                     event,
-                                    ConnectorData(
-                                        GoogleChatConnectorCallback(
-                                            connectorId,
-                                            spaceName,
-                                            threadName,
-                                            chatService,
-                                            introMessage,
-                                            useThread,
-                                        ),
-                                    ),
+                                    ConnectorData(callback),
                                 )
                             }
                         }
@@ -126,9 +129,14 @@ class GoogleChatConnector(
         callback as GoogleChatConnectorCallback
 
         executor.executeBlocking(Duration.ofMillis(delayInMs)) {
-            callback.sendGoogleMessage(
-                message,
-            )
+            val processingMessageName = callback.processingMessageName
+
+            if (processingMessageName != null) {
+                callback.patchGoogleMessage(processingMessageName, message)
+                callback.processingMessageName = null
+            } else {
+                callback.sendGoogleMessageAndGetName(message)
+            }
         }
     }
 
