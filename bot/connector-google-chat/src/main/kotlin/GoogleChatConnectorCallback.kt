@@ -19,9 +19,12 @@ package ai.tock.bot.connector.googlechat
 import ai.tock.bot.connector.ConnectorCallbackBase
 import ai.tock.bot.connector.googlechat.builder.googleChatConnectorType
 import ai.tock.bot.engine.user.UserTimeline
+import ai.tock.shared.booleanProperty
 import com.google.api.services.chat.v1.HangoutsChat
 import com.google.api.services.chat.v1.model.Thread
 import mu.KotlinLogging
+
+private val sendIntroMessage: Boolean = booleanProperty("tock_api_google_chat_connector_test_send_intro_message", false)
 
 data class GoogleChatConnectorCallback(
     override val applicationId: String,
@@ -30,6 +33,7 @@ data class GoogleChatConnectorCallback(
     private val chatService: HangoutsChat,
     private val introMessage: String?,
     val useThread: Boolean,
+    private val waitingMessage: String,
 ) : ConnectorCallbackBase(applicationId, googleChatConnectorType) {
     private val logger = KotlinLogging.logger {}
     var processingMessageName: String? = null
@@ -37,7 +41,7 @@ data class GoogleChatConnectorCallback(
     fun initializeProcessingMessage() {
         processingMessageName =
             sendGoogleMessageAndGetName(
-                GoogleChatConnectorTextMessageOut("⏳ Génération en cours…"),
+                GoogleChatConnectorTextMessageOut(waitingMessage),
             )
     }
 
@@ -46,8 +50,9 @@ data class GoogleChatConnectorCallback(
      * Sends the intro message if this is a new conversation (empty dialog).
      */
     override fun initialUserTimelineLoaded(userTimeline: UserTimeline) {
-        if (shouldSendIntro(userTimeline)) {
+        if (shouldSendIntro(userTimeline) || sendIntroMessage) {
             sendIntroMessage()
+            initializeProcessingMessage()
         }
     }
 
@@ -66,11 +71,14 @@ data class GoogleChatConnectorCallback(
         val message = introMessage ?: return
         logger.info {
             "Sending Google Chat intro message: space=$spaceName" +
-                if (useThread) ", thread=$threadName" else ""
+                    if (useThread) ", thread=$threadName" else ""
         }
-        sendGoogleMessageAndGetName(
-            GoogleChatConnectorTextMessageOut(message),
-        )
+        val gMessage = GoogleChatConnectorTextMessageOut(message)
+
+        processingMessageName?.let {
+            patchGoogleMessage(it, gMessage)
+            processingMessageName = null
+        } ?: sendGoogleMessageAndGetName(gMessage)
     }
 
     /**
@@ -88,7 +96,7 @@ data class GoogleChatConnectorCallback(
 
             logger.info {
                 "Sending Google Chat message: space=$spaceName" +
-                    if (useThread) ", thread=$threadName" else ""
+                        if (useThread) ", thread=$threadName" else ""
             }
 
             val request =
@@ -108,8 +116,8 @@ data class GoogleChatConnectorCallback(
         } catch (e: Exception) {
             logger.error(e) {
                 "Failed to send Google Chat message: " +
-                    "space=$spaceName" +
-                    if (useThread) ", thread=$threadName" else ""
+                        "space=$spaceName" +
+                        if (useThread) ", thread=$threadName" else ""
             }
         }
         return messageName

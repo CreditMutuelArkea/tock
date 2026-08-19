@@ -49,6 +49,7 @@ class GoogleChatConnector(
     private val introMessage: String? = null,
     private val useThread: Boolean = false,
     private val sourcesLabel: String,
+    private val waitingMessage: String,
 ) : ConnectorBase(GoogleChatConnectorProvider.connectorType) {
     private val logger = KotlinLogging.logger {}
     private val executor: Executor by injector.instance()
@@ -97,6 +98,7 @@ class GoogleChatConnector(
                                         chatService,
                                         introMessage,
                                         useThread,
+                                        waitingMessage
                                     )
 
                                 callback.initializeProcessingMessage()
