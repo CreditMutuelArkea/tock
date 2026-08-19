@@ -98,7 +98,7 @@ class GoogleChatConnector(
                                         chatService,
                                         introMessage,
                                         useThread,
-                                        waitingMessage
+                                        waitingMessage,
                                     )
 
                                 callback.initializeProcessingMessage()

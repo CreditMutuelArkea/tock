@@ -130,7 +130,7 @@ internal object GoogleChatConnectorProvider : ConnectorProvider {
                 introMessage,
                 useThread,
                 sourcesLabel,
-                waitingMessage
+                waitingMessage,
             )
         }
     }
