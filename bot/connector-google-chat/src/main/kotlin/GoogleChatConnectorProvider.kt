@@ -237,6 +237,11 @@ internal object GoogleChatConnectorProvider : ConnectorProvider {
                     SOURCES_LABEL_PARAMETER,
                     false,
                 ),
+                ConnectorTypeConfigurationField(
+                    "Waiting message",
+                    WAITING_MESSAGE_PARAMETER,
+                    false,
+                ),
             ),
             svgIcon = resourceAsString("/google_chat.svg"),
         )
