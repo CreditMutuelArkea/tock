@@ -219,6 +219,7 @@ export interface SearchResultChunk {
   scores: ChannelScores;
   outcome: ChunkOutcome;
   pinned: boolean;
+  metadata?: Record<string, unknown>;
 }
 
 export type PinnedRankStrategy = 'truncated' | 'score_only' | 'exact_rank';

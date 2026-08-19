@@ -110,27 +110,13 @@
   <nb-card-header>{{ 'vsi.diagnostic.step_retrieval' | transloco }}</nb-card-header>
   <nb-card-body>
     <div class="controls-grid">
-      <tock-form-control
+      <tock-vector-store-index-selector
+        [indexes]="indexes"
+        [selected]="currentIndex"
         [label]="'vsi.common.index_label' | transloco"
-        name="index"
-      >
-        <nb-select
-          fullWidth
-          [selected]="currentIndex"
-          (selectedChange)="selectIndex($event)"
-          (blur)="hideTooltips()"
-          [placeholder]="'vsi.common.index_placeholder' | transloco"
-        >
-          @for (index of indexes; track index.indexName) {
-          <nb-option [value]="index">
-            {{ index.indexName }}
-            @if (index.isCurrent) {
-            <span class="text-muted ml-1">({{ 'vsi.common.current_index' | transloco }})</span>
-            }
-          </nb-option>
-          }
-        </nb-select>
-      </tock-form-control>
+        [placeholder]="'vsi.common.index_placeholder' | transloco"
+        (indexChange)="selectIndex($event)"
+      ></tock-vector-store-index-selector>
 
       <tock-form-control
         [label]="'vsi.diagnostic.search_type_label' | transloco"

@@ -20,26 +20,13 @@
 <nb-card class="shadow-sm mb-2">
   <nb-card-body>
     <div class="index-grid">
-      <tock-form-control
+      <tock-vector-store-index-selector
+        [indexes]="indexes"
+        [selected]="currentIndex"
         [label]="'vsi.common.index_label' | transloco"
-        name="index"
-      >
-        <nb-select
-          fullWidth
-          [selected]="currentIndex"
-          (selectedChange)="selectIndex($event)"
-          [placeholder]="'vsi.common.index_placeholder' | transloco"
-        >
-          @for (index of indexes; track index.indexName) {
-          <nb-option [value]="index">
-            {{ index.indexName }}
-            @if (index.isCurrent) {
-            <span class="text-muted ml-1">({{ 'vsi.common.current_index' | transloco }})</span>
-            }
-          </nb-option>
-          }
-        </nb-select>
-      </tock-form-control>
+        [placeholder]="'vsi.common.index_placeholder' | transloco"
+        (indexChange)="selectIndex($event)"
+      ></tock-vector-store-index-selector>
 
       @if (currentIndex) {
       <div class="d-flex flex-column justify-content-center">

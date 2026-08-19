@@ -2,7 +2,6 @@
   "common": {
     "index_label": "Index",
     "index_placeholder": "Select an index",
-    "current_index": "current",
     "no_bot_configuration_detected": "No bot configuration detected"
   },
   "exploration": {

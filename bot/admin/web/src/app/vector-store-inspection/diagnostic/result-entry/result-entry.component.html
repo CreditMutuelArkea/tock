@@ -92,6 +92,12 @@
   @if (displayContent) {
   <nb-card-body class="background-basic-color-2 p-2 inner-shade-top">
     <div class="background-basic-color-1 rounded px-2 py-1 font-size-small text-muted chunk-content">{{ result.content }}</div>
+
+    @if (result.metadata) {
+    <div class="background-basic-color-1 rounded px-2 py-1 mt-2">
+      <tock-vector-store-metadata [metadata]="result.metadata"></tock-vector-store-metadata>
+    </div>
+    }
   </nb-card-body>
   }
 </nb-card>

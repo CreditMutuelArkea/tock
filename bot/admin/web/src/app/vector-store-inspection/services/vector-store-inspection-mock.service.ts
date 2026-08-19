@@ -931,7 +931,8 @@ export class VectorStoreInspectionMockService extends VectorStoreInspectionServi
         compressor: ctx.compressorScore.get(chunk.chunkId) ?? null
       },
       outcome: ctx.outcome,
-      pinned: ctx.pinned
+      pinned: ctx.pinned,
+      metadata: chunk.metadata
     };
   }
 

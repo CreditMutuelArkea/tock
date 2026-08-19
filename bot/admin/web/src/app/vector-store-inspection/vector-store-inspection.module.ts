@@ -31,6 +31,8 @@ import { VectorStoreInspectionTabsComponent } from './vector-store-inspection-ta
 import { DocumentEntryComponent } from './exploration/document-entry/document-entry.component';
 import { ResultEntryComponent } from './diagnostic/result-entry/result-entry.component';
 import { RunComparisonComponent } from './diagnostic/run-comparison/run-comparison.component';
+import { MetadataViewComponent } from './utils/metadata-view/metadata-view.component';
+import { IndexSelectorComponent } from './utils/index-selector/index-selector.component';
 
 @NgModule({
   imports: [
@@ -62,7 +64,9 @@ import { RunComparisonComponent } from './diagnostic/run-comparison/run-comparis
     DocumentEntryComponent,
     DiagnosticComponent,
     ResultEntryComponent,
-    RunComparisonComponent
+    RunComparisonComponent,
+    MetadataViewComponent,
+    IndexSelectorComponent
   ],
   providers: [
     provideTranslocoScope({ scope: 'vector-store-inspection', alias: 'vsi' }),
