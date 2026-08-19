@@ -127,6 +127,7 @@ data class GoogleChatConnectorCallback(
                     messageName,
                     message.toGoogleMessage(),
                 )
+                .setUpdateMask("text")
                 .execute()
 
             logger.info {
