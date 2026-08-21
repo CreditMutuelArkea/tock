@@ -26,10 +26,10 @@ import { TranslocoService } from '@jsverse/transloco';
 import { Subject, filter, take, takeUntil } from 'rxjs';
 
 @Component({
-    selector: 'tock-bot-admin-root',
-    templateUrl: './bot-admin-app.component.html',
-    styleUrls: ['./bot-admin-app.component.css'],
-    standalone: false
+  selector: 'tock-bot-admin-root',
+  templateUrl: './bot-admin-app.component.html',
+  styleUrls: ['./bot-admin-app.component.css'],
+  standalone: false
 })
 export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
@@ -174,6 +174,11 @@ export class BotAdminAppComponent implements AuthListener, OnInit, OnDestroy {
     const t = (key: string) => this.transloco.translate(key);
 
     return [
+      {
+        title: t('menu.dashboard'),
+        link: '/dashboard',
+        icon: 'speedometer2'
+      },
       {
         title: t('menu.language-understanding'),
         icon: 'chat-dots',
