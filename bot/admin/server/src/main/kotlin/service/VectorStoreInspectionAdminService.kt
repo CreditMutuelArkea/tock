@@ -113,10 +113,17 @@ object VectorStoreInspectionAdminService {
         botId: String,
     ): VectorStoreInspectionCondenseResponse? {
         val rag = ragConfiguration(namespace, botId)
+        val businessRulesConfiguration = BusinessRulesService.getBusinessRulesConfiguration(namespace, botId)
         return inspectionService.condense(
             VectorStoreInspectionCondenseRequest(
                 questionCondensingLlmSetting = rag.questionCondensingLlmSetting,
-                questionCondensingPrompt = rag.questionCondensingPrompt,
+                questionCondensingPrompt =
+                    rag.questionCondensingPrompt.copy(
+                        inputs =
+                            mapOf(
+                                "lexicon_groups" to businessRulesConfiguration?.lexiconGroups.orEmpty().map { it.terms },
+                            ),
+                    ),
                 question = request.question,
             ),
         )
