@@ -18,6 +18,7 @@ package ai.tock.genai.orchestratorclient.responses
 
 import ai.tock.genai.orchestratorcore.models.vectorstore.DocumentSearchType
 import ai.tock.genai.orchestratorcore.models.vectorstore.VectorStoreProvider
+import com.fasterxml.jackson.annotation.JsonAlias
 import com.fasterxml.jackson.annotation.JsonInclude
 
 data class VectorStoreCapabilitiesResponse(
@@ -101,6 +102,7 @@ data class VectorStoreInspectionSearchFunnel(
     val vector: VectorStoreInspectionFunnelStage,
     val fts: VectorStoreInspectionFunnelStage,
     val rrf: VectorStoreInspectionFunnelStage,
+    @param:JsonAlias("top_k_cut")
     val topKCut: VectorStoreInspectionFunnelStage,
     val compression: VectorStoreInspectionFunnelStage,
 )

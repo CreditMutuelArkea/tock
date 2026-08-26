@@ -20,12 +20,40 @@ import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionChannelRa
 import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionChannelScores
 import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionFunnelStage
 import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionSearchFunnel
+import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionSearchResponse
 import ai.tock.genai.orchestratorclient.responses.VectorStoreInspectionSearchResultChunk
 import ai.tock.shared.jackson.mapper
+import com.fasterxml.jackson.databind.PropertyNamingStrategies
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class VectorStoreInspectionSerializationTest {
+    @Test
+    fun `orchestrator top k cut stage is deserialized`() {
+        val response =
+            mapper.copy().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).readValue(
+                """
+                {
+                  "funnel": {
+                    "vector": {"status": "applied", "count": 5},
+                    "fts": {"status": "skipped", "count": null},
+                    "rrf": {"status": "skipped", "count": null},
+                    "top_k_cut": {"status": "applied", "count": 3},
+                    "compression": {"status": "disabled", "count": null}
+                  },
+                  "compression_stage": "before_cut",
+                  "results": [],
+                  "duration": 0.1
+                }
+                """.trimIndent(),
+                VectorStoreInspectionSearchResponse::class.java,
+            )
+
+        assertEquals("applied", response.funnel.topKCut.status)
+        assertEquals(3, response.funnel.topKCut.count)
+    }
+
     @Test
     fun `null channel data is explicit in the Studio response`() {
         val skipped = VectorStoreInspectionFunnelStage(status = "skipped", count = null)
