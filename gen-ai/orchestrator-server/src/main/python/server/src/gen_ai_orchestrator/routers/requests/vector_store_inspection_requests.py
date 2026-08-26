@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+#
 """Request models for vector store inspection."""
 
 from enum import Enum
@@ -35,20 +35,20 @@ from gen_ai_orchestrator.models.vector_stores.vector_store_types import (
 
 
 class AnomalyCode(str, Enum):
-    NEAR_EMPTY_CHUNK = "near_empty_chunk"
-    NON_URL_SOURCE = "non_url_source"
-    DUPLICATE_TITLE = "duplicate_title"
+    NEAR_EMPTY_CHUNK = 'near_empty_chunk'
+    NON_URL_SOURCE = 'non_url_source'
+    DUPLICATE_TITLE = 'duplicate_title'
 
 
 class CompressionStage(str, Enum):
-    BEFORE_CUT = "before_cut"
-    AFTER_CUT = "after_cut"
+    BEFORE_CUT = 'before_cut'
+    AFTER_CUT = 'after_cut'
 
 
 class PinnedRankStrategy(str, Enum):
-    TRUNCATED = "truncated"
-    SCORE_ONLY = "score_only"
-    EXACT_RANK = "exact_rank"
+    TRUNCATED = 'truncated'
+    SCORE_ONLY = 'score_only'
+    EXACT_RANK = 'exact_rank'
 
 
 class VectorStoreInspectionCapabilitiesRequest(BaseModel):
@@ -107,15 +107,15 @@ class VectorStoreInspectionSearchRequest(BaseModel):
     pinned_chunk_ids: list[str] = Field(default_factory=list, max_length=50)
     pinned_rank_strategy: PinnedRankStrategy = PinnedRankStrategy.SCORE_ONLY
 
-    @model_validator(mode="after")
+    @model_validator(mode='after')
     def validate_search(self):
         if self.search_type in {
             DocumentSearchType.FULL_TEXT_SEARCH,
             DocumentSearchType.HYBRID_SEARCH,
         } and not any(keyword.strip() for keyword in self.key_words):
-            raise ValueError("key_words is required for full-text and hybrid search")
+            raise ValueError('key_words is required for full-text and hybrid search')
         if self.compression_enabled and self.compressor_setting is None:
             raise ValueError(
-                "compressor_setting is required when compression is enabled"
+                'compressor_setting is required when compression is enabled'
             )
         return self

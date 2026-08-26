@@ -191,14 +191,15 @@ object VectorStoreInspectionAdminService {
         botId: String,
         vectorStoreSetting: VectorStoreSetting?,
     ): String =
-        VectorStoreUtils.getVectorStoreElements(
-            namespace = namespace,
-            botId = botId,
-            indexSessionId = "",
-            kNeighborsDocuments = 1,
-            documentSearchType = DocumentSearchType.SIMILARITY_SEARCH,
-            vectorStoreSetting = vectorStoreSetting,
-        ).second
+        VectorStoreUtils
+            .getVectorStoreElements(
+                namespace = namespace,
+                botId = botId,
+                indexSessionId = "",
+                kNeighborsDocuments = 1,
+                documentSearchType = DocumentSearchType.SIMILARITY_SEARCH,
+                vectorStoreSetting = vectorStoreSetting,
+            ).second
 
     private fun ragConfiguration(
         namespace: String,

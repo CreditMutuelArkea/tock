@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+#
 """Response models for vector store inspection."""
 
 from enum import Enum
@@ -100,10 +100,10 @@ class CondenseResponse(BaseModel):
 
 
 class FunnelStageStatus(str, Enum):
-    APPLIED = "applied"
-    SKIPPED = "skipped"
-    DISABLED = "disabled"
-    FAILED_FALLBACK = "failed_fallback"
+    APPLIED = 'applied'
+    SKIPPED = 'skipped'
+    DISABLED = 'disabled'
+    FAILED_FALLBACK = 'failed_fallback'
 
 
 class FunnelStage(BaseModel):
@@ -135,12 +135,12 @@ class ChannelScores(BaseModel):
 
 
 class ChunkOutcome(str, Enum):
-    KEPT = "kept"
-    CUT_BY_TOP_K = "cut_by_top_k"
-    BELOW_MIN_SCORE = "below_min_score"
-    RERANKED_OUT = "reranked_out"
-    FILLED_BELOW_THRESHOLD = "filled_below_threshold"
-    NOT_RETRIEVED = "not_retrieved"
+    KEPT = 'kept'
+    CUT_BY_TOP_K = 'cut_by_top_k'
+    BELOW_MIN_SCORE = 'below_min_score'
+    RERANKED_OUT = 'reranked_out'
+    FILLED_BELOW_THRESHOLD = 'filled_below_threshold'
+    NOT_RETRIEVED = 'not_retrieved'
 
 
 class SearchResultChunk(BaseModel):

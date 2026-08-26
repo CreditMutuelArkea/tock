@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+#
 """Read-only PGVector exploration and retrieval diagnostics."""
 
 import asyncio
@@ -116,36 +116,36 @@ class PromptCaptureHandler(BaseCallbackHandler):
     """Capture the complete prompt value used by the condensation chain."""
 
     def __init__(self):
-        self.prompt = ""
+        self.prompt = ''
 
     def on_chain_end(self, outputs: Any, **kwargs: Any) -> None:
         if isinstance(outputs, ChatPromptValue):
-            self.prompt = "\n\n".join(
+            self.prompt = '\n\n'.join(
                 f"{message.type}: {message.content}" for message in outputs.messages
             )
 
 
 def _assert_allowed_index(index_name: str, index_name_prefix: str) -> None:
     if not index_name.startswith(index_name_prefix):
-        raise HTTPException(status_code=403, detail="Index is outside the current bot")
+        raise HTTPException(status_code=403, detail='Index is outside the current bot')
 
 
 def _normalise_datetime(value: Optional[str]) -> str:
     if not value:
-        return ""
+        return ''
     try:
-        return datetime.strptime(value, "%Y-%m-%d_%Hh%Mm%S").isoformat()
+        return datetime.strptime(value, '%Y-%m-%d_%Hh%Mm%S').isoformat()
     except ValueError:
         return value
 
 
 def _source(metadata: dict[str, Any]) -> Optional[str]:
-    value = metadata.get("source") or metadata.get("reference")
+    value = metadata.get('source') or metadata.get('reference')
     return str(value) if value else None
 
 
 def _document_id(document: Document) -> str:
-    return str(document.metadata.get("id") or "")
+    return str(document.metadata.get('id') or '')
 
 
 def _pg_factory(setting, index_name: str, embedding_function) -> PGVectorFactory:
@@ -157,7 +157,7 @@ def _pg_factory(setting, index_name: str, embedding_function) -> PGVectorFactory
     if not isinstance(factory, PGVectorFactory):
         raise HTTPException(
             status_code=501,
-            detail="Vector store inspection is currently available for PGVector only",
+            detail='Vector store inspection is currently available for PGVector only',
         )
     return factory
 
@@ -191,9 +191,9 @@ async def get_capabilities(
             supports_scores=True,
             supports_index_listing=False,
             supports_metadata_filter=True,
-            notes=["hybrid_and_fts_not_implemented", "inspection_not_implemented"],
+            notes=['hybrid_and_fts_not_implemented', 'inspection_not_implemented'],
         )
-    raise HTTPException(status_code=501, detail="Unsupported vector store provider")
+    raise HTTPException(status_code=501, detail='Unsupported vector store provider')
 
 
 async def get_indexes(
@@ -220,16 +220,16 @@ async def get_indexes(
             GROUP BY c.name
             ORDER BY MAX(e.cmetadata->>'index_datetime') DESC NULLS LAST, c.name
         """),
-        {"prefix": request.index_name_prefix},
+        {'prefix': request.index_name_prefix},
     )
     return IndexListResponse(
         indexes=[
             VectorStoreIndexDescription(
-                index_name=row["index_name"],
-                index_session_id=row["index_session_id"],
-                index_datetime=_normalise_datetime(row["index_datetime"]),
-                document_count=int(row["document_count"]),
-                chunk_count=int(row["chunk_count"]),
+                index_name=row['index_name'],
+                index_session_id=row['index_session_id'],
+                index_datetime=_normalise_datetime(row['index_datetime']),
+                document_count=int(row['document_count']),
+                chunk_count=int(row['chunk_count']),
             )
             for row in rows
         ]
@@ -364,14 +364,14 @@ async def get_documents(
     filters = request.filter
     text_filter = filters.text.strip() if filters and filters.text else None
     params = {
-        "index_name": request.index_name,
-        "near_empty_length": NEAR_EMPTY_LENGTH,
-        "text_filter": text_filter,
-        "text_pattern": f"%{text_filter}%" if text_filter else "%",
-        "document_id": filters.document_id if filters else None,
-        "anomaly": filters.anomaly.value if filters and filters.anomaly else None,
-        "start": request.start,
-        "size": request.size,
+        'index_name': request.index_name,
+        'near_empty_length': NEAR_EMPTY_LENGTH,
+        'text_filter': text_filter,
+        'text_pattern': f"%{text_filter}%" if text_filter else '%',
+        'document_id': filters.document_id if filters else None,
+        'anomaly': filters.anomaly.value if filters and filters.anomaly else None,
+        'start': request.start,
+        'size': request.size,
     }
     page_task = _fetch_all(engine, _documents_page_statement(), params)
     stats_task = (
@@ -381,7 +381,7 @@ async def get_documents(
     )
     page_rows, stats_rows = await asyncio.gather(page_task, stats_task)
 
-    document_ids = [row["document_id"] for row in page_rows]
+    document_ids = [row['document_id'] for row in page_rows]
     chunks_by_document: dict[str, list[InspectedChunk]] = {}
     if request.include_chunks and document_ids:
         chunks_statement = text("""
@@ -398,20 +398,20 @@ async def get_documents(
                     ELSE 2147483647
                 END,
                 e.cmetadata->>'chunk'
-        """).bindparams(bindparam("document_ids", expanding=True))
+        """).bindparams(bindparam('document_ids', expanding=True))
         chunk_rows = await _fetch_all(
             engine,
             chunks_statement,
-            {"index_name": request.index_name, "document_ids": document_ids},
+            {'index_name': request.index_name, 'document_ids': document_ids},
         )
         for row in chunk_rows:
-            metadata = dict(row["cmetadata"] or {})
-            document = Document(page_content=row["document"] or "", metadata=metadata)
+            metadata = dict(row['cmetadata'] or {})
+            document = Document(page_content=row['document'] or '', metadata=metadata)
             content = get_source_content(document)
             chunks_by_document.setdefault(_document_id(document), []).append(
                 InspectedChunk(
                     chunk_id=get_chunk_identifier(document),
-                    chunk=str(metadata.get("chunk") or ""),
+                    chunk=str(metadata.get('chunk') or ''),
                     content=content,
                     content_length=len(content),
                     metadata=metadata,
@@ -420,46 +420,46 @@ async def get_documents(
 
     rows = [
         InspectedDocument(
-            document_id=row["document_id"],
-            title=row["title"],
-            source=row["source"],
-            chunk_count=int(row["chunk_count"]),
-            index_session_id=row["index_session_id"],
+            document_id=row['document_id'],
+            title=row['title'],
+            source=row['source'],
+            chunk_count=int(row['chunk_count']),
+            index_session_id=row['index_session_id'],
             chunks=(
-                chunks_by_document.get(row["document_id"], [])
+                chunks_by_document.get(row['document_id'], [])
                 if request.include_chunks
                 else None
             ),
         )
         for row in page_rows
     ]
-    total = int(page_rows[0]["total"]) if page_rows else 0
+    total = int(page_rows[0]['total']) if page_rows else 0
     stats = None
     anomalies: list[IndexAnomaly] = []
     if stats_rows:
         stats_row = stats_rows[0]
         stats = IndexStats(
-            document_count=int(stats_row["document_count"]),
-            chunk_count=int(stats_row["chunk_count"]),
-            chunks_per_document_avg=float(stats_row["chunks_per_document_avg"]),
-            chunk_length_median=float(stats_row["chunk_length_median"]),
-            index_datetime=_normalise_datetime(stats_row["index_datetime"]),
+            document_count=int(stats_row['document_count']),
+            chunk_count=int(stats_row['chunk_count']),
+            chunks_per_document_avg=float(stats_row['chunks_per_document_avg']),
+            chunk_length_median=float(stats_row['chunk_length_median']),
+            index_datetime=_normalise_datetime(stats_row['index_datetime']),
         )
         anomalies = [
             IndexAnomaly(
                 code=AnomalyCode.NEAR_EMPTY_CHUNK,
-                count=int(stats_row["near_empty_count"]),
-                severity="warning",
+                count=int(stats_row['near_empty_count']),
+                severity='warning',
             ),
             IndexAnomaly(
                 code=AnomalyCode.NON_URL_SOURCE,
-                count=int(stats_row["non_url_count"]),
-                severity="info",
+                count=int(stats_row['non_url_count']),
+                severity='info',
             ),
             IndexAnomaly(
                 code=AnomalyCode.DUPLICATE_TITLE,
-                count=int(stats_row["duplicate_title_count"]),
-                severity="info",
+                count=int(stats_row['duplicate_title_count']),
+                severity='info',
             ),
         ]
     return VectorStoreInspectionDocumentsResponse(
@@ -486,12 +486,12 @@ async def condense(
     ]
     capture = PromptCaptureHandler()
     result = await chain.ainvoke(
-        {"question": request.question, "chat_history": history},
+        {'question': request.question, 'chat_history': history},
         config=RunnableConfig(callbacks=[capture]),
     )
     return CondenseResponse(
-        condensed_question=result["condensed_question"],
-        key_words=result.get("key_words") or [],
+        condensed_question=result['condensed_question'],
+        key_words=result.get('key_words') or [],
         effective_prompt=capture.prompt,
         duration=time.perf_counter() - started,
     )
@@ -512,22 +512,22 @@ async def _fts_documents(factory: PGVectorFactory, query: str, k: int):
             ORDER BY score DESC, e.id
             LIMIT :k
         """),
-        {"query": query, "index_name": factory.index_name, "k": k},
+        {'query': query, 'index_name': factory.index_name, 'k': k},
     )
     return [
         (
             Document(
-                page_content=row["document"] or "",
-                metadata=dict(row["cmetadata"] or {}),
+                page_content=row['document'] or '',
+                metadata=dict(row['cmetadata'] or {}),
             ),
-            float(row["score"]),
+            float(row['score']),
         )
         for row in rows
     ]
 
 
 def _keywords_query(keywords: list[str]) -> str:
-    return " OR ".join(keyword.strip() for keyword in keywords if keyword.strip())
+    return ' OR '.join(keyword.strip() for keyword in keywords if keyword.strip())
 
 
 async def _pinned_documents(
@@ -541,16 +541,16 @@ async def _pinned_documents(
         JOIN langchain_pg_collection c ON c.uuid = e.collection_id
         WHERE c.name = :index_name
           AND concat(e.cmetadata->>'id', ':', e.cmetadata->>'chunk') IN :chunk_ids
-    """).bindparams(bindparam("chunk_ids", expanding=True))
+    """).bindparams(bindparam('chunk_ids', expanding=True))
     rows = await _fetch_all(
         factory.pool.async_engine,
         statement,
-        {"index_name": factory.index_name, "chunk_ids": pinned_ids},
+        {'index_name': factory.index_name, 'chunk_ids': pinned_ids},
     )
     documents = [
         Document(
-            page_content=row["document"] or "",
-            metadata=dict(row["cmetadata"] or {}),
+            page_content=row['document'] or '',
+            metadata=dict(row['cmetadata'] or {}),
         )
         for row in rows
     ]
@@ -575,7 +575,7 @@ async def _pinned_vector_metrics(
         )
     """
         if exact_rank
-        else "NULL"
+        else 'NULL'
     )
     statement = text(f"""
         WITH targets AS (
@@ -590,20 +590,20 @@ async def _pinned_vector_metrics(
         )
         SELECT target.chunk_id, target.distance, {rank_sql} AS rank
         FROM targets target
-    """).bindparams(bindparam("chunk_ids", expanding=True))
+    """).bindparams(bindparam('chunk_ids', expanding=True))
     rows = await _fetch_all(
         factory.pool.async_engine,
         statement,
         {
-            "embedding": "[" + ",".join(map(str, embedding)) + "]",
-            "index_name": factory.index_name,
-            "chunk_ids": pinned_ids,
+            'embedding': '[' + ','.join(map(str, embedding)) + ']',
+            'index_name': factory.index_name,
+            'chunk_ids': pinned_ids,
         },
     )
     return {
-        row["chunk_id"]: (
-            int(row["rank"]) if row["rank"] is not None else None,
-            1.0 - float(row["distance"]),
+        row['chunk_id']: (
+            int(row['rank']) if row['rank'] is not None else None,
+            1.0 - float(row['distance']),
         )
         for row in rows
     }
@@ -629,7 +629,7 @@ async def _pinned_fts_metrics(
         )
     """
         if exact_rank
-        else "NULL"
+        else 'NULL'
     )
     statement = text(f"""
         WITH q AS (
@@ -648,16 +648,16 @@ async def _pinned_fts_metrics(
         )
         SELECT target.chunk_id, target.score, {rank_sql} AS rank
         FROM targets target
-    """).bindparams(bindparam("chunk_ids", expanding=True))
+    """).bindparams(bindparam('chunk_ids', expanding=True))
     rows = await _fetch_all(
         factory.pool.async_engine,
         statement,
-        {"query": query, "index_name": factory.index_name, "chunk_ids": pinned_ids},
+        {'query': query, 'index_name': factory.index_name, 'chunk_ids': pinned_ids},
     )
     return {
-        row["chunk_id"]: (
-            int(row["rank"]) if row["rank"] is not None else None,
-            float(row["score"]),
+        row['chunk_id']: (
+            int(row['rank']) if row['rank'] is not None else None,
+            float(row['score']),
         )
         for row in rows
     }
@@ -672,8 +672,8 @@ def _result(
     return SearchResultChunk(
         chunk_id=candidate.chunk_id,
         document_id=_document_id(document),
-        title=str(document.metadata.get("title") or ""),
-        chunk=str(document.metadata.get("chunk") or ""),
+        title=str(document.metadata.get('title') or ''),
+        chunk=str(document.metadata.get('chunk') or ''),
         content=get_source_content(document),
         ranks=ChannelRanks(**candidate.ranks),
         scores=ChannelScores(**candidate.scores),
@@ -691,9 +691,9 @@ async def _compress(
     updates = {}
     if override:
         updates = {
-            "min_score": override.min_score,
-            "max_documents": override.max_documents,
-            "fill_to_max_documents": override.fill_to_max_documents,
+            'min_score': override.min_score,
+            'max_documents': override.max_documents,
+            'fill_to_max_documents': override.fill_to_max_documents,
         }
     setting = request.compressor_setting.model_copy(update=updates)
     compressor = get_compressor_factory(
@@ -720,9 +720,9 @@ async def _compress(
     compressed_ids = [get_chunk_identifier(doc) for doc in compressed]
     compressed_set = set(compressed_ids)
     scores = {
-        chunk_id: float(document.metadata["retriever_score"])
+        chunk_id: float(document.metadata['retriever_score'])
         for chunk_id, document in documents_by_id.items()
-        if document.metadata.get("retriever_score") is not None
+        if document.metadata.get('retriever_score') is not None
     }
     min_score = float(setting.min_score or 0)
     outcomes = {}
@@ -790,14 +790,14 @@ async def search(request: VectorStoreInspectionSearchRequest) -> SearchResponse:
         candidate = candidates.setdefault(
             get_chunk_identifier(document), Candidate(document=document)
         )
-        candidate.ranks["vector"] = rank
-        candidate.scores["vector"] = 1.0 - float(distance)
+        candidate.ranks['vector'] = rank
+        candidate.scores['vector'] = 1.0 - float(distance)
     for rank, (document, score) in enumerate(fts_rows, start=1):
         candidate = candidates.setdefault(
             get_chunk_identifier(document), Candidate(document=document)
         )
-        candidate.ranks["fts"] = rank
-        candidate.scores["fts"] = float(score)
+        candidate.ranks['fts'] = rank
+        candidate.scores['fts'] = float(score)
 
     is_hybrid = use_vector and use_fts
     if is_hybrid:
@@ -808,8 +808,8 @@ async def search(request: VectorStoreInspectionSearchRequest) -> SearchResponse:
             reverse=True,
         )
         for rank, candidate in enumerate(retrieved, start=1):
-            candidate.ranks["rrf"] = rank
-            candidate.scores["rrf"] = rrf_by_key[get_document_key(candidate.document)]
+            candidate.ranks['rrf'] = rank
+            candidate.scores['rrf'] = rrf_by_key[get_document_key(candidate.document)]
     elif use_vector:
         retrieved = [candidates[get_chunk_identifier(doc)] for doc in vector_docs]
     else:
@@ -874,7 +874,7 @@ async def search(request: VectorStoreInspectionSearchRequest) -> SearchResponse:
         )
 
     for candidate in retrieved:
-        candidate.scores["compressor"] = compressor_scores.get(candidate.chunk_id)
+        candidate.scores['compressor'] = compressor_scores.get(candidate.chunk_id)
 
     pinned_set = set(request.pinned_chunk_ids)
     results = [
@@ -912,11 +912,11 @@ async def search(request: VectorStoreInspectionSearchRequest) -> SearchResponse:
         document = stored_pins[chunk_id]
         candidate = Candidate(document=document)
         if chunk_id in vector_metrics:
-            candidate.ranks["vector"], candidate.scores["vector"] = vector_metrics[
+            candidate.ranks['vector'], candidate.scores['vector'] = vector_metrics[
                 chunk_id
             ]
         if chunk_id in fts_metrics:
-            candidate.ranks["fts"], candidate.scores["fts"] = fts_metrics[chunk_id]
+            candidate.ranks['fts'], candidate.scores['fts'] = fts_metrics[chunk_id]
         results.append(_result(candidate, ChunkOutcome.NOT_RETRIEVED, True))
 
     return SearchResponse(

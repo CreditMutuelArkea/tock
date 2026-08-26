@@ -11,7 +11,7 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
-
+#
 """Internal API used by the Tock admin server to inspect vector stores."""
 
 from fastapi import APIRouter
@@ -39,39 +39,39 @@ from gen_ai_orchestrator.services.vector_store_inspection.vector_store_inspectio
 )
 
 vector_store_inspection_router = APIRouter(
-    prefix="/vector-store-inspection", tags=["Vector Store Inspection"]
+    prefix='/vector-store-inspection', tags=['Vector Store Inspection']
 )
 
 
-@vector_store_inspection_router.post("/capabilities")
+@vector_store_inspection_router.post('/capabilities')
 async def inspect_capabilities(
     request: VectorStoreInspectionCapabilitiesRequest,
 ) -> VectorStoreCapabilitiesResponse:
     return await get_capabilities(request)
 
 
-@vector_store_inspection_router.post("/indexes")
+@vector_store_inspection_router.post('/indexes')
 async def inspect_indexes(
     request: VectorStoreInspectionIndexesRequest,
 ) -> IndexListResponse:
     return await get_indexes(request)
 
 
-@vector_store_inspection_router.post("/documents")
+@vector_store_inspection_router.post('/documents')
 async def inspect_documents(
     request: VectorStoreInspectionDocumentsRequest,
 ) -> VectorStoreInspectionDocumentsResponse:
     return await get_documents(request)
 
 
-@vector_store_inspection_router.post("/condense")
+@vector_store_inspection_router.post('/condense')
 async def inspect_condensation(
     request: VectorStoreInspectionCondenseRequest,
 ) -> CondenseResponse:
     return await condense(request)
 
 
-@vector_store_inspection_router.post("/search")
+@vector_store_inspection_router.post('/search')
 async def inspect_search(
     request: VectorStoreInspectionSearchRequest,
 ) -> SearchResponse:
