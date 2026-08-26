@@ -24,7 +24,7 @@ import { BotSharedModule } from '../shared/bot-shared.module';
 import { DiagnosticComponent } from './diagnostic/diagnostic.component';
 import { ExplorationComponent } from './exploration/exploration.component';
 import { VectorStoreInspectionRoutingModule } from './vector-store-inspection-routing.module';
-import { VectorStoreInspectionMockService } from './services/vector-store-inspection-mock.service';
+import { VectorStoreInspectionRestService } from './services/vector-store-inspection-rest.service';
 import { VectorStoreInspectionStateService } from './services/vector-store-inspection-state.service';
 import { VectorStoreInspectionService } from './services/vector-store-inspection.service';
 import { VectorStoreInspectionTabsComponent } from './vector-store-inspection-tabs.component';
@@ -70,9 +70,7 @@ import { IndexSelectorComponent } from './utils/index-selector/index-selector.co
   ],
   providers: [
     provideTranslocoScope({ scope: 'vector-store-inspection', alias: 'vsi' }),
-    // Swap this single line for the REST implementation once the
-    // /gen-ai/bots/:botId/vector-store/* routes are available.
-    { provide: VectorStoreInspectionService, useClass: VectorStoreInspectionMockService },
+    { provide: VectorStoreInspectionService, useClass: VectorStoreInspectionRestService },
     VectorStoreInspectionStateService
   ]
 })

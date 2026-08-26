@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, inject, Input } from '@angular/core';
 
 import { ChunkId, InspectedChunk, InspectedDocument } from '../../models/vector-store-inspection.models';
 import { VectorStoreInspectionStateService } from '../../services/vector-store-inspection-state.service';
@@ -20,11 +20,11 @@ const NEAR_EMPTY_LENGTH = 50;
   standalone: false
 })
 export class DocumentEntryComponent {
+  readonly state = inject(VectorStoreInspectionStateService);
+
   @Input() document!: InspectedDocument;
 
   displayChunks: boolean = false;
-
-  constructor(public state: VectorStoreInspectionStateService) {}
 
   switchChunksDetail(): void {
     this.displayChunks = !this.displayChunks;

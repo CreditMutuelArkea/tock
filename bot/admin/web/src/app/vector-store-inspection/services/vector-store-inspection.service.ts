@@ -11,20 +11,12 @@ import {
   SearchResponse,
   VectorStoreCapabilities
 } from '../models/vector-store-inspection.models';
-import { VectorDbProvider } from '../../configuration/vector-db-settings/models/providers-configuration';
-
 /**
  * API surface for vector store inspection.
  *
  * Declared as an abstract class rather than an interface so it can be used as
- * an Angular injection token. Two implementations are expected:
- *  - VectorStoreInspectionMockService, used while the backend endpoints are
- *    being specified and reviewed;
- *  - a REST implementation calling /gen-ai/bots/:botId/vector-store/*, once
- *    those routes land.
- *
- * Switching between them is a single provider change in the module. No
- * component should ever reference the mock directly.
+ * an Angular injection token. Its implementation calls the admin routes under
+ * /gen-ai/bots/:botId/vector-store/*.
  */
 export abstract class VectorStoreInspectionService {
   /**

@@ -29,9 +29,6 @@ import { VectorStoreInspectionService } from './vector-store-inspection.service'
  * botId is the current application name: GenAIVerticle passes app.namespace and
  * app.name to every Gen AI service, and app.name is the botId on the backend.
  *
- * To switch from the mock to this implementation, change the single provider
- * line in the feature module:
- *   { provide: VectorStoreInspectionService, useClass: VectorStoreInspectionRestService }
  */
 @Injectable()
 export class VectorStoreInspectionRestService extends VectorStoreInspectionService {
