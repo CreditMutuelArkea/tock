@@ -49,6 +49,8 @@ private const val INTRO_MESSAGE_PARAMETER = "introMessage"
 private const val USE_THREAD_PARAMETER = "useThread"
 private const val SOURCES_LABEL_PARAMETER = "sourcesLabel"
 private const val WAITING_MESSAGE_PARAMETER = "waitingMessage"
+private const val ENABLE_FEEDBACK_PARAMETER = "enableFeedback"
+private const val FEEDBACK_ACKNOWLEDGEMENT_LABEL_PARAMETER = "feedbackAcknowledgementLabel"
 
 // Lifetime (in seconds) of each impersonated access token.
 // This is the TTL of a single token, not a hard limit on the connector:
@@ -120,6 +122,19 @@ internal object GoogleChatConnectorProvider : ConnectorProvider {
                     ?.takeIf { it.isNotBlank() }
                     ?: "\uD83D\uDCAD Thinking..."
 
+            val feedback =
+                if (connectorConfiguration.parameters[ENABLE_FEEDBACK_PARAMETER] == "1") {
+                    GoogleChatFeedback(
+                        callbackUrl = "${getBaseUrl().trimEnd('/')}/${path.trimStart('/')}",
+                        acknowledgementLabel =
+                            connectorConfiguration.parameters[FEEDBACK_ACKNOWLEDGEMENT_LABEL_PARAMETER]
+                                ?.takeIf { it.isNotBlank() }
+                                ?: "Feedback recorded",
+                    )
+                } else {
+                    null
+                }
+
             return GoogleChatConnector(
                 connectorId,
                 path,
@@ -131,6 +146,7 @@ internal object GoogleChatConnectorProvider : ConnectorProvider {
                 useThread,
                 sourcesLabel,
                 waitingMessage,
+                feedback,
             )
         }
     }
@@ -240,6 +256,16 @@ internal object GoogleChatConnectorProvider : ConnectorProvider {
                 ConnectorTypeConfigurationField(
                     "Waiting message",
                     WAITING_MESSAGE_PARAMETER,
+                    false,
+                ),
+                ConnectorTypeConfigurationField(
+                    "Enable feedback buttons (true = 1, false = 0)",
+                    ENABLE_FEEDBACK_PARAMETER,
+                    false,
+                ),
+                ConnectorTypeConfigurationField(
+                    "Feedback acknowledgement label",
+                    FEEDBACK_ACKNOWLEDGEMENT_LABEL_PARAMETER,
                     false,
                 ),
             ),

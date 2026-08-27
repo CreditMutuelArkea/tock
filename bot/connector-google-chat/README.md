@@ -54,6 +54,8 @@ Authentication Audience → Project Number
 | **Service account to impersonate** (optional) | `bot-sa@project.iam.gserviceaccount.com` |
 | **Use condensed footnotes** | `1` = condensed, `0` = detailed |
 | **Display sources without URL** | `1` = displayed, `0` = hidden |
+| **Enable feedback buttons** | `1` = enabled, `0` = disabled (default) |
+| **Feedback acknowledgement label** | Label displayed after a vote (default: `Feedback recorded`) |
 
 ---
 
@@ -94,6 +96,12 @@ The connector includes a converter that transforms standard Markdown into a simp
 ---
 
 ##  Bot Behavior
+
+### Feedback buttons
+
+When feedback is enabled, final bot answers include thumbs-up and thumbs-down buttons. The first vote is stored on the corresponding Tock action. The two buttons are then replaced with the selected button in a disabled state, preventing further changes from the Google Chat message.
+
+Waiting and introductory messages don't include feedback buttons.
 
 ###  Conversation Management
 
