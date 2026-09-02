@@ -31,5 +31,6 @@ class FeedbackEvent(
 ) : OneToOneEvent(userId, recipientId, applicationId) {
     /** Whether this event can replace feedback already stored on the action. */
     var replaceExisting: Boolean = true
+
     override fun toString(): String = "Feedback=$feedback to $actionId"
 }
