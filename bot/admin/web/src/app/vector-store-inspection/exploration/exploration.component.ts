@@ -45,6 +45,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
   private readonly botConfiguration = inject(BotConfigurationService);
   private readonly inspection = inject(VectorStoreInspectionService);
   public readonly state = inject(VectorStoreInspectionStateService);
+  private documentsRequestId = 0;
 
   ngOnInit(): void {
     // Read the list from the stream rather than from the loadIndexes result:
@@ -57,6 +58,8 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     this.state.currentIndex$.pipe(takeUntil(this.destroy$)).subscribe((index) => {
       const changed = index?.indexName !== this.currentIndex?.indexName;
       this.currentIndex = index;
+
+      if (changed) this.documentsRequestId++;
 
       if (index && changed) {
         // A different index invalidates the current page. Pins are left alone:
@@ -115,6 +118,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
     if (!this.currentIndex) return;
 
     this.loading = true;
+    const requestId = ++this.documentsRequestId;
 
     this.inspection
       .getDocuments({
@@ -131,6 +135,7 @@ export class ExplorationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
+          if (requestId !== this.documentsRequestId) return;
           this.stats = response.stats;
           this.anomalies = response.anomalies;
           this.documents = response.rows;
@@ -142,7 +147,9 @@ export class ExplorationComponent implements OnInit, OnDestroy {
 
           this.loading = false;
         },
-        error: () => (this.loading = false)
+        error: () => {
+          if (requestId === this.documentsRequestId) this.loading = false;
+        }
       });
   }
 

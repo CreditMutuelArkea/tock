@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { NbTooltipDirective, NbToastrService } from '@nebular/theme';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -37,6 +38,8 @@ interface DiagnosticNavigationState {
   question?: string;
   condensed_question?: string;
   key_words?: string[];
+  indexName?: string;
+  k?: number;
 }
 
 /** Shape of the compressor setting fields this view tweaks. */
@@ -130,6 +133,8 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
   private readonly inspection = inject(VectorStoreInspectionService);
   private readonly location = inject(Location);
   private readonly toastrService = inject(NbToastrService);
+  private readonly translocoService = inject(TranslocoService);
+  private navigationIndexName: string | null = null;
   public readonly state = inject(VectorStoreInspectionStateService);
 
   ngOnInit(): void {
@@ -139,6 +144,16 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
     // match the preselected index against options it does not hold yet.
     this.state.indexes$.pipe(takeUntil(this.destroy$)).subscribe((indexes) => {
       this.indexes = indexes;
+      if (this.navigationIndexName && indexes.length) {
+        const indexName = this.navigationIndexName;
+        this.navigationIndexName = null;
+        const index = indexes.find((candidate) => candidate.indexName === indexName);
+        if (index) {
+          this.state.selectIndex(index);
+        } else {
+          this.toastrService.warning('', this.translocoService.translate('vsi.diagnostic.index_not_found', { indexName }));
+        }
+      }
     });
 
     this.state.currentIndex$.pipe(takeUntil(this.destroy$)).subscribe((index) => {
@@ -203,6 +218,12 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
     if (!navigationState?.question) return;
 
     this.question = navigationState.question;
+    this.navigationIndexName = navigationState.indexName ?? null;
+
+    if (navigationState.k && navigationState.k > 0) {
+      this.k = navigationState.k;
+      this.fetchK = navigationState.k;
+    }
 
     if (navigationState.condensed_question) {
       this.condensedQuestion = navigationState.condensed_question;
@@ -354,7 +375,7 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
     // keywords, silently. Acceptable at runtime, misleading in a diagnostic
     // tool, so it is refused here instead.
     if (this.needsKeyWords && !this.keyWords.length) {
-      this.toastrService.warning('', 'vsi.diagnostic.keywords_required');
+      this.toastrService.warning('', this.translocoService.translate('vsi.diagnostic.keywords_required'));
       return;
     }
 
@@ -397,7 +418,10 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
 
           this.loading = false;
         },
-        error: () => (this.loading = false)
+        error: () => {
+          this.loading = false;
+          this.clearResults();
+        }
       });
   }
 

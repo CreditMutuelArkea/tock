@@ -268,10 +268,10 @@ export type RunDiffField = 'index' | 'searchType' | 'query' | 'keyWords' | 'fetc
 
 /**
  * Why a chunk present in the reference run is missing from the current one.
- * The two cases must not be collapsed: one is an ingestion problem, the other
- * a ranking problem.
+ * An ingestion problem must only be reported when the current index was
+ * explicitly checked. Otherwise the cause remains unknown.
  */
-export type AbsenceReason = 'absent_from_index' | 'outside_fetch_k';
+export type AbsenceReason = 'absent_from_index' | 'outside_fetch_k' | 'unknown';
 
 export type RunDelta = 'gained' | 'lost' | 'moved' | 'stable';
 

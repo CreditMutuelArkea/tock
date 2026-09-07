@@ -87,6 +87,7 @@
             ghost
             size="tiny"
             [status]="isPinned(chunk.chunkId) ? 'primary' : 'basic'"
+            [disabled]="!state.canPin(chunk.chunkId)"
             [nbTooltip]="
               (isPinned(chunk.chunkId) ? 'vsi.exploration.unpin_chunk_tooltip' : 'vsi.exploration.pin_chunk_tooltip') | transloco
             "

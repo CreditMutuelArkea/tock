@@ -50,7 +50,8 @@
       "HYBRID_SEARCH": "Hybride"
     },
     "capability_notes": {
-      "hybrid_and_fts_not_implemented": "Ce fournisseur ne prend en charge que la recherche vectorielle. Les modes plein texte et hybride ne sont pas implémentés."
+      "hybrid_and_fts_not_implemented": "Ce fournisseur ne prend en charge que la recherche vectorielle. Les modes plein texte et hybride ne sont pas implémentés.",
+      "inspection_not_implemented": "L’inspection de la base vectorielle n’est pas implémentée pour ce fournisseur."
     },
     "step_question": "1 · Question",
     "step_retrieval": "2 · Recherche",
@@ -73,6 +74,7 @@
     "keywords_label": "Mots-clés",
     "keywords_placeholder": "Séparés par des virgules",
     "keywords_required": "Les modes plein texte et hybride exigent des mots-clés.",
+    "index_not_found": "L’index enregistré {{indexName}} n’est plus disponible.",
     "condensation_hint": "La condensation n'est pas déterministe : la recherche envoie ces valeurs telles quelles, ce qui permet de rejouer une exécution à l'identique.",
     "keywords_manual_hint": "Sans condensation, aucun mot-clé n'est produit : ils doivent être saisis à la main.",
     "use_compression": "Appliquer la compression",
@@ -165,7 +167,9 @@
       "absent_from_index": "absent de l'index",
       "absent_from_index_tooltip": "Les deux exécutions portent sur des index différents et ce chunk n'existe pas dans l'index courant : c'est un problème d'ingestion",
       "outside_fetch_k": "hors du top fetch k",
-      "outside_fetch_k_tooltip": "Même index : ce chunk existe toujours mais n'est plus remonté dans la fenêtre ramenée, c'est un problème de classement"
+      "outside_fetch_k_tooltip": "Ce chunk existe toujours mais n'est plus remonté dans la fenêtre ramenée, c'est un problème de classement",
+      "unknown": "non vérifié dans l’index",
+      "unknown_tooltip": "L’index a changé et ce chunk n’a pas été vérifié explicitement : son absence ne peut pas être attribuée à l’ingestion"
     },
     "stable_toggle": "{{count}} résultat(s) stable(s)",
     "pin_reference_button": "Définir comme référence",

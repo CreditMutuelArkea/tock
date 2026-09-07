@@ -96,7 +96,16 @@ export function buildRunComparison(reference: SearchRun, current: SearchRun): Ru
     if (rankReference !== null && rankCurrent === null) {
       delta = 'lost';
       lost++;
-      absenceReason = indexChanged ? 'absent_from_index' : 'outside_fetch_k';
+      const currentChunk = currentChunks.get(chunkId);
+      const wasCheckedInCurrentIndex = current.request.pinnedChunkIds?.includes(chunkId);
+      absenceReason =
+        currentChunk?.outcome === 'not_retrieved'
+          ? 'outside_fetch_k'
+          : indexChanged
+          ? wasCheckedInCurrentIndex
+            ? 'absent_from_index'
+            : 'unknown'
+          : 'outside_fetch_k';
     } else if (rankReference === null && rankCurrent !== null) {
       delta = 'gained';
       gained++;

@@ -239,7 +239,9 @@ export class ChatUiDialogLoggerComponent implements OnInit, OnDestroy {
       state: {
         question: debugData.user_question,
         condensed_question: debugData.condensing_llm_answer?.condensed_question,
-        key_words: debugData.condensing_llm_answer?.key_words
+        key_words: debugData.condensing_llm_answer?.key_words,
+        indexName: debugData.document_index_name,
+        k: debugData.document_search_params?.k
       }
     });
   }

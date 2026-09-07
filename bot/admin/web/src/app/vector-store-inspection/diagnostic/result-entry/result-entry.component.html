@@ -1,6 +1,6 @@
 <nb-card
   class="shadow-sm mb-2"
-  [class.pinned-entry]="result.pinned"
+  [class.pinned-entry]="pinned"
 >
   <nb-card-body class="list-grid">
     <div
@@ -80,11 +80,12 @@
         ghost
         shape="round"
         size="small"
-        [status]="result.pinned ? 'primary' : 'basic'"
-        [nbTooltip]="(result.pinned ? 'vsi.diagnostic.unpin_tooltip' : 'vsi.diagnostic.pin_tooltip') | transloco"
+        [status]="pinned ? 'primary' : 'basic'"
+        [disabled]="!canPin"
+        [nbTooltip]="(pinned ? 'vsi.diagnostic.unpin_tooltip' : 'vsi.diagnostic.pin_tooltip') | transloco"
         (click)="togglePin()"
       >
-        <nb-icon [icon]="result.pinned ? 'pin-angle-fill' : 'pin-angle'"></nb-icon>
+        <nb-icon [icon]="pinned ? 'pin-angle-fill' : 'pin-angle'"></nb-icon>
       </button>
     </div>
   </nb-card-body>

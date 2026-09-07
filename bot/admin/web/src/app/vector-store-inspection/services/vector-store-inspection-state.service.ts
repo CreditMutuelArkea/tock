@@ -4,6 +4,8 @@ import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { VectorStoreInspectionService } from './vector-store-inspection.service';
 import { DocumentSearchType } from '../../rag/rag-settings/models/engines-configurations';
 import { ChunkId, SearchRun, VectorStoreCapabilities, VectorStoreIndex } from '../models/vector-store-inspection.models';
+
+export const MAX_PINNED_CHUNKS = 50;
 /**
  * State shared by the exploration and diagnostic views.
  *
@@ -113,8 +115,13 @@ export class VectorStoreInspectionStateService {
     return this.pinnedChunkIds$$.value.includes(chunkId);
   }
 
+  canPin(chunkId: ChunkId): boolean {
+    return this.isPinned(chunkId) || this.pinnedChunkIds$$.value.length < MAX_PINNED_CHUNKS;
+  }
+
   togglePin(chunkId: ChunkId): void {
     const current = this.pinnedChunkIds$$.value;
+    if (!current.includes(chunkId) && current.length >= MAX_PINNED_CHUNKS) return;
     this.pinnedChunkIds$$.next(current.includes(chunkId) ? current.filter((id) => id !== chunkId) : [...current, chunkId]);
   }
 

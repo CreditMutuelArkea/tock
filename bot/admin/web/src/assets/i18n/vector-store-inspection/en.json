@@ -49,7 +49,8 @@
       "HYBRID_SEARCH": "Hybrid"
     },
     "capability_notes": {
-      "hybrid_and_fts_not_implemented": "This provider only supports vector search. Full text and hybrid modes are not implemented."
+      "hybrid_and_fts_not_implemented": "This provider only supports vector search. Full text and hybrid modes are not implemented.",
+      "inspection_not_implemented": "Vector store inspection is not implemented for this provider."
     },
     "step_question": "1 · Question",
     "step_retrieval": "2 · Retrieval",
@@ -72,6 +73,7 @@
     "keywords_label": "Keywords",
     "keywords_placeholder": "Comma separated",
     "keywords_required": "Full text and hybrid modes require keywords.",
+    "index_not_found": "The recorded index {{indexName}} is no longer available.",
     "condensation_hint": "Condensation is not deterministic: the search sends these values as they are, so a run can be replayed identically.",
     "keywords_manual_hint": "Without condensation no keyword is produced: they have to be typed in.",
     "use_compression": "Apply compression",
@@ -164,7 +166,9 @@
       "absent_from_index": "absent from index",
       "absent_from_index_tooltip": "The two runs target different indexes and this chunk does not exist in the current one: an ingestion problem",
       "outside_fetch_k": "outside top fetch k",
-      "outside_fetch_k_tooltip": "Same index: the chunk still exists but no longer surfaces within the fetched window, a ranking problem"
+      "outside_fetch_k_tooltip": "The chunk still exists but no longer surfaces within the fetched window, a ranking problem",
+      "unknown": "not checked in index",
+      "unknown_tooltip": "The index changed and this chunk was not explicitly checked, so its absence cannot be attributed to ingestion"
     },
     "stable_toggle": "{{count}} stable result(s)",
     "pin_reference_button": "Set as reference",

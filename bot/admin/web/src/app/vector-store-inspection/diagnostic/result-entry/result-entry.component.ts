@@ -35,6 +35,14 @@ export class ResultEntryComponent {
     this.state.togglePin(this.result.chunkId);
   }
 
+  get pinned(): boolean {
+    return this.state.isPinned(this.result.chunkId);
+  }
+
+  get canPin(): boolean {
+    return this.state.canPin(this.result.chunkId);
+  }
+
   get outcomeStatus(): string {
     switch (this.result.outcome) {
       case 'kept':
