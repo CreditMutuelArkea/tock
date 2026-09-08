@@ -117,7 +117,7 @@ open class EventListenerBase : EventListener {
                     logger.warn("Feedback ignored: no action found with id ${event.actionId} in the current dialog.")
                 }
             }
-            return false
+            return true
         }
     }
 

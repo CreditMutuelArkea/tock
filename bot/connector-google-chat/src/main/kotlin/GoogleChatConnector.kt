@@ -144,7 +144,7 @@ class GoogleChatConnector(
                 .messages()
                 .patch(
                     request.messageName,
-                    Message().setAccessoryWidgets(feedback?.acknowledgement(request.vote)),
+                    Message().setAccessoryWidgets(feedback?.acknowledgement(request.vote, request.event.actionId)),
                 ).setUpdateMask("accessoryWidgets")
                 .execute()
         } catch (e: Exception) {

@@ -33,22 +33,23 @@ internal const val GOOGLE_CHAT_FEEDBACK_VOTE_PARAMETER = "TOCK_FEEDBACK_VOTE"
 
 class GoogleChatFeedback(
     private val callbackUrl: String,
-    private val acknowledgementLabel: String,
 ) {
     fun addButtons(
         message: Message,
         actionId: String,
     ): Message = message.setAccessoryWidgets(listOf(buttonsWidget(actionId)))
 
-    fun acknowledgement(vote: FeedbackVote): List<AccessoryWidget> =
+    fun acknowledgement(
+        vote: FeedbackVote,
+        actionId: String,
+    ): List<AccessoryWidget> =
         listOf(
             AccessoryWidget().setButtonList(
                 GoogleAppsCardV1ButtonList().setButtons(
                     listOf(
                         feedbackButton(
                             vote = vote,
-                            actionId = null,
-                            text = acknowledgementLabel,
+                            actionId = actionId,
                             disabled = true,
                         ),
                     ),
@@ -65,13 +66,11 @@ class GoogleChatFeedback(
 
     private fun feedbackButton(
         vote: FeedbackVote,
-        actionId: String?,
-        text: String? = null,
+        actionId: String,
         disabled: Boolean = false,
     ): GoogleAppsCardV1Button {
         val button =
             GoogleAppsCardV1Button()
-                .setText(text)
                 .setAltText(vote.altText)
                 .setDisabled(disabled)
                 .setIcon(
@@ -80,23 +79,20 @@ class GoogleChatFeedback(
                         .setMaterialIcon(GoogleAppsCardV1MaterialIcon().setName(vote.materialIcon)),
                 )
 
-        if (actionId != null) {
-            button.setOnClick(
-                GoogleAppsCardV1OnClick().setAction(
-                    GoogleAppsCardV1Action()
-                        .setFunction(callbackUrl)
-                        .setLoadIndicator("SPINNER")
-                        .setParameters(
-                            listOf(
-                                actionParameter(GOOGLE_CHAT_FEEDBACK_ACTION_PARAMETER, GOOGLE_CHAT_FEEDBACK_ACTION_VALUE),
-                                actionParameter(GOOGLE_CHAT_FEEDBACK_ACTION_ID_PARAMETER, actionId),
-                                actionParameter(GOOGLE_CHAT_FEEDBACK_VOTE_PARAMETER, vote.name),
-                            ),
+        return button.setOnClick(
+            GoogleAppsCardV1OnClick().setAction(
+                GoogleAppsCardV1Action()
+                    .setFunction(callbackUrl)
+                    .setLoadIndicator("SPINNER")
+                    .setParameters(
+                        listOf(
+                            actionParameter(GOOGLE_CHAT_FEEDBACK_ACTION_PARAMETER, GOOGLE_CHAT_FEEDBACK_ACTION_VALUE),
+                            actionParameter(GOOGLE_CHAT_FEEDBACK_ACTION_ID_PARAMETER, actionId),
+                            actionParameter(GOOGLE_CHAT_FEEDBACK_VOTE_PARAMETER, vote.name),
                         ),
-                ),
-            )
-        }
-        return button
+                    ),
+            ),
+        )
     }
 
     private fun actionParameter(
