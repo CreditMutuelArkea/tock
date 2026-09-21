@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@jsverse/transloco';
 import { NbTooltipDirective, NbToastrService } from '@nebular/theme';
 import { Subject, takeUntil } from 'rxjs';
@@ -132,13 +133,22 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
   private readonly botConfiguration = inject(BotConfigurationService);
   private readonly inspection = inject(VectorStoreInspectionService);
   private readonly location = inject(Location);
+  private readonly route = inject(ActivatedRoute);
   private readonly toastrService = inject(NbToastrService);
   private readonly translocoService = inject(TranslocoService);
   private navigationIndexName: string | null = null;
   public readonly state = inject(VectorStoreInspectionStateService);
 
+  /**
+   * Chunk id to pin on entry, handed over through the URL by the knowledge base
+   * retrieval test. Applied once, after the first applyBotContext, since that
+   * reset wipes the pins on the initial bot resolution.
+   */
+  private pendingPinChunkId: string | null = null;
+
   ngOnInit(): void {
     this.applyNavigationState();
+    this.applyRouteParams();
 
     // The list must be fed before the selection, otherwise nb-select cannot
     // match the preselected index against options it does not hold yet.
@@ -196,6 +206,14 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
         this.compressorSettings = null;
       }
 
+      // Applied here rather than in ngOnInit: applyBotContext clears the pins on
+      // the first bot resolution, so pinning earlier would be wiped straight away.
+      if (this.pendingPinChunkId) {
+        const chunkId = this.pendingPinChunkId;
+        this.pendingPinChunkId = null;
+        if (!this.state.isPinned(chunkId)) this.state.togglePin(chunkId);
+      }
+
       // loadIndexes uses its cache unless forced, so re-entering the view with
       // the same bot costs nothing.
       this.state.loadIndexes(botChanged).pipe(takeUntil(this.destroy$)).subscribe();
@@ -233,6 +251,22 @@ export class DiagnosticComponent implements OnInit, OnDestroy {
     if (navigationState.key_words?.length) {
       this.keyWordsInput = navigationState.key_words.join(', ');
     }
+  }
+
+  /**
+   * Pre-fills the form from the knowledge base retrieval test hand-off, which
+   * passes the entry chunk and the tested question in the URL. Unlike the dialog
+   * logger state, these survive a reload, which suits an investigation. The pin
+   * itself is deferred to the bot context (see pendingPinChunkId).
+   */
+  private applyRouteParams(): void {
+    const params = this.route.snapshot.queryParamMap;
+
+    const chunkId = params.get('chunkId');
+    if (chunkId) this.pendingPinChunkId = chunkId;
+
+    const question = params.get('question');
+    if (question && !this.question) this.question = question;
   }
 
   private botKey(confs: BotApplicationConfiguration[]): string | null {
