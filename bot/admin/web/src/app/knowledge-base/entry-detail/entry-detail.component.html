@@ -37,6 +37,10 @@
       size="medium"
       (click)="cancel()"
     >
+      <nb-icon
+        icon="x-lg"
+        class="mr-2"
+      ></nb-icon>
       {{ 'knowledge-base.entry-detail.cancel_button' | transloco }}
     </button>
     <button
@@ -93,15 +97,24 @@
           <div class="field-help text-muted mb-2">{{ 'knowledge-base.entry-detail.hints_help' | transloco }}</div>
 
           <div formArrayName="searchHints">
-            @for (hint of searchHints.controls; track $index) {
+            <!-- track by the control, not $index: tracking a mutated FormArray by index makes
+                 Angular reuse DOM nodes by position and mis-pair inputs with their controls. -->
+            @for (hint of searchHints.controls; track hint; let i = $index) {
             <div class="hint-row">
               <input
                 nbInput
                 fullWidth
                 fieldSize="small"
-                [formControlName]="$index"
-                [placeholder]="'knowledge-base.entry-detail.hint_placeholder' | transloco"
+                [formControlName]="i"
+                [placeholder]="
+                  (isTrailingEmptyHint(i)
+                    ? 'knowledge-base.entry-detail.hint_add_placeholder'
+                    : 'knowledge-base.entry-detail.hint_placeholder'
+                  ) | transloco
+                "
+                (input)="onHintInput(i)"
               />
+              @if (!isTrailingEmptyHint(i)) {
               <button
                 nbButton
                 ghost
@@ -109,28 +122,14 @@
                 size="small"
                 type="button"
                 [nbTooltip]="'knowledge-base.entry-detail.remove_hint_tooltip' | transloco"
-                (click)="removeHint($index)"
+                (click)="removeHint(i)"
               >
                 <nb-icon icon="x-lg"></nb-icon>
               </button>
+              }
             </div>
             }
           </div>
-
-          <button
-            nbButton
-            ghost
-            size="small"
-            type="button"
-            class="mt-1"
-            (click)="addHint()"
-          >
-            <nb-icon
-              icon="plus-lg"
-              class="mr-1"
-            ></nb-icon>
-            {{ 'knowledge-base.entry-detail.add_hint_button' | transloco }}
-          </button>
         </div>
       </nb-card-body>
     </nb-card>
@@ -181,7 +180,6 @@
       <tock-knowledge-base-retrieval-test
         [entryId]="entry?.id ?? null"
         [syncStatus]="syncStatus"
-        [suggestions]="retrievalSuggestions"
         [draft]="!isPublished"
         [dirty]="form.dirty"
       ></tock-knowledge-base-retrieval-test>
@@ -202,8 +200,30 @@
           fullWidth
           formControlName="status"
         >
-          <nb-option [value]="EntryStatus.DRAFT">{{ 'knowledge-base.status_draft' | transloco }}</nb-option>
-          <nb-option [value]="EntryStatus.PUBLISHED">{{ 'knowledge-base.status_published' | transloco }}</nb-option>
+          <nb-select-label>
+            <nb-icon
+              [icon]="isPublished ? 'check-circle-fill' : 'pencil-square'"
+              class="mr-2 status-icon"
+              [class.status-icon--published]="isPublished"
+              [class.status-icon--draft]="!isPublished"
+            ></nb-icon>
+            {{ (isPublished ? 'knowledge-base.status_published' : 'knowledge-base.status_draft') | transloco }}
+          </nb-select-label>
+
+          <nb-option [value]="EntryStatus.DRAFT">
+            <nb-icon
+              icon="pencil-square"
+              class="mr-2 status-icon status-icon--draft"
+            ></nb-icon>
+            {{ 'knowledge-base.status_draft' | transloco }}
+          </nb-option>
+          <nb-option [value]="EntryStatus.PUBLISHED">
+            <nb-icon
+              icon="check-circle-fill"
+              class="mr-2 status-icon status-icon--published"
+            ></nb-icon>
+            {{ 'knowledge-base.status_published' | transloco }}
+          </nb-option>
         </nb-select>
         <div class="field-help text-muted mt-1">
           {{

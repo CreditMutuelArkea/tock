@@ -33,14 +33,15 @@ import {
 
 import { KnowledgeBaseRoutingModule } from './knowledge-base-routing.module';
 import { KnowledgeBaseEntriesBoardComponent } from './entries-board/entries-board.component';
+import { KnowledgeBaseJobProgressComponent } from './entries-board/job-progress/job-progress.component';
 import { KnowledgeBaseSyncBannerComponent } from './entries-board/sync-banner/sync-banner.component';
 import { KnowledgeBaseEntriesImportComponent } from './entries-import/entries-import.component';
 import { KnowledgeBaseEntryDetailComponent } from './entry-detail/entry-detail.component';
 import { KnowledgeBaseRetrievalTestComponent } from './entry-detail/retrieval-test/retrieval-test.component';
 import { KnowledgeBaseMockService } from './services/knowledge-base-mock.service';
+// import { KnowledgeBaseRestService } from './services/knowledge-base-rest.service';
 import { KnowledgeBaseService } from './services/knowledge-base.service';
 import { BotSharedModule } from '../shared/bot-shared.module';
-import { KnowledgeBaseJobProgressComponent } from './entries-board/job-progress/job-progress.component';
 
 @NgModule({
   declarations: [
@@ -74,12 +75,15 @@ import { KnowledgeBaseJobProgressComponent } from './entries-board/job-progress/
     provideTranslocoScope({ scope: 'knowledge-base', alias: 'knowledge-base' }),
 
     // Implementation switch. Components only ever inject the abstract KnowledgeBaseService.
-    // Moving to the real backend is: replace the two lines below with
-    //   { provide: KnowledgeBaseService, useClass: KnowledgeBaseRestService }
-    // The board's demo scenario selector injects KnowledgeBaseMockService optionally, so it
-    // disappears on its own once the mock is no longer provided.
+    //
+    // Mock (current): serves the functional prototype from in-memory seed data.
     KnowledgeBaseMockService,
     { provide: KnowledgeBaseService, useExisting: KnowledgeBaseMockService }
+    //
+    // REST (once the backend endpoints land): replace the two lines above with the line below
+    // and uncomment the import. The board's demo scenario selector injects KnowledgeBaseMockService
+    // optionally, so it disappears on its own once the mock is no longer provided.
+    // { provide: KnowledgeBaseService, useClass: KnowledgeBaseRestService }
   ]
 })
 export class KnowledgeBaseModule {}

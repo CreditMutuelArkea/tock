@@ -100,6 +100,8 @@ Le filtre textuel de l'écran d'exploration ne peut pas rendre ce service : c'es
 
 En complément, une action « ouvrir dans le diagnostic » passe le `chunk_id` en paramètre de route ; le diagnostic l'épingle à l'initialisation et l'utilisateur y accède à l'analyse fine, variation de `k` et de `fetchK`, modes de recherche, compression, comparaison d'exécutions. Le test intégré donne la réponse immédiate, le diagnostic l'investigation.
 
+Le champ de question reste libre, sans formulations proposées. Tester avec l'intitulé ou les termes de rapprochement de l'entrée serait circulaire : ce sont précisément les textes embeddés dans sa ligne, et elle sortirait presque toujours en tête, ce qui donnerait une fausse assurance là où le test devrait alerter. La question utile est celle d'un utilisateur réel, avec ses propres mots. Proposer des questions réelles issues des dialogues ou des échantillons d'évaluation, proches de l'entrée, serait le prolongement naturel ; il suppose un appel serveur et un rapprochement sémantique, et relève des évolutions hors v1.
+
 Deux réserves à connaître. Le test suppose un index : en mode autonome non encore amorcé, l'action est désactivée avec un message explicite. Et tant que la régression RAG v3 sur `compressor_setting` n'est pas corrigée, l'outil d'inspection reflète le comportement **attendu** de la compression et non le runtime réel, écart qu'il faut signaler plutôt que laisser découvrir en recette.
 
 ### 3.5 Import et export

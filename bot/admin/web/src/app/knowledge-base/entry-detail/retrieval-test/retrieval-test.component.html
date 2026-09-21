@@ -90,18 +90,7 @@
       </button>
     </div>
 
-    @if (suggestions.length) {
-    <div class="retrieval-suggestions mb-3">
-      <span class="text-muted mr-1">{{ 'knowledge-base.retrieval-test.suggestions_label' | transloco }}</span>
-      @for (suggestion of suggestions; track suggestion) {
-      <a
-        class="retrieval-suggestion"
-        (click)="useSuggestion(suggestion)"
-        >{{ suggestion }}</a
-      >
-      }
-    </div>
-    } @if (result) {
+    @if (result) {
     <div class="retrieval-result">
       <!-- Headline verdict: this is what the user came for -->
       @if (result.entryRank) {
@@ -111,7 +100,7 @@
           status="success"
           class="mr-2"
         ></nb-icon>
-        {{ 'knowledge-base.retrieval-test.verdict_found' | transloco : { rank: result.entryRank, k: result.k } }}
+        {{ 'knowledge-base.retrieval-test.verdict_found' | transloco: { rank: result.entryRank, k: result.k } }}
       </div>
       } @else {
       <div class="retrieval-verdict retrieval-verdict--missing">
@@ -120,7 +109,7 @@
           status="danger"
           class="mr-2"
         ></nb-icon>
-        {{ 'knowledge-base.retrieval-test.verdict_not_retrieved' | transloco : { k: result.k } }}
+        {{ 'knowledge-base.retrieval-test.verdict_not_retrieved' | transloco: { k: result.k } }}
       </div>
       }
 
@@ -145,7 +134,7 @@
             </div>
             <div class="retrieval-hit-content">{{ hit.content }}</div>
           </div>
-          <div class="retrieval-hit-score">{{ hit.score | number : '1.2-2' }}</div>
+          <div class="retrieval-hit-score">{{ hit.score | number: '1.2-2' }}</div>
         </div>
         }
       </div>

@@ -290,6 +290,215 @@ réutiliser les data classes du client.
 
 ---
 
+## Contrat des endpoints admin
+
+Les routes admin sont le contrat que consomme déjà le service front
+(`knowledge-base-rest.service.ts`), et les corps décrits ici sont ses types
+TypeScript. Les settings (vector store, `EMSetting`, `indexSessionId`) ne
+figurent dans aucun corps : le serveur admin les résout depuis Mongo et les
+injecte dans l'appel orchestrateur. `namespace` et `botId` ne sont pas non plus
+dans les corps, ils viennent de l'URL et de la session.
+
+Convention JSON : `camelCase`, dates en ISO 8601, `null` explicite plutôt que
+champ absent.
+
+### Types partagés
+
+```
+KnowledgeBaseEntry {
+  id            string
+  namespace     string
+  botIds        string[]            // un seul élément en v1
+  title         string              // formulation principale, embeddée
+  searchHints   string[]            // termes de rapprochement, embeddés
+  content       string              // markdown, embeddé
+  sourceUrl     string | null
+  tags          string[]
+  status        "DRAFT" | "PUBLISHED"
+  contentHash   string              // empreinte du contenu projeté
+  projectionState "INDEXED" | "PENDING" | "ORPHAN" | "NONE"   // déduit, non stocké
+  projectedAt   string | null
+  projectedIndexSessionId string | null
+  createdAt     string
+  createdBy     string
+  updatedAt     string | null
+  updatedBy     string | null
+}
+
+EntryPayload = { title, searchHints, content, sourceUrl, tags, status }
+// ce que le studio envoie en création et mise à jour ; le reste est calculé
+// serveur
+
+SyncStatus {
+  indexMode     "NONE" | "TOCK_MANAGED" | "EXTERNAL"
+  indexSessionId string | null
+  indexName     string | null       // résolu serveur, jamais construit par le front
+  embeddingModelKnown boolean        // false si l'index n'a pas été produit par Tock
+  embeddingModel string | null
+  lastProjectionAt string | null
+  counts { total, draft, published, indexed, pending, orphan }   // entiers
+}
+
+Job {
+  id            string
+  type          "SAVE_ENTRY" | "DELETE_ENTRY" | "PUBLISH" | "UNPUBLISH"
+                | "REPAIR_INDEX" | "CREATE_INDEX"
+  state         "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED"
+  startedAt     string
+  endedAt       string | null
+  progress      { total, done, failed }                          // entiers
+  failures      { entryId, title, error }[]                      // échecs par entrée
+  projected     number              // lignes écrites, connu à la fin
+  removed       number              // lignes supprimées, connu à la fin
+  syncStatus    SyncStatus | null   // rempli à la fin, évite un appel de plus
+  error         string | null       // renseigné si state = FAILED
+}
+```
+
+`state = FAILED` désigne la tâche qui n'a pas pu s'exécuter. Un échec **par
+entrée** n'échoue pas la tâche : il alimente `failures`, et les entrées
+concernées restent `PENDING`.
+
+### Entrées
+
+**`GET /entries`** — liste paginée.
+Query params : `start`, `size` (obligatoires), `search`, `status`,
+`projectionState`, `tag`, `sort` (`title` | `updatedAt` | `status`),
+`direction` (`asc` | `desc`). Réponse : `PaginatedResult<KnowledgeBaseEntry>`,
+soit `{ rows, total, start, end }`, aligné sur l'existant.
+
+**`GET /entries/:entryId`** → `KnowledgeBaseEntry`.
+
+**`POST /entries`** — corps `EntryPayload`.
+L'entrée est écrite en base immédiatement ; sa projection est mise en file.
+Réponse :
+
+```
+{ entry: KnowledgeBaseEntry, job: Job }
+```
+
+Le `job` est toujours présent, même sans rien à projeter (brouillon, ou pas
+d'index) : dans ce cas il revient déjà `COMPLETED`. Pas de forme conditionnelle.
+
+**`PUT /entries/:entryId`** — corps `EntryPayload`, même réponse
+`{ entry, job }`.
+
+**`POST /entries/:entryId/delete`** → `Job` (type `DELETE_ENTRY`).
+POST et non DELETE parce qu'un corps de réponse est nécessaire pour porter la
+tâche.
+
+**`GET /tags`** → `string[]`, tags distincts en usage.
+
+### Index et synchronisation
+
+**`GET /sync`** → `SyncStatus`. Détection d'écart de niveau 1 uniquement,
+servie depuis Mongo, jamais d'accès à la base vectorielle.
+
+**`POST /sync`** → `Job` (type `REPAIR_INDEX`). Reprojette les entrées publiées,
+nettoie les lignes orphelines.
+
+**`POST /index`** → `Job` (type `CREATE_INDEX`). Mode autonome : crée la session
+d'index depuis la base de connaissances et projette les entrées publiées.
+
+### Actions en lot et tâches
+
+**`POST /bulk-status`** — corps `{ entryIds: string[], status }` → `Job`
+(type `PUBLISH` ou `UNPUBLISH`).
+
+**`GET /jobs/:jobId`** → `Job`. Interrogé par le front pendant l'exécution.
+
+**`GET /jobs/active`** → `Job | null`. Tâche en cours sur le bot, quelle qu'en
+soit l'origine. Corps vide quand aucune ne tourne (le front mappe vers `null`),
+pas un 404.
+
+### Test de remontée
+
+**`POST /retrieval-test`** — corps `{ question: string, entryId?: string }`.
+Aucun accès neuf à la base vectorielle : la route rejoue la recherche de l'outil
+d'inspection (`/vector-store-inspection/search`) en épinglant le chunk de
+l'entrée (`{entryId}:1/1`), puis mappe le résultat. Réponse :
+
+```
+RetrievalTest {
+  question      string
+  indexSessionId string
+  k             number
+  entryRank     number | null       // rang de l'entrée, null si hors du top k
+  hits {
+    rank        number
+    score       number
+    title       string
+    source      string | null
+    sourceType  "internal_kb" | "document"
+    kbEntryId   string | null       // renseigné si sourceType = internal_kb
+    content     string
+  }[]
+}
+```
+
+### Import et export
+
+**`POST /import/preview`** — corps `{ rows: ImportRow[] }`.
+La lecture et le mapping du fichier sont faits côté studio ; seule la détection
+de doublons contre l'existant a besoin du serveur. Réponse :
+`ImportCandidate[]`.
+
+```
+ImportRow {                         // sortie du parsing front
+  payload       EntryPayload        // status déjà forcé à DRAFT
+  sourceId      string | null
+  issues        string[]            // clés i18n
+  rejected      boolean
+  faqEnabled    boolean | null      // FAQ désactivée, pour tri à l'affichage
+}
+
+ImportCandidate {
+  payload       EntryPayload
+  sourceId      string | null
+  state         "NEW" | "DUPLICATE" | "REJECTED"
+  existingEntryId string | null     // renseigné si DUPLICATE
+  issues        string[]
+  faqEnabled    boolean | null
+}
+```
+
+Détection de doublon sur le titre normalisé (minuscules, espaces compactés).
+
+**`POST /import`** — corps
+`{ candidates: ImportCandidate[], duplicatePolicy: "SKIP" | "UPDATE" | "CREATE" }`.
+Les entrées sont créées **en brouillon**, sans exception. Réponse :
+
+```
+ImportResult {
+  created   number
+  updated   number
+  skipped   number
+  failed    number
+  entryIds  string[]                // créées ou mises à jour, pour publication en lot
+}
+```
+
+L'import écrit des entrées en base, pas dans l'index : il ne déclenche pas de
+tâche. La publication groupée qui suit, elle, passe par `POST /bulk-status`.
+
+**`GET /export`** → `ExportEnvelope`.
+
+```
+ExportEnvelope {
+  format    "tock-knowledge-base"
+  version   1
+  exportedAt string
+  namespace string
+  botId     string
+  entries   ({ ...EntryPayload, sourceId: string | null })[]
+}
+```
+
+Rien de propre à un environnement n'est exporté : ni identifiants internes, ni
+état de projection, ni session d'index.
+
+---
+
 ## Synthèse par effort
 
 | Zone                            | Fichiers     | Nature                                 | Poids       |

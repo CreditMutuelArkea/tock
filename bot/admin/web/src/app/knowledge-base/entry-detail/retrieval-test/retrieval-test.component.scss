@@ -15,24 +15,6 @@
   color: var(--color-warning-default);
 }
 
-.retrieval-suggestions {
-  font-size: 0.75rem;
-}
-
-.retrieval-suggestion {
-  display: inline-block;
-  cursor: pointer;
-  padding: 0.05rem 0.45rem;
-  margin: 0 0.25rem 0.25rem 0;
-  border-radius: 0.75rem;
-  background-color: var(--background-basic-color-3);
-  color: var(--text-hint-color);
-
-  &:hover {
-    color: var(--text-basic-color);
-  }
-}
-
 .retrieval-verdict {
   display: flex;
   align-items: center;

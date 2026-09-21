@@ -75,7 +75,6 @@
     "hints_label": "Termes de rapprochement",
     "hints_help": "Facultatif. Autres formulations, synonymes, mots-clés : tout ce qui aide l'entrée à être retrouvée. Ces termes sont indexés avec le contenu. Quelques-uns suffisent, une liste trop longue dilue la recherche.",
     "hint_placeholder": "Une autre formulation, un synonyme, un mot-clé",
-    "add_hint_button": "Ajouter un terme",
     "remove_hint_tooltip": "Supprimer ce terme",
     "content_label": "Contenu",
     "content_placeholder": "Le contenu de l'entrée, en markdown",
@@ -114,14 +113,14 @@
     "created_by": "Créée par",
     "updated_by": "Modifiée par",
     "discard_title": "Abandonner les modifications",
-    "discard_subtitle": "Les modifications en cours seront perdues."
+    "discard_subtitle": "Les modifications en cours seront perdues.",
+    "hint_add_placeholder": "Ajouter une formulation, un synonyme, un mot-clé"
   },
   "retrieval-test": {
     "title": "Tester la recherche",
     "help": "Vérifie si cette entrée serait récupérée pour une question donnée, et à quel rang. Sans cela, l'optimisation d'une entrée se fait à l'aveugle.",
     "question_placeholder": "Une question telle qu'un utilisateur la poserait",
     "run_button": "Tester",
-    "suggestions_label": "Utiliser :",
     "unavailable_no_index": "Aucun index n'est configuré pour ce bot : la recherche ne peut pas être testée.",
     "unavailable_not_saved": "Enregistrez l'entrée pour pouvoir tester sa remontée.",
     "draft_notice": "Cette entrée est un brouillon : elle n'est pas dans l'index et ne remontera pas.",

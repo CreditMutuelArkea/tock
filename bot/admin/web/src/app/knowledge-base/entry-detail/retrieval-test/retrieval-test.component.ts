@@ -53,8 +53,6 @@ export class KnowledgeBaseRetrievalTestComponent implements OnDestroy {
   /** Null while the entry has not been created yet. */
   @Input() entryId: string | null = null;
   @Input() syncStatus: KnowledgeBaseSyncStatus;
-  /** Question and variants currently typed in the form, offered as one click shortcuts. */
-  @Input() suggestions: string[] = [];
   /** True when the entry being edited is a draft, hence absent from the index. */
   @Input() draft: boolean = false;
   /** True when the form holds unsaved changes. */
@@ -81,10 +79,6 @@ export class KnowledgeBaseRetrievalTestComponent implements OnDestroy {
 
   get canRun(): boolean {
     return this.available && !this.running && !!this.questionControl.value?.trim();
-  }
-
-  useSuggestion(suggestion: string): void {
-    this.questionControl.setValue(suggestion);
   }
 
   run(): void {

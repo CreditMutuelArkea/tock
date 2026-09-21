@@ -79,8 +79,8 @@ export class KnowledgeBaseEntryDetailComponent implements OnInit, OnDestroy {
     // The title carries the primary phrasing of the entry. It plays the role a question would
     // in a FAQ, without imposing the question / answer dichotomy.
     title: new FormControl<string>('', [Validators.required, Validators.maxLength(300)]),
-    // One empty row by default, a "+" button adds more. Rows left empty are dropped on save,
-    // so hints stay optional without forcing the user to delete the default row.
+    // A trailing empty input is always kept under the filled ones (see ensureTrailingEmptyHint).
+    // Rows left empty are dropped on save, so hints stay optional.
     searchHints: new FormArray<FormControl<string>>([new FormControl<string>('', { nonNullable: true })]),
     content: new FormControl<string>('', [Validators.required]),
     sourceUrl: new FormControl<string | null>(null, [Validators.pattern(/^https?:\/\/.+/)]),
@@ -114,13 +114,6 @@ export class KnowledgeBaseEntryDetailComponent implements OnInit, OnDestroy {
 
   get isPublished(): boolean {
     return this.form.controls.status.value === KnowledgeBaseEntryStatus.PUBLISHED;
-  }
-
-  /** Title and non empty hints, offered as shortcuts in the retrieval test. */
-  get retrievalSuggestions(): string[] {
-    return [this.title.value, ...this.searchHints.controls.map((control) => control.value)]
-      .map((value) => (value ?? '').trim())
-      .filter((value) => value.length > 0);
   }
 
   ngOnInit(): void {
@@ -173,23 +166,59 @@ export class KnowledgeBaseEntryDetailComponent implements OnInit, OnDestroy {
       status: entry.status
     });
 
-    this.searchHints.clear();
-    const hints = entry.searchHints.length ? entry.searchHints : [''];
-    hints.forEach((hint) => this.searchHints.push(new FormControl<string>(hint, { nonNullable: true })));
+    // Only filled terms are laid out, ahead of the single trailing input used to add one.
+    this.searchHints.clear({ emitEvent: false });
+    entry.searchHints
+      .filter((hint) => hint.trim().length)
+      .forEach((hint) => this.searchHints.push(new FormControl<string>(hint, { nonNullable: true }), { emitEvent: false }));
+    this.ensureTrailingEmptyHint();
 
     this.form.markAsPristine();
   }
 
-  // ---------------------------------------------------------------- Variants
+  // ----------------------------------------------------------------
+  // Matching terms: filled inputs first, then a single empty one to add a new term, as
+  // elsewhere in the app. Typing into that trailing input makes a fresh empty one appear
+  // under it, so there is no "add" button. Empty rows are dropped on save. The list grows on
+  // real user input only (onHintInput), never from a subscription, so the programmatic
+  // rebuild in patchForm cannot trigger it.
+  // ----------------------------------------------------------------
 
-  addHint(): void {
-    this.searchHints.push(new FormControl<string>('', { nonNullable: true }));
-    this.form.markAsDirty();
+  /** Adds the single trailing empty input, once, after the filled terms. */
+  private ensureTrailingEmptyHint(): void {
+    const last = this.searchHints.at(this.searchHints.length - 1);
+    if (!last || last.value.trim().length) {
+      this.searchHints.push(new FormControl<string>('', { nonNullable: true }), { emitEvent: false });
+    }
+  }
+
+  private isEmptyHint(index: number): boolean {
+    return !this.searchHints.at(index).value.trim().length;
+  }
+
+  /**
+   * Called from the template when a hint input changes. Growing the list only on real user
+   * input — never from a valueChanges subscription — avoids reacting to the programmatic
+   * rebuild done in patchForm.
+   */
+  onHintInput(index: number): void {
+    // Typing into the trailing input turns it into a filled term: add a new empty one under it.
+    if (index === this.searchHints.length - 1 && this.searchHints.at(index).value.trim().length) {
+      this.searchHints.push(new FormControl<string>('', { nonNullable: true }), { emitEvent: false });
+    }
+  }
+
+  isTrailingEmptyHint(index: number): boolean {
+    return index === this.searchHints.length - 1 && this.isEmptyHint(index);
   }
 
   removeHint(index: number): void {
     this.searchHints.removeAt(index);
-    if (!this.searchHints.length) this.addHint();
+    // Guard against ending on two empty inputs after removing a filled term above the trailing one.
+    if (this.searchHints.length >= 2 && this.isEmptyHint(this.searchHints.length - 1) && this.isEmptyHint(this.searchHints.length - 2)) {
+      this.searchHints.removeAt(this.searchHints.length - 1);
+    }
+    this.ensureTrailingEmptyHint();
     this.form.markAsDirty();
   }
 

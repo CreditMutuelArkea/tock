@@ -112,3 +112,18 @@
     margin-top: 0.3rem;
   }
 }
+
+.status-icon {
+  vertical-align: -0.125em;
+
+  // Nebular's select button forces its own text colour on the projected label, icon included.
+  // Explicit classes rather than the nb-icon status binding, and !important to win over it.
+  // The icon lives in this component's template, so encapsulated styles reach it with no ::ng-deep.
+  &--published {
+    color: var(--color-success-default) !important;
+  }
+
+  &--draft {
+    color: var(--color-warning-default) !important;
+  }
+}

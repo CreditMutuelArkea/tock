@@ -75,7 +75,6 @@
     "hints_label": "Matching terms",
     "hints_help": "Optional. Other phrasings, synonyms, keywords: anything that helps the entry be found. They are indexed along with the content. A few are enough, a long list dilutes the search.",
     "hint_placeholder": "Another phrasing, a synonym, a keyword",
-    "add_hint_button": "Add a term",
     "remove_hint_tooltip": "Remove this term",
     "content_label": "Content",
     "content_placeholder": "The content of the entry, in markdown",
@@ -114,14 +113,14 @@
     "created_by": "Created by",
     "updated_by": "Updated by",
     "discard_title": "Discard changes",
-    "discard_subtitle": "Pending changes will be lost."
+    "discard_subtitle": "Pending changes will be lost.",
+    "hint_add_placeholder": "Add a phrasing, a synonym, a keyword"
   },
   "retrieval-test": {
     "title": "Test retrieval",
     "help": "Checks whether this entry would be retrieved for a given question, and at what rank. Without it, tuning an entry is guesswork.",
     "question_placeholder": "A question as a user would ask it",
     "run_button": "Test",
-    "suggestions_label": "Use:",
     "unavailable_no_index": "No index is configured for this bot: retrieval cannot be tested.",
     "unavailable_not_saved": "Save the entry to test its retrieval.",
     "draft_notice": "This entry is a draft: it is not in the index and will not be retrieved.",
